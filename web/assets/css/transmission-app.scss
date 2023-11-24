@@ -1,28 +1,3 @@
-// Colors related to torrent status
-$blue-100: #51b3f7;
-$blue-200: #357aaa;
-$blue-300: #2c7fea;
-$blue-400: #1847d4;
-$green-100: #26aa55;
-$green-300: #7cef99;
-$green-400: #67c87f;
-$green-500: #34dc70;
-$grey-200: #e1e4e8;
-$grey-500: #828282;
-$grey-900: #191919;
-$red-500: #d73a49;
-$white: #fff;
-$black: #000;
-$dark-mode-white: #c9d1d9;
-$yellow-300: #ffea7f;
-$grey-40: #666;
-$nice-grey: #f8f8f8;
-$dark-mode-black: #121212;
-$default-accent-color-dark: #0c2d6b;
-$default-border-dark: #575757;
-$default-border-light: #aeaeae;
-$default-tinted: rgba(128, 128, 144, 0.125);
-
 // Z-INDEX ENUM
 // $z-index-progressbar: 1;
 $z-index-popup: 2;
@@ -55,140 +30,163 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   }
 }
 
-/// GLOBAL
-
 :root {
   --pauseresume-size: 20px;
   --dialog-padding: 20px;
   --dialog-logo-padding: calc(var(--dialog-padding) * 0.66);
 
+  /* colors related to torrent status */
+  --blue-100: #51b3f7;
+  --blue-200: #357aaa;
+  --blue-300: #2c7fea;
+  --blue-400: #1847d4;
+  --green-100: #26aa55;
+  --green-300: #7cef99;
+  --green-400: #67c87f;
+  --green-500: #34dc70;
+  --grey-200: #e1e4e8;
+  --grey-500: #828282;
+  --grey-900: #191919;
+  --red-500: #d73a49;
+  --white: #fff;
+  --black: #000;
+  --dark-mode-white: #c9d1d9;
+  --yellow-300: #ffea7f;
+  --grey-40: #666;
+  --nice-grey: #f8f8f8;
+  --dark-mode-black: #121212;
+  --default-accent-color-dark: #0c2d6b;
+  --default-border-dark: #575757;
+  --default-border-light: #aeaeae;
+  --default-tinted: rgba(128, 128, 144, 0.125);
+
   --progress: 100%;
-  --color-fg-error: #{$red-500};
-  --color-fg-port-closed: #{$red-500};
-  --color-fg-port-open: #{$green-100};
-  --color-progressbar-background-2: #{$green-400};
-  --color-progressbar-verify: #{$yellow-300};
-  --color-progressbar-magnet: #{$yellow-300};
-  --color-progressbar-paused: #{$grey-200};
-  --color-progressbar-leech: #{$blue-200};
-  --color-progressbar-queued: #{$blue-400};
-  --color-bg-even: #{$default-tinted};
-  --color-toolbar-background: #{$default-tinted};
-  --color-bg-tabs: #{$default-tinted};
+  --color-fg-error: var(--red-500);
+  --color-fg-port-closed: var(--red-500);
+  --color-fg-port-open: var(--green-100);
+  --color-progressbar-background-2: var(--green-400);
+  --color-progressbar-verify: var(--yellow-300);
+  --color-progressbar-magnet: var(--yellow-300);
+  --color-progressbar-paused: var(--grey-200);
+  --color-progressbar-leech: var(--blue-200);
+  --color-progressbar-queued: var(--blue-400);
+  --color-bg-even: var(--default-tinted);
+  --color-toolbar-background: var(--default-tinted);
+  --color-bg-tabs: var(--default-tinted);
 
   color-scheme: light dark;
 
   @media (prefers-color-scheme: dark) {
-    --color-bg-odd: #{$black};
-    --color-bg-primary: #{$black};
-    --color-bg-popup: #{$black};
-    --color-bg-hover: #{$grey-40};
-    --color-fg-primary: #{$dark-mode-white};
-    --color-fg-secondary: #{$nice-grey};
-    --color-fg-on-popup: #{$nice-grey};
+    --color-bg-odd: var(--black);
+    --color-bg-primary: var(--black);
+    --color-bg-popup: var(--black);
+    --color-bg-hover: var(--grey-40);
+    --color-fg-primary: var(--dark-mode-white);
+    --color-fg-secondary: var(--nice-grey);
+    --color-fg-on-popup: var(--nice-grey);
     --color-fg-disabled: #808088;
     --color-bg-warn: #cf6679;
-    --color-fg-warn: #{$dark-mode-black};
-    --color-border: #{$dark-mode-white};
-    --color-border-selected: #{$grey-500};
-    --color-fg-tertiary: #{$grey-500};
-    --color-bg-selected: #{$default-accent-color-dark};
-    --color-default-border: #{$default-border-dark};
-    --color-progressbar-seed-1: #{$green-100};
-    --color-progressbar-seed-2: #{$green-400};
-    --color-progressbar-paused: #{$grey-500};
-    --color-progressbar-leech: #{$blue-200};
-    --color-progressbar-seed-paused: #{$grey-500};
+    --color-fg-warn: var(--dark-mode-black);
+    --color-border: var(--dark-mode-white);
+    --color-border-selected: var(--grey-500);
+    --color-fg-tertiary: var(--grey-500);
+    --color-bg-selected: var(--default-accent-color-dark);
+    --color-default-border: var(--default-border-dark);
+    --color-progressbar-seed-1: var(--green-100);
+    --color-progressbar-seed-2: var(--green-400);
+    --color-progressbar-paused: var(--grey-500);
+    --color-progressbar-leech: var(--blue-200);
+    --color-progressbar-seed-paused: var(--grey-500);
 
     .contrast-more {
-      --color-fg-error: #{$red-500};
-      --color-fg-port-closed: #{$red-500};
-      --color-fg-port-open: #{$green-100};
-      --color-bg-hover: #{$grey-40};
-      --color-fg-primary: #{$white};
-      --color-bg-even: #{$black};
-      --color-fg-secondary: #{$white};
-      --color-fg-on-popup: #{$white};
-      --color-fg-disabled: #{$white};
+      --color-fg-error: var(--red-500);
+      --color-fg-port-closed: var(--red-500);
+      --color-fg-port-open: var(--green-100);
+      --color-bg-hover: var(--grey-40);
+      --color-fg-primary: var(--white);
+      --color-bg-even: var(--black);
+      --color-fg-secondary: var(--white);
+      --color-fg-on-popup: var(--white);
+      --color-fg-disabled: var(--white);
       --color-bg-warn: #cf6679;
-      --color-fg-warn: #{$black};
-      --color-border: #{$white};
-      --color-border-selected: #{$white};
-      --color-fg-tertiary: #{$white};
-      --color-toolbar-background: #{$black};
-      --color-bg-selected: #{$blue-300};
-      --color-bg-tabs: #{$black};
-      --color-fg-tabs: #{$white};
-      --color-default-border: #{$white};
-      --color-progressbar-seed-1: #{$black};
-      --color-progressbar-seed-2: #{$white};
-      --color-progressbar-seed-paused: #{$grey-500};
-      --color-progressbar-background-2: #{$white};
-      --color-progressbar-verify: #{$yellow-300};
-      --color-progressbar-magnet: #{$yellow-300};
-      --color-progressbar-paused: #{$grey-500};
-      --color-progressbar-leech: #{$blue-200};
-      --color-progressbar-queued: #{$blue-400};
+      --color-fg-warn: var(--black);
+      --color-border: var(--white);
+      --color-border-selected: var(--white);
+      --color-fg-tertiary: var(--white);
+      --color-toolbar-background: var(--black);
+      --color-bg-selected: var(--blue-300);
+      --color-bg-tabs: var(--black);
+      --color-fg-tabs: var(--white);
+      --color-default-border: var(--white);
+      --color-progressbar-seed-1: var(--black);
+      --color-progressbar-seed-2: var(--white);
+      --color-progressbar-seed-paused: var(--grey-500);
+      --color-progressbar-background-2: var(--white);
+      --color-progressbar-verify: var(--yellow-300);
+      --color-progressbar-magnet: var(--yellow-300);
+      --color-progressbar-paused: var(--grey-500);
+      --color-progressbar-leech: var(--blue-200);
+      --color-progressbar-queued: var(--blue-400);
     }
   }
   @media (prefers-color-scheme: light) {
-    --color-bg-odd: #{$white};
-    --color-bg-primary: #{$white};
-    --color-bg-popup: #{$white};
-    --color-fg-error: #{$red-500};
-    --color-fg-port-closed: #{$red-500};
-    --color-fg-port-open: #{$green-400};
-    --color-progressbar-verify: #{$yellow-300};
-    --color-progressbar-magnet: #{$yellow-300};
-    --color-progressbar-paused: #{$grey-200};
-    --color-progressbar-leech: #{$blue-100};
-    --color-progressbar-queued: #{$blue-400};
-    --color-bg-hover: #{$nice-grey};
+    --color-bg-odd: var(--white);
+    --color-bg-primary: var(--white);
+    --color-bg-popup: var(--white);
+    --color-fg-error: var(--red-500);
+    --color-fg-port-closed: var(--red-500);
+    --color-fg-port-open: var(--green-400);
+    --color-progressbar-verify: var(--yellow-300);
+    --color-progressbar-magnet: var(--yellow-300);
+    --color-progressbar-paused: var(--grey-200);
+    --color-progressbar-leech: var(--blue-100);
+    --color-progressbar-queued: var(--blue-400);
+    --color-bg-hover: var(--nice-grey);
     --color-fg-primary: #404040;
-    --color-fg-on-popup: #{$grey-900};
-    --color-fg-secondary: #{$grey-500};
-    --color-border: #{$grey-500};
+    --color-fg-on-popup: var(--grey-900);
+    --color-fg-secondary: var(--grey-500);
+    --color-border: var(--grey-500);
     --color-border-selected: #d0d7de;
-    --color-fg-tertiary: #{$grey-500};
+    --color-fg-tertiary: var(--grey-500);
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
-    --color-fg-disabled: #{$grey-500};
-    --color-bg-selected: #{$blue-300};
-    --color-default-border: #{$default-border-light};
-    --color-dialog-border: #{$nice-grey};
-    --color-progressbar-seed-1: #{$green-500};
-    --color-progressbar-seed-2: #{$green-300};
-    --color-progressbar-seed-paused: #{$grey-200};
+    --color-fg-disabled: var(--grey-500);
+    --color-bg-selected: var(--blue-300);
+    --color-default-border: var(--default-border-light);
+    --color-dialog-border: var(--nice-grey);
+    --color-progressbar-seed-1: var(--green-500);
+    --color-progressbar-seed-2: var(--green-300);
+    --color-progressbar-seed-paused: var(--grey-200);
 
     .contrast-more {
-      --color-fg-error: #{$red-500};
-      --color-fg-port-closed: #{$red-500};
-      --color-fg-port-open: #{$green-400};
-      --color-bg-hover: #{$grey-40};
-      --color-fg-primary: #{$black};
-      --color-bg-even: #{$white};
-      --color-fg-secondary: #{$black};
-      --color-fg-on-popup: #{$black};
-      --color-fg-disabled: #{$black};
+      --color-fg-error: var(--red-500);
+      --color-fg-port-closed: var(--red-500);
+      --color-fg-port-open: var(--green-400);
+      --color-bg-hover: var(--grey-40);
+      --color-fg-primary: var(--black);
+      --color-bg-even: var(--white);
+      --color-fg-secondary: var(--black);
+      --color-fg-on-popup: var(--black);
+      --color-fg-disabled: var(--black);
       --color-bg-warn: #cf6679;
-      --color-fg-warn: #{$white};
-      --color-border: #{$black};
-      --color-border-selected: #{$black};
-      --color-fg-tertiary: #{$black};
-      --color-toolbar-background: #{$white};
-      --color-bg-selected: #{$blue-300};
-      --color-bg-tabs: #{$white};
-      --color-fg-tabs: #{$black};
-      --color-default-border: #{$black};
-      --color-progressbar-seed-1: #{$black};
-      --color-progressbar-seed-2: #{$white};
-      --color-progressbar-seed-paused: #{$grey-500};
-      --color-progressbar-background-2: #{$white};
-      --color-progressbar-verify: #{$yellow-300};
-      --color-progressbar-magnet: #{$yellow-300};
-      --color-progressbar-paused: #{$grey-500};
-      --color-progressbar-leech: #{$blue-200};
-      --color-progressbar-queued: #{$blue-400};
+      --color-fg-warn: var(--white);
+      --color-border: var(--black);
+      --color-border-selected: var(--black);
+      --color-fg-tertiary: var(--black);
+      --color-toolbar-background: var(--white);
+      --color-bg-selected: var(--blue-300);
+      --color-bg-tabs: var(--white);
+      --color-fg-tabs: var(--black);
+      --color-default-border: var(--black);
+      --color-progressbar-seed-1: var(--black);
+      --color-progressbar-seed-2: var(--white);
+      --color-progressbar-seed-paused: var(--grey-500);
+      --color-progressbar-background-2: var(--white);
+      --color-progressbar-verify: var(--yellow-300);
+      --color-progressbar-magnet: var(--yellow-300);
+      --color-progressbar-paused: var(--grey-500);
+      --color-progressbar-leech: var(--blue-200);
+      --color-progressbar-queued: var(--blue-400);
     }
   }
 }
@@ -405,7 +403,7 @@ $popup-top: 51px; // TODO: ugly that this is hardcoded
 }
 
 .torrent-container {
-  background-color: $white;
+  background-color: var(--white);
 }
 
 $app-image: '../img/box.svg';
