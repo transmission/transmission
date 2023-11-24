@@ -1133,54 +1133,6 @@ namespace
 {
 namespace location_helpers
 {
-void setLocationInSessionThread(tr_torrent* tor, std::string const& path, bool move_from_old_path, int volatile* setme_state)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->session->am_in_session_thread());
-
-    auto ok = bool{ true };
-    if (move_from_old_path)
-    {
-        if (setme_state != nullptr)
-        {
-            *setme_state = TR_LOC_MOVING;
-        }
-
-        // ensure the files are all closed and idle before moving
-        tor->session->closeTorrentFiles(tor);
-        tor->session->verify_remove(tor);
-
-        auto error = tr_error{};
-        ok = tor->metainfo_.files().move(tor->current_dir(), path, tor->name(), &error);
-        if (error)
-        {
-            tor->error().set_local_error(fmt::format(
-                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
-                fmt::arg("old_path", tor->current_dir()),
-                fmt::arg("path", path),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
-            tr_torrentStop(tor);
-        }
-    }
-
-    // tell the torrent where the files are
-    if (ok)
-    {
-        tor->set_download_dir(path);
-
-        if (move_from_old_path)
-        {
-            tor->incomplete_dir_.clear();
-            tor->current_dir_ = tor->download_dir();
-        }
-    }
-
-    if (setme_state != nullptr)
-    {
-        *setme_state = ok ? TR_LOC_DONE : TR_LOC_ERROR;
-    }
-}
 size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 {
     auto* walk = paths;
@@ -1200,6 +1152,54 @@ size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 } // namespace location_helpers
 } // namespace
 
+void tr_torrent::set_location_in_session_thread(std::string_view const path, bool move_from_old_path, int volatile* setme_state)
+{
+    TR_ASSERT(session->am_in_session_thread());
+
+    auto ok = bool{ true };
+    if (move_from_old_path)
+    {
+        if (setme_state != nullptr)
+        {
+            *setme_state = TR_LOC_MOVING;
+        }
+
+        // ensure the files are all closed and idle before moving
+        session->closeTorrentFiles(this);
+        session->verify_remove(this);
+
+        auto error = tr_error{};
+        ok = metainfo_.files().move(current_dir(), path, name(), &error);
+        if (error)
+        {
+            this->error().set_local_error(fmt::format(
+                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", current_dir()),
+                fmt::arg("path", path),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
+            tr_torrentStop(this);
+        }
+    }
+
+    // tell the torrent where the files are
+    if (ok)
+    {
+        set_download_dir(path);
+
+        if (move_from_old_path)
+        {
+            incomplete_dir_.clear();
+            current_dir_ = download_dir();
+        }
+    }
+
+    if (setme_state != nullptr)
+    {
+        *setme_state = ok ? TR_LOC_DONE : TR_LOC_ERROR;
+    }
+}
+
 void tr_torrent::set_location(std::string_view location, bool move_from_old_path, int volatile* setme_state)
 {
     using namespace location_helpers;
@@ -1209,8 +1209,8 @@ void tr_torrent::set_location(std::string_view location, bool move_from_old_path
         *setme_state = TR_LOC_MOVING;
     }
 
-    this->session
-        ->runInSessionThread(setLocationInSessionThread, this, std::string{ location }, move_from_old_path, setme_state);
+    session->runInSessionThread([this, loc = std::string(location), move_from_old_path, setme_state]()
+                                { set_location_in_session_thread(loc, move_from_old_path, setme_state); });
 }
 
 void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from_old_path, int volatile* setme_state)
@@ -2662,4 +2662,26 @@ time_t tr_torrent::ResumeHelper::seconds_seeding(time_t now) const noexcept
 void tr_torrent::ResumeHelper::load_seconds_seeding_before_current_start(time_t when) noexcept
 {
     tor_.seconds_seeding_before_current_start_ = when;
+}
+
+// ---
+
+void tr_torrent::ResumeHelper::load_download_dir(std::string_view const dir) noexcept
+{
+    bool const is_current_dir = tor_.current_dir_ == tor_.download_dir_;
+    tor_.download_dir_ = dir;
+    if (is_current_dir)
+    {
+        tor_.current_dir_ = tor_.download_dir_;
+    }
+}
+
+void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) noexcept
+{
+    bool const is_current_dir = tor_.current_dir_ == tor_.incomplete_dir_;
+    tor_.incomplete_dir_ = dir;
+    if (is_current_dir)
+    {
+        tor_.current_dir_ = tor_.incomplete_dir_;
+    }
 }

@@ -91,6 +91,8 @@ struct tr_torrent final : public tr_completion::torrent_view
     public:
         void load_date_added(time_t when) noexcept;
         void load_date_done(time_t when) noexcept;
+        void load_download_dir(std::string_view dir) noexcept;
+        void load_incomplete_dir(std::string_view dir) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
@@ -1006,17 +1008,6 @@ public:
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
 
-    // Where the files are when the torrent is complete.
-    tr_interned_string download_dir_;
-
-    // Where the files are when the torrent is incomplete.
-    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
-    tr_interned_string incomplete_dir_;
-
-    // Where the files are now.
-    // Will equal either download_dir or incomplete_dir
-    tr_interned_string current_dir_;
-
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
     CumulativeCount bytes_uploaded_;
@@ -1057,6 +1048,7 @@ private:
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
     friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+    friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
     friend void tr_torrentStop(tr_torrent* tor);
     friend void tr_torrentVerify(tr_torrent* tor);
 
@@ -1255,6 +1247,8 @@ private:
     void on_metainfo_updated();
     void on_metainfo_completed();
 
+    void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
+
     void stop_now();
 
     [[nodiscard]] bool is_new_torrent_a_seed();
@@ -1268,6 +1262,17 @@ private:
     labels_t labels_;
 
     tr_interned_string bandwidth_group_;
+
+    // Where the files are when the torrent is complete.
+    tr_interned_string download_dir_;
+
+    // Where the files are when the torrent is incomplete.
+    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
+    tr_interned_string incomplete_dir_;
+
+    // Where the files are now.
+    // Will equal either download_dir or incomplete_dir
+    tr_interned_string current_dir_;
 
     tr_sha1_digest_t obfuscated_hash_ = {};
 

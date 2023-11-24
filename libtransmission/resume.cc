@@ -662,26 +662,14 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
     if ((fields_to_load & (tr_resume::Progress | tr_resume::DownloadDir)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->current_dir() == tor->download_dir();
-        tor->download_dir_ = sv;
-        if (is_current_dir)
-        {
-            tor->current_dir_ = sv;
-        }
-
+        helper.load_download_dir(sv);
         fields_loaded |= tr_resume::DownloadDir;
     }
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->current_dir() == tor->incomplete_dir();
-        tor->incomplete_dir_ = sv;
-        if (is_current_dir)
-        {
-            tor->current_dir_ = sv;
-        }
-
+        helper.load_incomplete_dir(sv);
         fields_loaded |= tr_resume::IncompleteDir;
     }
 
@@ -815,7 +803,12 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
     return fields_loaded;
 }
 
-auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor, tr_ctorMode mode)
+auto setFromCtor(
+    tr_torrent* tor,
+    tr_torrent::ResumeHelper& helper,
+    tr_resume::fields_t fields,
+    tr_ctor const* ctor,
+    tr_ctorMode mode)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -839,21 +832,21 @@ auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* cto
         if (tr_ctorGetDownloadDir(ctor, mode, &path) && !tr_str_is_empty(path))
         {
             ret |= tr_resume::DownloadDir;
-            tor->download_dir_ = path;
+            helper.load_download_dir(path);
         }
     }
 
     return ret;
 }
 
-auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+auto useMandatoryFields(tr_torrent* tor, tr_torrent::ResumeHelper& helper, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
-    return setFromCtor(tor, fields, ctor, TR_FORCE);
+    return setFromCtor(tor, helper, fields, ctor, TR_FORCE);
 }
 
-auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+auto useFallbackFields(tr_torrent* tor, tr_torrent::ResumeHelper& helper, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
-    return setFromCtor(tor, fields, ctor, TR_FALLBACK);
+    return setFromCtor(tor, helper, fields, ctor, TR_FALLBACK);
 }
 } // namespace
 
@@ -863,11 +856,11 @@ fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields
 
     auto ret = fields_t{};
 
-    ret |= useMandatoryFields(tor, fields_to_load, ctor);
+    ret |= useMandatoryFields(tor, helper, fields_to_load, ctor);
     fields_to_load &= ~ret;
     ret |= loadFromFile(tor, helper, fields_to_load);
     fields_to_load &= ~ret;
-    ret |= useFallbackFields(tor, fields_to_load, ctor);
+    ret |= useFallbackFields(tor, helper, fields_to_load, ctor);
 
     return ret;
 }
