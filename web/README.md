@@ -2,19 +2,19 @@
 
 A web interface is built into all Transmission flavors, enabling them to be controlled remotely.
 
-## Building Without Node
+## Notes for Packagers
 
-Transmission includes a prebuilt webapp bundle in its releases because
-the bundling tools are not easy to install on all of the target platforms
-that Transmission supports.
+### Building Without Node
 
-Debian has understandable security concerns about shipping prebuilt
-bundles and would prefer to generate the bundle itself without requiring
-a network connection (e.g. for `npm install`). Unfortunately, this is
-problematic due to some `devDependencies` that aren't available as Debian
-packages.
+Transmission includes a prebuilt webapp bundle in its releases. This is
+done because it's not easy to install the bundling tools on all of the
+platforms that Transmission supports. Debian can't use this prebuilt
+bundle due to its (understandable) policies that require building from
+source. Unfortunately, building with `node run build` is also problematic
+because of some of `package.json`'s `devDependencies` aren't available as
+Debian packages.
 
-Follow these steps to build webapp on Debian without Node.js:
+Follow these steps to build the webapp from source on Debian without Node:
 
 ```sh
 $ sudo apt install rsass perl esbuild
