@@ -411,29 +411,6 @@ a {
   background-color: var(--white);
 }
 
-@mixin mime-icon($mime-icon-url) {
-  background-color: var(--color-fg-primary);
-  -webkit-mask-image: $mime-icon-url;
-  -webkit-mask-repeat: no-repeat;
-  mask-image: $mime-icon-url;
-  mask-repeat: no-repeat;
-
-  &[data-icon-multifile='true'] {
-    -webkit-mask-image: $mime-icon-url, var(--folder-image-url);
-    -webkit-mask-position:
-      top left,
-      bottom right;
-    -webkit-mask-repeat: no-repeat, no-repeat;
-    -webkit-mask-size: 16px, 16px;
-    mask-image: $mime-icon-url, var(--folder-image-url);
-    mask-position:
-      top left,
-      bottom right;
-    mask-repeat: no-repeat, no-repeat;
-    mask-size: 16px, 16px;
-  }
-}
-
 .torrent-list {
   cursor: pointer;
   list-style-type: none;
@@ -461,33 +438,52 @@ a {
       background-position:
         center,
         top left;
+      -webkit-mask-image: var(--mime-icon-url);
+      -webkit-mask-repeat: no-repeat;
+      mask-image: var(--mime-icon-url);
+      mask-repeat: no-repeat;
+
+      &[data-icon-multifile='true'] {
+        -webkit-mask-image: var(--mime-icon-url), var(--folder-image-url);
+        -webkit-mask-position:
+          top left,
+          bottom right;
+        -webkit-mask-repeat: no-repeat, no-repeat;
+        -webkit-mask-size: 16px, 16px;
+        mask-image: var(--mime-icon-url), var(--folder-image-url);
+        mask-position:
+          top left,
+          bottom right;
+        mask-repeat: no-repeat, no-repeat;
+        mask-size: 16px, 16px;
+      }
 
       &[data-icon-mime-type='audio'] {
-        @include mime-icon(var(--audio-image-url));
+        --mime-icon-url: var(--audio-image-url);
       }
 
       &[data-icon-mime-type='application'] {
-        @include mime-icon(var(--app-image-url));
+        --mime-icon-url: var(--app-image-url);
       }
 
       &[data-icon-mime-type='font'] {
-        @include mime-icon(var(--font-image-url));
+        --mime-icon-url: var(--font-image-url);
       }
 
       &[data-icon-mime-type='image'] {
-        @include mime-icon(var(--image-image-url));
+        --mime-icon-url: var(--image-image-url);
       }
 
       &[data-icon-mime-type='model'] {
-        @include mime-icon(var(--package-image-url));
+        --mime-icon-url: var(--package-image-url);
       }
 
       &[data-icon-mime-type='text'] {
-        @include mime-icon(var(--text-image-url));
+        --mime-icon-url: var(--text-image-url);
       }
 
       &[data-icon-mime-type='video'] {
-        @include mime-icon(var(--video-image-url));
+        --mime-icon-url: var(--video-image-url);
       }
     }
 
@@ -551,14 +547,14 @@ a {
       flex-direction: row-reverse;
 
       .icon {
+        -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
         flex-shrink: 0;
         height: var(--icon-size);
-        -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
         mask-size: var(--icon-size), calc(var(--icon-size) / 2);
         width: var(--icon-size);
 
         &[data-icon-multifile='true'] {
-          @include mime-icon(var(--folder-image-url));
+          --mime-icon-url: var(--folder-image-url);
         }
       }
 
