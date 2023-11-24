@@ -55,15 +55,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   }
 }
 
-@mixin button {
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  display: inline-block;
-  padding: 3px;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
 /// GLOBAL
 
 :root {
@@ -425,14 +416,6 @@ $image-image: '../img/image.svg';
 $package-image: '../img/package.svg';
 $text-image: '../img/file-text.svg';
 $video-image: '../img/film.svg';
-
-@mixin mime-icon-compact($mime-icon) {
-  &[data-icon-multifile='true'] {
-    background-image: url($folder-image);
-    background-position: center;
-    background-size: 16px;
-  }
-}
 
 @mixin mime-icon($mime-icon) {
   // background-image: url($mime-icon);
