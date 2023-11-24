@@ -1,17 +1,3 @@
-// ICONS -- see assets/img/README.md for sources and license details
-// Are you a designer? New icon PRs welcomed!
-$image-alt-speed-disabled: '../img/modern-tortoise.png';
-$image-alt-speed-enabled: '../img/modern-tortoise-blue.png';
-$image-baseline: '../img/horizontal-rule.svg';
-$image-chevron-dn: '../img/chevron-down.svg';
-$image-chevron-up: '../img/chevron-up.svg';
-$image-lock-fill: '../img/lock-fill.svg';
-$image-magnet: '../img/magnet.svg';
-$image-pause-circle-active: '../img/pause-circle-active.svg';
-$image-pause-circle-idle: '../img/pause-circle-idle.svg';
-$image-play-circle-active: '../img/play-circle-active.svg';
-$image-play-circle-idle: '../img/play-circle-idle.svg';
-
 /// MIXINS
 
 @mixin for-phone-only {
@@ -35,35 +21,49 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --dialog-padding: 20px;
   --logo-size: 64px;
   --pauseresume-size: 20px;
-  --toolbar-height: 50px;
+  --popup-top: 51px; // TODO: ugly that this is hardcoded
   --progressbar-border: 1;
   --progressbar-height: 20;
-  --popup-top: 51px; // TODO: ugly that this is hardcoded
+  --toolbar-height: 50px;
 
   /* colors related to torrent status */
+  --black: #000;
   --blue-100: #51b3f7;
   --blue-200: #357aaa;
   --blue-300: #2c7fea;
   --blue-400: #1847d4;
+  --dark-mode-black: #121212;
+  --dark-mode-white: #c9d1d9;
+  --default-accent-color-dark: #0c2d6b;
+  --default-border-dark: #575757;
+  --default-border-light: #aeaeae;
+  --default-tinted: rgba(128, 128, 144, 0.125);
   --green-100: #26aa55;
   --green-300: #7cef99;
   --green-400: #67c87f;
   --green-500: #34dc70;
   --grey-200: #e1e4e8;
+  --grey-40: #666;
   --grey-500: #828282;
   --grey-900: #191919;
+  --nice-grey: #f8f8f8;
   --red-500: #d73a49;
   --white: #fff;
-  --black: #000;
-  --dark-mode-white: #c9d1d9;
   --yellow-300: #ffea7f;
-  --grey-40: #666;
-  --nice-grey: #f8f8f8;
-  --dark-mode-black: #121212;
-  --default-accent-color-dark: #0c2d6b;
-  --default-border-dark: #575757;
-  --default-border-light: #aeaeae;
-  --default-tinted: rgba(128, 128, 144, 0.125);
+
+  /* ICONS -- see assets/img/README.md for sources and license details */
+  /* Are you a designer? New icon PRs welcomed! */
+  --image-alt-speed-disabled: url('../img/modern-tortoise.png');
+  --image-alt-speed-enabled: url('../img/modern-tortoise-blue.png');
+  --image-baseline: url('../img/horizontal-rule.svg');
+  --image-chevron-dn: url('../img/chevron-down.svg');
+  --image-chevron-up: url('../img/chevron-up.svg');
+  --image-lock-fill: url('../img/lock-fill.svg');
+  --image-magnet: url('../img/magnet.svg');
+  --image-pause-circle-active: url('../img/pause-circle-active.svg');
+  --image-pause-circle-idle: url('../img/pause-circle-idle.svg');
+  --image-play-circle-active: url('../img/play-circle-active.svg');
+  --image-play-circle-idle: url('../img/play-circle-idle.svg');
 
   --progress: 100%;
   --color-fg-error: var(--red-500);
@@ -331,7 +331,7 @@ a {
   }
 
   &.alt-speed-enabled {
-    background-image: url($image-alt-speed-enabled);
+    background-image: var(--image-alt-speed-enabled);
     background-position: bottom left;
     background-size: 20px;
   }
@@ -637,20 +637,20 @@ $video-image: '../img/film.svg';
     width: var(--pauseresume-size);
 
     &[data-action='pause'] {
-      background-image: url($image-pause-circle-idle);
+      background-image: var(--image-pause-circle-idle);
 
       &:active,
       &:hover {
-        background-image: url($image-pause-circle-active);
+        background-image: var(--image-pause-circle-active);
       }
     }
 
     &[data-action='resume'] {
-      background-image: url($image-play-circle-idle);
+      background-image: var(--image-play-circle-idle);
 
       &:active,
       &:hover {
-        background-image: url($image-play-circle-active);
+        background-image: var(--image-play-circle-active);
       }
     }
   }
@@ -794,7 +794,7 @@ $video-image: '../img/film.svg';
   }
 
   .alt-speed-section-label {
-    background: transparent url($image-alt-speed-enabled) no-repeat;
+    background: transparent var(--image-alt-speed-enabled) no-repeat;
     background-position: left;
     background-position-y: 4px;
     background-size: 20px;
@@ -1029,8 +1029,8 @@ $video-image: '../img/film.svg';
     border: 0;
     cursor: pointer;
     height: 1rem;
-    -webkit-mask: url($image-magnet) no-repeat center / 14px;
-    mask: url($image-magnet) no-repeat center / 14px;
+    -webkit-mask: var(--image-magnet) no-repeat center / 14px;
+    mask: var(--image-magnet) no-repeat center / 14px;
     vertical-align: middle;
     width: 1rem;
   }
@@ -1199,8 +1199,8 @@ $video-image: '../img/film.svg';
   .encryption {
     &[data-encrypted='true'] {
       background-color: var(--color-border-selected);
-      -webkit-mask: url($image-lock-fill) no-repeat center / 14px;
-      mask: url($image-lock-fill) no-repeat center / 14px;
+      -webkit-mask: var(--image-lock-fill) no-repeat center / 14px;
+      mask: var(--image-lock-fill) no-repeat center / 14px;
       width: 10px;
     }
   }
@@ -1271,16 +1271,16 @@ $video-image: '../img/film.svg';
   }
 
   > .low {
-    background-image: url($image-chevron-dn);
+    background-image: var(--image-chevron-dn);
     border-right-width: 0;
   }
 
   > .normal {
-    background-image: url($image-baseline);
+    background-image: var(--image-baseline);
   }
 
   > .high {
-    background-image: url($image-chevron-up);
+    background-image: var(--image-chevron-up);
     border-left-width: 0;
   }
 
@@ -1446,13 +1446,13 @@ $video-image: '../img/film.svg';
       grid-area: check;
 
       &:checked ~ #alt-speed-image {
-        background-image: url($image-alt-speed-enabled);
+        background-image: var(--image-alt-speed-enabled);
         background-position: left;
         background-size: 22px;
       }
 
       &:not(:checked) ~ #alt-speed-image {
-        background-image: url($image-alt-speed-disabled);
+        background-image: var(--image-alt-speed-disabled);
         background-size: 22px;
       }
     }
