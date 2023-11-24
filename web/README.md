@@ -2,18 +2,34 @@
 
 A web interface is built into all Transmission flavors, enabling them to be controlled remotely.
 
-## Notes for Packagers
+## Building Without Node
 
-A `package.json.buildonly` file has been provided to reduce the number
-of dependencies needed to build the web client. It removes the linting
-rules used during development and leaves only what's needed to build.
-To use it, overwrite `package.json` with it before the install & build
-steps:
+Transmission includes a prebuilt webapp bundle in its releases because
+the bundling tools are not easy to install on all of the target platforms
+that Transmission supports.
+
+Debian has understandable security concerns about shipping prebuilt
+bundles and would prefer to generate the bundle itself without requiring
+a network connection (e.g. for `npm install`). Unfortunately, this is
+problematic due to some `devDependencies` that aren't available as Debian
+packages.
+
+Follow these steps to build webapp on Debian without Node.js:
 
 ```sh
-$ cp --force package.json.buildonly package.json
-$ npm install
-$ npm run build
+$ sudo apt install rsass perl esbuild
+$ cd transmission/web/
+$ rsass assets/css/transmission-app.scss > assets/css/transmission-app.css
+$ perl -p -i -e 's/transmission-app.scss/transmission-app.css/' src/main.js
+$ esbuild \
+  --allow-overwrite \
+  --bundle \
+  --legal-comments=external \
+  --loader:.png=binary \
+  --loader:.svg=binary \
+  --minify \
+  --outfile=public_html/transmission-app.js \
+  src/main.js
 ```
 
 ## Notes for Developers
