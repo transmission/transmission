@@ -1612,8 +1612,8 @@ void tr_torrentVerify(tr_torrent* tor)
             if (did_files_disappear(tor))
             {
                 tor->error().set_local_error(
-                    _("Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\". "
-                      "To re-download, start the torrent."));
+                    _("Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", "
+                      "then use \"Verify Local Data\" again. To re-download, start the torrent."));
                 tor->start_when_stable = false;
             }
 
