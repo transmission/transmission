@@ -439,37 +439,35 @@ bool torrent_is_seed_idle_limit_done(tr_torrent const& tor, time_t now)
 } // namespace seed_limit_helpers
 } // namespace
 
-void tr_torrentCheckSeedLimit(tr_torrent* tor)
+void tr_torrent::stop_if_seed_limit_reached()
 {
     using namespace seed_limit_helpers;
 
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (!tor->is_running() || tor->is_stopping_ || !tor->is_done())
+    if (!is_running() || is_stopping_ || !is_done())
     {
         return;
     }
 
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
-    if (tr_torrentIsSeedRatioDone(tor))
+    if (tr_torrentIsSeedRatioDone(this))
     {
-        tr_logAddInfoTor(tor, _("Seed ratio reached; pausing torrent"));
-        tor->stop_soon();
-        tor->session->onRatioLimitHit(tor);
+        tr_logAddInfoTor(this, _("Seed ratio reached; pausing torrent"));
+        stop_soon();
+        session->onRatioLimitHit(this);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
-    else if (torrent_is_seed_idle_limit_done(*tor, tr_time()))
+    else if (torrent_is_seed_idle_limit_done(*this, tr_time()))
     {
-        tr_logAddInfoTor(tor, _("Seeding idle limit reached; pausing torrent"));
+        tr_logAddInfoTor(this, _("Seeding idle limit reached; pausing torrent"));
 
-        tor->stop_soon();
-        tor->finished_seeding_by_idle_ = true;
-        tor->session->onIdleLimitHit(tor);
+        stop_soon();
+        finished_seeding_by_idle_ = true;
+        session->onIdleLimitHit(this);
     }
 
-    if (tor->is_stopping_)
+    if (is_stopping_)
     {
-        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
+        callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
     }
 }
 

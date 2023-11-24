@@ -2007,7 +2007,7 @@ void tr_peerMgr::rechoke_pulse() const
         if (tor->is_running())
         {
             // possibly stop torrents that have seeded enough
-            tr_torrentCheckSeedLimit(tor);
+            tor->stop_if_seed_limit_reached();
         }
 
         if (tor->is_running())

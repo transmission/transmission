@@ -68,8 +68,6 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 
 [[nodiscard]] tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
 
-void tr_torrentCheckSeedLimit(tr_torrent* tor);
-
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
@@ -977,6 +975,8 @@ public:
 
     void start_in_session_thread();
 
+    void stop_if_seed_limit_reached();
+
     [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
     {
         return obfuscated_hash_ == test;
@@ -1031,8 +1031,6 @@ public:
 
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
-    bool finished_seeding_by_idle_ = false;
-
     bool is_running_ = false;
 
     // start the torrent after all the startup scaffolding is done,
@@ -1044,7 +1042,6 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
-    friend void tr_torrentCheckSeedLimit(tr_torrent* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
     friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
@@ -1319,6 +1316,8 @@ private:
     bool is_dirty_ = false;
     bool is_queued_ = false;
     bool is_stopping_ = false;
+
+    bool finished_seeding_by_idle_ = false;
 
     bool needs_completeness_check_ = true;
 
