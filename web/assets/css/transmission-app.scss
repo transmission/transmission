@@ -1,6 +1,3 @@
-@use 'sass:color';
-@use 'sass:math';
-
 // Colors related to torrent status
 $blue-100: #51b3f7;
 $blue-200: #357aaa;
@@ -70,6 +67,10 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 /// GLOBAL
 
 :root {
+  --pauseresume-size: 20px;
+  --dialog-padding: 20px;
+  --dialog-logo-padding: calc(var(--dialog-padding) * 0.66);
+
   --progress: 100%;
   --color-fg-error: #{$red-500};
   --color-fg-port-closed: #{$red-500};
@@ -395,8 +396,6 @@ $speed-icon-size: 20px;
 
 /// TORRENT CONTAINER
 
-$pauseresume-size-number: 20;
-$pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border: 1;
 $progressbar-height: 20;
 $popup-top: 51px; // TODO: ugly that this is hardcoded
@@ -665,9 +664,9 @@ $video-image: '../img/film.svg';
   .torrent-pauseresume-button {
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: $pauseresume-size;
-    margin-left: math.floor(math.div($pauseresume-size-number, 2)) * 1px;
-    width: $pauseresume-size;
+    background-size: var(--pauseresume-size);
+    margin-left: calc(var(--pauseresume-size) / 2);
+    width: var(--pauseresume-size);
 
     &[data-action='pause'] {
       background-image: url($image-pause-circle-idle);
@@ -1510,13 +1509,11 @@ $video-image: '../img/film.svg';
 
 /// DIALOGS
 
-$dialog-padding-number: 20;
-$dialog-logo-padding-number: math.div($dialog-padding-number * 2, 3);
 $logo-size: 64px;
 
 @include for-phone-only {
   .dialog-buttons {
-    padding-top: $dialog-logo-padding-number * 1px;
+    padding-top: var(--dialog-logo-padding);
   }
 
   .dialog-container {
@@ -1527,7 +1524,7 @@ $logo-size: 64px;
   }
 
   .dialog-logo {
-    padding-bottom: $dialog-logo-padding-number * 1px;
+    padding-bottom: var(--dialog-logo-padding);
   }
 
   .dialog-window {
@@ -1549,7 +1546,7 @@ $logo-size: 64px;
 
   .dialog-logo {
     grid-area: icon;
-    padding-right: $dialog-logo-padding-number * 1px;
+    padding-right: var(--dialog-logo-padding);
   }
 
   .dialog-window {
@@ -1632,7 +1629,7 @@ dialog {
 .dialog-window {
   background: var(--color-bg-primary);
   border-radius: 8px;
-  padding: $dialog-padding-number * 1px;
+  padding: var(--dialog-padding);
 }
 
 .dialog-workarea {
