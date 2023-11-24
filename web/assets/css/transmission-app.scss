@@ -1,7 +1,3 @@
-// Z-INDEX ENUM
-// $z-index-progressbar: 1;
-$z-index-popup: 2;
-
 // ICONS -- see assets/img/README.md for sources and license details
 // Are you a designer? New icon PRs welcomed!
 $image-alt-speed-disabled: '../img/modern-tortoise.png';
@@ -31,9 +27,18 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 }
 
 :root {
-  --pauseresume-size: 20px;
-  --dialog-padding: 20px;
+  /* z-index enum */
+  --z-index-popup: 2;
+
+  /* various dimensions */
   --dialog-logo-padding: calc(var(--dialog-padding) * 0.66);
+  --dialog-padding: 20px;
+  --logo-size: 64px;
+  --pauseresume-size: 20px;
+  --toolbar-height: 50px;
+  --progressbar-border: 1;
+  --progressbar-height: 20;
+  --popup-top: 51px; // TODO: ugly that this is hardcoded
 
   /* colors related to torrent status */
   --blue-100: #51b3f7;
@@ -256,16 +261,13 @@ a {
 
 /// TOOLBAR
 
-$toolbar-height-number: 50;
-$toolbar-height: $toolbar-height-number * 1px;
-
 #mainwin-toolbar {
   align-items: center;
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
-  height: $toolbar-height;
+  height: var(--toolbar-height);
   margin: 0;
   width: 100%;
 
@@ -276,11 +278,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     border: 0;
     border-radius: 5px;
     cursor: pointer;
-    height: $toolbar-height;
+    height: var(--toolbar-height);
     margin-right: 6px;
     user-select: none;
     -webkit-user-select: none;
-    width: $toolbar-height;
+    width: var(--toolbar-height);
 
     svg {
       stroke: var(--color-fg-primary);
@@ -367,14 +369,12 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 }
 
-$speed-icon-size: 20px;
-
 .speed-up-icon,
 .speed-dn-icon {
   fill: var(--color-fg-primary);
 
   svg {
-    width: $speed-icon-size;
+    width: 20px;
   }
 }
 
@@ -384,10 +384,6 @@ $speed-icon-size: 20px;
 }
 
 /// TORRENT CONTAINER
-
-$progressbar-border: 1;
-$progressbar-height: 20;
-$popup-top: 51px; // TODO: ugly that this is hardcoded
 
 .flexible-space {
   margin-right: auto;
@@ -416,25 +412,24 @@ $text-image: '../img/file-text.svg';
 $video-image: '../img/film.svg';
 
 @mixin mime-icon($mime-icon) {
-  // background-image: url($mime-icon);
   background-color: var(--color-fg-primary);
   -webkit-mask-image: url($mime-icon);
-  mask-image: url($mime-icon);
   -webkit-mask-repeat: no-repeat;
+  mask-image: url($mime-icon);
   mask-repeat: no-repeat;
 
   &[data-icon-multifile='true'] {
     -webkit-mask-image: url($mime-icon), url($folder-image);
-    mask-image: url($mime-icon), url($folder-image);
     -webkit-mask-position:
       top left,
       bottom right;
+    -webkit-mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-size: 16px, 16px;
+    mask-image: url($mime-icon), url($folder-image);
     mask-position:
       top left,
       bottom right;
-    -webkit-mask-repeat: no-repeat, no-repeat;
     mask-repeat: no-repeat, no-repeat;
-    -webkit-mask-size: 16px, 16px;
     mask-size: 16px, 16px;
   }
 }
@@ -549,8 +544,7 @@ $video-image: '../img/film.svg';
     }
 
     &.compact {
-      $icon-size-num: 16;
-      $icon-size: $icon-size-num * 1px;
+      --icon-size: 16px;
 
       align-items: center;
       display: flex;
@@ -558,14 +552,10 @@ $video-image: '../img/film.svg';
 
       .icon {
         flex-shrink: 0;
-        height: $icon-size;
-        -webkit-mask-size:
-          $icon-size,
-          $icon-size-num * 0.5px;
-        mask-size:
-          $icon-size,
-          $icon-size-num * 0.5px;
-        width: $icon-size;
+        height: var(--icon-size);
+        -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
+        mask-size: var(--icon-size), calc(var(--icon-size) / 2);
+        width: var(--icon-size);
 
         &[data-icon-multifile='true'] {
           @include mime-icon($folder-image);
@@ -578,8 +568,7 @@ $video-image: '../img/film.svg';
     }
 
     &:not(.compact) {
-      $icon-size-num: 32;
-      $icon-size: $icon-size-num * 1px;
+      --icon-size: 32px;
       align-items: center;
       display: grid;
       grid-column-gap: 12px;
@@ -588,16 +577,14 @@ $video-image: '../img/film.svg';
         'icon progress-text progress-text'
         'icon progressbar progressbar'
         'icon peers peers';
-      grid-template-columns: $icon-size auto 1fr;
+      grid-template-columns: var(--icon-size) auto 1fr;
       padding: 6px 12px;
 
       .icon {
-        background-size:
-          $icon-size,
-          $icon-size-num * 0.5px;
+        background-size: var(--icon-size), calc(var(--icon-size) / 2);
         grid-area: icon;
-        height: $icon-size;
-        width: $icon-size;
+        height: var(--icon-size);
+        width: var(--icon-size);
       }
 
       .torrent-name {
@@ -674,7 +661,7 @@ $video-image: '../img/film.svg';
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
-    height: ($progressbar-height - ($progressbar-border * 2)) * 1px;
+    height: calc(var(--progressbar-height) - var(--progressbar-border) * 2);
 
     &.full {
       flex-grow: 1;
@@ -781,8 +768,8 @@ $video-image: '../img/film.svg';
   background: $background-color;
   bottom: 0;
   right: 0;
-  top: $popup-top;
-  z-index: $z-index-popup;
+  top: var(--popup-top);
+  z-index: var(--z-index-popup);
 
   .tabs-page {
     grid-column-gap: 8px;
@@ -929,8 +916,8 @@ $video-image: '../img/film.svg';
   flex-direction: column;
   position: absolute;
   right: 0;
-  top: $popup-top;
-  z-index: $z-index-popup;
+  top: var(--popup-top);
+  z-index: var(--z-index-popup);
   @include for-phone-only {
     left: 0;
   }
@@ -1177,9 +1164,9 @@ $video-image: '../img/film.svg';
 // Peers Tab
 
 .peer-list {
-  $table-border: 1px solid var(--color-default-border);
+  --table-border: 1px solid var(--color-default-border);
 
-  border: $table-border;
+  border: var(--table-border);
   border-collapse: collapse;
   cursor: default;
   table-layout: fixed;
@@ -1193,7 +1180,7 @@ $video-image: '../img/film.svg';
   }
 
   td {
-    border: $table-border;
+    border: var(--table-border);
     color: var(--color-fg-secondary);
     // padding: 5px 10px;
   }
@@ -1306,7 +1293,6 @@ $video-image: '../img/film.svg';
 /// CONTEXT MENU
 
 .context-menu {
-  $disabled-color: var(--color-fg-disabled);
   background-color: var(--color-bg-primary);
   border-radius: 5px;
   color: var(--color-fg-on-popup);
@@ -1330,7 +1316,7 @@ $video-image: '../img/film.svg';
     }
 
     &:disabled {
-      color: $disabled-color;
+      color: var(--color-fg-disabled);
       cursor: none;
     }
 
@@ -1359,7 +1345,7 @@ $video-image: '../img/film.svg';
   right: 0;
   margin: 6px;
   top: 50px;
-  z-index: $z-index-popup;
+  z-index: var(--z-index-popup);
 
   @include for-phone-only {
     height: 80vh;
@@ -1490,8 +1476,6 @@ $video-image: '../img/film.svg';
 
 /// DIALOGS
 
-$logo-size: 64px;
-
 @include for-phone-only {
   .dialog-buttons {
     padding-top: var(--dialog-logo-padding);
@@ -1500,7 +1484,7 @@ $logo-size: 64px;
   .dialog-container {
     opacity: 96%;
     position: absolute;
-    top: $popup-top;
+    top: var(--popup-top);
     width: 100%;
   }
 
@@ -1518,7 +1502,7 @@ $logo-size: 64px;
   .dialog-container {
     min-width: 500px;
     position: absolute;
-    top: $popup-top * 2;
+    top: calc(var(--popup-top) * 2);
   }
 
   .dialog-heading {
@@ -1540,7 +1524,7 @@ $logo-size: 64px;
       'icon message'
       'icon workarea'
       'icon buttons';
-    grid-template-columns: $logo-size 1fr;
+    grid-template-columns: var(--logo-size) 1fr;
     padding: 2px 12px;
   }
 }
@@ -1580,7 +1564,7 @@ dialog {
   color: var(--color-fg-primary);
   display: block;
   padding: 0;
-  z-index: $z-index-popup;
+  z-index: var(--z-index-popup);
 
   @include for-tablet-portrait-up {
     border: 0;
@@ -1598,8 +1582,8 @@ dialog {
 
 .dialog-logo {
   background: transparent url('../img/logo.png') top left no-repeat;
-  height: $logo-size;
-  width: $logo-size;
+  height: var(--logo-size);
+  width: var(--logo-size);
 }
 
 .dialog-message {
