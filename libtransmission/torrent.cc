@@ -1758,12 +1758,13 @@ namespace completeness_helpers
 
 void tr_torrent::create_empty_files() const
 {
-    if (!has_metainfo())
+    auto const base = current_dir();
+    TR_ASSERT(!std::empty(base));
+    if (!has_metainfo() || std::empty(base))
     {
         return;
     }
 
-    auto const base = download_dir();
     auto const file_count = this->file_count();
     for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
     {
