@@ -622,34 +622,6 @@ void torrentResetTransferStats(tr_torrent* tor)
     tor->set_dirty();
 }
 
-void torrentStartImpl(tr_torrent* const tor)
-{
-    auto const lock = tor->unique_lock();
-
-    TR_ASSERT(tr_isTorrent(tor));
-
-    // We are after `torrentStart` and before announcing to trackers/peers,
-    // so now is the best time to create wanted empty files.
-    tor->create_empty_files();
-
-    tor->recheck_completeness();
-    tor->set_is_queued(false);
-
-    time_t const now = tr_time();
-
-    tor->is_running_ = true;
-    tor->completeness = tor->completion.status();
-    tor->startDate = now;
-    tor->mark_changed();
-    tor->error().clear();
-    tor->finished_seeding_by_idle_ = false;
-
-    torrentResetTransferStats(tor);
-    tor->session->announcer_->startTorrent(tor);
-    tor->lpdAnnounceAt = now;
-    tor->started_.emit(tor);
-}
-
 bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     return tr_sys_path_remove(filename, error);
@@ -777,9 +749,38 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 
     tor->is_running_ = true;
     tor->set_dirty();
-    tor->session->runInSessionThread(torrentStartImpl, tor);
+    tor->session->runInSessionThread([tor]() { tor->start_in_session_thread(); });
 }
 } // namespace
+
+void tr_torrent::start_in_session_thread()
+{
+    using namespace start_stop_helpers;
+
+    TR_ASSERT(session->am_in_session_thread());
+    auto const lock = unique_lock();
+
+    // We are after `torrentStart` and before announcing to trackers/peers,
+    // so now is the best time to create wanted empty files.
+    create_empty_files();
+
+    recheck_completeness();
+    set_is_queued(false);
+
+    time_t const now = tr_time();
+
+    is_running_ = true;
+    completeness = completion.status();
+    date_started_ = now;
+    mark_changed();
+    error().clear();
+    finished_seeding_by_idle_ = false;
+
+    torrentResetTransferStats(this);
+    session->announcer_->startTorrent(this);
+    lpdAnnounceAt = now;
+    started_.emit(this);
+}
 
 void tr_torrent::stop_now()
 {
@@ -803,7 +804,7 @@ void tr_torrent::stop_now()
 
     if (!is_deleting_)
     {
-        tr_torrentSave(this);
+        save_resume_file();
     }
 
     set_is_queued(false);
@@ -861,22 +862,18 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
 
 // ---
 
-namespace
-{
-namespace torrent_init_helpers
-{
 // Sniff out newly-added seeds so that they can skip the verify step
-bool isNewTorrentASeed(tr_torrent* tor)
+bool tr_torrent::is_new_torrent_a_seed()
 {
-    if (!tor->has_metainfo())
+    if (!has_metainfo())
     {
         return false;
     }
 
-    for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = file_count(); i < n; ++i)
     {
         // it's not a new seed if a file is missing
-        auto const found = tor->find_file(i);
+        auto const found = find_file(i);
         if (!found)
         {
             return false;
@@ -889,52 +886,21 @@ bool isNewTorrentASeed(tr_torrent* tor)
         }
 
         // it's not a new seed if a file size is wrong
-        if (found->size != tor->file_size(i))
+        if (found->size != file_size(i))
         {
             return false;
         }
 
         // it's not a new seed if it was modified after it was added
-        if (found->last_modified_at >= tor->addedDate)
+        if (found->last_modified_at >= date_added_)
         {
             return false;
         }
     }
 
     // check the first piece
-    return tor->ensure_piece_is_checked(0);
+    return ensure_piece_is_checked(0);
 }
-
-void on_metainfo_completed(tr_torrent* tor)
-{
-    // we can look for files now that we know what files are in the torrent
-    tor->refresh_current_dir();
-
-    callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
-
-    if (tor->session->shouldFullyVerifyAddedTorrents() || !isNewTorrentASeed(tor))
-    {
-        // Potentially, we are in `tr_torrentNew`, and we don't want any file created before `torrentStartImpl`, so we Verify but we don't Create files.
-        tr_torrentVerify(tor);
-    }
-    else
-    {
-        tor->completion.set_has_all();
-        tor->doneDate = tor->addedDate;
-        tor->recheck_completeness();
-
-        if (tor->start_when_stable)
-        {
-            torrentStart(tor, {});
-        }
-        else if (tor->is_running())
-        {
-            tr_torrentStop(tor);
-        }
-    }
-}
-} // namespace torrent_init_helpers
-} // namespace
 
 void tr_torrent::on_metainfo_updated()
 {
@@ -947,10 +913,39 @@ void tr_torrent::on_metainfo_updated()
     checked_pieces_ = tr_bitfield{ size_t(piece_count()) };
 }
 
+void tr_torrent::on_metainfo_completed()
+{
+    // we can look for files now that we know what files are in the torrent
+    refresh_current_dir();
+
+    callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_ADDED);
+
+    if (session->shouldFullyVerifyAddedTorrents() || !is_new_torrent_a_seed())
+    {
+        // Potentially, we are in `tr_torrentNew`,
+        // and we don't want any file created before `torrentStart`
+        // so we Verify but we don't Create files.
+        tr_torrentVerify(this);
+    }
+    else
+    {
+        completion.set_has_all();
+        date_done_ = date_added_;
+        recheck_completeness();
+
+        if (start_when_stable)
+        {
+            torrentStart(this, {});
+        }
+        else if (is_running())
+        {
+            tr_torrentStop(this);
+        }
+    }
+}
+
 void tr_torrent::init(tr_ctor const* const ctor)
 {
-    using namespace torrent_init_helpers;
-
     session = tr_ctorGetSession(ctor);
     TR_ASSERT(session != nullptr);
     auto const lock = unique_lock();
@@ -987,7 +982,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
     mark_changed();
 
-    addedDate = tr_time(); // this is a default that will be overwritten by the resume file
+    date_added_ = tr_time(); // this is a default that will be overwritten by the resume file
 
     tr_resume::fields_t loaded = {};
 
@@ -997,7 +992,8 @@ void tr_torrent::init(tr_ctor const* const ctor)
         // the same ones that would be saved back again, so don't let them
         // affect the 'is dirty' flag.
         auto const was_dirty = is_dirty();
-        loaded = tr_resume::load(this, tr_resume::All, ctor);
+        auto resume_helper = ResumeHelper{ *this };
+        loaded = tr_resume::load(this, resume_helper, tr_resume::All, ctor);
         set_dirty(was_dirty);
         tr_torrent_metainfo::migrate_file(session->torrentDir(), name(), info_hash_string(), ".torrent"sv);
     }
@@ -1072,7 +1068,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
     if (auto const has_metainfo = this->has_metainfo(); is_new_torrent && has_metainfo)
     {
-        on_metainfo_completed(this);
+        on_metainfo_completed();
     }
     else if (start_when_stable)
     {
@@ -1089,8 +1085,6 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
 void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
 {
-    using namespace torrent_init_helpers;
-
     TR_ASSERT(!has_metainfo());
     metainfo_ = std::move(tm);
     on_metainfo_updated();
@@ -1100,14 +1094,12 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     this->set_dirty();
     this->mark_edited();
 
-    on_metainfo_completed(this);
+    on_metainfo_completed();
     this->on_announce_list_changed();
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
-    using namespace torrent_init_helpers;
-
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
     TR_ASSERT(session != nullptr);
@@ -1365,11 +1357,11 @@ tr_stat tr_torrent::stats() const
 
     auto const verify_progress = this->verify_progress();
     stats.recheckProgress = verify_progress.value_or(0.0);
-    stats.activityDate = this->activityDate;
-    stats.addedDate = this->addedDate;
-    stats.doneDate = this->doneDate;
-    stats.editDate = this->editDate;
-    stats.startDate = this->startDate;
+    stats.activityDate = this->date_active_;
+    stats.addedDate = this->date_added_;
+    stats.doneDate = this->date_done_;
+    stats.editDate = this->date_edited_;
+    stats.startDate = this->date_started_;
     stats.secondsSeeding = this->seconds_seeding(now_sec);
     stats.secondsDownloading = this->seconds_downloading(now_sec);
 
@@ -1724,15 +1716,16 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 
 // ---
 
-void tr_torrentSave(tr_torrent* tor)
+void tr_torrent::save_resume_file()
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (tor->is_dirty())
+    if (!is_dirty())
     {
-        tor->set_dirty(false);
-        tr_resume::save(tor);
+        return;
     }
+
+    set_dirty(false);
+    auto helper = ResumeHelper{ *this };
+    tr_resume::save(this, helper);
 }
 
 // --- Completeness
@@ -1833,7 +1826,7 @@ void tr_torrent::recheck_completeness()
             {
                 tr_announcerTorrentCompleted(this);
                 this->mark_changed();
-                this->doneDate = tr_time();
+                date_done_ = tr_time();
             }
 
             if (this->current_dir() == this->incomplete_dir())
@@ -1850,7 +1843,7 @@ void tr_torrent::recheck_completeness()
 
         if (this->is_done())
         {
-            tr_torrentSave(this);
+            save_resume_file();
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
@@ -2310,14 +2303,14 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
 
     if (is_new_torrent)
     {
-        if (session->shouldFullyVerifyAddedTorrents() || !torrent_init_helpers::isNewTorrentASeed(this))
+        if (session->shouldFullyVerifyAddedTorrents() || !is_new_torrent_a_seed())
         {
             tr_torrentVerify(this);
         }
         else
         {
             completion.set_has_all();
-            doneDate = addedDate;
+            date_done_ = date_added_;
             recheck_completeness();
         }
     }
@@ -2594,7 +2587,7 @@ bool tr_torrentHasMetadata(tr_torrent const* tor)
 
 void tr_torrent::mark_edited()
 {
-    this->editDate = tr_time();
+    this->date_edited_ = tr_time();
 }
 
 void tr_torrent::mark_changed()
@@ -2646,4 +2639,59 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
             checked_pieces_.unset_span(begin, end);
         }
     }
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::date_active() const noexcept
+{
+    return tor_.date_active_;
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::date_added() const noexcept
+{
+    return tor_.date_added_;
+}
+
+void tr_torrent::ResumeHelper::load_date_added(time_t when) noexcept
+{
+    tor_.date_added_ = when;
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::date_done() const noexcept
+{
+    return tor_.date_done_;
+}
+
+void tr_torrent::ResumeHelper::load_date_done(time_t when) noexcept
+{
+    tor_.date_done_ = when;
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::seconds_downloading(time_t now) const noexcept
+{
+    return tor_.seconds_downloading(now);
+}
+
+void tr_torrent::ResumeHelper::load_seconds_downloading_before_current_start(time_t when) noexcept
+{
+    tor_.seconds_downloading_before_current_start_ = when;
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::seconds_seeding(time_t now) const noexcept
+{
+    return tor_.seconds_seeding(now);
+}
+
+void tr_torrent::ResumeHelper::load_seconds_seeding_before_current_start(time_t when) noexcept
+{
+    tor_.seconds_seeding_before_current_start_ = when;
 }

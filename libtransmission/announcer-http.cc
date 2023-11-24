@@ -106,7 +106,7 @@ struct http_announce_data
 
 bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response& response)
 {
-    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
     auto const& log_name = static_cast<http_announce_data const*>(vdata)->log_name;
 
     response.did_connect = did_connect;
@@ -138,7 +138,7 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
 
 void onAnnounceDone(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
     auto* data = static_cast<http_announce_data*>(vdata);
 
     auto const got_all_responses = ++data->requests_answered_count == data->requests_sent_count;
@@ -486,7 +486,7 @@ private:
 
 void onScrapeDone(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
     auto* const data = static_cast<scrape_data*>(vdata);
 
     auto& response = data->response();
