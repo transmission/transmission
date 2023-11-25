@@ -946,8 +946,6 @@ public:
         return error_;
     }
 
-    void start_in_session_thread();
-
     void stop_if_seed_limit_reached();
 
     [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
@@ -1236,6 +1234,8 @@ private:
     void recheck_completeness();
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
+
+    void start_in_session_thread();
 
     void stop_now();
 
