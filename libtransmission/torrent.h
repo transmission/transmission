@@ -849,24 +849,6 @@ public:
         return {};
     }
 
-    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
-    {
-        auto const idle_limit_minutes = effective_idle_limit_minutes();
-        if (!idle_limit_minutes)
-        {
-            return {};
-        }
-
-        auto const idle_seconds = this->idle_seconds(now);
-        if (!idle_seconds)
-        {
-            return {};
-        }
-
-        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
-        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
-    }
-
     // --- seed ratio
 
     constexpr void set_seed_ratio_mode(tr_ratiolimit mode) noexcept
@@ -1169,6 +1151,24 @@ private:
         }
 
         return {};
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
+    {
+        auto const idle_limit_minutes = effective_idle_limit_minutes();
+        if (!idle_limit_minutes)
+        {
+            return {};
+        }
+
+        auto const idle_seconds = this->idle_seconds(now);
+        if (!idle_seconds)
+        {
+            return {};
+        }
+
+        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
+        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
     }
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept

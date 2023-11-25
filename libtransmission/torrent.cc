@@ -427,22 +427,8 @@ void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 
 // ---
 
-namespace
-{
-namespace seed_limit_helpers
-{
-bool torrent_is_seed_idle_limit_done(tr_torrent const& tor, time_t now)
-{
-    auto const secs_left = tor.idle_seconds_left(now);
-    return secs_left && *secs_left == 0U;
-}
-} // namespace seed_limit_helpers
-} // namespace
-
 void tr_torrent::stop_if_seed_limit_reached()
 {
-    using namespace seed_limit_helpers;
-
     if (!is_running() || is_stopping_ || !is_done())
     {
         return;
@@ -456,7 +442,7 @@ void tr_torrent::stop_if_seed_limit_reached()
         session->onRatioLimitHit(this);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
-    else if (torrent_is_seed_idle_limit_done(*this, tr_time()))
+    else if (auto const secs_left = idle_seconds_left(tr_time()); secs_left && *secs_left == 0U)
     {
         tr_logAddInfoTor(this, _("Seeding idle limit reached; pausing torrent"));
 
