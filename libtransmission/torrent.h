@@ -900,11 +900,6 @@ public:
 
     // ---
 
-    constexpr void set_needs_completeness_check() noexcept
-    {
-        needs_completeness_check_ = true;
-    }
-
     void do_idle_work()
     {
         if (needs_completeness_check_)
@@ -1187,6 +1182,11 @@ private:
         }
 
         return true;
+    }
+
+    constexpr void set_needs_completeness_check() noexcept
+    {
+        needs_completeness_check_ = true;
     }
 
     void set_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
