@@ -387,11 +387,6 @@ public:
         return completion_.amount_done(tab, n_tabs);
     }
 
-    void set_has_piece(tr_piece_index_t piece, bool has)
-    {
-        completion_.set_has_piece(piece, has);
-    }
-
     /// FILE <-> PIECE
 
     [[nodiscard]] auto pieces_in_file(tr_file_index_t file) const
@@ -1241,6 +1236,13 @@ private:
         }
 
         return {};
+    }
+
+    // ---
+
+    void set_has_piece(tr_piece_index_t piece, bool has)
+    {
+        completion_.set_has_piece(piece, has);
     }
 
     void on_metainfo_updated();
