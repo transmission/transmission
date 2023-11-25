@@ -767,6 +767,8 @@ public:
         is_stopping_ = true;
     }
 
+    void start(bool bypass_queue, std::optional<bool> has_local_data);
+
     [[nodiscard]] constexpr auto is_dirty() const noexcept
     {
         return is_dirty_;
@@ -984,8 +986,6 @@ public:
     tr_completeness completeness = TR_LEECH;
 
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
-
-    bool is_running_ = false;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
@@ -1322,6 +1322,7 @@ private:
     bool is_deleting_ = false;
     bool is_dirty_ = false;
     bool is_queued_ = false;
+    bool is_running_ = false;
     bool is_stopping_ = false;
 
     bool finished_seeding_by_idle_ = false;
