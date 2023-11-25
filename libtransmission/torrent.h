@@ -517,11 +517,6 @@ public:
         return metainfo_.announce_list();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto tracker_count() const noexcept
-    {
-        return std::size(this->announce_list());
-    }
-
     [[nodiscard]] auto tracker_list() const
     {
         return this->announce_list().to_string();

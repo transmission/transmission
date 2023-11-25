@@ -902,7 +902,7 @@ char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 
 char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 {
-    auto const old_size = tor->tracker_count();
+    auto const old_list = tor->tracker_list();
 
     for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
@@ -916,7 +916,7 @@ char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         tor->announce_list().add(announce);
     }
 
-    if (tor->tracker_count() == old_size)
+    if (tor->tracker_list() == old_list) // unchanged
     {
         return "error setting announce list";
     }
@@ -956,7 +956,7 @@ char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
 
 char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
 {
-    auto const old_size = tor->tracker_count();
+    auto const old_list = tor->tracker_list();
 
     for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
     {
@@ -970,7 +970,7 @@ char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         tor->announce_list().remove(static_cast<tr_tracker_id_t>(id));
     }
 
-    if (tor->tracker_count() == old_size)
+    if (tor->tracker_list() == old_list) // unchanged
     {
         return "error setting announce list";
     }
