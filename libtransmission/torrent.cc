@@ -770,7 +770,7 @@ void tr_torrent::start_in_session_thread()
     time_t const now = tr_time();
 
     is_running_ = true;
-    completeness = completion.status();
+    completeness = completion_.status();
     date_started_ = now;
     mark_changed();
     error().clear();
@@ -904,7 +904,7 @@ bool tr_torrent::is_new_torrent_a_seed()
 
 void tr_torrent::on_metainfo_updated()
 {
-    completion = tr_completion{ this, &block_info() };
+    completion_ = tr_completion{ this, &block_info() };
     obfuscated_hash_ = tr_sha1::digest("req2"sv, info_hash());
     fpm_.reset(metainfo_);
     file_mtimes_.resize(file_count());
@@ -926,7 +926,7 @@ void tr_torrent::on_metainfo_completed()
     }
     else
     {
-        completion.set_has_all();
+        completion_.set_has_all();
         date_done_ = date_added_;
         recheck_completeness();
 
@@ -995,7 +995,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
         tr_torrent_metainfo::migrate_file(session->torrentDir(), name(), info_hash_string(), ".torrent"sv);
     }
 
-    completeness = completion.status();
+    completeness = completion_.status();
 
     tr_ctorInitTorrentPriorities(ctor, this);
     tr_ctorInitTorrentWanted(ctor, this);
@@ -1340,32 +1340,32 @@ tr_stat tr_torrent::stats() const
         stats.knownPeersFrom[i] = swarm_stats.known_peer_from_count[i];
     }
 
-    auto const piece_upload_speed = this->bandwidth_.get_piece_speed(now_msec, TR_UP);
+    auto const piece_upload_speed = bandwidth_.get_piece_speed(now_msec, TR_UP);
     stats.pieceUploadSpeed_KBps = piece_upload_speed.count(Speed::Units::KByps);
-    auto const piece_download_speed = this->bandwidth_.get_piece_speed(now_msec, TR_DOWN);
+    auto const piece_download_speed = bandwidth_.get_piece_speed(now_msec, TR_DOWN);
     stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
-    stats.percentComplete = this->completion.percent_complete();
+    stats.percentComplete = completion_.percent_complete();
     stats.metadataPercentComplete = tr_torrentGetMetadataPercent(this);
 
-    stats.percentDone = this->completion.percent_done();
-    stats.leftUntilDone = this->completion.left_until_done();
-    stats.sizeWhenDone = this->completion.size_when_done();
+    stats.percentDone = completion_.percent_done();
+    stats.leftUntilDone = completion_.left_until_done();
+    stats.sizeWhenDone = completion_.size_when_done();
 
     auto const verify_progress = this->verify_progress();
     stats.recheckProgress = verify_progress.value_or(0.0);
-    stats.activityDate = this->date_active_;
-    stats.addedDate = this->date_added_;
-    stats.doneDate = this->date_done_;
-    stats.editDate = this->date_edited_;
-    stats.startDate = this->date_started_;
-    stats.secondsSeeding = this->seconds_seeding(now_sec);
-    stats.secondsDownloading = this->seconds_downloading(now_sec);
+    stats.activityDate = date_active_;
+    stats.addedDate = date_added_;
+    stats.doneDate = date_done_;
+    stats.editDate = date_edited_;
+    stats.startDate = date_started_;
+    stats.secondsSeeding = seconds_seeding(now_sec);
+    stats.secondsDownloading = seconds_downloading(now_sec);
 
-    stats.corruptEver = this->bytes_corrupt_.ever();
-    stats.downloadedEver = this->bytes_downloaded_.ever();
-    stats.uploadedEver = this->bytes_uploaded_.ever();
-    stats.haveValid = this->completion.has_valid();
+    stats.corruptEver = bytes_corrupt_.ever();
+    stats.downloadedEver = bytes_downloaded_.ever();
+    stats.uploadedEver = bytes_uploaded_.ever();
+    stats.haveValid = completion_.has_valid();
     stats.haveUnchecked = this->has_total() - stats.haveValid;
     stats.desiredAvailable = tr_peerMgrGetDesiredAvailable(this);
 
@@ -1455,7 +1455,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
         return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted };
     }
 
-    auto const have = tor->completion.count_has_bytes_in_span(tor->fpm_.byte_span(file));
+    auto const have = tor->completion_.count_has_bytes_in_span(tor->fpm_.byte_span(file));
     return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), begin, end, priority, wanted };
 }
 
@@ -1766,7 +1766,7 @@ void tr_torrent::recheck_completeness()
 
     needs_completeness_check_ = false;
 
-    auto const new_completeness = completion.status();
+    auto const new_completeness = completion_.status();
 
     if (new_completeness != completeness)
     {
@@ -2183,7 +2183,7 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
     auto const span = fpm_.file_span(piece);
     for (auto file = span.begin; file < span.end; ++file)
     {
-        if (completion.has_blocks(block_span_for_file(file)))
+        if (completion_.has_blocks(block_span_for_file(file)))
         {
             on_file_completed(file);
         }
@@ -2214,7 +2214,7 @@ void tr_torrent::on_block_received(tr_block_index_t const block)
 
     set_dirty();
 
-    completion.add_block(block);
+    completion_.add_block(block);
 
     auto const block_loc = this->block_loc(block);
     auto const first_piece = block_loc.piece;
@@ -2265,7 +2265,7 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
         }
         else
         {
-            completion.set_has_all();
+            completion_.set_has_all();
             date_done_ = date_added_;
             recheck_completeness();
         }
@@ -2553,7 +2553,7 @@ void tr_torrent::mark_changed()
 
 void tr_torrent::set_blocks(tr_bitfield blocks)
 {
-    this->completion.set_blocks(std::move(blocks));
+    completion_.set_blocks(std::move(blocks));
 }
 
 [[nodiscard]] bool tr_torrent::ensure_piece_is_checked(tr_piece_index_t piece)

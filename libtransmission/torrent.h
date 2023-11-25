@@ -184,7 +184,7 @@ public:
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
-        , completion{ this, &this->metainfo_.block_info() }
+        , completion_{ this, &this->metainfo_.block_info() }
     {
     }
 
@@ -317,57 +317,57 @@ public:
 
     [[nodiscard]] auto left_until_done() const
     {
-        return completion.left_until_done();
+        return completion_.left_until_done();
     }
 
     [[nodiscard]] auto size_when_done() const
     {
-        return completion.size_when_done();
+        return completion_.size_when_done();
     }
 
     [[nodiscard]] constexpr auto has_metainfo() const noexcept
     {
-        return completion.has_metainfo();
+        return completion_.has_metainfo();
     }
 
     [[nodiscard]] constexpr auto has_all() const noexcept
     {
-        return completion.has_all();
+        return completion_.has_all();
     }
 
     [[nodiscard]] constexpr auto has_none() const noexcept
     {
-        return completion.has_none();
+        return completion_.has_none();
     }
 
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
     {
-        return completion.has_piece(piece);
+        return completion_.has_piece(piece);
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto has_block(tr_block_index_t block) const
     {
-        return completion.has_block(block);
+        return completion_.has_block(block);
     }
 
     [[nodiscard]] auto count_missing_blocks_in_piece(tr_piece_index_t piece) const
     {
-        return completion.count_missing_blocks_in_piece(piece);
+        return completion_.count_missing_blocks_in_piece(piece);
     }
 
     [[nodiscard]] auto count_missing_bytes_in_piece(tr_piece_index_t piece) const
     {
-        return completion.count_missing_bytes_in_piece(piece);
+        return completion_.count_missing_bytes_in_piece(piece);
     }
 
     [[nodiscard]] constexpr auto has_total() const
     {
-        return completion.has_total();
+        return completion_.has_total();
     }
 
     [[nodiscard]] auto create_piece_bitfield() const
     {
-        return completion.create_piece_bitfield();
+        return completion_.create_piece_bitfield();
     }
 
     [[nodiscard]] constexpr bool is_done() const noexcept
@@ -387,19 +387,19 @@ public:
 
     [[nodiscard]] constexpr auto& blocks() const noexcept
     {
-        return completion.blocks();
+        return completion_.blocks();
     }
 
     void amount_done_bins(float* tab, int n_tabs) const
     {
-        return completion.amount_done(tab, n_tabs);
+        return completion_.amount_done(tab, n_tabs);
     }
 
     void set_blocks(tr_bitfield blocks);
 
     void set_has_piece(tr_piece_index_t piece, bool has)
     {
-        completion.set_has_piece(piece, has);
+        completion_.set_has_piece(piece, has);
     }
 
     /// FILE <-> PIECE
@@ -998,9 +998,6 @@ public:
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
-    // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
-    tr_completion completion;
-
     // true iff the piece was verified more recently than any of the piece's
     // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
     // it means that piece needs to be checked before its data is used.
@@ -1209,7 +1206,7 @@ private:
         auto const lock = unique_lock();
 
         files_wanted_.set(files, n_files, wanted);
-        completion.invalidate_size_when_done();
+        completion_.invalidate_size_when_done();
 
         if (!is_bootstrapping)
         {
@@ -1257,6 +1254,8 @@ private:
     VerifyDoneCallback verify_done_callback_;
 
     labels_t labels_;
+
+    tr_completion completion_;
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
 
