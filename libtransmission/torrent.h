@@ -767,7 +767,7 @@ public:
         is_stopping_ = true;
     }
 
-    void start(bool bypass_queue, std::optional<bool> has_local_data);
+    void start(bool bypass_queue, std::optional<bool> has_any_local_data);
 
     [[nodiscard]] constexpr auto is_dirty() const noexcept
     {

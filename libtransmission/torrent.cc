@@ -1108,29 +1108,6 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 
 // --- Location
 
-namespace
-{
-namespace location_helpers
-{
-size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
-{
-    auto* walk = paths;
-
-    if (auto const& path = tor->download_dir(); !std::empty(path))
-    {
-        *walk++ = path.sv();
-    }
-
-    if (auto const& path = tor->incomplete_dir(); !std::empty(path))
-    {
-        *walk++ = path.sv();
-    }
-
-    return walk - paths;
-}
-} // namespace location_helpers
-} // namespace
-
 void tr_torrent::set_location_in_session_thread(std::string_view const path, bool move_from_old_path, int volatile* setme_state)
 {
     TR_ASSERT(session->am_in_session_thread());
@@ -1179,10 +1156,31 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
     }
 }
 
+namespace
+{
+namespace location_helpers
+{
+size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
+{
+    auto* walk = paths;
+
+    if (auto const& path = tor->download_dir(); !std::empty(path))
+    {
+        *walk++ = path.sv();
+    }
+
+    if (auto const& path = tor->incomplete_dir(); !std::empty(path))
+    {
+        *walk++ = path.sv();
+    }
+
+    return walk - paths;
+}
+} // namespace location_helpers
+} // namespace
+
 void tr_torrent::set_location(std::string_view location, bool move_from_old_path, int volatile* setme_state)
 {
-    using namespace location_helpers;
-
     if (setme_state != nullptr)
     {
         *setme_state = TR_LOC_MOVING;
@@ -1326,27 +1324,27 @@ tr_stat tr_torrent::stats() const
     auto const piece_download_speed = bandwidth().get_piece_speed(now_msec, TR_DOWN);
     stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
-    stats.percentComplete = completion_.percent_complete();
+    stats.percentComplete = this->completion_.percent_complete();
     stats.metadataPercentComplete = tr_torrentGetMetadataPercent(this);
 
-    stats.percentDone = completion_.percent_done();
-    stats.leftUntilDone = completion_.left_until_done();
-    stats.sizeWhenDone = completion_.size_when_done();
+    stats.percentDone = this->completion_.percent_done();
+    stats.leftUntilDone = this->completion_.left_until_done();
+    stats.sizeWhenDone = this->completion_.size_when_done();
 
     auto const verify_progress = this->verify_progress();
     stats.recheckProgress = verify_progress.value_or(0.0);
-    stats.activityDate = date_active_;
-    stats.addedDate = date_added_;
-    stats.doneDate = date_done_;
-    stats.editDate = date_edited_;
-    stats.startDate = date_started_;
-    stats.secondsSeeding = seconds_seeding(now_sec);
-    stats.secondsDownloading = seconds_downloading(now_sec);
+    stats.activityDate = this->date_active_;
+    stats.addedDate = this->date_added_;
+    stats.doneDate = this->date_done_;
+    stats.editDate = this->date_edited_;
+    stats.startDate = this->date_started_;
+    stats.secondsSeeding = this->seconds_seeding(now_sec);
+    stats.secondsDownloading = this->seconds_downloading(now_sec);
 
-    stats.corruptEver = bytes_corrupt_.ever();
-    stats.downloadedEver = bytes_downloaded_.ever();
-    stats.uploadedEver = bytes_uploaded_.ever();
-    stats.haveValid = completion_.has_valid();
+    stats.corruptEver = this->bytes_corrupt_.ever();
+    stats.downloadedEver = this->bytes_downloaded_.ever();
+    stats.uploadedEver = this->bytes_uploaded_.ever();
+    stats.haveValid = this->completion_.has_valid();
     stats.haveUnchecked = this->has_total() - stats.haveValid;
     stats.desiredAvailable = tr_peerMgrGetDesiredAvailable(this);
 
