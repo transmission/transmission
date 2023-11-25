@@ -5,11 +5,14 @@
 #import "DefaultAppHelper.h"
 
 #import <AppKit/AppKit.h>
+#ifdef __MAC_12_0
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#endif
 
 static NSString* const kMagnetURLScheme = @"magnet";
 static NSString* const kTorrentFileType = @"org.bittorrent.torrent";
 
+#ifdef __MAC_12_0
 UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
 {
     static UTType* result = nil;
@@ -21,6 +24,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
 
     return result;
 }
+#endif
 
 @interface DefaultAppHelper ()
 
@@ -41,6 +45,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
 
 - (BOOL)isDefaultForTorrentFiles
 {
+#ifdef __MAC_12_0
     if (@available(macOS 12, *))
     {
         UTType* fileType = GetTorrentFileType();
@@ -58,6 +63,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
         }
     }
     else
+#endif
     {
         NSString* bundleId = (__bridge NSString*)LSCopyDefaultRoleHandlerForContentType((__bridge CFStringRef)kTorrentFileType, kLSRolesViewer);
         if (!bundleId)
@@ -76,6 +82,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
 
 - (void)setDefaultForTorrentFiles:(void (^_Nullable)())completionHandler
 {
+#ifdef __MAC_12_0
     if (@available(macOS 12, *))
     {
         UTType* fileType = GetTorrentFileType();
@@ -94,6 +101,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
         }];
     }
     else
+#endif
     {
         OSStatus const result = LSSetDefaultRoleHandlerForContentType(
             (__bridge CFStringRef)kTorrentFileType,
@@ -147,6 +155,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
 
 - (void)setDefaultForMagnetURLs:(void (^_Nullable)())completionHandler
 {
+#ifdef __MAC_12_0
     if (@available(macOS 12, *))
     {
         NSURL* appUrl = [NSWorkspace.sharedWorkspace URLForApplicationWithBundleIdentifier:self.bundleIdentifier];
@@ -165,6 +174,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
                                               }];
     }
     else
+#endif
     {
         OSStatus const result = LSSetDefaultHandlerForURLScheme(
             (__bridge CFStringRef)kMagnetURLScheme,
