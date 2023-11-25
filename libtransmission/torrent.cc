@@ -1944,18 +1944,17 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     return err == 0;
 }
 
-// TODO(ckerr) migrate to fpm?
-tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file)
+tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) const noexcept
 {
-    auto const [begin_byte, end_byte] = tor->fpm_.byte_span(file);
+    auto const [begin_byte, end_byte] = fpm_.byte_span(file);
 
-    auto const begin_block = tor->byte_loc(begin_byte).block;
+    auto const begin_block = byte_loc(begin_byte).block;
     if (begin_byte >= end_byte) // 0-byte file
     {
         return { begin_block, begin_block + 1 };
     }
 
-    auto const final_block = tor->byte_loc(end_byte - 1).block;
+    auto const final_block = byte_loc(end_byte - 1).block;
     auto const end_block = final_block + 1;
     return { begin_block, end_block };
 }
@@ -2184,7 +2183,7 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
     auto const span = fpm_.file_span(piece);
     for (auto file = span.begin; file < span.end; ++file)
     {
-        if (completion.has_blocks(tr_torGetFileBlockSpan(this, file)))
+        if (completion.has_blocks(block_span_for_file(file)))
         {
             on_file_completed(file);
         }

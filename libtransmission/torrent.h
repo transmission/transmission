@@ -66,8 +66,6 @@ void tr_torrentChangeMyPort(tr_torrent* tor);
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
-[[nodiscard]] tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
-
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
@@ -312,6 +310,8 @@ public:
     {
         return metainfo_.total_size();
     }
+
+    [[nodiscard]] tr_block_span_t block_span_for_file(tr_file_index_t file) const noexcept;
 
     /// COMPLETION
 
@@ -1006,8 +1006,6 @@ public:
     // it means that piece needs to be checked before its data is used.
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
-    tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
-
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
     CumulativeCount bytes_uploaded_;
@@ -1259,6 +1257,8 @@ private:
     VerifyDoneCallback verify_done_callback_;
 
     labels_t labels_;
+
+    tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
 
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
