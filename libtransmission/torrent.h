@@ -196,11 +196,6 @@ public:
         tr_torrent_rename_done_func callback,
         void* callback_user_data);
 
-    tr_sha1_digest_t piece_hash(tr_piece_index_t i) const
-    {
-        return metainfo_.piece_hash(i);
-    }
-
     // these functions should become private when possible,
     // but more refactoring is needed before that can happen
     // because much of tr_torrent's impl is in the non-member C bindings
@@ -479,7 +474,24 @@ public:
         return incomplete_dir_;
     }
 
+    /// METAINFO
+
+    [[nodiscard]] constexpr auto& metainfo() noexcept
+    {
+        return metainfo_;
+    }
+
+    [[nodiscard]] constexpr auto const& metainfo() const noexcept
+    {
+        return metainfo_;
+    }
+
     /// METAINFO - FILES
+
+    [[nodiscard]] TR_CONSTEXPR20 auto const& files() const noexcept
+    {
+        return metainfo_.files();
+    }
 
     [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
@@ -549,6 +561,11 @@ public:
     }
 
     /// METAINFO - OTHER
+
+    [[nodiscard]] auto piece_hash(tr_piece_index_t i) const
+    {
+        return metainfo_.piece_hash(i);
+    }
 
     void set_name(std::string_view name)
     {
@@ -985,8 +1002,6 @@ public:
         return obfuscated_hash_ == test;
     }
 
-    tr_torrent_metainfo metainfo_;
-
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
@@ -1252,6 +1267,8 @@ private:
     VerifyDoneCallback verify_done_callback_;
 
     labels_t labels_;
+
+    tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
 

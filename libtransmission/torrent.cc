@@ -650,7 +650,8 @@ void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc
         {
             delete_func(filename, user_data, nullptr);
         };
-        tor->metainfo_.files().remove(tor->current_dir(), tor->name(), delete_func_wrapper);
+
+        tor->files().remove(tor->current_dir(), tor->name(), delete_func_wrapper);
     }
 
     tr_torrentFreeInSessionThread(tor);
@@ -1167,7 +1168,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
         session->verify_remove(this);
 
         auto error = tr_error{};
-        ok = metainfo_.files().move(current_dir(), path, name(), &error);
+        ok = files().move(current_dir(), path, name(), &error);
         if (error)
         {
             this->error().set_local_error(fmt::format(
@@ -1225,7 +1226,7 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent::find_file(tr_file_index_t
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return metainfo_.files().find(file_index, std::data(paths), n_paths);
+    return files().find(file_index, std::data(paths), n_paths);
 }
 
 bool tr_torrent::has_any_local_data() const
@@ -1234,7 +1235,7 @@ bool tr_torrent::has_any_local_data() const
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return metainfo_.files().hasAnyLocalData(std::data(paths), n_paths);
+    return files().hasAnyLocalData(std::data(paths), n_paths);
 }
 
 void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
