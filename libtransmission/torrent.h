@@ -426,8 +426,6 @@ public:
         set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ false);
     }
 
-    void recheck_completeness(); // TODO(ckerr): should be private
-
     /// PRIORITIES
 
     [[nodiscard]] tr_priority_t piece_priority(tr_piece_index_t piece) const
@@ -1250,6 +1248,8 @@ private:
     void on_piece_completed(tr_piece_index_t piece);
     void on_piece_failed(tr_piece_index_t piece);
     void on_file_completed(tr_file_index_t file);
+
+    void recheck_completeness();
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 
