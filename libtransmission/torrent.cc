@@ -1456,7 +1456,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
         return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted };
     }
 
-    auto const have = tor->completion_.count_has_bytes_in_span(tor->fpm_.byte_span(file));
+    auto const have = tor->completion_.count_has_bytes_in_span(tor->byte_span(file));
     return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), begin, end, priority, wanted };
 }
 
@@ -1947,7 +1947,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 
 tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) const noexcept
 {
-    auto const [begin_byte, end_byte] = fpm_.byte_span(file);
+    auto const [begin_byte, end_byte] = byte_span(file);
 
     auto const begin_block = byte_loc(begin_byte).block;
     if (begin_byte >= end_byte) // 0-byte file
