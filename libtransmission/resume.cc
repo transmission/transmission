@@ -569,7 +569,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::ResumeHelper& h
             mtimes.resize(n_files);
         }
 
-        tor->init_checked_pieces(checked, std::data(mtimes));
+        helper.load_checked_pieces(checked, std::data(mtimes));
 
         /// COMPLETION
 

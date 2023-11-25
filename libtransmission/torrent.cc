@@ -2569,31 +2569,33 @@ void tr_torrent::mark_changed()
     return checked;
 }
 
-void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
-{
-    TR_ASSERT(std::size(checked) == this->piece_count());
-    checked_pieces_ = checked;
+// --- RESUME HELPER
 
-    auto const n = this->file_count();
-    this->file_mtimes_.resize(n);
+void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
+{
+    TR_ASSERT(std::size(checked) == tor_.piece_count());
+    tor_.checked_pieces_ = checked;
+
+    auto const n = tor_.file_count();
+    tor_.file_mtimes_.resize(n);
 
     for (size_t i = 0; i < n; ++i)
     {
-        auto const found = this->find_file(i);
+        auto const found = tor_.find_file(i);
         auto const mtime = found ? found->last_modified_at : 0;
 
-        this->file_mtimes_[i] = mtime;
+        tor_.file_mtimes_[i] = mtime;
 
         // if a file has changed, mark its pieces as unchecked
         if (mtime == 0 || mtime != mtimes[i])
         {
-            auto const [begin, end] = pieces_in_file(i);
-            checked_pieces_.unset_span(begin, end);
+            auto const [begin, end] = tor_.pieces_in_file(i);
+            tor_.checked_pieces_.unset_span(begin, end);
         }
     }
 }
 
-// --- RESUME HELPER
+// ---
 
 tr_bitfield const& tr_torrent::ResumeHelper::blocks() const noexcept
 {

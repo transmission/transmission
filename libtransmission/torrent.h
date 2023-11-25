@@ -85,6 +85,7 @@ struct tr_torrent final : public tr_completion::torrent_view
     class ResumeHelper
     {
     public:
+        void load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
         void load_blocks(tr_bitfield blocks);
         void load_date_added(time_t when) noexcept;
         void load_date_done(time_t when) noexcept;
@@ -626,8 +627,6 @@ public:
     /// METAINFO - PIECE CHECKSUMS
 
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
-
-    void init_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
 
     ///
 
