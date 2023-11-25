@@ -522,11 +522,6 @@ public:
         return std::size(this->announce_list());
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& tracker(size_t i) const
-    {
-        return this->announce_list().at(i);
-    }
-
     [[nodiscard]] auto tracker_list() const
     {
         return this->announce_list().to_string();
