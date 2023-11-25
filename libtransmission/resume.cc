@@ -464,7 +464,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
     }
 
     // add the 'checked pieces' bitfield
-    bitfieldToRaw(tor->checked_pieces_, tr_variantDictAdd(prog, TR_KEY_pieces));
+    bitfieldToRaw(helper.checked_pieces(), tr_variantDictAdd(prog, TR_KEY_pieces));
 
     /* add the progress */
     if (tor->completeness == TR_SEED)

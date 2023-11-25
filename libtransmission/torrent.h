@@ -95,6 +95,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
         [[nodiscard]] tr_bitfield const& blocks() const noexcept;
+        [[nodiscard]] tr_bitfield const& checked_pieces() const noexcept;
         [[nodiscard]] std::vector<time_t> const& file_mtimes() const noexcept;
         [[nodiscard]] time_t date_active() const noexcept;
         [[nodiscard]] time_t date_added() const noexcept;
@@ -961,11 +962,6 @@ public:
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
-    // true iff the piece was verified more recently than any of the piece's
-    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
-    // it means that piece needs to be checked before its data is used.
-    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
-
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
     CumulativeCount bytes_uploaded_;
@@ -1250,6 +1246,11 @@ private:
     Error error_;
 
     VerifyDoneCallback verify_done_callback_;
+
+    // true iff the piece was verified more recently than any of the piece's
+    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
+    // it means that piece needs to be checked before its data is used.
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
     labels_t labels_;
 

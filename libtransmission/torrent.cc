@@ -2557,6 +2557,11 @@ void tr_torrent::mark_changed()
 
 // --- RESUME HELPER
 
+tr_bitfield const& tr_torrent::ResumeHelper::checked_pieces() const noexcept
+{
+    return tor_.checked_pieces_;
+}
+
 void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
 {
     TR_ASSERT(std::size(checked) == tor_.piece_count());
