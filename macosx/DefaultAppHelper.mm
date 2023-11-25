@@ -65,7 +65,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
     else
 #endif
     {
-        NSString* bundleId = (__bridge NSString*)LSCopyDefaultRoleHandlerForContentType((__bridge CFStringRef)kTorrentFileType, kLSRolesViewer);
+        NSString* bundleId = (__bridge_transfer NSString*)LSCopyDefaultRoleHandlerForContentType((__bridge CFStringRef)kTorrentFileType, kLSRolesViewer);
         if (!bundleId)
         {
             return NO;
@@ -138,7 +138,7 @@ UTType* GetTorrentFileType(void) API_AVAILABLE(macos(11.0))
     }
     else
     {
-        NSString* bundleId = (__bridge NSString*)LSCopyDefaultHandlerForURLScheme((__bridge CFStringRef)kMagnetURLScheme);
+        NSString* bundleId = (__bridge_transfer NSString*)LSCopyDefaultHandlerForURLScheme((__bridge CFStringRef)kMagnetURLScheme);
         if (!bundleId)
         {
             return NO;
