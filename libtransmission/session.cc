@@ -338,7 +338,7 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
     auto const lock = session_->unique_lock();
 
     auto const* const tor = session_->torrents().get(torrent_id);
-    return tor == nullptr ? 0U : tor->bandwidth_.clamp(TR_DOWN, byte_count);
+    return tor == nullptr ? 0U : tor->bandwidth().clamp(TR_DOWN, byte_count);
 }
 
 void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
@@ -347,7 +347,7 @@ void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byt
 
     if (auto* const tor = session_->torrents().get(torrent_id); tor != nullptr)
     {
-        tor->bandwidth_.notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
+        tor->bandwidth().notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
     }
 }
 

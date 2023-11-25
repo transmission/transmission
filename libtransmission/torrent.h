@@ -987,8 +987,6 @@ public:
 
     tr_torrent_metainfo metainfo_;
 
-    tr_bandwidth bandwidth_;
-
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
@@ -1254,6 +1252,8 @@ private:
     VerifyDoneCallback verify_done_callback_;
 
     labels_t labels_;
+
+    tr_bandwidth bandwidth_;
 
     tr_completion completion_;
 
