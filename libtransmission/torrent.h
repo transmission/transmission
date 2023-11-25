@@ -943,8 +943,6 @@ public:
         return error_;
     }
 
-    void init(tr_ctor const* ctor);
-
     void start_in_session_thread();
 
     void stop_if_seed_limit_reached();
@@ -1229,6 +1227,8 @@ private:
     {
         completion_.set_has_piece(piece, has);
     }
+
+    void init(tr_ctor const* ctor);
 
     void on_metainfo_updated();
     void on_metainfo_completed();
