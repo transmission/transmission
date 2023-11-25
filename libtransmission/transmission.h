@@ -1386,7 +1386,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent, bool force = false);
+void tr_torrentVerify(tr_torrent* torrent);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 

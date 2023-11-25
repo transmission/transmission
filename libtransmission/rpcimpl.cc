@@ -282,32 +282,15 @@ char const* torrentReannounce(
     return nullptr;
 }
 
-namespace torrent_verify_helpers
-{
-char const* torrentVerifyImpl(tr_session* session, tr_variant* args_in, bool force)
+char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_torrentVerify(tor, force);
+        tr_torrentVerify(tor);
         session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
     }
 
     return nullptr;
-}
-} // namespace torrent_verify_helpers
-
-char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
-{
-    return torrent_verify_helpers::torrentVerifyImpl(session, args_in, false);
-}
-
-char const* torrentVerifyForce(
-    tr_session* session,
-    tr_variant* args_in,
-    tr_variant* /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
-{
-    return torrent_verify_helpers::torrentVerifyImpl(session, args_in, true);
 }
 
 // ---
@@ -2341,7 +2324,7 @@ struct rpc_method
     handler func;
 };
 
-auto constexpr Methods = std::array<rpc_method, 25>{ {
+auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "blocklist-update"sv, false, blocklistUpdate },
     { "free-space"sv, true, freeSpace },
     { "group-get"sv, true, groupGet },
@@ -2366,7 +2349,6 @@ auto constexpr Methods = std::array<rpc_method, 25>{ {
     { "torrent-start-now"sv, true, torrentStartNow },
     { "torrent-stop"sv, true, torrentStop },
     { "torrent-verify"sv, true, torrentVerify },
-    { "torrent-verify-force"sv, true, torrentVerifyForce },
 } };
 
 void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/, void* /*user_data*/)
