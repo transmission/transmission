@@ -450,12 +450,12 @@ void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
     }
 }
 
-void saveProgress(tr_variant* dict, tr_torrent const* tor)
+void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHelper const& helper)
 {
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
-    auto const& mtimes = tor->file_mtimes_;
+    auto const& mtimes = helper.file_mtimes();
     auto const n = std::size(mtimes);
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
     for (auto const& mtime : mtimes)
@@ -900,7 +900,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
-        saveProgress(&top, tor);
+        saveProgress(&top, tor, helper);
     }
 
     saveSpeedLimits(&top, tor);

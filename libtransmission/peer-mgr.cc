@@ -765,7 +765,7 @@ private:
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
-                tr_torrentGotBlock(tor, loc.block);
+                tor->on_block_received(loc.block);
             }
 
             break;

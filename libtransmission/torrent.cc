@@ -2138,25 +2138,21 @@ std::string_view tr_torrent::primary_mime_type() const
 
 // ---
 
-namespace
-{
-namespace got_block_helpers
-{
-void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
+void tr_torrent::on_file_completed(tr_file_index_t const file)
 {
     /* close the file so that we can reopen in read-only mode as needed */
-    tor->session->closeTorrentFile(tor, i);
+    session->closeTorrentFile(this, file);
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */
-    tor->file_mtimes_[i] = tr_time();
+    file_mtimes_[file] = tr_time();
 
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
-    if (auto found = tor->find_file(i); found)
+    if (auto found = find_file(file); found)
     {
-        if (auto const& file_subpath = tor->file_subpath(i); file_subpath != found->subpath())
+        if (auto const& file_subpath = this->file_subpath(file); file_subpath != found->subpath())
         {
             auto const& oldpath = found->filename();
             auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
@@ -2165,7 +2161,7 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
             if (!tr_sys_path_rename(oldpath, newpath, &error))
             {
                 tr_logAddErrorTor(
-                    tor,
+                    this,
                     fmt::format(
                         _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
                         fmt::arg("old_path", oldpath),
@@ -2177,72 +2173,67 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
     }
 }
 
-void onPieceCompleted(tr_torrent* tor, tr_piece_index_t piece)
+void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
 {
-    tor->piece_completed_.emit(tor, piece);
+    piece_completed_.emit(this, piece);
 
     // bookkeeping
-    tor->set_needs_completeness_check();
+    set_needs_completeness_check();
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const span = tor->fpm_.file_span(piece);
+    auto const span = fpm_.file_span(piece);
     for (auto file = span.begin; file < span.end; ++file)
     {
-        if (tor->completion.has_blocks(tr_torGetFileBlockSpan(tor, file)))
+        if (completion.has_blocks(tr_torGetFileBlockSpan(this, file)))
         {
-            onFileCompleted(tor, file);
+            on_file_completed(file);
         }
     }
 }
 
-void onPieceFailed(tr_torrent* tor, tr_piece_index_t piece)
+void tr_torrent::on_piece_failed(tr_piece_index_t const piece)
 {
-    tr_logAddDebugTor(tor, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
+    tr_logAddDebugTor(this, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
 
-    auto const n = tor->piece_size(piece);
-    tor->bytes_corrupt_ += n;
-    tor->bytes_downloaded_.reduce(n);
-    tor->got_bad_piece_.emit(tor, piece);
-    tor->set_has_piece(piece, false);
+    auto const n = piece_size(piece);
+    bytes_corrupt_ += n;
+    bytes_downloaded_.reduce(n);
+    got_bad_piece_.emit(this, piece);
+    set_has_piece(piece, false);
 }
-} // namespace got_block_helpers
-} // namespace
 
-void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
+void tr_torrent::on_block_received(tr_block_index_t const block)
 {
-    using namespace got_block_helpers;
+    TR_ASSERT(session->am_in_session_thread());
 
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->session->am_in_session_thread());
-
-    if (tor->has_block(block))
+    if (has_block(block))
     {
-        tr_logAddDebugTor(tor, "we have this block already...");
-        tor->bytes_downloaded_.reduce(tor->block_size(block));
+        tr_logAddDebugTor(this, "we have this block already...");
+        bytes_downloaded_.reduce(block_size(block));
         return;
     }
 
-    tor->set_dirty();
+    set_dirty();
 
-    tor->completion.add_block(block);
+    completion.add_block(block);
 
-    auto const block_loc = tor->block_loc(block);
+    auto const block_loc = this->block_loc(block);
     auto const first_piece = block_loc.piece;
-    auto const last_piece = tor->byte_loc(block_loc.byte + tor->block_size(block) - 1).piece;
+    auto const last_piece = byte_loc(block_loc.byte + block_size(block) - 1).piece;
     for (auto piece = first_piece; piece <= last_piece; ++piece)
     {
-        if (!tor->has_piece(piece))
+        if (!has_piece(piece))
         {
             continue;
         }
 
-        if (tor->check_piece(piece))
+        if (check_piece(piece))
         {
-            onPieceCompleted(tor, piece);
+            on_piece_completed(piece);
         }
         else
         {
-            onPieceFailed(tor, piece);
+            on_piece_failed(piece);
         }
     }
 }
@@ -2682,4 +2673,11 @@ void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) n
     {
         tor_.current_dir_ = tor_.incomplete_dir_;
     }
+}
+
+// ---
+
+std::vector<time_t> const& tr_torrent::ResumeHelper::file_mtimes() const noexcept
+{
+    return tor_.file_mtimes_;
 }

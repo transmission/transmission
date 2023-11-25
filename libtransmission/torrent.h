@@ -94,6 +94,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
+        [[nodiscard]] std::vector<time_t> const& file_mtimes() const noexcept;
         [[nodiscard]] time_t date_active() const noexcept;
         [[nodiscard]] time_t date_added() const noexcept;
         [[nodiscard]] time_t date_done() const noexcept;
@@ -961,6 +962,8 @@ public:
         session->announcer_->resetTorrent(this);
     }
 
+    void on_block_received(tr_block_index_t block);
+
     [[nodiscard]] constexpr auto& error() noexcept
     {
         return error_;
@@ -1005,9 +1008,6 @@ public:
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
 
-    // when Transmission thinks the torrent's files were last changed
-    std::vector<time_t> file_mtimes_;
-
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
     CumulativeCount bytes_uploaded_;
@@ -1043,7 +1043,6 @@ private:
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
-    friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
     friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
     friend void tr_torrentStop(tr_torrent* tor);
@@ -1243,6 +1242,9 @@ private:
 
     void on_metainfo_updated();
     void on_metainfo_completed();
+    void on_piece_completed(tr_piece_index_t piece);
+    void on_piece_failed(tr_piece_index_t piece);
+    void on_file_completed(tr_file_index_t file);
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 
@@ -1257,6 +1259,9 @@ private:
     VerifyDoneCallback verify_done_callback_;
 
     labels_t labels_;
+
+    // when Transmission thinks the torrent's files were last changed
+    std::vector<time_t> file_mtimes_;
 
     tr_interned_string bandwidth_group_;
 
@@ -1330,9 +1335,6 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
     return tor != nullptr && tor->session != nullptr;
 }
-
-// Tell the `tr_torrent` that it's gotten a block
-void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
