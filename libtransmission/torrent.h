@@ -85,6 +85,7 @@ struct tr_torrent final : public tr_completion::torrent_view
     class ResumeHelper
     {
     public:
+        void load_blocks(tr_bitfield blocks);
         void load_date_added(time_t when) noexcept;
         void load_date_done(time_t when) noexcept;
         void load_download_dir(std::string_view dir) noexcept;
@@ -92,6 +93,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
+        [[nodiscard]] tr_bitfield const& blocks() const noexcept;
         [[nodiscard]] std::vector<time_t> const& file_mtimes() const noexcept;
         [[nodiscard]] time_t date_active() const noexcept;
         [[nodiscard]] time_t date_added() const noexcept;
@@ -380,17 +382,10 @@ public:
         return completeness == TR_PARTIAL_SEED;
     }
 
-    [[nodiscard]] constexpr auto& blocks() const noexcept
-    {
-        return completion_.blocks();
-    }
-
     void amount_done_bins(float* tab, int n_tabs) const
     {
         return completion_.amount_done(tab, n_tabs);
     }
-
-    void set_blocks(tr_bitfield blocks);
 
     void set_has_piece(tr_piece_index_t piece, bool has)
     {

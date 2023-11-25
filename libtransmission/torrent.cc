@@ -2552,11 +2552,6 @@ void tr_torrent::mark_changed()
     this->bump_date_changed(tr_time());
 }
 
-void tr_torrent::set_blocks(tr_bitfield blocks)
-{
-    completion_.set_blocks(std::move(blocks));
-}
-
 [[nodiscard]] bool tr_torrent::ensure_piece_is_checked(tr_piece_index_t piece)
 {
     TR_ASSERT(piece < this->piece_count());
@@ -2596,6 +2591,18 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
             checked_pieces_.unset_span(begin, end);
         }
     }
+}
+
+// --- RESUME HELPER
+
+tr_bitfield const& tr_torrent::ResumeHelper::blocks() const noexcept
+{
+    return tor_.completion_.blocks();
+}
+
+void tr_torrent::ResumeHelper::load_blocks(tr_bitfield blocks)
+{
+    tor_.completion_.set_blocks(std::move(blocks));
 }
 
 // ---

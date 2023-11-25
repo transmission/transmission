@@ -473,7 +473,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
     }
 
     /* add the blocks bitfield */
-    bitfieldToRaw(tor->blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
+    bitfieldToRaw(helper.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 /*
@@ -496,7 +496,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
  * First approach (pre-2.20) had an "mtimes" list identical to
  * 3.10, but not the 'pieces' bitfield.
  */
-auto loadProgress(tr_variant* dict, tr_torrent* tor)
+auto loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::ResumeHelper& helper)
 {
     if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
@@ -615,7 +615,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else
         {
-            tor->set_blocks(blocks);
+            helper.load_blocks(blocks);
         }
 
         return tr_resume::Progress;
@@ -752,7 +752,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
     // seed or a partial seed.
     if ((fields_to_load & tr_resume::Progress) != 0)
     {
-        fields_loaded |= loadProgress(&top, tor);
+        fields_loaded |= loadProgress(&top, tor, helper);
     }
 
     if (!tor->is_done() && (fields_to_load & tr_resume::FilePriorities) != 0)
