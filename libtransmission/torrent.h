@@ -524,8 +524,6 @@ public:
 
     bool set_tracker_list(std::string_view text);
 
-    void on_tracker_response(tr_tracker_event const* event);
-
     /// METAINFO - WEBSEEDS
 
     [[nodiscard]] TR_CONSTEXPR20 auto webseed_count() const noexcept
@@ -1238,6 +1236,7 @@ private:
     void on_piece_completed(tr_piece_index_t piece);
     void on_piece_failed(tr_piece_index_t piece);
     void on_file_completed(tr_file_index_t file);
+    void on_tracker_response(tr_tracker_event const* event);
 
     void recheck_completeness();
 
