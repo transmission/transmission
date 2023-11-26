@@ -50,16 +50,6 @@ struct tr_torrent_announcer;
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
-void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor);
-
-void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
-
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error* error);
-
-tr_session* tr_ctorGetSession(tr_ctor const* ctor);
-
-bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme_incomplete_dir);
-
 // ---
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
@@ -1222,7 +1212,7 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
-    void init(tr_ctor const* ctor);
+    void init(tr_ctor const& ctor);
 
     void on_metainfo_updated();
     void on_metainfo_completed();
@@ -1338,18 +1328,6 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
     return tor != nullptr && tor->session != nullptr;
 }
-
-tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
-
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error* error = nullptr);
-void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels);
-void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
-tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
-tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
-
-void tr_ctorSetVerifyDoneCallback(tr_ctor* ctor, tr_torrent::VerifyDoneCallback&& callback);
-tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

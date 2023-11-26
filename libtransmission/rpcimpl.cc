@@ -33,6 +33,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
+#include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
@@ -1339,11 +1340,10 @@ char const* blocklistUpdate(
 
 // ---
 
-void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
+void add_torrent_impl(struct tr_rpc_idle_data* data, tr_ctor& ctor)
 {
     tr_torrent* duplicate_of = nullptr;
-    tr_torrent* tor = tr_torrentNew(ctor, &duplicate_of);
-    tr_ctorFree(ctor);
+    tr_torrent* tor = tr_torrentNew(&ctor, &duplicate_of);
 
     if (tor == nullptr && duplicate_of == nullptr)
     {
@@ -1376,8 +1376,14 @@ void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
 
 struct add_torrent_idle_data
 {
-    struct tr_rpc_idle_data* data;
-    tr_ctor* ctor;
+    add_torrent_idle_data(tr_rpc_idle_data* data_in, tr_ctor&& ctor_in)
+        : data{ data_in }
+        , ctor{ std::move(ctor_in) }
+    {
+    }
+
+    tr_rpc_idle_data* data;
+    tr_ctor ctor;
 };
 
 void onMetadataFetched(tr_web::FetchResponse const& web_response)
@@ -1393,8 +1399,8 @@ void onMetadataFetched(tr_web::FetchResponse const& web_response)
 
     if (status == 200 || status == 221) /* http or ftp success.. */
     {
-        tr_ctorSetMetainfo(data->ctor, std::data(body), std::size(body), nullptr);
-        addTorrentImpl(data->data, data->ctor);
+        data->ctor.set_metainfo(body);
+        add_torrent_impl(data->data, data->ctor);
     }
     else
     {
@@ -1458,7 +1464,7 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     auto i = int64_t{};
     tr_variant* l = nullptr;
-    tr_ctor* ctor = tr_ctorNew(session);
+    auto ctor = tr_ctor{ session };
 
     /* set the optional arguments */
 
@@ -1467,53 +1473,52 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (!std::empty(download_dir))
     {
-        auto const sz_download_dir = std::string{ download_dir };
-        tr_ctorSetDownloadDir(ctor, TR_FORCE, sz_download_dir.c_str());
+        ctor.set_download_dir(TR_FORCE, download_dir);
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_paused, &val))
     {
-        tr_ctorSetPaused(ctor, TR_FORCE, val);
+        ctor.set_paused(TR_FORCE, val);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit, &i))
     {
-        tr_ctorSetPeerLimit(ctor, TR_FORCE, (uint16_t)i);
+        ctor.set_peer_limit(TR_FORCE, static_cast<uint16_t>(i));
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &i))
     {
-        tr_ctorSetBandwidthPriority(ctor, (tr_priority_t)i);
+        ctor.set_bandwidth_priority(static_cast<tr_priority_t>(i));
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &l))
     {
         auto const files = fileListFromList(l);
-        tr_ctorSetFilesWanted(ctor, std::data(files), std::size(files), false);
+        ctor.set_files_wanted(std::data(files), std::size(files), false);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_files_wanted, &l))
     {
         auto const files = fileListFromList(l);
-        tr_ctorSetFilesWanted(ctor, std::data(files), std::size(files), true);
+        ctor.set_files_wanted(std::data(files), std::size(files), true);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_priority_low, &l))
     {
         auto const files = fileListFromList(l);
-        tr_ctorSetFilePriorities(ctor, std::data(files), std::size(files), TR_PRI_LOW);
+        ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_LOW);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_priority_normal, &l))
     {
         auto const files = fileListFromList(l);
-        tr_ctorSetFilePriorities(ctor, std::data(files), std::size(files), TR_PRI_NORMAL);
+        ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_NORMAL);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_priority_high, &l))
     {
         auto const files = fileListFromList(l);
-        tr_ctorSetFilePriorities(ctor, std::data(files), std::size(files), TR_PRI_HIGH);
+        ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_HIGH);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_labels, &l))
@@ -1522,18 +1527,17 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (errmsg != nullptr)
         {
-            tr_ctorFree(ctor);
             return errmsg;
         }
 
-        tr_ctorSetLabels(ctor, std::move(labels));
+        ctor.set_labels(std::move(labels));
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
 
     if (isCurlURL(filename))
     {
-        auto* const d = new add_torrent_idle_data{ idle_data, ctor };
+        auto* const d = new add_torrent_idle_data{ idle_data, std::move(ctor) };
         auto options = tr_web::FetchOptions{ filename, onMetadataFetched, d };
         options.cookies = cookies;
         session->fetch(std::move(options));
@@ -1544,16 +1548,15 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (std::empty(filename))
         {
-            auto const metainfo = tr_base64_decode(metainfo_base64);
-            ok = tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+            ok = ctor.set_metainfo(tr_base64_decode(metainfo_base64));
         }
         else if (tr_sys_path_exists(tr_pathbuf{ filename }))
         {
-            ok = tr_ctorSetMetainfoFromFile(ctor, filename);
+            ok = ctor.set_metainfo_from_file(filename);
         }
         else
         {
-            ok = tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
+            ok = ctor.set_metainfo_from_magnet_link(filename);
         }
 
         if (!ok)
@@ -1561,7 +1564,7 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
             return "unrecognized info";
         }
 
-        addTorrentImpl(idle_data, ctor);
+        add_torrent_impl(idle_data, ctor);
     }
 
     return nullptr;

@@ -47,7 +47,7 @@ auto inline constexpr Group = fields_t{ 1 << 23 };
 
 auto inline constexpr All = ~fields_t{ 0 };
 
-fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const* ctor);
+fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const& ctor);
 
 void save(tr_torrent* tor, tr_torrent::ResumeHelper const& helper);
 
