@@ -49,6 +49,7 @@
 #include "libtransmission/session-settings.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/torrent-ctor.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
@@ -1430,7 +1431,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
-        if (tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr) && tr_torrentNew(ctor, nullptr) != nullptr)
+        if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
         {
             ++n_torrents;
         }
@@ -1442,7 +1443,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
         auto const path = tr_pathbuf{ folder, '/', name };
 
         if (tr_file_read(path, buf) &&
-            tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
+            ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
             tr_torrentNew(ctor, nullptr) != nullptr)
         {
             ++n_torrents;

@@ -23,6 +23,7 @@
 #include <libtransmission/file.h> // tr_sys_file_*()
 #include <libtransmission/platform.h> // TR_PATH_DELIMITER
 #include <libtransmission/quark.h>
+#include <libtransmission/torrent-ctor.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -358,8 +359,7 @@ protected:
         auto verified_lock = std::unique_lock(verified_mutex_);
         auto const n_previously_verified = std::size(verified_);
 
-        tr_ctorSetVerifyDoneCallback(
-            ctor,
+        ctor->set_verify_done_callback(
             [this](tr_torrent* const tor)
             {
                 auto lambda_verified_lock = std::lock_guard{ verified_mutex_ };

@@ -802,7 +802,7 @@ void Session::Impl::add_file_async_callback(
 
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
-    auto const* const session = get_session();
+    auto* const session = get_session();
     if (session == nullptr)
     {
         return false;

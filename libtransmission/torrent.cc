@@ -37,6 +37,7 @@
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
 #include "libtransmission/subprocess.h"
+#include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
@@ -921,36 +922,37 @@ void tr_torrent::on_metainfo_completed()
     }
 }
 
-void tr_torrent::init(tr_ctor const* const ctor)
+void tr_torrent::init(tr_ctor const& ctor)
 {
-    session = tr_ctorGetSession(ctor);
+    session = ctor.session();
     TR_ASSERT(session != nullptr);
     auto const lock = unique_lock();
 
     queuePosition = std::size(session->torrents());
 
     on_metainfo_updated();
-    char const* dir = nullptr;
-    if (tr_ctorGetDownloadDir(ctor, TR_FORCE, &dir) || tr_ctorGetDownloadDir(ctor, TR_FALLBACK, &dir))
+
+    if (auto dir = ctor.download_dir(TR_FORCE); !std::empty(dir))
+    {
+        download_dir_ = dir;
+    }
+    else if (dir = ctor.download_dir(TR_FALLBACK); !std::empty(dir))
     {
         download_dir_ = dir;
     }
 
-    if (!tr_ctorGetIncompleteDir(ctor, &dir))
-    {
-        dir = tr_sessionGetIncompleteDir(session);
-    }
-
     if (tr_sessionIsIncompleteDirEnabled(session))
     {
-        incomplete_dir_ = dir;
+        auto const& dir = ctor.incomplete_dir();
+        incomplete_dir_ = !std::empty(dir) ? dir : session->incompleteDir();
     }
+
     bandwidth().set_parent(&session->top_bandwidth_);
-    bandwidth().set_priority(tr_ctorGetBandwidthPriority(ctor));
+    bandwidth().set_priority(ctor.bandwidth_priority());
     error().clear();
     finished_seeding_by_idle_ = false;
 
-    set_labels(tr_ctorGetLabels(ctor));
+    set_labels(ctor.labels());
 
     session->addTorrent(this);
 
@@ -977,8 +979,8 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
     completeness = completion_.status();
 
-    tr_ctorInitTorrentPriorities(ctor, this);
-    tr_ctorInitTorrentWanted(ctor, this);
+    ctor.init_torrent_priorities(*this);
+    ctor.init_torrent_wanted(*this);
 
     refresh_current_dir();
 
@@ -1026,7 +1028,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
         if (has_metainfo()) // torrent file
         {
-            tr_ctorSaveContents(ctor, filename, &error);
+            ctor.save(filename, &error);
         }
         else // magnet link
         {
@@ -1079,11 +1081,11 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
-    auto* const session = tr_ctorGetSession(ctor);
+    auto* const session = ctor->session();
     TR_ASSERT(session != nullptr);
 
     // is the metainfo valid?
-    auto metainfo = tr_ctorStealMetainfo(ctor);
+    auto metainfo = ctor->steal_metainfo();
     if (std::empty(metainfo.info_hash_string()))
     {
         return nullptr;
@@ -1101,8 +1103,8 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
     }
 
     auto* const tor = new tr_torrent{ std::move(metainfo) };
-    tor->verify_done_callback_ = tr_ctorStealVerifyDoneCallback(ctor);
-    tor->init(ctor);
+    tor->verify_done_callback_ = ctor->steal_verify_done_callback();
+    tor->init(*ctor);
     return tor;
 }
 
