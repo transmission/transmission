@@ -11,17 +11,19 @@
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
+#include <ctime>
 #include <exception>
 #include <iostream>
 #include <iterator> // for std::back_inserter
 #include <locale>
+#include <memory>
 #include <optional>
 #include <set>
 #include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <utility>
+#include <type_traits>
 #include <vector>
 
 #ifdef _WIN32
@@ -50,15 +52,27 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
+#include "libtransmission/values.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 time_t libtransmission::detail::tr_time::current_time = {};
+
+// ---
+
+namespace libtransmission::Values
+{
+
+// default values; can be overridden by client apps
+Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+
+} // namespace libtransmission::Values
 
 // ---
 
@@ -268,7 +282,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
 
-    auto const res = fmt::format_to_n(dst, siz - 1, FMT_STRING("{:s}"), src);
+    auto const res = fmt::format_to_n(dst, siz - 1, "{:s}", src);
     *res.out = '\0';
     return res.size;
 }
@@ -349,7 +363,7 @@ std::string tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
+        return fmt::format("Unknown error ({:#08x})", code);
     }
 
     auto text = std::string{};
@@ -664,242 +678,6 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 #endif
 }
 
-// ---
-
-namespace
-{
-namespace formatter_impl
-{
-
-struct formatter_unit
-{
-    std::array<char, 16> name;
-    uint64_t value;
-};
-
-using formatter_units = std::array<formatter_unit, 4>;
-
-enum
-{
-    TR_FMT_KB,
-    TR_FMT_MB,
-    TR_FMT_GB,
-    TR_FMT_TB
-};
-
-void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    uint64_t value = kilo;
-    tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
-    units[TR_FMT_KB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_MB].name), mb, std::size(units[TR_FMT_MB].name));
-    units[TR_FMT_MB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_GB].name), gb, std::size(units[TR_FMT_GB].name));
-    units[TR_FMT_GB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_TB].name), tb, std::size(units[TR_FMT_TB].name));
-    units[TR_FMT_TB].value = value;
-}
-
-char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
-{
-    formatter_unit const* unit = nullptr;
-
-    if (bytes < u[1].value)
-    {
-        unit = std::data(u);
-    }
-    else if (bytes < u[2].value)
-    {
-        unit = &u[1];
-    }
-    else if (bytes < u[3].value)
-    {
-        unit = &u[2];
-    }
-    else
-    {
-        unit = &u[3];
-    }
-
-    double const value = static_cast<double>(bytes) / unit->value;
-    auto const* const units = std::data(unit->name);
-
-    auto precision = int{};
-    if (unit->value == 1)
-    {
-        precision = 0;
-    }
-    else if (value < 100)
-    {
-        precision = 2;
-    }
-    else
-    {
-        precision = 1;
-    }
-
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}Lf} {:s}", value, precision, units);
-    *out = '\0';
-    return buf;
-}
-
-formatter_units size_units;
-formatter_units speed_units;
-formatter_units mem_units;
-
-} // namespace formatter_impl
-} // namespace
-
-size_t tr_speed_K = 0;
-
-void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-    formatter_init(size_units, kilo, kb, mb, gb, tb);
-}
-
-std::string tr_formatter_size_B(uint64_t bytes)
-{
-    using namespace formatter_impl;
-    auto buf = std::array<char, 64>{};
-    return formatter_get_size_str(size_units, std::data(buf), bytes, std::size(buf));
-}
-
-void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-    tr_speed_K = kilo;
-    formatter_init(speed_units, kilo, kb, mb, gb, tb);
-}
-
-std::string tr_formatter_speed_KBps(double kilo_per_second)
-{
-    using namespace formatter_impl;
-
-    auto speed = kilo_per_second;
-
-    if (speed < 999.95) // 0.0 KB to 999.9 KB (0.0 KiB to 999.9 KiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-
-    double const kilo = speed_units[TR_FMT_KB].value;
-    speed /= kilo;
-
-    if (speed < 99.995) // 0.98 MB to 99.99 MB (1.00 MiB to 99.99 MiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 999.95) // 100.0 MB to 999.9 MB (100.0 MiB to 999.9 MiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-
-    speed /= kilo;
-
-    if (speed < 99.995) // 0.98 GB to 99.99 GB (1.00 GiB to 99.99 GiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    // 100.0 GB and above (100.0 GiB and above)
-    return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-}
-
-std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
-{
-    using namespace formatter_impl;
-
-    auto speed = kilo_per_second;
-
-    if (speed < 99.95) // 0.0 KB to 99.9 KB (0.0 KiB to 99.9 KiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-    if (speed < 999.5) // 100 KB to 999 KB (100 KiB to 999 KiB)
-    {
-        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-
-    double const kilo = speed_units[TR_FMT_KB].value;
-    speed /= kilo;
-
-    if (speed < 9.995) // 0.98 MB to 9.99 MB (1.00 MiB to 9.99 MiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 99.95) // 10.0 MB to 99.9 MB (10.0 MiB to 99.9 MiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 999.5) // 100 MB to 999 MB (100 MiB to 999 MiB)
-    {
-        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-
-    speed /= kilo;
-
-    if (speed < 9.995) // 0.98 GB to 9.99 GB (1.00 GiB to 9.99 GiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    if (speed < 99.95) // 10.0 GB to 99.9 GB (10.0 GiB to 99.9 GiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    // 100 GB and above (100 GiB and above)
-    return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-}
-
-size_t tr_mem_K = 0;
-
-void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-
-    tr_mem_K = kilo;
-    formatter_init(mem_units, kilo, kb, mb, gb, tb);
-}
-
-std::string tr_formatter_mem_B(size_t bytes_per_second)
-{
-    using namespace formatter_impl;
-
-    auto buf = std::array<char, 64>{};
-    return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
-}
-
-tr_variant tr_formatter_get_units()
-{
-    using namespace formatter_impl;
-
-    auto const make_units_vec = [](formatter_units const& units)
-    {
-        auto units_vec = tr_variant::Vector{};
-        units_vec.reserve(std::size(units));
-        std::transform(
-            std::begin(units),
-            std::end(units),
-            std::back_inserter(units_vec),
-            [](auto const& unit) { return std::data(unit.name); });
-        return units_vec;
-    };
-
-    auto units_map = tr_variant::Map{ 6U };
-    units_map.try_emplace(TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(mem_units));
-    units_map.try_emplace(TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(size_units));
-    units_map.try_emplace(TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(speed_units));
-    return tr_variant{ std::move(units_map) };
-}
-
 // --- ENVIRONMENT
 
 bool tr_env_key_exists(char const* key)
@@ -1013,7 +791,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <iomanip> // std::setbase
 #include <sstream>
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
@@ -1042,7 +820,7 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 
 #include <charconv> // std::from_chars()
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
@@ -1077,7 +855,7 @@ template std::optional<unsigned int> tr_num_parse(std::string_view str, std::str
 template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
 {
     auto const* const begin_ch = std::data(str);

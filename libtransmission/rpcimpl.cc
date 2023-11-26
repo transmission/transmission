@@ -28,6 +28,7 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
@@ -36,12 +37,14 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -235,7 +238,7 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
     {
         if (tor->activity() != TR_STATUS_STOPPED)
         {
-            tor->is_stopping_ = true;
+            tor->stop_soon();
             session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
         }
     }
@@ -279,32 +282,15 @@ char const* torrentReannounce(
     return nullptr;
 }
 
-namespace torrent_verify_helpers
-{
-char const* torrentVerifyImpl(tr_session* session, tr_variant* args_in, bool force)
+char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_torrentVerify(tor, force);
+        tr_torrentVerify(tor);
         session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
     }
 
     return nullptr;
-}
-} // namespace torrent_verify_helpers
-
-char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
-{
-    return torrent_verify_helpers::torrentVerifyImpl(session, args_in, false);
-}
-
-char const* torrentVerifyForce(
-    tr_session* session,
-    tr_variant* args_in,
-    tr_variant* /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
-{
-    return torrent_verify_helpers::torrentVerifyImpl(session, args_in, true);
 }
 
 // ---
@@ -479,8 +465,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_peerIsInterested, peer.peerIsInterested);
         peer_map.try_emplace(TR_KEY_port, peer.port);
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
-        peer_map.try_emplace(TR_KEY_rateToClient, tr_toSpeedBytes(peer.rateToClient_KBps));
-        peer_map.try_emplace(TR_KEY_rateToPeer, tr_toSpeedBytes(peer.rateToPeer_KBps));
+        peer_map.try_emplace(TR_KEY_rateToClient, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_rateToPeer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
         peers_vec.emplace_back(std::move(peer_map));
     }
     tr_torrentPeersFree(peers, n_peers);
@@ -655,7 +641,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_isStalled: return st.isStalled;
     case TR_KEY_labels: return make_labels_vec(tor);
     case TR_KEY_leftUntilDone: return st.leftUntilDone;
-    case TR_KEY_magnetLink: return tor.metainfo_.magnet();
+    case TR_KEY_magnetLink: return tor.magnet();
     case TR_KEY_manualAnnounceTime: return tr_announcerNextManualAnnounce(&tor);
     case TR_KEY_maxConnectedPeers: return tor.peer_limit();
     case TR_KEY_metadataPercentComplete: return st.metadataPercentComplete;
@@ -674,8 +660,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_primary_mime_type: return tor.primary_mime_type();
     case TR_KEY_priorities: return make_file_priorities_vec(tor);
     case TR_KEY_queuePosition: return st.queuePosition;
-    case TR_KEY_rateDownload: return tr_toSpeedBytes(st.pieceDownloadSpeed_KBps);
-    case TR_KEY_rateUpload: return tr_toSpeedBytes(st.pieceUploadSpeed_KBps);
+    case TR_KEY_rateDownload: return Speed{ st.pieceDownloadSpeed_KBps, Speed::Units::KByps }.base_quantity();
+    case TR_KEY_rateUpload: return Speed{ st.pieceUploadSpeed_KBps, Speed::Units::KByps }.base_quantity();
     case TR_KEY_recheckProgress: return st.recheckProgress;
     case TR_KEY_secondsDownloading: return st.secondsDownloading;
     case TR_KEY_secondsSeeding: return st.secondsSeeding;
@@ -916,7 +902,7 @@ char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 
 char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 {
-    auto const old_size = tor->tracker_count();
+    auto const old_list = tor->tracker_list();
 
     for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
@@ -930,7 +916,7 @@ char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         tor->announce_list().add(announce);
     }
 
-    if (tor->tracker_count() == old_size)
+    if (tor->tracker_list() == old_list) // unchanged
     {
         return "error setting announce list";
     }
@@ -970,7 +956,7 @@ char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
 
 char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
 {
-    auto const old_size = tor->tracker_count();
+    auto const old_list = tor->tracker_list();
 
     for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
     {
@@ -984,7 +970,7 @@ char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         tor->announce_list().remove(static_cast<tr_tracker_id_t>(id));
     }
 
-    if (tor->tracker_count() == old_size)
+    if (tor->tracker_list() == old_list) // unchanged
     {
         return "error setting announce list";
     }
@@ -1212,8 +1198,8 @@ char const* torrentRenamePath(
 
 void onPortTested(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
+    auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
     {
@@ -1223,16 +1209,26 @@ void onPortTested(tr_web::FetchResponse const& web_response)
                 _("Couldn't test port: {error} ({error_code})"),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
+        return;
     }
-    else /* success */
+
+    auto const addr = tr_address::from_string(primary_ip);
+    if (!addr || !addr->is_valid())
     {
-        bool const is_open = tr_strv_starts_with(body, '1');
-        tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
-        tr_idle_function_done(data, SuccessResult);
+        tr_idle_function_done(data, "Unknown error, please file a bug report to us");
+        return;
     }
+
+    bool const is_open = tr_strv_starts_with(body, '1');
+    tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
+    if (tr_variantDictFind(data->args_out, TR_KEY_ipProtocol) == nullptr) // `ipProtocol` was not specified in the request
+    {
+        tr_variantDictAddStrView(data->args_out, TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+    }
+    tr_idle_function_done(data, SuccessResult);
 }
 
-char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* idle_data)
 {
     auto const port = session->advertisedPeerPort();
     auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
@@ -1240,7 +1236,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     if (std::string_view arg; tr_variantDictFindStrView(args_in, TR_KEY_ipProtocol, &arg))
     {
-        tr_variantDictAddStrView(args_out, TR_KEY_ipProtocol, arg);
+        tr_variantDictAddStr(args_out, TR_KEY_ipProtocol, arg);
         if (arg == "ipv4"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
@@ -1249,7 +1245,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
         }
-        else if (arg != "any"sv)
+        else
         {
             return "invalid ip protocol string";
         }
@@ -1262,7 +1258,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
 
 void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
     auto* const session = data->session;
 
@@ -1386,7 +1382,7 @@ struct add_torrent_idle_data
 
 void onMetadataFetched(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
     tr_logAddTrace(fmt::format(
@@ -1604,9 +1600,9 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
             auto limits = group->get_limits();
             tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
             tr_variantDictAddStr(dict, TR_KEY_name, name);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit_KBps);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit_KBps);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_up_enabled, limits.up_limited);
         }
     }
@@ -1632,12 +1628,12 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
     {
-        limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+        limits.down_limit = Speed{ limit, Speed::Units::KByps };
     }
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
     {
-        limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+        limits.up_limit = Speed{ limit, Speed::Units::KByps };
     }
 
     group.set_limits(limits);
@@ -1867,7 +1863,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
+        session->set_speed_limit(TR_DOWN, Speed{ i, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
@@ -1877,7 +1873,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
+        session->set_speed_limit(TR_UP, Speed{ i, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))
@@ -1926,10 +1922,10 @@ char const* sessionStats(tr_session* session, tr_variant* /*args_in*/, tr_varian
         [](auto const* tor) { return tor->is_running(); });
 
     tr_variantDictAddInt(args_out, TR_KEY_activeTorrentCount, running);
-    tr_variantDictAddReal(args_out, TR_KEY_downloadSpeed, session->pieceSpeedBps(TR_DOWN));
+    tr_variantDictAddInt(args_out, TR_KEY_downloadSpeed, session->piece_speed(TR_DOWN).base_quantity());
     tr_variantDictAddInt(args_out, TR_KEY_pausedTorrentCount, total - running);
     tr_variantDictAddInt(args_out, TR_KEY_torrentCount, total);
-    tr_variantDictAddReal(args_out, TR_KEY_uploadSpeed, session->pieceSpeedBps(TR_UP));
+    tr_variantDictAddInt(args_out, TR_KEY_uploadSpeed, session->piece_speed(TR_UP).base_quantity());
 
     auto stats = session->stats().cumulative();
     tr_variant* d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
@@ -1963,6 +1959,35 @@ constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
     default:
         return "preferred"sv;
     }
+}
+
+[[nodiscard]] auto values_get_units()
+{
+    using namespace libtransmission::Values;
+
+    auto const make_units_vec = [](auto const& units)
+    {
+        auto units_vec = tr_variant::Vector{};
+        for (size_t i = 0;; ++i)
+        {
+            auto const display_name = units.display_name(i);
+            if (std::empty(display_name))
+            {
+                break;
+            }
+            units_vec.emplace_back(display_name);
+        }
+        return units_vec;
+    };
+
+    auto units_map = tr_variant::Map{ 6U };
+    units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
+    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
+    units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
+    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
+    units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
+    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Speed::units()));
+    return tr_variant{ std::move(units_map) };
 }
 
 void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
@@ -2141,19 +2166,19 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_up:
-        tr_variantDictAddInt(d, key, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
+        tr_variantDictAddInt(d, key, s->speed_limit(TR_UP).count(Speed::Units::KByps));
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_UP));
+        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_UP));
         break;
 
     case TR_KEY_speed_limit_down:
-        tr_variantDictAddInt(d, key, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
+        tr_variantDictAddInt(d, key, s->speed_limit(TR_DOWN).count(Speed::Units::KByps));
         break;
 
     case TR_KEY_speed_limit_down_enabled:
-        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_DOWN));
+        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_DOWN));
         break;
 
     case TR_KEY_script_torrent_added_filename:
@@ -2197,7 +2222,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_units:
-        *tr_variantDictAdd(d, key) = tr_formatter_get_units();
+        *tr_variantDictAdd(d, key) = values_get_units();
         break;
 
     case TR_KEY_version:
@@ -2210,6 +2235,9 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_session_id:
         tr_variantDictAddStr(d, key, s->sessionId());
+        break;
+
+    default:
         break;
     }
 }
@@ -2296,7 +2324,7 @@ struct rpc_method
     handler func;
 };
 
-auto constexpr Methods = std::array<rpc_method, 25>{ {
+auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "blocklist-update"sv, false, blocklistUpdate },
     { "free-space"sv, true, freeSpace },
     { "group-get"sv, true, groupGet },
@@ -2321,7 +2349,6 @@ auto constexpr Methods = std::array<rpc_method, 25>{ {
     { "torrent-start-now"sv, true, torrentStartNow },
     { "torrent-stop"sv, true, torrentStop },
     { "torrent-verify"sv, true, torrentVerify },
-    { "torrent-verify-force"sv, true, torrentVerifyForce },
 } };
 
 void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/, void* /*user_data*/)

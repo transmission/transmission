@@ -160,6 +160,14 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSUInteger totalPeersLocal;
 @property(nonatomic, readonly) NSUInteger totalPeersLTEP;
 
+@property(nonatomic, readonly) NSUInteger totalKnownPeersTracker;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersIncoming;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersCache;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersPex;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersDHT;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersLocal;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersLTEP;
+
 @property(nonatomic, readonly) NSUInteger peersSendingToUs;
 @property(nonatomic, readonly) NSUInteger peersGettingFromUs;
 

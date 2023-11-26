@@ -26,6 +26,7 @@ public:
     {
         long status = 0; // http server response, e.g. 200
         std::string body;
+        std::string primary_ip;
         bool did_connect = false;
         bool did_timeout = false;
         void* user_data = nullptr;
@@ -99,6 +100,8 @@ public:
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
     void startShutdown(std::chrono::milliseconds /*deadline*/);
+
+    [[nodiscard]] bool is_idle() const noexcept;
 
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel

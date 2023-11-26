@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cerrno>
+#include <cstddef>
 #include <string>
 
 #ifdef _WIN32

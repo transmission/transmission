@@ -11,6 +11,7 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
 #include "Application.h"

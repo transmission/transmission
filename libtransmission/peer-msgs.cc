@@ -15,6 +15,7 @@
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <queue>
+#include <ratio>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -381,16 +382,9 @@ public:
         }
     }
 
-    bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const override
+    [[nodiscard]] Speed get_piece_speed(uint64_t now, tr_direction dir) const override
     {
-        auto const bytes_per_second = io->get_piece_speed_bytes_per_second(now, dir);
-
-        if (setme_bytes_per_second != nullptr)
-        {
-            *setme_bytes_per_second = bytes_per_second;
-        }
-
-        return bytes_per_second > 0;
+        return io->get_piece_speed(now, dir);
     }
 
     [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
@@ -559,19 +553,18 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_bytes_per_second = get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
+        auto rate = get_piece_speed(now, TR_PEER_TO_CLIENT);
         if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
         {
-            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speed_limit_bps(TR_PEER_TO_CLIENT));
+            rate = std::min(rate, torrent->speed_limit(TR_PEER_TO_CLIENT));
         }
 
         // honor the session limits, if enabled
         if (torrent->uses_session_limits())
         {
-            if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
-                irate_bytes_per_second)
+            if (auto const limit = torrent->session->active_speed_limit(TR_PEER_TO_CLIENT); limit)
             {
-                rate_bytes_per_second = std::min(rate_bytes_per_second, *irate_bytes_per_second);
+                rate = std::min(rate, *limit);
             }
         }
 
@@ -579,7 +572,7 @@ private:
         // many requests we should send to this peer
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
+        size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = reqq ? *reqq : 250;
 
         auto max_reqs = estimated_blocks_in_period;

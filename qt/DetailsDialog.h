@@ -138,7 +138,7 @@ private:
 
     std::map<QString, QTreeWidgetItem*> peers_;
 
-    QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.svg"));
+    QIcon const icon_encrypted_ = QIcon{ QStringLiteral(":/icons/encrypted.svg") };
     QIcon const icon_unencrypted_ = {};
 
     static int prev_tab_index_;

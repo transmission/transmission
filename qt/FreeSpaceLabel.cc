@@ -3,9 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstdint>
+
 #include <QDir>
+#include <QLabel>
+#include <QString>
+#include <QWidget>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
 #include "Formatter.h"
@@ -25,8 +31,8 @@ int const IntervalMSec = 15000;
 } // namespace
 
 FreeSpaceLabel::FreeSpaceLabel(QWidget* parent)
-    : QLabel(parent)
-    , timer_(this)
+    : QLabel{ parent }
+    , timer_{ this }
 {
     timer_.setSingleShot(true);
     timer_.setInterval(IntervalMSec);
@@ -78,7 +84,7 @@ void FreeSpaceLabel::onTimer()
             // update the label
             if (auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes); bytes && *bytes > 1)
             {
-                setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
+                setText(tr("%1 free").arg(Formatter::storage_to_string(*bytes)));
             }
             else
             {

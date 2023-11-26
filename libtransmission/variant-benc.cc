@@ -71,7 +71,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
     }
 
     // parse the string and make sure the next char is `Suffix`
-    auto const value = tr_num_parse<int64_t>(walk, &walk);
+    auto value = tr_num_parse<int64_t>(walk, &walk);
     if (!value || !tr_strv_starts_with(walk, Suffix))
     {
         return {};
@@ -79,7 +79,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     walk.remove_prefix(std::size(Suffix));
     *benc = walk;
-    return *value;
+    return value;
 }
 
 /**
@@ -158,28 +158,19 @@ struct MyHandler : public transmission::benc::Handler
             return false;
         }
 
-        tr_variantInitInt(variant, value);
+        *variant = value;
         return true;
     }
 
     bool String(std::string_view sv, Context const& /*context*/) final
     {
-        auto* const variant = get_node();
-        if (variant == nullptr)
+        if (auto* const variant = get_node(); variant != nullptr)
         {
-            return false;
+            *variant = inplace_ ? tr_variant::unmanaged_string(sv) : tr_variant{ sv };
+            return true;
         }
 
-        if (inplace_)
-        {
-            tr_variantInitStrView(variant, sv);
-        }
-        else
-        {
-            tr_variantInitStr(variant, sv);
-        }
-
-        return true;
+        return false;
     }
 
     bool StartDict(Context const& /*context*/) final

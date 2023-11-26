@@ -6,13 +6,15 @@
 #include <algorithm>
 #include <array>
 #include <chrono> // operator""ms
-#include <cstdio>
+#include <cstddef> // size_t
+#include <cstdint>
 #include <ctime>
 #include <deque>
 #include <iterator>
 #include <map>
 #include <memory>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -115,11 +117,10 @@ struct tr_scrape_info
 class tr_announcer_impl final : public tr_announcer
 {
 public:
-    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp, std::atomic<size_t>& n_pending_stops)
+    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp)
         : session{ session_in }
         , announcer_udp_{ announcer_udp }
         , upkeep_timer_{ session_in->timerMaker().create() }
-        , n_pending_stops_{ n_pending_stops }
     {
         upkeep_timer_->set_callback([this]() { this->upkeep(); });
         upkeep_timer_->start_repeating(UpkeepInterval);
@@ -147,7 +148,7 @@ public:
         flushCloseMessages();
     }
 
-    void upkeep();
+    void upkeep() override;
 
     void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
     void onScrapeDone(tr_scrape_response const& response);
@@ -184,22 +185,7 @@ public:
 
     void announce(tr_announce_request const& request, tr_announce_response_func on_response)
     {
-        auto const is_stop = request.event == TR_ANNOUNCE_EVENT_STOPPED;
-        TR_ASSERT(!is_shutting_down_ || is_stop);
-
-        if (is_stop)
-        {
-            ++n_pending_stops_;
-
-            on_response =
-                [&n_stops = n_pending_stops_, on_response = std::move(on_response)](tr_announce_response const& response)
-            {
-                TR_ASSERT(n_stops > 0U);
-                --n_stops;
-
-                on_response(response);
-            };
-        }
+        TR_ASSERT(!is_shutting_down_ || request.event == TR_ANNOUNCE_EVENT_STOPPED);
 
         if (auto const announce_sv = request.announce_url.sv();
             tr_strv_starts_with(announce_sv, "http://"sv) || tr_strv_starts_with(announce_sv, "https://"sv))
@@ -239,19 +225,13 @@ private:
 
     std::set<tr_announce_request, StopsCompare> stops_;
 
-    std::atomic<size_t>& n_pending_stops_;
-
     bool is_shutting_down_ = false;
 };
 
-std::unique_ptr<tr_announcer> tr_announcer::create(
-    tr_session* session,
-    tr_announcer_udp& announcer_udp,
-    std::atomic<size_t>& n_pending_stops)
+std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
 {
     TR_ASSERT(session != nullptr);
-
-    return std::make_unique<tr_announcer_impl>(session, announcer_udp, n_pending_stops);
+    return std::make_unique<tr_announcer_impl>(session, announcer_udp);
 }
 
 // ---
@@ -805,7 +785,7 @@ void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
     buf.reserve(std::size(events) * 20);
     for (size_t i = 0, n = std::size(events); i < n; ++i)
     {
-        fmt::format_to(std::back_inserter(buf), FMT_STRING("[{:d}:{:s}]"), i, tr_announce_event_get_string(events[i]));
+        fmt::format_to(std::back_inserter(buf), "[{:d}:{:s}]", i, tr_announce_event_get_string(events[i]));
     }
 
     tr_logAddTraceTier(tier, std::move(buf));
@@ -1060,7 +1040,7 @@ void tr_announcer_impl::onAnnounceDone(
            Don't bother publishing if there are other trackers -- it's
            all too common for people to load up dozens of dead trackers
            in a torrent's metainfo... */
-        if (tier->tor->tracker_count() < 2)
+        if (std::size(tier->tor->announce_list()) < 2U)
         {
             publishError(tier, response.errmsg);
         }

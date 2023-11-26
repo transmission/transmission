@@ -24,8 +24,8 @@ int getHSpacing(QWidget const* w)
 } // namespace
 
 FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo)
-    : QItemDelegate(parent)
-    , combo_(combo)
+    : QItemDelegate{ parent }
+    , combo_{ combo }
 {
 }
 

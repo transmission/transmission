@@ -17,10 +17,13 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/observable.h"
 #include "libtransmission/open-files.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // _()
+
+using namespace std::literals;
 
 namespace
 {
@@ -32,7 +35,7 @@ namespace
 
 bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    if (length == 0)
+    if (length == 0U)
     {
         return true;
     }
@@ -48,12 +51,12 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     if (!TR_ERROR_IS_ENOSPC(local_error.code()))
     {
-        char const zero = '\0';
+        static char constexpr Zero = '\0';
 
         local_error = {};
 
         /* fallback: the old-style seek-and-write */
-        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, nullptr, &local_error) &&
+        if (tr_sys_file_write_at(fd, &Zero, 1, length - 1, nullptr, &local_error) &&
             tr_sys_file_truncate(fd, length, &local_error))
         {
             return true;
@@ -72,7 +75,7 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
 bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    if (length == 0)
+    if (length == 0U)
     {
         return true;
     }
@@ -122,22 +125,26 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
 // ---
 
-std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
+std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_files::get(
+    tr_torrent_id_t tor_id,
+    tr_file_index_t file_num,
+    bool writable)
 {
-    if (auto* const found = pool_.get(make_key(tor_id, file_num)); found != nullptr)
+    if (auto found = pool_.get(make_key(tor_id, file_num)); found)
     {
-        if (writable && !found->writable_)
+        auto& [entry, tag] = *found;
+        if (writable && !entry.writable_)
         {
             return {};
         }
 
-        return found->fd_;
+        return std::pair{ entry.fd_, std::move(tag) };
     }
 
     return {};
 }
 
-std::optional<tr_sys_file_t> tr_open_files::get(
+std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_files::get(
     tr_torrent_id_t tor_id,
     tr_file_index_t file_num,
     bool writable,
@@ -147,11 +154,12 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 {
     // is there already an entry
     auto key = make_key(tor_id, file_num);
-    if (auto* const found = pool_.get(key); found != nullptr)
+    if (auto found = pool_.get(key); found)
     {
-        if (!writable || found->writable_)
+        auto& [entry, tag] = *found;
+        if (!writable || entry.writable_)
         {
-            return found->fd_;
+            return std::pair{ entry.fd_, std::move(tag) };
         }
 
         pool_.erase(key); // close so we can re-open as writable
@@ -199,20 +207,20 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
     {
         bool success = false;
-        char const* type = nullptr;
+        auto type = std::string_view{};
 
         if (allocation == TR_PREALLOCATE_FULL)
         {
             success = preallocate_file_full(fd, file_size, &error);
-            type = "full";
+            type = "full"sv;
         }
         else if (allocation == TR_PREALLOCATE_SPARSE)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
-            type = "sparse";
+            type = "sparse"sv;
         }
 
-        TR_ASSERT(type != nullptr);
+        TR_ASSERT(!std::empty(type));
 
         if (!success)
         {
@@ -245,11 +253,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     }
 
     // cache it
-    auto& entry = pool_.add(std::move(key));
+    auto [entry, tag] = pool_.add(std::move(key));
     entry.fd_ = fd;
     entry.writable_ = writable;
 
-    return fd;
+    return std::pair{ fd, std::move(tag) };
 }
 
 void tr_open_files::close_all()

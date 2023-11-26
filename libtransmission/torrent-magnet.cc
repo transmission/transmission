@@ -5,12 +5,16 @@
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
+#include <ios>
 #include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <utility> // std::move
 #include <vector>
 
@@ -228,7 +232,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_error* error)
     }
 
     // yay we have an info dict. Let's make a torrent file
-    auto top_var = build_metainfo_except_info_dict(tor->metainfo_);
+    auto top_var = build_metainfo_except_info_dict(tor->metainfo());
     tr_variantMergeDicts(tr_variantDictAddDict(&top_var, TR_KEY_info, 0), &*info_dict_v);
     auto const benc = serde.to_string(top_var);
 
@@ -389,7 +393,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tor->metainfo_.magnet();
+    return tor->magnet();
 }
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)

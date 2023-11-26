@@ -19,39 +19,16 @@
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> // _()
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 
 using namespace std::chrono_literals;
+using namespace libtransmission::Values;
 
-/***
-****
-***/
-
-static auto constexpr MemK = size_t{ 1024 };
-static char constexpr MemKStr[] = "KiB";
-static char constexpr MemMStr[] = "MiB";
-static char constexpr MemGStr[] = "GiB";
-static char constexpr MemTStr[] = "TiB";
-
-static auto constexpr DiskK = size_t{ 1000 };
-static char constexpr DiskKStr[] = "kB";
-static char constexpr DiskMStr[] = "MB";
-static char constexpr DiskGStr[] = "GB";
-static char constexpr DiskTStr[] = "TB";
-
-static auto constexpr SpeedK = size_t{ 1000 };
 #define SPEED_K_STR "kB/s"
-static char constexpr SpeedKStr[] = SPEED_K_STR;
-static char constexpr SpeedMStr[] = "MB/s";
-static char constexpr SpeedGStr[] = "GB/s";
-static char constexpr SpeedTStr[] = "TB/s";
-
-/***
-****
-***/
 
 static auto constexpr LineWidth = int{ 80 };
 
@@ -159,9 +136,9 @@ static std::string getStatusStr(tr_stat const* st)
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps),
+            Speed{ st->pieceDownloadSpeed_KBps, Speed::Units::KByps }.to_string(),
             st->peersGettingFromUs,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
             tr_strlratio(st->ratio));
     }
 
@@ -171,7 +148,7 @@ static std::string getStatusStr(tr_stat const* st)
             FMT_STRING("Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]"),
             st->peersGettingFromUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
             tr_strlratio(st->ratio));
     }
 
@@ -203,10 +180,6 @@ int tr_main(int argc, char* argv[])
     auto const init_mgr = tr_lib_init();
 
     tr_locale_set_global("");
-
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     printf("%s %s\n", MyReadableName, LONG_VERSION_STRING);
 

@@ -4,18 +4,22 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstddef> // std::byte
 #include <cstdint> // uint64_t, uint32_t
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <thread>
+#include <utility> // for std::move()
 #include <vector>
 
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;

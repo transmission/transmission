@@ -5,14 +5,18 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <ctime>
 #include <iterator> // for std::back_inserter
 #include <set>
 #include <string_view>
+#include <vector>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "Speed.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -65,7 +69,7 @@ auto getIds(Iter it, Iter end)
 ***/
 
 TorrentModel::TorrentModel(Prefs const& prefs)
-    : prefs_(prefs)
+    : prefs_{ prefs }
 {
 }
 

@@ -29,6 +29,7 @@
 
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/version.h>
 
 #include "AddData.h"
@@ -99,6 +100,7 @@ Application::Application(int& argc, char** argv)
 {
     setApplicationName(config_name_);
     loadTranslations();
+    initUnits();
 
 #if defined(_WIN32) || defined(__APPLE__)
 
@@ -403,6 +405,20 @@ void Application::loadTranslations()
     }
 }
 
+void Application::initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    Config::Speed = { Config::Base::Kilo,       tr("B/s").toStdString(),  tr("kB/s").toStdString(),
+                      tr("MB/s").toStdString(), tr("GB/s").toStdString(), tr("TB/s").toStdString() };
+
+    Config::Memory = { Config::Base::Kibi,      tr("B").toStdString(),   tr("KiB").toStdString(),
+                       tr("MiB").toStdString(), tr("GiB").toStdString(), tr("TiB").toStdString() };
+
+    Config::Storage = { Config::Base::Kilo,     tr("B").toStdString(),  tr("kB").toStdString(),
+                        tr("MB").toStdString(), tr("GB").toStdString(), tr("TB").toStdString() };
+}
+
 void Application::quitLater() const
 {
     QTimer::singleShot(0, this, SLOT(quit()));
@@ -634,9 +650,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(QVariantMap({
-            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
-        })); // hints
+        args.append(QVariantMap{ {
+            std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
+        } }); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);

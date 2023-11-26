@@ -11,7 +11,9 @@
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <ctime> // time_t
+#include <functional>
 #include <iterator> // std::back_inserter
+#include <memory>
 #include <optional>
 #include <tuple> // std::tie
 #include <unordered_map>
@@ -50,9 +52,11 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 static auto constexpr CancelHistorySec = int{ 60 };
 
@@ -336,6 +340,7 @@ public:
             auto& [socket_address, peer_info] = *iter;
             if (peer_info.is_inactive(now))
             {
+                --stats.known_peer_from_count[peer_info.from_first()];
                 iter = connectable_pool.erase(iter);
             }
             else
@@ -355,7 +360,7 @@ public:
         return std::count_if(
             std::begin(webseeds),
             std::end(webseeds),
-            [&now](auto const& webseed) { return webseed->isTransferringPieces(now, TR_DOWN, nullptr); });
+            [&now](auto const& webseed) { return webseed->get_piece_speed(now, TR_DOWN).base_quantity() != 0U; });
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto peerCount() const noexcept
@@ -455,6 +460,10 @@ public:
             peer_info.found_at(from);
             peer_info.set_pex_flags(flags);
         }
+        else if (is_connectable)
+        {
+            ++stats.known_peer_from_count[from];
+        }
 
         mark_all_seeds_flag_dirty();
 
@@ -475,7 +484,7 @@ public:
                 auto const now = tr_time();
                 auto* const tor = s->tor;
 
-                tor->uploadedCur += event.length;
+                tor->bytes_uploaded_ += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(now);
                 tor->set_dirty();
@@ -756,7 +765,7 @@ private:
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
-                tr_torrentGotBlock(tor, loc.block);
+                tor->on_block_received(loc.block);
             }
 
             break;
@@ -789,7 +798,7 @@ private:
 
     static void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
     {
-        tor->downloadedCur += sent_length;
+        tor->bytes_downloaded_ += sent_length;
         tor->set_date_active(now);
         tor->set_dirty();
         tor->session->add_downloaded(sent_length);
@@ -817,7 +826,8 @@ private:
             }
 
             info_this.merge(info_that);
-            connectable_pool.erase(info_that.listen_socket_address());
+            auto from = info_that.from_first();
+            stats.known_peer_from_count[from] -= connectable_pool.erase(info_that.listen_socket_address());
         }
         else if (!was_connectable)
         {
@@ -833,6 +843,7 @@ private:
         }
         else
         {
+            ++stats.known_peer_from_count[nh.mapped().from_first()];
             TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
         }
         nh.key().port_ = event.port;
@@ -859,6 +870,7 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
+            --stats.known_peer_from_count[info_that.from_first()];
             // Note that it_that is invalid after this point
             graveyard_pool.insert(connectable_pool.extract(it_that));
 
@@ -870,6 +882,7 @@ private:
 
         if (was_connectable)
         {
+            --stats.known_peer_from_count[info_this.from_first()];
             graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
         }
 
@@ -1198,92 +1211,92 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 /* FIXME: this is kind of a mess. */
 [[nodiscard]] bool on_handshake_done(tr_peerMgr* const manager, tr_handshake::Result const& result)
 {
+    auto const lock = manager->unique_lock();
+
     TR_ASSERT(result.io != nullptr);
-
-    bool const ok = result.is_connected;
-
-    auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
-
     auto const& socket_address = result.io->socket_address();
-
-    auto* const info_ptr = s != nullptr ? s->get_existing_peer_info(socket_address) : nullptr;
+    auto* const swarm = manager->get_existing_swarm(result.io->torrent_hash());
+    auto* info = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : nullptr;
 
     if (result.io->is_incoming())
     {
         manager->incoming_handshakes.erase(socket_address);
     }
-    else if (info_ptr != nullptr)
+    else if (info != nullptr)
     {
-        info_ptr->destroy_handshake();
+        info->destroy_handshake();
     }
 
-    auto const lock = manager->unique_lock();
-
-    if (!ok || s == nullptr || !s->is_running)
+    if (!result.is_connected || swarm == nullptr || !swarm->is_running)
     {
-        if (info_ptr != nullptr && !info_ptr->is_connected())
+        if (info != nullptr && !info->is_connected())
         {
-            info_ptr->on_connection_failed();
+            info->on_connection_failed();
 
             if (!result.read_anything_from_peer)
             {
                 tr_logAddTraceSwarm(
-                    s,
+                    swarm,
                     fmt::format(
                         "marking peer {} as unreachable... num_fails is {}",
-                        info_ptr->display_name(),
-                        info_ptr->connection_failure_count()));
-                info_ptr->set_connectable(false);
+                        info->display_name(),
+                        info->connection_failure_count()));
+                info->set_connectable(false);
             }
         }
+
+        return false;
     }
-    else /* looking good */
+
+    if (result.io->is_incoming())
     {
-        // If this is an outgoing connection, then we are sure we already have the peer info object
-        auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false) :
-                                                *info_ptr;
-
-        if (!result.io->is_incoming())
-        {
-            info.set_connectable();
-        }
-
-        // If we're connected via µTP, then we know the peer supports µTP...
-        if (result.io->is_utp())
-        {
-            info.set_utp_supported();
-        }
-
-        if (info.is_banned())
-        {
-            tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", info.display_name()));
-        }
-        else if (s->peerCount() >= s->tor->peer_limit())
-        {
-            // too many peers already
-        }
-        else if (info.is_connected())
-        {
-            // we're already connected to this peer; do nothing
-        }
-        else
-        {
-            auto client = tr_interned_string{};
-            if (result.peer_id)
-            {
-                auto buf = std::array<char, 128>{};
-                tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
-                client = tr_interned_string{ tr_quark_new(std::data(buf)) };
-            }
-
-            result.io->set_bandwidth(&s->tor->bandwidth_);
-            create_bit_torrent_peer(s->tor, result.io, &info, client);
-
-            return true;
-        }
+        info = &swarm->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false);
     }
 
-    return false;
+    if (info == nullptr)
+    {
+        return false;
+    }
+
+    if (!result.io->is_incoming())
+    {
+        info->set_connectable();
+    }
+
+    // If we're connected via µTP, then we know the peer supports µTP...
+    if (result.io->is_utp())
+    {
+        info->set_utp_supported();
+    }
+
+    if (info->is_banned())
+    {
+        tr_logAddTraceSwarm(swarm, fmt::format("banned peer {} tried to reconnect", info->display_name()));
+        return false;
+    }
+
+    if (swarm->peerCount() >= swarm->tor->peer_limit()) // too many peers already
+    {
+        return false;
+    }
+
+    if (info->is_connected()) // we're already connected to this peer; do nothing
+    {
+        return false;
+    }
+
+    auto client = tr_interned_string{};
+    if (result.peer_id)
+    {
+        auto buf = std::array<char, 128>{};
+        tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
+        client = tr_interned_string{ tr_quark_new(std::data(buf)) };
+    }
+
+    result.io->set_bandwidth(&swarm->tor->bandwidth());
+    create_bit_torrent_peer(swarm->tor, result.io, info, client);
+
+    return true;
 }
 } // namespace handshake_helpers
 } // namespace
@@ -1626,8 +1639,8 @@ namespace peer_stat_helpers
     stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_CLIENT_TO_PEER));
-    stats.rateToClient_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_PEER_TO_CLIENT));
+    stats.rateToPeer_KBps = peer->get_piece_speed(now_msec, TR_CLIENT_TO_PEER).count(Speed::Units::KByps);
+    stats.rateToClient_KBps = peer->get_piece_speed(now_msec, TR_PEER_TO_CLIENT).count(Speed::Units::KByps);
     stats.peerIsChoked = peer->peer_is_choked();
     stats.peerIsInterested = peer->peer_is_interested();
     stats.clientIsChoked = peer->client_is_choked();
@@ -1803,37 +1816,37 @@ namespace rechoke_uploads_helpers
 {
 struct ChokeData
 {
-    ChokeData(tr_peerMsgs* msgs_in, int rate_in, uint8_t salt_in, bool is_interested_in, bool was_choked_in, bool is_choked_in)
-        : msgs{ msgs_in }
-        , rate{ rate_in }
-        , salt{ salt_in }
-        , is_interested{ is_interested_in }
-        , was_choked{ was_choked_in }
-        , is_choked{ is_choked_in }
+    ChokeData(tr_peerMsgs* msgs, Speed rate, uint8_t salt, bool is_interested, bool was_choked, bool is_choked)
+        : msgs_{ msgs }
+        , rate_{ rate }
+        , salt_{ salt }
+        , is_interested_{ is_interested }
+        , was_choked_{ was_choked }
+        , is_choked_{ is_choked }
     {
     }
 
-    tr_peerMsgs* msgs;
-    int rate;
-    uint8_t salt;
-    bool is_interested;
-    bool was_choked;
-    bool is_choked;
+    tr_peerMsgs* msgs_;
+    Speed rate_;
+    uint8_t salt_;
+    bool is_interested_;
+    bool was_choked_;
+    bool is_choked_;
 
     [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
     {
         // prefer higher overall speeds
-        if (auto const val = tr_compare_3way(this->rate, that.rate); val != 0)
+        if (auto const val = tr_compare_3way(rate_, that.rate_); val != 0)
         {
             return -val;
         }
 
-        if (this->was_choked != that.was_choked) // prefer unchoked
+        if (was_choked_ != that.was_choked_) // prefer unchoked
         {
-            return this->was_choked ? 1 : -1;
+            return was_choked_ ? 1 : -1;
         }
 
-        return tr_compare_3way(this->salt, that.salt);
+        return tr_compare_3way(salt_, that.salt_);
     }
 
     [[nodiscard]] constexpr auto operator<(ChokeData const& that) const noexcept
@@ -1843,23 +1856,22 @@ struct ChokeData
 };
 
 /* get a rate for deciding which peers to choke and unchoke. */
-[[nodiscard]] auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
+[[nodiscard]] auto get_rate(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
     if (tor->is_done())
     {
-        return peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
+        return peer->get_piece_speed(now, TR_CLIENT_TO_PEER);
     }
 
-    /* downloading a private torrent... take upload speed into account
-     * because there may only be a small window of opportunity to share */
+    // downloading a private torrent... take upload speed into account
+    // because there may only be a small window of opportunity to share
     if (tor->is_private())
     {
-        return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) +
-            peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
+        return peer->get_piece_speed(now, TR_PEER_TO_CLIENT) + peer->get_piece_speed(now, TR_CLIENT_TO_PEER);
     }
 
-    /* downloading a public torrent */
-    return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
+    // downloading a public torrent
+    return peer->get_piece_speed(now, TR_PEER_TO_CLIENT);
 }
 
 // an optimistically unchoked peer is immune from rechoking
@@ -1876,7 +1888,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     choked.reserve(peer_count);
     auto const* const session = s->manager->session;
     bool const choke_all = !s->tor->client_can_upload();
-    bool const is_maxed_out = s->tor->bandwidth_.is_maxed_out(TR_UP, now);
+    bool const is_maxed_out = s->tor->bandwidth().is_maxed_out(TR_UP, now);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -1907,7 +1919,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         {
             choked.emplace_back(
                 peer,
-                getRateBps(s->tor, peer, now),
+                get_rate(s->tor, peer, now),
                 salter(),
                 peer->peer_is_interested(),
                 peer->peer_is_choked(),
@@ -1942,11 +1954,11 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             break;
         }
 
-        item.is_choked = is_maxed_out ? item.was_choked : false;
+        item.is_choked_ = is_maxed_out ? item.was_choked_ : false;
 
         ++checked_choke_count;
 
-        if (item.is_interested)
+        if (item.is_interested_)
         {
             ++unchoked_interested;
         }
@@ -1959,7 +1971,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 
         for (auto i = checked_choke_count, n = std::size(choked); i < n; ++i)
         {
-            if (choked[i].is_interested)
+            if (choked[i].is_interested_)
             {
                 rand_pool.push_back(&choked[i]);
             }
@@ -1968,15 +1980,15 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         if (auto const n = std::size(rand_pool); n != 0)
         {
             auto* c = rand_pool[tr_rand_int(n)];
-            c->is_choked = false;
-            s->optimistic = c->msgs;
+            c->is_choked_ = false;
+            s->optimistic = c->msgs_;
             s->optimistic_unchoke_time_scaler = OptimisticUnchokeMultiplier;
         }
     }
 
     for (auto& item : choked)
     {
-        item.msgs->set_choke(item.is_choked);
+        item.msgs_->set_choke(item.is_choked_);
     }
 }
 } // namespace rechoke_uploads_helpers
@@ -1995,7 +2007,7 @@ void tr_peerMgr::rechoke_pulse() const
         if (tor->is_running())
         {
             // possibly stop torrents that have seeded enough
-            tr_torrentCheckSeedLimit(tor);
+            tor->stop_if_seed_limit_reached();
         }
 
         if (tor->is_running())
@@ -2316,14 +2328,9 @@ struct peer_candidate
     tr_peer_info const* peer_info;
 };
 
-[[nodiscard]] bool torrentWasRecentlyStarted(tr_torrent const* tor)
+[[nodiscard]] constexpr uint64_t addValToKey(uint64_t value, unsigned int width, uint64_t addme)
 {
-    return difftime(tr_time(), tor->startDate) < 120;
-}
-
-[[nodiscard]] constexpr uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
-{
-    value = value << (uint64_t)width;
+    value <<= width;
     value |= addme;
     return value;
 }
@@ -2336,11 +2343,11 @@ struct peer_candidate
 
     /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
     i = peer_info.connection_failure_count() != 0U ? 1U : 0U;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
     i = peer_info.connection_attempt_time();
-    score = addValToKey(score, 32, i);
+    score = addValToKey(score, 32U, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
     switch (tor->get_priority())
@@ -2358,30 +2365,30 @@ struct peer_candidate
         break;
     }
 
-    score = addValToKey(score, 4, i);
+    score = addValToKey(score, 4U, i);
 
-    /* prefer recently-started torrents */
-    i = torrentWasRecentlyStarted(tor) ? 0 : 1;
-    score = addValToKey(score, 1, i);
+    // prefer recently-started torrents
+    i = tor->started_recently(tr_time()) ? 0 : 1;
+    score = addValToKey(score, 1U, i);
 
     /* prefer torrents we're downloading with */
     i = tor->is_done() ? 1 : 0;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* prefer peers that are known to be connectible */
     i = peer_info.is_connectable().value_or(false) ? 0 : 1;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* prefer peers that we might be able to upload to */
     i = peer_info.is_seed() ? 0 : 1;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* Prefer peers that we got from more trusted sources.
      * lower `fromBest` values indicate more trusted sources */
-    score = addValToKey(score, 4, peer_info.from_best());
+    score = addValToKey(score, 4U, peer_info.from_best());
 
     /* salt */
-    score = addValToKey(score, 8, salt);
+    score = addValToKey(score, 8U, salt);
 
     return score;
 }
@@ -2428,7 +2435,7 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (seeding && tor->bandwidth_.is_maxed_out(TR_UP, now_msec))
+        if (seeding && tor->bandwidth().is_maxed_out(TR_UP, now_msec))
         {
             continue;
         }

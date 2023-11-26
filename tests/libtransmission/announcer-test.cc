@@ -7,6 +7,7 @@
 #include <array>
 #include <cassert>
 #include <cstddef> // std::byte
+#include <optional>
 #include <string_view>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
