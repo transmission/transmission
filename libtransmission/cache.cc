@@ -223,10 +223,10 @@ int Cache::flush_span(CIter const begin, CIter const end)
     return {};
 }
 
-int Cache::flush_file(tr_torrent const* torrent, tr_file_index_t file)
+int Cache::flush_file(tr_torrent const* const torrent, tr_file_index_t const file)
 {
     auto const tor_id = torrent->id();
-    auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
+    auto const [block_begin, block_end] = torrent->block_span_for_file(file);
 
     auto const lock = std::lock_guard{ mutex_ };
     return flush_span(

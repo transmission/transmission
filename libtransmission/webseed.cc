@@ -176,7 +176,7 @@ public:
         , callback_data{ callback_data_in }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
         , have_{ tor->piece_count() }
-        , bandwidth_{ &tor->bandwidth_ }
+        , bandwidth_{ &tor->bandwidth() }
     {
         have_.set_has_all();
         idle_timer_->start_repeating(IdleTimerInterval);

@@ -641,7 +641,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_isStalled: return st.isStalled;
     case TR_KEY_labels: return make_labels_vec(tor);
     case TR_KEY_leftUntilDone: return st.leftUntilDone;
-    case TR_KEY_magnetLink: return tor.metainfo_.magnet();
+    case TR_KEY_magnetLink: return tor.magnet();
     case TR_KEY_manualAnnounceTime: return tr_announcerNextManualAnnounce(&tor);
     case TR_KEY_maxConnectedPeers: return tor.peer_limit();
     case TR_KEY_metadataPercentComplete: return st.metadataPercentComplete;
@@ -902,7 +902,7 @@ char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 
 char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 {
-    auto const old_size = tor->tracker_count();
+    auto const old_list = tor->tracker_list();
 
     for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
@@ -916,7 +916,7 @@ char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         tor->announce_list().add(announce);
     }
 
-    if (tor->tracker_count() == old_size)
+    if (tor->tracker_list() == old_list) // unchanged
     {
         return "error setting announce list";
     }
@@ -956,7 +956,7 @@ char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
 
 char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
 {
-    auto const old_size = tor->tracker_count();
+    auto const old_list = tor->tracker_list();
 
     for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
     {
@@ -970,7 +970,7 @@ char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         tor->announce_list().remove(static_cast<tr_tracker_id_t>(id));
     }
 
-    if (tor->tracker_count() == old_size)
+    if (tor->tracker_list() == old_list) // unchanged
     {
         return "error setting announce list";
     }
