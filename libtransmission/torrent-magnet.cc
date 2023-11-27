@@ -382,7 +382,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
     if (auto const& m = tor->incomplete_metadata; m)
     {
-        if (auto const& n = m->piece_count; n != 0)
+        if (auto const n = m->piece_count; n != 0)
         {
             return (n - std::size(m->pieces_needed)) / static_cast<double>(n);
         }
