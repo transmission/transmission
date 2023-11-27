@@ -943,6 +943,25 @@ public:
         return obfuscated_hash_ == test;
     }
 
+    // --- queue position
+
+    [[nodiscard]] constexpr auto queue_position() const noexcept
+    {
+        return queue_position_;
+    }
+
+    void set_unique_queue_position(size_t const new_pos);
+
+    static inline constexpr struct
+    {
+        constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
+        {
+            return a->queue_position_ < b->queue_position_;
+        }
+    } CompareQueuePosition{};
+
+    // ---
+
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
@@ -968,8 +987,6 @@ public:
     tr_swarm* swarm = nullptr;
 
     time_t lpdAnnounceAt = 0;
-
-    size_t queuePosition = 0;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -1283,6 +1300,8 @@ private:
      * and in the handshake are expected to match.
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
+
+    size_t queue_position_ = 0;
 
     time_t date_active_ = 0;
     time_t date_added_ = 0;

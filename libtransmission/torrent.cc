@@ -9,6 +9,7 @@
 #include <climits> /* INT_MAX */
 #include <cstddef> // size_t
 #include <ctime>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -464,32 +465,23 @@ namespace
 {
 namespace queue_helpers
 {
-constexpr struct
-{
-    constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
-    {
-        return a->queuePosition < b->queuePosition;
-    }
-} CompareTorrentByQueuePosition{};
+constexpr auto MinQueuePosition = std::numeric_limits<size_t>::min();
+constexpr auto MaxQueuePosition = std::numeric_limits<size_t>::max();
 
 #ifdef TR_ENABLE_ASSERTS
-bool queueIsSequenced(tr_session const* const session)
+[[nodiscard]] bool torrents_are_sorted_by_queue_position(std::vector<tr_torrent*> torrents)
 {
-    auto torrents = session->torrents().get_all();
-    std::sort(
-        std::begin(torrents),
-        std::end(torrents),
-        [](auto const* a, auto const* b) { return a->queuePosition < b->queuePosition; });
+    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
 
-    /* test them */
-    bool is_sequenced = true;
-
-    for (size_t i = 0, n = std::size(torrents); is_sequenced && i < n; ++i)
+    for (size_t idx = 0, end_idx = std::size(torrents); idx < end_idx; ++idx)
     {
-        is_sequenced = torrents[i]->queuePosition == i;
+        if (torrents[idx]->queue_position() != idx)
+        {
+            return false;
+        }
     }
 
-    return is_sequenced;
+    return true;
 }
 #endif
 } // namespace queue_helpers
@@ -497,42 +489,45 @@ bool queueIsSequenced(tr_session const* const session)
 
 size_t tr_torrentGetQueuePosition(tr_torrent const* tor)
 {
-    return tor->queuePosition;
+    return tor->queue_position();
+}
+
+void tr_torrent::set_unique_queue_position(size_t const new_pos)
+{
+    using namespace queue_helpers;
+
+    auto current = size_t{};
+    auto const old_pos = queue_position_;
+
+    queue_position_ = MaxQueuePosition;
+
+    auto& torrents = session->torrents();
+    for (auto* const walk : torrents)
+    {
+        if ((old_pos < new_pos) && (old_pos <= walk->queue_position_) && (walk->queue_position_ <= new_pos))
+        {
+            --walk->queue_position_;
+            walk->mark_changed();
+        }
+
+        if ((old_pos > new_pos) && (new_pos <= walk->queue_position_) && (walk->queue_position_ < old_pos))
+        {
+            ++walk->queue_position_;
+            walk->mark_changed();
+        }
+
+        current = std::max(current, walk->queue_position_ + 1U);
+    }
+
+    queue_position_ = std::min(new_pos, current);
+    mark_changed();
+
+    TR_ASSERT(torrents_are_sorted_by_queue_position(torrents.get_all()));
 }
 
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 {
-    using namespace queue_helpers;
-
-    size_t current = 0;
-    auto const old_pos = tor->queuePosition;
-
-    tor->queuePosition = static_cast<size_t>(-1);
-
-    for (auto* const walk : tor->session->torrents())
-    {
-        if ((old_pos < queue_position) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= queue_position))
-        {
-            walk->queuePosition--;
-            walk->mark_changed();
-        }
-
-        if ((old_pos > queue_position) && (queue_position <= walk->queuePosition) && (walk->queuePosition < old_pos))
-        {
-            walk->queuePosition++;
-            walk->mark_changed();
-        }
-
-        if (current < walk->queuePosition + 1)
-        {
-            current = walk->queuePosition + 1;
-        }
-    }
-
-    tor->queuePosition = std::min(queue_position, current);
-    tor->mark_changed();
-
-    TR_ASSERT(queueIsSequenced(tor->session));
+    tor->set_unique_queue_position(queue_position);
 }
 
 void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t torrent_count)
@@ -540,10 +535,10 @@ void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t torrent_coun
     using namespace queue_helpers;
 
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition);
-    for (auto* tor : torrents)
+    std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
+    for (auto* const tor : torrents)
     {
-        tr_torrentSetQueuePosition(tor, 0);
+        tor->set_unique_queue_position(MinQueuePosition);
     }
 }
 
@@ -552,12 +547,12 @@ void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count
     using namespace queue_helpers;
 
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition);
-    for (auto* tor : torrents)
+    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    for (auto* const tor : torrents)
     {
-        if (tor->queuePosition > 0)
+        if (auto const pos = tor->queue_position(); pos > MinQueuePosition)
         {
-            tr_torrentSetQueuePosition(tor, tor->queuePosition - 1);
+            tor->set_unique_queue_position(pos - 1U);
         }
     }
 }
@@ -567,12 +562,12 @@ void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_cou
     using namespace queue_helpers;
 
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::rbegin(torrents), std::rend(torrents), CompareTorrentByQueuePosition);
-    for (auto* tor : torrents)
+    std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
+    for (auto* const tor : torrents)
     {
-        if (tor->queuePosition < UINT_MAX)
+        if (auto const pos = tor->queue_position(); pos < MaxQueuePosition)
         {
-            tr_torrentSetQueuePosition(tor, tor->queuePosition + 1);
+            tor->set_unique_queue_position(pos + 1U);
         }
     }
 }
@@ -582,10 +577,10 @@ void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t torrent_c
     using namespace queue_helpers;
 
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
-    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition);
-    for (auto* tor : torrents)
+    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
+    for (auto* const tor : torrents)
     {
-        tr_torrentSetQueuePosition(tor, UINT_MAX);
+        tor->set_unique_queue_position(MaxQueuePosition);
     }
 }
 
@@ -662,18 +657,9 @@ void freeTorrent(tr_torrent* tor)
 
     if (!session->isClosing())
     {
-        // "so you die, captain, and we all move up in rank."
-        // resequence the queue positions
-        for (auto* t : session->torrents())
-        {
-            if (t->queuePosition > tor->queuePosition)
-            {
-                t->queuePosition--;
-                t->mark_changed();
-            }
-        }
-
-        TR_ASSERT(queueIsSequenced(session));
+        // move the torrent being freed to the end of the queue so that
+        // all the torrents queued after it will move up one position
+        tor->set_unique_queue_position(queue_helpers::MaxQueuePosition);
     }
 
     delete tor;
@@ -928,7 +914,7 @@ void tr_torrent::init(tr_ctor const& ctor)
     TR_ASSERT(session != nullptr);
     auto const lock = unique_lock();
 
-    queuePosition = std::size(session->torrents());
+    queue_position_ = std::size(session->torrents());
 
     on_metainfo_updated();
 
@@ -1305,7 +1291,7 @@ tr_stat tr_torrent::stats() const
     stats.id = this->id();
     stats.activity = activity;
     stats.error = this->error().error_type();
-    stats.queuePosition = this->queuePosition;
+    stats.queuePosition = queue_position();
     stats.idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
     stats.isStalled = IsStalled(this, idle_seconds);
     stats.errorString = this->error().errmsg().c_str();

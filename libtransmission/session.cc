@@ -616,7 +616,7 @@ std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_dire
             std::begin(candidates),
             std::begin(candidates) + num_wanted,
             std::end(candidates),
-            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
+            tr_torrent::CompareQueuePosition);
         candidates.resize(num_wanted);
     }
 
