@@ -348,8 +348,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
 
         // redraw buttons
-        [torrentCell.fControlButton display];
-        [torrentCell.fRevealButton display];
+        torrentCell.fControlButton.needsDisplay = YES;
+        torrentCell.fRevealButton.needsDisplay = YES;
 
         return torrentCell;
     }

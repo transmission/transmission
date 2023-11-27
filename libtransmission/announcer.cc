@@ -1040,7 +1040,7 @@ void tr_announcer_impl::onAnnounceDone(
            Don't bother publishing if there are other trackers -- it's
            all too common for people to load up dozens of dead trackers
            in a torrent's metainfo... */
-        if (tier->tor->tracker_count() < 2)
+        if (std::size(tier->tor->announce_list()) < 2U)
         {
             publishError(tier, response.errmsg);
         }

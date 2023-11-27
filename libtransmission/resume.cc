@@ -24,8 +24,9 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
-#include "libtransmission/torrent.h"
+#include "libtransmission/torrent-ctor.h"
 #include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -450,12 +451,12 @@ void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
     }
 }
 
-void saveProgress(tr_variant* dict, tr_torrent const* tor)
+void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHelper const& helper)
 {
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
-    auto const& mtimes = tor->file_mtimes_;
+    auto const& mtimes = helper.file_mtimes();
     auto const n = std::size(mtimes);
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
     for (auto const& mtime : mtimes)
@@ -464,7 +465,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor)
     }
 
     // add the 'checked pieces' bitfield
-    bitfieldToRaw(tor->checked_pieces_, tr_variantDictAdd(prog, TR_KEY_pieces));
+    bitfieldToRaw(helper.checked_pieces(), tr_variantDictAdd(prog, TR_KEY_pieces));
 
     /* add the progress */
     if (tor->completeness == TR_SEED)
@@ -473,7 +474,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor)
     }
 
     /* add the blocks bitfield */
-    bitfieldToRaw(tor->blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
+    bitfieldToRaw(helper.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 /*
@@ -496,7 +497,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor)
  * First approach (pre-2.20) had an "mtimes" list identical to
  * 3.10, but not the 'pieces' bitfield.
  */
-auto loadProgress(tr_variant* dict, tr_torrent* tor)
+auto loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::ResumeHelper& helper)
 {
     if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
@@ -569,7 +570,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
             mtimes.resize(n_files);
         }
 
-        tor->init_checked_pieces(checked, std::data(mtimes));
+        helper.load_checked_pieces(checked, std::data(mtimes));
 
         /// COMPLETION
 
@@ -615,7 +616,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else
         {
-            tor->set_blocks(blocks);
+            helper.load_blocks(blocks);
         }
 
         return tr_resume::Progress;
@@ -662,26 +663,14 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
     if ((fields_to_load & (tr_resume::Progress | tr_resume::DownloadDir)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->current_dir() == tor->download_dir();
-        tor->download_dir_ = sv;
-        if (is_current_dir)
-        {
-            tor->current_dir_ = sv;
-        }
-
+        helper.load_download_dir(sv);
         fields_loaded |= tr_resume::DownloadDir;
     }
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->current_dir() == tor->incomplete_dir();
-        tor->incomplete_dir_ = sv;
-        if (is_current_dir)
-        {
-            tor->current_dir_ = sv;
-        }
-
+        helper.load_incomplete_dir(sv);
         fields_loaded |= tr_resume::IncompleteDir;
     }
 
@@ -764,7 +753,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
     // seed or a partial seed.
     if ((fields_to_load & tr_resume::Progress) != 0)
     {
-        fields_loaded |= loadProgress(&top, tor);
+        fields_loaded |= loadProgress(&top, tor, helper);
     }
 
     if (!tor->is_done() && (fields_to_load & tr_resume::FilePriorities) != 0)
@@ -815,59 +804,75 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
     return fields_loaded;
 }
 
-auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor, tr_ctorMode mode)
+auto set_from_ctor(
+    tr_torrent* tor,
+    tr_torrent::ResumeHelper& helper,
+    tr_resume::fields_t const fields,
+    tr_ctor const& ctor,
+    tr_ctorMode const mode)
 {
     auto ret = tr_resume::fields_t{};
 
     if ((fields & tr_resume::Run) != 0)
     {
-        if (auto is_paused = bool{}; tr_ctorGetPaused(ctor, mode, &is_paused))
+        if (auto const val = ctor.paused(mode); val)
         {
-            tor->start_when_stable = !is_paused;
+            tor->start_when_stable = !*val;
             ret |= tr_resume::Run;
         }
     }
 
-    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->max_connected_peers_))
+    if ((fields & tr_resume::MaxPeers) != 0)
     {
-        ret |= tr_resume::MaxPeers;
+        if (auto const val = ctor.peer_limit(mode); val)
+        {
+            tor->max_connected_peers_ = *val;
+            ret |= tr_resume::MaxPeers;
+        }
     }
 
     if ((fields & tr_resume::DownloadDir) != 0)
     {
-        char const* path = nullptr;
-        if (tr_ctorGetDownloadDir(ctor, mode, &path) && !tr_str_is_empty(path))
+        if (auto const& val = ctor.download_dir(mode); !std::empty(val))
         {
+            helper.load_download_dir(val);
             ret |= tr_resume::DownloadDir;
-            tor->download_dir_ = path;
         }
     }
 
     return ret;
 }
 
-auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+auto use_mandatory_fields(
+    tr_torrent* const tor,
+    tr_torrent::ResumeHelper& helper,
+    tr_resume::fields_t const fields,
+    tr_ctor const& ctor)
 {
-    return setFromCtor(tor, fields, ctor, TR_FORCE);
+    return set_from_ctor(tor, helper, fields, ctor, TR_FORCE);
 }
 
-auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+auto use_fallback_fields(
+    tr_torrent* const tor,
+    tr_torrent::ResumeHelper& helper,
+    tr_resume::fields_t const fields,
+    tr_ctor const& ctor)
 {
-    return setFromCtor(tor, fields, ctor, TR_FALLBACK);
+    return set_from_ctor(tor, helper, fields, ctor, TR_FALLBACK);
 }
 } // namespace
 
-fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const* ctor)
+fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const& ctor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     auto ret = fields_t{};
 
-    ret |= useMandatoryFields(tor, fields_to_load, ctor);
+    ret |= use_mandatory_fields(tor, helper, fields_to_load, ctor);
     fields_to_load &= ~ret;
     ret |= loadFromFile(tor, helper, fields_to_load);
     fields_to_load &= ~ret;
-    ret |= useFallbackFields(tor, fields_to_load, ctor);
+    ret |= use_fallback_fields(tor, helper, fields_to_load, ctor);
 
     return ret;
 }
@@ -907,7 +912,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
-        saveProgress(&top, tor);
+        saveProgress(&top, tor, helper);
     }
 
     saveSpeedLimits(&top, tor);
