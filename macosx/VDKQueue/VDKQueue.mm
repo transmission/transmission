@@ -169,22 +169,23 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
 - (void)watcherThread:(id)sender
 {
-    int n;
-    struct kevent ev;
-    // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
-    struct timespec timeout = { 1, 0 };
-    // So we don't have to risk accessing iVars when the thread is terminated.
-    int theFD = _coreQueueFD;
-
-    NSMutableArray* notesToPost = [[NSMutableArray alloc] initWithCapacity:5];
-
 #if DEBUG_LOG_THREAD_LIFETIME
     NSLog(@"watcherThread started.");
 #endif
 
+    NSThread.currentThread.name = @"VDKQueue";
+
+    // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
+    const struct timespec timeout = { 1, 0 };
+    // So we don't have to risk accessing iVars when the thread is terminated.
+    int const theFD = _coreQueueFD;
+
+    NSMutableArray* notesToPost = [[NSMutableArray alloc] initWithCapacity:5];
+
     while (_keepWatcherThreadRunning)
     {
-        n = kevent(theFD, NULL, 0, &ev, 1, &timeout);
+        struct kevent ev;
+        int n = kevent(theFD, NULL, 0, &ev, 1, &timeout);
         if (n <= 0 || ev.filter != EVFILT_VNODE || !ev.fflags)
         {
             continue;
