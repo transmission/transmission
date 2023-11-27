@@ -943,6 +943,14 @@ public:
         return obfuscated_hash_ == test;
     }
 
+    static inline constexpr struct
+    {
+        constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
+        {
+            return a->queuePosition < b->queuePosition;
+        }
+    } CompareQueuePosition{};
+
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
