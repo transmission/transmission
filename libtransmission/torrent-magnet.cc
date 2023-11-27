@@ -266,15 +266,15 @@ bool use_new_metainfo(tr_torrent* tor, tr_error* error)
 void on_have_all_metainfo(tr_torrent* tor)
 {
     auto error = tr_error{};
+    auto& m = tor->incomplete_metadata;
+    TR_ASSERT(m);
     if (use_new_metainfo(tor, &error))
     {
-        delete tor->incomplete_metadata;
-        tor->incomplete_metadata = nullptr;
+        delete m;
+        m = nullptr;
     }
     else /* drat. */
     {
-        auto& m = tor->incomplete_metadata;
-        TR_ASSERT(m);
         auto const n = m->piece_count;
 
         m->pieces_needed = create_all_needed(n);
