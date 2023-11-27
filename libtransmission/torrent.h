@@ -943,13 +943,61 @@ public:
         return obfuscated_hash_ == test;
     }
 
+    // --- queue position
+
+    [[nodiscard]] constexpr auto queue_position() const noexcept
+    {
+        return queue_position_;
+    }
+
+    constexpr void set_queue_position(size_t const new_pos) noexcept
+    {
+        queue_position_ = new_pos;
+    }
+
+    template<typename Iter>
+    void set_unique_queue_position(size_t const new_pos, Iter const begin, Iter const end)
+    {
+        auto current = size_t{};
+        auto const old_pos = queue_position();
+
+        queue_position_ = static_cast<size_t>(-1);
+
+        for (auto walk = begin; walk != end; ++walk)
+        {
+            tr_torrent* const tor = *walk;
+
+            if ((old_pos < new_pos) && (old_pos <= tor->queue_position()) && (tor->queue_position() <= new_pos))
+            {
+                --tor->queue_position_;
+                tor->mark_changed();
+            }
+
+            if ((old_pos > new_pos) && (new_pos <= tor->queue_position()) && (tor->queue_position() < old_pos))
+            {
+                ++tor->queue_position_;
+                tor->mark_changed();
+            }
+
+            if (current < tor->queue_position() + 1)
+            {
+                current = tor->queue_position() + 1;
+            }
+        }
+
+        queue_position_ = std::min(new_pos, current);
+        mark_changed();
+    }
+
     static inline constexpr struct
     {
         constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
         {
-            return a->queuePosition < b->queuePosition;
+            return a->queue_position_ < b->queue_position_;
         }
     } CompareQueuePosition{};
+
+    // ---
 
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
@@ -976,8 +1024,6 @@ public:
     tr_swarm* swarm = nullptr;
 
     time_t lpdAnnounceAt = 0;
-
-    size_t queuePosition = 0;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -1291,6 +1337,8 @@ private:
      * and in the handshake are expected to match.
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
+
+    size_t queue_position_ = 0;
 
     time_t date_active_ = 0;
     time_t date_added_ = 0;
