@@ -453,11 +453,6 @@ public:
 
     /// METAINFO
 
-    [[nodiscard]] constexpr auto& metainfo() noexcept
-    {
-        return metainfo_;
-    }
-
     [[nodiscard]] constexpr auto const& metainfo() const noexcept
     {
         return metainfo_;
