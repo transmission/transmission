@@ -950,11 +950,6 @@ public:
         return queue_position_;
     }
 
-    constexpr void set_queue_position(size_t const new_pos) noexcept
-    {
-        queue_position_ = new_pos;
-    }
-
     void set_unique_queue_position(size_t const new_pos);
 
     static inline constexpr struct
