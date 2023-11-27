@@ -504,17 +504,9 @@ public:
         return metainfo_.announce_list();
     }
 
-    [[nodiscard]] constexpr auto& announce_list() noexcept
-    {
-        return metainfo_.announce_list();
-    }
+    bool set_announce_list(tr_announce_list announce_list);
 
-    [[nodiscard]] auto tracker_list() const
-    {
-        return this->announce_list().to_string();
-    }
-
-    bool set_tracker_list(std::string_view text);
+    bool set_announce_list(std::string_view announce_list_str);
 
     /// METAINFO - WEBSEEDS
 
@@ -917,13 +909,6 @@ public:
         return peer_id_;
     }
 
-    // should be called when done modifying the torrent's announce list.
-    void on_announce_list_changed()
-    {
-        mark_edited();
-        session->announcer_->resetTorrent(this);
-    }
-
     void on_block_received(tr_block_index_t block);
 
     [[nodiscard]] constexpr auto& error() noexcept
@@ -1221,6 +1206,9 @@ private:
 
         return {};
     }
+
+    // must be called after the torrent's announce list changes.
+    void on_announce_list_changed();
 
     // ---
 
