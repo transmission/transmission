@@ -143,7 +143,7 @@ public:
                 return { iter->second, false };
             }
 
-            return { vec_.emplace_back(key, tr_variant{ std::move(val) }).second, true };
+            return { vec_.emplace_back(key, tr_variant{ std::forward<Val>(val) }).second, true };
         }
 
         // --- custom functions

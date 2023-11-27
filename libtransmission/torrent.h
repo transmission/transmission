@@ -50,16 +50,6 @@ struct tr_torrent_announcer;
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
-void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor);
-
-void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
-
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error* error);
-
-tr_session* tr_ctorGetSession(tr_ctor const* ctor);
-
-bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme_incomplete_dir);
-
 // ---
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
@@ -953,6 +943,25 @@ public:
         return obfuscated_hash_ == test;
     }
 
+    // --- queue position
+
+    [[nodiscard]] constexpr auto queue_position() const noexcept
+    {
+        return queue_position_;
+    }
+
+    void set_unique_queue_position(size_t const new_pos);
+
+    static inline constexpr struct
+    {
+        constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
+        {
+            return a->queue_position_ < b->queue_position_;
+        }
+    } CompareQueuePosition{};
+
+    // ---
+
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
@@ -978,8 +987,6 @@ public:
     tr_swarm* swarm = nullptr;
 
     time_t lpdAnnounceAt = 0;
-
-    size_t queuePosition = 0;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -1222,7 +1229,7 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
-    void init(tr_ctor const* ctor);
+    void init(tr_ctor const& ctor);
 
     void on_metainfo_updated();
     void on_metainfo_completed();
@@ -1294,6 +1301,8 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
+    size_t queue_position_ = 0;
+
     time_t date_active_ = 0;
     time_t date_added_ = 0;
     time_t date_changed_ = 0;
@@ -1338,18 +1347,6 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
     return tor != nullptr && tor->session != nullptr;
 }
-
-tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
-
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error* error = nullptr);
-void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels);
-void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
-tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
-tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
-
-void tr_ctorSetVerifyDoneCallback(tr_ctor* ctor, tr_torrent::VerifyDoneCallback&& callback);
-tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

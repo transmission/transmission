@@ -196,7 +196,7 @@ static std::string getConfigDir(int argc, char const* const* argv)
     return tr_getDefaultConfigDir(MyName);
 }
 
-static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
+static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
     auto const is_torrent = tr_strv_ends_with(lowercase, ".torrent"sv);
