@@ -140,6 +140,8 @@ extern NSString const* VDKQueueAccessRevocationNotification;
 - (void)addPath:(NSString*)aPath;
 - (void)addPath:(NSString*)aPath notifyingAbout:(u_int)flags; // See note above for values to pass in "flags"
 
+//  Either `removePath:` or `removeAllPaths` must be called if we want this object to ever be dealloc'd.
+//  This is because adding a path detaches a thread which retains self.
 - (void)removePath:(NSString*)aPath;
 - (void)removeAllPaths;
 

@@ -111,13 +111,11 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
 - (void)dealloc
 {
-    // Shut down the thread that's scanning for kQueue events
-    _keepWatcherThreadRunning = NO;
-
-    // Do this to close all the open file descriptors for files we're watching
-    [self removeAllPaths];
-
-    _watchedPathEntries = nil;
+    // Close our kqueue's file descriptor
+    if (close(_coreQueueFD) == -1)
+    {
+        NSLog(@"VDKQueue watcherThread: Couldn't close main kqueue (%d)", errno);
+    }
 }
 
 #pragma mark -
@@ -254,12 +252,6 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
         });
     }
 
-    // Close our kqueue's file descriptor
-    if (close(theFD) == -1)
-    {
-        NSLog(@"VDKQueue watcherThread: Couldn't close main kqueue (%d)", errno);
-    }
-
 #if DEBUG_LOG_THREAD_LIFETIME
     NSLog(@"watcherThread finished.");
 #endif
@@ -308,12 +300,13 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
     @synchronized(self)
     {
-        VDKQueuePathEntry* entry = _watchedPathEntries[aPath];
+        // Close the open file descriptor if we're watching it.
+        [_watchedPathEntries removeObjectForKey:aPath];
 
-        // Remove it only if we're watching it.
-        if (entry)
+        if (_watchedPathEntries.count == 0)
         {
-            [_watchedPathEntries removeObjectForKey:aPath];
+            // Shut down the thread that's scanning for kQueue events.
+            _keepWatcherThreadRunning = NO;
         }
     }
 }
@@ -322,7 +315,11 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 {
     @synchronized(self)
     {
+        // Close all the open file descriptors for files we're watching.
         [_watchedPathEntries removeAllObjects];
+
+        // Shut down the thread that's scanning for kQueue events.
+        _keepWatcherThreadRunning = NO;
     }
 }
 
