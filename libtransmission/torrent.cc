@@ -521,9 +521,7 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
     queue_position_ = std::min(new_pos, current);
     mark_changed();
 
-#ifdef TR_ENABLE_ASSERTS
     TR_ASSERT(torrents_are_sorted_by_queue_position(torrents.get_all()));
-#endif
 }
 
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
