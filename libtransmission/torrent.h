@@ -955,39 +955,7 @@ public:
         queue_position_ = new_pos;
     }
 
-    template<typename Iter>
-    void set_unique_queue_position(size_t const new_pos, Iter const begin, Iter const end)
-    {
-        auto current = size_t{};
-        auto const old_pos = queue_position();
-
-        queue_position_ = static_cast<size_t>(-1);
-
-        for (auto walk = begin; walk != end; ++walk)
-        {
-            tr_torrent* const tor = *walk;
-
-            if ((old_pos < new_pos) && (old_pos <= tor->queue_position()) && (tor->queue_position() <= new_pos))
-            {
-                --tor->queue_position_;
-                tor->mark_changed();
-            }
-
-            if ((old_pos > new_pos) && (new_pos <= tor->queue_position()) && (tor->queue_position() < old_pos))
-            {
-                ++tor->queue_position_;
-                tor->mark_changed();
-            }
-
-            if (current < tor->queue_position() + 1)
-            {
-                current = tor->queue_position() + 1;
-            }
-        }
-
-        queue_position_ = std::min(new_pos, current);
-        mark_changed();
-    }
+    void set_unique_queue_position(size_t const new_pos);
 
     static inline constexpr struct
     {
