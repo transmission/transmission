@@ -1934,58 +1934,69 @@ bool tr_torrent::check_piece(tr_piece_index_t piece)
 
 // ---
 
-bool tr_torrent::set_tracker_list(std::string_view text)
+bool tr_torrent::set_announce_list(std::string_view announce_list_str)
 {
-    auto const lock = this->unique_lock();
+    auto ann = tr_announce_list{};
+    return ann.parse(announce_list_str) && set_announce_list(std::move(ann));
+}
 
-    auto announce_list = tr_announce_list();
-    if (!announce_list.parse(text))
+bool tr_torrent::set_announce_list(tr_announce_list announce_list)
+{
+    auto const lock = unique_lock();
+
+    auto& tgt = metainfo_.announce_list();
+
+    tgt = std::move(announce_list);
+
+    // save the changes
+    auto save_error = tr_error{};
+    auto filename = std::string{};
+    if (has_metainfo())
     {
+        filename = torrent_file();
+        tgt.save(filename, &save_error);
+    }
+    else
+    {
+        filename = magnet_file();
+        tr_file_save(filename, magnet(), &save_error);
+    }
+
+    on_announce_list_changed();
+
+    if (save_error.has_value())
+    {
+        error().set_local_error(fmt::format(
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("error", save_error.message()),
+            fmt::arg("error_code", save_error.code())));
         return false;
     }
 
-    auto const has_metadata = this->has_metainfo();
-    if (has_metadata && !announce_list.save(torrent_file()))
-    {
-        return false;
-    }
+    return true;
+}
 
-    this->metainfo_.announce_list() = announce_list;
-    this->mark_edited();
-
-    // magnet links
-    if (!has_metadata)
-    {
-        auto const magnet_file = this->magnet_file();
-        auto const magnet_link = this->magnet();
-        auto save_error = tr_error{};
-        if (!tr_file_save(magnet_file, magnet_link, &save_error))
-        {
-            this->error().set_local_error(fmt::format(
-                _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", magnet_file),
-                fmt::arg("error", save_error.message()),
-                fmt::arg("error_code", save_error.code())));
-        }
-    }
-
-    /* if we had a tracker-related error on this torrent,
-     * and that tracker's been removed,
-     * then clear the error */
+void tr_torrent::on_announce_list_changed()
+{
+    // if we had a tracker-related error on this torrent,
+    // and that tracker's been removed,
+    // then clear the error
     if (auto const& error_url = error_.announce_url(); !std::empty(error_url))
     {
+        auto const& ann = metainfo().announce_list();
         if (std::any_of(
-                std::begin(this->announce_list()),
-                std::end(this->announce_list()),
+                std::begin(ann),
+                std::end(ann),
                 [error_url](auto const& tracker) { return tracker.announce == error_url; }))
         {
             error_.clear();
         }
     }
 
-    on_announce_list_changed();
+    mark_edited();
 
-    return true;
+    session->announcer_->resetTorrent(this);
 }
 
 void tr_torrent::on_tracker_response(tr_tracker_event const* event)
@@ -2027,12 +2038,12 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
 
 bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
 {
-    return text != nullptr && tor->set_tracker_list(text);
+    return text != nullptr && tor->set_announce_list(text);
 }
 
 std::string tr_torrentGetTrackerList(tr_torrent const* tor)
 {
-    return tor->tracker_list();
+    return tor->announce_list().to_string();
 }
 
 size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen)
