@@ -273,6 +273,8 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
         return;
     }
 
+    aPath = aPath.stringByStandardizingPath;
+
     @synchronized(self)
     {
         if (_watchedPathEntries[aPath])
@@ -298,6 +300,8 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
     {
         return;
     }
+
+    aPath = aPath.stringByStandardizingPath;
 
     @synchronized(self)
     {

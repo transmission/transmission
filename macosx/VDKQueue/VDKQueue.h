@@ -136,7 +136,7 @@ extern NSString const* VDKQueueAccessRevocationNotification;
 //        Just add it or remove it and this class will take action only if appropriate.
 //        (Add only if we're not already watching it, remove only if we are.)
 //
-//  Warning: You must pass full, root-relative paths. Do not pass tilde-abbreviated paths or file URLs.
+//  Warning: Only pass file paths ("/path"), not string representations of URLs ("file://path").
 - (void)addPath:(NSString*)aPath;
 - (void)addPath:(NSString*)aPath notifyingAbout:(u_int)flags; // See note above for values to pass in "flags"
 
