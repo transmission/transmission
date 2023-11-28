@@ -47,12 +47,7 @@ protected:
         for (size_t i = 0; i < n_files; ++i)
         {
             auto payload = std::vector<std::byte>{};
-            // TODO(5.0.0): zero-sized files are disabled in these test
-            // because tr_torrent_metainfo discards them, throwing off the
-            // builder-to-metainfo comparisons here. tr_torrent_metainfo
-            // will behave when BEP52 support is added in Transmission 5.
-            static auto constexpr MinFileSize = size_t{ 1U };
-            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int(max_size))));
+            payload.resize(static_cast<size_t>(tr_rand_int(max_size)));
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };

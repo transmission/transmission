@@ -77,17 +77,17 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 
 tr_file_piece_map::file_span_t tr_file_piece_map::file_span(tr_piece_index_t piece) const
 {
-    static constexpr auto Compare = CompareToSpan<tr_piece_index_t>{ false };
+    static constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
     auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, Compare);
     return { static_cast<tr_file_index_t>(equal_begin - begin), static_cast<tr_file_index_t>(equal_end - begin) };
 }
 
-tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset, bool include_empty_files) const
+tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset) const
 {
-    auto const compare = CompareToSpan<uint64_t>{ include_empty_files };
+    static constexpr auto Compare = CompareToSpan<uint64_t>{};
     auto const begin = std::begin(file_bytes_);
-    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, compare);
+    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, Compare);
     tr_file_index_t const file_index = std::distance(begin, it);
     auto const file_offset = offset - it->begin;
     return file_offset_t{ file_index, file_offset };

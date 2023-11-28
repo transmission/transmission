@@ -460,11 +460,6 @@ private:
     {
         bool ok = true;
 
-        if (file_length_ == 0)
-        {
-            return ok;
-        }
-
         // FIXME: Check to see if we already added this file. This is a safeguard
         // for hybrid torrents with duplicate info between "file tree" and "files"
         if (std::empty(file_subpath_))

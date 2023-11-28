@@ -78,7 +78,7 @@ enum class IoMode
     Write
 };
 
-bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, IoMode io_mode)
+bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, bool do_write)
 {
     if (auto found = tor->find_file(file_index); found)
     {
@@ -86,7 +86,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
         return true;
     }
 
-    if (io_mode != IoMode::Write)
+    if (!do_write)
     {
         return false;
     }
@@ -129,9 +129,9 @@ void readOrWriteBytes(
 
     // --- Find the fd
 
-    auto fd_top = session->openFiles().get(tor->id(), file_index, do_write);
+    auto fd = session->openFiles().get(tor->id(), file_index, do_write);
     auto filename = tr_pathbuf{};
-    if (!fd_top && !getFilename(filename, tor, file_index, io_mode))
+    if (!fd && !getFilename(filename, tor, file_index, do_write))
     {
         auto const err = ENOENT;
         error->set(
@@ -144,20 +144,20 @@ void readOrWriteBytes(
         return;
     }
 
-    if (!fd_top) // not in the cache, so open or create it now
+    if (!fd) // not in the cache, so open or create it now
     {
         // open (and maybe create) the file
         auto const prealloc = (!do_write || !tor->file_is_wanted(file_index)) ? TR_PREALLOCATE_NONE :
                                                                                 tor->session->preallocationMode();
-        fd_top = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
-        if (fd_top && do_write)
+        fd = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
+        if (fd && do_write)
         {
             // make a note that we just created a file
             tor->session->add_file_created();
         }
     }
 
-    if (!fd_top) // couldn't create/open it either
+    if (!fd) // couldn't create/open it either
     {
         auto const errnum = errno;
         error->set(
@@ -171,11 +171,10 @@ void readOrWriteBytes(
         return;
     }
 
-    auto const& [fd, tag] = *fd_top;
     switch (io_mode)
     {
     case IoMode::Read:
-        if (!readEntireBuf(fd, file_offset, buf, buflen, error) && *error)
+        if (!readEntireBuf(*fd, file_offset, buf, buflen, error) && *error)
         {
             tr_logAddErrorTor(
                 tor,
@@ -189,7 +188,7 @@ void readOrWriteBytes(
         break;
 
     case IoMode::Write:
-        if (!writeEntireBuf(fd, file_offset, buf, buflen, error) && *error)
+        if (!writeEntireBuf(*fd, file_offset, buf, buflen, error) && *error)
         {
             tr_logAddErrorTor(
                 tor,
@@ -203,7 +202,7 @@ void readOrWriteBytes(
         break;
 
     case IoMode::Prefetch:
-        tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
+        tr_sys_file_advise(*fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
         break;
     }
 }
@@ -216,7 +215,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         return EINVAL;
     }
 
-    auto [file_index, file_offset] = tor->file_offset(loc, false);
+    auto [file_index, file_offset] = tor->file_offset(loc);
 
     while (buflen != 0U)
     {

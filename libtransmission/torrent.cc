@@ -720,6 +720,10 @@ void tr_torrent::start_in_session_thread()
     TR_ASSERT(session->am_in_session_thread());
     auto const lock = unique_lock();
 
+    // We are after `torrentStart` and before announcing to trackers/peers,
+    // so now is the best time to create wanted empty files.
+    create_empty_files();
+
     recheck_completeness();
     set_is_queued(false);
 
@@ -882,6 +886,9 @@ void tr_torrent::on_metainfo_completed()
 
     if (session->shouldFullyVerifyAddedTorrents() || !is_new_torrent_a_seed())
     {
+        // Potentially, we are in `tr_torrentNew`,
+        // and we don't want any file created before `torrentStart`
+        // so we Verify but we don't Create files.
         tr_torrentVerify(this);
     }
     else
@@ -1702,6 +1709,43 @@ namespace completeness_helpers
 }
 } // namespace completeness_helpers
 } // namespace
+
+void tr_torrent::create_empty_files() const
+{
+    auto const base = current_dir();
+    TR_ASSERT(!std::empty(base));
+    if (!has_metainfo() || std::empty(base))
+    {
+        return;
+    }
+
+    auto const file_count = this->file_count();
+    for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
+    {
+        if (file_size(file_index) != 0U || !file_is_wanted(file_index) || find_file(file_index))
+        {
+            continue;
+        }
+
+        // torrent contains a wanted zero-bytes file and that file isn't on disk yet.
+        // We attempt to create that file.
+        auto filename = tr_pathbuf{};
+        auto const& subpath = file_subpath(file_index);
+        filename.assign(base, '/', subpath);
+
+        // create subfolders, if any
+        auto dir = tr_pathbuf{ filename.sv() };
+        dir.popdir();
+        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+
+        // create the file
+        if (auto const fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_SEQUENTIAL, 0666);
+            fd != TR_BAD_SYS_FILE)
+        {
+            tr_sys_file_close(fd);
+        }
+    }
+}
 
 void tr_torrent::recheck_completeness()
 {

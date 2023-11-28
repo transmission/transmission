@@ -34,7 +34,7 @@ auto constexpr SleepPerSecondDuringVerify = 100ms;
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(Mediator& verify_mediator, bool const abort_flag)
 {
     verify_mediator.on_verify_started();
 
@@ -54,7 +54,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         auto const file_length = metainfo.file_size(file_index);
 
         /* if we're starting a new file... */
-        if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
+        if (file_pos == 0U && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
             auto const found = verify_mediator.find_file(file_index);
             fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
@@ -71,7 +71,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         if (fd != TR_BAD_SYS_FILE)
         {
             auto num_read = uint64_t{};
-            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
+            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0U)
             {
                 bytes_this_pass = num_read;
                 sha->add(std::data(buffer), bytes_this_pass);
@@ -86,7 +86,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         file_pos += bytes_this_pass;
 
         /* if we're finishing a piece... */
-        if (left_in_piece == 0)
+        if (left_in_piece == 0U)
         {
             auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
             verify_mediator.on_piece_checked(piece, has_piece);
@@ -101,11 +101,11 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
 
             sha->clear();
             ++piece;
-            piece_pos = 0;
+            piece_pos = 0U;
         }
 
         /* if we're finishing a file... */
-        if (left_in_file == 0)
+        if (left_in_file == 0U)
         {
             if (fd != TR_BAD_SYS_FILE)
             {
@@ -114,7 +114,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
             }
 
             ++file_index;
-            file_pos = 0;
+            file_pos = 0U;
         }
     }
 

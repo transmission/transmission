@@ -388,9 +388,9 @@ public:
         return fpm_.piece_span(file);
     }
 
-    [[nodiscard]] auto file_offset(tr_block_info::Location loc, bool include_empty_files) const
+    [[nodiscard]] auto file_offset(tr_block_info::Location loc) const
     {
-        return fpm_.file_offset(loc.byte, include_empty_files);
+        return fpm_.file_offset(loc.byte);
     }
 
     /// WANTED
@@ -1229,6 +1229,7 @@ private:
     void on_file_completed(tr_file_index_t file);
     void on_tracker_response(tr_tracker_event const* event);
 
+    void create_empty_files() const;
     void recheck_completeness();
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
