@@ -215,7 +215,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         return EINVAL;
     }
 
-    auto [file_index, file_offset] = tor->file_offset(loc, true);
+    auto [file_index, file_offset] = tor->file_offset(loc);
 
     while (buflen != 0U)
     {
