@@ -107,7 +107,7 @@ public:
      */
     void set_peer(std::weak_ptr<tr_peerIo> peer) noexcept
     {
-        this->peer_ = std::move(peer);
+        peer_ = std::move(peer);
     }
 
     /**
@@ -125,12 +125,12 @@ public:
 
     [[nodiscard]] constexpr auto get_priority() const noexcept
     {
-        return this->priority_;
+        return priority_;
     }
 
     constexpr void set_priority(tr_priority_t prio) noexcept
     {
-        this->priority_ = prio;
+        priority_ = prio;
     }
 
     /**
@@ -143,7 +143,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed(this->band_[dir].raw_, HistoryMSec, now);
+        return get_speed(band_[dir].raw_, HistoryMSec, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
@@ -151,7 +151,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed(this->band_[dir].piece_, HistoryMSec, now);
+        return get_speed(band_[dir].piece_, HistoryMSec, now);
     }
 
     /**
@@ -161,7 +161,7 @@ public:
      */
     constexpr bool set_desired_speed(tr_direction dir, Speed desired_speed)
     {
-        auto& value = this->band_[dir].desired_speed_;
+        auto& value = band_[dir].desired_speed_;
         bool const did_change = desired_speed != value;
         value = desired_speed;
         return did_change;
@@ -173,7 +173,7 @@ public:
      */
     [[nodiscard]] constexpr auto get_desired_speed(tr_direction dir) const
     {
-        return this->band_[dir].desired_speed_;
+        return band_[dir].desired_speed_;
     }
 
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
@@ -193,7 +193,7 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        auto& value = this->band_[dir].is_limited_;
+        auto& value = band_[dir].is_limited_;
         auto const did_change = is_limited != value;
         value = is_limited;
         return did_change;
@@ -204,7 +204,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_limited(tr_direction dir) const noexcept
     {
-        return this->band_[dir].is_limited_;
+        return band_[dir].is_limited_;
     }
 
     /**
@@ -215,7 +215,7 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        auto& value = this->band_[direction].honor_parent_limits_;
+        auto& value = band_[direction].honor_parent_limits_;
         auto const did_change = is_enabled != value;
         value = is_enabled;
         return did_change;
@@ -223,7 +223,7 @@ public:
 
     [[nodiscard]] constexpr bool are_parent_limits_honored(tr_direction direction) const
     {
-        return this->band_[direction].honor_parent_limits_;
+        return band_[direction].honor_parent_limits_;
     }
 
     [[nodiscard]] tr_bandwidth_limits get_limits() const;

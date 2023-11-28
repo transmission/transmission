@@ -86,7 +86,7 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
 tr_bandwidth::tr_bandwidth(tr_bandwidth* parent, bool is_group)
     : priority_(is_group ? TR_PRI_NONE : TR_PRI_NORMAL)
 {
-    this->set_parent(parent);
+    set_parent(parent);
 }
 
 // ---
@@ -136,7 +136,7 @@ void tr_bandwidth::set_parent(tr_bandwidth* new_parent)
 #endif
 
         new_parent->children_.push_back(this);
-        this->parent_ = new_parent;
+        parent_ = new_parent;
     }
 }
 
@@ -147,7 +147,7 @@ void tr_bandwidth::allocate_bandwidth(
     uint64_t period_msec,
     std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
 {
-    auto const priority = std::min(parent_priority, this->priority_);
+    auto const priority = std::min(parent_priority, priority_);
 
     // set the available bandwidth
     for (auto const dir : { TR_UP, TR_DOWN })
@@ -160,7 +160,7 @@ void tr_bandwidth::allocate_bandwidth(
     }
 
     // add this bandwidth's peer, if any, to the peer pool
-    if (auto shared = this->peer_.lock(); shared)
+    if (auto shared = peer_.lock(); shared)
     {
         TR_ASSERT(tr_isPriority(priority));
         shared->set_priority(priority);
@@ -168,7 +168,7 @@ void tr_bandwidth::allocate_bandwidth(
     }
 
     // traverse & repeat for the subtree
-    for (auto* child : this->children_)
+    for (auto* child : children_)
     {
         child->allocate_bandwidth(priority, period_msec, peer_pool);
     }
@@ -225,7 +225,7 @@ void tr_bandwidth::allocate(uint64_t period_msec)
     // allocateBandwidth () is a helper function with two purposes:
     // 1. allocate bandwidth to b and its subtree
     // 2. accumulate an array of all the peerIos from b and its subtree.
-    this->allocate_bandwidth(TR_PRI_NONE, period_msec, refs);
+    allocate_bandwidth(TR_PRI_NONE, period_msec, refs);
 
     for (auto const& io : refs)
     {
@@ -278,14 +278,14 @@ size_t tr_bandwidth::clamp(tr_direction const dir, size_t byte_count) const noex
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    if (this->band_[dir].is_limited_)
+    if (band_[dir].is_limited_)
     {
-        byte_count = std::min(byte_count, this->band_[dir].bytes_left_);
+        byte_count = std::min(byte_count, band_[dir].bytes_left_);
     }
 
-    if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byte_count > 0)
+    if (parent_ != nullptr && band_[dir].honor_parent_limits_ && byte_count > 0)
     {
-        byte_count = this->parent_->clamp(dir, byte_count);
+        byte_count = parent_->clamp(dir, byte_count);
     }
 
     return byte_count;
@@ -295,7 +295,7 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    auto& band = this->band_[dir];
+    auto& band = band_[dir];
 
     if (band.is_limited_ && is_piece_data)
     {
@@ -309,9 +309,9 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
         notify_bandwidth_consumed_bytes(now, band.piece_, byte_count);
     }
 
-    if (this->parent_ != nullptr)
+    if (parent_ != nullptr)
     {
-        this->parent_->notify_bandwidth_consumed(dir, byte_count, is_piece_data, now);
+        parent_->notify_bandwidth_consumed(dir, byte_count, is_piece_data, now);
     }
 }
 
@@ -320,17 +320,17 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 tr_bandwidth_limits tr_bandwidth::get_limits() const
 {
     auto limits = tr_bandwidth_limits{};
-    limits.up_limit = this->get_desired_speed(TR_UP);
-    limits.down_limit = this->get_desired_speed(TR_DOWN);
-    limits.up_limited = this->is_limited(TR_UP);
-    limits.down_limited = this->is_limited(TR_DOWN);
+    limits.up_limit = get_desired_speed(TR_UP);
+    limits.down_limit = get_desired_speed(TR_DOWN);
+    limits.up_limited = is_limited(TR_UP);
+    limits.down_limited = is_limited(TR_DOWN);
     return limits;
 }
 
 void tr_bandwidth::set_limits(tr_bandwidth_limits const& limits)
 {
-    this->set_desired_speed(TR_UP, limits.up_limit);
-    this->set_desired_speed(TR_DOWN, limits.down_limit);
-    this->set_limited(TR_UP, limits.up_limited);
-    this->set_limited(TR_DOWN, limits.down_limited);
+    set_desired_speed(TR_UP, limits.up_limit);
+    set_desired_speed(TR_DOWN, limits.down_limit);
+    set_limited(TR_UP, limits.up_limited);
+    set_limited(TR_DOWN, limits.down_limited);
 }
