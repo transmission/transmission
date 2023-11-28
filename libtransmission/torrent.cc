@@ -1828,7 +1828,7 @@ tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
     return tor->get_priority();
 }
 
-void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
+void tr_torrentSetPriority(tr_torrent* const tor, tr_priority_t const priority)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isPriority(priority));

@@ -673,6 +673,7 @@ public:
         this->date_active_ = when;
 
         bump_date_changed(when);
+        set_dirty();
     }
 
     [[nodiscard]] constexpr auto activity() const noexcept
@@ -742,11 +743,6 @@ public:
     }
 
     void start(bool bypass_queue, std::optional<bool> has_any_local_data);
-
-    constexpr void set_dirty(bool dirty = true) noexcept
-    {
-        is_dirty_ = dirty;
-    }
 
     [[nodiscard]] constexpr auto has_changed_since(time_t when) const noexcept
     {
@@ -974,9 +970,11 @@ private:
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
+    friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);
     friend void tr_torrentStartNow(tr_torrent* tor);
     friend void tr_torrentStop(tr_torrent* tor);
+    friend void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled);
     friend void tr_torrentVerify(tr_torrent* tor);
 
     enum class VerifyState : uint8_t
@@ -1211,6 +1209,11 @@ private:
 
     void mark_changed();
     void mark_edited();
+
+    constexpr void set_dirty(bool dirty = true) noexcept
+    {
+        is_dirty_ = dirty;
+    }
 
     [[nodiscard]] constexpr auto is_dirty() const noexcept
     {
