@@ -468,7 +468,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
     bitfieldToRaw(helper.checked_pieces(), tr_variantDictAdd(prog, TR_KEY_pieces));
 
     /* add the progress */
-    if (tor->completeness == TR_SEED)
+    if (tor->is_seed())
     {
         tr_variantDictAddStrView(prog, TR_KEY_have, "all"sv);
     }

@@ -361,17 +361,17 @@ public:
 
     [[nodiscard]] constexpr bool is_done() const noexcept
     {
-        return completeness != TR_LEECH;
+        return completeness_ != TR_LEECH;
     }
 
     [[nodiscard]] constexpr bool is_seed() const noexcept
     {
-        return completeness == TR_SEED;
+        return completeness_ == TR_SEED;
     }
 
     [[nodiscard]] constexpr bool is_partial_seed() const noexcept
     {
-        return completeness == TR_PARTIAL_SEED;
+        return completeness_ == TR_PARTIAL_SEED;
     }
 
     void amount_done_bins(float* tab, int n_tabs) const
@@ -982,8 +982,6 @@ public:
 
     time_t lpdAnnounceAt = 0;
 
-    tr_completeness completeness = TR_LEECH;
-
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
     bool start_when_stable = false;
@@ -1320,6 +1318,8 @@ private:
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     VerifyState verify_state_ = VerifyState::None;
+
+    tr_completeness completeness_ = TR_LEECH;
 
     uint16_t idle_limit_minutes_ = 0;
 

@@ -737,7 +737,7 @@ void tr_torrent::start_in_session_thread()
     time_t const now = tr_time();
 
     is_running_ = true;
-    completeness = completion_.status();
+    completeness_ = completion_.status();
     date_started_ = now;
     mark_changed();
     error().clear();
@@ -963,7 +963,7 @@ void tr_torrent::init(tr_ctor const& ctor)
         tr_torrent_metainfo::migrate_file(session->torrentDir(), name(), info_hash_string(), ".torrent"sv);
     }
 
-    completeness = completion_.status();
+    completeness_ = completion_.status();
 
     ctor.init_torrent_priorities(*this);
     ctor.init_torrent_wanted(*this);
@@ -1417,7 +1417,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
     auto const length = tor->file_size(file);
     auto const [begin, end] = tor->pieces_in_file(file);
 
-    if (tor->completeness == TR_SEED || length == 0)
+    if (tor->is_seed() || length == 0)
     {
         return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted };
     }
@@ -1729,9 +1729,7 @@ void tr_torrent::recheck_completeness()
 
     needs_completeness_check_ = false;
 
-    auto const new_completeness = completion_.status();
-
-    if (new_completeness != completeness)
+    if (auto const new_completeness = completion_.status(); completeness_ != new_completeness)
     {
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
@@ -1742,35 +1740,35 @@ void tr_torrent::recheck_completeness()
                 this,
                 fmt::format(
                     "State changed from {} to {}",
-                    get_completion_string(completeness),
+                    get_completion_string(completeness_),
                     get_completion_string(new_completeness)));
         }
 
-        this->completeness = new_completeness;
-        this->session->closeTorrentFiles(this);
+        completeness_ = new_completeness;
+        session->closeTorrentFiles(this);
 
-        if (this->is_done())
+        if (is_done())
         {
             if (recent_change)
             {
                 tr_announcerTorrentCompleted(this);
-                this->mark_changed();
+                mark_changed();
                 date_done_ = tr_time();
             }
 
-            if (this->current_dir() == this->incomplete_dir())
+            if (current_dir() == incomplete_dir())
             {
-                this->set_location(this->download_dir(), true, nullptr);
+                set_location(download_dir(), true, nullptr);
             }
 
             done_.emit(this, recent_change);
         }
 
-        this->session->onTorrentCompletenessChanged(this, completeness, was_running);
+        session->onTorrentCompletenessChanged(this, completeness_, was_running);
 
-        this->set_dirty();
+        set_dirty();
 
-        if (this->is_done())
+        if (is_done())
         {
             save_resume_file();
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
