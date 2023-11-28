@@ -85,10 +85,10 @@ private:
     static constexpr size_t HistorySize = HistoryMSec / GranularityMSec;
 
 public:
-    explicit tr_bandwidth(tr_bandwidth* new_parent);
+    explicit tr_bandwidth(tr_bandwidth* new_parent, bool is_group = false);
 
-    tr_bandwidth()
-        : tr_bandwidth{ nullptr }
+    explicit tr_bandwidth(bool is_group = false)
+        : tr_bandwidth{ nullptr, is_group }
     {
     }
 
@@ -274,7 +274,12 @@ private:
     std::vector<tr_bandwidth*> children_;
     tr_bandwidth* parent_ = nullptr;
     std::weak_ptr<tr_peerIo> peer_;
-    tr_priority_t priority_ = 0;
+    tr_priority_t priority_;
 };
 
 /* @} */
+
+constexpr bool tr_isPriority(tr_priority_t p)
+{
+    return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
+}

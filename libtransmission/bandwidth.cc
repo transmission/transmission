@@ -83,7 +83,8 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
 
 // ---
 
-tr_bandwidth::tr_bandwidth(tr_bandwidth* new_parent)
+tr_bandwidth::tr_bandwidth(tr_bandwidth* new_parent, bool is_group)
+    : priority_(is_group ? TR_PRI_NONE : TR_PRI_NORMAL)
 {
     this->set_parent(new_parent);
 }
@@ -146,7 +147,7 @@ void tr_bandwidth::allocate_bandwidth(
     uint64_t period_msec,
     std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
 {
-    auto const priority = std::max(parent_priority, this->priority_);
+    auto const priority = std::min(parent_priority, this->priority_);
 
     // set the available bandwidth
     for (auto const dir : { TR_UP, TR_DOWN })
@@ -161,6 +162,7 @@ void tr_bandwidth::allocate_bandwidth(
     // add this bandwidth's peer, if any, to the peer pool
     if (auto shared = this->peer_.lock(); shared)
     {
+        TR_ASSERT(tr_isPriority(priority));
         shared->set_priority(priority);
         peer_pool.push_back(std::move(shared));
     }
@@ -223,7 +225,7 @@ void tr_bandwidth::allocate(uint64_t period_msec)
     // allocateBandwidth () is a helper function with two purposes:
     // 1. allocate bandwidth to b and its subtree
     // 2. accumulate an array of all the peerIos from b and its subtree.
-    this->allocate_bandwidth(TR_PRI_LOW, period_msec, refs);
+    this->allocate_bandwidth(TR_PRI_NONE, period_msec, refs);
 
     for (auto const& io : refs)
     {
@@ -239,8 +241,13 @@ void tr_bandwidth::allocate(uint64_t period_msec)
             normal.push_back(io.get());
             [[fallthrough]];
 
-        default:
+        case TR_PRI_LOW:
             low.push_back(io.get());
+            break;
+
+        default:
+            TR_ASSERT_MSG(false, "invalid priority");
+            break;
         }
     }
 
