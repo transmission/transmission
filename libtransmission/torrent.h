@@ -761,7 +761,6 @@ public:
         is_dirty_ = dirty;
     }
 
-    void mark_edited();
     void mark_changed();
 
     [[nodiscard]] constexpr auto has_changed_since(time_t when) const noexcept
@@ -1222,6 +1221,8 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
+    void mark_edited();
+
     void init(tr_ctor const& ctor);
 
     void on_metainfo_updated();
@@ -1234,6 +1235,12 @@ private:
     void recheck_completeness();
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
+
+    void rename_path_in_session_thread(
+        std::string_view oldpath,
+        std::string_view newname,
+        tr_torrent_rename_done_func callback,
+        void* const callback_user_data);
 
     void start_in_session_thread();
 

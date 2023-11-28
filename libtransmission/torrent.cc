@@ -1057,8 +1057,8 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
 
     got_metainfo_.emit(this);
     session->onMetadataCompleted(this);
-    this->set_dirty();
-    this->mark_edited();
+    set_dirty();
+    mark_edited();
 
     on_metainfo_completed();
     this->on_announce_list_changed();
@@ -2406,61 +2406,59 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
     }
 }
 
-void torrentRenamePath(
-    tr_torrent* const tor,
-    std::string const& oldpath, // NOLINT performance-unnecessary-value-param
-    std::string const& newname, // NOLINT performance-unnecessary-value-param
-    tr_torrent_rename_done_func callback,
+} // namespace rename_helpers
+} // namespace
+
+void tr_torrent::rename_path_in_session_thread(
+    std::string_view const oldpath,
+    std::string_view const newname,
+    tr_torrent_rename_done_func const callback,
     void* const callback_user_data)
 {
-    TR_ASSERT(tr_isTorrent(tor));
+    using namespace rename_helpers;
 
-    int error = 0;
+    auto error = int{ 0 };
 
-    if (!renameArgsAreValid(tor, oldpath, newname))
+    if (!renameArgsAreValid(this, oldpath, newname))
     {
         error = EINVAL;
     }
-    else if (auto const file_indices = renameFindAffectedFiles(tor, oldpath); std::empty(file_indices))
+    else if (auto const file_indices = renameFindAffectedFiles(this, oldpath); std::empty(file_indices))
     {
         error = EINVAL;
     }
     else
     {
-        error = renamePath(tor, oldpath, newname);
+        error = renamePath(this, oldpath, newname);
 
         if (error == 0)
         {
             /* update tr_info.files */
             for (auto const& file_index : file_indices)
             {
-                renameTorrentFileString(tor, oldpath, newname, file_index);
+                renameTorrentFileString(this, oldpath, newname, file_index);
             }
 
             /* update tr_info.name if user changed the toplevel */
-            if (std::size(file_indices) == tor->file_count() && !tr_strv_contains(oldpath, '/'))
+            if (std::size(file_indices) == file_count() && !tr_strv_contains(oldpath, '/'))
             {
-                tor->set_name(newname);
+                set_name(newname);
             }
 
-            tor->mark_edited();
-            tor->set_dirty();
+            mark_edited();
+            set_dirty();
         }
     }
 
-    ///
+    mark_changed();
 
-    tor->mark_changed();
-
-    /* callback */
     if (callback != nullptr)
     {
-        (*callback)(tor, oldpath.c_str(), newname.c_str(), error, callback_user_data);
+        auto const szold = tr_pathbuf{ oldpath };
+        auto const sznew = tr_pathbuf{ newname };
+        (*callback)(this, szold.c_str(), sznew.c_str(), error, callback_user_data);
     }
 }
-
-} // namespace rename_helpers
-} // namespace
 
 void tr_torrent::rename_path(
     std::string_view oldpath,
@@ -2468,15 +2466,9 @@ void tr_torrent::rename_path(
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
-    using namespace rename_helpers;
-
     this->session->runInSessionThread(
-        torrentRenamePath,
-        this,
-        std::string{ oldpath },
-        std::string{ newname },
-        callback,
-        callback_user_data);
+        [this, oldpath = std::string(oldpath), newname = std::string(newname), callback, callback_user_data]()
+        { rename_path_in_session_thread(oldpath, newname, callback, callback_user_data); });
 }
 
 void tr_torrentRenamePath(
@@ -2528,8 +2520,8 @@ void tr_torrent::mark_changed()
     }
 
     bool const checked = check_piece(piece);
-    this->mark_changed();
-    this->set_dirty();
+    mark_changed();
+    set_dirty();
 
     checked_pieces_.set(piece, checked);
     return checked;
