@@ -597,17 +597,6 @@ bool torrentShouldQueue(tr_torrent const* const tor)
     return tor->session->count_queue_free_slots(dir) == 0;
 }
 
-void torrentResetTransferStats(tr_torrent* tor)
-{
-    auto const lock = tor->unique_lock();
-
-    tor->bytes_uploaded_.start_new_session();
-    tor->bytes_downloaded_.start_new_session();
-    tor->bytes_corrupt_.start_new_session();
-
-    tor->set_dirty();
-}
-
 bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     return tr_sys_path_remove(filename, error);
@@ -743,7 +732,11 @@ void tr_torrent::start_in_session_thread()
     error().clear();
     finished_seeding_by_idle_ = false;
 
-    torrentResetTransferStats(this);
+    bytes_uploaded_.start_new_session();
+    bytes_downloaded_.start_new_session();
+    bytes_corrupt_.start_new_session();
+    set_dirty();
+
     session->announcer_->startTorrent(this);
     lpdAnnounceAt = now;
     started_.emit(this);
