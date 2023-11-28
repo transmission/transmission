@@ -393,11 +393,6 @@ public:
         return fpm_.file_offset(loc.byte, include_empty_files);
     }
 
-    [[nodiscard]] auto byte_span(tr_file_index_t file) const
-    {
-        return fpm_.byte_span(file);
-    }
-
     /// WANTED
 
     [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
@@ -1206,6 +1201,11 @@ private:
 
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
+
+    [[nodiscard]] auto byte_span(tr_file_index_t file) const
+    {
+        return fpm_.byte_span(file);
+    }
 
     // ---
 
