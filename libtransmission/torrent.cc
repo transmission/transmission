@@ -1530,13 +1530,8 @@ void tr_torrentStartNow(tr_torrent* tor)
     if (tr_isTorrent(tor))
     {
         tor->start_when_stable_ = true;
-        tor->start(false /*bypass_queue*/, {});
+        tor->start(true /*bypass_queue*/, {});
     }
-}
-
-void tr_torrentStartMagnet(tr_torrent* tor)
-{
-    tr_torrentStart(tor);
 }
 
 // ---
