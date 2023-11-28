@@ -786,7 +786,7 @@ void tr_torrentStop(tr_torrent* tor)
 
     auto const lock = tor->unique_lock();
 
-    tor->start_when_stable = false;
+    tor->start_when_stable_ = false;
     tor->set_dirty();
     tor->session->runInSessionThread([tor]() { tor->stop_now(); });
 }
@@ -897,7 +897,7 @@ void tr_torrent::on_metainfo_completed()
         date_done_ = date_added_;
         recheck_completeness();
 
-        if (start_when_stable)
+        if (start_when_stable_)
         {
             start(false, {});
         }
@@ -1038,7 +1038,7 @@ void tr_torrent::init(tr_ctor const& ctor)
     {
         on_metainfo_completed();
     }
-    else if (start_when_stable)
+    else if (start_when_stable_)
     {
         auto const bypass_queue = !has_metainfo; // to fetch metainfo from peers
         start(bypass_queue, has_any_local_data);
@@ -1516,28 +1516,22 @@ void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 
 // --- Start/Stop Callback
 
-namespace
-{
-void tr_torrentStartImpl(tr_torrent* tor, bool bypass_queue)
-{
-    if (!tr_isTorrent(tor))
-    {
-        return;
-    }
-
-    tor->start_when_stable = true;
-    tor->start(bypass_queue, {});
-}
-} // namespace
-
 void tr_torrentStart(tr_torrent* tor)
 {
-    tr_torrentStartImpl(tor, false);
+    if (tr_isTorrent(tor))
+    {
+        tor->start_when_stable_ = true;
+        tor->start(false /*bypass_queue*/, {});
+    }
 }
 
 void tr_torrentStartNow(tr_torrent* tor)
 {
-    tr_torrentStartImpl(tor, true);
+    if (tr_isTorrent(tor))
+    {
+        tor->start_when_stable_ = true;
+        tor->start(false /*bypass_queue*/, {});
+    }
 }
 
 void tr_torrentStartMagnet(tr_torrent* tor)
@@ -1577,7 +1571,7 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->error().set_local_error(
                     _("Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", "
                       "then use \"Verify Local Data\" again. To re-download, start the torrent."));
-                tor->start_when_stable = false;
+                tor->start_when_stable_ = false;
             }
 
             tor->session->verify_add(tor);
@@ -1671,7 +1665,7 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
                     tor->verify_done_callback_(tor);
                 }
 
-                if (tor->start_when_stable)
+                if (tor->start_when_stable_)
                 {
                     tor->start(false, !tor->checked_pieces_.has_none());
                 }
@@ -2645,6 +2639,18 @@ void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) n
     {
         tor_.current_dir_ = tor_.incomplete_dir_;
     }
+}
+
+// ---
+
+void tr_torrent::ResumeHelper::load_start_when_stable(bool const val) noexcept
+{
+    tor_.start_when_stable_ = val;
+}
+
+bool tr_torrent::ResumeHelper::start_when_stable() const noexcept
+{
+    return tor_.start_when_stable_;
 }
 
 // ---

@@ -83,6 +83,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         void load_incomplete_dir(std::string_view dir) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
+        void load_start_when_stable(bool val) noexcept;
 
         [[nodiscard]] tr_bitfield const& blocks() const noexcept;
         [[nodiscard]] tr_bitfield const& checked_pieces() const noexcept;
@@ -92,6 +93,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         [[nodiscard]] time_t date_done() const noexcept;
         [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
         [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
+        [[nodiscard]] bool start_when_stable() const noexcept;
 
     private:
         friend class libtransmission::test::RenameTest_multifileTorrent_Test;
@@ -979,10 +981,6 @@ public:
 
     time_t lpdAnnounceAt = 0;
 
-    // start the torrent after all the startup scaffolding is done,
-    // e.g. fetching metadata from peers and/or verifying the torrent
-    bool start_when_stable = false;
-
 private:
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
@@ -991,6 +989,8 @@ private:
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
+    friend void tr_torrentStart(tr_torrent* tor);
+    friend void tr_torrentStartNow(tr_torrent* tor);
     friend void tr_torrentStop(tr_torrent* tor);
     friend void tr_torrentVerify(tr_torrent* tor);
 
@@ -1342,6 +1342,10 @@ private:
     bool needs_completeness_check_ = true;
 
     bool sequential_download_ = false;
+
+    // start the torrent after all the startup scaffolding is done,
+    // e.g. fetching metadata from peers and/or verifying the torrent
+    bool start_when_stable_ = false;
 };
 
 // ---
