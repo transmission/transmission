@@ -80,12 +80,12 @@ struct tr_bandwidth
 private:
     using Speed = libtransmission::Values::Speed;
 
-    static constexpr size_t HistoryMSec = 2000U;
-    static constexpr size_t GranularityMSec = 250U;
-    static constexpr size_t HistorySize = HistoryMSec / GranularityMSec;
+    static constexpr auto HistoryMSec = 2000U;
+    static constexpr auto GranularityMSec = 250U;
+    static constexpr auto HistorySize = HistoryMSec / GranularityMSec;
 
 public:
-    explicit tr_bandwidth(tr_bandwidth* new_parent, bool is_group = false);
+    explicit tr_bandwidth(tr_bandwidth* parent, bool is_group = false);
 
     explicit tr_bandwidth(bool is_group = false)
         : tr_bandwidth{ nullptr, is_group }
@@ -107,7 +107,7 @@ public:
      */
     void set_peer(std::weak_ptr<tr_peerIo> peer) noexcept
     {
-        this->peer_ = std::move(peer);
+        peer_ = std::move(peer);
     }
 
     /**
@@ -123,14 +123,14 @@ public:
 
     void set_parent(tr_bandwidth* new_parent);
 
-    [[nodiscard]] constexpr tr_priority_t get_priority() const noexcept
+    [[nodiscard]] constexpr auto get_priority() const noexcept
     {
-        return this->priority_;
+        return priority_;
     }
 
     constexpr void set_priority(tr_priority_t prio) noexcept
     {
-        this->priority_ = prio;
+        priority_ = prio;
     }
 
     /**
@@ -143,7 +143,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed(this->band_[dir].raw_, HistoryMSec, now);
+        return get_speed(band_[dir].raw_, HistoryMSec, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
@@ -151,7 +151,7 @@ public:
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed(this->band_[dir].piece_, HistoryMSec, now);
+        return get_speed(band_[dir].piece_, HistoryMSec, now);
     }
 
     /**
@@ -161,8 +161,8 @@ public:
      */
     constexpr bool set_desired_speed(tr_direction dir, Speed desired_speed)
     {
-        auto& value = this->band_[dir].desired_speed_;
-        bool const did_change = desired_speed != value;
+        auto& value = band_[dir].desired_speed_;
+        auto const did_change = desired_speed != value;
         value = desired_speed;
         return did_change;
     }
@@ -173,7 +173,7 @@ public:
      */
     [[nodiscard]] constexpr auto get_desired_speed(tr_direction dir) const
     {
-        return this->band_[dir].desired_speed_;
+        return band_[dir].desired_speed_;
     }
 
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
@@ -193,8 +193,8 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        bool& value = this->band_[dir].is_limited_;
-        bool const did_change = is_limited != value;
+        auto& value = band_[dir].is_limited_;
+        auto const did_change = is_limited != value;
         value = is_limited;
         return did_change;
     }
@@ -204,7 +204,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_limited(tr_direction dir) const noexcept
     {
-        return this->band_[dir].is_limited_;
+        return band_[dir].is_limited_;
     }
 
     /**
@@ -215,17 +215,15 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        bool& value = this->band_[direction].honor_parent_limits_;
-        bool const did_change = is_enabled != value;
+        auto& value = band_[direction].honor_parent_limits_;
+        auto const did_change = is_enabled != value;
         value = is_enabled;
         return did_change;
     }
 
     [[nodiscard]] constexpr bool are_parent_limits_honored(tr_direction direction) const
     {
-        TR_ASSERT(tr_isDirection(direction));
-
-        return this->band_[direction].honor_parent_limits_;
+        return band_[direction].honor_parent_limits_;
     }
 
     [[nodiscard]] tr_bandwidth_limits get_limits() const;
@@ -279,7 +277,7 @@ private:
 
 /* @} */
 
-constexpr bool tr_isPriority(tr_priority_t p)
+constexpr auto tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
 }
