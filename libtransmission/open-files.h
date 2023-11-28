@@ -24,12 +24,9 @@
 class tr_open_files
 {
 public:
-    [[nodiscard]] std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> get(
-        tr_torrent_id_t tor_id,
-        tr_file_index_t file_num,
-        bool writable);
+    [[nodiscard]] std::optional<tr_sys_file_t> get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable);
 
-    [[nodiscard]] std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> get(
+    [[nodiscard]] std::optional<tr_sys_file_t> get(
         tr_torrent_id_t tor_id,
         tr_file_index_t file_num,
         bool writable,

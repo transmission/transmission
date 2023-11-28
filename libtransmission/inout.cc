@@ -94,9 +94,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
     // We didn't find the file that we want to write to.
     // Let's figure out where it goes so that we can create it.
     auto const base = tor->current_dir();
-    auto const suffix = tor->session->isIncompleteFileNamingEnabled() && tor->file_size(file_index) > 0U ?
-        tr_torrent_files::PartialFileSuffix :
-        ""sv;
+    auto const suffix = tor->session->isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
     setme.assign(base, '/', tor->file_subpath(file_index), suffix);
     return true;
 }
@@ -118,6 +116,11 @@ void readOrWriteBytes(
     TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
 
+    if (file_size == 0U)
+    {
+        return;
+    }
+
     auto local_error = tr_error{};
     if (error == nullptr)
     {
@@ -126,9 +129,9 @@ void readOrWriteBytes(
 
     // --- Find the fd
 
-    auto fd_top = session->openFiles().get(tor->id(), file_index, do_write);
+    auto fd = session->openFiles().get(tor->id(), file_index, do_write);
     auto filename = tr_pathbuf{};
-    if (!fd_top && !getFilename(filename, tor, file_index, do_write))
+    if (!fd && !getFilename(filename, tor, file_index, do_write))
     {
         auto const err = ENOENT;
         error->set(
@@ -141,20 +144,20 @@ void readOrWriteBytes(
         return;
     }
 
-    if (!fd_top) // not in the cache, so open or create it now
+    if (!fd) // not in the cache, so open or create it now
     {
         // open (and maybe create) the file
         auto const prealloc = (!do_write || !tor->file_is_wanted(file_index)) ? TR_PREALLOCATE_NONE :
                                                                                 tor->session->preallocationMode();
-        fd_top = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
-        if (fd_top && do_write)
+        fd = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
+        if (fd && do_write)
         {
             // make a note that we just created a file
             tor->session->add_file_created();
         }
     }
 
-    if (!fd_top) // couldn't create/open it either
+    if (!fd) // couldn't create/open it either
     {
         auto const errnum = errno;
         error->set(
@@ -168,16 +171,10 @@ void readOrWriteBytes(
         return;
     }
 
-    if (file_size == 0U)
-    {
-        return;
-    }
-
-    auto const& [fd, tag] = *fd_top;
     switch (io_mode)
     {
     case IoMode::Read:
-        if (!readEntireBuf(fd, file_offset, buf, buflen, error) && *error)
+        if (!readEntireBuf(*fd, file_offset, buf, buflen, error) && *error)
         {
             tr_logAddErrorTor(
                 tor,
@@ -191,7 +188,7 @@ void readOrWriteBytes(
         break;
 
     case IoMode::Write:
-        if (!writeEntireBuf(fd, file_offset, buf, buflen, error) && *error)
+        if (!writeEntireBuf(*fd, file_offset, buf, buflen, error) && *error)
         {
             tr_logAddErrorTor(
                 tor,
@@ -205,7 +202,7 @@ void readOrWriteBytes(
         break;
 
     case IoMode::Prefetch:
-        tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
+        tr_sys_file_advise(*fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
         break;
     }
 }
