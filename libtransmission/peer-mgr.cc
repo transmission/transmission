@@ -2363,6 +2363,10 @@ struct peer_candidate
     case TR_PRI_LOW:
         i = 2;
         break;
+
+    default:
+        TR_ASSERT_MSG(false, "invalid priority");
+        break;
     }
 
     score = addValToKey(score, 4U, i);
