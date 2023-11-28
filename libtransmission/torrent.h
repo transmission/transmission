@@ -761,8 +761,6 @@ public:
         is_dirty_ = dirty;
     }
 
-    void mark_changed();
-
     [[nodiscard]] constexpr auto has_changed_since(time_t when) const noexcept
     {
         return date_changed_ > when;
@@ -1221,6 +1219,7 @@ private:
         completion_.set_has_piece(piece, has);
     }
 
+    void mark_changed();
     void mark_edited();
 
     void init(tr_ctor const& ctor);
