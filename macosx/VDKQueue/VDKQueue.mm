@@ -175,6 +175,7 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
     NSThread.currentThread.name = @"VDKQueue";
 
+    struct kevent ev;
     // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
     const struct timespec timeout = { 1, 0 };
     // So we don't have to risk accessing iVars when the thread is terminated.
@@ -184,7 +185,6 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
     while (_keepWatcherThreadRunning)
     {
-        struct kevent ev;
         int n = kevent(theFD, NULL, 0, &ev, 1, &timeout);
         if (n <= 0 || ev.filter != EVFILT_VNODE || !ev.fflags)
         {
