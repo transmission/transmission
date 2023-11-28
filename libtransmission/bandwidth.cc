@@ -28,14 +28,14 @@ using namespace libtransmission::Values;
 
 Speed tr_bandwidth::get_speed(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
-    if (now == 0)
+    if (now == 0U)
     {
         now = tr_time_msec();
     }
 
     if (now != r.cache_time_)
     {
-        uint64_t bytes = 0;
+        uint64_t bytes = 0U;
         uint64_t const cutoff = now - interval_msec;
 
         for (int i = r.newest_; r.date_[i] > cutoff;)
@@ -78,7 +78,7 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
     }
 
     /* invalidate cache_val*/
-    r.cache_time_ = 0;
+    r.cache_time_ = 0U;
 }
 
 // ---
@@ -188,7 +188,7 @@ void tr_bandwidth::phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir)
     // process until we run out of bandwidth and/or peers that can use it.
     for (size_t n_unfinished = std::size(peers); n_unfinished > 0U;)
     {
-        for (size_t i = 0; i < n_unfinished;)
+        for (size_t i = 0U; i < n_unfinished;)
         {
             // Value of 3000 bytes chosen so that when using µTP we'll send a full-size
             // frame right away and leave enough buffered data for the next frame to go
@@ -283,7 +283,7 @@ size_t tr_bandwidth::clamp(tr_direction const dir, size_t byte_count) const noex
         byte_count = std::min(byte_count, band_[dir].bytes_left_);
     }
 
-    if (parent_ != nullptr && band_[dir].honor_parent_limits_ && byte_count > 0)
+    if (parent_ != nullptr && band_[dir].honor_parent_limits_ && byte_count > 0U)
     {
         byte_count = parent_->clamp(dir, byte_count);
     }

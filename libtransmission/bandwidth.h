@@ -162,7 +162,7 @@ public:
     constexpr bool set_desired_speed(tr_direction dir, Speed desired_speed)
     {
         auto& value = band_[dir].desired_speed_;
-        bool const did_change = desired_speed != value;
+        auto const did_change = desired_speed != value;
         value = desired_speed;
         return did_change;
     }
