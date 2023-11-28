@@ -388,7 +388,7 @@ private:
         };
 
         pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
-        return pex;
+        return std::move(pex);
     }
 
     static void callback(void* vself, int event, unsigned char const* info_hash, void const* data, size_t data_len)

@@ -49,6 +49,7 @@
 #include "libtransmission/session-settings.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/torrent-ctor.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
@@ -338,7 +339,7 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
     auto const lock = session_->unique_lock();
 
     auto const* const tor = session_->torrents().get(torrent_id);
-    return tor == nullptr ? 0U : tor->bandwidth_.clamp(TR_DOWN, byte_count);
+    return tor == nullptr ? 0U : tor->bandwidth().clamp(TR_DOWN, byte_count);
 }
 
 void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
@@ -347,7 +348,7 @@ void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byt
 
     if (auto* const tor = session_->torrents().get(torrent_id); tor != nullptr)
     {
-        tor->bandwidth_.notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
+        tor->bandwidth().notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
     }
 }
 
@@ -615,7 +616,7 @@ std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_dire
             std::begin(candidates),
             std::begin(candidates) + num_wanted,
             std::end(candidates),
-            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
+            tr_torrent::CompareQueuePosition);
         candidates.resize(num_wanted);
     }
 
@@ -1430,7 +1431,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
-        if (tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr) && tr_torrentNew(ctor, nullptr) != nullptr)
+        if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
         {
             ++n_torrents;
         }
@@ -1442,7 +1443,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
         auto const path = tr_pathbuf{ folder, '/', name };
 
         if (tr_file_read(path, buf) &&
-            tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
+            ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
             tr_torrentNew(ctor, nullptr) != nullptr)
         {
             ++n_torrents;

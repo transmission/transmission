@@ -765,7 +765,7 @@ private:
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
-                tr_torrentGotBlock(tor, loc.block);
+                tor->on_block_received(loc.block);
             }
 
             break;
@@ -1293,7 +1293,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
         client = tr_interned_string{ tr_quark_new(std::data(buf)) };
     }
 
-    result.io->set_bandwidth(&swarm->tor->bandwidth_);
+    result.io->set_bandwidth(&swarm->tor->bandwidth());
     create_bit_torrent_peer(swarm->tor, result.io, info, client);
 
     return true;
@@ -1888,7 +1888,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     choked.reserve(peer_count);
     auto const* const session = s->manager->session;
     bool const choke_all = !s->tor->client_can_upload();
-    bool const is_maxed_out = s->tor->bandwidth_.is_maxed_out(TR_UP, now);
+    bool const is_maxed_out = s->tor->bandwidth().is_maxed_out(TR_UP, now);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -2007,7 +2007,7 @@ void tr_peerMgr::rechoke_pulse() const
         if (tor->is_running())
         {
             // possibly stop torrents that have seeded enough
-            tr_torrentCheckSeedLimit(tor);
+            tor->stop_if_seed_limit_reached();
         }
 
         if (tor->is_running())
@@ -2435,7 +2435,7 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (seeding && tor->bandwidth_.is_maxed_out(TR_UP, now_msec))
+        if (seeding && tor->bandwidth().is_maxed_out(TR_UP, now_msec))
         {
             continue;
         }
