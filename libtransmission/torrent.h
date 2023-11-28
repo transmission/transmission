@@ -753,11 +753,6 @@ public:
 
     void start(bool bypass_queue, std::optional<bool> has_any_local_data);
 
-    [[nodiscard]] constexpr auto is_dirty() const noexcept
-    {
-        return is_dirty_;
-    }
-
     constexpr void set_dirty(bool dirty = true) noexcept
     {
         is_dirty_ = dirty;
@@ -1221,6 +1216,11 @@ private:
 
     void mark_changed();
     void mark_edited();
+
+    [[nodiscard]] constexpr auto is_dirty() const noexcept
+    {
+        return is_dirty_;
+    }
 
     void init(tr_ctor const& ctor);
 
