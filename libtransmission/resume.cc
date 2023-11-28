@@ -688,7 +688,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
 
     if ((fields_to_load & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
-        tor->max_connected_peers_ = static_cast<uint16_t>(i);
+        tor->set_peer_limit(static_cast<uint16_t>(i));
         fields_loaded |= tr_resume::MaxPeers;
     }
 
@@ -826,7 +826,7 @@ auto set_from_ctor(
     {
         if (auto const val = ctor.peer_limit(mode); val)
         {
-            tor->max_connected_peers_ = *val;
+            tor->set_peer_limit(*val);
             ret |= tr_resume::MaxPeers;
         }
     }

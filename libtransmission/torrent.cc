@@ -1855,12 +1855,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->max_connected_peers_ != max_connected_peers)
-    {
-        tor->max_connected_peers_ = max_connected_peers;
-
-        tor->set_dirty();
-    }
+    tor->set_peer_limit(max_connected_peers);
 }
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)

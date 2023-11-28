@@ -786,6 +786,15 @@ public:
         return max_connected_peers_;
     }
 
+    constexpr void set_peer_limit(uint16_t val) noexcept
+    {
+        if (max_connected_peers_ != val)
+        {
+            max_connected_peers_ = val;
+            set_dirty();
+        }
+    }
+
     // --- idleness
 
     void set_idle_limit_mode(tr_idlelimit mode) noexcept
@@ -974,8 +983,6 @@ public:
     time_t lpdAnnounceAt = 0;
 
     tr_completeness completeness = TR_LEECH;
-
-    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
@@ -1315,6 +1322,8 @@ private:
     VerifyState verify_state_ = VerifyState::None;
 
     uint16_t idle_limit_minutes_ = 0;
+
+    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
     bool is_deleting_ = false;
     bool is_dirty_ = false;
