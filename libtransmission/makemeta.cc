@@ -158,7 +158,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
     {
         if (error != nullptr)
         {
-            error->set_from_errno(ENOENT);
+            error->set(ENOENT, "zero-length torrents are not allowed"sv);
         }
 
         return false;
