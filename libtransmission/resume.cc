@@ -634,13 +634,14 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
     tr_torrent_metainfo::migrate_file(tor->session->resumeDir(), tor->name(), tor->info_hash_string(), ".resume"sv);
 
     auto const filename = tor->resume_file();
-    if (!tr_sys_path_exists(filename))
+    auto benc = std::vector<char>{};
+    if (!tr_sys_path_exists(filename) || !tr_file_read(filename, benc))
     {
         return {};
     }
 
     auto serde = tr_variant_serde::benc();
-    auto otop = serde.parse_file(filename);
+    auto otop = serde.inplace().parse(benc);
     if (!otop)
     {
         tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, serde.error_.message()));
