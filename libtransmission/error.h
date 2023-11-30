@@ -42,10 +42,21 @@ public:
         return has_value();
     }
 
+    void set(int code, std::string&& message)
+    {
+        code_ = code;
+        message_ = std::move(message);
+    }
+
     void set(int code, std::string_view message)
     {
         code_ = code;
         message_.assign(message);
+    }
+
+    void set(int code, char const* const message)
+    {
+        set(code, std::string_view{ message != nullptr ? message : "" });
     }
 
     void prefix_message(std::string_view prefix)
