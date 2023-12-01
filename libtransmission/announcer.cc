@@ -351,17 +351,6 @@ private:
     std::optional<int64_t> downloader_count_;
 };
 
-// format: `${host}:${port}`
-tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
-{
-    auto buf = std::array<char, 1024>{};
-    auto* const begin = std::data(buf);
-    auto const* const end = fmt::format_to_n(begin, std::size(buf), "{:s}:{:d}", parsed.host, parsed.port).out;
-    auto const sv = std::string_view{ begin, static_cast<size_t>(end - begin) };
-
-    return tr_interned_string{ sv };
-}
-
 // ---
 
 /** @brief A group of trackers in a single tier, as per the multitracker spec */
