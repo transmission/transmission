@@ -1231,27 +1231,29 @@ namespace on_scrape_done_helpers
 
 void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* errmsg)
 {
-    // increment the error count
-    auto* current_tracker = tier->currentTracker();
-    if (current_tracker != nullptr)
+    if (auto* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
     {
         ++current_tracker->consecutive_failures;
+
+        tr_logAddDebugTier(
+            tier,
+            fmt::format(
+                "Tracker '{}' scrape error: {} (Can retry in {} seconds)",
+                current_tracker->announce_parsed.authority,
+                errmsg,
+                current_tracker->getRetryInterval()));
     }
 
     // set the error message
     tier->last_scrape_str = errmsg != nullptr ? errmsg : "";
+    tier->lastScrapeSucceeded = false;
 
     // switch to the next tracker
-    current_tracker = tier->useNextTracker();
-
-    // schedule a rescrape
-    auto const interval = current_tracker->getRetryInterval();
-    auto const authority = current_tracker->announce_parsed.authority;
-    tr_logAddDebugTier(
-        tier,
-        fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", authority, errmsg, interval));
-    tier->lastScrapeSucceeded = false;
-    tier->scheduleNextScrape(interval);
+    if (auto* const current_tracker = tier->useNextTracker(); current_tracker != nullptr)
+    {
+        // schedule a rescrape
+        tier->scheduleNextScrape(current_tracker->getRetryInterval());
+    }
 }
 
 void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const& response)
