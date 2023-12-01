@@ -24,6 +24,8 @@
 
 #include <fmt/core.h>
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bitfield.h"
@@ -1983,7 +1985,7 @@ void tr_peerMsgsImpl::sendPex()
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
-    auto tmpbuf = std::vector<std::byte>{};
+    auto tmpbuf = small::vector<std::byte, 2048U>{};
 
     for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {

@@ -383,10 +383,10 @@ namespace make_torrent_field_helpers
     for (auto const& tracker : trackers)
     {
         auto tracker_map = tr_variant::Map{ 5U };
-        tracker_map.try_emplace(TR_KEY_announce, tracker.announce.sv());
+        tracker_map.try_emplace(TR_KEY_announce, tr_variant::unmanaged_string(tracker.announce.sv()));
         tracker_map.try_emplace(TR_KEY_id, tracker.id);
-        tracker_map.try_emplace(TR_KEY_scrape, tracker.scrape.sv());
-        tracker_map.try_emplace(TR_KEY_sitename, tracker.announce_parsed.sitename);
+        tracker_map.try_emplace(TR_KEY_scrape, tr_variant::unmanaged_string(tracker.scrape.sv()));
+        tracker_map.try_emplace(TR_KEY_sitename, tr_variant::unmanaged_string(tracker.announce_parsed.sitename));
         tracker_map.try_emplace(TR_KEY_tier, tracker.tier);
         vec.emplace_back(std::move(tracker_map));
     }
@@ -611,7 +611,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_dateCreated: return tor.date_created();
     case TR_KEY_desiredAvailable: return st.desiredAvailable;
     case TR_KEY_doneDate: return st.doneDate;
-    case TR_KEY_downloadDir: return tor.download_dir().sv();
+    case TR_KEY_downloadDir: return tr_variant::unmanaged_string(tor.download_dir().sv());
     case TR_KEY_downloadLimit: return tr_torrentGetSpeedLimit_KBps(&tor, TR_DOWN);
     case TR_KEY_downloadLimited: return tor.uses_speed_limit(TR_DOWN);
     case TR_KEY_downloadedEver: return st.downloadedEver;
@@ -623,8 +623,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_fileStats: return make_file_stats_vec(tor);
     case TR_KEY_file_count: return tor.file_count();
     case TR_KEY_files: return make_file_vec(tor);
-    case TR_KEY_group: return tor.bandwidth_group().sv();
-    case TR_KEY_hashString: return tor.info_hash_string().sv();
+    case TR_KEY_group: return tr_variant::unmanaged_string(tor.bandwidth_group().sv());
+    case TR_KEY_hashString: return tr_variant::unmanaged_string(tor.info_hash_string().sv());
     case TR_KEY_haveUnchecked: return st.haveUnchecked;
     case TR_KEY_haveValid: return st.haveValid;
     case TR_KEY_honorsSessionLimits: return tor.uses_session_limits();
@@ -650,7 +650,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_pieceCount: return tor.piece_count();
     case TR_KEY_pieceSize: return tor.piece_size();
     case TR_KEY_pieces: return make_piece_bitfield(tor);
-    case TR_KEY_primary_mime_type: return tor.primary_mime_type();
+    case TR_KEY_primary_mime_type: return tr_variant::unmanaged_string(tor.primary_mime_type());
     case TR_KEY_priorities: return make_file_priorities_vec(tor);
     case TR_KEY_queuePosition: return st.queuePosition;
     case TR_KEY_rateDownload: return Speed{ st.pieceDownloadSpeed_KBps, Speed::Units::KByps }.base_quantity();
