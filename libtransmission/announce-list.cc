@@ -101,7 +101,6 @@ bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier
     tracker.announce_parsed = *parsed;
     tracker.tier = get_tier(tier, *parsed);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format("{:s}:{:d}", parsed->host, parsed->port);
 
     if (auto const scrape_str = announce_to_scrape(tracker.announce.sv()); scrape_str)
     {
