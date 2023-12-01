@@ -78,23 +78,32 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
     return add(announce_url_sv, tier);
 }
 
-bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
+bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier)
 {
-    auto const announce = tr_urlParseTracker(announce_url_sv);
-    if (!announce || !can_add(*announce))
+    // Make sure the announce URL is usable before we intern it.
+    if (auto const announce = tr_urlParseTracker(announce_url); !announce || !can_add(*announce))
+    {
+        return false;
+    }
+
+    // Parse again with the interned string so that `parsed` fields all
+    // point to the interned addresses. This second call should never
+    // fail, but check anyway to make the linter happy.
+    auto const announce_interned = tr_interned_string{ announce_url };
+    auto const parsed = tr_urlParseTracker(announce_interned.sv());
+    if (!parsed)
     {
         return false;
     }
 
     auto tracker = tracker_info{};
-    tracker.announce = announce_url_sv;
-    tracker.tier = get_tier(tier, *announce);
+    tracker.announce = announce_interned;
+    tracker.announce_parsed = *parsed;
+    tracker.tier = get_tier(tier, *parsed);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format("{:s}:{:d}", announce->host, announce->port);
-    tracker.sitename = announce->sitename;
-    tracker.query = announce->query;
+    tracker.host_and_port = fmt::format("{:s}:{:d}", parsed->host, parsed->port);
 
-    if (auto const scrape_str = announce_to_scrape(announce_url_sv); scrape_str)
+    if (auto const scrape_str = announce_to_scrape(tracker.announce.sv()); scrape_str)
     {
         tracker.scrape = *scrape_str;
     }

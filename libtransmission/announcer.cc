@@ -242,7 +242,7 @@ struct tr_tracker
     explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
         : host_and_port{ info.host_and_port }
         , announce_url{ info.announce }
-        , sitename{ info.sitename }
+        , sitename{ info.announce_parsed.sitename }
         , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
         , id{ info.id }
     {

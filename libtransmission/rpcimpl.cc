@@ -386,7 +386,7 @@ namespace make_torrent_field_helpers
         tracker_map.try_emplace(TR_KEY_announce, tracker.announce.sv());
         tracker_map.try_emplace(TR_KEY_id, tracker.id);
         tracker_map.try_emplace(TR_KEY_scrape, tracker.scrape.sv());
-        tracker_map.try_emplace(TR_KEY_sitename, tracker.sitename.sv());
+        tracker_map.try_emplace(TR_KEY_sitename, tracker.announce_parsed.sitename);
         tracker_map.try_emplace(TR_KEY_tier, tracker.tier);
         vec.emplace_back(std::move(tracker_map));
     }
