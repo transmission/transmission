@@ -6,11 +6,12 @@
 import { createDialogContainer } from './utils.js';
 
 export class RenameDialog extends EventTarget {
-  constructor(controller, remote) {
+  constructor(controller, remote, action_input_value) {
     super();
 
     this.controller = controller;
     this.remote = remote;
+    this.action_input_value = action_input_value;
     this.elements = {};
     this.torrents = [];
 
@@ -25,10 +26,15 @@ export class RenameDialog extends EventTarget {
     }
 
     this.torrents = torrents;
-    this.elements = RenameDialog._create();
+    this.elements = RenameDialog._create(
+      this.action_input_value === null ? 'Rename' : 'Confirm',
+    );
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    this.elements.entry.value = torrents[0].getName();
+    this.elements.entry.value =
+      this.action_input_value === null
+        ? torrents[0].getName()
+        : this.action_input_value;
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -46,7 +52,11 @@ export class RenameDialog extends EventTarget {
   }
 
   _onDismiss() {
-    this.close();
+    if (this.action_input_value === null) {
+      this.close();
+    } else {
+      this.controller.action_manager.click('show-inspector');
+    }
   }
 
   _onConfirm() {
@@ -59,14 +69,14 @@ export class RenameDialog extends EventTarget {
       }
     });
 
-    this.close();
+    this._onDismiss();
   }
 
-  static _create() {
+  static _create(confirm_text) {
     const elements = createDialogContainer('rename-dialog');
     elements.root.setAttribute('aria-label', 'Rename Torrent');
     elements.heading.textContent = 'Enter new name:';
-    elements.confirm.textContent = 'Rename';
+    elements.confirm.textContent = confirm_text;
 
     const label = document.createElement('label');
     label.setAttribute('for', 'torrent-rename-name');

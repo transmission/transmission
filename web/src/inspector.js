@@ -63,7 +63,7 @@ export class Inspector extends EventTarget {
     }
   }
 
-  static _createInfoPage() {
+  static _createInfoPage(controller) {
     const root = document.createElement('div');
     root.classList.add('inspector-info-page');
     const elements = { root };
@@ -75,18 +75,40 @@ export class Inspector extends EventTarget {
       root.append(label);
     };
 
-    const append_row = (text) => {
+    const append_row = (text, action) => {
       const lhs = document.createElement('label');
       setTextContent(lhs, text);
       root.append(lhs);
 
+      if (action) {
+        const rhs = document.createElement('input');
+        rhs.setAttribute('type', 'text');
+        rhs.addEventListener('keydown', (k) => {
+          if (k.key === 'Enter') {
+            controller.action_input_value = rhs.value;
+            controller.action_manager.click(action);
+          }
+        });
+        root.append(rhs);
+        return rhs;
+      }
       const rhs = document.createElement('span');
       root.append(rhs);
       return rhs;
     };
 
-    append_section_title('Activity');
+    append_section_title('Torrent');
     let rows = [
+      ['name', 'Name:', 'show-rename-dialog'],
+      ['labels', 'Labels:', 'show-labels-dialog'],
+      ['location', 'Location:', 'show-move-dialog'],
+    ];
+    for (const [name, text, action] of rows) {
+      elements[name] = append_row(text, action);
+    }
+
+    append_section_title('Activity');
+    rows = [
       ['have', 'Have:'],
       ['availability', 'Availability:'],
       ['uploaded', 'Uploaded:'],
@@ -104,14 +126,12 @@ export class Inspector extends EventTarget {
     append_section_title('Details');
     rows = [
       ['size', 'Size:'],
-      ['location', 'Location:'],
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
       ['dateAdded', 'Date added:'],
       ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
-      ['labels', 'Labels:'],
     ];
     for (const [name, text] of rows) {
       elements[name] = append_row(text);
@@ -165,7 +185,7 @@ export class Inspector extends EventTarget {
   _create() {
     const pages = {
       files: Inspector._createFilesPage(),
-      info: Inspector._createInfoPage(),
+      info: Inspector._createInfoPage(this.controller),
       peers: Inspector._createPeersPage(),
       tiers: Inspector._createTiersPage(),
     };
@@ -256,8 +276,56 @@ export class Inspector extends EventTarget {
       0,
     );
 
-    // state
+    // torrent name
     let string = null;
+    let action = false;
+    let placeholder = torrents.length >= 2 ? mixed : none;
+    if (torrents.length === 1) {
+      string = torrents[0].getName();
+      action = true;
+    }
+    if (e.info.name !== document.activeElement) {
+      e.info.name.value = string;
+    }
+    e.info.name.placeholder = placeholder;
+    e.info.name.disabled = !action;
+
+    // labels
+    if (torrents.length === 0) {
+      string = null;
+      action = false;
+    } else {
+      string = torrents[0].getLabels().join(', ');
+      action = true;
+    }
+    if (e.info.labels !== document.activeElement) {
+      e.info.labels.value = string;
+    }
+    e.info.labels.placeholder = none;
+    e.info.labels.disabled = !action;
+
+    // location
+    string = null;
+    action = false;
+    placeholder = none;
+    if (torrents.length > 0) {
+      const get = (t) => t.getDownloadDir();
+      const first = get(torrents[0]);
+      if (torrents.every((t) => get(t) === first)) {
+        string = first;
+        action = true;
+      } else {
+        placeholder = mixed;
+      }
+    }
+    if (e.info.location !== document.activeElement) {
+      e.info.location.value = string;
+    }
+    e.info.location.placeholder = placeholder;
+    e.info.location.disabled = !action;
+
+    // state
+    string = null;
     if (torrents.length === 0) {
       string = none;
     } else if (torrents.every((t) => t.isFinished())) {
@@ -323,7 +391,7 @@ export class Inspector extends EventTarget {
     }
     setTextContent(e.info.availability, fmt.stringSanitizer(string));
 
-    //  downloaded
+    // downloaded
     if (torrents.length === 0) {
       string = none;
     } else {
@@ -366,7 +434,7 @@ export class Inspector extends EventTarget {
     if (torrents.length === 0) {
       string = none;
     } else if (torrents.every((t) => t.isStopped())) {
-      string = stateString; // paused || finished}
+      string = stateString;
     } else {
       const get = (t) => t.getStartDate();
       const first = get(torrents[0]);
@@ -488,10 +556,6 @@ export class Inspector extends EventTarget {
       setTextContent(e.info.comment, string);
     }
 
-    // labels
-    string = torrents.length === 0 ? none : torrents[0].getLabels().join(', ');
-    setTextContent(e.info.labels, string);
-
     // origin
     if (torrents.length === 0) {
       string = none;
@@ -521,16 +585,6 @@ export class Inspector extends EventTarget {
       }
     }
     setTextContent(e.info.origin, string);
-
-    // location
-    if (torrents.length === 0) {
-      string = none;
-    } else {
-      const get = (t) => t.getDownloadDir();
-      const first = get(torrents[0]);
-      string = torrents.every((t) => get(t) === first) ? first : mixed;
-    }
-    setTextContent(e.info.location, string);
 
     // dateAdded
     if (torrents.length === 0) {
