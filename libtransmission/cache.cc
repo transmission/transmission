@@ -174,7 +174,7 @@ Cache::CIter Cache::get_block(tr_torrent const* torrent, tr_block_info::Location
     return std::end(blocks_);
 }
 
-int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme)
+int Cache::read_block(tr_torrent const* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme)
 {
     if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))
     {

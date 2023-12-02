@@ -38,7 +38,7 @@ public:
     // @return any error code from cacheTrim()
     int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
 
-    int read_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
+    int read_block(tr_torrent const* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
     int prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len);
     int flush_torrent(tr_torrent const* torrent);
     int flush_file(tr_torrent const* torrent, tr_file_index_t file);

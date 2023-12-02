@@ -1943,8 +1943,7 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 
 // ---
 
-// TODO: should be const after tr_ioTestPiece() is const
-bool tr_torrent::check_piece(tr_piece_index_t piece)
+bool tr_torrent::check_piece(tr_piece_index_t const piece) const
 {
     bool const pass = tr_ioTestPiece(this, piece);
     tr_logAddTraceTor(this, fmt::format("[LAZY] tr_torrent.checkPiece tested piece {}, pass=={}", piece, pass));
