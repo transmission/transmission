@@ -141,7 +141,6 @@ void read_or_write_bytes(
 {
     TR_ASSERT(file_index < tor->file_count());
 
-    bool const writable = io_mode == IoMode::Write;
     auto const file_size = tor->file_size(file_index);
     TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
@@ -150,45 +149,40 @@ void read_or_write_bytes(
         return;
     }
 
+    auto const writable = io_mode == IoMode::Write;
     auto const fd = get_fd(session, session->openFiles(), tor, writable, file_index, error);
-    if (!fd)
+    if (!fd || error)
     {
         return;
     }
 
+    auto fmtstr = ""sv;
     switch (io_mode)
     {
-    case IoMode::Read:
-        if (!read_entire_buf(*fd, file_offset, buf, buflen, error) && error)
-        {
-            tr_logAddErrorTor(
-                tor,
-                fmt::format(
-                    _("Couldn't read '{path}': {error} ({error_code})"),
-                    fmt::arg("path", tor->file_subpath(file_index)),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
-            return;
-        }
-        break;
-
-    case IoMode::Write:
-        if (!write_entire_buf(*fd, file_offset, buf, buflen, error) && error)
-        {
-            tr_logAddErrorTor(
-                tor,
-                fmt::format(
-                    _("Couldn't save '{path}': {error} ({error_code})"),
-                    fmt::arg("path", tor->file_subpath(file_index)),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
-            return;
-        }
-        break;
-
     case IoMode::Prefetch:
         tr_sys_file_advise(*fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
         break;
+
+    case IoMode::Write:
+        fmtstr = _("Couldn't save '{path}': {error} ({error_code})");
+        write_entire_buf(*fd, file_offset, buf, buflen, error);
+        break;
+
+    case IoMode::Read:
+        fmtstr = _("Couldn't read '{path}': {error} ({error_code})");
+        read_entire_buf(*fd, file_offset, buf, buflen, error);
+        break;
+    }
+
+    if (error)
+    {
+        tr_logAddErrorTor(
+            tor,
+            fmt::format(
+                fmt::runtime(fmtstr),
+                fmt::arg("path", tor->file_subpath(file_index)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
     }
 }
 
