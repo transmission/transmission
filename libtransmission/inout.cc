@@ -130,13 +130,13 @@ enum class IoMode
 };
 
 void read_or_write_bytes(
-    tr_session* session,
-    tr_torrent* tor,
-    IoMode io_mode,
-    tr_file_index_t file_index,
-    uint64_t file_offset,
-    uint8_t* buf,
-    size_t buflen,
+    tr_session* const session,
+    tr_torrent const* const tor,
+    IoMode const io_mode,
+    tr_file_index_t const file_index,
+    uint64_t const file_offset,
+    uint8_t* const buf,
+    size_t const buflen,
     tr_error& error)
 {
     TR_ASSERT(file_index < tor->file_count());
@@ -232,7 +232,7 @@ int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location
     return 0;
 }
 
-std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent* tor, tr_piece_index_t piece)
+std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent* const tor, tr_piece_index_t const piece)
 {
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(piece < tor->piece_count());
@@ -276,22 +276,22 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent* tor, tr_piece_index
 
 } // namespace
 
-int tr_ioRead(tr_torrent* tor, tr_block_info::Location const& loc, size_t len, uint8_t* setme)
+int tr_ioRead(tr_torrent* const tor, tr_block_info::Location const& loc, size_t const len, uint8_t* const setme)
 {
     return read_or_write_piece(tor, IoMode::Read, loc, setme, len);
 }
 
-int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location const& loc, size_t len)
+int tr_ioPrefetch(tr_torrent* const tor, tr_block_info::Location const& loc, size_t const len)
 {
     return read_or_write_piece(tor, IoMode::Prefetch, loc, nullptr, len);
 }
 
-int tr_ioWrite(tr_torrent* tor, tr_block_info::Location const& loc, size_t len, uint8_t const* writeme)
+int tr_ioWrite(tr_torrent* const tor, tr_block_info::Location const& loc, size_t const len, uint8_t const* const writeme)
 {
     return read_or_write_piece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len);
 }
 
-bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
+bool tr_ioTestPiece(tr_torrent* const tor, tr_piece_index_t const piece)
 {
     auto const hash = recalculate_hash(tor, piece);
     return hash && *hash == tor->piece_hash(piece);
