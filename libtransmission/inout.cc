@@ -81,7 +81,7 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
 {
     auto const tor_id = tor->id();
 
-    // do we already have it?
+    // is the file already open in the fd pool?
     if (auto const fd = open_files.get(tor_id, file_index, writable); fd)
     {
         return fd;
@@ -91,7 +91,7 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
     auto const create_if_missing = writable && tor->file_is_wanted(file_index);
     auto const prealloc = create_if_missing ? tor->session->preallocationMode() : tr_open_files::Preallocation::None;
     auto const file_size = tor->file_size(file_index);
-    if (auto found = tor->find_file(file_index); found)
+    if (auto const found = tor->find_file(file_index); found)
     {
         return open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size);
     }
@@ -109,6 +109,7 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
             session->add_file_created();
             return fd;
         }
+
         err = errno;
     }
 
