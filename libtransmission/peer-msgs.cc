@@ -1270,7 +1270,7 @@ void prefetchPieces(tr_peerMsgsImpl* msgs)
     {
         if (auto& req = requests[i]; !req.prefetched)
         {
-            msgs->session->cache->prefetch_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
+            msgs->session->cache->prefetch_block(*msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
             req.prefetched = true;
         }
     }
@@ -1876,7 +1876,7 @@ namespace peer_pulse_helpers
     if (ok)
     {
         ok = msgs->session->cache
-                 ->read_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+                 ->read_block(*msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
     }
 
     if (ok)

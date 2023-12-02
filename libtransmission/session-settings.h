@@ -12,6 +12,7 @@
 
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/open-files.h" // for tr_open_files::Preallocation
 #include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/quark.h"
 
@@ -51,7 +52,7 @@ struct tr_variant;
     V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "") \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true, "") \
-    V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE, "") \
+    V(TR_KEY_preallocation, preallocation_mode, tr_open_files::Preallocation, tr_open_files::Preallocation::Sparse, "") \
     V(TR_KEY_prefetch_enabled, is_prefetch_enabled, bool, true, "") \
     V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true, "") \
     V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U, "") \

@@ -609,7 +609,7 @@ void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc
     if (delete_flag && tor->has_metainfo())
     {
         // ensure the files are all closed and idle before moving
-        tor->session->closeTorrentFiles(tor);
+        tor->session->close_torrent_files(tor->id());
         tor->session->verify_remove(tor);
 
         if (delete_func == nullptr)
@@ -764,7 +764,7 @@ void tr_torrent::stop_now()
     stopped_.emit(this);
     session->announcer_->stopTorrent(this);
 
-    session->closeTorrentFiles(this);
+    session->close_torrent_files(id());
 
     if (!is_deleting_)
     {
@@ -1109,7 +1109,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
         }
 
         // ensure the files are all closed and idle before moving
-        session->closeTorrentFiles(this);
+        session->close_torrent_files(id());
         session->verify_remove(this);
 
         auto error = tr_error{};
@@ -1771,7 +1771,7 @@ void tr_torrent::recheck_completeness()
         }
 
         completeness_ = new_completeness;
-        session->closeTorrentFiles(this);
+        session->close_torrent_files(id());
 
         if (is_done())
         {
@@ -1943,10 +1943,9 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 
 // ---
 
-// TODO: should be const after tr_ioTestPiece() is const
-bool tr_torrent::check_piece(tr_piece_index_t piece)
+bool tr_torrent::check_piece(tr_piece_index_t const piece) const
 {
-    bool const pass = tr_ioTestPiece(this, piece);
+    auto const pass = tr_ioTestPiece(*this, piece);
     tr_logAddTraceTor(this, fmt::format("[LAZY] tr_torrent.checkPiece tested piece {}, pass=={}", piece, pass));
     return pass;
 }
@@ -2133,7 +2132,7 @@ std::string_view tr_torrent::primary_mime_type() const
 void tr_torrent::on_file_completed(tr_file_index_t const file)
 {
     /* close the file so that we can reopen in read-only mode as needed */
-    session->closeTorrentFile(this, file);
+    session->close_torrent_file(*this, file);
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */

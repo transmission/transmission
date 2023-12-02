@@ -1098,7 +1098,7 @@ private:
         return checked_pieces_.test(piece);
     }
 
-    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
+    [[nodiscard]] bool check_piece(tr_piece_index_t piece) const;
 
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {

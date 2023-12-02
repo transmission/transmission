@@ -17,6 +17,7 @@
 
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port
+#include "libtransmission/open-files.h" // for tr_open_files::Preallocation
 #include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
 #include "libtransmission/variant.h"
@@ -41,12 +42,12 @@ auto constexpr LogKeys = std::array<std::pair<std::string_view, tr_log_level>, 7
     { "warn", TR_LOG_WARN },
 } };
 
-auto constexpr PreallocationKeys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 5>{ {
-    { "off", TR_PREALLOCATE_NONE },
-    { "none", TR_PREALLOCATE_NONE },
-    { "fast", TR_PREALLOCATE_SPARSE },
-    { "sparse", TR_PREALLOCATE_SPARSE },
-    { "full", TR_PREALLOCATE_FULL },
+auto constexpr PreallocationKeys = std::array<std::pair<std::string_view, tr_open_files::Preallocation>, 5>{ {
+    { "off", tr_open_files::Preallocation::None },
+    { "none", tr_open_files::Preallocation::None },
+    { "fast", tr_open_files::Preallocation::Sparse },
+    { "sparse", tr_open_files::Preallocation::Sparse },
+    { "full", tr_open_files::Preallocation::Full },
 } };
 
 auto constexpr VerifyModeKeys = std::array<std::pair<std::string_view, tr_verify_added_mode>, 2>{ {
@@ -228,7 +229,7 @@ tr_variant VariantConverter::save<tr_port>(tr_port const& val)
 // ---
 
 template<>
-std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mode>(tr_variant const& src)
+std::optional<tr_open_files::Preallocation> VariantConverter::load<tr_open_files::Preallocation>(tr_variant const& src)
 {
     static constexpr auto Keys = PreallocationKeys;
 
@@ -249,7 +250,7 @@ std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mod
     {
         for (auto const& [name, value] : Keys)
         {
-            if (value == *val)
+            if (value == static_cast<tr_open_files::Preallocation>(*val))
             {
                 return value;
             }
@@ -260,9 +261,9 @@ std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mod
 }
 
 template<>
-tr_variant VariantConverter::save<tr_preallocation_mode>(tr_preallocation_mode const& val)
+tr_variant VariantConverter::save<tr_open_files::Preallocation>(tr_open_files::Preallocation const& val)
 {
-    return int64_t{ val };
+    return static_cast<int64_t>(val);
 }
 
 // ---

@@ -142,7 +142,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     tr_file_index_t file_num,
     bool writable,
     std::string_view filename_in,
-    tr_preallocation_mode allocation,
+    Preallocation allocation,
     uint64_t file_size)
 {
     // is there already an entry
@@ -196,17 +196,17 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         return {};
     }
 
-    if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
+    if (writable && !already_existed && allocation != Preallocation::None)
     {
         bool success = false;
         char const* type = nullptr;
 
-        if (allocation == TR_PREALLOCATE_FULL)
+        if (allocation == Preallocation::Full)
         {
             success = preallocate_file_full(fd, file_size, &error);
             type = "full";
         }
-        else if (allocation == TR_PREALLOCATE_SPARSE)
+        else if (allocation == Preallocation::Sparse)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
             type = "sparse";
