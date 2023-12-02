@@ -33,7 +33,7 @@ using namespace std::literals;
 namespace
 {
 
-bool readEntireBuf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error& error)
+bool read_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error& error)
 {
     while (buflen > 0U)
     {
@@ -52,7 +52,7 @@ bool readEntireBuf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t* buf, u
     return true;
 }
 
-bool writeEntireBuf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error& error)
+bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error& error)
 {
     while (buflen > 0U)
     {
@@ -78,7 +78,7 @@ enum class IoMode
     Write
 };
 
-bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, bool do_write)
+bool get_filename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, bool do_write)
 {
     if (auto found = tor->find_file(file_index); found)
     {
@@ -99,7 +99,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
     return true;
 }
 
-void readOrWriteBytes(
+void read_or_write_bytes(
     tr_session* session,
     tr_torrent* tor,
     IoMode io_mode,
@@ -125,7 +125,7 @@ void readOrWriteBytes(
 
     auto fd = session->openFiles().get(tor->id(), file_index, do_write);
     auto filename = tr_pathbuf{};
-    if (!fd && !getFilename(filename, tor, file_index, do_write))
+    if (!fd && !get_filename(filename, tor, file_index, do_write))
     {
         auto const err = ENOENT;
         error.set(
@@ -168,7 +168,7 @@ void readOrWriteBytes(
     switch (io_mode)
     {
     case IoMode::Read:
-        if (!readEntireBuf(*fd, file_offset, buf, buflen, error) && error)
+        if (!read_entire_buf(*fd, file_offset, buf, buflen, error) && error)
         {
             tr_logAddErrorTor(
                 tor,
@@ -182,7 +182,7 @@ void readOrWriteBytes(
         break;
 
     case IoMode::Write:
-        if (!writeEntireBuf(*fd, file_offset, buf, buflen, error) && error)
+        if (!write_entire_buf(*fd, file_offset, buf, buflen, error) && error)
         {
             tr_logAddErrorTor(
                 tor,
@@ -202,7 +202,7 @@ void readOrWriteBytes(
 }
 
 /* returns 0 on success, or an errno on failure */
-int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
+int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
 {
     if (loc.piece >= tor->piece_count())
     {
@@ -216,7 +216,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->file_size(file_index) - file_offset });
 
         auto error = tr_error{};
-        readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
+        read_or_write_bytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
         if (error) // if IO failed, set torrent's error if not already set
         {
             if (io_mode == IoMode::Write && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
@@ -241,7 +241,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
     return 0;
 }
 
-std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
+std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent* tor, tr_piece_index_t piece)
 {
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(piece < tor->piece_count());
@@ -287,21 +287,21 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
 
 int tr_ioRead(tr_torrent* tor, tr_block_info::Location const& loc, size_t len, uint8_t* setme)
 {
-    return readOrWritePiece(tor, IoMode::Read, loc, setme, len);
+    return read_or_write_piece(tor, IoMode::Read, loc, setme, len);
 }
 
 int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location const& loc, size_t len)
 {
-    return readOrWritePiece(tor, IoMode::Prefetch, loc, nullptr, len);
+    return read_or_write_piece(tor, IoMode::Prefetch, loc, nullptr, len);
 }
 
 int tr_ioWrite(tr_torrent* tor, tr_block_info::Location const& loc, size_t len, uint8_t const* writeme)
 {
-    return readOrWritePiece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len);
+    return read_or_write_piece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len);
 }
 
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
 {
-    auto const hash = recalculateHash(tor, piece);
+    auto const hash = recalculate_hash(tor, piece);
     return hash && *hash == tor->piece_hash(piece);
 }
