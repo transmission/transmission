@@ -668,8 +668,8 @@ void DetailsDialog::refreshUI()
             f += t->failedThisSession();
         }
 
-        QString const dstr = fmt.sizeToString(d);
-        QString const fstr = fmt.sizeToString(f);
+        QString const dstr = Formatter::storage_to_string(d);
+        QString const fstr = Formatter::storage_to_string(f);
 
         if (f != 0)
         {
@@ -713,14 +713,14 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        auto uploaded = uint64_t{};
+        auto uploaded_this_session = uint64_t{};
 
         for (Torrent const* const t : torrents)
         {
-            uploaded += t->uploadedThisSession();
+            uploaded_this_session += t->uploadedThisSession();
         }
 
-        string = tr("%1").arg(fmt.sizeToString(uploaded));
+        string = tr("%1").arg(Formatter::storage_to_string(uploaded_this_session));
     }
 
     ui_.uploadedThisSessionValueLabel->setText(string);
