@@ -188,7 +188,7 @@ void read_or_write_bytes(
 }
 
 /* returns 0 on success, or an errno on failure */
-int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
+int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, uint64_t buflen)
 {
     if (loc.piece >= tor->piece_count())
     {
@@ -199,10 +199,10 @@ int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location
 
     while (buflen != 0U)
     {
-        uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->file_size(file_index) - file_offset });
-
+        auto const bytes_this_pass = std::min(buflen, tor->file_size(file_index) - file_offset);
         auto error = tr_error{};
         read_or_write_bytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
+
         if (error) // if IO failed, set torrent's error if not already set
         {
             if (io_mode == IoMode::Write && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
