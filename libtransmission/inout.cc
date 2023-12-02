@@ -187,46 +187,35 @@ void read_or_write_bytes(
     }
 }
 
-/* returns 0 on success, or an errno on failure */
-int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, uint64_t buflen)
+void read_or_write_piece(
+    tr_torrent const* const tor,
+    IoMode const io_mode,
+    tr_block_info::Location const loc,
+    uint8_t* buf,
+    uint64_t buflen,
+    tr_error& error)
 {
     if (loc.piece >= tor->piece_count())
     {
-        return EINVAL;
+        error.set_from_errno(EINVAL);
+        return;
     }
 
     auto [file_index, file_offset] = tor->file_offset(loc);
-
     auto* const session = tor->session;
     auto& open_files = session->openFiles();
-    while (buflen != 0U)
+    while (buflen != 0U && !error)
     {
         auto const bytes_this_pass = std::min(buflen, tor->file_size(file_index) - file_offset);
-        auto error = tr_error{};
         read_or_write_bytes(session, open_files, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
-
-        if (error) // if IO failed, set torrent's error if not already set
-        {
-            if (io_mode == IoMode::Write && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
-            {
-                tor->error().set_local_error(error.message());
-                tr_torrentStop(tor);
-            }
-
-            return error.code();
-        }
-
         if (buf != nullptr)
         {
             buf += bytes_this_pass;
         }
         buflen -= bytes_this_pass;
-
         ++file_index;
         file_offset = 0U;
     }
-
-    return 0;
 }
 
 std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent* const tor, tr_piece_index_t const piece)
@@ -275,17 +264,31 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent* const tor, tr_piece
 
 int tr_ioRead(tr_torrent* const tor, tr_block_info::Location const& loc, size_t const len, uint8_t* const setme)
 {
-    return read_or_write_piece(tor, IoMode::Read, loc, setme, len);
+    auto error = tr_error{};
+    read_or_write_piece(tor, IoMode::Read, loc, setme, len, error);
+    return error.code();
 }
 
 int tr_ioPrefetch(tr_torrent* const tor, tr_block_info::Location const& loc, size_t const len)
 {
-    return read_or_write_piece(tor, IoMode::Prefetch, loc, nullptr, len);
+    auto error = tr_error{};
+    read_or_write_piece(tor, IoMode::Prefetch, loc, nullptr, len, error);
+    return error.code();
 }
 
 int tr_ioWrite(tr_torrent* const tor, tr_block_info::Location const& loc, size_t const len, uint8_t const* const writeme)
 {
-    return read_or_write_piece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len);
+    auto error = tr_error{};
+    read_or_write_piece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len, error);
+
+    // if IO failed, set torrent's error if not already set
+    if (error && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
+    {
+        tor->error().set_local_error(error.message());
+        tr_torrentStop(tor);
+    }
+
+    return error.code();
 }
 
 bool tr_ioTestPiece(tr_torrent* const tor, tr_piece_index_t const piece)
