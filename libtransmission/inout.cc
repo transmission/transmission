@@ -71,33 +71,63 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
     return true;
 }
 
+[[nodiscard]] std::optional<tr_sys_file_t> get_fd(
+    tr_session* const session,
+    tr_open_files& open_files,
+    tr_torrent const* const tor,
+    bool const writable,
+    tr_file_index_t const file_index,
+    tr_error& error)
+{
+    auto const tor_id = tor->id();
+
+    // do we already have it?
+    if (auto const fd = open_files.get(tor_id, file_index, writable); fd)
+    {
+        return fd;
+    }
+
+    // does the file exist?
+    auto const create_if_missing = writable && tor->file_is_wanted(file_index);
+    auto const prealloc = create_if_missing ? tor->session->preallocationMode() : tr_open_files::Preallocation::None;
+    auto const file_size = tor->file_size(file_index);
+    if (auto found = tor->find_file(file_index); found)
+    {
+        return open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size);
+    }
+
+    // do we want to create it?
+    auto err = ENOENT;
+    if (create_if_missing)
+    {
+        auto const base = tor->current_dir();
+        auto const suffix = tor->session->isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
+        auto const filename = tr_pathbuf{ base, '/', tor->file_subpath(file_index), suffix };
+        if (auto const fd = open_files.get(tor_id, file_index, writable, filename, prealloc, file_size); fd)
+        {
+            // make a note that we just created a file
+            session->add_file_created();
+            return fd;
+        }
+        err = errno;
+    }
+
+    error.set(
+        err,
+        fmt::format(
+            _("Couldn't get '{path}': {error} ({error_code})"),
+            fmt::arg("path", tor->file_subpath(file_index)),
+            fmt::arg("error", tr_strerror(err)),
+            fmt::arg("error_code", err)));
+    return {};
+}
+
 enum class IoMode
 {
     Read,
     Prefetch,
     Write
 };
-
-bool get_filename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, bool do_write)
-{
-    if (auto found = tor->find_file(file_index); found)
-    {
-        setme.assign(found->filename());
-        return true;
-    }
-
-    if (!do_write)
-    {
-        return false;
-    }
-
-    // We didn't find the file that we want to write to.
-    // Let's figure out where it goes so that we can create it.
-    auto const base = tor->current_dir();
-    auto const suffix = tor->session->isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
-    setme.assign(base, '/', tor->file_subpath(file_index), suffix);
-    return true;
-}
 
 void read_or_write_bytes(
     tr_session* session,
@@ -111,57 +141,18 @@ void read_or_write_bytes(
 {
     TR_ASSERT(file_index < tor->file_count());
 
-    bool const do_write = io_mode == IoMode::Write;
+    bool const writable = io_mode == IoMode::Write;
     auto const file_size = tor->file_size(file_index);
     TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
-
     if (file_size == 0U)
     {
         return;
     }
 
-    // --- Find the fd
-
-    auto fd = session->openFiles().get(tor->id(), file_index, do_write);
-    auto filename = tr_pathbuf{};
-    if (!fd && !get_filename(filename, tor, file_index, do_write))
+    auto const fd = get_fd(session, session->openFiles(), tor, writable, file_index, error);
+    if (!fd)
     {
-        auto const err = ENOENT;
-        error.set(
-            err,
-            fmt::format(
-                _("Couldn't get '{path}': {error} ({error_code})"),
-                fmt::arg("path", tor->file_subpath(file_index)),
-                fmt::arg("error", tr_strerror(err)),
-                fmt::arg("error_code", err)));
-        return;
-    }
-
-    if (!fd) // not in the cache, so open or create it now
-    {
-        // open (and maybe create) the file
-        auto const prealloc = (!do_write || !tor->file_is_wanted(file_index)) ? tr_open_files::Preallocation::None :
-                                                                                tor->session->preallocationMode();
-        fd = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
-        if (fd && do_write)
-        {
-            // make a note that we just created a file
-            tor->session->add_file_created();
-        }
-    }
-
-    if (!fd) // couldn't create/open it either
-    {
-        auto const errnum = errno;
-        error.set(
-            errnum,
-            fmt::format(
-                _("Couldn't get '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
-                fmt::arg("error", tr_strerror(errnum)),
-                fmt::arg("error_code", errnum)));
-        tr_logAddErrorTor(tor, std::string{ error.message() });
         return;
     }
 
