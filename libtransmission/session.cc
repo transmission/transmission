@@ -2009,13 +2009,13 @@ void tr_session::verify_add(tr_torrent* const tor)
 
 // ---
 
-void tr_session::closeTorrentFiles(tr_torrent const& tor) noexcept
+void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {
-    this->cache->flush_torrent(tor);
-    openFiles().close_torrent(tor.id());
+    this->cache->flush_torrent(tor_id);
+    openFiles().close_torrent(tor_id);
 }
 
-void tr_session::closeTorrentFile(tr_torrent const& tor, tr_file_index_t file_num) noexcept
+void tr_session::close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept
 {
     this->cache->flush_file(tor, file_num);
     openFiles().close_file(tor.id(), file_num);

@@ -25,7 +25,7 @@
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
 
-Cache::Key Cache::make_key(tr_torrent const& tor, tr_block_info::Location loc) noexcept
+Cache::Key Cache::make_key(tr_torrent const& tor, tr_block_info::Location const loc) noexcept
 {
     return std::make_pair(tor.id(), loc.block);
 }
@@ -130,7 +130,7 @@ Cache::Cache(tr_torrents const& torrents, Memory const max_size)
 
 // ---
 
-int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<BlockData> writeme)
+int Cache::write_block(tr_torrent_id_t const tor_id, tr_block_index_t const block, std::unique_ptr<BlockData> writeme)
 {
     if (max_blocks_ == 0U)
     {
@@ -225,10 +225,8 @@ int Cache::flush_file(tr_torrent const& tor, tr_file_index_t const file)
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), CompareCacheBlockByKey));
 }
 
-int Cache::flush_torrent(tr_torrent const& tor)
+int Cache::flush_torrent(tr_torrent_id_t const tor_id)
 {
-    auto const tor_id = tor.id();
-
     return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), CompareCacheBlockByKey),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), CompareCacheBlockByKey));

@@ -557,8 +557,8 @@ public:
         return open_files_;
     }
 
-    void closeTorrentFiles(tr_torrent const& tor) noexcept;
-    void closeTorrentFile(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
+    void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
+    void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
 
     // announce ip
 
