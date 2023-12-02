@@ -88,9 +88,9 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
     }
 
     // does the file exist?
-    auto const create_if_missing = writable && tor->file_is_wanted(file_index);
-    auto const prealloc = create_if_missing ? tor->session->preallocationMode() : tr_open_files::Preallocation::None;
     auto const file_size = tor->file_size(file_index);
+    auto const create_if_missing = writable && tor->file_is_wanted(file_index);
+    auto const prealloc = create_if_missing ? session->preallocationMode() : tr_open_files::Preallocation::None;
     if (auto const found = tor->find_file(file_index); found)
     {
         return open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size);
@@ -132,16 +132,16 @@ enum class IoMode
 
 void read_or_write_bytes(
     tr_session* const session,
+    tr_open_files& open_files,
     tr_torrent const* const tor,
     IoMode const io_mode,
     tr_file_index_t const file_index,
     uint64_t const file_offset,
     uint8_t* const buf,
-    size_t const buflen,
+    uint64_t const buflen,
     tr_error& error)
 {
     TR_ASSERT(file_index < tor->file_count());
-
     auto const file_size = tor->file_size(file_index);
     TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
@@ -151,7 +151,7 @@ void read_or_write_bytes(
     }
 
     auto const writable = io_mode == IoMode::Write;
-    auto const fd = get_fd(session, session->openFiles(), tor, writable, file_index, error);
+    auto const fd = get_fd(session, open_files, tor, writable, file_index, error);
     if (!fd || error)
     {
         return;
@@ -197,11 +197,13 @@ int read_or_write_piece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location
 
     auto [file_index, file_offset] = tor->file_offset(loc);
 
+    auto* const session = tor->session;
+    auto& open_files = session->openFiles();
     while (buflen != 0U)
     {
         auto const bytes_this_pass = std::min(buflen, tor->file_size(file_index) - file_offset);
         auto error = tr_error{};
-        read_or_write_bytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
+        read_or_write_bytes(session, open_files, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
 
         if (error) // if IO failed, set torrent's error if not already set
         {
