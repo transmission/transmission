@@ -67,13 +67,6 @@ enum tr_verify_added_mode
     TR_VERIFY_ADDED_FULL = 1
 };
 
-enum tr_preallocation_mode
-{
-    TR_PREALLOCATE_NONE = 0,
-    TR_PREALLOCATE_SPARSE = 1,
-    TR_PREALLOCATE_FULL = 2
-};
-
 enum tr_encryption_mode
 {
     TR_CLEAR_PREFERRED,

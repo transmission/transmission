@@ -147,8 +147,8 @@ void readOrWriteBytes(
     if (!fd) // not in the cache, so open or create it now
     {
         // open (and maybe create) the file
-        auto const prealloc = (!do_write || !tor->file_is_wanted(file_index)) ? TR_PREALLOCATE_NONE :
-                                                                                tor->session->preallocationMode();
+        auto const prealloc = (!do_write || !tor->file_is_wanted(file_index)) ? tr_open_files::Preallocation::None
+                                                                              : tor->session->preallocationMode();
         fd = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
         if (fd && do_write)
         {
