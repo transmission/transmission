@@ -5292,9 +5292,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         maxSize.height -= self.toolbarHeight;
         maxSize.height -= self.mainWindowComponentHeight;
 
-        //add a small buffer
-        maxSize.height -= 50;
-
         if (height > maxSize.height)
         {
             height = maxSize.height;
