@@ -53,7 +53,6 @@ struct tr_variant;
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true, "") \
     V(TR_KEY_preallocation, preallocation_mode, tr_open_files::Preallocation, tr_open_files::Preallocation::Sparse, "") \
-    V(TR_KEY_prefetch_enabled, is_prefetch_enabled, bool, true, "") \
     V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true, "") \
     V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U, "") \
     V(TR_KEY_ratio_limit, ratio_limit, double, 2.0, "") \

@@ -29,8 +29,6 @@ struct tr_torrent;
  */
 [[nodiscard]] int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
 
-int tr_ioPrefetch(tr_torrent const& tor, tr_block_info::Location const& loc, size_t len);
-
 /**
  * Writes the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.

@@ -185,16 +185,6 @@ int Cache::read_block(tr_torrent const& tor, tr_block_info::Location const& loc,
     return tr_ioRead(tor, loc, len, setme);
 }
 
-int Cache::prefetch_block(tr_torrent const& tor, tr_block_info::Location const& loc, size_t len)
-{
-    if (auto const iter = get_block(tor, loc); iter != std::end(blocks_))
-    {
-        return {}; // already have it
-    }
-
-    return tr_ioPrefetch(tor, loc, len);
-}
-
 // ---
 
 int Cache::flush_span(CIter const begin, CIter const end)
