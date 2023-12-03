@@ -884,16 +884,16 @@ std::optional<int> popNextMetadataRequest(tr_peerMsgsImpl* msgs)
 
 void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
-    if (auto const must_send_rej = msgs->io->supports_fext(); !must_send_rej)
+    auto& queue = msgs->peer_requested_;
+
+    if (auto const must_send_rej = msgs->io->supports_fext(); must_send_rej)
     {
-        return;
+        for (auto const& req : queue)
+        {
+            protocolSendReject(msgs, &req);
+        }
     }
 
-    auto& queue = msgs->peer_requested_;
-    for (auto const& req : queue)
-    {
-        protocolSendReject(msgs, &req);
-    }
     queue.clear();
 }
 
