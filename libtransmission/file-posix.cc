@@ -842,58 +842,6 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
     return ret;
 }
 
-bool tr_sys_file_advise(
-    [[maybe_unused]] tr_sys_file_t handle,
-    [[maybe_unused]] uint64_t offset,
-    [[maybe_unused]] uint64_t size,
-    [[maybe_unused]] tr_sys_file_advice_t advice,
-    [[maybe_unused]] tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(size > 0);
-    TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
-
-    bool ret = true;
-
-#if defined(HAVE_POSIX_FADVISE)
-
-    int const native_advice = advice == TR_SYS_FILE_ADVICE_WILL_NEED ?
-        POSIX_FADV_WILLNEED :
-        (advice == TR_SYS_FILE_ADVICE_DONT_NEED ? POSIX_FADV_DONTNEED : POSIX_FADV_NORMAL);
-
-    TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
-
-    if (int const code = posix_fadvise(handle, offset, size, native_advice); code != 0)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(errno);
-        }
-
-        ret = false;
-    }
-
-#elif defined(__APPLE__)
-
-    if (advice == TR_SYS_FILE_ADVICE_WILL_NEED)
-    {
-        auto radv = radvisory{};
-        radv.ra_offset = offset;
-        radv.ra_count = size;
-
-        ret = fcntl(handle, F_RDADVISE, &radv) != -1;
-
-        if (error != nullptr && !ret)
-        {
-            error->set_from_errno(errno);
-        }
-    }
-
-#endif
-
-    return ret;
-}
-
 namespace
 {
 namespace preallocate_helpers

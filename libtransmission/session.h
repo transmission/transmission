@@ -786,11 +786,6 @@ public:
         return settings_.preferred_transport;
     }
 
-    [[nodiscard]] constexpr auto allowsPrefetch() const noexcept
-    {
-        return settings_.is_prefetch_enabled;
-    }
-
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
     {
         return settings_.idle_seeding_limit_enabled;

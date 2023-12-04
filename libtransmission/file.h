@@ -75,12 +75,6 @@ enum tr_sys_path_get_info_flags_t
     TR_SYS_PATH_NO_FOLLOW = (1 << 0)
 };
 
-enum tr_sys_file_advice_t
-{
-    TR_SYS_FILE_ADVICE_WILL_NEED,
-    TR_SYS_FILE_ADVICE_DONT_NEED
-};
-
 enum tr_sys_file_preallocate_flags_t
 {
     TR_SYS_FILE_PREALLOC_SPARSE = (1 << 0)
@@ -468,24 +462,6 @@ bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error = nullptr)
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error = nullptr);
-
-/**
- * @brief Tell system to prefetch or discard some part of file which is [not] to be read soon.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[in]  offset Offset in file to prefetch from.
- * @param[in]  size   Number of bytes to prefetch.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_advise(
-    tr_sys_file_t handle,
-    uint64_t offset,
-    uint64_t size,
-    tr_sys_file_advice_t advice,
-    tr_error* error = nullptr);
 
 /**
  * @brief Preallocate file to specified size in full or sparse mode.

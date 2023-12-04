@@ -75,7 +75,6 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, bool const abor
             {
                 bytes_this_pass = num_read;
                 sha->add(std::data(buffer), bytes_this_pass);
-                tr_sys_file_advise(fd, file_pos, bytes_this_pass, TR_SYS_FILE_ADVICE_DONT_NEED);
             }
         }
 

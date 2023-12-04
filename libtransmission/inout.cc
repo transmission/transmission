@@ -123,18 +123,11 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
     return {};
 }
 
-enum class IoMode
-{
-    Read,
-    Prefetch,
-    Write
-};
-
 void read_or_write_bytes(
     tr_session& session,
     tr_open_files& open_files,
     tr_torrent const& tor,
-    IoMode const io_mode,
+    bool const writable,
     tr_file_index_t const file_index,
     uint64_t const file_offset,
     uint8_t* const buf,
@@ -150,7 +143,6 @@ void read_or_write_bytes(
         return;
     }
 
-    auto const writable = io_mode == IoMode::Write;
     auto const fd = get_fd(session, open_files, tor, writable, file_index, error);
     if (!fd || error)
     {
@@ -158,21 +150,15 @@ void read_or_write_bytes(
     }
 
     auto fmtstr = ""sv;
-    switch (io_mode)
+    if (writable)
     {
-    case IoMode::Prefetch:
-        tr_sys_file_advise(*fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
-        break;
-
-    case IoMode::Write:
         fmtstr = _("Couldn't save '{path}': {error} ({error_code})");
         write_entire_buf(*fd, file_offset, buf, buflen, error);
-        break;
-
-    case IoMode::Read:
+    }
+    else
+    {
         fmtstr = _("Couldn't read '{path}': {error} ({error_code})");
         read_entire_buf(*fd, file_offset, buf, buflen, error);
-        break;
     }
 
     if (error)
@@ -189,7 +175,7 @@ void read_or_write_bytes(
 
 void read_or_write_piece(
     tr_torrent const& tor,
-    IoMode const io_mode,
+    bool const writable,
     tr_block_info::Location const loc,
     uint8_t* buf,
     uint64_t buflen,
@@ -207,7 +193,7 @@ void read_or_write_piece(
     while (buflen != 0U && !error)
     {
         auto const bytes_this_pass = std::min(buflen, tor.file_size(file_index) - file_offset);
-        read_or_write_bytes(session, open_files, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, error);
+        read_or_write_bytes(session, open_files, tor, writable, file_index, file_offset, buf, bytes_this_pass, error);
         if (buf != nullptr)
         {
             buf += bytes_this_pass;
@@ -264,21 +250,14 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
 int tr_ioRead(tr_torrent const& tor, tr_block_info::Location const& loc, size_t const len, uint8_t* const setme)
 {
     auto error = tr_error{};
-    read_or_write_piece(tor, IoMode::Read, loc, setme, len, error);
-    return error.code();
-}
-
-int tr_ioPrefetch(tr_torrent const& tor, tr_block_info::Location const& loc, size_t const len)
-{
-    auto error = tr_error{};
-    read_or_write_piece(tor, IoMode::Prefetch, loc, nullptr, len, error);
+    read_or_write_piece(tor, false /*writable*/, loc, setme, len, error);
     return error.code();
 }
 
 int tr_ioWrite(tr_torrent& tor, tr_block_info::Location const& loc, size_t const len, uint8_t const* const writeme)
 {
     auto error = tr_error{};
-    read_or_write_piece(tor, IoMode::Write, loc, const_cast<uint8_t*>(writeme), len, error);
+    read_or_write_piece(tor, true /*writable*/, loc, const_cast<uint8_t*>(writeme), len, error);
 
     // if IO failed, set torrent's error if not already set
     if (error && tor.error().error_type() != TR_STAT_LOCAL_ERROR)
