@@ -372,6 +372,11 @@ std::string tr_metainfo_builder::benc(tr_error* error) const
     return tr_variant_serde::benc().to_string(tr_variant{ std::move(top) });
 }
 
+bool tr_metainfo_builder::save(std::string_view filename, tr_error* error) const
+{
+    return tr_file_save(filename, benc(error), error);
+}
+
 uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
 {
     // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.

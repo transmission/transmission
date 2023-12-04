@@ -16,6 +16,7 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission

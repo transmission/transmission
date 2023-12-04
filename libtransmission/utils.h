@@ -5,9 +5,10 @@
 
 #pragma once
 
+#include <algorithm> // for std::for_each()
 #include <cctype>
-#include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <ctime> // time_t
 #include <locale>
 #include <memory>
@@ -16,10 +17,6 @@
 #include <string_view>
 #include <type_traits>
 #include <vector>
-
-#include "libtransmission/tr-macros.h"
-#include "libtransmission/variant.h"
-#include "libtransmission/values.h"
 
 struct tr_error;
 
@@ -310,15 +307,17 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 
 class tr_net_init_mgr
 {
-private:
-    tr_net_init_mgr();
-    TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
-
 public:
     ~tr_net_init_mgr();
     static std::unique_ptr<tr_net_init_mgr> create();
 
 private:
+    tr_net_init_mgr();
+    tr_net_init_mgr(tr_net_init_mgr&&) = delete;
+    tr_net_init_mgr(tr_net_init_mgr const&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr&&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr const&) = delete;
+
     static bool initialised;
 };
 
