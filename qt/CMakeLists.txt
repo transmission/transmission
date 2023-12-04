@@ -246,7 +246,7 @@ if(INSTALL_DOC)
 endif()
 
 install(
-    FILES transmission-qt.desktop
+    FILES com.transmissionbt.transmission.qt.desktop
     DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 
 if(ENABLE_NLS)

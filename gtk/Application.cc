@@ -697,20 +697,10 @@ void Application::on_open(std::vector<Glib::RefPtr<Gio::File>> const& files, Gli
     impl_->open_files(files);
 }
 
-namespace
-{
-
-std::string get_application_id(std::string const& config_dir)
-{
-    struct stat sb = {};
-    (void)::stat(config_dir.c_str(), &sb);
-    return fmt::format("com.transmissionbt.transmission_{}_{}", sb.st_dev, sb.st_ino);
-}
-
-} // namespace
-
 Application::Application(std::string const& config_dir, bool start_paused, bool start_iconified)
-    : Gtk::Application(get_application_id(config_dir), TR_GIO_APPLICATION_FLAGS(HANDLES_OPEN))
+    : Gtk::Application(
+          "com.transmissionbt.transmission.gtk",
+          TR_GIO_APPLICATION_FLAGS(HANDLES_OPEN) | TR_GIO_APPLICATION_FLAGS(NON_UNIQUE))
     , impl_(std::make_unique<Impl>(*this, config_dir, start_paused, start_iconified))
 {
 }
