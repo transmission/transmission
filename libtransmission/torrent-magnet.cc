@@ -66,7 +66,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    if (tor->incomplete_metadata)
+    if (tor->incomplete_metadata != nullptr)
     {
         return false;
     }
