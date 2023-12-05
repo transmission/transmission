@@ -32,8 +32,6 @@ public:
         init_sizes(total_size_in, piece_size_in);
     }
 
-    void init_sizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept;
-
     [[nodiscard]] constexpr auto block_count() const noexcept
     {
         return n_blocks_;
@@ -146,6 +144,8 @@ public:
     }
 
 private:
+    void init_sizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept;
+
     // Location of the last byte in `piece`.
     [[nodiscard]] constexpr Location piece_last_loc(tr_piece_index_t piece) const noexcept
     {
