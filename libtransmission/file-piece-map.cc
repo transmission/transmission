@@ -75,7 +75,7 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
     reset({ tm.total_size(), tm.piece_size() }, std::data(file_sizes), std::size(file_sizes));
 }
 
-tr_file_piece_map::file_span_t tr_file_piece_map::file_span(tr_piece_index_t piece) const
+tr_file_piece_map::file_span_t tr_file_piece_map::file_span_for_piece(tr_piece_index_t piece) const
 {
     static constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
@@ -142,7 +142,7 @@ tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t piece) const
     }
 
     // check the priorities of the files that touch this piece
-    if (auto const [begin_file, end_file] = fpm_->file_span(piece); end_file <= std::size(priorities_))
+    if (auto const [begin_file, end_file] = fpm_->file_span_for_piece(piece); end_file <= std::size(priorities_))
     {
         auto const begin = std::begin(priorities_) + begin_file;
         auto const end = std::begin(priorities_) + end_file;
@@ -184,6 +184,6 @@ bool tr_files_wanted::piece_wanted(tr_piece_index_t piece) const
         return true;
     }
 
-    auto const [begin, end] = fpm_->file_span(piece);
+    auto const [begin, end] = fpm_->file_span_for_piece(piece);
     return wanted_.count(begin, end) != 0U;
 }

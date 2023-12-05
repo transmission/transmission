@@ -61,7 +61,7 @@ public:
         return file_pieces_[file];
     }
 
-    [[nodiscard]] file_span_t file_span(tr_piece_index_t piece) const;
+    [[nodiscard]] file_span_t file_span_for_piece(tr_piece_index_t piece) const;
 
     [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
 
