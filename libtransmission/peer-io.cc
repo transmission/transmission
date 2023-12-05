@@ -59,7 +59,8 @@ namespace
 // since that's what peer-io does by default anyway.
 [[nodiscard]] auto constexpr canRetryFromError(int error_code) noexcept
 {
-    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
+    return error_code == 0 || error_code == EAGAIN || error_code == EWOULDBLOCK || error_code == EINTR ||
+        error_code == EINPROGRESS;
 }
 
 size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
