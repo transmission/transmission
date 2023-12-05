@@ -87,46 +87,8 @@ private:
 
     using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
-
     std::vector<piece_span_t> file_pieces_;
-
     std::vector<tr_piece_index_t> edge_pieces_;
-
-    template<typename T>
-    struct CompareToSpan
-    {
-        using span_t = index_span_t<T>;
-
-        [[nodiscard]] constexpr int compare(T item, span_t span) const // <=>
-        {
-            if (item < span.begin)
-            {
-                return -1;
-            }
-
-            if (item >= span.end)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        [[nodiscard]] constexpr bool operator()(T item, span_t span) const // <
-        {
-            return compare(item, span) < 0;
-        }
-
-        [[nodiscard]] constexpr int compare(span_t span, T item) const // <=>
-        {
-            return -compare(item, span);
-        }
-
-        [[nodiscard]] constexpr bool operator()(span_t span, T item) const // <
-        {
-            return compare(span, item) < 0;
-        }
-    };
 };
 
 class tr_file_priorities
