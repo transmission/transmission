@@ -95,12 +95,6 @@ tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset)
 
 // ---
 
-void tr_file_priorities::reset(tr_file_piece_map const* fpm)
-{
-    fpm_ = fpm;
-    priorities_ = {};
-}
-
 void tr_file_priorities::set(tr_file_index_t file, tr_priority_t new_priority)
 {
     if (std::empty(priorities_))

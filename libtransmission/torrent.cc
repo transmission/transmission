@@ -872,7 +872,7 @@ void tr_torrent::on_metainfo_updated()
     obfuscated_hash_ = tr_sha1::digest("req2"sv, info_hash());
     fpm_.reset(metainfo_);
     file_mtimes_.resize(file_count());
-    file_priorities_.reset(&fpm_);
+    file_priorities_ = tr_file_priorities{ &fpm_ };
     files_wanted_.reset(&fpm_);
     checked_pieces_ = tr_bitfield{ size_t(piece_count()) };
 }

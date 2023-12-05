@@ -137,7 +137,6 @@ public:
     {
     }
 
-    void reset(tr_file_piece_map const*);
     void set(tr_file_index_t file, tr_priority_t priority);
     void set(tr_file_index_t const* files, size_t n, tr_priority_t priority);
 
