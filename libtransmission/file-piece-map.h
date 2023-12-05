@@ -70,11 +70,6 @@ public:
         return std::size(file_pieces_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
-    {
-        return std::empty(file_pieces_);
-    }
-
     // TODO(ckerr) minor wart here, two identical span types
     [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span(tr_file_index_t file) const
     {
