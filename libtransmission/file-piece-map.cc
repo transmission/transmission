@@ -157,10 +157,10 @@ tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t piece) const
 
 // ---
 
-void tr_files_wanted::reset(tr_file_piece_map const* fpm)
+tr_files_wanted::tr_files_wanted(tr_file_piece_map const* fpm)
+    : fpm_{ fpm }
+    , wanted_{ std::size(*fpm) }
 {
-    fpm_ = fpm;
-    wanted_ = tr_bitfield{ std::size(*fpm) };
     wanted_.set_has_all(); // by default we want all files
 }
 
