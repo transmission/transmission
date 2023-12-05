@@ -55,7 +55,7 @@ public:
 
     [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t size() const
+    [[nodiscard]] TR_CONSTEXPR20 size_t file_count() const
     {
         return std::size(file_pieces_);
     }

@@ -153,7 +153,7 @@ void tr_file_priorities::set(tr_file_index_t file, tr_priority_t new_priority)
             return;
         }
 
-        priorities_.assign(std::size(*fpm_), TR_PRI_NORMAL);
+        priorities_.assign(fpm_->file_count(), TR_PRI_NORMAL);
         priorities_.shrink_to_fit();
     }
 
@@ -170,7 +170,7 @@ void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority
 
 tr_priority_t tr_file_priorities::file_priority(tr_file_index_t file) const
 {
-    TR_ASSERT(file < std::size(*fpm_));
+    TR_ASSERT(file < fpm_->file_count());
 
     if (std::empty(priorities_))
     {
@@ -208,7 +208,7 @@ tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t piece) const
 
 tr_files_wanted::tr_files_wanted(tr_file_piece_map const* fpm)
     : fpm_{ fpm }
-    , wanted_{ std::size(*fpm) }
+    , wanted_{ fpm->file_count() }
 {
     wanted_.set_has_all(); // by default we want all files
 }
