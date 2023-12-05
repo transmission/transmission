@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <limits>
 #include <memory>
 #include <utility> // for std::swap()
 #include <vector>
@@ -84,7 +85,7 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
 // ---
 
 tr_bandwidth::tr_bandwidth(tr_bandwidth* parent, bool is_group)
-    : priority_(is_group ? TR_PRI_NONE : TR_PRI_NORMAL)
+    : priority_(is_group ? std::numeric_limits<tr_priority_t>::max() : TR_PRI_NORMAL)
 {
     set_parent(parent);
 }
@@ -225,7 +226,7 @@ void tr_bandwidth::allocate(uint64_t period_msec)
     // allocateBandwidth () is a helper function with two purposes:
     // 1. allocate bandwidth to b and its subtree
     // 2. accumulate an array of all the peerIos from b and its subtree.
-    allocate_bandwidth(TR_PRI_NONE, period_msec, refs);
+    allocate_bandwidth(std::numeric_limits<tr_priority_t>::max(), period_msec, refs);
 
     for (auto const& io : refs)
     {
