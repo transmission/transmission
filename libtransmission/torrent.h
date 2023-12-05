@@ -383,9 +383,9 @@ public:
 
     /// FILE <-> PIECE
 
-    [[nodiscard]] auto pieces_in_file(tr_file_index_t file) const
+    [[nodiscard]] auto piece_span_for_file(tr_file_index_t file) const
     {
-        return fpm_.piece_span(file);
+        return fpm_.piece_span_for_file(file);
     }
 
     [[nodiscard]] auto file_offset(tr_block_info::Location loc) const

@@ -548,8 +548,8 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::ResumeHelper& h
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
 
                     time_checked = tr_time();
-                    auto const [begin, end] = tor->pieces_in_file(fi);
-                    for (size_t i = 0, n = end - begin; i < n; ++i)
+                    auto const [piece_begin, piece_end] = tor->piece_span_for_file(fi);
+                    for (size_t i = 0, n = piece_end - piece_begin; i < n; ++i)
                     {
                         int64_t piece_time = 0;
                         tr_variantGetInt(tr_variantListChild(b, i + 1), &piece_time);

@@ -1415,7 +1415,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
     auto const priority = tor->file_priorities_.file_priority(file);
     auto const wanted = tor->files_wanted_.file_wanted(file);
     auto const length = tor->file_size(file);
-    auto const [begin, end] = tor->pieces_in_file(file);
+    auto const [begin, end] = tor->piece_span_for_file(file);
 
     if (tor->is_seed() || length == 0)
     {
@@ -2564,21 +2564,21 @@ void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, t
     TR_ASSERT(std::size(checked) == tor_.piece_count());
     tor_.checked_pieces_ = checked;
 
-    auto const n = tor_.file_count();
-    tor_.file_mtimes_.resize(n);
+    auto const n_files = tor_.file_count();
+    tor_.file_mtimes_.resize(n_files);
 
-    for (size_t i = 0; i < n; ++i)
+    for (size_t file = 0; file < n_files; ++file)
     {
-        auto const found = tor_.find_file(i);
+        auto const found = tor_.find_file(file);
         auto const mtime = found ? found->last_modified_at : 0;
 
-        tor_.file_mtimes_[i] = mtime;
+        tor_.file_mtimes_[file] = mtime;
 
         // if a file has changed, mark its pieces as unchecked
-        if (mtime == 0 || mtime != mtimes[i])
+        if (mtime == 0 || mtime != mtimes[file])
         {
-            auto const [begin, end] = tor_.pieces_in_file(i);
-            tor_.checked_pieces_.unset_span(begin, end);
+            auto const [piece_begin, piece_end] = tor_.piece_span_for_file(file);
+            tor_.checked_pieces_.unset_span(piece_begin, piece_end);
         }
     }
 }

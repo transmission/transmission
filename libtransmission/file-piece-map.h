@@ -56,7 +56,7 @@ public:
 
     void reset(tr_torrent_metainfo const& tm);
 
-    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span(tr_file_index_t file) const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span_for_file(tr_file_index_t file) const noexcept
     {
         return file_pieces_[file];
     }

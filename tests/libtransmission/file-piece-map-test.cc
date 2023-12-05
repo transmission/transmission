@@ -122,12 +122,12 @@ TEST_F(FilePieceMapTest, pieceSpan)
     uint64_t offset = 0U;
     for (tr_file_index_t file = 0U; file < n; ++file)
     {
-        EXPECT_EQ(ExpectedPieceSpans[file].begin, fpm.piece_span(file).begin);
-        EXPECT_EQ(ExpectedPieceSpans[file].end, fpm.piece_span(file).end);
+        EXPECT_EQ(ExpectedPieceSpans[file].begin, fpm.piece_span_for_file(file).begin);
+        EXPECT_EQ(ExpectedPieceSpans[file].end, fpm.piece_span_for_file(file).end);
         offset += FileSizes[file];
     }
     EXPECT_EQ(TotalSize, offset);
-    EXPECT_EQ(block_info_.piece_count(), fpm.piece_span(std::size(FileSizes) - 1U).end);
+    EXPECT_EQ(block_info_.piece_count(), fpm.piece_span_for_file(std::size(FileSizes) - 1U).end);
 }
 
 TEST_F(FilePieceMapTest, priorities)
@@ -157,9 +157,9 @@ TEST_F(FilePieceMapTest, priorities)
 
     auto const mark_file_endpoints_as_high_priority = [&]()
     {
-        for (tr_file_index_t i = 0U; i < n_files; ++i)
+        for (tr_file_index_t file = 0U; file < n_files; ++file)
         {
-            auto const [begin_piece, end_piece] = fpm.piece_span(i);
+            auto const [begin_piece, end_piece] = fpm.piece_span_for_file(file);
             expected_piece_priorities[begin_piece] = TR_PRI_HIGH;
             if (end_piece > begin_piece)
             {
