@@ -60,8 +60,7 @@ public:
         return std::size(file_pieces_);
     }
 
-    // TODO(ckerr) minor wart here, two identical span types
-    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t const file) const
     {
         auto const& span = file_bytes_[file];
         return tr_byte_span_t{ span.begin, span.end };
@@ -73,10 +72,11 @@ public:
     }
 
 private:
+    using byte_span_t = index_span_t<uint64_t>;
+
     void reset(tr_torrent_metainfo const& tm);
     void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
-    using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
     std::vector<piece_span_t> file_pieces_;
     std::vector<tr_piece_index_t> edge_pieces_;
