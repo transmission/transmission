@@ -19,6 +19,16 @@
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 
+tr_file_piece_map::tr_file_piece_map(tr_torrent_metainfo const& tm)
+{
+    reset(tm);
+}
+
+tr_file_piece_map::tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
+{
+    reset(block_info, file_sizes, n_files);
+}
+
 void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
 {
     file_bytes_.resize(n_files);

@@ -870,7 +870,7 @@ void tr_torrent::on_metainfo_updated()
 {
     completion_ = tr_completion{ this, &block_info() };
     obfuscated_hash_ = tr_sha1::digest("req2"sv, info_hash());
-    fpm_.reset(metainfo_);
+    fpm_ = tr_file_piece_map{ metainfo_ };
     file_mtimes_.resize(file_count());
     file_priorities_ = tr_file_priorities{ &fpm_ };
     files_wanted_ = tr_files_wanted{ &fpm_ };

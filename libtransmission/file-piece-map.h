@@ -43,18 +43,8 @@ public:
     };
 
     using file_offset_t = offset_t<tr_file_index_t>;
-
-    explicit tr_file_piece_map(tr_torrent_metainfo const& tm)
-    {
-        reset(tm);
-    }
-
-    tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
-    {
-        reset(block_info, file_sizes, n_files);
-    }
-
-    void reset(tr_torrent_metainfo const& tm);
+    explicit tr_file_piece_map(tr_torrent_metainfo const& tm);
+    tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
     [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span_for_file(tr_file_index_t file) const noexcept
     {
@@ -83,6 +73,7 @@ public:
     }
 
 private:
+    void reset(tr_torrent_metainfo const& tm);
     void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
     using byte_span_t = index_span_t<uint64_t>;
