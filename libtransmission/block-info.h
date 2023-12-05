@@ -11,17 +11,6 @@
 
 struct tr_block_info
 {
-private:
-    uint64_t total_size_ = 0;
-    uint32_t piece_size_ = 0;
-    tr_piece_index_t n_pieces_ = 0;
-
-    tr_block_index_t n_blocks_ = 0;
-    // should be same type as BlockSize
-    uint32_t final_block_size_ = 0;
-    // should be same type as piece_size
-    uint32_t final_piece_size_ = 0;
-
 public:
     static auto constexpr BlockSize = uint32_t{ 1024 * 16 };
 
@@ -64,14 +53,6 @@ public:
 
     struct Location
     {
-        uint64_t byte = 0;
-
-        tr_piece_index_t piece = 0;
-        uint32_t piece_offset = 0;
-
-        tr_block_index_t block = 0;
-        uint32_t block_offset = 0;
-
         [[nodiscard]] constexpr bool operator==(Location const& that) const noexcept
         {
             return this->byte == that.byte;
@@ -81,6 +62,14 @@ public:
         {
             return this->byte < that.byte;
         }
+
+        uint64_t byte = {};
+
+        tr_piece_index_t piece = {};
+        uint32_t piece_offset = {};
+
+        tr_block_index_t block = {};
+        uint32_t block_offset = {};
     };
 
     // Location of the torrent's nth byte
@@ -154,6 +143,16 @@ private:
 
     [[nodiscard]] constexpr bool is_initialized() const noexcept
     {
-        return piece_size_ != 0;
+        return piece_size_ != 0U;
     }
+
+    uint64_t total_size_ = {};
+
+    tr_block_index_t n_blocks_ = {};
+    tr_piece_index_t n_pieces_ = {};
+
+    uint32_t final_block_size_ = {};
+
+    uint32_t piece_size_ = {};
+    uint32_t final_piece_size_ = {};
 };
