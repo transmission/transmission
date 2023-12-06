@@ -886,8 +886,8 @@ void tr_torrent::on_metainfo_completed()
 
     if (session->shouldFullyVerifyAddedTorrents() || !is_new_torrent_a_seed())
     {
-        // Potentially, we are in `tr_torrentNew`,
-        // and we don't want any file created before `torrentStart`
+        // Potentially, we are in `tr_torrent::init`,
+        // and we don't want any file created before `tr_torrent::start`
         // so we Verify but we don't Create files.
         tr_torrentVerify(this);
     }
