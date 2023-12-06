@@ -383,9 +383,9 @@ public:
 
     /// FILE <-> PIECE
 
-    [[nodiscard]] auto pieces_in_file(tr_file_index_t file) const
+    [[nodiscard]] auto piece_span_for_file(tr_file_index_t file) const
     {
-        return fpm_.piece_span(file);
+        return fpm_.piece_span_for_file(file);
     }
 
     [[nodiscard]] auto file_offset(tr_block_info::Location loc) const
@@ -1195,9 +1195,9 @@ private:
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
 
-    [[nodiscard]] auto byte_span(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t file) const
     {
-        return fpm_.byte_span(file);
+        return fpm_.byte_span_for_file(file);
     }
 
     // ---
