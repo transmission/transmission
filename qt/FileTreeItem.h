@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <QCoreApplication>
@@ -94,7 +95,7 @@ public:
 private:
     QString priorityString() const;
     QString sizeString() const;
-    void getSubtreeWantedSize(uint64_t& have, uint64_t& total) const;
+    std::pair<uint64_t, uint64_t> get_subtree_wanted_size() const;
     double progress() const;
     uint64_t size() const;
     std::unordered_map<QString, int> const& getMyChildRows() const;
