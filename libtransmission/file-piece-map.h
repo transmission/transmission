@@ -46,7 +46,7 @@ public:
     explicit tr_file_piece_map(tr_torrent_metainfo const& tm);
     tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
-    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span_for_file(tr_file_index_t file) const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span_for_file(tr_file_index_t const file) const noexcept
     {
         return file_pieces_[file];
     }
@@ -66,7 +66,7 @@ public:
         return tr_byte_span_t{ span.begin, span.end };
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t piece) const
+    [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t const piece) const
     {
         return std::binary_search(std::begin(edge_pieces_), std::end(edge_pieces_), piece);
     }

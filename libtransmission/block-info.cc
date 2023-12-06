@@ -8,7 +8,7 @@
 #include "libtransmission/block-info.h"
 #include "libtransmission/tr-assert.h" // TR_ASSERT
 
-void tr_block_info::init_sizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept
+void tr_block_info::init_sizes(uint64_t const total_size_in, uint32_t const piece_size_in) noexcept
 {
     TR_ASSERT(piece_size_in == 0 || piece_size_in >= BlockSize);
     if (piece_size_in == 0)

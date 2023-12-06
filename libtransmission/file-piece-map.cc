@@ -24,12 +24,12 @@ tr_file_piece_map::tr_file_piece_map(tr_torrent_metainfo const& tm)
     reset(tm);
 }
 
-tr_file_piece_map::tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
+tr_file_piece_map::tr_file_piece_map(tr_block_info const& block_info, uint64_t const* const file_sizes, size_t const n_files)
 {
     reset(block_info, file_sizes, n_files);
 }
 
-void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
+void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* const file_sizes, size_t const n_files)
 {
     file_bytes_.resize(n_files);
     file_bytes_.shrink_to_fit();
@@ -107,24 +107,24 @@ struct CompareToSpan
         return 0;
     }
 
-    [[nodiscard]] constexpr bool operator()(T item, span_t span) const // <
+    [[nodiscard]] constexpr bool operator()(T const item, span_t const span) const // <
     {
         return compare(item, span) < 0;
     }
 
-    [[nodiscard]] constexpr int compare(span_t span, T item) const // <=>
+    [[nodiscard]] constexpr int compare(span_t const span, T const item) const // <=>
     {
         return -compare(item, span);
     }
 
-    [[nodiscard]] constexpr bool operator()(span_t span, T item) const // <
+    [[nodiscard]] constexpr bool operator()(span_t const span, T const item) const // <
     {
         return compare(span, item) < 0;
     }
 };
 } // namespace
 
-tr_file_piece_map::file_span_t tr_file_piece_map::file_span_for_piece(tr_piece_index_t piece) const
+tr_file_piece_map::file_span_t tr_file_piece_map::file_span_for_piece(tr_piece_index_t const piece) const
 {
     static constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
@@ -132,7 +132,7 @@ tr_file_piece_map::file_span_t tr_file_piece_map::file_span_for_piece(tr_piece_i
     return { static_cast<tr_file_index_t>(equal_begin - begin), static_cast<tr_file_index_t>(equal_end - begin) };
 }
 
-tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset) const
+tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t const offset) const
 {
     static constexpr auto Compare = CompareToSpan<uint64_t>{};
     auto const begin = std::begin(file_bytes_);
@@ -144,7 +144,7 @@ tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset)
 
 // ---
 
-void tr_file_priorities::set(tr_file_index_t file, tr_priority_t new_priority)
+void tr_file_priorities::set(tr_file_index_t const file, tr_priority_t const new_priority)
 {
     if (std::empty(priorities_))
     {
@@ -160,7 +160,7 @@ void tr_file_priorities::set(tr_file_index_t file, tr_priority_t new_priority)
     priorities_[file] = new_priority;
 }
 
-void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority_t new_priority)
+void tr_file_priorities::set(tr_file_index_t const* const files, size_t const n, tr_priority_t const new_priority)
 {
     for (size_t i = 0U; i < n; ++i)
     {
@@ -168,7 +168,7 @@ void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority
     }
 }
 
-tr_priority_t tr_file_priorities::file_priority(tr_file_index_t file) const
+tr_priority_t tr_file_priorities::file_priority(tr_file_index_t const file) const
 {
     TR_ASSERT(file < fpm_->file_count());
 
@@ -180,7 +180,7 @@ tr_priority_t tr_file_priorities::file_priority(tr_file_index_t file) const
     return priorities_[file];
 }
 
-tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t piece) const
+tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t const piece) const
 {
     // increase priority if a file begins or ends in this piece
     // because that makes life easier for code/users using at incomplete files.
@@ -206,27 +206,27 @@ tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t piece) const
 
 // ---
 
-tr_files_wanted::tr_files_wanted(tr_file_piece_map const* fpm)
+tr_files_wanted::tr_files_wanted(tr_file_piece_map const* const fpm)
     : fpm_{ fpm }
     , wanted_{ fpm->file_count() }
 {
     wanted_.set_has_all(); // by default we want all files
 }
 
-void tr_files_wanted::set(tr_file_index_t file, bool wanted)
+void tr_files_wanted::set(tr_file_index_t const file, bool const wanted)
 {
     wanted_.set(file, wanted);
 }
 
-void tr_files_wanted::set(tr_file_index_t const* files, size_t n, bool wanted)
+void tr_files_wanted::set(tr_file_index_t const* const files, size_t const n_files, bool const wanted)
 {
-    for (size_t i = 0U; i < n; ++i)
+    for (size_t idx = 0U; idx < n_files; ++idx)
     {
-        set(files[i], wanted);
+        set(files[idx], wanted);
     }
 }
 
-bool tr_files_wanted::piece_wanted(tr_piece_index_t piece) const
+bool tr_files_wanted::piece_wanted(tr_piece_index_t const piece) const
 {
     if (wanted_.has_all())
     {

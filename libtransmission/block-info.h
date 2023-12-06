@@ -16,7 +16,7 @@ public:
 
     tr_block_info() noexcept = default;
 
-    tr_block_info(uint64_t total_size_in, uint32_t piece_size_in) noexcept
+    tr_block_info(uint64_t const total_size_in, uint32_t const piece_size_in) noexcept
     {
         init_sizes(total_size_in, piece_size_in);
     }
@@ -26,7 +26,7 @@ public:
         return n_blocks_;
     }
 
-    [[nodiscard]] constexpr auto block_size(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto block_size(tr_block_index_t const block) const noexcept
     {
         return block + 1 == n_blocks_ ? final_block_size_ : BlockSize;
     }
@@ -41,7 +41,7 @@ public:
         return piece_size_;
     }
 
-    [[nodiscard]] constexpr auto piece_size(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr auto piece_size(tr_piece_index_t const piece) const noexcept
     {
         return piece + 1 == n_pieces_ ? final_piece_size_ : piece_size();
     }
@@ -73,7 +73,7 @@ public:
     };
 
     // Location of the torrent's nth byte
-    [[nodiscard]] constexpr auto byte_loc(uint64_t byte_idx) const noexcept
+    [[nodiscard]] constexpr auto byte_loc(uint64_t const byte_idx) const noexcept
     {
         auto loc = Location{};
 
@@ -100,18 +100,18 @@ public:
     }
 
     // Location of the first byte in `block`.
-    [[nodiscard]] constexpr auto block_loc(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto block_loc(tr_block_index_t const block) const noexcept
     {
         return byte_loc(uint64_t{ block } * BlockSize);
     }
 
     // Location of the first byte (+ optional offset and length) in `piece`
-    [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
+    [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = {}, uint32_t length = {}) const noexcept
     {
         return byte_loc(uint64_t{ piece } * piece_size() + offset + length);
     }
 
-    [[nodiscard]] constexpr tr_block_span_t block_span_for_piece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr tr_block_span_t block_span_for_piece(tr_piece_index_t const piece) const noexcept
     {
         if (!is_initialized())
         {
@@ -121,7 +121,7 @@ public:
         return { piece_loc(piece).block, piece_last_loc(piece).block + 1 };
     }
 
-    [[nodiscard]] constexpr tr_byte_span_t byte_span_for_piece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr tr_byte_span_t byte_span_for_piece(tr_piece_index_t const piece) const noexcept
     {
         if (!is_initialized())
         {
@@ -136,7 +136,7 @@ private:
     void init_sizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept;
 
     // Location of the last byte in `piece`.
-    [[nodiscard]] constexpr Location piece_last_loc(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr Location piece_last_loc(tr_piece_index_t const piece) const noexcept
     {
         return byte_loc(static_cast<uint64_t>(piece) * piece_size() + piece_size(piece) - 1);
     }
