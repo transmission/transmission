@@ -12,7 +12,7 @@
 struct tr_block_info
 {
 public:
-    static auto constexpr BlockSize = uint32_t{ 1024 * 16 };
+    static auto constexpr BlockSize = uint32_t{ 1024U * 16U };
 
     tr_block_info() noexcept = default;
 
@@ -28,7 +28,7 @@ public:
 
     [[nodiscard]] constexpr auto block_size(tr_block_index_t const block) const noexcept
     {
-        return block + 1 == n_blocks_ ? final_block_size_ : BlockSize;
+        return block + 1U == n_blocks_ ? final_block_size_ : BlockSize;
     }
 
     [[nodiscard]] constexpr auto piece_count() const noexcept
@@ -43,7 +43,7 @@ public:
 
     [[nodiscard]] constexpr auto piece_size(tr_piece_index_t const piece) const noexcept
     {
-        return piece + 1 == n_pieces_ ? final_piece_size_ : piece_size();
+        return piece + 1U == n_pieces_ ? final_piece_size_ : piece_size();
     }
 
     [[nodiscard]] constexpr auto total_size() const noexcept
@@ -83,8 +83,8 @@ public:
 
             if (byte_idx == total_size()) // handle 0-byte files at the end of a torrent
             {
-                loc.block = block_count() - 1;
-                loc.piece = piece_count() - 1;
+                loc.block = block_count() - 1U;
+                loc.piece = piece_count() - 1U;
             }
             else
             {
@@ -118,7 +118,7 @@ public:
             return { 0U, 0U };
         }
 
-        return { piece_loc(piece).block, piece_last_loc(piece).block + 1 };
+        return { piece_loc(piece).block, piece_last_loc(piece).block + 1U };
     }
 
     [[nodiscard]] constexpr tr_byte_span_t byte_span_for_piece(tr_piece_index_t const piece) const noexcept
