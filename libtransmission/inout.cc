@@ -89,8 +89,8 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
 
     // does the file exist?
     auto const file_size = tor.file_size(file_index);
-    auto const create_if_missing = writable && tor.file_is_wanted(file_index);
-    auto const prealloc = create_if_missing ? session.preallocationMode() : tr_open_files::Preallocation::None;
+    auto const prealloc = writable && tor.file_is_wanted(file_index) ? session.preallocationMode() :
+                                                                       tr_open_files::Preallocation::None;
     if (auto const found = tor.find_file(file_index); found)
     {
         return open_files.get(tor_id, file_index, writable, found->filename(), prealloc, file_size);
@@ -98,7 +98,7 @@ bool write_entire_buf(tr_sys_file_t const fd, uint64_t file_offset, uint8_t cons
 
     // do we want to create it?
     auto err = ENOENT;
-    if (create_if_missing)
+    if (writable)
     {
         auto const base = tor.current_dir();
         auto const suffix = session.isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
