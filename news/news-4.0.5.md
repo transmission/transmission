@@ -58,6 +58,5 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 ### Contributions to GTK Client:
 
 * @nevack ([Dzmitry Neviadomski](https://github.com/nevack)):
-  * Fixed crash when opening torrent file from "Recently used" section in GTK 4. ([#6131](https://github.com/transmission/transmission/pull/6131), [#6142](https://github.com/transmission/transmission/pull/6142))
-  * Fix: do not use get_files2 in 4.0.x branch. ([#6144](https://github.com/transmission/transmission/pull/6144))
+  * Fixed crash when opening torrent file from "Recently used" section in GTK 4. ([#6131](https://github.com/transmission/transmission/pull/6131), [#6142](https://github.com/transmission/transmission/pull/6142), [#6144](https://github.com/transmission/transmission/pull/6144))
 
