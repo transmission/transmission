@@ -57,7 +57,7 @@ namespace
 {
 // Helps us to ignore errors that say "try again later"
 // since that's what peer-io does by default anyway.
-[[nodiscard]] constexpr auto constexpr can_retry_from_error(int error_code) noexcept
+[[nodiscard]] constexpr auto can_retry_from_error(int error_code) noexcept
 {
     return error_code == 0 || error_code == EAGAIN || error_code == EWOULDBLOCK || error_code == EINTR ||
         error_code == EINPROGRESS;
