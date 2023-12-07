@@ -88,10 +88,6 @@ export class ActionManager extends EventTarget {
         shortcut: 'V',
         text: 'Verify local data',
       },
-      'verify-selected-torrents-force': {
-        enabled: false,
-        text: 'Verify local data (force)',
-      },
     });
   }
 
@@ -205,7 +201,6 @@ export class ActionManager extends EventTarget {
       'show-move-dialog',
       'trash-selected-torrents',
       'verify-selected-torrents',
-      'verify-selected-torrents-force',
     ]);
 
     set_enabled(counts.selected === 1, ['show-rename-dialog']);

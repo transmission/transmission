@@ -3,8 +3,6 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
-let default_path = '';
-
 import { createDialogContainer } from './utils.js';
 
 export class MoveDialog extends EventTarget {
@@ -25,13 +23,11 @@ export class MoveDialog extends EventTarget {
       return;
     }
 
-    default_path = default_path || torrents[0].getDownloadDir();
-
     this.torrents = torrents;
     this.elements = MoveDialog._create();
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
-    this.elements.entry.value = default_path;
+    this.elements.entry.value = torrents[0].getDownloadDir();
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -55,7 +51,6 @@ export class MoveDialog extends EventTarget {
   _onConfirm() {
     const ids = this.torrents.map((tor) => tor.getId());
     const path = this.elements.entry.value.trim();
-    default_path = path;
     this.remote.moveTorrents(ids, path);
     this.close();
   }

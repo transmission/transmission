@@ -3736,7 +3736,6 @@
 					"-fmodules",
 					"-fcxx-modules",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3757,7 +3756,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3782,7 +3780,6 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3803,7 +3800,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3983,7 +3979,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4014,7 +4009,6 @@
 					"-fmodules",
 					"-fcxx-modules",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4219,7 +4213,6 @@
 					"-fmodules",
 					"-fcxx-modules",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4240,7 +4233,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4318,7 +4310,6 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4339,7 +4330,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4417,7 +4407,6 @@
 					"-fmodules",
 					"-fcxx-modules",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4446,7 +4435,6 @@
 					"-fmodules",
 					"-fcxx-modules",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4475,7 +4463,6 @@
 					"-fmodules",
 					"-fcxx-modules",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4545,7 +4532,6 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4566,7 +4552,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4728,7 +4713,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4749,7 +4733,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4770,7 +4753,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4791,7 +4773,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4812,7 +4793,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4833,7 +4813,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4854,7 +4833,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4875,7 +4853,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4896,7 +4873,6 @@
 					"$(inherited)",
 					.,
 				);
-				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",

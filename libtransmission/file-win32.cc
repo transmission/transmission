@@ -1127,24 +1127,6 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
     return ret;
 }
 
-bool tr_sys_file_advise(
-    [[maybe_unused]] tr_sys_file_t handle,
-    uint64_t /*offset*/,
-    [[maybe_unused]] uint64_t size,
-    [[maybe_unused]] tr_sys_file_advice_t advice,
-    tr_error* /*error*/)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(size > 0);
-    TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
-
-    bool ret = true;
-
-    /* ??? */
-
-    return ret;
-}
-
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);

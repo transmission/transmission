@@ -227,9 +227,9 @@ export class Remote {
       this._controller.refreshTorrents();
     });
   }
-  verifyTorrents(torrent_ids, force, callback, context) {
+  verifyTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(
-      force ? 'torrent-verify-force' : 'torrent-verify',
+      'torrent-verify',
       torrent_ids,
       callback,
       context,

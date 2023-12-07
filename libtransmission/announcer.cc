@@ -240,9 +240,8 @@ std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_annou
 struct tr_tracker
 {
     explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
-        : host_and_port{ info.host_and_port }
-        , announce_url{ info.announce }
-        , sitename{ info.sitename }
+        : announce_url{ info.announce }
+        , announce_parsed{ info.announce_parsed }
         , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
         , id{ info.id }
     {
@@ -335,9 +334,8 @@ struct tr_tracker
         return false;
     }
 
-    tr_interned_string const host_and_port;
     tr_interned_string const announce_url;
-    std::string_view const sitename;
+    tr_url_parsed_t const announce_parsed;
     tr_scrape_info* const scrape_info;
 
     std::string tracker_id;
@@ -352,17 +350,6 @@ private:
     std::optional<int64_t> download_count_;
     std::optional<int64_t> downloader_count_;
 };
-
-// format: `${host}:${port}`
-tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
-{
-    auto buf = std::array<char, 1024>{};
-    auto* const begin = std::data(buf);
-    auto const* const end = fmt::format_to_n(begin, std::size(buf), "{:s}:{:d}", parsed.host, parsed.port).out;
-    auto const sv = std::string_view{ begin, static_cast<size_t>(end - begin) };
-
-    return tr_interned_string{ sv };
-}
 
 // ---
 
@@ -463,11 +450,12 @@ struct tr_tier
         return std::nullopt;
     }
 
-    [[nodiscard]] std::string buildLogName() const
+    [[nodiscard]] auto buildLogName() const
     {
-        auto const* const current_tracker = currentTracker();
-        auto const host_and_port_sv = current_tracker == nullptr ? "?"sv : current_tracker->host_and_port.sv();
-        return fmt::format("{:s} at {:s}", tor->name(), host_and_port_sv);
+        auto const* const tracker = currentTracker();
+        return tracker != nullptr ?
+            fmt::format("{:s} at {:s}:{:d}", tor->name(), tracker->announce_parsed.host, tracker->announce_parsed.port) :
+            fmt::format("{:s} at ?", tor->name());
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -1040,7 +1028,7 @@ void tr_announcer_impl::onAnnounceDone(
            Don't bother publishing if there are other trackers -- it's
            all too common for people to load up dozens of dead trackers
            in a torrent's metainfo... */
-        if (tier->tor->tracker_count() < 2)
+        if (std::size(tier->tor->announce_list()) < 2U)
         {
             publishError(tier, response.errmsg);
         }
@@ -1243,27 +1231,29 @@ namespace on_scrape_done_helpers
 
 void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* errmsg)
 {
-    // increment the error count
-    auto* current_tracker = tier->currentTracker();
-    if (current_tracker != nullptr)
+    if (auto* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
     {
         ++current_tracker->consecutive_failures;
+
+        tr_logAddDebugTier(
+            tier,
+            fmt::format(
+                "Tracker '{}' scrape error: {} (Can retry in {} seconds)",
+                current_tracker->announce_parsed.authority,
+                errmsg,
+                current_tracker->getRetryInterval()));
     }
 
     // set the error message
     tier->last_scrape_str = errmsg != nullptr ? errmsg : "";
+    tier->lastScrapeSucceeded = false;
 
     // switch to the next tracker
-    current_tracker = tier->useNextTracker();
-
-    // schedule a rescrape
-    auto const interval = current_tracker->getRetryInterval();
-    auto const* const host_and_port_cstr = current_tracker->host_and_port.c_str();
-    tr_logAddDebugTier(
-        tier,
-        fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", host_and_port_cstr, errmsg, interval));
-    tier->lastScrapeSucceeded = false;
-    tier->scheduleNextScrape(interval);
+    if (auto* const current_tracker = tier->useNextTracker(); current_tracker != nullptr)
+    {
+        // schedule a rescrape
+        tier->scheduleNextScrape(current_tracker->getRetryInterval());
+    }
 }
 
 void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const& response)
@@ -1617,17 +1607,20 @@ namespace tracker_view_helpers
 {
 [[nodiscard]] auto trackerView(tr_torrent const& tor, size_t tier_index, tr_tier const& tier, tr_tracker const& tracker)
 {
+    auto const& announce = tracker.announce_parsed;
     auto const now = tr_time();
     auto view = tr_tracker_view{};
 
-    view.host_and_port = tracker.host_and_port.c_str();
+    *fmt::format_to_n(
+         std::data(view.host_and_port),
+         std::size(view.host_and_port) - 1U,
+         "{:s}:{:d}",
+         announce.host,
+         announce.port)
+         .out = '\0';
+    *fmt::format_to_n(std::data(view.sitename), std::size(view.sitename) - 1U, "{:s}", announce.sitename).out = '\0';
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
-    *std::copy_n(
-        std::begin(tracker.sitename),
-        std::min(std::size(tracker.sitename), sizeof(view.sitename) - 1),
-        view.sitename) = '\0';
-
     view.id = tracker.id;
     view.tier = tier_index;
     view.isBackup = &tracker != tier.currentTracker();

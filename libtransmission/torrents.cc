@@ -57,7 +57,7 @@ tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash) const
     return begin == end ? nullptr : *begin;
 }
 
-tr_torrent* tr_torrents::find_from_obfuscated_hash(tr_sha1_digest_t const& obfuscated_hash)
+tr_torrent* tr_torrents::find_from_obfuscated_hash(tr_sha1_digest_t const& obfuscated_hash) const
 {
     for (auto* const tor : *this)
     {

@@ -557,8 +557,8 @@ public:
         return open_files_;
     }
 
-    void closeTorrentFiles(tr_torrent* tor) noexcept;
-    void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
+    void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
+    void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
 
     // announce ip
 
@@ -784,11 +784,6 @@ public:
     [[nodiscard]] constexpr auto preferred_transport() const noexcept
     {
         return settings_.preferred_transport;
-    }
-
-    [[nodiscard]] constexpr auto allowsPrefetch() const noexcept
-    {
-        return settings_.is_prefetch_enabled;
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
@@ -1125,7 +1120,7 @@ public:
     std::unique_ptr<tr_udp_core> udp_core_;
 
     // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
+    tr_bandwidth top_bandwidth_{ true };
 
 private:
     // depends-on: top_bandwidth_
@@ -1203,8 +1198,3 @@ private:
 public:
     std::unique_ptr<libtransmission::Timer> utp_timer;
 };
-
-constexpr bool tr_isPriority(tr_priority_t p)
-{
-    return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
-}

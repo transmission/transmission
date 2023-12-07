@@ -176,7 +176,7 @@ public:
         , callback_data{ callback_data_in }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
         , have_{ tor->piece_count() }
-        , bandwidth_{ &tor->bandwidth_ }
+        , bandwidth_{ &tor->bandwidth() }
     {
         have_.set_has_all();
         idle_timer_->start_repeating(IdleTimerInterval);
@@ -502,7 +502,7 @@ void task_request_next_chunk(tr_webseed_task* task)
 
     auto const loc = tor->byte_loc(task->loc.byte + evbuffer_get_length(task->content()));
 
-    auto const [file_index, file_offset] = tor->file_offset(loc, false);
+    auto const [file_index, file_offset] = tor->file_offset(loc);
     auto const left_in_file = tor->file_size(file_index) - file_offset;
     auto const left_in_task = task->end_byte - loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);

@@ -140,7 +140,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
     auto error = tr_error{};
-    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
+    EXPECT_FALSE(ctor->save(tgt_filename, &error));
     EXPECT_TRUE(error);
     EXPECT_EQ(EINVAL, error.code());
     error = {};
@@ -148,7 +148,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     // now try saving _with_ metainfo
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
     EXPECT_FALSE(error) << error;
-    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
+    EXPECT_TRUE(ctor->save(tgt_filename, &error));
     EXPECT_FALSE(error) << error;
 
     // the saved contents should match the source file's contents

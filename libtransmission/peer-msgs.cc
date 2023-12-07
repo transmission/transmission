@@ -24,6 +24,8 @@
 
 #include <fmt/core.h>
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bitfield.h"
@@ -180,9 +182,6 @@ auto constexpr MetadataReqQ = int{ 64 };
 auto constexpr ReqQ = int{ 512 };
 
 // used in lowering the outMessages queue period
-
-// how many blocks to keep prefetched per peer
-auto constexpr PrefetchMax = size_t{ 18 };
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
@@ -633,17 +632,7 @@ public:
 
     std::shared_ptr<tr_peerIo> const io;
 
-    struct QueuedPeerRequest : public peer_request
-    {
-        explicit QueuedPeerRequest(peer_request in) noexcept
-            : peer_request{ in }
-        {
-        }
-
-        bool prefetched = false;
-    };
-
-    std::vector<QueuedPeerRequest> peer_requested_;
+    std::vector<peer_request> peer_requested_;
 
     std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex;
 
@@ -895,15 +884,17 @@ std::optional<int> popNextMetadataRequest(tr_peerMsgsImpl* msgs)
 
 void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
+    auto& queue = msgs->peer_requested_;
+
     if (auto const must_send_rej = msgs->io->supports_fext(); must_send_rej)
     {
-        for (auto const& req : msgs->peer_requested_)
+        for (auto const& req : queue)
         {
             protocolSendReject(msgs, &req);
         }
     }
 
-    msgs->peer_requested_.clear();
+    queue.clear();
 }
 
 // ---
@@ -1255,25 +1246,6 @@ void parseLtep(tr_peerMsgsImpl* msgs, MessageReader& payload)
 
 ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
 
-void prefetchPieces(tr_peerMsgsImpl* msgs)
-{
-    if (!msgs->session->allowsPrefetch())
-    {
-        return;
-    }
-
-    // ensure that the first `PrefetchMax` items in `msgs->peer_requested_` are prefetched.
-    auto& requests = msgs->peer_requested_;
-    for (size_t i = 0, n = std::min(PrefetchMax, std::size(requests)); i < n; ++i)
-    {
-        if (auto& req = requests[i]; !req.prefetched)
-        {
-            msgs->session->cache->prefetch_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
-            req.prefetched = true;
-        }
-    }
-}
-
 [[nodiscard]] bool canAddRequestFromPeer(tr_peerMsgsImpl const* const msgs, struct peer_request const& req)
 {
     if (msgs->peer_is_choked())
@@ -1308,7 +1280,6 @@ void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
     if (canAddRequestFromPeer(msgs, *req))
     {
         msgs->peer_requested_.emplace_back(*req);
-        prefetchPieces(msgs);
     }
     else if (msgs->io->supports_fext())
     {
@@ -1874,7 +1845,7 @@ namespace peer_pulse_helpers
     if (ok)
     {
         ok = msgs->session->cache
-                 ->read_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+                 ->read_block(*msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
     }
 
     if (ok)
@@ -1983,7 +1954,7 @@ void tr_peerMsgsImpl::sendPex()
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
-    auto tmpbuf = std::vector<std::byte>{};
+    auto tmpbuf = small::vector<std::byte, 2048U>{};
 
     for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {

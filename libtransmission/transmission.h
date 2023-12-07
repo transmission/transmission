@@ -67,13 +67,6 @@ enum tr_verify_added_mode
     TR_VERIFY_ADDED_FULL = 1
 };
 
-enum tr_preallocation_mode
-{
-    TR_PREALLOCATE_NONE = 0,
-    TR_PREALLOCATE_SPARSE = 1,
-    TR_PREALLOCATE_FULL = 2
-};
-
 enum tr_encryption_mode
 {
     TR_CLEAR_PREFERRED,
@@ -589,9 +582,6 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
 
-/** @brief DEPRECATED. Equivalent to `tr_torrentStart()`. Use that instead. */
-void tr_torrentStartMagnet(tr_torrent* tor);
-
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
 size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
 
@@ -749,7 +739,7 @@ enum tr_ctorMode
 
 /** @brief Create a torrent constructor object used to instantiate a `tr_torrent`
     @param session the tr_session. */
-tr_ctor* tr_ctorNew(tr_session const* session);
+tr_ctor* tr_ctorNew(tr_session* session);
 
 /** @brief Free a torrent constructor object */
 void tr_ctorFree(tr_ctor* ctor);
@@ -804,10 +794,10 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setme_is_paus
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool is_paused);
 
 /** @brief Set the priorities for files in a torrent */
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority);
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, tr_priority_t priority);
 
 /** @brief Set the download flag for files in a torrent */
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted);
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
 /** @brief Get the torrent file that this ctor's metainfo came from,
            or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
@@ -1247,13 +1237,13 @@ enum tr_tracker_state
 
 /*
  * Unlike other _view structs, it is safe to keep a tr_tracker_view copy.
- * The announce, scrape, and host strings are interned & never go out-of-scope.
+ * The announce and scrape strings are interned & never go out-of-scope.
  */
 struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host_and_port; // uniquely-identifying tracker name (`${host}:${port}`)
+    char host_and_port[72]; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.
@@ -1386,7 +1376,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent, bool force = false);
+void tr_torrentVerify(tr_torrent* torrent);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 
