@@ -37,17 +37,6 @@
 
 struct sockaddr;
 
-#ifdef _WIN32
-#undef EAGAIN
-#define EAGAIN WSAEWOULDBLOCK
-#undef EINTR
-#define EINTR WSAEINTR
-#undef EINPROGRESS
-#define EINPROGRESS WSAEINPROGRESS
-#undef EPIPE
-#define EPIPE WSAECONNRESET
-#endif
-
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
@@ -59,8 +48,12 @@ namespace
 // since that's what peer-io does by default anyway.
 [[nodiscard]] constexpr auto can_retry_from_error(int error_code) noexcept
 {
+#ifdef _WIN32
+    return error_code == 0 || error_code == WSAEWOULDBLOCK || error_code == WSAEINTR || error_code == WSAEINPROGRESS;
+#else
     return error_code == 0 || error_code == EAGAIN || error_code == EWOULDBLOCK || error_code == EINTR ||
         error_code == EINPROGRESS;
+#endif
 }
 
 size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
