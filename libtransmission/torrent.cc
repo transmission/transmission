@@ -1362,7 +1362,7 @@ tr_stat tr_torrent::stats() const
 
         if (seed_ratio_applies)
         {
-            stats.eta = eta_speed_byps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / eta_speed_byps;
+            stats.eta = eta_speed_byps == 0U ? static_cast<time_t>(TR_ETA_UNKNOWN) : seed_ratio_bytes_left / eta_speed_byps;
         }
 
         if (eta_speed_byps < 1U)
