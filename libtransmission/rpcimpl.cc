@@ -2471,7 +2471,7 @@ tr_variant tr_rpc_parse_list_str(std::string_view str)
     }
 
     auto num_vec = tr_variant::Vector{};
-    num_vec.reserve(n_values);
-    std::copy_n(std::cbegin(values), n_values, std::back_inserter(num_vec));
+    num_vec.resize(n_values);
+    std::copy_n(std::cbegin(values), n_values, std::begin(num_vec));
     return { std::move(num_vec) };
 }

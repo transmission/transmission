@@ -472,7 +472,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     settings.merge(session->settings_.settings());
     settings.merge(session->alt_speeds_.settings());
     settings.merge(session->rpc_server_->settings());
-    (*settings.get_if<tr_variant::Map>())[TR_KEY_message_level] = tr_logGetLevel();
+    tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
     return settings;
 }
 
