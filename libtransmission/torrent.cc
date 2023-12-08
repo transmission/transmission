@@ -2400,6 +2400,7 @@ void tr_torrent::setDownloadDir(std::string_view path, bool is_new_torrent)
 {
     download_dir = path;
     markEdited();
+    markChanged();
     setDirty();
     refreshCurrentDir();
 
