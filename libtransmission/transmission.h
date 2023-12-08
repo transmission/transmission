@@ -53,8 +53,6 @@ struct tr_torrent;
 struct tr_torrent_metainfo;
 struct tr_variant;
 
-using tr_priority_t = int8_t;
-
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 enum tr_verify_added_mode
@@ -72,6 +70,13 @@ enum tr_encryption_mode
     TR_CLEAR_PREFERRED,
     TR_ENCRYPTION_PREFERRED,
     TR_ENCRYPTION_REQUIRED
+};
+
+enum tr_priority_t : int8_t
+{
+    TR_PRI_LOW = -1,
+    TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
+    TR_PRI_HIGH = 1
 };
 
 #define TR_RATIO_NA (-1)
@@ -1009,13 +1014,6 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
 void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
-
-enum : tr_priority_t
-{
-    TR_PRI_LOW = -1,
-    TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
-    TR_PRI_HIGH = 1
-};
 
 /**
  * @brief Set a batch of files to a particular priority.
