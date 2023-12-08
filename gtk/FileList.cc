@@ -725,24 +725,25 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
 
         if (cid == file_cols.priority.index())
         {
-            auto priority = iter->get_value(file_cols.priority);
+            auto const old_priority = iter->get_value(file_cols.priority);
+            auto new_priority = TR_PRI_NORMAL;
 
-            switch (priority)
+            switch (old_priority)
             {
             case TR_PRI_NORMAL:
-                priority = TR_PRI_HIGH;
+                new_priority = TR_PRI_HIGH;
                 break;
 
             case TR_PRI_HIGH:
-                priority = TR_PRI_LOW;
+                new_priority = TR_PRI_LOW;
                 break;
 
             default:
-                priority = TR_PRI_NORMAL;
+                new_priority = TR_PRI_NORMAL;
                 break;
             }
 
-            tr_torrentSetFilePriorities(tor, indexBuf.data(), indexBuf.size(), priority);
+            tr_torrentSetFilePriorities(tor, indexBuf.data(), indexBuf.size(), new_priority);
         }
         else
         {
