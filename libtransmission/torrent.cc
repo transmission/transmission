@@ -2245,6 +2245,7 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
 {
     download_dir_ = path;
+    mark_changed();
     mark_edited();
     set_dirty();
     refresh_current_dir();
