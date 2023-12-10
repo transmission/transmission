@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -37,9 +37,7 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -50,7 +48,7 @@ class PreferenceWidget
 
 public:
     explicit PreferenceWidget(QObject* object)
-        : object_(object)
+        : object_{ object }
     {
     }
 
@@ -156,7 +154,7 @@ QString qtDayName(int day)
 
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 {
-    PreferenceWidget pref_widget(widget);
+    auto pref_widget = PreferenceWidget{ widget };
 
     if (pref_widget.is<QCheckBox>())
     {
@@ -172,7 +170,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QTimeEdit>())
     {
-        pref_widget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(prefs_.getInt(pref_key) * 60));
+        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
     }
     else if (pref_widget.is<QLineEdit>())
     {
@@ -200,11 +198,11 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 
 void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
 {
-    PreferenceWidget pref_widget(widget);
+    auto pref_widget = PreferenceWidget{ widget };
 
     pref_widget.setPrefKey(pref_key);
     updateWidgetValue(widget, pref_key);
-    widgets_.insert(pref_key, widget);
+    widgets_.try_emplace(pref_key, widget);
 
     if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
@@ -248,7 +246,7 @@ void PrefsDialog::linkColumnCheckboxToPref(QWidget* widget, int column)
 
     pref_widget.as<QCheckBox>()->setChecked(checked);
 
-    widgets_.insert(Prefs::COMPACT_COLUMNS, widget);
+    widgets_.try_emplace(Prefs::COMPACT_COLUMNS, widget);
 
     if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
@@ -279,7 +277,7 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
     // We don't want to change the preference every time there's a keystroke
     // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
     // only update the pref when the text changed AND focus was lost.
-    char const constexpr* const StartValue = "StartValue";
+    char constexpr const* const StartValue = "StartValue";
 
     if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
     {
@@ -299,7 +297,7 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
 
 void PrefsDialog::checkBoxToggled(bool checked)
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QCheckBox>())
     {
@@ -330,7 +328,7 @@ void PrefsDialog::columnCheckBoxToggled(bool checked, int column)
 
 void PrefsDialog::spinBoxEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QDoubleSpinBox>())
     {
@@ -344,17 +342,17 @@ void PrefsDialog::spinBoxEditingFinished()
 
 void PrefsDialog::timeEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QTimeEdit>())
     {
-        setPref(pref_widget.getPrefKey(), QTime(0, 0).secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
+        setPref(pref_widget.getPrefKey(), QTime{ 0, 0 }.secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
     }
 }
 
 void PrefsDialog::lineEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QLineEdit>())
     {
@@ -369,7 +367,7 @@ void PrefsDialog::lineEditingFinished()
 
 void PrefsDialog::pathChanged(QString const& path)
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<PathButton>())
     {
@@ -411,18 +409,18 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_unit_str = Formatter::get().unitStr(Formatter::get().SPEED, Formatter::get().KB);
-    auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
-    QLocale const locale;
+    auto const suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+
+    auto const locale = QLocale{};
 
     ui_.uploadSpeedLimitSpin->setSuffix(suffix);
     ui_.downloadSpeedLimitSpin->setSuffix(suffix);
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant(TR_SCHED_ALL));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant(TR_SCHED_WEEKDAY));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant(TR_SCHED_WEEKEND));
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant{ TR_SCHED_ALL });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant{ TR_SCHED_WEEKDAY });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant{ TR_SCHED_WEEKEND });
     ui_.altSpeedLimitDaysCombo->insertSeparator(ui_.altSpeedLimitDaysCombo->count());
 
     for (int i = locale.firstDayOfWeek(); i <= Qt::Sunday; ++i)
@@ -451,7 +449,7 @@ void PrefsDialog::initSpeedTab()
     sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
                    << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedLimitsSectionLayout);
     cr->addLayout(ui_.altSpeedLimitsSectionLayout);
     cr->update();
@@ -529,7 +527,7 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
     linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.incomingPeersSectionLayout);
     cr->addLayout(ui_.peerLimitsSectionLayout);
     cr->update();
@@ -563,12 +561,11 @@ void PrefsDialog::onBlocklistUpdated(int n)
 
 void PrefsDialog::onUpdateBlocklistClicked()
 {
-    blocklist_dialog_ = new QMessageBox(
-        QMessageBox::Information,
-        QString(),
-        tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
-        QMessageBox::Close,
-        this);
+    blocklist_dialog_ = new QMessageBox{ QMessageBox::Information,
+                                         QString{},
+                                         tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
+                                         QMessageBox::Close,
+                                         this };
     connect(blocklist_dialog_, &QDialog::rejected, this, &PrefsDialog::onUpdateBlocklistCancelled);
     connect(&session_, &Session::blocklistUpdated, this, &PrefsDialog::onBlocklistUpdated);
     blocklist_dialog_->show();
@@ -595,7 +592,7 @@ void PrefsDialog::initPrivacyTab()
     block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton
                    << ui_.autoUpdateBlocklistCheck;
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.encryptionSectionLayout);
     cr->addLayout(ui_.blocklistSectionLayout);
     cr->update();
@@ -682,7 +679,7 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
     linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.addingSectionLayout);
     cr->addLayout(ui_.downloadQueueSectionLayout);
     cr->addLayout(ui_.incompleteSectionLayout);
@@ -727,11 +724,11 @@ void PrefsDialog::updateSeedingWidgetsLocality()
 ***/
 
 PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , prefs_(prefs)
-    , is_server_(session.isServer())
-    , is_local_(session_.isLocal())
+    : BaseDialog{ parent }
+    , session_{ session }
+    , prefs_{ prefs }
+    , is_server_{ session.isServer() }
+    , is_local_{ session_.isLocal() }
 {
     ui_.setupUi(this);
 
@@ -870,11 +867,9 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator const it(widgets_.find(key));
-
-    if (it != widgets_.end())
+    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
     {
-        QWidget* w(it.value());
+        QWidget* const w = iter->second;
 
         w->blockSignals(true);
 

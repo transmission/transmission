@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,7 +20,7 @@ class TorrentView::HeaderWidget : public QWidget
 {
 public:
     explicit HeaderWidget(TorrentView* parent)
-        : QWidget(parent)
+        : QWidget{ parent }
     {
         setFont(QApplication::font("QMiniFont"));
     }
@@ -35,7 +35,7 @@ public:
     [[nodiscard]] QSize sizeHint() const override
     {
         QStyleOptionHeader option;
-        option.rect = QRect(0, 0, 100, 100);
+        option.rect = QRect{ 0, 0, 100, 100 };
 
         QRect const label_rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
@@ -51,7 +51,7 @@ protected:
         option.state = QStyle::State_Enabled;
         option.position = QStyleOptionHeader::OnlyOneSection;
 
-        QStylePainter painter(this);
+        QStylePainter painter{ this };
         painter.drawControl(QStyle::CE_HeaderSection, option);
 
         option.rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
@@ -68,8 +68,8 @@ private:
 };
 
 TorrentView::TorrentView(QWidget* parent)
-    : QTableView(parent)
-    , header_widget_(new HeaderWidget(this))
+    : QTableView{ parent }
+    , header_widget_{ new HeaderWidget{ this } }
 {
     setShowGrid(false);
     verticalHeader()->hide();

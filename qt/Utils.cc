@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -82,7 +82,7 @@ int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
     option.font = view->font();
 
     return view->style()
-        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view)
+        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize{ QWIDGETSIZE_MAX, QWIDGETSIZE_MAX }, view)
         .width();
 }
 
@@ -93,7 +93,7 @@ int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
     option.text = text;
     option.sortIndicator = view->isSortIndicatorShown() ? QStyleOptionHeader::SortDown : QStyleOptionHeader::None;
 
-    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize(), view).width();
+    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize{}, view).width();
 }
 
 QColor Utils::getFadedColor(QColor const& color)

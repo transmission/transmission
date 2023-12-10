@@ -1,13 +1,28 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
+#include <initializer_list>
+#include <ios>
+#include <optional>
+#include <string> // std::getline()
 #include <string_view>
+#include <utility> // for std::move, std::pair
 #include <vector>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#include <cerrno>
+#include <netinet/in.h>
+#endif
 
 #include <fmt/core.h>
 
@@ -20,7 +35,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strvEndsWith()
+#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strv_ends_with()
 
 using namespace std::literals;
 
@@ -183,7 +198,7 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
         return {};
     }
 
-    auto const pflen = tr_parseNum<size_t>(line.substr(pos + 1));
+    auto const pflen = tr_num_parse<size_t>(line.substr(pos + 1));
     if (!pflen)
     {
         return {};
@@ -305,7 +320,7 @@ auto getFilenamesInDir(std::string_view folder)
 
 } // namespace
 
-void Blocklist::ensureLoaded() const
+void Blocklists::Blocklist::ensureLoaded() const
 {
     if (!std::empty(rules_))
     {
@@ -313,16 +328,15 @@ void Blocklist::ensureLoaded() const
     }
 
     // get the file's size
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", bin_file_),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
     if (!file_info)
     {
@@ -389,42 +403,7 @@ void Blocklist::ensureLoaded() const
         fmt::arg("count", std::size(rules_))));
 }
 
-std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled)
-{
-    // check for files that need to be updated
-    for (auto const& src_file : getFilenamesInDir(blocklist_dir))
-    {
-        if (tr_strvEndsWith(src_file, BinFileSuffix))
-        {
-            continue;
-        }
-
-        // ensure this src_file has an up-to-date corresponding bin_file
-        auto const src_info = tr_sys_path_get_info(src_file);
-        auto const bin_file = tr_pathbuf{ src_file, BinFileSuffix };
-        auto const bin_info = tr_sys_path_get_info(bin_file);
-        auto const bin_needs_update = src_info && (!bin_info || bin_info->last_modified_at <= src_info->last_modified_at);
-        if (bin_needs_update)
-        {
-            if (auto const ranges = parseFile(src_file); !std::empty(ranges))
-            {
-                save(bin_file, std::data(ranges), std::size(ranges));
-            }
-        }
-    }
-
-    auto ret = std::vector<Blocklist>{};
-    for (auto const& bin_file : getFilenamesInDir(blocklist_dir))
-    {
-        if (tr_strvEndsWith(bin_file, BinFileSuffix))
-        {
-            ret.emplace_back(bin_file, is_enabled);
-        }
-    }
-    return ret;
-}
-
-bool Blocklist::contains(tr_address const& addr) const
+bool Blocklists::Blocklist::contains(tr_address const& addr) const
 {
     TR_ASSERT(addr.is_valid());
 
@@ -469,7 +448,10 @@ bool Blocklist::contains(tr_address const& addr) const
     return std::binary_search(std::begin(rules_), std::end(rules_), addr, Compare{});
 }
 
-std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled)
+std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
+    std::string_view external_file,
+    std::string_view bin_file,
+    bool is_enabled)
 {
     // if we can't parse the file, do nothing
     auto rules = parseFile(external_file);
@@ -481,16 +463,15 @@ std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std:
     // make a copy of `external_file` for our own safekeeping
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
     tr_sys_path_remove(src_file.c_str());
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", src_file),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
     if (!copied)
     {
@@ -503,6 +484,96 @@ std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std:
     auto ret = Blocklist{ bin_file, is_enabled };
     ret.rules_ = std::move(rules);
     return ret;
+}
+
+// ---
+
+void Blocklists::set_enabled(bool is_enabled)
+{
+    for (auto& blocklist : blocklists_)
+    {
+        blocklist.setEnabled(is_enabled);
+    }
+
+    changed_.emit();
+}
+
+void Blocklists::load(std::string_view folder, bool is_enabled)
+{
+    folder_ = folder;
+    blocklists_ = load_folder(folder, is_enabled);
+
+    changed_.emit();
+}
+
+// static
+std::vector<Blocklists::Blocklist> Blocklists::Blocklists::load_folder(std::string_view const folder, bool const is_enabled)
+{
+    // check for files that need to be updated
+    for (auto const& src_file : getFilenamesInDir(folder))
+    {
+        if (tr_strv_ends_with(src_file, BinFileSuffix))
+        {
+            continue;
+        }
+
+        // ensure this src_file has an up-to-date corresponding bin_file
+        auto const src_info = tr_sys_path_get_info(src_file);
+        auto const bin_file = tr_pathbuf{ src_file, BinFileSuffix };
+        auto const bin_info = tr_sys_path_get_info(bin_file);
+        auto const bin_needs_update = src_info && (!bin_info || bin_info->last_modified_at <= src_info->last_modified_at);
+        if (bin_needs_update)
+        {
+            if (auto const ranges = parseFile(src_file); !std::empty(ranges))
+            {
+                save(bin_file, std::data(ranges), std::size(ranges));
+            }
+        }
+    }
+
+    auto ret = std::vector<Blocklist>{};
+    for (auto const& bin_file : getFilenamesInDir(folder))
+    {
+        if (tr_strv_ends_with(bin_file, BinFileSuffix))
+        {
+            ret.emplace_back(bin_file, is_enabled);
+        }
+    }
+    return ret;
+}
+
+size_t Blocklists::update_primary_blocklist(std::string_view external_file, bool is_enabled)
+{
+    // These rules will replace the default blocklist.
+    // Build the path of the default blocklist .bin file where we'll save these rules.
+    auto const bin_file = tr_pathbuf{ folder_, '/', DEFAULT_BLOCKLIST_FILENAME };
+
+    // Try to save it
+    auto added = Blocklist::saveNew(external_file, bin_file, is_enabled);
+    if (!added)
+    {
+        return 0U;
+    }
+
+    auto const n_rules = std::size(*added);
+
+    // Add (or replace) it in our blocklists_ vector
+    if (auto iter = std::find_if(
+            std::begin(blocklists_),
+            std::end(blocklists_),
+            [&bin_file](auto const& candidate) { return bin_file == candidate.binFile(); });
+        iter != std::end(blocklists_))
+    {
+        *iter = std::move(*added);
+    }
+    else
+    {
+        blocklists_.emplace_back(std::move(*added));
+    }
+
+    changed_.emit();
+
+    return n_rules;
 }
 
 } // namespace libtransmission

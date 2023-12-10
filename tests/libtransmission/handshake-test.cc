@@ -6,17 +6,39 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cerrno>
+#include <cstddef> // size_t, std::byte
+#include <cstdint> // uint8_t
+#include <map>
+#include <memory>
+#include <optional>
 #include <string_view>
+#include <utility>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#include <unistd.h> // write()
+#endif
 
 #include <event2/util.h>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h> // tr_sha1_to_string, tr_base...
 #include <libtransmission/handshake.h>
+#include <libtransmission/net.h>
 #include <libtransmission/peer-io.h>
+#include <libtransmission/peer-mse.h>
+#include <libtransmission/peer-socket.h>
 #include <libtransmission/session.h> // tr_peerIdInit()
 #include <libtransmission/timer.h>
+#include <libtransmission/tr-assert.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -81,11 +103,6 @@ public:
             return true;
         }
 
-        [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t /*tor_id*/, tr_address const& /*addr*/) const override
-        {
-            return false;
-        }
-
         [[nodiscard]] size_t pad(void* setme, [[maybe_unused]] size_t maxlen) const override
         {
             TR_ASSERT(maxlen > 10);
@@ -99,7 +116,7 @@ public:
             return private_key_;
         }
 
-        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_address const& /*addr*/) override
+        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_socket_address const& /*socket_address*/) override
         {
         }
 
@@ -143,8 +160,7 @@ public:
     static auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
     static auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
 
-    tr_address const DefaultPeerAddr = *tr_address::from_string("127.0.0.1"sv);
-    tr_port const DefaultPeerPort = tr_port::fromHost(8080);
+    tr_socket_address const DefaultPeerSockAddr{ *tr_address::from_string("127.0.0.1"sv), tr_port::from_host(8080) };
     tr_handshake::Mediator::TorrentInfo const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
                                                                    tr_peerIdInit(),
                                                                    tr_torrent_id_t{ 100 },
@@ -158,12 +174,11 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
-        return std::make_pair(
-            tr_peerIo::new_incoming(
-                session,
-                &session->top_bandwidth_,
-                tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0])),
-            sockpair[1]);
+        return std::pair{ tr_peerIo::new_incoming(
+                              session,
+                              &session->top_bandwidth_,
+                              tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0])),
+                          sockpair[1] };
     }
 
     auto createOutgoingIo(tr_session* session, tr_sha1_digest_t const& info_hash)
@@ -171,8 +186,8 @@ public:
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
         auto peer_io = tr_peerIo::create(session, &session->top_bandwidth_, &info_hash, false /*incoming*/, false /*seed*/);
-        peer_io->set_socket(tr_peer_socket(session, DefaultPeerAddr, DefaultPeerPort, sockpair[0]));
-        return std::make_pair(std::move(peer_io), sockpair[1]);
+        peer_io->set_socket(tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0]));
+        return std::pair{ std::move(peer_io), sockpair[1] };
     }
 
     static constexpr auto makePeerId(std::string_view sv)
@@ -247,7 +262,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     EXPECT_EQ(peer_id, res->peer_id);
     EXPECT_EQ(TorrentWeAreSeeding.info_hash, io->torrent_hash());
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 // The datastream is identical to HandshakeTest.incomingPlaintext,
@@ -274,7 +289,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     EXPECT_FALSE(res->peer_id);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 TEST_F(HandshakeTest, outgoingPlaintext)
@@ -302,7 +317,7 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
     EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 TEST_F(HandshakeTest, incomingEncrypted)
@@ -341,7 +356,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
     EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
     EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 // The datastream is identical to HandshakeTest.incomingEncrypted,
@@ -375,7 +390,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 TEST_F(HandshakeTest, outgoingEncrypted)
@@ -419,7 +434,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
     EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 } // namespace libtransmission::test

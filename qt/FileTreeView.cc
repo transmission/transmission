@@ -1,14 +1,15 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <queue>
+#include <set>
 
 #include <QHeaderView>
 #include <QMenu>
-#include <QQueue>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
 
@@ -21,6 +22,8 @@
 #include "Formatter.h"
 #include "Utils.h"
 
+using namespace libtransmission::Values;
+
 namespace
 {
 
@@ -29,10 +32,10 @@ char const* const PriorityKey = "priority";
 }
 
 FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
-    : QTreeView(parent)
-    , model_(new FileTreeModel(this, is_editable))
-    , proxy_(new QSortFilterProxyModel(this))
-    , delegate_(new FileTreeDelegate(this))
+    : QTreeView{ parent }
+    , model_{ new FileTreeModel{ this, is_editable } }
+    , proxy_{ new QSortFilterProxyModel{ this } }
+    , delegate_{ new FileTreeDelegate{ this } }
 {
     proxy_->setSourceModel(model_);
     proxy_->setSortRole(FileTreeModel::SortRole);
@@ -56,11 +59,11 @@ void FileTreeView::onClicked(QModelIndex const& proxy_index)
 
     if (model_index.column() == FileTreeModel::COL_WANTED)
     {
-        model_->twiddleWanted(QModelIndexList() << model_index);
+        model_->twiddleWanted(QModelIndexList{} << model_index);
     }
     else if (model_index.column() == FileTreeModel::COL_PRIORITY)
     {
-        model_->twiddlePriority(QModelIndexList() << model_index);
+        model_->twiddlePriority(QModelIndexList{} << model_index);
     }
 }
 
@@ -88,12 +91,11 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         switch (column)
         {
         case FileTreeModel::COL_SIZE:
-            for (int s = Formatter::get().B; s <= Formatter::get().TB; ++s)
-            {
-                item_texts
-                    << (QStringLiteral("999.9 ") + Formatter::get().unitStr(Formatter::MEM, static_cast<Formatter::Size>(s)));
-            }
-
+            item_texts << QString::fromStdString(Memory{ 999.9, Memory::Units::Bytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::KBytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::MBytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::GBytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::TBytes }.to_string());
             break;
 
         case FileTreeModel::COL_PROGRESS:
@@ -253,7 +255,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
     std::sort(wanted_indices.begin(), wanted_indices.end());
 
-    QSet<QModelIndex> wanted_indices_parents;
+    auto wanted_indices_parents = std::set<QModelIndex>{};
 
     for (QModelIndex const& i : wanted_indices)
     {
@@ -263,13 +265,14 @@ void FileTreeView::onlyCheckSelectedItems()
         }
     }
 
-    QQueue<QModelIndex> parents_queue;
-    parents_queue.enqueue(root_index);
+    auto parents_queue = std::queue<QModelIndex>{};
+    parents_queue.emplace(root_index);
     QModelIndexList unwanted_indices;
 
-    while (!parents_queue.isEmpty())
+    while (!std::empty(parents_queue))
     {
-        QModelIndex const parent_index = parents_queue.dequeue();
+        auto const parent_index = parents_queue.front();
+        parents_queue.pop();
 
         if (std::binary_search(wanted_indices.begin(), wanted_indices.end(), parent_index))
         {
@@ -293,13 +296,13 @@ void FileTreeView::onlyCheckSelectedItems()
             {
                 unwanted_indices << child_index;
             }
-            else if (!wanted_indices_parents.contains(child_index))
+            else if (wanted_indices_parents.count(child_index) == 0U)
             {
                 unwanted_indices << child_index;
             }
             else
             {
-                parents_queue.enqueue(child_index);
+                parents_queue.emplace(child_index);
             }
         }
     }
@@ -348,7 +351,7 @@ void FileTreeView::refreshContextMenuActionsSensitivity()
 
 void FileTreeView::initContextMenu()
 {
-    context_menu_ = new QMenu(this);
+    context_menu_ = new QMenu{ this };
 
     check_selected_action_ = context_menu_->addAction(tr("Check Selected"), this, SLOT(checkSelectedItems()));
     uncheck_selected_action_ = context_menu_->addAction(tr("Uncheck Selected"), this, SLOT(uncheckSelectedItems()));

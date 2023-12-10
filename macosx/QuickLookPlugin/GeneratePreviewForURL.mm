@@ -3,8 +3,11 @@
 @import QuickLook;
 
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
 
@@ -12,6 +15,31 @@ QL_EXTERN_C_BEGIN
 OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
 void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
 QL_EXTERN_C_END
+
+static NSUInteger const kIconWidth = 16;
+
+namespace
+{
+
+class FileTreeNode
+{
+  public:
+    FileTreeNode() = default;
+    ~FileTreeNode() = default;
+
+    auto MaybeCreateChild(std::string_view child_name)
+    {
+        return children_.try_emplace(std::string{ child_name });
+    }
+
+  private:
+    FileTreeNode(FileTreeNode const&) = delete;
+    FileTreeNode& operator=(FileTreeNode&) = delete;
+
+    std::unordered_map<std::string, FileTreeNode> children_;
+};
+
+} // namespace
 
 NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableDictionary* allImgProps)
 {
@@ -41,7 +69,7 @@ NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableD
     return [@"cid:" stringByAppendingString:iconFileName];
 }
 
-OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options)
+OSStatus GeneratePreviewForURL(void* /*thisInterface*/, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options)
 {
     // Before proceeding make sure the user didn't cancel the request
     if (QLPreviewRequestIsCancelled(preview))
@@ -54,7 +82,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     //try to parse the torrent file
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseTorrentFile(((__bridge NSURL*)url).path.UTF8String))
+    if (!metainfo.parse_torrent_file(((__bridge NSURL*)url).path.UTF8String))
     {
         return noErr;
     }
@@ -71,7 +99,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSString* name = @(metainfo.name().c_str());
 
-    auto const n_files = metainfo.fileCount();
+    auto const n_files = metainfo.file_count();
     auto const is_multifile = n_files > 1;
     NSString* fileTypeString = is_multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension;
 
@@ -82,7 +110,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
                              width,
                              name];
 
-    NSString* fileSizeString = [NSString stringForFileSize:metainfo.totalSize()];
+    NSString* fileSizeString = [NSString stringForFileSize:metainfo.total_size()];
     if (is_multifile)
     {
         NSString* fileCountString = [NSString
@@ -91,7 +119,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     }
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
 
-    auto const date_created = metainfo.dateCreated();
+    auto const date_created = metainfo.date_created();
     NSString* dateCreatedString = date_created > 0 ?
         [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:date_created] dateStyle:NSDateFormatterLongStyle
                                        timeStyle:NSDateFormatterShortStyle] :
@@ -135,7 +163,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSMutableArray* lists = [NSMutableArray array];
 
-    auto const n_webseeds = metainfo.webseedCount();
+    auto const n_webseeds = metainfo.webseed_count();
     if (n_webseeds > 0)
     {
         NSMutableString* listSection = [NSMutableString string];
@@ -157,7 +185,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [lists addObject:listSection];
     }
 
-    auto const& announce_list = metainfo.announceList();
+    auto const& announce_list = metainfo.announce_list();
     if (!std::empty(announce_list))
     {
         NSMutableString* listSection = [NSMutableString string];
@@ -189,22 +217,61 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
             localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Files", nil, bundle, "quicklook file header"), n_files];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
-#warning display folders?
+        FileTreeNode root{};
+
         for (auto const& [path, size] : metainfo.files().sortedByPath())
         {
-            NSString* fullFilePath = @(path.c_str());
-            NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
+            FileTreeNode* curNode = &root;
+            size_t level = 0;
 
-            NSString* shortenedFilePath = [fullFilePath substringFromIndex:name.length + 1];
-            NSString* fileSize = [NSString stringForFileSize:size];
+            auto subpath = std::string_view{ path };
+            auto path_vec = std::vector<std::string_view>{};
+            auto token = std::string_view{};
+            while (tr_strv_sep(&subpath, &token, '/'))
+            {
+                path_vec.emplace_back(token);
+            }
+            size_t const last = path_vec.size() - 1;
 
-            NSUInteger const width = 16;
-            [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</td><td class=\"grey\">%@</td></tr>",
-                                      generateIconData(shortenedFilePath.pathExtension, width, allImgProps),
-                                      width,
-                                      width,
-                                      shortenedFilePath,
-                                      fileSize];
+            for (auto const& part : path_vec)
+            {
+                auto [it, inserted] = curNode->MaybeCreateChild(part);
+                if (inserted)
+                {
+                    NSString* prefix = @"";
+                    for (size_t i = 0; i < level; ++i)
+                    {
+                        prefix = [prefix stringByAppendingString:@"&emsp;"];
+                    }
+
+                    NSString* pathPart = @(it->first.c_str());
+                    NSString* pathExt = nil;
+                    NSString* fileSize = nil;
+                    if (level < last)
+                    {
+                        // This node is a directory.
+                        pathExt = NSFileTypeForHFSTypeCode(kGenericFolderIcon);
+                        fileSize = @"";
+                    }
+                    else
+                    {
+                        // This node is a leaf file.
+                        pathExt = pathPart.pathExtension;
+                        fileSize = [NSString stringForFileSize:size];
+                    }
+
+                    [listSection appendFormat:@"<tr><td>%@<img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</td><td class=\"grey\">%@</td></tr>",
+                                              prefix,
+                                              generateIconData(pathExt, kIconWidth, allImgProps),
+                                              kIconWidth,
+                                              kIconWidth,
+                                              pathPart,
+                                              fileSize];
+                }
+
+                curNode = &it->second;
+                level++;
+            }
         }
 
         [listSection appendString:@"</table>"];
@@ -234,7 +301,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     return noErr;
 }
 
-void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview)
+void CancelPreviewGeneration(void* /*thisInterface*/, QLPreviewRequestRef preview)
 {
     // Implement only if supported
 }

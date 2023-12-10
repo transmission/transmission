@@ -1,11 +1,11 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <QMap>
+#include <map>
 
 #include <libtransmission/tr-macros.h>
 
@@ -51,7 +51,7 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    using key2widget_t = QMap<int, QWidget*>;
+    using key2widget_t = std::map<int, QWidget*>;
 
     bool updateWidgetValue(QWidget* widget, int pref_key) const;
     void linkWidgetToPref(QWidget* widget, int pref_key);

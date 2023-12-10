@@ -5,11 +5,6 @@ Users can set environmental variables to override Transmission's default behavio
  * If `TRANSMISSION_WEB_HOME` is set, Transmission will look there for the [Web Interface](Web-Interface.md) files, such as the JavaScript, HTML, and graphics files.
  * If `TR_CURL_SSL_NO_VERIFY` is set, Transmission will not validate SSL certificate for HTTPS connections when talking to trackers. See CURL's documentation ([CURLOPT_SSL_VERIFYHOST](https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html) and [CURLOPT_SSL_VERIFYPEER](https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html)) for more details.
  * If `TR_CURL_VERBOSE` is set, debugging information for libcurl will be enabled.  More information about libcurl's debugging mode [is available here](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTVERBOSE).
- * If `TR_DEBUG_FD` is set to an integer, that integer is treated as a [file descriptor](https://en.wikipedia.org/wiki/File_descriptor) and very verbose debugging information is written to it.  For example, here is how to turn on debugging and save it to a file named "runlog" when running Transmission from a bash shell:
-   ```console
-   $ export TR_DEBUG_FD=2
-   $ transmission 2>runlog
-   ```
  * If `TR_DHT_VERBOSE` is set, Transmission will log all of the DHT's activities in excruciating detail to standard error.
 
 ## Standard Variables Used by Transmission

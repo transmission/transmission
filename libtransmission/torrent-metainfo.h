@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,12 +11,12 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
-#include "magnet-metainfo.h"
-#include "torrent-files.h"
-#include "tr-strbuf.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 
@@ -28,13 +28,13 @@ public:
         return std::empty(files_);
     }
 
-    bool parseBenc(std::string_view benc, tr_error** error = nullptr);
+    bool parse_benc(std::string_view benc, tr_error* error = nullptr);
 
     // Helper function wrapper around parseBenc().
     // If you're looping through several files, passing in a non-nullptr
     // `contents` can reduce the number of memory allocations needed to
     // load multiple files.
-    bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
+    bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error* error = nullptr);
 
     // FILES
 
@@ -42,70 +42,70 @@ public:
     {
         return files_;
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
         return files().fileCount();
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const
     {
         return files().fileSize(i);
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& file_subpath(tr_file_index_t i) const
     {
         return files().path(i);
     }
 
-    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
+    void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
         files_.setPath(i, subpath);
     }
 
     /// BLOCK INFO
 
-    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
+    [[nodiscard]] constexpr auto const& block_info() const noexcept
     {
         return block_info_;
     }
 
-    [[nodiscard]] constexpr auto blockCount() const noexcept
+    [[nodiscard]] constexpr auto block_count() const noexcept
     {
-        return blockInfo().blockCount();
+        return block_info().block_count();
     }
-    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const noexcept
+    [[nodiscard]] constexpr auto byte_loc(uint64_t nth_byte) const noexcept
     {
-        return blockInfo().byteLoc(nth_byte);
+        return block_info().byte_loc(nth_byte);
     }
-    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto block_loc(tr_block_index_t block) const noexcept
     {
-        return blockInfo().blockLoc(block);
+        return block_info().block_loc(block);
     }
-    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
+    [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
-        return blockInfo().pieceLoc(piece, offset, length);
+        return block_info().piece_loc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto block_size(tr_block_index_t block) const noexcept
     {
-        return blockInfo().blockSize(block);
+        return block_info().block_size(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr auto block_span_for_piece(tr_piece_index_t piece) const noexcept
     {
-        return blockInfo().blockSpanForPiece(piece);
+        return block_info().block_span_for_piece(piece);
     }
-    [[nodiscard]] constexpr auto pieceCount() const noexcept
+    [[nodiscard]] constexpr auto piece_count() const noexcept
     {
-        return blockInfo().pieceCount();
+        return block_info().piece_count();
     }
-    [[nodiscard]] constexpr auto pieceSize() const noexcept
+    [[nodiscard]] constexpr auto piece_size() const noexcept
     {
-        return blockInfo().pieceSize();
+        return block_info().piece_size();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr auto piece_size(tr_piece_index_t piece) const noexcept
     {
-        return blockInfo().pieceSize(piece);
+        return block_info().piece_size(piece);
     }
-    [[nodiscard]] constexpr auto totalSize() const noexcept
+    [[nodiscard]] constexpr auto total_size() const noexcept
     {
-        return blockInfo().totalSize();
+        return block_info().total_size();
     }
 
     // OTHER PROPERTIES
@@ -123,72 +123,72 @@ public:
         return source_;
     }
 
-    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
+    [[nodiscard]] constexpr auto is_private() const noexcept
     {
         return is_private_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const
+    [[nodiscard]] TR_CONSTEXPR20 tr_sha1_digest_t const& piece_hash(tr_piece_index_t piece) const
     {
         return pieces_[piece];
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool hasV1Metadata() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 bool has_v1_metadata() const noexcept
     {
         // need 'pieces' field and 'files' or 'length'
         // TODO check for 'files' or 'length'
         return !std::empty(pieces_);
     }
 
-    [[nodiscard]] constexpr bool hasV2Metadata() const noexcept
+    [[nodiscard]] constexpr bool has_v2_metadata() const noexcept
     {
         return is_v2_;
     }
 
-    [[nodiscard]] constexpr auto const& dateCreated() const noexcept
+    [[nodiscard]] constexpr auto const& date_created() const noexcept
     {
         return date_created_;
     }
 
-    [[nodiscard]] constexpr auto infoDictSize() const noexcept
+    [[nodiscard]] constexpr auto info_dict_size() const noexcept
     {
         return info_dict_size_;
     }
 
-    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
+    [[nodiscard]] constexpr auto info_dict_offset() const noexcept
     {
         return info_dict_offset_;
     }
 
-    [[nodiscard]] constexpr auto piecesOffset() const noexcept
+    [[nodiscard]] constexpr auto pieces_offset() const noexcept
     {
         return pieces_offset_;
     }
 
     // UTILS
 
-    [[nodiscard]] auto torrentFile(std::string_view torrent_dir) const
+    [[nodiscard]] auto torrent_file(std::string_view torrent_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+        return make_filename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".torrent");
     }
 
-    [[nodiscard]] auto magnetFile(std::string_view torrent_dir) const
+    [[nodiscard]] auto magnet_file(std::string_view torrent_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
+        return make_filename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".magnet");
     }
 
-    [[nodiscard]] auto resumeFile(std::string_view resume_dir) const
+    [[nodiscard]] auto resume_file(std::string_view resume_dir) const
     {
-        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+        return make_filename(resume_dir, name(), info_hash_string(), BasenameFormat::Hash, ".resume");
     }
 
-    static bool migrateFile(
+    static bool migrate_file(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
         std::string_view suffix);
 
-    static void removeFile(
+    static void remove_file(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
@@ -196,12 +196,8 @@ public:
 
 private:
     friend struct MetainfoHandler;
-    static bool parseImpl(tr_torrent_metainfo& setme, std::string_view benc, tr_error** error);
-    // static bool parsePath(std::string_view root, tr_variant* path, std::string& setme);
-    static std::string fixWebseedUrl(tr_torrent_metainfo const& tm, std::string_view url);
-    // static std::string_view parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size);
-    // static std::string_view parseAnnounce(tr_torrent_metainfo& setme, tr_variant* meta);
-    // static void parseWebseeds(tr_torrent_metainfo& setme, tr_variant* meta);
+    static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);
+    static std::string fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url);
 
     enum class BasenameFormat
     {
@@ -209,16 +205,16 @@ private:
         NameAndPartialHash
     };
 
-    [[nodiscard]] static tr_pathbuf makeFilename(
+    [[nodiscard]] static std::string make_filename(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
         BasenameFormat format,
         std::string_view suffix);
 
-    [[nodiscard]] auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    [[nodiscard]] auto make_filename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
-        return makeFilename(dirname, name(), infoHashString(), format, suffix);
+        return make_filename(dirname, name(), info_hash_string(), format, suffix);
     }
 
     tr_block_info block_info_ = tr_block_info{ 0, 0 };

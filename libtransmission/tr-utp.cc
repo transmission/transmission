@@ -1,24 +1,22 @@
-// This file Copyright © 2010-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <cstdint>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 
 #include <fmt/core.h>
 
 #include <libutp/utp.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 
@@ -91,10 +89,9 @@ void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 
     utp_getpeername(utp_sock, from, &fromlen);
 
-    if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
+    if (auto addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
     {
-        auto const& [addr, port] = *addrport;
-        session->addIncoming(tr_peer_socket{ addr, port, utp_sock });
+        session->addIncoming({ *addrport, utp_sock });
     }
     else
     {
@@ -135,6 +132,9 @@ uint64 utp_callback(utp_callback_arguments* args)
     case UTP_SENDTO:
         utp_send_to(session, args->buf, args->len, args->address, args->address_len);
         break;
+
+    default:
+        break;
     }
 
     return 0;
@@ -165,7 +165,7 @@ void restart_timer(tr_session* session)
         interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    session->utp_timer->startSingleShot(interval);
+    session->utp_timer->start_single_shot(interval);
 }
 
 void timer_callback(void* vsession)

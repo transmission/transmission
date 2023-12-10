@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -16,6 +16,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
 #import "VDKQueue.h"
@@ -126,6 +127,41 @@ static NSString* const kDonateURL = @"https://transmissionbt.com/donate/";
 
 static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
 
+static void initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
+    // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
+    int const ArbitraryPluralNumber = 17;
+
+    NSByteCountFormatter* unitFormatter = [[NSByteCountFormatter alloc] init];
+    unitFormatter.includesCount = NO;
+    unitFormatter.allowsNonnumericFormatting = NO;
+    unitFormatter.allowedUnits = NSByteCountFormatterUseBytes;
+    NSString* b_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
+    NSString* k_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseMB;
+    NSString* m_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseGB;
+    NSString* g_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
+    NSString* t_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    Config::Memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+    Config::Storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                        m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+
+    b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)");
+    k_str = NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)");
+    m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)");
+    g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)");
+    t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)");
+    Config::Speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                      m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+}
+
 static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
 {
     NSDictionary* dict = @{@"Active" : @(active), @"ByUser" : @(byUser)};
@@ -203,7 +239,7 @@ static void removeKeRangerRansomware()
             pid_t const krProcessId = [line substringFromIndex:1].intValue;
             if (kill(krProcessId, SIGKILL) == -1)
             {
-                NSLog(@"Unable to forcibly terminate ransomware process (kernel_service, pid %d), please do so manually", (int)krProcessId);
+                NSLog(@"Unable to forcibly terminate ransomware process (kernel_service, pid %d), please do so manually", krProcessId);
             }
         }
     }
@@ -417,9 +453,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //upgrading from versions < 2.40: clear recent items
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
-        tr_variant settings;
-        tr_variantInitDict(&settings, 41);
-        tr_sessionGetDefaultSettings(&settings);
+        auto settings = tr_sessionGetDefaultSettings();
 
         BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
@@ -516,38 +550,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
         }
 
-        NSByteCountFormatter* unitFormatter = [[NSByteCountFormatter alloc] init];
-        unitFormatter.includesCount = NO;
-        unitFormatter.allowsNonnumericFormatting = NO;
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
-        // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
-        // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
-        NSString* kbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseMB;
-        NSString* mbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseGB;
-        NSString* gbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
-        NSString* tbString = [unitFormatter stringFromByteCount:17];
-
-        tr_formatter_size_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
-
-        tr_formatter_speed_init(
-            1000,
-            NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)").UTF8String,
-            NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)").UTF8String,
-            NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)").UTF8String,
-            NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)").UTF8String); //why not?
-
-        tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
+        initUnits();
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, &settings);
-        tr_variantClear(&settings);
+        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
         tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
@@ -602,6 +608,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+
     Toolbar* toolbar = [[Toolbar alloc] initWithIdentifier:@"TRMainToolbar"];
     toolbar.delegate = self;
     toolbar.allowsUserCustomization = YES;
@@ -625,11 +633,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     //set table size
     BOOL const small = [self.fDefaults boolForKey:@"SmallView"];
-    if (small)
-    {
-        self.fTableView.rowHeight = kRowHeightSmall;
-    }
-    self.fTableView.usesAlternatingRowBackgroundColors = !small;
+    self.fTableView.rowHeight = small ? kRowHeightSmall : kRowHeightRegular;
+    self.fTableView.usesAutomaticRowHeights = NO;
+    self.fTableView.floatsGroupRows = YES;
+    //self.fTableView.usesAlternatingRowBackgroundColors = !small;
 
     [self.fWindow setContentBorderThickness:NSMinY(self.fTableView.enclosingScrollView.frame) forEdge:NSMinYEdge];
     self.fWindow.movableByWindowBackground = YES;
@@ -1169,6 +1176,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         return;
     }
 
+    NSString* urlString = task.currentRequest.URL.absoluteString;
+    if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+    {
+        // originalRequest was a redirect to a magnet
+        [self performSelectorOnMainThread:@selector(openMagnet:) withObject:urlString waitUntilDone:NO];
+        return;
+    }
+
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
                          task.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding,
@@ -1208,7 +1223,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     for (NSString* torrentPath in filenames)
     {
         auto metainfo = tr_torrent_metainfo{};
-        if (!metainfo.parseTorrentFile(torrentPath.UTF8String)) // invalid torrent
+        if (!metainfo.parse_torrent_file(torrentPath.UTF8String)) // invalid torrent
         {
             if (type != AddTypeAuto)
             {
@@ -1254,7 +1269,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         //determine to show the options window
-        auto const is_multifile = metainfo.fileCount() > 1;
+        auto const is_multifile = metainfo.file_count() > 1;
         BOOL const showWindow = type == AddTypeShowOptions ||
             ([self.fDefaults boolForKey:@"DownloadAsk"] && (is_multifile || ![self.fDefaults boolForKey:@"DownloadAskMulti"]) &&
              (type != AddTypeAuto || ![self.fDefaults boolForKey:@"DownloadAskManual"]));
@@ -2317,6 +2332,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             [self.fInfoController updateInfoStats];
         }
+
+        [self.fTableView reloadVisibleRows];
     }
 
     //badge dock
@@ -3002,7 +3019,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         //for each torrent, removes the previous piece info if it's not in allTorrents, and keeps track of which torrents we already found in allTorrents
         void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL*) = ^(Torrent* torrent, NSUInteger /*idx*/, BOOL* /*stop*/) {
-            //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe fo concurrent enumeration
+            //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe for concurrent enumeration
             if (![allTorrents containsObject:torrent])
             {
                 torrent.previousFinishedPieces = nil;
@@ -3239,9 +3256,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //set all groups as expanded
         [self.fTableView removeAllCollapsedGroups];
 
-//since we're not doing this the right way (boo buggy animation), we need to remember selected values
-#warning when Lion-only and using views instead of cells, this likely won't be needed
-        NSArray* selectedValues = self.fTableView.selectedValues;
+        // we need to remember selected values
+        NSArray<Torrent*>* selectedTorrents = self.fTableView.selectedTorrents;
 
         beganUpdates = YES;
         [self.fTableView beginUpdates];
@@ -3287,10 +3303,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 [self.fTableView expandItem:group];
         }
 
-        if (selectedValues)
-        {
-            [self.fTableView selectValues:selectedValues];
-        }
+        self.fTableView.selectedTorrents = selectedTorrents;
     }
 
     //sort the torrents (won't sort the groups, though)
@@ -3536,7 +3549,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         auto metainfo = tr_torrent_metainfo{};
-        if (!metainfo.parseTorrentFile(fullFile.UTF8String))
+        if (!metainfo.parse_torrent_file(fullFile.UTF8String))
         {
             continue;
         }
@@ -3597,66 +3610,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isItemExpandable:(id)item
 {
     return ![item isKindOfClass:[Torrent class]];
-}
-
-- (id)outlineView:(NSOutlineView*)outlineView objectValueForTableColumn:(NSTableColumn*)tableColumn byItem:(id)item
-{
-    if ([item isKindOfClass:[Torrent class]])
-    {
-        if (tableColumn)
-        {
-            return nil;
-        }
-        return ((Torrent*)item).hashString;
-    }
-    else
-    {
-        NSString* ident = tableColumn.identifier;
-        TorrentGroup* group = (TorrentGroup*)item;
-        if ([ident isEqualToString:@"Group"])
-        {
-            NSInteger groupIndex = group.groupIndex;
-            return groupIndex != -1 ? [GroupsController.groups nameForIndex:groupIndex] : NSLocalizedString(@"No Group", "Group table row");
-        }
-        else if ([ident isEqualToString:@"Color"])
-        {
-            NSInteger groupIndex = group.groupIndex;
-            return [GroupsController.groups imageForIndex:groupIndex];
-        }
-        else if ([ident isEqualToString:@"DL Image"])
-        {
-            NSImage* image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
-            image.accessibilityDescription = NSLocalizedString(@"DL", "Torrent -> status image");
-            return image;
-        }
-        else if ([ident isEqualToString:@"UL Image"])
-        {
-            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
-            {
-                NSImage* image = [NSImage imageNamed:@"YingYangGroupTemplate"];
-                image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
-                return image;
-            }
-            else
-            {
-                NSImage* image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
-                image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
-                return image;
-            }
-        }
-        else
-        {
-            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
-            {
-                return [NSString stringForRatio:group.ratio];
-            }
-            else
-            {
-                CGFloat rate = [ident isEqualToString:@"UL"] ? group.uploadRate : group.downloadRate;
-                return [NSString stringForSpeed:rate];
-            }
-        }
-    }
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView writeItems:(NSArray*)items toPasteboard:(NSPasteboard*)pasteboard
@@ -3862,7 +3815,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(fileToParse.path.UTF8String))
+                if (metainfo.parse_torrent_file(fileToParse.path.UTF8String))
                 {
                     if (!self.fOverlayWindow)
                     {
@@ -3937,7 +3890,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(file.path.UTF8String))
+                if (metainfo.parse_torrent_file(file.path.UTF8String))
                 {
                     [filesToOpen addObject:file.path];
                 }
@@ -3980,7 +3933,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     BOOL makeSmall = ![self.fDefaults boolForKey:@"SmallView"];
     [self.fDefaults setBool:makeSmall forKey:@"SmallView"];
 
-    self.fTableView.usesAlternatingRowBackgroundColors = !makeSmall;
+    //self.fTableView.usesAlternatingRowBackgroundColors = !makeSmall;
 
     self.fTableView.rowHeight = makeSmall ? kRowHeightSmall : kRowHeightRegular;
 
@@ -4598,7 +4551,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         return YES;
     }
 
-    //only enable some items if it is in a context menu or the window is useable
+    //only enable some items if it is in a context menu or the window is usable
     BOOL canUseTable = self.fWindow.keyWindow || menuItem.menu.supermenu != NSApp.mainMenu;
 
     //enable open items
@@ -5319,6 +5272,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
+
+        //account for group padding...
+        if (groups > 1)
+        {
+            height += (groups - 1) * 20;
+        }
     }
     else
     {

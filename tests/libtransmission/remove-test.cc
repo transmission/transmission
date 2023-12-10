@@ -4,8 +4,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cstdio>
+#include <cstdint> // uint64_t
 #include <set>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -15,6 +16,7 @@
 #include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

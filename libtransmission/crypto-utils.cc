@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,12 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <functional>
+#include <cstddef>
+#include <cstdint>
 #include <iterator>
+#include <optional>
 #include <random>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <vector>
 
 extern "C"
@@ -22,10 +23,9 @@ extern "C"
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -53,7 +53,7 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
 
     // convert it to a string. string holds three parts:
     // DigestPrefix, stringified digest of plaintext + salt, and the salt.
-    return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, tr_sha1_to_string(digest), salt);
+    return fmt::format("{:s}{:s}{:s}", SaltedPrefix, tr_sha1_to_string(digest), salt);
 }
 
 } // namespace ssha1_impl
@@ -81,7 +81,7 @@ bool tr_ssha1_test(std::string_view text)
 {
     using namespace ssha1_impl;
 
-    return tr_strvStartsWith(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
+    return tr_strv_starts_with(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
 }
 
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
@@ -131,7 +131,7 @@ std::string tr_base64_encode(std::string_view input)
         std::data(buf),
         std::data(buf) + len,
         std::back_inserter(str),
-        [](auto ch) { return !tr_strvContains("\r\n"sv, ch); });
+        [](auto ch) { return !tr_strv_contains("\r\n"sv, ch); });
     return str;
 }
 
@@ -151,24 +151,16 @@ namespace
 namespace hex_impl
 {
 
-constexpr void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
+template<typename InIt, typename OutIt>
+constexpr void tr_binary_to_hex(InIt begin, InIt end, OutIt out)
 {
     auto constexpr Hex = "0123456789abcdef"sv;
 
-    auto const* input = static_cast<uint8_t const*>(vinput);
-    auto* output = static_cast<char*>(voutput);
-
-    /* go from back to front to allow for in-place conversion */
-    input += byte_length;
-    output += byte_length * 2;
-
-    *output = '\0';
-
-    while (byte_length-- > 0)
+    while (begin != end)
     {
-        unsigned int const val = *(--input);
-        *(--output) = Hex[val & 0xf];
-        *(--output) = Hex[val >> 4];
+        auto const val = static_cast<unsigned int>(*begin++);
+        *out++ = Hex[val >> 4];
+        *out++ = Hex[val & 0xF];
     }
 }
 
@@ -189,21 +181,23 @@ constexpr void tr_hex_to_binary(char const* input, void* voutput, size_t byte_le
 } // namespace hex_impl
 } // namespace
 
-std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
+tr_sha1_string tr_sha1_to_string(tr_sha1_digest_t const& digest)
 {
     using namespace hex_impl;
 
-    auto str = std::string(std::size(digest) * 2, '?');
-    tr_binary_to_hex(digest.data(), str.data(), std::size(digest));
+    auto str = tr_sha1_string{};
+    tr_binary_to_hex(std::begin(digest), std::end(digest), std::back_inserter(str));
+    TR_ASSERT(std::size(str) == TrSha1DigestStrlen);
     return str;
 }
 
-std::string tr_sha256_to_string(tr_sha256_digest_t const& digest)
+tr_sha256_string tr_sha256_to_string(tr_sha256_digest_t const& digest)
 {
     using namespace hex_impl;
 
-    auto str = std::string(std::size(digest) * 2, '?');
-    tr_binary_to_hex(digest.data(), str.data(), std::size(digest));
+    auto str = tr_sha256_string{};
+    tr_binary_to_hex(std::begin(digest), std::end(digest), std::back_inserter(str));
+    TR_ASSERT(std::size(str) == TrSha256DigestStrlen);
     return str;
 }
 

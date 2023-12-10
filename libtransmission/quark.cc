@@ -1,10 +1,13 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <iterator> // for std::distance()
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -18,7 +21,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 404>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 407>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -47,6 +50,7 @@ auto constexpr MyStatic = std::array<std::string_view, 404>{ ""sv,
                                                              "availability"sv,
                                                              "bandwidth-priority"sv,
                                                              "bandwidthPriority"sv,
+                                                             "beginPiece"sv,
                                                              "bind-address-ipv4"sv,
                                                              "bind-address-ipv6"sv,
                                                              "bitfield"sv,
@@ -110,6 +114,7 @@ auto constexpr MyStatic = std::array<std::string_view, 404>{ ""sv,
                                                              "editDate"sv,
                                                              "encoding"sv,
                                                              "encryption"sv,
+                                                             "endPiece"sv,
                                                              "error"sv,
                                                              "errorString"sv,
                                                              "eta"sv,
@@ -156,6 +161,7 @@ auto constexpr MyStatic = std::array<std::string_view, 404>{ ""sv,
                                                              "incomplete-dir-enabled"sv,
                                                              "info"sv,
                                                              "inhibit-desktop-hibernation"sv,
+                                                             "ipProtocol"sv,
                                                              "ipv4"sv,
                                                              "ipv6"sv,
                                                              "isBackup"sv,
@@ -249,7 +255,7 @@ auto constexpr MyStatic = std::array<std::string_view, 404>{ ""sv,
                                                              "port-forwarding-enabled"sv,
                                                              "port-is-open"sv,
                                                              "preallocation"sv,
-                                                             "prefetch-enabled"sv,
+                                                             "preferred-transport"sv,
                                                              "primary-mime-type"sv,
                                                              "priorities"sv,
                                                              "priority"sv,

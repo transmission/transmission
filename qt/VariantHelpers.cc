@@ -1,4 +1,4 @@
-// This file Copyright © 2020-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include "VariantHelpers.h"
 
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <string_view>
 
@@ -33,8 +34,8 @@ bool change(double& setme, double const& value)
 
 bool change(Speed& setme, tr_variant const* value)
 {
-    auto const bytes_per_second = getValue<int>(value);
-    return bytes_per_second && change(setme, Speed::fromBps(*bytes_per_second));
+    auto const byps = getValue<int>(value);
+    return byps && change(setme, Speed{ *byps, Speed::Units::Byps });
 }
 
 bool change(TorrentHash& setme, tr_variant const* value)
@@ -180,7 +181,7 @@ bool change(TrackerStat& setme, tr_variant const* value)
     if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty())
     {
         setme.announce = trApp->intern(setme.announce);
-        trApp->faviconCache().add(setme.sitename, setme.announce);
+        trApp->load_favicon(setme.announce);
     }
 
     return changed;
@@ -190,37 +191,37 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
 void variantInit(tr_variant* init_me, bool value)
 {
-    tr_variantInitBool(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int64_t value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, double value)
 {
-    tr_variantInitReal(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, QByteArray const& value)
 {
-    tr_variantInitRaw(init_me, value.constData(), value.size());
+    *init_me = std::string_view{ value.constData(), static_cast<size_t>(value.size()) };
 }
 
 void variantInit(tr_variant* init_me, QString const& value)
 {
-    variantInit(init_me, value.toUtf8());
+    *init_me = value.toStdString();
 }
 
 void variantInit(tr_variant* init_me, std::string_view value)
 {
-    tr_variantInitStr(init_me, value);
+    *init_me = value;
 }
 
 } // namespace trqt::variant_helpers

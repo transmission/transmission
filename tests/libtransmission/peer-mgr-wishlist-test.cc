@@ -3,14 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
+#include <cstddef> // size_t
 #include <map>
-#include <type_traits>
+#include <set>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/bitfield.h>
 #include <libtransmission/peer-mgr-wishlist.h>
 
 #include "gtest/gtest.h"
@@ -135,7 +136,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
     auto requested = tr_bitfield(250);
     for (auto const& span : spans)
     {
-        requested.setSpan(span.begin, span.end);
+        requested.set_span(span.begin, span.end);
     }
     EXPECT_EQ(240U, requested.count());
     EXPECT_EQ(0U, requested.count(0, 10));
@@ -262,7 +263,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     auto requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
-        requested.setSpan(span.begin, span.end);
+        requested.set_span(span.begin, span.end);
     }
     EXPECT_EQ(150U, requested.count());
     EXPECT_EQ(0U, requested.count(0, 150));
@@ -275,7 +276,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
-        requested.setSpan(span.begin, span.end);
+        requested.set_span(span.begin, span.end);
     }
     EXPECT_EQ(300U, requested.count());
     EXPECT_EQ(150U, requested.count(0, 150));
@@ -325,7 +326,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setSpan(range.begin, range.end);
+            requested.set_span(range.begin, range.end);
         }
         EXPECT_EQ(10U, requested.count());
         EXPECT_EQ(10U, requested.count(0, 100));
@@ -341,7 +342,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setSpan(range.begin, range.end);
+            requested.set_span(range.begin, range.end);
         }
         EXPECT_EQ(20U, requested.count());
         EXPECT_EQ(10U, requested.count(0, 100));

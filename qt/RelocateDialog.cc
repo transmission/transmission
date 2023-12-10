@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -27,9 +27,9 @@ void RelocateDialog::onMoveToggled(bool b) const
 }
 
 RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , ids_(std::move(ids))
+    : BaseDialog{ parent }
+    , session_{ session }
+    , ids_{ std::move(ids) }
 {
     ui_.setupUi(this);
 

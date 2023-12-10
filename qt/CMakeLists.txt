@@ -1,5 +1,8 @@
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 
+# https://doc.qt.io/qt-6/macos.html#supported-versions
+set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
+
 add_executable(${TR_NAME}-qt WIN32)
 
 target_sources(${TR_NAME}-qt
@@ -21,7 +24,6 @@ target_sources(${TR_NAME}-qt
         DetailsDialog.cc
         DetailsDialog.h
         FaviconCache.cc
-        FaviconCache.h
         FileTreeDelegate.cc
         FileTreeDelegate.h
         FileTreeItem.cc

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -29,6 +29,7 @@
 
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/version.h>
 
 #include "AddData.h"
@@ -93,13 +94,13 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 } // namespace
 
 Application::Application(int& argc, char** argv)
-    : QApplication(argc, argv)
+    : QApplication{ argc, argv }
     , config_name_{ QStringLiteral("transmission") }
     , display_name_{ QStringLiteral("transmission-qt") }
-    , start_now_regex_{ QRegularExpression(QStringLiteral(R"rgx(start-now\((\d+)\))rgx")) }
 {
     setApplicationName(config_name_);
     loadTranslations();
+    initUnits();
 
 #if defined(_WIN32) || defined(__APPLE__)
 
@@ -287,7 +288,7 @@ Application::Application(int& argc, char** argv)
     connect(session_.get(), &Session::sourceChanged, this, &Application::onSessionSourceChanged);
     connect(session_.get(), &Session::torrentsRemoved, model_.get(), &TorrentModel::removeTorrents);
     connect(session_.get(), &Session::torrentsUpdated, model_.get(), &TorrentModel::updateTorrents);
-    connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addTorrent));
+    connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addWatchdirTorrent));
 
     // init from preferences
     for (auto const key : { Prefs::DIR_WATCH })
@@ -326,12 +327,11 @@ Application::Application(int& argc, char** argv)
 
     if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-        auto* dialog = new QMessageBox(
-            QMessageBox::Information,
-            QString(),
-            tr("<b>Transmission is a file sharing program.</b>"),
-            QMessageBox::Ok | QMessageBox::Cancel,
-            window_.get());
+        auto* dialog = new QMessageBox{ QMessageBox::Information,
+                                        QString{},
+                                        tr("<b>Transmission is a file sharing program.</b>"),
+                                        QMessageBox::Ok | QMessageBox::Cancel,
+                                        window_.get() };
         dialog->setInformativeText(
             tr("When you run a torrent, its data will be made available to others by means of upload. "
                "Any content you share is your sole responsibility."));
@@ -345,16 +345,16 @@ Application::Application(int& argc, char** argv)
         dialog->show();
     }
 
+    // torrent files passed in on the command line
     for (QString const& filename : filenames)
     {
-        addTorrent(filename);
+        addTorrent(AddData{ filename });
     }
 
     InteropHelper::registerObject(this);
 
 #ifdef QT_DBUS_LIB
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    if (bus.isConnected())
+    if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         bus.connect(
             fdo_notifications_service_name_,
@@ -370,7 +370,7 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList() <<
+    auto const qt_qm_dirs = QStringList{} <<
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
 #else
@@ -381,7 +381,7 @@ void Application::loadTranslations()
 #endif
         (applicationDirPath() + QStringLiteral("/translations"));
 
-    QStringList const app_qm_dirs = QStringList() <<
+    QStringList const app_qm_dirs = QStringList{} <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
@@ -403,6 +403,20 @@ void Application::loadTranslations()
     {
         installTranslator(&app_translator_);
     }
+}
+
+void Application::initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    Config::Speed = { Config::Base::Kilo,       tr("B/s").toStdString(),  tr("kB/s").toStdString(),
+                      tr("MB/s").toStdString(), tr("GB/s").toStdString(), tr("TB/s").toStdString() };
+
+    Config::Memory = { Config::Base::Kibi,      tr("B").toStdString(),   tr("KiB").toStdString(),
+                       tr("MiB").toStdString(), tr("GiB").toStdString(), tr("TiB").toStdString() };
+
+    Config::Storage = { Config::Base::Kilo,     tr("B").toStdString(),  tr("kB").toStdString(),
+                        tr("MB").toStdString(), tr("GB").toStdString(), tr("TB").toStdString() };
 }
 
 void Application::quitLater() const
@@ -473,7 +487,7 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const
 void Application::notifyTorrentAdded(Torrent const* tor) const
 {
     QStringList actions;
-    actions << QString(QLatin1String("start-now(%1)")).arg(tor->id()) << QObject::tr("Start Now");
+    actions << QString{ QLatin1String("start-now(%1)") }.arg(tor->id()) << QObject::tr("Start Now");
     notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
@@ -574,16 +588,27 @@ void Application::refreshTorrents()
 ****
 ***/
 
-void Application::addTorrent(QString const& addme) const
+void Application::addWatchdirTorrent(QString const& filename) const
 {
-    addTorrent(AddData(addme));
+    auto add_data = AddData{ filename };
+    auto const disposal = prefs_->getBool(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
+                                                                   AddData::FilenameDisposal::Rename;
+    add_data.setFileDisposal(disposal);
+    addTorrent(std::move(add_data));
 }
 
-void Application::addTorrent(AddData const& addme) const
+void Application::addTorrent(AddData addme) const
 {
     if (addme.type == addme.NONE)
     {
         return;
+    }
+
+    // if there's not already a disposal action set,
+    // then honor the `trash original` preference setting
+    if (!addme.fileDisposal() && prefs_->getBool(Prefs::TRASH_ORIGINAL))
+    {
+        addme.setFileDisposal(AddData::FilenameDisposal::Delete);
     }
 
     if (!prefs_->getBool(Prefs::OPTIONS_PROMPT))
@@ -592,7 +617,7 @@ void Application::addTorrent(AddData const& addme) const
     }
     else
     {
-        auto* o = new OptionsDialog(*session_, *prefs_, addme, window_.get());
+        auto* o = new OptionsDialog{ *session_, *prefs_, addme, window_.get() };
         o->show();
     }
 
@@ -625,9 +650,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(QVariantMap({
-            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
-        })); // hints
+        args.append(QVariantMap{ {
+            std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
+        } }); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);
@@ -656,17 +681,16 @@ void Application::onNotificationActionInvoked(quint32 /* notification_id */, QSt
 }
 #endif
 
-FaviconCache& Application::faviconCache()
-{
-    return favicons_;
-}
-
 /***
 ****
 ***/
 
 int tr_main(int argc, char** argv)
 {
+    auto const init_mgr = tr_lib_init();
+
+    tr_locale_set_global("");
+
     InteropHelper::initialize();
 
     Application const app(argc, argv);

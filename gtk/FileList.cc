@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -552,7 +552,7 @@ void FileList::Impl::set_torrent(tr_torrent_id_t torrent_id)
 
                 auto path = std::string_view{ file.name };
                 auto token = std::string_view{};
-                while (tr_strvSep(&path, &token, '/'))
+                while (tr_strv_sep(&path, &token, '/'))
                 {
                     auto*& node = nodes[std::make_pair(parent, token)];
 
@@ -924,11 +924,11 @@ FileList::Impl::Impl(
 {
     /* create the view */
     view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *view_,
         [this](guint button, TrGdkModifierType state, double view_x, double view_y, bool /*context_menu_requested*/)
         { return onViewButtonPressed(button, state, view_x, view_y); },
-        [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
+        [this](double view_x, double view_y) { return on_item_view_button_released(*view_, view_x, view_y); });
 
     auto pango_font_description = view_->create_pango_context()->get_font_description();
     if (auto const new_size = pango_font_description.get_size() * 0.8; pango_font_description.get_size_is_absolute())

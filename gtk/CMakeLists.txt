@@ -12,8 +12,8 @@ target_sources(${TR_NAME}-gtk
         DetailsDialog.h
         Dialogs.cc
         Dialogs.h
+        DynamicPropertyStore.h
         FaviconCache.cc
-        FaviconCache.h
         FileList.cc
         FileList.h
         FilterBar.cc
@@ -73,6 +73,10 @@ target_sources(${TR_NAME}-gtk
         Utils.cc
         Utils.h)
 
+tr_allow_compile_if(
+    [=[[GTK_VERSION EQUAL 3]]=]
+        TorrentCellRenderer.cc)
+
 target_sources(${TR_NAME}-gtk
     PRIVATE
         ui/gtk3/AddTrackerDialog.ui
@@ -106,6 +110,8 @@ target_sources(${TR_NAME}-gtk
         ui/gtk4/PrefsDialog.ui
         ui/gtk4/RelocateDialog.ui
         ui/gtk4/StatsDialog.ui
+        ui/gtk4/TorrentListItemCompact.ui
+        ui/gtk4/TorrentListItemFull.ui
         ui/gtk4/TorrentUrlChooserDialog.ui)
 
 source_group(Ui/GTK4

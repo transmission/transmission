@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -48,6 +48,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
+using namespace libtransmission::Values;
 
 /**
 ***
@@ -795,10 +797,10 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
         store_ = whitelist_tree_model_new(gtr_pref_string_get(TR_KEY_rpc_whitelist));
 
         view_->set_model(store_);
-        setup_tree_view_button_event_handling(
+        setup_item_view_button_event_handling(
             *view_,
             {},
-            [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
+            [this](double view_x, double view_y) { return on_item_view_button_released(*view_, view_x, view_y); });
 
         whitelist_widgets_.push_back(view_);
         auto const sel = view_->get_selection();
@@ -840,20 +842,22 @@ public:
 SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, builder, core)
 {
+    auto const speed_units_kbyps_str = Speed::units().display_name(Speed::Units::KByps);
+
     localize_label(
         *init_check_button("upload_limit_check", TR_KEY_speed_limit_up_enabled),
-        fmt::arg("speed_units", speed_K_str));
+        fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("upload_limit_spin", TR_KEY_speed_limit_up, 0, std::numeric_limits<int>::max(), 5);
 
     localize_label(
         *init_check_button("download_limit_check", TR_KEY_speed_limit_down_enabled),
-        fmt::arg("speed_units", speed_K_str));
+        fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("download_limit_spin", TR_KEY_speed_limit_down, 0, std::numeric_limits<int>::max(), 5);
 
-    localize_label(*get_widget<Gtk::Label>("alt_upload_limit_label"), fmt::arg("speed_units", speed_K_str));
+    localize_label(*get_widget<Gtk::Label>("alt_upload_limit_label"), fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("alt_upload_limit_spin", TR_KEY_alt_speed_up, 0, std::numeric_limits<int>::max(), 5);
 
-    localize_label(*get_widget<Gtk::Label>("alt_download_limit_label"), fmt::arg("speed_units", speed_K_str));
+    localize_label(*get_widget<Gtk::Label>("alt_download_limit_label"), fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("alt_download_limit_spin", TR_KEY_alt_speed_down, 0, std::numeric_limits<int>::max(), 5);
 
     init_time_combo("alt_speed_start_time_combo", TR_KEY_alt_speed_time_begin);

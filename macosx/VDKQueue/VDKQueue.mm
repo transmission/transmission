@@ -1,5 +1,5 @@
 //    VDKQueue.mm
-//  Copyright © 2017-2022 Transmission authors and contributors.
+//  Copyright © Transmission authors and contributors.
 //
 //  Based on VDKQueue (https://github.com/bdkjones/VDKQueue) which was created and copyrighted by Bryan D K Jones on 28 March 2012.
 //  Based on UKKQueue (https://github.com/uliwitness/UKFileWatcher) which was created and copyrighted by Uli Kusterer on 21 Dec 2003.
@@ -111,13 +111,11 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
 - (void)dealloc
 {
-    // Shut down the thread that's scanning for kQueue events
-    _keepWatcherThreadRunning = NO;
-
-    // Do this to close all the open file descriptors for files we're watching
-    [self removeAllPaths];
-
-    _watchedPathEntries = nil;
+    // Close our kqueue's file descriptor
+    if (close(_coreQueueFD) == -1)
+    {
+        NSLog(@"VDKQueue watcherThread: Couldn't close main kqueue (%d)", errno);
+    }
 }
 
 #pragma mark -
@@ -171,22 +169,23 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 
 - (void)watcherThread:(id)sender
 {
-    int n;
-    struct kevent ev;
-    // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
-    struct timespec timeout = { 1, 0 };
-    // So we don't have to risk accessing iVars when the thread is terminated.
-    int theFD = _coreQueueFD;
-
-    NSMutableArray* notesToPost = [[NSMutableArray alloc] initWithCapacity:5];
-
 #if DEBUG_LOG_THREAD_LIFETIME
     NSLog(@"watcherThread started.");
 #endif
 
+    NSThread.currentThread.name = @"VDKQueue";
+
+    struct kevent ev;
+    // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
+    const struct timespec timeout = { 1, 0 };
+    // So we don't have to risk accessing iVars when the thread is terminated.
+    int const theFD = _coreQueueFD;
+
+    NSMutableArray* notesToPost = [[NSMutableArray alloc] initWithCapacity:5];
+
     while (_keepWatcherThreadRunning)
     {
-        n = kevent(theFD, NULL, 0, &ev, 1, &timeout);
+        int n = kevent(theFD, NULL, 0, &ev, 1, &timeout);
         if (n <= 0 || ev.filter != EVFILT_VNODE || !ev.fflags)
         {
             continue;
@@ -254,12 +253,6 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
         });
     }
 
-    // Close our kqueue's file descriptor
-    if (close(theFD) == -1)
-    {
-        NSLog(@"VDKQueue watcherThread: Couldn't close main kqueue (%d)", errno);
-    }
-
 #if DEBUG_LOG_THREAD_LIFETIME
     NSLog(@"watcherThread finished.");
 #endif
@@ -279,6 +272,8 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
     {
         return;
     }
+
+    aPath = aPath.stringByStandardizingPath;
 
     @synchronized(self)
     {
@@ -306,14 +301,17 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
         return;
     }
 
+    aPath = aPath.stringByStandardizingPath;
+
     @synchronized(self)
     {
-        VDKQueuePathEntry* entry = _watchedPathEntries[aPath];
+        // Close the open file descriptor if we're watching it.
+        [_watchedPathEntries removeObjectForKey:aPath];
 
-        // Remove it only if we're watching it.
-        if (entry)
+        if (_watchedPathEntries.count == 0)
         {
-            [_watchedPathEntries removeObjectForKey:aPath];
+            // Shut down the thread that's scanning for kQueue events.
+            _keepWatcherThreadRunning = NO;
         }
     }
 }
@@ -322,7 +320,11 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 {
     @synchronized(self)
     {
+        // Close all the open file descriptors for files we're watching.
         [_watchedPathEntries removeAllObjects];
+
+        // Shut down the thread that's scanning for kQueue events.
+        _keepWatcherThreadRunning = NO;
     }
 }
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -114,12 +114,12 @@ public:
 
         if (notify_pipe_[0] != TR_BAD_SOCKET)
         {
-            evutil_closesocket(notify_pipe_[0]);
+            tr_net_close_socket(notify_pipe_[0]);
         }
 
         if (notify_pipe_[1] != TR_BAD_SOCKET)
         {
-            evutil_closesocket(notify_pipe_[1]);
+            tr_net_close_socket(notify_pipe_[1]);
         }
 
         if (fd_ != INVALID_HANDLE_VALUE)
@@ -134,8 +134,6 @@ private:
 
     void init(struct event_base* event_base)
     {
-        tr_net_init();
-
         auto const path = dirname();
         auto const wide_path = tr_win32_utf8_to_native(path);
         if (std::empty(wide_path))

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,14 +6,17 @@
 #include "MakeDialog.h"
 
 #include <chrono>
+#include <cmath>
 #include <future>
 #include <utility>
 #include <vector>
 
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QPushButton>
+#include <QString>
 #include <QTimer>
 
 #include <libtransmission/error.h>
@@ -38,7 +41,7 @@ public:
     MakeProgressDialog(
         Session& session,
         tr_metainfo_builder& builder,
-        std::future<tr_error*> future,
+        std::future<tr_error> future,
         QString outfile,
         QWidget* parent = nullptr);
 
@@ -49,7 +52,7 @@ private slots:
 private:
     Session& session_;
     tr_metainfo_builder& builder_;
-    std::future<tr_error*> future_;
+    std::future<tr_error> future_;
     QString const outfile_;
     Ui::MakeProgressDialog ui_ = {};
     QTimer timer_;
@@ -60,14 +63,14 @@ private:
 MakeProgressDialog::MakeProgressDialog(
     Session& session,
     tr_metainfo_builder& builder,
-    std::future<tr_error*> future,
+    std::future<tr_error> future,
     QString outfile,
     QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , builder_(builder)
-    , future_(std::move(future))
-    , outfile_(std::move(outfile))
+    : BaseDialog{ parent }
+    , session_{ session }
+    , builder_{ builder }
+    , future_{ std::move(future) }
+    , outfile_{ std::move(outfile) }
 {
     ui_.setupUi(this);
 
@@ -84,11 +87,11 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
     switch (ui_.dialogButtons->standardButton(button))
     {
     case QDialogButtonBox::Open:
-        session_.addNewlyCreatedTorrent(outfile_, QFileInfo(QString::fromStdString(builder_.top())).dir().path());
+        session_.addNewlyCreatedTorrent(outfile_, QFileInfo{ QString::fromStdString(builder_.top()) }.dir().path());
         break;
 
     case QDialogButtonBox::Abort:
-        builder_.cancelChecksums();
+        builder_.cancel_checksums();
         break;
 
     default: // QDialogButtonBox::Ok:
@@ -111,14 +114,14 @@ void MakeProgressDialog::onProgress()
     auto progress = int{ 100 }; // [0..100]
     if (!is_done)
     {
-        auto const [current, total] = builder_.checksumStatus();
+        auto const [current, total] = builder_.checksum_status();
         progress = static_cast<int>((100.0 * current) / total);
     }
     ui_.progressBar->setValue(progress);
 
     // progress label
     auto const top = QString::fromStdString(builder_.top());
-    auto const base = QFileInfo(top).completeBaseName();
+    auto const base = QFileInfo{ top }.completeBaseName();
     QString str;
 
     auto success = false;
@@ -128,22 +131,22 @@ void MakeProgressDialog::onProgress()
     }
     else
     {
-        tr_error* error = future_.get();
+        auto error = future_.get();
 
-        if (error == nullptr)
+        if (!error)
         {
             builder_.save(outfile_.toStdString(), &error);
         }
 
-        if (error == nullptr)
+        if (!error)
         {
             str = tr("Created \"%1\"!").arg(base);
             success = true;
         }
         else
         {
-            str = tr("Couldn't create \"%1\": %2 (%3)").arg(base).arg(QString::fromUtf8(error->message)).arg(error->code);
-            tr_error_free(error);
+            auto err_msg = QString::fromUtf8(std::data(error.message()), std::size(error.message()));
+            str = tr("Couldn't create \"%1\": %2 (%3)").arg(base).arg(err_msg).arg(error.code());
         }
     }
 
@@ -171,29 +174,29 @@ void MakeDialog::makeTorrent()
     // get the announce list
     auto trackers = tr_announce_list();
     trackers.parse(ui_.trackersEdit->toPlainText().toStdString());
-    builder_->setAnnounceList(std::move(trackers));
+    builder_->set_announce_list(std::move(trackers));
 
     // the file to create
     auto const path = QString::fromStdString(builder_->top());
-    auto const torrent_name = QFileInfo(path).completeBaseName() + QStringLiteral(".torrent");
-    auto const outfile = QDir(ui_.destinationButton->path()).filePath(torrent_name);
+    auto const torrent_name = QFileInfo{ path }.completeBaseName() + QStringLiteral(".torrent");
+    auto const outfile = QDir{ ui_.destinationButton->path() }.filePath(torrent_name);
 
     // comment
     if (ui_.commentCheck->isChecked())
     {
-        builder_->setComment(ui_.commentEdit->text().toStdString());
+        builder_->set_comment(ui_.commentEdit->text().toStdString());
     }
 
     // source
     if (ui_.sourceCheck->isChecked())
     {
-        builder_->setSource(ui_.sourceEdit->text().toStdString());
+        builder_->set_source(ui_.sourceEdit->text().toStdString());
     }
 
-    builder_->setPrivate(ui_.privateCheck->isChecked());
+    builder_->set_private(ui_.privateCheck->isChecked());
 
     // pop up the dialog
-    auto* dialog = new MakeProgressDialog(session_, *builder_, builder_->makeChecksums(), outfile, this);
+    auto* dialog = new MakeProgressDialog{ session_, *builder_, builder_->make_checksums(), outfile, this };
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -226,13 +229,13 @@ void MakeDialog::onSourceChanged()
     }
     else
     {
-        ui_.pieceSizeSlider->setValue(log2(builder_->pieceSize()));
+        ui_.pieceSizeSlider->setValue(log2(builder_->piece_size()));
     }
 }
 
 MakeDialog::MakeDialog(Session& session, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
+    : BaseDialog{ parent }
+    , session_{ session }
 {
     ui_.setupUi(this);
 
@@ -242,7 +245,7 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent)
     ui_.sourceFolderButton->setMode(PathButton::DirectoryMode);
     ui_.sourceFileButton->setMode(PathButton::FileMode);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.filesSectionLayout);
     cr->addLayout(ui_.propertiesSectionLayout);
     cr->update();
@@ -269,7 +272,7 @@ void MakeDialog::dragEnterEvent(QDragEnterEvent* event)
 {
     QMimeData const* mime = event->mimeData();
 
-    if (!mime->urls().isEmpty() && QFileInfo(mime->urls().front().path()).exists())
+    if (!mime->urls().isEmpty() && QFileInfo{ mime->urls().front().path() }.exists())
     {
         event->acceptProposedAction();
     }
@@ -277,8 +280,8 @@ void MakeDialog::dragEnterEvent(QDragEnterEvent* event)
 
 void MakeDialog::dropEvent(QDropEvent* event)
 {
-    QString const filename = event->mimeData()->urls().front().path();
-    QFileInfo const file_info(filename);
+    auto const filename = event->mimeData()->urls().front().path();
+    auto const file_info = QFileInfo{ filename };
 
     if (file_info.exists())
     {
@@ -306,13 +309,13 @@ void MakeDialog::updatePiecesLabel()
     }
     else
     {
-        auto const files = tr("%Ln File(s)", nullptr, builder_->fileCount());
-        auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount());
+        auto const files = tr("%Ln File(s)", nullptr, builder_->file_count());
+        auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->piece_count());
         text = tr("%1 in %2; %3 @ %4")
-                   .arg(Formatter::get().sizeToString(builder_->totalSize()))
+                   .arg(Formatter::storage_to_string(builder_->total_size()))
                    .arg(files)
                    .arg(pieces)
-                   .arg(Formatter::get().memToString(static_cast<uint64_t>(builder_->pieceSize())));
+                   .arg(Formatter::memory_to_string(static_cast<uint64_t>(builder_->piece_size())));
         ui_.pieceSizeSlider->setEnabled(true);
     }
 
@@ -325,7 +328,7 @@ void MakeDialog::onPieceSizeUpdated(int value)
 
     if (builder_)
     {
-        builder_->setPieceSize(new_size);
+        builder_->set_piece_size(new_size);
     }
 
     updatePiecesLabel();

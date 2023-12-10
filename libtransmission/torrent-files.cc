@@ -1,9 +1,11 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::find()
+#include <array>
+#include <cstddef>
 #include <cctype>
 #include <functional>
 #include <iterator>
@@ -17,9 +19,10 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/error.h"
+#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -91,7 +94,7 @@ bool isJunkFile(std::string_view filename)
 
 #ifdef __APPLE__
     // check for resource forks. <http://web.archive.org/web/20101010051608/http://support.apple.com/kb/TA20578>
-    if (tr_strvStartsWith(base, "._"sv))
+    if (tr_strv_starts_with(base, "._"sv))
     {
         return true;
     }
@@ -156,18 +159,12 @@ bool tr_torrent_files::hasAnyLocalData(std::string_view const* paths, size_t n_p
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
     std::string_view parent_in,
-    double volatile* setme_progress,
     std::string_view parent_name,
-    tr_error** error) const
+    tr_error* error) const
 {
-    if (setme_progress != nullptr)
-    {
-        *setme_progress = 0.0;
-    }
-
     auto const old_parent = tr_pathbuf{ old_parent_in };
     auto const parent = tr_pathbuf{ parent_in };
-    tr_logAddTrace(fmt::format(FMT_STRING("Moving files from '{:s}' to '{:s}'"), old_parent, parent), parent_name);
+    tr_logAddTrace(fmt::format("Moving files from '{:s}' to '{:s}'", old_parent, parent), parent_name);
 
     if (tr_sys_path_is_same(old_parent, parent))
     {
@@ -181,9 +178,7 @@ bool tr_torrent_files::move(
 
     auto const paths = std::array<std::string_view, 1>{ old_parent.sv() };
 
-    auto const total_size = totalSize();
     auto err = bool{};
-    auto bytes_moved = uint64_t{};
 
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
@@ -203,16 +198,10 @@ bool tr_torrent_files::move(
         }
 
         tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), parent_name);
-        if (!tr_moveFile(old_path, path, error))
+        if (!tr_file_move(old_path, path, error))
         {
             err = true;
             break;
-        }
-
-        if (setme_progress != nullptr && total_size > 0U)
-        {
-            bytes_moved += fileSize(i);
-            *setme_progress = static_cast<double>(bytes_moved) / total_size;
         }
     }
 
@@ -264,7 +253,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     {
         if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
-            tr_moveFile(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
+            tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }
     }
 
@@ -319,13 +308,24 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
 namespace
 {
 
+// `isUnixReservedFile` and `isWin32ReservedFile` kept as `maybe_unused`
+// for potential support of different filesystems on the same OS
+[[nodiscard, maybe_unused]] bool isUnixReservedFile(std::string_view in) noexcept
+{
+    static auto constexpr ReservedNames = std::array<std::string_view, 2>{
+        "."sv,
+        ".."sv,
+    };
+    return (std::find(std::begin(ReservedNames), std::end(ReservedNames), in) != std::end(ReservedNames));
+}
+
 // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 // Do not use the following reserved names for the name of a file:
 // CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8,
 // COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
 // Also avoid these names followed immediately by an extension;
 // for example, NUL.txt is not recommended.
-[[nodiscard]] bool isReservedFile(std::string_view in) noexcept
+[[nodiscard, maybe_unused]] bool isWin32ReservedFile(std::string_view in) noexcept
 {
     if (std::empty(in))
     {
@@ -362,14 +362,30 @@ namespace
     return std::any_of(
         std::begin(ReservedPrefixes),
         std::end(ReservedPrefixes),
-        [in_upper_sv](auto const& prefix) { return tr_strvStartsWith(in_upper_sv, prefix); });
+        [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
+}
+
+[[nodiscard]] bool isReservedFile(std::string_view in) noexcept
+{
+#ifdef _WIN32
+    return isWin32ReservedFile(in);
+#else
+    return isUnixReservedFile(in);
+#endif
+}
+
+// `isUnixReservedChar` and `isWin32ReservedChar` kept as `maybe_unused`
+// for potential support of different filesystems on the same OS
+[[nodiscard, maybe_unused]] auto constexpr isUnixReservedChar(unsigned char ch) noexcept
+{
+    return ch == '/';
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
 // Use any character in the current code page for a name, including Unicode
 // characters and characters in the extended character set (128–255),
 // except for the following:
-[[nodiscard]] auto constexpr isReservedChar(char ch) noexcept
+[[nodiscard, maybe_unused]] auto constexpr isWin32ReservedChar(unsigned char ch) noexcept
 {
     switch (ch)
     {
@@ -384,21 +400,34 @@ namespace
     case '|':
         return true;
     default:
-        return false;
+        return ch <= 31;
     }
 }
 
+[[nodiscard]] auto constexpr isReservedChar(unsigned char ch) noexcept
+{
+#ifdef _WIN32
+    return isWin32ReservedChar(ch);
+#else
+    return isUnixReservedChar(ch);
+#endif
+}
+
+// https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
 void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
+#ifdef _WIN32
     // remove leading and trailing spaces
-    in = tr_strvStrip(in);
+    in = tr_strv_strip(in);
 
     // remove trailing periods
-    while (tr_strvEndsWith(in, '.'))
+    while (tr_strv_ends_with(in, '.'))
     {
         in.remove_suffix(1);
     }
+#endif
 
+    // replace reserved filenames with an underscore
     if (isReservedFile(in))
     {
         out.append('_');
@@ -417,7 +446,7 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 void tr_torrent_files::makeSubpathPortable(std::string_view path, tr_pathbuf& append_me)
 {
     auto segment = std::string_view{};
-    while (tr_strvSep(&path, &segment, '/'))
+    while (tr_strv_sep(&path, &segment, '/'))
     {
         appendSanitizedComponent(segment, append_me);
         append_me.append('/');

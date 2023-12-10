@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,8 @@
 #pragma once
 
 #include <chrono>
-#include <cstddef>
+#include <cstddef> // size_t
+#include <ctime> // time_t
 #include <functional>
 #include <memory>
 #include <optional>
@@ -25,6 +26,7 @@ public:
     {
         long status = 0; // http server response, e.g. 200
         std::string body;
+        std::string primary_ip;
         bool did_connect = false;
         bool did_timeout = false;
         void* user_data = nullptr;
@@ -99,6 +101,8 @@ public:
     // are left alone so that they can finish.
     void startShutdown(std::chrono::milliseconds /*deadline*/);
 
+    [[nodiscard]] bool is_idle() const noexcept;
+
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel
     // all of its tasks.
@@ -122,13 +126,13 @@ public:
         }
 
         // Return IPv4 user public address string, or nullopt to not use one
-        [[nodiscard]] virtual std::optional<std::string> publicAddressV4() const
+        [[nodiscard]] virtual std::optional<std::string> bind_address_V4() const
         {
             return std::nullopt;
         }
 
         // Return IPv6 user public address string, or nullopt to not use one
-        [[nodiscard]] virtual std::optional<std::string> publicAddressV6() const
+        [[nodiscard]] virtual std::optional<std::string> bind_address_V6() const
         {
             return std::nullopt;
         }
@@ -156,7 +160,10 @@ public:
             func(response);
         }
 
-        [[nodiscard]] virtual time_t now() const = 0;
+        [[nodiscard]] virtual time_t now() const
+        {
+            return time(nullptr);
+        }
     };
 
     // Note that tr_web does no management of the `mediator` reference.

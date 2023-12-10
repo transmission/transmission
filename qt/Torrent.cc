@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,6 +11,7 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
 #include "Application.h"
@@ -23,8 +24,8 @@
 using ::trqt::variant_helpers::change;
 
 Torrent::Torrent(Prefs const& prefs, int id)
-    : id_(id)
-    , prefs_(prefs)
+    : id_{ id }
+    , prefs_{ prefs }
 {
 }
 
@@ -94,18 +95,7 @@ int Torrent::compareSeedProgress(Torrent const& that) const
 
     double const a_progress = a_ratio / *a_ratio_limit;
     double const b_progress = b_ratio / *b_ratio_limit;
-
-    if (a_progress < b_progress)
-    {
-        return -1;
-    }
-
-    if (a_progress > b_progress)
-    {
-        return 1;
-    }
-
-    return 0;
+    return tr_compare_3way(a_progress, b_progress);
 }
 
 int Torrent::compareRatio(Torrent const& that) const
@@ -128,17 +118,7 @@ int Torrent::compareRatio(Torrent const& that) const
         return -1;
     }
 
-    if (a < b)
-    {
-        return -1;
-    }
-
-    if (a > b)
-    {
-        return 1;
-    }
-
-    return 0;
+    return tr_compare_3way(a, b);
 }
 
 int Torrent::compareETA(Torrent const& that) const
@@ -359,5 +339,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return trApp->faviconCache().find(sitename);
+    return trApp->find_favicon(sitename);
 }

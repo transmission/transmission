@@ -3,20 +3,19 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
+#include <cassert>
+#include <cstddef> // std::byte, size_t
+#include <cstdint> // uint8_t
 #include <cstring>
 #include <iostream>
-#include <numeric>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/peer-mse.h>
 #include <libtransmission/crypto-utils.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
 #include "crypto-test-ref.h"
@@ -79,25 +78,21 @@ TEST(Crypto, encryptDecrypt)
     auto decrypted1 = std::array<char, 128>{};
 
     auto a = tr_message_stream_encryption::Filter{};
-    a.encryptInit(false, a_dh, SomeHash);
-    std::copy_n(std::begin(Input1), std::size(Input1), std::begin(encrypted1));
-    a.encrypt(std::size(Input1), std::data(encrypted1));
+    a.encrypt_init(false, a_dh, SomeHash);
+    a.encrypt(std::data(Input1), std::size(Input1), std::data(encrypted1));
     auto b = tr_message_stream_encryption::Filter{};
-    b.decryptInit(true, b_dh, SomeHash);
-    std::copy_n(std::begin(encrypted1), std::size(Input1), std::begin(decrypted1));
-    b.decrypt(std::size(Input1), std::data(decrypted1));
+    b.decrypt_init(true, b_dh, SomeHash);
+    b.decrypt(std::data(encrypted1), std::size(Input1), std::data(decrypted1));
     EXPECT_EQ(Input1, std::data(decrypted1)) << "Input1 " << Input1 << " decrypted1 " << std::data(decrypted1);
 
     auto constexpr Input2 = "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)"sv;
     auto encrypted2 = std::array<char, 128>{};
     auto decrypted2 = std::array<char, 128>{};
 
-    b.encryptInit(true, b_dh, SomeHash);
-    std::copy_n(std::begin(Input2), std::size(Input2), std::begin(encrypted2));
-    b.encrypt(std::size(Input2), std::data(encrypted2));
-    a.decryptInit(false, a_dh, SomeHash);
-    std::copy_n(std::begin(encrypted2), std::size(Input2), std::begin(decrypted2));
-    a.decrypt(std::size(Input2), std::data(decrypted2));
+    b.encrypt_init(true, b_dh, SomeHash);
+    b.encrypt(std::data(Input2), std::size(Input2), std::data(encrypted2));
+    a.decrypt_init(false, a_dh, SomeHash);
+    a.decrypt(std::data(encrypted2), std::size(Input2), std::data(decrypted2));
     EXPECT_EQ(Input2, std::data(decrypted2)) << "Input2 " << Input2 << " decrypted2 " << std::data(decrypted2);
 }
 

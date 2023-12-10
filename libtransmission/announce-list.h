@@ -1,20 +1,22 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "quark.h"
-#include "interned-string.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/web-utils.h"
 
 struct tr_error;
 struct tr_url_parsed_t;
@@ -26,8 +28,7 @@ public:
     {
         tr_interned_string announce;
         tr_interned_string scrape;
-        tr_interned_string host; // 'example.org:80'
-        tr_interned_string sitename; // 'example'
+        tr_url_parsed_t announce_parsed;
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
@@ -98,12 +99,14 @@ public:
         return trackers_ != that.trackers_;
     }
 
-    bool add(std::string_view announce_url_sv)
+    void add_to_map(tr_variant::Map& setme) const;
+
+    bool add(std::string_view announce_url)
     {
-        return add(announce_url_sv, this->nextTier());
+        return add(announce_url, this->nextTier());
     }
 
-    bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
+    bool add(std::string_view announce_url, tr_tracker_tier_t tier);
     void add(tr_announce_list const& src);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);
@@ -121,18 +124,19 @@ public:
      * - Blank line denotes a new tier
      */
     bool parse(std::string_view text);
-    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::string to_string() const;
 
-    bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
+    bool save(std::string_view torrent_file, tr_error* error = nullptr) const;
 
-    [[nodiscard]] static std::optional<std::string> announceToScrape(std::string_view announce);
-    [[nodiscard]] static tr_quark announceToScrape(tr_quark announce);
+    [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
 
 private:
-    [[nodiscard]] tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
+    [[nodiscard]] tr_variant to_tiers_variant() const;
 
-    bool canAdd(tr_url_parsed_t const& announce);
-    static tr_tracker_id_t nextUniqueId();
+    [[nodiscard]] tr_tracker_tier_t get_tier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
+
+    [[nodiscard]] bool can_add(tr_url_parsed_t const& announce) const noexcept;
+    static tr_tracker_id_t next_unique_id();
     trackers_t::iterator find(std::string_view announce);
     trackers_t::iterator find(tr_tracker_id_t id);
 

@@ -1,4 +1,4 @@
-// This file Copyright 2010-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,22 +6,20 @@
 #include <array>
 #include <cerrno>
 #include <csignal>
+#include <cstdlib>
 #include <map>
+#include <string>
 #include <string_view>
 
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/subprocess.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
@@ -42,14 +40,12 @@ void handle_sigchld(int /*i*/)
     /* FIXME: Call old handler, if any */
 }
 
-void set_system_error(tr_error** error, int code, std::string_view what)
+void set_system_error(tr_error* error, int code, std::string_view what)
 {
-    if (error == nullptr)
+    if (error != nullptr)
     {
-        return;
+        error->set(code, fmt::format("{:s} failed: {:s} ({:d})", what, tr_strerror(code), code));
     }
-
-    tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s} ({:d})"), what, tr_strerror(code), code));
 }
 
 [[nodiscard]] bool tr_spawn_async_in_child(
@@ -84,7 +80,7 @@ void set_system_error(tr_error** error, int code, std::string_view what)
     return true;
 }
 
-[[nodiscard]] bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
+[[nodiscard]] bool tr_spawn_async_in_parent(int pipe_fd, tr_error* error)
 {
     int child_errno = 0;
     ssize_t count = 0;
@@ -122,7 +118,7 @@ bool tr_spawn_async(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
     std::string_view work_dir,
-    tr_error** error)
+    tr_error* error)
 {
     static bool sigchld_handler_set = false;
 

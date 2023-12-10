@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,9 +16,9 @@
 #include "Utils.h"
 
 PathButton::PathButton(QWidget* parent)
-    : QToolButton(parent)
+    : QToolButton{ parent }
 {
-    setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
+    setSizePolicy(QSizePolicy{ QSizePolicy::Preferred, QSizePolicy::Fixed });
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     setText(tr("(None)")); // for minimum width
 
@@ -70,13 +70,13 @@ QString const& PathButton::path() const
 
 QSize PathButton::sizeHint() const
 {
-    QSize const sh(QToolButton::sizeHint());
+    auto const sh = QToolButton::sizeHint();
     return { qMin(sh.width(), 150), sh.height() };
 }
 
 void PathButton::paintEvent(QPaintEvent* /*event*/)
 {
-    QStylePainter painter(this);
+    auto painter = QStylePainter{ this };
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
@@ -99,7 +99,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
 
 void PathButton::onClicked() const
 {
-    auto* dialog = new QFileDialog(window(), effectiveTitle());
+    auto* dialog = new QFileDialog{ window(), effectiveTitle() };
     dialog->setFileMode(isDirMode() ? QFileDialog::Directory : QFileDialog::ExistingFile);
 
     if (isDirMode())
@@ -112,7 +112,7 @@ void PathButton::onClicked() const
         dialog->setNameFilter(name_filter_);
     }
 
-    if (auto const path_info = QFileInfo(path_); !path_.isEmpty() && path_info.exists())
+    if (auto const path_info = QFileInfo{ path_ }; !path_.isEmpty() && path_info.exists())
     {
         if (path_info.isDir())
         {
@@ -141,7 +141,7 @@ void PathButton::onFileSelected(QString const& path)
 
 void PathButton::updateAppearance()
 {
-    QFileInfo const path_info(path_);
+    QFileInfo const path_info{ path_ };
 
     int const icon_size(style()->pixelMetric(QStyle::PM_SmallIconSize));
     QFileIconProvider const icon_provider;
@@ -150,7 +150,7 @@ void PathButton::updateAppearance()
 
     if (!path_.isEmpty() && path_info.exists())
     {
-        icon = icon_provider.icon(QFileInfo(path_));
+        icon = icon_provider.icon(QFileInfo{ path_ });
     }
 
     if (icon.isNull())
@@ -158,9 +158,9 @@ void PathButton::updateAppearance()
         icon = icon_provider.icon(isDirMode() ? QFileIconProvider::Folder : QFileIconProvider::File);
     }
 
-    setIconSize(QSize(icon_size, icon_size));
+    setIconSize(QSize{ icon_size, icon_size });
     setIcon(icon);
-    setToolTip(path_ == text() ? QString() : path_);
+    setToolTip(path_ == text() ? QString{} : path_);
 
     update();
 }

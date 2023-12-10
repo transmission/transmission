@@ -1,21 +1,25 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
+#include <utility> // std::move()
 
 #include "libtransmission/session-settings.h"
 #include "libtransmission/variant.h"
 
-void tr_session_settings::load(tr_variant* src)
+void tr_session_settings::load(tr_variant const& src)
 {
+    auto const* map = src.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return;
+    }
+
 #define V(key, field, type, default_value, comment) \
-    if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
+    if (auto const iter = map->find(key); iter != std::end(*map)) \
     { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
+        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(iter->second); val) \
         { \
             this->field = *val; \
         } \
@@ -24,11 +28,17 @@ void tr_session_settings::load(tr_variant* src)
 #undef V
 }
 
-void tr_session_settings::save(tr_variant* tgt) const
+tr_variant tr_session_settings::settings() const
 {
+    auto map = tr_variant::Map{};
 #define V(key, field, type, default_value, comment) \
-    tr_variantDictRemove(tgt, key); \
-    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
+    map.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     SESSION_SETTINGS_FIELDS(V)
 #undef V
+    return tr_variant{ std::move(map) };
+}
+
+tr_variant tr_session_settings::default_settings()
+{
+    return tr_session_settings{}.settings();
 }

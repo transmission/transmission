@@ -1,5 +1,5 @@
 //    VDKQueue.h
-//  Copyright © 2017-2022 Transmission authors and contributors.
+//  Copyright © Transmission authors and contributors.
 //
 //  Based on VDKQueue (https://github.com/bdkjones/VDKQueue) which was created and copyrighted by Bryan D K Jones on 28 March 2012.
 //  Based on UKKQueue (https://github.com/uliwitness/UKFileWatcher) which was created and copyrighted by Uli Kusterer on 21 Dec 2003.
@@ -136,10 +136,12 @@ extern NSString const* VDKQueueAccessRevocationNotification;
 //        Just add it or remove it and this class will take action only if appropriate.
 //        (Add only if we're not already watching it, remove only if we are.)
 //
-//  Warning: You must pass full, root-relative paths. Do not pass tilde-abbreviated paths or file URLs.
+//  Warning: Only pass file paths ("/path"), not string representations of URLs ("file://path").
 - (void)addPath:(NSString*)aPath;
 - (void)addPath:(NSString*)aPath notifyingAbout:(u_int)flags; // See note above for values to pass in "flags"
 
+//  Either `removePath:` or `removeAllPaths` must be called if we want this object to ever be dealloc'd.
+//  This is because adding a path detaches a thread which retains self.
 - (void)removePath:(NSString*)aPath;
 - (void)removeAllPaths;
 

@@ -1,15 +1,20 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <ctime>
 #include <iterator> // for std::back_inserter
 #include <set>
 #include <string_view>
+#include <vector>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
 #include <QDateTime>
@@ -69,7 +74,7 @@ auto getIds(Iter it, Iter end)
 ***/
 
 TorrentModel::TorrentModel(Prefs const& prefs)
-    : prefs_(prefs)
+    : prefs_{ prefs }
 {
 }
 
@@ -117,16 +122,16 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 return t->name();
 
             case COL_PRIVATE:
-                return Formatter::get().boolToString(t->isPrivate());
+                return Formatter::bool_to_string(t->isPrivate());
 
             case COL_STATUS:
                 return t->activityString();
 
             case COL_SIZE:
-                return Formatter::get().sizeToString(t->sizeWhenDone());
+                return Formatter::storage_to_string(t->sizeWhenDone());
 
             case COL_SEEDING_TIME:
-                return Formatter::get().timeToString(static_cast<int>(std::difftime(std::time(nullptr), t->lastStarted())));
+                return Formatter::time_to_string(static_cast<int>(std::difftime(std::time(nullptr), t->lastStarted())));
 
             case COL_SEEDS:
                 return tr("%1 / %2").arg(t->peersWeAreUploadingTo()).arg(t->connectedPeers());
@@ -138,23 +143,23 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
 
             case COL_ACTIVITY:
                 return tr("%1 / %2")
-                    .arg(Formatter::get().downloadSpeedToString(t->downloadSpeed()))
-                    .arg(Formatter::get().uploadSpeedToString(t->uploadSpeed()));
+                    .arg(t->downloadSpeed().to_download_qstring())
+                    .arg(t->uploadSpeed().to_upload_qstring());
 
             case COL_ETA:
-                return Formatter::get().timeToString(t->getETA());
+                return Formatter::time_to_string(t->getETA());
 
             case COL_RATIO:
-                return Formatter::get().ratioToString(t->ratio());
+                return Formatter::ratio_to_string(t->ratio());
 
             case COL_DOWNLOADED:
-                return Formatter::get().sizeToString(t->downloadedEver());
+                return Formatter::storage_to_string(t->downloadedEver());
 
             case COL_UPLOADED:
-                return Formatter::get().sizeToString(t->uploadedEver());
+                return Formatter::storage_to_string(t->uploadedEver());
 
             case COL_PROGRESS:
-                return Formatter::get().percentToString(t->percentDone());
+                return Formatter::percent_to_string(t->percentDone());
 
             case COL_TRACKER_STATUS:
                 if (!t->trackerStats().empty())
@@ -211,7 +216,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 return t->queuePosition();
 
             case COL_SIZE_LEFT:
-                return Formatter::get().sizeToString(t->totalSize() - t->pieceSize() * t->pieceCount());
+                return Formatter::storage_to_string(t->totalSize() - t->pieceSize() * t->pieceCount());
 
             case COL_ID:
                 return t->id();
@@ -406,7 +411,7 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
 
     // build a list of the property keys
     tr_variant* const first_child = tr_variantListChild(torrent_list, 0);
-    bool const table = tr_variantIsList(first_child);
+    bool const table = first_child != nullptr && first_child->holds_alternative<tr_variant::Vector>();
     std::vector<tr_quark> keys;
     if (table)
     {
@@ -484,7 +489,7 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
 
         if (tor == nullptr)
         {
-            tor = new Torrent(prefs_, *id);
+            tor = new Torrent{ prefs_, *id };
             instantiated.push_back(tor);
             is_new = true;
         }
@@ -675,9 +680,9 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
 
     if (torrents_.empty())
     {
-        beginInsertRows(QModelIndex(), 0, torrents.size() - 1);
+        beginInsertRows(QModelIndex{}, 0, torrents.size() - 1);
         torrents_ = torrents;
-        std::sort(torrents_.begin(), torrents_.end(), TorrentIdLessThan());
+        std::sort(torrents_.begin(), torrents_.end(), TorrentIdLessThan{});
         endInsertRows();
     }
     else
@@ -687,7 +692,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
             auto const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
             auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
-            beginInsertRows(QModelIndex(), row, row);
+            beginInsertRows(QModelIndex{}, row, row);
             torrents_.insert(it, tor);
             endInsertRows();
         }
@@ -702,7 +707,7 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
     {
         auto const& [first, last] = *it;
 
-        beginRemoveRows(QModelIndex(), first, last);
+        beginRemoveRows(QModelIndex{}, first, last);
         torrents_.erase(torrents_.begin() + first, torrents_.begin() + last + 1);
         endRemoveRows();
     }

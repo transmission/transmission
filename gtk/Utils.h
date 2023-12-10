@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,6 +9,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/values.h>
 
 #include <glibmm/objectbase.h>
 #include <glibmm/refptr.h>
@@ -22,6 +23,10 @@
 #include <gtkmm/widget.h>
 #include <gtkmm/window.h>
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <gtkmm/listview.h>
+#endif
+
 #include <fmt/core.h>
 
 #include <cstddef>
@@ -34,28 +39,6 @@
 #include <vector>
 
 #include <sys/types.h>
-
-/***
-****
-***/
-
-extern int const mem_K;
-extern char const* const mem_K_str;
-extern char const* const mem_M_str;
-extern char const* const mem_G_str;
-extern char const* const mem_T_str;
-
-extern int const disk_K;
-extern char const* const disk_K_str;
-extern char const* const disk_M_str;
-extern char const* const disk_G_str;
-extern char const* const disk_T_str;
-
-extern int const speed_K;
-extern char const* const speed_K_str;
-extern char const* const speed_M_str;
-extern char const* const speed_G_str;
-extern char const* const speed_T_str;
 
 /***
 ****
@@ -81,6 +64,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
@@ -97,6 +81,15 @@ using TrObjectSignalNotifyCallback = void(Glib::RefPtr<Glib::ObjectBase const> c
 
 Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::ObjectBase& object);
 void gtr_object_notify_emit(Glib::ObjectBase& object);
+
+template<typename T>
+inline GParamSpec* gtr_get_param_spec(char const* name, char const* nick, char const* blurb)
+{
+    auto dummy_value = Glib::Value<T>();
+    dummy_value.init(decltype(dummy_value)::value_type());
+
+    return dummy_value.create_param_spec(name, nick, blurb, TR_GLIB_PARAM_FLAGS(READABLE));
+}
 
 void gtr_open_uri(Glib::ustring const& uri);
 
@@ -137,25 +130,42 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& window_or_child, tr_torrent* dupl
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
-bool on_tree_view_button_pressed(
+bool on_item_view_button_pressed(
     Gtk::TreeView& view,
     double event_x,
     double event_y,
     bool context_menu_requested,
     std::function<void(double, double)> const& callback = {});
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+bool on_item_view_button_pressed(
+    Gtk::ListView& view,
+    double event_x,
+    double event_y,
+    bool context_menu_requested,
+    std::function<void(double, double)> const& callback = {});
+#endif
 
 /* if the click didn't specify a row, clear the selection */
-bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double event_y);
+bool on_item_view_button_released(Gtk::TreeView& view, double event_x, double event_y);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+bool on_item_view_button_released(Gtk::ListView& view, double event_x, double event_y);
+#endif
 
 using TrGdkModifierType = IF_GTKMM4(Gdk::ModifierType, guint);
 
-void setup_tree_view_button_event_handling(
+void setup_item_view_button_event_handling(
     Gtk::TreeView& view,
     std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
     std::function<bool(double, double)> const& release_callback);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+void setup_item_view_button_event_handling(
+    Gtk::ListView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback);
+#endif
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 
@@ -170,25 +180,6 @@ inline T gtr_str_strip(T const& text)
     auto const new_begin = text.find_first_not_of("\t\n\v\f\r ");
     auto const new_end = text.find_last_not_of("\t\n\v\f\r ");
     return new_begin == T::npos ? T() : text.substr(new_begin, new_end == T::npos ? new_end : new_end - new_begin + 1);
-}
-
-template<typename T>
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
-{
-    using std::rel_ops::operator>;
-
-    if (lhs < rhs)
-    {
-        return -1;
-    }
-
-    if (lhs > rhs)
-    {
-        return 1;
-    }
-
-    return 0;
 }
 
 std::string gtr_get_full_resource_path(std::string const& rel_path);
@@ -269,7 +260,7 @@ T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustri
 template<typename F>
 void gtr_window_on_close(Gtk::Window& widget, F&& callback)
 {
-    auto bool_callback = [callback]() mutable -> bool
+    auto bool_callback = [callback = std::move(callback)]() mutable -> bool
     {
         if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(callback)>>)
         {

@@ -1,10 +1,12 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
 #include <optional>
+
+#include "libtransmission/utils.h"
 
 #include "Filters.h"
 #include "Prefs.h"
@@ -14,7 +16,7 @@
 #include "Utils.h"
 
 TorrentFilter::TorrentFilter(Prefs const& prefs)
-    : prefs_(prefs)
+    : prefs_{ prefs }
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
@@ -62,6 +64,148 @@ void TorrentFilter::refilter()
 {
     invalidate();
 }
+
+/***
+****
+***/
+
+bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
+{
+    int val = 0;
+    auto const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
+
+    switch (prefs_.get<SortMode>(Prefs::SORT_MODE).mode())
+    {
+    case SortMode::SORT_BY_QUEUE:
+        if (val == 0)
+        {
+            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
+        }
+
+        break;
+
+    case SortMode::SORT_BY_SIZE:
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->sizeWhenDone(), b->sizeWhenDone());
+        }
+
+        break;
+
+    case SortMode::SORT_BY_AGE:
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->dateAdded(), b->dateAdded());
+        }
+
+        break;
+
+    case SortMode::SORT_BY_ID:
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->id(), b->id());
+        }
+
+        break;
+
+    case SortMode::SORT_BY_ACTIVITY:
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed());
+        }
+
+        if (val == 0)
+        {
+            val = tr_compare_3way(
+                a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
+                b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
+        }
+
+        [[fallthrough]];
+
+    case SortMode::SORT_BY_STATE:
+        if (val == 0)
+        {
+            val = -tr_compare_3way(a->isPaused(), b->isPaused());
+        }
+
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->getActivity(), b->getActivity());
+        }
+
+        if (val == 0)
+        {
+            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
+        }
+
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->hasError(), b->hasError());
+        }
+
+        [[fallthrough]];
+
+    case SortMode::SORT_BY_PROGRESS:
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->metadataPercentDone(), b->metadataPercentDone());
+        }
+
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->percentComplete(), b->percentComplete());
+        }
+
+        if (val == 0)
+        {
+            val = a->compareSeedProgress(*b);
+        }
+
+        if (val == 0)
+        {
+            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
+        }
+
+        [[fallthrough]];
+
+    case SortMode::SORT_BY_RATIO:
+        if (val == 0)
+        {
+            val = a->compareRatio(*b);
+        }
+
+        break;
+
+    case SortMode::SORT_BY_ETA:
+        if (val == 0)
+        {
+            val = a->compareETA(*b);
+        }
+
+        break;
+
+    default:
+        break;
+    }
+
+    if (val == 0)
+    {
+        val = -a->name().compare(b->name(), Qt::CaseInsensitive);
+    }
+
+    if (val == 0)
+    {
+        val = tr_compare_3way(a->hash(), b->hash());
+    }
+
+    return val < 0;
+}
+
+/***
+****
+***/
 
 bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {

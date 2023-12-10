@@ -1,10 +1,11 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <list>
 #include <string>
 #include <string_view>
@@ -19,6 +20,9 @@
 #include <process.h> /* _beginthreadex(), _endthreadex() */
 #include <windows.h>
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
+#ifdef small // workaround name collision between libsmall and rpcndr.h
+#undef small
+#endif
 #else
 #include <pwd.h>
 #include <unistd.h> /* getuid() */
@@ -40,7 +44,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"
-#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -110,13 +114,13 @@ std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto content = std::vector<char>{};
     if (auto const filename = fmt::format("{:s}/{:s}"sv, xdgConfigHome(), "user-dirs.dirs"sv);
-        !tr_sys_path_exists(filename) || !tr_loadFile(filename, content) || std::empty(content))
+        !tr_sys_path_exists(filename) || !tr_file_read(filename, content) || std::empty(content))
     {
         return {};
     }
 
     // search for key="val" and extract val
-    auto const search = fmt::format(FMT_STRING("{:s}=\""), key);
+    auto const search = fmt::format("{:s}=\"", key);
     auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
     if (begin == std::end(content))
     {
@@ -187,7 +191,7 @@ std::string tr_getDefaultConfigDir(std::string_view appname)
 
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
+    return tr_strv_to_buf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
 }
 
 std::string tr_getDefaultDownloadDir()
@@ -213,7 +217,7 @@ std::string tr_getDefaultDownloadDir()
 
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_getDefaultDownloadDir(), buf, buflen);
+    return tr_strv_to_buf(tr_getDefaultDownloadDir(), buf, buflen);
 }
 
 // ---
@@ -308,9 +312,9 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 
         auto sv = std::string_view{ buf };
         auto token = std::string_view{};
-        while (tr_strvSep(&sv, &token, ':'))
+        while (tr_strv_sep(&sv, &token, ':'))
         {
-            token = tr_strvStrip(token);
+            token = tr_strv_strip(token);
             if (!std::empty(token))
             {
                 candidates.emplace_back(token);

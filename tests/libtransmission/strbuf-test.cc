@@ -4,13 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstring>
+#include <iterator>
 #include <string_view>
-
-#include <libtransmission/transmission.h>
 
 #include <libtransmission/tr-strbuf.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using StrbufTest = ::testing::Test;
 using namespace std::literals;

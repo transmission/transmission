@@ -3,18 +3,24 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <chrono>
+#include <ctime>
 #include <set>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/transmission.h> // tr_torrent_activity
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj()
+#include <libtransmission/net.h>
 #include <libtransmission/session.h>
+#include <libtransmission/timer.h>
 #include <libtransmission/tr-lpd.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -33,6 +39,11 @@ public:
     explicit MyMediator(tr_session& session)
         : session_{ session }
     {
+    }
+
+    [[nodiscard]] tr_address bind_address(tr_address_type /* type */) const override
+    {
+        return {};
     }
 
     [[nodiscard]] tr_port port() const override
@@ -74,7 +85,7 @@ public:
     }
 
     tr_session& session_;
-    tr_port port_ = tr_port::fromHost(51413);
+    tr_port port_ = tr_port::from_host(51413);
     bool allows_lpd_ = true;
     std::vector<TorrentInfo> torrents_;
     std::set<std::string> found_;
@@ -96,7 +107,7 @@ auto makeRandomHashString()
 TEST_F(LpdTest, HelloWorld)
 {
     auto mediator = MyMediator{ *session_ };
-    auto lpd = tr_lpd::create(mediator, session_->eventBase());
+    auto lpd = tr_lpd::create(mediator, session_->event_base());
     EXPECT_TRUE(lpd);
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
@@ -104,7 +115,7 @@ TEST_F(LpdTest, HelloWorld)
 TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 {
     auto mediator_a = MyMediator{ *session_ };
-    auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
+    auto lpd_a = tr_lpd::create(mediator_a, session_->event_base());
     EXPECT_TRUE(lpd_a);
 
     auto const info_hash_str = makeRandomHashString();
@@ -116,7 +127,7 @@ TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 
     auto mediator_b = MyMediator{ *session_ };
     mediator_b.torrents_.push_back(info);
-    auto lpd_b = tr_lpd::create(mediator_b, session_->eventBase());
+    auto lpd_b = tr_lpd::create(mediator_b, session_->event_base());
 
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
     EXPECT_EQ(1U, mediator_a.found_.count(info_hash_str));
@@ -126,7 +137,7 @@ TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 TEST_F(LpdTest, DISABLED_canMultiAnnounce)
 {
     auto mediator_a = MyMediator{ *session_ };
-    auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
+    auto lpd_a = tr_lpd::create(mediator_a, session_->event_base());
     EXPECT_TRUE(lpd_a);
 
     auto info_hash_strings = std::array<std::string, 2>{};
@@ -150,7 +161,7 @@ TEST_F(LpdTest, DISABLED_canMultiAnnounce)
         mediator_b.torrents_.push_back(info);
     }
 
-    auto lpd_b = tr_lpd::create(mediator_b, session_->eventBase());
+    auto lpd_b = tr_lpd::create(mediator_b, session_->event_base());
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
 
     for (auto const& info : infos)
@@ -162,7 +173,7 @@ TEST_F(LpdTest, DISABLED_canMultiAnnounce)
 TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
 {
     auto mediator_a = MyMediator{ *session_ };
-    auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
+    auto lpd_a = tr_lpd::create(mediator_a, session_->event_base());
     EXPECT_TRUE(lpd_a);
 
     // similar to canMultiAnnounce...
@@ -192,7 +203,7 @@ TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
         mediator_b.torrents_.push_back(info);
     }
 
-    auto lpd_b = tr_lpd::create(mediator_b, session_->eventBase());
+    auto lpd_b = tr_lpd::create(mediator_b, session_->event_base());
     waitFor([&mediator_a]() { return !std::empty(mediator_a.found_); }, 1s);
 
     for (auto& info : infos)

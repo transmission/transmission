@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const copyright =
-`// This file Copyright © 2021-2023${new Date().getFullYear()} Mnemosyne LLC.
+`// This file Copyright © 2021-${new Date().getFullYear()} Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.`;
@@ -49,11 +49,9 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>
-{{
-${mime_type_lines}
-}};
-
+inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>{
+    { ${mime_type_lines.trim()} }
+};
 `);
     } catch (e) {
       console.error(e.message);

@@ -24,5 +24,8 @@ node_modules/
 /third-party/suffixes_dafsa.h
 /web/public_html/transmission-app.js.map
 
+# clangd compile commands
+compile_commands.json
+
 # CLion IDE build directory
 /cmake-build-*/

@@ -1,9 +1,13 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <cerrno>
+#include <cstdint> // int64_t
+#include <cstdio> // FILE
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -62,14 +66,20 @@
 #include <xfs/xqm.h>
 #endif
 
-#include "libtransmission/transmission.h"
-
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
 #include "libtransmission/tr-macros.h"
-#include "libtransmission/utils.h"
-#include "libtransmission/platform-quota.h"
+#include "libtransmission/utils.h" // tr_win32_utf8_to_native
 
 namespace
 {
+struct tr_device_info
+{
+    std::string path;
+    std::string device;
+    std::string fstype;
+};
+
 #ifndef _WIN32
 
 [[nodiscard]] char const* getdev(std::string_view path)
@@ -234,12 +244,12 @@ extern "C"
 #include <quota.h>
 }
 
-[[nodiscard]] tr_disk_space getquota(char const* device)
+[[nodiscard]] tr_sys_path_capacity getquota(char const* device)
 {
     struct quotahandle* qh;
     struct quotakey qk;
     struct quotaval qv;
-    struct tr_disk_space disk_space = { -1, -1 };
+    struct tr_sys_path_capacity disk_space = { -1, -1 };
 
     qh = quota_open(device);
 
@@ -284,14 +294,14 @@ extern "C"
 
 #else
 
-[[nodiscard]] tr_disk_space getquota(char const* device)
+[[nodiscard]] tr_sys_path_capacity getquota(char const* device)
 {
 #if defined(__DragonFly__)
     struct ufs_dqblk dq = {};
 #else
     struct dqblk dq = {};
 #endif
-    struct tr_disk_space disk_space = { -1, -1 };
+    auto disk_space = tr_sys_path_capacity{ -1, -1 };
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) != 0)
@@ -356,12 +366,12 @@ extern "C"
     int64_t const freespace = limit - spaceused;
 
 #ifdef __APPLE__
-    disk_space.free = freespace < 0 ? 0 : freespace;
-    disk_space.total = limit < 0 ? 0 : limit;
+    disk_space.free = std::max(int64_t{ 0 }, freespace);
+    disk_space.total = std::max(int64_t{ 0 }, limit);
     return disk_space;
 #else
-    disk_space.free = freespace < 0 ? 0 : (freespace * 1024);
-    disk_space.total = limit < 0 ? 0 : (limit * 1024);
+    disk_space.free = std::max(int64_t{ 0 }, freespace * 1024);
+    disk_space.total = std::max(int64_t{ 0 }, limit * 1024);
     return disk_space;
 #endif
 }
@@ -370,9 +380,9 @@ extern "C"
 
 #ifdef HAVE_XQM
 
-[[nodiscard]] tr_disk_space getxfsquota(char const* device)
+[[nodiscard]] tr_sys_path_capacity getxfsquota(char const* device)
 {
-    struct tr_disk_space disk_space = { -1, -1 };
+    struct tr_sys_path_capacity disk_space = { -1, -1 };
     struct fs_disk_quota dq;
 
     if (quotactl(QCMD(Q_XGETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
@@ -409,9 +419,9 @@ extern "C"
 
 #endif /* _WIN32 */
 
-[[nodiscard]] tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
+[[nodiscard]] tr_sys_path_capacity get_quota_space([[maybe_unused]] tr_device_info const& info)
 {
-    struct tr_disk_space ret = { -1, -1 };
+    struct tr_sys_path_capacity ret = { -1, -1 };
 
 #ifndef _WIN32
 
@@ -431,11 +441,11 @@ extern "C"
     return ret;
 }
 
-[[nodiscard]] tr_disk_space getDiskSpace(char const* path)
+[[nodiscard]] tr_sys_path_capacity getDiskSpace(char const* path)
 {
 #ifdef _WIN32
 
-    struct tr_disk_space ret = { -1, -1 };
+    struct tr_sys_path_capacity ret = { -1, -1 };
 
     if (auto const wide_path = tr_win32_utf8_to_native(path); !std::empty(wide_path))
     {
@@ -454,9 +464,9 @@ extern "C"
 #elif defined(HAVE_STATVFS)
 
     struct statvfs buf = {};
-    return statvfs(path, &buf) != 0 ?
-        (struct tr_disk_space){ -1, -1 } :
-        (struct tr_disk_space){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize, (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
+    return statvfs(path, &buf) != 0 ? (struct tr_sys_path_capacity){ -1, -1 } :
+                                      (struct tr_sys_path_capacity){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize,
+                                                                     (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
 
 #else
 
@@ -466,8 +476,6 @@ extern "C"
 
 #endif
 }
-
-} // namespace
 
 tr_device_info tr_device_info_create(std::string_view path)
 {
@@ -481,7 +489,7 @@ tr_device_info tr_device_info_create(std::string_view path)
     return out;
 }
 
-tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const& info)
+tr_sys_path_capacity tr_device_info_get_disk_space(struct tr_device_info const& info)
 {
     if (std::empty(info.path))
     {
@@ -489,7 +497,7 @@ tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const& info)
         return { -1, -1 };
     }
 
-    auto space = getQuotaSpace(info);
+    auto space = get_quota_space(info);
 
     if (space.free < 0 || space.total < 0)
     {
@@ -497,4 +505,37 @@ tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const& info)
     }
 
     return space;
+}
+
+} // namespace
+
+std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error* error)
+{
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
+    auto const info = tr_sys_path_get_info(path, 0, &local_error);
+    if (!info)
+    {
+        return {};
+    }
+
+    if (!info->isFolder())
+    {
+        error->set_from_errno(ENOTDIR);
+        return {};
+    }
+
+    auto const device = tr_device_info_create(path);
+    auto capacity = tr_device_info_get_disk_space(device);
+    if (capacity.free < 0 || capacity.total < 0)
+    {
+        error->set_from_errno(EINVAL);
+        return {};
+    }
+
+    return capacity;
 }

@@ -1,19 +1,24 @@
-// Except where noted, this file Copyright © 2010-2023 Johannes Lieder.
+// Except where noted, This file Copyright © Johannes Lieder.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t
+#include <cstring>
+#include <ctime> // time_t
+#include <functional>
 #include <memory>
 #include <optional>
-#include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <ctime>
-#include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif
@@ -35,7 +40,7 @@
 
 using namespace std::literals;
 
-// Code in this namespace Copyright © 2022 Mnemosyne LLC.
+// Code in this namespace Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only), MIT (SPDX: MIT),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -58,7 +63,7 @@ auto makeCookie()
 }
 
 constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
-auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
+auto constexpr McastPort = tr_port::from_host(6771); /**<LPD source and destination UPD port */
 
 /*
  * A LSD announce is formatted as follows:
@@ -79,28 +84,27 @@ auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destinati
  * multiple infohashes the packet length should not exceed 1400
  * bytes to avoid MTU/fragmentation problems.
  */
-auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::string_view const* info_hash_strings, size_t n_strings)
+auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::vector<std::string_view> const& info_hash_strings)
 {
-    static auto constexpr Major = 1;
-    static auto constexpr Minor = 1;
-    static auto constexpr CrLf = "\r\n"sv;
+    auto ret = fmt::format(
+        "BT-SEARCH * HTTP/1.1\r\n"
+        "Host: {:s}:{:d}\r\n"
+        "Port: {:d}\r\n",
+        McastGroup,
+        McastPort.host(),
+        port.host());
 
-    auto ostr = std::ostringstream{};
-    ostr << "BT-SEARCH * HTTP/" << Major << '.' << Minor << CrLf //
-         << "Host: " << McastGroup << ':' << McastPort.host() << CrLf //
-         << "Port: " << port.host() << CrLf;
-    for (size_t i = 0; i < n_strings; ++i)
+    for (auto const& info_hash : info_hash_strings)
     {
-        ostr << "Infohash: " << tr_strupper(info_hash_strings[i]) << CrLf;
+        ret += fmt::format("Infohash: {:s}\r\n", tr_strupper(info_hash));
     }
 
     if (!std::empty(cookie))
     {
-        ostr << "cookie: " << cookie << CrLf;
+        ret += fmt::format("cookie: {:s}\r\n", cookie);
     }
 
-    ostr << CrLf << CrLf;
-    return ostr.str();
+    return ret + "\r\n\r\n";
 }
 
 struct ParsedAnnounce
@@ -124,7 +128,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
     {
         // parse `${major}.${minor}`
         auto walk = announce.substr(pos + std::size(key));
-        if (auto const major = tr_parseNum<int>(walk, &walk); major && tr_strvStartsWith(walk, '.'))
+        if (auto const major = tr_num_parse<int>(walk, &walk); major && tr_strv_starts_with(walk, '.'))
         {
             ret.major = *major;
         }
@@ -134,7 +138,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
         }
 
         walk.remove_prefix(1); // the '.' between major and minor
-        if (auto const minor = tr_parseNum<int>(walk, &walk); minor && tr_strvStartsWith(walk, CrLf))
+        if (auto const minor = tr_num_parse<int>(walk, &walk); minor && tr_strv_starts_with(walk, CrLf))
         {
             ret.minor = *minor;
         }
@@ -148,9 +152,9 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
     if (auto const pos = announce.find(key); pos != std::string_view::npos)
     {
         auto walk = announce.substr(pos + std::size(key));
-        if (auto const port = tr_parseNum<uint16_t>(walk, &walk); port && tr_strvStartsWith(walk, CrLf))
+        if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && tr_strv_starts_with(walk, CrLf))
         {
-            ret.port = tr_port::fromHost(*port);
+            ret.port = tr_port::from_host(*port);
         }
         else
         {
@@ -213,9 +217,9 @@ public:
             return;
         }
 
-        announce_timer_->startRepeating(AnnounceInterval);
+        announce_timer_->start_repeating(AnnounceInterval);
         announceUpkeep();
-        dos_timer_->startRepeating(DosInterval);
+        dos_timer_->start_repeating(DosInterval);
         dosUpkeep();
     }
 
@@ -228,14 +232,9 @@ public:
     {
         event_.reset();
 
-        if (mcast_rcv_socket_ != TR_BAD_SOCKET)
+        if (mcast_socket_ != TR_BAD_SOCKET)
         {
-            evutil_closesocket(mcast_rcv_socket_);
-        }
-
-        if (mcast_snd_socket_ != TR_BAD_SOCKET)
-        {
-            evutil_closesocket(mcast_snd_socket_);
+            tr_net_close_socket(mcast_socket_);
         }
 
         tr_logAddTrace("Done uninitialising Local Peer Discovery");
@@ -250,10 +249,8 @@ private:
         }
 
         auto const err = sockerrno;
-        evutil_closesocket(mcast_rcv_socket_);
-        evutil_closesocket(mcast_snd_socket_);
-        mcast_rcv_socket_ = TR_BAD_SOCKET;
-        mcast_snd_socket_ = TR_BAD_SOCKET;
+        tr_net_close_socket(mcast_socket_);
+        mcast_socket_ = TR_BAD_SOCKET;
         tr_logAddWarn(fmt::format(
             _("Couldn't initialize LPD: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(err)),
@@ -272,113 +269,80 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        tr_net_init();
-
-        int const opt_on = 1;
+        auto const opt_on = int{ 1 };
 
         static_assert(AnnounceScope > 0);
 
         tr_logAddDebug("Initialising Local Peer Discovery");
 
-        /* setup datagram socket (receive) */
+        /* setup datagram socket */
         {
-            mcast_rcv_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
+            mcast_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
 
-            if (mcast_rcv_socket_ == TR_BAD_SOCKET)
+            if (mcast_socket_ == TR_BAD_SOCKET)
             {
                 return false;
             }
 
-            if (evutil_make_socket_nonblocking(mcast_rcv_socket_) == -1)
+            if (evutil_make_socket_nonblocking(mcast_socket_) == -1)
             {
                 return false;
             }
 
-            if (setsockopt(
-                    mcast_rcv_socket_,
-                    SOL_SOCKET,
-                    SO_REUSEADDR,
-                    reinterpret_cast<char const*>(&opt_on),
-                    sizeof(opt_on)) == -1)
+            if (setsockopt(mcast_socket_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
+                -1)
             {
                 return false;
             }
 
 #if HAVE_SO_REUSEPORT
-            if (setsockopt(
-                    mcast_rcv_socket_,
-                    SOL_SOCKET,
-                    SO_REUSEPORT,
-                    reinterpret_cast<char const*>(&opt_on),
-                    sizeof(opt_on)) == -1)
+            if (setsockopt(mcast_socket_, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
+                -1)
             {
                 return false;
             }
 #endif
 
-            mcast_addr_ = {};
-            mcast_addr_.sin_family = AF_INET;
-            mcast_addr_.sin_port = McastPort.network();
-            mcast_addr_.sin_addr.s_addr = INADDR_ANY;
+            auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(mediator_.bind_address(TR_AF_INET), McastPort);
 
-            if (bind(mcast_rcv_socket_, reinterpret_cast<sockaddr*>(&mcast_addr_), sizeof(mcast_addr_)) == -1)
+            if (bind(mcast_socket_, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == -1)
             {
                 return false;
             }
 
-            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
-            {
-                return false;
-            }
+            auto const mcast_addr = tr_address::from_string(McastGroup);
+            TR_ASSERT(mcast_addr);
+            auto const [mcast_ss, mcast_sslen] = tr_socket_address::to_sockaddr(*mcast_addr, McastPort);
+            std::memcpy(&mcast_addr_, &mcast_ss, mcast_sslen);
 
             /* we want to join that LPD multicast group */
-            struct ip_mreq mcast_req = {};
+            ip_mreq mcast_req = {};
             mcast_req.imr_multiaddr = mcast_addr_.sin_addr;
-            mcast_req.imr_interface.s_addr = INADDR_ANY;
+            mcast_req.imr_interface = reinterpret_cast<sockaddr_in const*>(&bind_ss)->sin_addr;
 
             if (setsockopt(
-                    mcast_rcv_socket_,
+                    mcast_socket_,
                     IPPROTO_IP,
                     IP_ADD_MEMBERSHIP,
                     reinterpret_cast<char const*>(&mcast_req),
-                    sizeof(struct ip_mreq)) == -1)
-            {
-                return false;
-            }
-        }
-
-        /* setup datagram socket (send) */
-        {
-            unsigned char const scope = AnnounceScope;
-
-            mcast_snd_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
-
-            if (mcast_snd_socket_ == TR_BAD_SOCKET)
-            {
-                return false;
-            }
-
-            if (evutil_make_socket_nonblocking(mcast_snd_socket_) == -1)
+                    sizeof(mcast_req)) == -1)
             {
                 return false;
             }
 
             /* configure outbound multicast TTL */
             if (setsockopt(
-                    mcast_snd_socket_,
+                    mcast_socket_,
                     IPPROTO_IP,
                     IP_MULTICAST_TTL,
-                    reinterpret_cast<char const*>(&scope),
-                    sizeof(scope)) == -1)
+                    reinterpret_cast<char const*>(&AnnounceScope),
+                    sizeof(AnnounceScope)) == -1)
             {
                 return false;
             }
         }
 
-        /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
-         * any announcement received during the initial interval will be discarded. */
-
-        event_.reset(event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this));
+        event_.reset(event_new(event_base, mcast_socket_, EV_READ | EV_PERSIST, event_callback, this));
         event_add(event_.get(), nullptr);
 
         tr_logAddDebug("Local Peer Discovery initialised");
@@ -410,15 +374,15 @@ private:
         auto addr_len = socklen_t{ sizeof(foreign_addr) };
         auto foreign_msg = std::array<char, MaxDatagramLength>{};
         auto const res = recvfrom(
-            mcast_rcv_socket_,
+            mcast_socket_,
             std::data(foreign_msg),
             MaxDatagramLength,
             0,
             reinterpret_cast<sockaddr*>(&foreign_addr),
             &addr_len);
 
-        // If we couldn't read it or it was too big, discard it
-        if (res < 1 || static_cast<size_t>(res) > MaxDatagramLength)
+        // If we couldn't read it, discard it
+        if (res < 1)
         {
             return;
         }
@@ -446,13 +410,12 @@ private:
             return;
         }
 
-        auto peer_addr = tr_address{};
-        peer_addr.addr.addr4 = foreign_addr.sin_addr;
+        auto [peer_addr, compact] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&foreign_addr.sin_addr));
         for (auto const& hash_string : parsed->info_hash_strings)
         {
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
             {
-                tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
+                tr_logAddDebug(fmt::format("Cannot serve torrent #{:s}", hash_string));
             }
         }
     }
@@ -471,7 +434,7 @@ private:
         auto const needs_announce = [&now](auto& info)
         {
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
-                (info.announce_after < now);
+                info.announce_after < now;
         };
         torrents.erase(
             std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce)),
@@ -483,26 +446,24 @@ private:
         }
 
         // prioritize the remaining torrents
-        std::sort(
-            std::begin(torrents),
-            std::end(torrents),
-            [](auto const& a, auto const& b)
+        static auto constexpr TorrentComparator = [](auto const& a, auto const& b)
+        {
+            if (a.activity != b.activity)
             {
-                if (a.activity != b.activity)
-                {
-                    return a.activity < b.activity;
-                }
+                return a.activity < b.activity;
+            }
 
-                if (a.announce_after != b.announce_after)
-                {
-                    return a.announce_after < b.announce_after;
-                }
-                return false;
-            });
+            if (a.announce_after != b.announce_after)
+            {
+                return a.announce_after < b.announce_after;
+            }
+            return false;
+        };
+        std::sort(std::begin(torrents), std::end(torrents), TorrentComparator);
 
         // cram in as many as will fit in a message
-        auto const baseline_size = std::size(makeAnnounceMsg(cookie_, mediator_.port(), nullptr, 0));
-        auto const size_with_one = std::size(makeAnnounceMsg(cookie_, mediator_.port(), &torrents.front().info_hash_str, 1));
+        auto const baseline_size = std::size(makeAnnounceMsg(cookie_, mediator_.port(), {}));
+        auto const size_with_one = std::size(makeAnnounceMsg(cookie_, mediator_.port(), { torrents.front().info_hash_str }));
         auto const size_per_hash = size_with_one - baseline_size;
         auto const max_torrents_per_announce = (MaxDatagramLength - baseline_size) / size_per_hash;
         auto info_hash_strings = std::vector<std::string_view>{};
@@ -513,7 +474,7 @@ private:
             std::begin(info_hash_strings),
             [](auto const& tor) { return tor.info_hash_str; });
 
-        if (!sendAnnounce(std::data(info_hash_strings), std::size(info_hash_strings)))
+        if (!sendAnnounce(info_hash_strings))
         {
             return;
         }
@@ -547,12 +508,12 @@ private:
      * matter). A listening client on the same network might react by adding us to his
      * peer pool for torrent t.
      */
-    bool sendAnnounce(std::string_view const* info_hash_strings, size_t n_strings)
+    bool sendAnnounce(std::vector<std::string_view> const& info_hash_strings)
     {
-        auto const announce = makeAnnounceMsg(cookie_, mediator_.port(), info_hash_strings, n_strings);
+        auto const announce = makeAnnounceMsg(cookie_, mediator_.port(), info_hash_strings);
         TR_ASSERT(std::size(announce) <= MaxDatagramLength);
         auto const res = sendto(
-            mcast_snd_socket_,
+            mcast_socket_,
             std::data(announce),
             std::size(announce),
             0,
@@ -564,8 +525,7 @@ private:
 
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
-    tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
-    tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
+    tr_socket_t mcast_socket_ = TR_BAD_SOCKET; /**multicast socket */
     libtransmission::evhelpers::event_unique_ptr event_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };

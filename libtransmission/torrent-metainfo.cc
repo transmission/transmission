@@ -1,11 +1,12 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
 #include <cerrno> // for EINVAL
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -16,16 +17,15 @@
 
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/quark.h"
+#include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -40,11 +40,11 @@ using namespace std::literals;
  * mktorrent and very old versions of utorrent, that don't add the
  * trailing slash for multifile torrents if omitted by the end user.
  */
-std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, std::string_view url)
+std::string tr_torrent_metainfo::fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url)
 {
-    url = tr_strvStrip(url);
+    url = tr_strv_strip(url);
 
-    if (tm.fileCount() > 1U && !std::empty(url) && url.back() != '/')
+    if (tm.file_count() > 1U && !std::empty(url) && url.back() != '/')
     {
         return std::string{ url } + '/';
     }
@@ -55,11 +55,6 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 namespace
 {
 auto constexpr MaxBencDepth = 32;
-
-bool tr_error_is_set(tr_error const* const* error)
-{
-    return (error != nullptr) && (*error != nullptr);
-}
 } // namespace
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
@@ -67,7 +62,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
     tr_torrent_metainfo& tm_;
-    int64_t piece_size_ = 0;
+    uint32_t piece_size_ = {};
     int64_t length_ = 0;
     std::string encoding_ = "UTF-8";
     std::string_view info_dict_begin_;
@@ -230,7 +225,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(PieceLengthKey) || pathIs(InfoKey, PieceLengthKey))
         {
-            piece_size_ = value;
+            piece_size_ = static_cast<uint32_t>(value);
         }
         else if (pathIs(InfoKey, LengthKey))
         {
@@ -347,19 +342,19 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(AnnounceKey))
         {
-            tm_.announceList().add(value, tier_);
+            tm_.announce_list().add(value, tier_);
         }
         else if (pathIs(EncodingKey))
         {
-            encoding_ = tr_strvStrip(value);
+            encoding_ = tr_strv_strip(value);
         }
         else if (pathIs(UrlListKey))
         {
-            tm_.addWebseed(value);
+            tm_.add_webseed(value);
         }
         else if (pathIs(InfoKey, NameKey) || pathIs(InfoKey, NameUtf8Key))
         {
-            tm_.setName(value);
+            tm_.set_name(value);
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
@@ -372,7 +367,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             }
             else
             {
-                tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", std::size(value)));
+                context.error.set(EINVAL, fmt::format("invalid piece size: {}", std::size(value)));
                 unhandled = true;
             }
         }
@@ -383,16 +378,16 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathStartsWith(AnnounceListKey))
         {
-            tm_.announceList().add(value, tier_);
+            tm_.announce_list().add(value, tier_);
         }
         else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
         {
-            tm_.addWebseed(value);
+            tm_.add_webseed(value);
         }
         else if (pathIs(MagnetInfoKey, DisplayNameKey) && std::empty(tm_.name()))
         {
             // compatibility with Transmission <= 3.0
-            tm_.setName(value);
+            tm_.set_name(value);
         }
         else if (pathIs(MagnetInfoKey, InfoHashKey))
         {
@@ -465,16 +460,11 @@ private:
     {
         bool ok = true;
 
-        if (file_length_ == 0)
-        {
-            return ok;
-        }
-
         // FIXME: Check to see if we already added this file. This is a safeguard
         // for hybrid torrents with duplicate info between "file tree" and "files"
         if (std::empty(file_subpath_))
         {
-            tr_error_set(context.error, EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
+            context.error.set(EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
             ok = false;
         }
         else
@@ -493,7 +483,7 @@ private:
     {
         if (std::empty(info_dict_begin_))
         {
-            tr_error_set(context.error, EINVAL, "no info_dict found");
+            context.error.set(EINVAL, "no info_dict found");
             return false;
         }
 
@@ -530,33 +520,33 @@ private:
         // "If length is present then the download represents a single file,
         // otherwise it represents a set of files which go in a directory structure.
         // In the single file case, length maps to the length of the file in bytes.
-        if (tm_.fileCount() == 0 && length_ != 0 && !std::empty(tm_.name_))
+        if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
             tm_.files_.add(tm_.name_, length_);
         }
 
-        if (auto const has_metainfo = tm_.infoDictSize() != 0U; has_metainfo)
+        if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)
         {
             // do some sanity checks to make sure the torrent looks sane
-            if (tm_.fileCount() == 0)
+            if (tm_.file_count() == 0)
             {
-                if (!tr_error_is_set(context.error))
+                if (!context.error)
                 {
-                    tr_error_set(context.error, EINVAL, "no files found");
+                    context.error.set(EINVAL, "no files found");
                 }
                 return false;
             }
 
-            if (piece_size_ == 0)
+            if (piece_size_ == 0U)
             {
-                if (!tr_error_is_set(context.error))
+                if (!context.error)
                 {
-                    tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
+                    context.error.set(EINVAL, fmt::format("invalid piece size: {}", piece_size_));
                 }
                 return false;
             }
 
-            tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
+            tm_.block_info_ = tr_block_info{ tm_.files_.totalSize(), piece_size_ };
             return true;
         }
 
@@ -631,25 +621,23 @@ private:
     static constexpr std::string_view XCrossSeedKey = "x_cross_seed"sv;
 };
 
-bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
+bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
 {
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = MetainfoHandler{ *this };
 
-    tr_error* my_error = nullptr;
-
+    auto local_error = tr_error{};
     if (error == nullptr)
     {
-        error = &my_error;
+        error = &local_error;
     }
+
     auto const ok = transmission::benc::parse(benc, stack, handler, nullptr, error);
 
-    if (tr_error_is_set(error))
+    if (*error)
     {
-        tr_logAddError(fmt::format("{} ({})", (*error)->message, (*error)->code));
+        tr_logAddError(fmt::format("{} ({})", error->message(), error->code()));
     }
-
-    tr_error_clear(&my_error);
 
     if (!ok)
     {
@@ -664,7 +652,7 @@ bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
     return true;
 }
 
-bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vector<char>* contents, tr_error** error)
+bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vector<char>* contents, tr_error* error)
 {
     auto local_contents = std::vector<char>{};
 
@@ -673,10 +661,10 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
         contents = &local_contents;
     }
 
-    return tr_loadFile(filename, *contents, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_file_read(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
 }
 
-tr_pathbuf tr_torrent_metainfo::makeFilename(
+std::string tr_torrent_metainfo::make_filename(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
@@ -685,23 +673,32 @@ tr_pathbuf tr_torrent_metainfo::makeFilename(
 {
     // `${dirname}/${name}.${info_hash}${suffix}`
     // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_pathbuf{ dirname, '/', info_hash_string, suffix } :
-                                            tr_pathbuf{ dirname, '/', name, '.', info_hash_string.substr(0, 16), suffix };
+    auto filename = tr_pathbuf{ dirname, '/' };
+    if (format == BasenameFormat::Hash)
+    {
+        filename.append(info_hash_string);
+    }
+    else
+    {
+        filename.append(name, '.', info_hash_string.substr(0, 16));
+    }
+    filename.append(suffix);
+    return std::string{ filename.sv() };
 }
 
-bool tr_torrent_metainfo::migrateFile(
+bool tr_torrent_metainfo::migrate_file(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    auto const old_filename = make_filename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
     if (!tr_sys_path_exists(old_filename))
     {
         return false;
     }
 
-    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    auto const new_filename = make_filename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     if (tr_sys_path_exists(new_filename))
     {
         tr_sys_path_remove(old_filename);
@@ -723,15 +720,15 @@ bool tr_torrent_metainfo::migrateFile(
     return renamed;
 }
 
-void tr_torrent_metainfo::removeFile(
+void tr_torrent_metainfo::remove_file(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    auto filename = make_filename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
     tr_sys_path_remove(filename, nullptr);
 
-    filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    filename = make_filename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     tr_sys_path_remove(filename, nullptr);
 }

@@ -4,14 +4,14 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstddef> // size_t, std::byte
 #include <string_view>
 
 #include "gtest/gtest.h"
 
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/magnet-metainfo.h>
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer()
+#include <libtransmission/magnet-metainfo.h>
+#include <libtransmission/tr-macros.h>
 
 using namespace std::literals;
 
@@ -65,8 +65,8 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(2U, std::size(mm.announceList()));
-        auto it = std::begin(mm.announceList());
+        EXPECT_EQ(2U, std::size(mm.announce_list()));
+        auto it = std::begin(mm.announce_list());
         EXPECT_EQ(0U, it->tier);
         EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.sv());
         EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, it->scrape.sv());
@@ -74,10 +74,10 @@ TEST(MagnetMetainfo, magnetParse)
         EXPECT_EQ(1U, it->tier);
         EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.sv());
         EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape.sv());
-        EXPECT_EQ(1U, mm.webseedCount());
+        EXPECT_EQ(1U, mm.webseed_count());
         EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed(0));
         EXPECT_EQ("Display Name"sv, mm.name());
-        EXPECT_EQ(ExpectedHash, mm.infoHash());
+        EXPECT_EQ(ExpectedHash, mm.info_hash());
     }
 
     for (auto const& uri : { "2I2UAEFDZJFN4W3UE65QSOTCUOEZ744B"sv, "d2354010a3ca4ade5b7427bb093a62a3899ff381"sv })
@@ -85,9 +85,9 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(0U, std::size(mm.announceList()));
-        EXPECT_EQ(0U, mm.webseedCount());
-        EXPECT_EQ(ExpectedHash, mm.infoHash());
+        EXPECT_EQ(0U, std::size(mm.announce_list()));
+        EXPECT_EQ(0U, mm.webseed_count());
+        EXPECT_EQ(ExpectedHash, mm.info_hash());
     }
 }
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -108,17 +108,28 @@
 
 + (NSString*)percentString:(CGFloat)progress longDecimals:(BOOL)longDecimals
 {
+    static NSNumberFormatter* longFormatter;
+    static NSNumberFormatter* shortFormatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        longFormatter = [[NSNumberFormatter alloc] init];
+        longFormatter.numberStyle = NSNumberFormatterPercentStyle;
+        longFormatter.maximumFractionDigits = 2;
+        shortFormatter = [[NSNumberFormatter alloc] init];
+        shortFormatter.numberStyle = NSNumberFormatterPercentStyle;
+        shortFormatter.maximumFractionDigits = 1;
+    });
     if (progress >= 1.0)
     {
-        return [NSString localizedStringWithFormat:@"%d%%", 100];
+        return [shortFormatter stringFromNumber:@(1)];
     }
     else if (longDecimals)
     {
-        return [NSString localizedStringWithFormat:@"%.2f%%", tr_truncd(progress * 100.0, 2)];
+        return [longFormatter stringFromNumber:@(MIN(progress, 0.9999))];
     }
     else
     {
-        return [NSString localizedStringWithFormat:@"%.1f%%", tr_truncd(progress * 100.0, 1)];
+        return [shortFormatter stringFromNumber:@(MIN(progress, 0.999))];
     }
 }
 

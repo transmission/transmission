@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,10 +13,12 @@
 #include <QRegularExpression>
 #include <QTimer>
 #include <QTranslator>
+#include <QWeakPointer>
 
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/favicon-cache.h>
 
-#include "FaviconCache.h"
+#include "AddData.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 
@@ -44,11 +46,34 @@ public:
         return *interned_strings_.insert(in).first;
     }
 
-    FaviconCache& faviconCache();
+    [[nodiscard]] QPixmap find_favicon(QString const& sitename) const
+    {
+        auto const key = sitename.toStdString();
+        auto const* const icon = favicon_cache_.find(key);
+        return icon != nullptr ? *icon : QPixmap{};
+    }
+
+    void load_favicon(QString const& url)
+    {
+        auto weak_self = QPointer<Application>{ this };
+
+        favicon_cache_.load(
+            url.toStdString(),
+            [weak_self = std::move(weak_self)](QPixmap const* /*favicon_or_nullptr*/)
+            {
+                if (!weak_self.isNull())
+                {
+                    weak_self.data()->faviconsChanged();
+                }
+            });
+    }
+
+signals:
+    void faviconsChanged();
 
 public slots:
-    void addTorrent(AddData const&) const;
-    void addTorrent(QString const&) const;
+    void addTorrent(AddData) const;
+    void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
     void consentGiven(int result) const;
@@ -67,6 +92,7 @@ private slots:
 private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
+    void initUnits();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
     void notifyTorrentAdded(Torrent const*) const;
@@ -82,7 +108,8 @@ private:
     time_t last_full_update_time_ = {};
     QTranslator qt_translator_;
     QTranslator app_translator_;
-    FaviconCache favicons_;
+
+    FaviconCache<QPixmap> favicon_cache_;
 
     QString const config_name_ = QStringLiteral("transmission");
     QString const display_name_ = QStringLiteral("transmission-qt");
@@ -93,8 +120,9 @@ private:
     QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
     QString const fdo_notifications_path_ = QStringLiteral("/org/freedesktop/Notifications");
     QString const fdo_notifications_interface_name_ = QStringLiteral("org.freedesktop.Notifications");
-    QRegularExpression const start_now_regex_;
 #endif
+
+    QRegularExpression const start_now_regex_{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())

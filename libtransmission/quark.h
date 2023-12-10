@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -50,6 +50,7 @@ enum
     TR_KEY_availability, // rpc
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
+    TR_KEY_beginPiece,
     TR_KEY_bind_address_ipv4,
     TR_KEY_bind_address_ipv6,
     TR_KEY_bitfield,
@@ -113,6 +114,7 @@ enum
     TR_KEY_editDate,
     TR_KEY_encoding,
     TR_KEY_encryption,
+    TR_KEY_endPiece,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -159,6 +161,7 @@ enum
     TR_KEY_incomplete_dir_enabled,
     TR_KEY_info,
     TR_KEY_inhibit_desktop_hibernation,
+    TR_KEY_ipProtocol,
     TR_KEY_ipv4,
     TR_KEY_ipv6,
     TR_KEY_isBackup,
@@ -252,7 +255,7 @@ enum
     TR_KEY_port_forwarding_enabled,
     TR_KEY_port_is_open,
     TR_KEY_preallocation,
-    TR_KEY_prefetch_enabled,
+    TR_KEY_preferred_transport,
     TR_KEY_primary_mime_type,
     TR_KEY_priorities,
     TR_KEY_priority,

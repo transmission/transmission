@@ -46,12 +46,12 @@
 #include "SqueezeLabel.h"
 
 SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent)
-    : QLabel(text, parent)
+    : QLabel{ text, parent }
 {
 }
 
 SqueezeLabel::SqueezeLabel(QWidget* parent)
-    : QLabel(parent)
+    : QLabel{ parent }
 {
 }
 
@@ -62,9 +62,9 @@ void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
         return QLabel::paintEvent(paint_event);
     }
 
-    QPainter painter(this);
-    QFontMetrics const fm = fontMetrics();
-    QStyleOption opt;
+    auto painter = QPainter{ this };
+    auto const fm = fontMetrics();
+    auto opt = QStyleOption{};
     opt.initFrom(this);
     auto const full_text = text();
     auto const elided_text = fm.elidedText(full_text, Qt::ElideRight, width());

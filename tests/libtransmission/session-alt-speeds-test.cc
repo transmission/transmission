@@ -3,17 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
 #include <ctime>
 #include <vector>
 
-#include <fmt/chrono.h>
-
 #include <libtransmission/transmission.h>
-#include <libtransmission/session.h>
-#include <libtransmission/session-id.h>
-#include <libtransmission/version.h>
+#include <libtransmission/session-alt-speeds.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using namespace std::literals;
 
@@ -25,7 +22,7 @@ protected:
     class MockMediator final : public tr_session_alt_speeds::Mediator
     {
     public:
-        void isActiveChanged(bool is_active, ChangeReason reason) override
+        void is_active_changed(bool is_active, ChangeReason reason) override
         {
             changelog_.emplace_back(is_active, reason, time());
         }
@@ -82,7 +79,7 @@ TEST_F(SessionAltSpeedsTest, canInstantiate)
 {
     auto mediator = MockMediator{};
     auto alt_speeds = tr_session_alt_speeds{ mediator };
-    EXPECT_FALSE(alt_speeds.isActive());
+    EXPECT_FALSE(alt_speeds.is_active());
 }
 
 TEST_F(SessionAltSpeedsTest, canActivate)
@@ -92,12 +89,12 @@ TEST_F(SessionAltSpeedsTest, canActivate)
     mediator.current_time_ = Now;
 
     auto alt_speeds = tr_session_alt_speeds{ mediator };
-    auto const changed_value = !alt_speeds.isActive();
+    auto const changed_value = !alt_speeds.is_active();
     EXPECT_EQ(0U, std::size(mediator.changelog_));
 
     static auto constexpr Reason = ChangeReason::User;
-    alt_speeds.setActive(changed_value, Reason);
-    EXPECT_EQ(changed_value, alt_speeds.isActive());
+    alt_speeds.set_active(changed_value, Reason);
+    EXPECT_EQ(changed_value, alt_speeds.is_active());
     ASSERT_EQ(1U, std::size(mediator.changelog_));
     EXPECT_EQ(changed_value, mediator.changelog_[0].is_active);
     EXPECT_EQ(Reason, mediator.changelog_[0].reason);
@@ -112,23 +109,23 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
     mediator.current_time_ = now;
 
     auto alt_speeds = tr_session_alt_speeds{ mediator };
-    alt_speeds.setStartMinute(60); // start at 1AM
-    alt_speeds.setEndMinute(120); // end at 2AM
-    alt_speeds.setWeekdays(TR_SCHED_ALL); // every day
-    alt_speeds.setSchedulerEnabled(true);
+    alt_speeds.set_start_minute(60); // start at 1AM
+    alt_speeds.set_end_minute(120); // end at 2AM
+    alt_speeds.set_weekdays(TR_SCHED_ALL); // every day
+    alt_speeds.set_scheduler_enabled(true);
     auto n_changes = std::size(mediator.changelog_);
     EXPECT_EQ(0U, n_changes);
 
     // Confirm that walking up to the threshold, but not crossing it, does not enable
     now += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
     mediator.current_time_ = now;
-    alt_speeds.checkScheduler();
+    alt_speeds.check_scheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
-    // Confirm that crossin the threshold does enable
+    // Confirm that crossing the threshold does enable
     now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
     mediator.current_time_ = now;
-    alt_speeds.checkScheduler();
+    alt_speeds.check_scheduler();
     ASSERT_EQ(n_changes + 1, std::size(mediator.changelog_));
     EXPECT_EQ(true, mediator.changelog_[n_changes].is_active);
     EXPECT_EQ(ChangeReason::Scheduler, mediator.changelog_[n_changes].reason);
@@ -138,13 +135,13 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
     // Confirm that walking up to the threshold, but not crossing it, does not disable
     now += std::chrono::duration_cast<std::chrono::seconds>(59min).count();
     mediator.current_time_ = now;
-    alt_speeds.checkScheduler();
+    alt_speeds.check_scheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
-    // Confirm that crossin the threshold does disable
+    // Confirm that crossing the threshold does disable
     now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
     mediator.current_time_ = now;
-    alt_speeds.checkScheduler();
+    alt_speeds.check_scheduler();
     ASSERT_EQ(n_changes + 1, std::size(mediator.changelog_));
     EXPECT_EQ(false, mediator.changelog_[n_changes].is_active);
     EXPECT_EQ(ChangeReason::Scheduler, mediator.changelog_[n_changes].reason);

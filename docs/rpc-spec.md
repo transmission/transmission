@@ -112,13 +112,13 @@ username and password (respectively), separated by a colon.
 
 ## 3 Torrent requests
 ### 3.1 Torrent action requests
-| Method name          | libtransmission function
-|:--|:--
-| `torrent-start`      | tr_torrentStart
-| `torrent-start-now`  | tr_torrentStartNow
-| `torrent-stop`       | tr_torrentStop
-| `torrent-verify`     | tr_torrentVerify
-| `torrent-reannounce` | tr_torrentManualUpdate ("ask tracker for more peers")
+| Method name          | libtransmission function | Description
+|:--|:--|:--
+| `torrent-start`      | tr_torrentStart          | start torrent
+| `torrent-start-now`  | tr_torrentStartNow       | start torrent disregarding queue position
+| `torrent-stop`       | tr_torrentStop           | stop torrent
+| `torrent-verify`     | tr_torrentVerify         | verify torrent
+| `torrent-reannounce` | tr_torrentManualUpdate   | re-announce to trackers now
 
 Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
@@ -294,6 +294,8 @@ The 'source' column here corresponds to the data structure there.
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
+| `beginPiece` | number | tr_file_view
+| `endPiece` | number | tr_file_view
 
 
 `fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
@@ -563,6 +565,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
 | `seedRatioLimit` | double | the default seed ratio for torrents to use
 | `seedRatioLimited` | boolean | true if seedRatioLimit is honored by default
+| `session-id` | string | the current `X-Transmission-Session-Id` value
 | `speed-limit-down-enabled` | boolean | true means enabled
 | `speed-limit-down` | number | max global download speed (KBps)
 | `speed-limit-up-enabled` | boolean | true means enabled
@@ -639,11 +642,11 @@ A stats object contains:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| uploadedBytes    | number     | tr_session_stats
-| downloadedBytes  | number     | tr_session_stats
-| filesAdded       | number     | tr_session_stats
-| sessionCount     | number     | tr_session_stats
-| secondsActive    | number     | tr_session_stats
+| `uploadedBytes`    | number     | tr_session_stats
+| `downloadedBytes`  | number     | tr_session_stats
+| `filesAdded`       | number     | tr_session_stats
+| `sessionCount`     | number     | tr_session_stats
+| `secondsActive`    | number     | tr_session_stats
 
 ### 4.3 Blocklist
 Method name: `blocklist-update`
@@ -658,9 +661,19 @@ from the outside world.
 
 Method name: `port-test`
 
-Request arguments: none
+Request arguments: an optional argument `ipProtocol`.
+`ipProtocol` is a string specifying the IP protocol version to be used for the port test.
+Set to `ipv4` to check IPv4, or set to `ipv6` to check IPv6.
+For backwards compatibility, it is allowed to omit this argument to get the behaviour before Transmission `4.1.0`,
+which is to check whichever IP protocol the OS happened to use to connect to our port test service,
+frankly not very useful.
 
-Response arguments: a Boolean, `port-is-open`
+Response arguments:
+
+| Key | Value Type | Description
+| :-- | :-- | :--
+| `port-is-open` | boolean | true if port is open, false if port is closed
+| `ipProtocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if an error occured
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
@@ -1009,3 +1022,6 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 |:---|:---
 | `torrent-get` | new arg `sequentialDownload`
 | `torrent-set` | new arg `sequentialDownload`
+| `torrent-get` | new arg `files.beginPiece`
+| `torrent-get` | new arg `files.endPiece`
+| `port-test` | new arg `ipProtocol`

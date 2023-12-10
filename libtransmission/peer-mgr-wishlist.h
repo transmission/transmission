@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,9 +12,7 @@
 #include <cstddef> // size_t
 #include <vector>
 
-#include "transmission.h"
-
-#include "torrent.h"
+#include "libtransmission/transmission.h"
 
 /**
  * Figures out what blocks we want to request next.
@@ -22,6 +20,8 @@
 class Wishlist
 {
 public:
+    static auto constexpr EndgameMaxPeers = size_t{ 2U };
+
     struct Mediator
     {
         [[nodiscard]] virtual bool clientCanRequestBlock(tr_block_index_t block) const = 0;

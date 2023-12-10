@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <iostream>
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -11,11 +11,16 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/block-info.h>
 #include <libtransmission/cache.h> // tr_cacheWriteBlock()
 #include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/quark.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -33,9 +38,9 @@ protected:
     void SetUp() override
     {
         auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.c_str());
+        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir);
         auto const incomplete_dir = GetParam().first;
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.c_str());
+        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir);
         tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
 
         SessionTest::SetUp();
@@ -58,7 +63,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
-    EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
     // auto completeness = completeness_unset;
@@ -76,14 +81,14 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<std::vector<uint8_t>> buf = {};
+        std::unique_ptr<Cache::BlockData> buf = {};
         bool done = {};
     };
 
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
-        data->session->cache->writeBlock(data->tor->id(), data->block, std::move(data->buf));
-        tr_torrentGotBlock(data->tor, data->block);
+        data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf));
+        data->tor->on_block_received(data->block);
         data->done = true;
     };
 
@@ -93,11 +98,12 @@ TEST_P(IncompleteDirTest, incompleteDir)
         data.session = session_;
         data.tor = tor;
 
-        auto const [begin, end] = tor->blockSpanForPiece(data.pieceIndex);
+        auto const [begin, end] = tor->block_span_for_piece(data.pieceIndex);
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            data.buf = std::make_unique<std::vector<uint8_t>>(tr_block_info::BlockSize, '\0');
+            data.buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
+            std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
             session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);
@@ -160,7 +166,7 @@ TEST_F(MoveTest, setLocation)
 
     // now move it
     auto state = int{ -1 };
-    tr_torrentSetLocation(tor, target_dir, true, nullptr, &state);
+    tr_torrentSetLocation(tor, target_dir, true, &state);
     auto test = [&state]()
     {
         return state == TR_LOC_DONE;

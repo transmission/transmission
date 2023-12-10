@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -94,6 +94,9 @@ Prefs.AltSpeedEnabled = 'alt-speed-enabled';
 Prefs.DisplayCompact = 'compact';
 Prefs.DisplayFull = 'full';
 Prefs.DisplayMode = 'display-mode';
+Prefs.ContrastLess = 'less';
+Prefs.ContrastMore = 'more';
+Prefs.ContrastMode = 'contrast-mode';
 Prefs.FilterActive = 'active';
 Prefs.FilterAll = 'all';
 Prefs.FilterDownloading = 'downloading';
@@ -119,6 +122,9 @@ Prefs.SortMode = 'sort-mode';
 Prefs._Defaults = {
   [Prefs.AltSpeedEnabled]: false,
   [Prefs.DisplayMode]: Prefs.DisplayFull,
+  [Prefs.ContrastMode]: window.matchMedia('(prefers-contrast: more)').matches
+    ? Prefs.ContrastMore
+    : Prefs.ContrastLess,
   [Prefs.FilterMode]: Prefs.FilterAll,
   [Prefs.NotificationsEnabled]: false,
   [Prefs.RefreshRate]: 5,

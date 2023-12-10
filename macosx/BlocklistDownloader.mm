@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -175,9 +175,13 @@ BlocklistDownloader* fBLDownloader = nil;
     {
         urlString = @"";
     }
-    else if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
+    else
     {
-        urlString = [@"https://" stringByAppendingString:urlString];
+        urlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
+        {
+            urlString = [@"https://" stringByAppendingString:urlString];
+        }
     }
 
     NSURLSessionDownloadTask* task = [self.fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];

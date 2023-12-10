@@ -47,3 +47,13 @@
 [submodule "third-party/wide-integer"]
 	path = third-party/wide-integer
 	url = https://github.com/transmission/wide-integer
+[submodule "third-party/small"]
+	path = third-party/small
+	url = https://github.com/transmission/small.git
+[submodule "third-party/rapidjson"]
+	path = third-party/rapidjson
+	url = https://github.com/transmission/rapidjson.git
+	fetchRecurseSubmodules = false
+[submodule "third-party/rpavlik-cmake-modules"]
+	path = third-party/rpavlik-cmake-modules
+	url = https://github.com/transmission/rpavlik-cmake-modules.git

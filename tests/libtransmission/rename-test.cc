@@ -3,22 +3,28 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <cerrno>
+#include <cstddef> // size_t
+#include <cstdint> // uint32_t, uint64_t
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/resume.h>
 #include <libtransmission/torrent.h> // tr_isTorrent()
-#include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-#include <array>
-#include <cerrno>
-#include <cstdio> // fopen()
-#include <string>
-#include <string_view>
+struct tr_ctor;
 
 using namespace std::literals;
 
@@ -68,9 +74,9 @@ protected:
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
         EXPECT_LT(0U, std::size(benc));
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error) << *error;
+        EXPECT_FALSE(error) << error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
@@ -81,11 +87,11 @@ protected:
 
     static bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string_view str)
     {
-        if (auto const found = tor->findFile(file_index); found)
+        if (auto const found = tor->find_file(file_index); found)
         {
             EXPECT_TRUE(tr_sys_path_exists(found->filename()));
             auto contents = std::vector<char>{};
-            return tr_loadFile(found->filename(), contents) &&
+            return tr_file_read(found->filename(), contents) &&
                 std::string_view{ std::data(contents), std::size(contents) } == str;
         }
 
@@ -99,7 +105,7 @@ protected:
         EXPECT_EQ(TR_STAT_OK, tst->error);
         EXPECT_EQ(total_size, tst->sizeWhenDone);
         EXPECT_EQ(total_size, tst->leftUntilDone);
-        EXPECT_EQ(total_size, tor->totalSize());
+        EXPECT_EQ(total_size, tor->total_size());
         EXPECT_EQ(0, tst->haveValid);
     }
 
@@ -137,14 +143,14 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(tr_isTorrent(tor));
 
     // sanity check the info
-    EXPECT_EQ(tr_file_index_t{ 1 }, tor->fileCount());
+    EXPECT_EQ(tr_file_index_t{ 1 }, tor->file_count());
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
 
     // sanity check the (empty) stats
     blockingTorrentVerify(tor);
     expectHaveNone(tor, TotalSize);
 
-    createSingleFileTorrentContents(tor->currentDir().sv());
+    createSingleFileTorrentContents(tor->current_dir().sv());
 
     // sanity check the stats again, now that we've added the file
     blockingTorrentVerify(tor);
@@ -176,7 +182,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  Now try a rename that should succeed
     ***/
 
-    auto tmpstr = tr_pathbuf{ tor->currentDir(), "/hello-world.txt" };
+    auto tmpstr = tr_pathbuf{ tor->current_dir(), "/hello-world.txt" };
     EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
@@ -185,14 +191,15 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     auto const torrent_filename = tr_torrentFilename(tor);
     EXPECT_EQ(std::string::npos, torrent_filename.find("foobar")); // confirm torrent file hasn't changed
-    tmpstr.assign(tor->currentDir(), "/foobar");
+    tmpstr.assign(tor->current_dir(), "/foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
     // (while it's renamed: confirm that the .resume file remembers the changes)
-    tr_resume::save(tor);
+    auto resume_helper = tr_torrent::ResumeHelper{ *tor };
+    tr_resume::save(tor, resume_helper);
     sync();
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
+    auto const loaded = tr_resume::load(tor, resume_helper, tr_resume::All, *ctor);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Name));
 
@@ -200,7 +207,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  ...and rename it back again
     ***/
 
-    tmpstr.assign(tor->currentDir(), "/foobar");
+    tmpstr.assign(tor->current_dir(), "/foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
     EXPECT_FALSE(tr_sys_path_exists(tmpstr));
@@ -250,8 +257,8 @@ TEST_F(RenameTest, multifileTorrent)
 
     // sanity check the info
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
-    EXPECT_EQ(TotalSize, tor->totalSize());
-    EXPECT_EQ(tr_file_index_t{ 4 }, tor->fileCount());
+    EXPECT_EQ(TotalSize, tor->total_size());
+    EXPECT_EQ(tr_file_index_t{ 4 }, tor->file_count());
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
@@ -263,7 +270,7 @@ TEST_F(RenameTest, multifileTorrent)
     expectHaveNone(tor, TotalSize);
 
     // build the local data
-    createMultifileTorrentContents(tor->currentDir().sv());
+    createMultifileTorrentContents(tor->current_dir().sv());
 
     // sanity check the (full) stats
     blockingTorrentVerify(tor);
@@ -300,10 +307,11 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, ExpectedContents[2]));
 
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
-    tr_resume::save(tor);
+    auto resume_helper = tr_torrent::ResumeHelper{ *tor };
+    tr_resume::save(tor, resume_helper);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
-    tor->setFileSubpath(1, "gabba gabba hey"sv);
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
+    tor->set_file_subpath(1, "gabba gabba hey"sv);
+    auto const loaded = tr_resume::load(tor, resume_helper, tr_resume::All, *ctor);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Filenames));
     EXPECT_EQ(ExpectedFiles[0], tr_torrentFile(tor, 0).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", tr_torrentFile(tor, 1).name);
@@ -414,6 +422,9 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
 
+    // rename filename collision
+    EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus/Kyphi", "Saffron"));
+    EXPECT_STREQ("Felidae", tr_torrentName(tor));
     /***
     ****
     ***/
@@ -439,12 +450,12 @@ TEST_F(RenameTest, partialFile)
     ***/
 
     auto* tor = zeroTorrentInit(ZeroTorrentState::Partial);
-    EXPECT_EQ(TotalSize, tor->totalSize());
-    EXPECT_EQ(PieceSize, tor->pieceSize());
-    EXPECT_EQ(PieceCount, tor->pieceCount());
-    EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->fileSubpath(0));
-    EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->fileSubpath(1));
-    EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->fileSubpath(2));
+    EXPECT_EQ(TotalSize, tor->total_size());
+    EXPECT_EQ(PieceSize, tor->piece_size());
+    EXPECT_EQ(PieceCount, tor->piece_count());
+    EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->file_subpath(0));
+    EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->file_subpath(1));
+    EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->file_subpath(2));
     EXPECT_NE(0, tr_torrentFile(tor, 0).have);
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
     EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
@@ -466,14 +477,14 @@ TEST_F(RenameTest, partialFile)
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        EXPECT_EQ(strings[i], tor->fileSubpath(i));
+        EXPECT_EQ(strings[i], tor->file_subpath(i));
     }
 
     strings[0] = "foo/bar.part";
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        auto const expected = tr_pathbuf{ tor->currentDir(), '/', strings[i] };
+        auto const expected = tr_pathbuf{ tor->current_dir(), '/', strings[i] };
         auto const actual = tr_torrentFindFile(tor, i);
         EXPECT_EQ(expected, actual);
     }

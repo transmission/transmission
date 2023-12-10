@@ -3,18 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstring> // strlen()
-// #include <unistd.h> // sync()
+#include <cstddef>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/blocklist.h>
-#include <libtransmission/file.h>
 #include <libtransmission/net.h>
-#include <libtransmission/peer-socket.h>
-#include <libtransmission/session.h> // tr_session.tr_session.addressIsBlocked()
+#include <libtransmission/session.h> // tr_session.addressIsBlocked()
 #include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test
@@ -23,7 +21,7 @@ namespace libtransmission::test
 class BlocklistTest : public SessionTest
 {
 protected:
-    static char const constexpr* const Contents1 =
+    static char constexpr const* const Contents1 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
@@ -31,7 +29,7 @@ protected:
         "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
         "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n";
 
-    static char const constexpr* const Contents2 =
+    static char constexpr const* const Contents2 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
@@ -43,7 +41,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         auto const addr = tr_address::from_string(address_str);
-        return !addr || session_->addressIsBlocked(*addr);
+        return !addr || session_->blocklist().contains(*addr);
     }
 };
 

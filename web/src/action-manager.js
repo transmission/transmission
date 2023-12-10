@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -51,6 +51,7 @@ export class ActionManager extends EventTarget {
       },
       'show-labels-dialog': {
         enabled: false,
+        shortcut: 'K',
         text: 'Edit Labels…',
       },
       'show-move-dialog': {
@@ -77,6 +78,7 @@ export class ActionManager extends EventTarget {
       },
       'start-all-torrents': { enabled: false, text: 'Start all' },
       'toggle-compact-rows': { enabled: true, text: 'Compact rows' },
+      'toggle-contrast': { enabled: true, text: 'High contrast UI' },
       'trash-selected-torrents': {
         enabled: false,
         text: 'Trash data and remove from list…',
@@ -111,7 +113,7 @@ export class ActionManager extends EventTarget {
     return new Map(
       Object.entries(this.actions)
         .filter(([, properties]) => properties.shortcut)
-        .map(([name, properties]) => [properties.shortcut, name])
+        .map(([name, properties]) => [properties.shortcut, name]),
     );
   }
 
@@ -145,7 +147,7 @@ export class ActionManager extends EventTarget {
     const selected_paused = selected.filter((tor) => tor.isStopped()).length;
     const selected_active = selected.length - selected_paused;
     const nonselected_paused = nonselected.filter((tor) =>
-      tor.isStopped()
+      tor.isStopped(),
     ).length;
     const nonselected_active = nonselected.length - nonselected_paused;
     const paused = selected_paused + nonselected_paused;
