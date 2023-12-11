@@ -1139,8 +1139,8 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
 
     auto const* const benc_end = serde.end();
 
-    if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
-        msg_end - benc_end <= MetadataPieceSize && piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
+    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= MetadataPieceSize &&
+        piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
