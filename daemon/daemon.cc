@@ -705,7 +705,14 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    session = tr_sessionInit(cdir, true, settings_);
+    auto error = tr_error{};
+    session = tr_sessionInit(cdir, true, settings_, &error);
+    if (session == nullptr)
+    {
+        printMessage(logfile_, TR_LOG_ERROR, MyName, error.message(), __FILE__, __LINE__);
+        return 2;
+    }
+
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
     tr_sessionSaveSettings(session, cdir, settings_);

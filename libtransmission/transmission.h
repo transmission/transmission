@@ -21,6 +21,7 @@
 #include <stdbool.h> // bool
 #endif
 
+#include "libtransmission/error.h"
 #include "libtransmission/tr-macros.h"
 
 using tr_file_index_t = size_t;
@@ -199,17 +200,22 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
  * @code
  *     auto settings = tr_sessionGetDefaultSettings();
  *     char const* const configDir = tr_getDefaultConfigDir("Transmission");
- *     tr_session* const session = tr_sessionInit(configDir, true, &settings);
+ *     auto error = tr_error{};
+ *     tr_session* const session = tr_sessionInit(configDir, true, settings, &error);
  * @endcode
  *
  * @param config_dir where Transmission will look for resume files, blocklists, etc.
  * @param message_queueing_enabled if false, messages will be dumped to stderr
  * @param settings libtransmission settings
+ * @param error Pointer to error object. Optional, pass `nullptr` if you are not interested in error details.
+ *
+ * @return A session handle on success, nullptr otherwise (with `error` set accordingly).
+ *
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings, tr_error* error);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */
@@ -233,7 +239,7 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs = 15);
  * @brief Return the session's configuration directory.
  *
  * This is where transmission stores its torrent files, .resume files,
- * blocklists, etc. It's set in `tr_transmissionInit()` and is immutable
+ * blocklists, etc. It's set in `tr_sessionInit()` and is immutable
  * during the session.
  */
 char const* tr_sessionGetConfigDir(tr_session const* session);
