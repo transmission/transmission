@@ -626,8 +626,6 @@ public:
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
-    int64_t metadata_size_hint = 0;
-
     tr_torrent* const torrent;
 
     std::shared_ptr<tr_peerIo> const io;
@@ -1060,9 +1058,9 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
+    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i))
     {
-        msgs->metadata_size_hint = i;
+        tr_torrentSetMetadataSizeHint(msgs->torrent, i);
     }
 
     /* look for upload_only (BEP 21) */
