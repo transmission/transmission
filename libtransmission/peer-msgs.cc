@@ -1060,7 +1060,14 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* look for metainfo size (BEP 9) */
     if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i))
     {
-        tr_torrentSetMetadataSizeHint(msgs->torrent, i);
+        if (!tr_isValidMetadataSizeHint(i))
+        {
+            msgs->peerSupportsMetadataXfer = false;
+        }
+        else
+        {
+            tr_torrentSetMetadataSizeHint(msgs->torrent, i);
+        }
     }
 
     /* look for upload_only (BEP 21) */

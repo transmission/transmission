@@ -49,6 +49,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
 
 std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now);
 
+bool tr_isValidMetadataSizeHint(int64_t const size);
+
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t metadata_size);
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor);

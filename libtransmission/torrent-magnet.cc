@@ -4,13 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <climits> /* INT_MAX */
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
 #include <ios>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -59,6 +59,11 @@ auto constexpr MinRepeatIntervalSecs = int{ 3 };
 }
 } // namespace
 
+bool tr_isValidMetadataSizeHint(int64_t const size)
+{
+    return size > 0 && size <= std::numeric_limits<int>::max();
+}
+
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
     if (tor->has_metainfo())
@@ -71,24 +76,20 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    int const n = (size <= 0 || size > INT_MAX) ? -1 : div_ceil(size, MetadataPieceSize);
-    tr_logAddDebugTor(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
-    if (n <= 0)
+    if (!tr_isValidMetadataSizeHint(size))
     {
+        TR_ASSERT(false);
         return false;
     }
+    auto const n = div_ceil(static_cast<int>(size), MetadataPieceSize);
+    tr_logAddDebugTor(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
-    auto m = std::make_unique<tr_incomplete_metadata>();
+    auto& m = tor->incomplete_metadata;
+    m = std::make_unique<tr_incomplete_metadata>();
     m->piece_count = n;
     m->metadata.resize(size);
     m->pieces_needed = create_all_needed(n);
 
-    if (std::empty(m->metadata) || std::empty(m->pieces_needed))
-    {
-        return false;
-    }
-
-    tor->incomplete_metadata = std::move(m);
     return true;
 }
 
