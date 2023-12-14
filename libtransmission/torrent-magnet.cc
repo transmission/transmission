@@ -10,7 +10,6 @@
 #include <deque>
 #include <fstream>
 #include <ios>
-#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -59,11 +58,6 @@ auto constexpr MinRepeatIntervalSecs = int{ 3 };
 }
 } // namespace
 
-bool tr_isValidMetadataSizeHint(int64_t const size)
-{
-    return size > 0 && size <= std::numeric_limits<int>::max();
-}
-
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
     if (tor->has_metainfo())
@@ -76,7 +70,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    if (!tr_isValidMetadataSizeHint(size))
+    if (!tr_incomplete_metadata::is_valid_metadata_size(size))
     {
         TR_ASSERT(false);
         return false;

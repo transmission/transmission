@@ -13,6 +13,7 @@
 #include <cstdint> // int64_t
 #include <ctime> // time_t
 #include <deque>
+#include <limits>
 #include <optional>
 #include <vector>
 
@@ -35,6 +36,11 @@ struct tr_incomplete_metadata
         int piece = 0;
     };
 
+    [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
+    {
+        return size > 0 && size <= std::numeric_limits<int>::max();
+    }
+
     std::vector<char> metadata;
 
     /** sorted from least to most recently requested */
@@ -48,8 +54,6 @@ bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_pi
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len);
 
 std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now);
-
-bool tr_isValidMetadataSizeHint(int64_t const size);
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t metadata_size);
 
