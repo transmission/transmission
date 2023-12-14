@@ -109,7 +109,7 @@ bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_pi
         return {};
     }
 
-    auto in = std::ifstream{ tor->torrent_file(), std::ios_base::in };
+    auto in = std::ifstream{ tor->torrent_file(), std::ios_base::in | std::ios_base::binary };
     if (!in.is_open())
     {
         return {};
