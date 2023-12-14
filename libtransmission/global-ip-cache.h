@@ -128,8 +128,6 @@ private:
         ABORT
     };
     array_ip_t<is_updating_t> is_updating_ = {};
-    array_ip_t<std::mutex> is_updating_mutex_;
-    array_ip_t<std::condition_variable> is_updating_cv_;
 
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
