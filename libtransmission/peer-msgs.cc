@@ -1142,13 +1142,10 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         /* NOOP */
     }
 
-    auto const* const benc_end = serde.end();
-
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= MetadataPieceSize &&
-        piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
+    if (auto const piece_len = msg_end - serde.end();
+        msg_type == MetadataMsgType::Data && piece * MetadataPieceSize + piece_len <= total_size)
     {
-        size_t const piece_len = msg_end - benc_end;
-        tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
+        tr_torrentSetMetadataPiece(msgs->torrent, piece, serde.end(), piece_len);
     }
 
     if (msg_type == MetadataMsgType::Request)
