@@ -44,10 +44,7 @@ struct tr_incomplete_metadata
         int piece = 0;
     };
 
-    explicit tr_incomplete_metadata(std::unique_ptr<Mediator> mediator)
-        : mediator_{ std::move(mediator) }
-    {
-    }
+    tr_incomplete_metadata(std::unique_ptr<Mediator> mediator, int64_t size);
 
     [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
     {
@@ -59,6 +56,11 @@ struct tr_incomplete_metadata
         return piece + 1 == piece_count ? // last piece
             std::size(metadata) - (piece * MetadataPieceSize) :
             MetadataPieceSize;
+    }
+
+    [[nodiscard]] auto log_name() const noexcept
+    {
+        return mediator_->log_name();
     }
 
     std::vector<char> metadata;

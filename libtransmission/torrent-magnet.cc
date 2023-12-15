@@ -32,6 +32,8 @@
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
+#define tr_logAddDebugMagnet(magnet, msg) tr_logAddDebug(msg, (magnet)->log_name())
+
 namespace
 {
 // don't ask for the same metadata piece more than this often
@@ -58,14 +60,22 @@ auto constexpr MinRepeatIntervalSecs = int{ 3 };
 }
 } // namespace
 
+tr_incomplete_metadata::tr_incomplete_metadata(std::unique_ptr<Mediator> mediator, int64_t const size)
+    : mediator_{ std::move(mediator) }
+{
+    TR_ASSERT(is_valid_metadata_size(size));
+
+    auto const n = div_ceil(static_cast<int>(size), MetadataPieceSize);
+    tr_logAddDebugMagnet(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
+
+    piece_count = n;
+    metadata.resize(size);
+    pieces_needed = create_all_needed(n);
+}
+
 void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 {
-    if (has_metainfo())
-    {
-        return;
-    }
-
-    if (incomplete_metadata)
+    if (has_metainfo() || incomplete_metadata)
     {
         return;
     }
@@ -75,14 +85,8 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
         TR_ASSERT(false);
         return;
     }
-    auto const n = div_ceil(static_cast<int>(size), MetadataPieceSize);
-    tr_logAddDebugTor(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
-    auto& m = incomplete_metadata;
-    m = std::make_unique<tr_incomplete_metadata>(std::make_unique<MagnetMediator>(*this));
-    m->piece_count = n;
-    m->metadata.resize(size);
-    m->pieces_needed = create_all_needed(n);
+    incomplete_metadata = std::make_unique<tr_incomplete_metadata>(std::make_unique<MagnetMediator>(*this), size);
 }
 
 [[nodiscard]] std::optional<tr_metadata_piece> tr_torrent::get_metadata_piece(int const piece) const
