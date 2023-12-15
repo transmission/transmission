@@ -72,5 +72,3 @@ struct tr_incomplete_metadata
 
     std::unique_ptr<Mediator> mediator_;
 };
-
-void tr_torrentMagnetDoIdleWork(tr_torrent* tor);
