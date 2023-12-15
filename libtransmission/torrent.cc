@@ -1315,7 +1315,7 @@ tr_stat tr_torrent::stats() const
     stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
     stats.percentComplete = this->completion_.percent_complete();
-    stats.metadataPercentComplete = tr_torrentGetMetadataPercent(this);
+    stats.metadataPercentComplete = get_metadata_percent();
 
     stats.percentDone = this->completion_.percent_done();
     stats.leftUntilDone = this->completion_.left_until_done();

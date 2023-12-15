@@ -56,6 +56,4 @@ struct tr_incomplete_metadata
     int piece_count = 0;
 };
 
-double tr_torrentGetMetadataPercent(tr_torrent const* tor);
-
 void tr_torrentMagnetDoIdleWork(tr_torrent* tor);

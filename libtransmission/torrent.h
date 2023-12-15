@@ -613,6 +613,8 @@ public:
 
     std::optional<int> get_next_metadata_request(time_t now) noexcept;
 
+    double get_metadata_percent() const noexcept;
+
     ///
 
     [[nodiscard]] tr_stat stats() const;

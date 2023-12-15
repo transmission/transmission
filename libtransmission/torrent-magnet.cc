@@ -340,14 +340,14 @@ std::optional<int> tr_torrent::get_next_metadata_request(time_t now) noexcept
     return req.piece;
 }
 
-double tr_torrentGetMetadataPercent(tr_torrent const* tor)
+double tr_torrent::get_metadata_percent() const noexcept
 {
-    if (tor->has_metainfo())
+    if (has_metainfo())
     {
         return 1.0;
     }
 
-    if (auto const& m = tor->incomplete_metadata; m)
+    if (auto const& m = incomplete_metadata; m)
     {
         if (auto const n = m->piece_count; n != 0)
         {
