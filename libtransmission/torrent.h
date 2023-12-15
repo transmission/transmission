@@ -1261,7 +1261,7 @@ private:
     void create_empty_files() const;
     void recheck_completeness();
 
-    bool use_new_metainfo(tr_error* error);
+    [[nodiscard]] bool use_new_metainfo(tr_error* error);
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 

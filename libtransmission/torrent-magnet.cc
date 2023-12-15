@@ -195,7 +195,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 } // namespace set_metadata_piece_helpers
 } // namespace
 
-bool tr_torrent::use_new_metainfo(tr_error* error)
+[[nodiscard]] bool tr_torrent::use_new_metainfo(tr_error* error)
 {
     using namespace set_metadata_piece_helpers;
 
@@ -265,49 +265,49 @@ void tr_torrent::on_have_all_metainfo()
     m.reset();
 }
 
-void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t const len)
+bool tr_incomplete_metadata::set_metadata_piece(int const piece, void const* data, size_t const len)
 {
     TR_ASSERT(data != nullptr);
 
-    tr_logAddDebugTor(this, fmt::format("got metadata piece {} of {} bytes", piece, len));
-
-    // are we set up to download metadata?
-    auto& m = incomplete_metadata;
-    if (!m)
-    {
-        return;
-    }
-
     // sanity test: is `piece` in range?
-    if (piece < 0 || piece >= m->piece_count)
+    if (piece < 0 || piece >= piece_count)
     {
-        return;
+        return false;
     }
 
     // sanity test: is `len` the right size?
-    if (m->get_piece_length(piece) != len)
+    if (get_piece_length(piece) != len)
     {
-        return;
+        return false;
     }
 
     // do we need this piece?
-    auto& needed = m->pieces_needed;
+    auto& needed = pieces_needed;
     auto const iter = std::find_if(
         std::begin(needed),
         std::end(needed),
         [piece](auto const& item) { return item.piece == piece; });
     if (iter == std::end(needed))
     {
-        return;
+        return false;
     }
 
     auto const offset = piece * MetadataPieceSize;
-    std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(m->metadata) + offset);
+    std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(metadata) + offset);
 
     needed.erase(iter);
-    tr_logAddDebugTor(this, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
+    tr_logAddDebugMagnet(this, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
 
-    if (std::empty(needed))
+    return std::empty(needed);
+}
+
+void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t const len)
+{
+    TR_ASSERT(data != nullptr);
+
+    tr_logAddDebugTor(this, fmt::format("got metadata piece {} of {} bytes", piece, len));
+
+    if (auto& m = incomplete_metadata; m && m->set_metadata_piece(piece, data, len))
     {
         tr_logAddDebugTor(this, fmt::format("we now have all the metainfo!"));
         on_have_all_metainfo();

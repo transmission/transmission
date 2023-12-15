@@ -58,6 +58,8 @@ struct tr_incomplete_metadata
             MetadataPieceSize;
     }
 
+    bool set_metadata_piece(int piece, void const* data, size_t len);
+
     [[nodiscard]] auto log_name() const noexcept
     {
         return mediator_->log_name();
