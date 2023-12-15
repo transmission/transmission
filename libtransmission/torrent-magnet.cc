@@ -316,15 +316,9 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
 // ---
 
-std::optional<int> tr_torrent::get_next_metadata_request(time_t now) noexcept
+[[nodiscard]] std::optional<int> tr_incomplete_metadata::get_next_metadata_request(time_t const now) noexcept
 {
-    auto& m = incomplete_metadata;
-    if (!m)
-    {
-        return {};
-    }
-
-    auto& needed = m->pieces_needed;
+    auto& needed = pieces_needed;
     if (std::empty(needed) || needed.front().requested_at + MinRepeatIntervalSecs >= now)
     {
         return {};
@@ -334,8 +328,18 @@ std::optional<int> tr_torrent::get_next_metadata_request(time_t now) noexcept
     needed.pop_front();
     req.requested_at = now;
     needed.push_back(req);
-    tr_logAddDebugTor(this, fmt::format("next piece to request: {}", req.piece));
+    tr_logAddDebugMagnet(this, fmt::format("next piece to request: {}", req.piece));
     return req.piece;
+}
+
+[[nodiscard]] std::optional<int> tr_torrent::get_next_metadata_request(time_t const now) noexcept
+{
+    if (auto& m = incomplete_metadata; m)
+    {
+        return m->get_next_metadata_request(now);
+    }
+
+    return {};
 }
 
 double tr_torrent::get_metadata_percent() const noexcept

@@ -60,6 +60,8 @@ struct tr_incomplete_metadata
 
     bool set_metadata_piece(int piece, void const* data, size_t len);
 
+    [[nodiscard]] std::optional<int> get_next_metadata_request(time_t now) noexcept;
+
     [[nodiscard]] auto log_name() const noexcept
     {
         return mediator_->log_name();

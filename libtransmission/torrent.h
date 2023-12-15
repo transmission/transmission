@@ -624,7 +624,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     void set_metadata_piece(int piece, void const* data, size_t len);
 
-    std::optional<int> get_next_metadata_request(time_t now) noexcept;
+    [[nodiscard]] std::optional<int> get_next_metadata_request(time_t now) noexcept;
 
     double get_metadata_percent() const noexcept;
 
