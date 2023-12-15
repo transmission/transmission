@@ -29,19 +29,14 @@ inline constexpr int MetadataPieceSize = 1024 * 16;
 
 using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
 
-struct tr_incomplete_metadata
+class tr_incomplete_metadata
 {
+public:
     struct Mediator
     {
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual std::string log_name() const noexcept = 0;
-    };
-
-    struct metadata_node
-    {
-        time_t requested_at = 0U;
-        int piece = 0;
     };
 
     tr_incomplete_metadata(std::unique_ptr<Mediator> mediator, int64_t size);
@@ -53,8 +48,8 @@ struct tr_incomplete_metadata
 
     [[nodiscard]] constexpr size_t get_piece_length(int const piece) const noexcept
     {
-        return piece + 1 == piece_count ? // last piece
-            std::size(metadata) - (piece * MetadataPieceSize) :
+        return piece + 1 == piece_count_ ? // last piece
+            std::size(metadata_) - (piece * MetadataPieceSize) :
             MetadataPieceSize;
     }
 
@@ -64,17 +59,28 @@ struct tr_incomplete_metadata
 
     [[nodiscard]] double get_metadata_percent() const noexcept;
 
+    [[nodiscard]] constexpr auto const& metadata() const noexcept
+    {
+        return metadata_;
+    }
+
     [[nodiscard]] auto log_name() const noexcept
     {
         return mediator_->log_name();
     }
 
-    std::vector<char> metadata;
+private:
+    struct metadata_node
+    {
+        time_t requested_at = 0U;
+        int piece = 0;
+    };
 
-    /** sorted from least to most recently requested */
-    std::deque<metadata_node> pieces_needed;
+    void create_all_needed(int n_pieces) noexcept;
 
-    int piece_count = 0;
+    std::vector<char> metadata_;
+    std::deque<metadata_node> pieces_needed_;
+    int piece_count_ = 0;
 
     std::unique_ptr<Mediator> mediator_;
 };

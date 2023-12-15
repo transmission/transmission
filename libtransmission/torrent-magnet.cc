@@ -39,26 +39,23 @@ namespace
 // don't ask for the same metadata piece more than this often
 auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
-[[nodiscard]] auto create_all_needed(int n_pieces)
-{
-    auto ret = std::deque<tr_incomplete_metadata::metadata_node>{};
-
-    ret.resize(n_pieces);
-
-    for (int i = 0; i < n_pieces; ++i)
-    {
-        ret[i].piece = i;
-    }
-
-    return ret;
-}
-
 [[nodiscard]] int div_ceil(int numerator, int denominator)
 {
     auto const [quot, rem] = std::div(numerator, denominator);
     return quot + (rem == 0 ? 0 : 1);
 }
 } // namespace
+
+void tr_incomplete_metadata::create_all_needed(int n_pieces) noexcept
+{
+    pieces_needed_.clear();
+    pieces_needed_.resize(n_pieces);
+
+    for (int i = 0; i < n_pieces; ++i)
+    {
+        pieces_needed_[i].piece = i;
+    }
+}
 
 tr_incomplete_metadata::tr_incomplete_metadata(std::unique_ptr<Mediator> mediator, int64_t const size)
     : mediator_{ std::move(mediator) }
@@ -68,9 +65,9 @@ tr_incomplete_metadata::tr_incomplete_metadata(std::unique_ptr<Mediator> mediato
     auto const n = div_ceil(static_cast<int>(size), MetadataPieceSize);
     tr_logAddDebugMagnet(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
-    piece_count = n;
-    metadata.resize(size);
-    pieces_needed = create_all_needed(n);
+    piece_count_ = n;
+    metadata_.resize(size);
+    create_all_needed(n);
 }
 
 void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
@@ -203,14 +200,14 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
     TR_ASSERT(m);
 
     // test the info_dict checksum
-    if (tr_sha1::digest(m->metadata) != info_hash())
+    if (tr_sha1::digest(m->metadata()) != info_hash())
     {
         return false;
     }
 
     // checksum passed; now try to parse it as benc
     auto serde = tr_variant_serde::benc().inplace();
-    auto info_dict_v = serde.parse(m->metadata);
+    auto info_dict_v = serde.parse(m->metadata());
     if (!info_dict_v)
     {
         if (error != nullptr)
@@ -270,7 +267,7 @@ bool tr_incomplete_metadata::set_metadata_piece(int const piece, void const* dat
     TR_ASSERT(data != nullptr);
 
     // sanity test: is `piece` in range?
-    if (piece < 0 || piece >= piece_count)
+    if (piece < 0 || piece >= piece_count_)
     {
         return false;
     }
@@ -282,7 +279,7 @@ bool tr_incomplete_metadata::set_metadata_piece(int const piece, void const* dat
     }
 
     // do we need this piece?
-    auto& needed = pieces_needed;
+    auto& needed = pieces_needed_;
     auto const iter = std::find_if(
         std::begin(needed),
         std::end(needed),
@@ -293,7 +290,7 @@ bool tr_incomplete_metadata::set_metadata_piece(int const piece, void const* dat
     }
 
     auto const offset = piece * MetadataPieceSize;
-    std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(metadata) + offset);
+    std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(metadata_) + offset);
 
     needed.erase(iter);
     tr_logAddDebugMagnet(this, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
@@ -318,7 +315,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
 [[nodiscard]] std::optional<int> tr_incomplete_metadata::get_next_metadata_request(time_t const now) noexcept
 {
-    auto& needed = pieces_needed;
+    auto& needed = pieces_needed_;
     if (std::empty(needed) || needed.front().requested_at + MinRepeatIntervalSecs >= now)
     {
         return {};
@@ -344,9 +341,9 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
 [[nodiscard]] double tr_incomplete_metadata::get_metadata_percent() const noexcept
 {
-    if (auto const n = piece_count; n != 0)
+    if (auto const n = piece_count_; n != 0)
     {
-        return (n - std::size(pieces_needed)) / static_cast<double>(n);
+        return (n - std::size(pieces_needed_)) / static_cast<double>(n);
     }
 
     return 0.0;
@@ -366,6 +363,8 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
     return 0.0;
 }
+
+// ---
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
