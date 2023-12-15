@@ -611,6 +611,8 @@ public:
 
     void set_metadata_piece(int piece, void const* data, size_t len);
 
+    std::optional<int> get_next_metadata_request(time_t now) noexcept;
+
     ///
 
     [[nodiscard]] tr_stat stats() const;

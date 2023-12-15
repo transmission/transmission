@@ -318,11 +318,9 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
 // ---
 
-std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
+std::optional<int> tr_torrent::get_next_metadata_request(time_t now) noexcept
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    auto& m = tor->incomplete_metadata;
+    auto& m = incomplete_metadata;
     if (!m)
     {
         return {};
@@ -338,7 +336,7 @@ std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
     needed.pop_front();
     req.requested_at = now;
     needed.push_back(req);
-    tr_logAddDebugTor(tor, fmt::format("next piece to request: {}", req.piece));
+    tr_logAddDebugTor(this, fmt::format("next piece to request: {}", req.piece));
     return req.piece;
 }
 

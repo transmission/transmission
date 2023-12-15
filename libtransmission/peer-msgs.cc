@@ -1748,7 +1748,7 @@ void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         return;
     }
 
-    if (auto const piece = tr_torrentGetNextMetadataRequest(msgs->torrent, now); piece)
+    if (auto const piece = msgs->torrent->get_next_metadata_request(now); piece)
     {
         auto tmp = tr_variant{};
         tr_variantInitDict(&tmp, 3);
