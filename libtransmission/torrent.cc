@@ -131,7 +131,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     }
 
     auto error = tr_error{};
-    tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
+    tor->use_metainfo_from_file(metainfo, filename, &error);
     if (error)
     {
         tor->error().set_local_error(fmt::format(

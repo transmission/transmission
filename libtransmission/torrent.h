@@ -969,6 +969,7 @@ public:
     time_t lpdAnnounceAt = 0;
 
 private:
+    friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
@@ -1205,6 +1206,8 @@ private:
     {
         return fpm_.byte_span_for_file(file);
     }
+
+    bool use_metainfo_from_file(tr_torrent_metainfo const* metainfo, char const* filename, tr_error* error);
 
     // ---
 

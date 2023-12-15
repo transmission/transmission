@@ -122,25 +122,21 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     return {};
 }
 
-bool tr_torrentUseMetainfoFromFile(
-    tr_torrent* tor,
-    tr_torrent_metainfo const* metainfo,
-    char const* filename_in,
-    tr_error* error)
+bool tr_torrent::use_metainfo_from_file(tr_torrent_metainfo const* metainfo, char const* filename_in, tr_error* error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrent_file().c_str(), error))
+    if (!tr_sys_path_copy(filename_in, torrent_file().c_str(), error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnet_file());
+    tr_sys_path_remove(magnet_file());
 
     // tor should keep this metainfo
-    tor->set_metainfo(*metainfo);
+    set_metainfo(*metainfo);
 
-    tor->incomplete_metadata.reset();
+    incomplete_metadata.reset();
 
     return true;
 }

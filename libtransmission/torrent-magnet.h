@@ -63,5 +63,3 @@ std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 double tr_torrentGetMetadataPercent(tr_torrent const* tor);
 
 void tr_torrentMagnetDoIdleWork(tr_torrent* tor);
-
-bool tr_torrentUseMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename, tr_error* error);
