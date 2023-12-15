@@ -1252,6 +1252,7 @@ private:
 
     void on_metainfo_updated();
     void on_metainfo_completed();
+    void on_have_all_metainfo();
     void on_piece_completed(tr_piece_index_t piece);
     void on_piece_failed(tr_piece_index_t piece);
     void on_file_completed(tr_file_index_t file);
@@ -1259,6 +1260,8 @@ private:
 
     void create_empty_files() const;
     void recheck_completeness();
+
+    bool use_new_metainfo(tr_error* error);
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 

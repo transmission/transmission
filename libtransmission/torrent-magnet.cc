@@ -192,14 +192,18 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 
     return tr_variant{ std::move(top) };
 }
+} // namespace set_metadata_piece_helpers
+} // namespace
 
-bool use_new_metainfo(tr_torrent* tor, tr_error* error)
+bool tr_torrent::use_new_metainfo(tr_error* error)
 {
-    auto const& m = tor->incomplete_metadata;
+    using namespace set_metadata_piece_helpers;
+
+    auto const& m = incomplete_metadata;
     TR_ASSERT(m);
 
     // test the info_dict checksum
-    if (tr_sha1::digest(m->metadata) != tor->info_hash())
+    if (tr_sha1::digest(m->metadata) != info_hash())
     {
         return false;
     }
@@ -219,7 +223,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_error* error)
     }
 
     // yay we have an info dict. Let's make a torrent file
-    auto top_var = build_metainfo_except_info_dict(tor->metainfo());
+    auto top_var = build_metainfo_except_info_dict(metainfo());
     tr_variantMergeDicts(tr_variantDictAddDict(&top_var, TR_KEY_info, 0), &*info_dict_v);
     auto const benc = serde.to_string(top_var);
 
@@ -231,38 +235,35 @@ bool use_new_metainfo(tr_torrent* tor, tr_error* error)
     }
 
     // save it
-    if (!tr_file_save(tor->torrent_file(), benc, error))
+    if (!tr_file_save(torrent_file(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnet_file());
+    tr_sys_path_remove(magnet_file());
 
     // tor should keep this metainfo
-    tor->set_metainfo(metainfo);
+    set_metainfo(metainfo);
 
     return true;
 }
 
-void on_have_all_metainfo(tr_torrent* tor)
+void tr_torrent::on_have_all_metainfo()
 {
-    auto error = tr_error{};
-    auto& m = tor->incomplete_metadata;
+    auto& m = incomplete_metadata;
     TR_ASSERT(m);
 
-    if (!use_new_metainfo(tor, &error)) /* drat. */
+    if (auto error = tr_error{}; !use_new_metainfo(&error)) /* drat. */
     {
         auto msg = std::string_view{ error && !std::empty(error.message()) ? error.message() : "unknown error" };
         tr_logAddWarnTor(
-            tor,
+            this,
             fmt::format("Couldn't parse magnet metainfo: '{error}'. Redownloading metadata", fmt::arg("error", msg)));
     }
 
     m.reset();
 }
-} // namespace set_metadata_piece_helpers
-} // namespace
 
 void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t const len)
 {
@@ -309,7 +310,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
     if (std::empty(needed))
     {
         tr_logAddDebugTor(this, fmt::format("we now have all the metainfo!"));
-        on_have_all_metainfo(this);
+        on_have_all_metainfo();
     }
 }
 
