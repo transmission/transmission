@@ -25,7 +25,7 @@ struct tr_torrent;
 struct tr_torrent_metainfo;
 
 // defined by BEP #9
-inline constexpr int MetadataPieceSize = 1024 * 16;
+inline constexpr auto MetadataPieceSize = 1024 * 16;
 
 using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
 
@@ -46,16 +46,16 @@ public:
         return size > 0 && size <= std::numeric_limits<int>::max();
     }
 
-    [[nodiscard]] constexpr size_t get_piece_length(int const piece) const noexcept
+    [[nodiscard]] constexpr size_t get_piece_length(int64_t const piece) const noexcept
     {
         return piece + 1 == piece_count_ ? // last piece
             std::size(metadata_) - (piece * MetadataPieceSize) :
             MetadataPieceSize;
     }
 
-    bool set_metadata_piece(int piece, void const* data, size_t len);
+    bool set_metadata_piece(int64_t piece, void const* data, size_t len);
 
-    [[nodiscard]] std::optional<int> get_next_metadata_request(time_t now) noexcept;
+    [[nodiscard]] std::optional<int64_t> get_next_metadata_request(time_t now) noexcept;
 
     [[nodiscard]] double get_metadata_percent() const noexcept;
 
@@ -72,15 +72,15 @@ public:
 private:
     struct metadata_node
     {
-        time_t requested_at = 0U;
-        int piece = 0;
+        time_t requested_at = {};
+        int64_t piece = {};
     };
 
-    void create_all_needed(int n_pieces) noexcept;
+    void create_all_needed(int64_t n_pieces) noexcept;
 
     std::vector<char> metadata_;
     std::deque<metadata_node> pieces_needed_;
-    int piece_count_ = 0;
+    int64_t piece_count_ = {};
 
     std::unique_ptr<Mediator> mediator_;
 };

@@ -37,21 +37,21 @@
 namespace
 {
 // don't ask for the same metadata piece more than this often
-auto constexpr MinRepeatIntervalSecs = int{ 3 };
+auto constexpr MinRepeatIntervalSecs = time_t{ 3 };
 
-[[nodiscard]] int div_ceil(int numerator, int denominator)
+[[nodiscard]] int64_t div_ceil(int64_t numerator, int64_t denominator)
 {
-    auto const [quot, rem] = std::div(numerator, denominator);
+    auto const [quot, rem] = std::lldiv(numerator, denominator);
     return quot + (rem == 0 ? 0 : 1);
 }
 } // namespace
 
-void tr_incomplete_metadata::create_all_needed(int n_pieces) noexcept
+void tr_incomplete_metadata::create_all_needed(int64_t n_pieces) noexcept
 {
     pieces_needed_.clear();
     pieces_needed_.resize(n_pieces);
 
-    for (int i = 0; i < n_pieces; ++i)
+    for (int64_t i = 0; i < n_pieces; ++i)
     {
         pieces_needed_[i].piece = i;
     }
@@ -62,7 +62,7 @@ tr_incomplete_metadata::tr_incomplete_metadata(std::unique_ptr<Mediator> mediato
 {
     TR_ASSERT(is_valid_metadata_size(size));
 
-    auto const n = div_ceil(static_cast<int>(size), MetadataPieceSize);
+    auto const n = div_ceil(size, MetadataPieceSize);
     tr_logAddDebugMagnet(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
     piece_count_ = n;
@@ -86,7 +86,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     incomplete_metadata_ = std::make_unique<tr_incomplete_metadata>(std::make_unique<MagnetMediator>(*this), size);
 }
 
-[[nodiscard]] std::optional<tr_metadata_piece> tr_torrent::get_metadata_piece(int const piece) const
+[[nodiscard]] std::optional<tr_metadata_piece> tr_torrent::get_metadata_piece(int64_t const piece) const
 {
     TR_ASSERT(piece >= 0);
 
@@ -97,7 +97,8 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 
     auto const info_dict_size = this->info_dict_size();
     TR_ASSERT(info_dict_size > 0);
-    if (auto const n_pieces = std::max(1, div_ceil(info_dict_size, MetadataPieceSize)); piece < 0 || piece >= n_pieces)
+    if (auto const n_pieces = std::max(int64_t{ 1 }, div_ceil(info_dict_size, MetadataPieceSize));
+        piece < 0 || piece >= n_pieces)
     {
         return {};
     }
@@ -107,7 +108,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     {
         return {};
     }
-    auto const offset_in_info_dict = static_cast<uint64_t>(piece) * MetadataPieceSize;
+    auto const offset_in_info_dict = piece * MetadataPieceSize;
     if (auto const offset_in_file = info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
     {
         return {};
@@ -262,7 +263,7 @@ void tr_torrent::on_have_all_metainfo()
     m.reset();
 }
 
-bool tr_incomplete_metadata::set_metadata_piece(int const piece, void const* data, size_t const len)
+bool tr_incomplete_metadata::set_metadata_piece(int64_t const piece, void const* const data, size_t const len)
 {
     TR_ASSERT(data != nullptr);
 
@@ -298,7 +299,7 @@ bool tr_incomplete_metadata::set_metadata_piece(int const piece, void const* dat
     return std::empty(needed);
 }
 
-void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t const len)
+void tr_torrent::set_metadata_piece(int64_t const piece, void const* const data, size_t const len)
 {
     TR_ASSERT(data != nullptr);
 
@@ -313,7 +314,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
 // ---
 
-[[nodiscard]] std::optional<int> tr_incomplete_metadata::get_next_metadata_request(time_t const now) noexcept
+[[nodiscard]] std::optional<int64_t> tr_incomplete_metadata::get_next_metadata_request(time_t const now) noexcept
 {
     auto& needed = pieces_needed_;
     if (std::empty(needed) || needed.front().requested_at + MinRepeatIntervalSecs >= now)
@@ -329,7 +330,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
     return req.piece;
 }
 
-[[nodiscard]] std::optional<int> tr_torrent::get_next_metadata_request(time_t const now) noexcept
+[[nodiscard]] std::optional<int64_t> tr_torrent::get_next_metadata_request(time_t const now) noexcept
 {
     if (auto& m = incomplete_metadata_; m)
     {

@@ -620,11 +620,11 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     void maybe_start_metadata_transfer(int64_t size) noexcept;
 
-    [[nodiscard]] std::optional<tr_metadata_piece> get_metadata_piece(int piece) const;
+    [[nodiscard]] std::optional<tr_metadata_piece> get_metadata_piece(int64_t piece) const;
 
-    void set_metadata_piece(int piece, void const* data, size_t len);
+    void set_metadata_piece(int64_t piece, void const* data, size_t len);
 
-    [[nodiscard]] std::optional<int> get_next_metadata_request(time_t now) noexcept;
+    [[nodiscard]] std::optional<int64_t> get_next_metadata_request(time_t now) noexcept;
 
     [[nodiscard]] double get_metadata_percent() const noexcept;
 
