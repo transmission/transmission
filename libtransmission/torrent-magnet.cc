@@ -273,24 +273,21 @@ void tr_torrentMagnetDoIdleWork(tr_torrent* const tor)
     }
 }
 
-void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len)
+void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t const len)
 {
-    using namespace set_metadata_piece_helpers;
-
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(data != nullptr);
 
-    tr_logAddDebugTor(tor, fmt::format("got metadata piece {} of {} bytes", piece, len));
+    tr_logAddDebugTor(this, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
     // are we set up to download metadata?
-    auto& m = tor->incomplete_metadata;
+    auto& m = incomplete_metadata;
     if (!m)
     {
         return;
     }
 
     // sanity test: is `piece` in range?
-    if ((piece < 0) || (piece >= m->piece_count))
+    if (piece < 0 || piece >= m->piece_count)
     {
         return;
     }
@@ -312,11 +309,11 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
         return;
     }
 
-    size_t const offset = piece * MetadataPieceSize;
+    auto const offset = piece * MetadataPieceSize;
     std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(m->metadata) + offset);
 
     needed.erase(iter);
-    tr_logAddDebugTor(tor, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
+    tr_logAddDebugTor(this, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
 }
 
 // ---

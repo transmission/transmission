@@ -56,8 +56,6 @@ struct tr_incomplete_metadata
     int piece_count = 0;
 };
 
-void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len);
-
 std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now);
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor);

@@ -609,6 +609,8 @@ public:
 
     [[nodiscard]] std::optional<tr_metadata_piece> get_metadata_piece(int piece) const;
 
+    void set_metadata_piece(int piece, void const* data, size_t len);
+
     ///
 
     [[nodiscard]] tr_stat stats() const;
