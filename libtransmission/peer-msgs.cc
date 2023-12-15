@@ -1065,7 +1065,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         }
         else
         {
-            tr_torrentSetMetadataSizeHint(msgs->torrent, metadata_size);
+            msgs->torrent->maybe_start_metadata_transfer(metadata_size);
         }
     }
 

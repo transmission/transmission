@@ -603,6 +603,10 @@ public:
 
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
 
+    /// METAINFO - MAGNET
+
+    void maybe_start_metadata_transfer(int64_t size) noexcept;
+
     ///
 
     [[nodiscard]] tr_stat stats() const;

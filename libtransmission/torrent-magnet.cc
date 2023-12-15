@@ -58,33 +58,31 @@ auto constexpr MinRepeatIntervalSecs = int{ 3 };
 }
 } // namespace
 
-bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
+void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 {
-    if (tor->has_metainfo())
+    if (has_metainfo())
     {
-        return false;
+        return;
     }
 
-    if (tor->incomplete_metadata)
+    if (incomplete_metadata)
     {
-        return false;
+        return;
     }
 
     if (!tr_incomplete_metadata::is_valid_metadata_size(size))
     {
         TR_ASSERT(false);
-        return false;
+        return;
     }
     auto const n = div_ceil(static_cast<int>(size), MetadataPieceSize);
-    tr_logAddDebugTor(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
+    tr_logAddDebugTor(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
-    auto& m = tor->incomplete_metadata;
+    auto& m = incomplete_metadata;
     m = std::make_unique<tr_incomplete_metadata>();
     m->piece_count = n;
     m->metadata.resize(size);
     m->pieces_needed = create_all_needed(n);
-
-    return true;
 }
 
 bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_piece& setme)
