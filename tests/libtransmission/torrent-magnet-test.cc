@@ -28,16 +28,16 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     };
     auto piece = int{ 0 };
     auto info_dict_size = size_t{ 0U };
-    auto data = tr_metadata_piece{};
     for (;;)
     {
-        if (!tr_torrentGetMetadataPiece(tor, piece++, data))
+        auto data = tor->get_metadata_piece(piece++);
+        if (!data)
         {
             break;
         }
 
-        benc.append(reinterpret_cast<char const*>(std::data(data)), std::size(data));
-        info_dict_size += std::size(data);
+        benc.append(reinterpret_cast<char const*>(std::data(*data)), std::size(*data));
+        info_dict_size += std::size(*data);
     }
     benc.append("e");
     EXPECT_EQ(tor->info_dict_size(), info_dict_size);

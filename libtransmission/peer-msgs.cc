@@ -1799,8 +1799,8 @@ namespace peer_pulse_helpers
         return {};
     }
 
-    auto data = tr_metadata_piece{};
-    if (!tr_torrentGetMetadataPiece(msgs->torrent, *piece, data))
+    auto data = msgs->torrent->get_metadata_piece(*piece);
+    if (!data)
     {
         // send a reject
         auto tmp = tr_variant{};
@@ -1816,7 +1816,7 @@ namespace peer_pulse_helpers
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
     tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
     tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->info_dict_size());
-    return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp), data);
+    return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp), *data);
 }
 
 [[nodiscard]] size_t add_next_piece(tr_peerMsgsImpl* msgs, uint64_t now)

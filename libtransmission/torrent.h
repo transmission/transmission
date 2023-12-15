@@ -607,6 +607,8 @@ public:
 
     void maybe_start_metadata_transfer(int64_t size) noexcept;
 
+    [[nodiscard]] std::optional<tr_metadata_piece> get_metadata_piece(int piece) const;
+
     ///
 
     [[nodiscard]] tr_stat stats() const;

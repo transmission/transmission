@@ -85,40 +85,41 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     m->pieces_needed = create_all_needed(n);
 }
 
-bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_piece& setme)
+[[nodiscard]] std::optional<tr_metadata_piece> tr_torrent::get_metadata_piece(int const piece) const
 {
-    TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
 
-    if (!tor->has_metainfo())
+    if (!has_metainfo())
     {
         return {};
     }
 
-    auto const n_pieces = std::max(1, div_ceil(tor->info_dict_size(), MetadataPieceSize));
-    if (piece < 0 || piece >= n_pieces)
+    auto const info_dict_size = this->info_dict_size();
+    TR_ASSERT(info_dict_size > 0);
+    if (auto const n_pieces = std::max(1, div_ceil(info_dict_size, MetadataPieceSize)); piece < 0 || piece >= n_pieces)
     {
         return {};
     }
 
-    auto in = std::ifstream{ tor->torrent_file(), std::ios_base::in | std::ios_base::binary };
+    auto in = std::ifstream{ torrent_file(), std::ios_base::in | std::ios_base::binary };
     if (!in.is_open())
     {
         return {};
     }
-
-    auto const info_dict_size = tor->info_dict_size();
-    TR_ASSERT(info_dict_size > 0);
     auto const offset_in_info_dict = static_cast<uint64_t>(piece) * MetadataPieceSize;
-    if (auto const offset_in_file = tor->info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
+    if (auto const offset_in_file = info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
     {
         return {};
     }
 
     auto const piece_len = offset_in_info_dict + MetadataPieceSize <= info_dict_size ? MetadataPieceSize :
                                                                                        info_dict_size - offset_in_info_dict;
-    setme.resize(piece_len);
-    return !!in.read(reinterpret_cast<char*>(std::data(setme)), std::size(setme));
+    if (auto ret = tr_metadata_piece(piece_len); in.read(reinterpret_cast<char*>(std::data(ret)), std::size(ret)))
+    {
+        return ret;
+    }
+
+    return {};
 }
 
 bool tr_torrentUseMetainfoFromFile(
