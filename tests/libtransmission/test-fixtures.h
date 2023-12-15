@@ -383,7 +383,7 @@ protected:
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
         //     512 files-filled-with-zeroes/512
-        char const* benc_base64 =
+        static auto constexpr BencBase64 =
             "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
             "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
             "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
@@ -404,7 +404,7 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto const benc = tr_base64_decode(benc_base64);
+        auto const benc = tr_base64_decode(BencBase64);
         EXPECT_LT(0U, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
         auto error = tr_error{};
@@ -444,6 +444,20 @@ protected:
         }
 
         auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
+        tr_ctorFree(ctor);
+        return tor;
+    }
+
+    [[nodiscard]] tr_torrent* zeroTorrentMagnetInit()
+    {
+        static auto constexpr V1Hash = "fa5794674a18241bec985ddc3390e3cb171345e4";
+
+        auto ctor = tr_ctorNew(session_);
+        ctor->set_metainfo_from_magnet_link(V1Hash);
+        tr_ctorSetPaused(ctor, TR_FORCE, true);
+
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+        EXPECT_NE(nullptr, tor);
         tr_ctorFree(ctor);
         return tor;
     }
