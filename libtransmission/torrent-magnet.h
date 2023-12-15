@@ -41,6 +41,13 @@ struct tr_incomplete_metadata
         return size > 0 && size <= std::numeric_limits<int>::max();
     }
 
+    [[nodiscard]] constexpr size_t get_piece_length(int const piece) const noexcept
+    {
+        return piece + 1 == piece_count ? // last piece
+            std::size(metadata) - (piece * MetadataPieceSize) :
+            MetadataPieceSize;
+    }
+
     std::vector<char> metadata;
 
     /** sorted from least to most recently requested */

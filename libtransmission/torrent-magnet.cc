@@ -152,13 +152,6 @@ namespace
 {
 namespace set_metadata_piece_helpers
 {
-[[nodiscard]] constexpr size_t get_piece_length(tr_incomplete_metadata const& m, int piece)
-{
-    return piece + 1 == m.piece_count ? // last piece
-        std::size(m.metadata) - (piece * MetadataPieceSize) :
-        MetadataPieceSize;
-}
-
 tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 {
     auto top = tr_variant::Map{ 8U };
@@ -308,7 +301,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
     }
 
     // sanity test: is `len` the right size?
-    if (get_piece_length(*m, piece) != len)
+    if (m->get_piece_length(piece) != len)
     {
         return;
     }
