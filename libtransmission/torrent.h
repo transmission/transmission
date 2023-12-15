@@ -175,7 +175,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         std::optional<time_t> time_started_;
     };
 
-    class MagnetMediator : public tr_incomplete_metadata::Mediator
+    class MagnetMediator : public tr_metadata_download::Mediator
     {
     public:
         explicit MagnetMediator(tr_torrent const& tor)
@@ -1290,7 +1290,7 @@ private:
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
-    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata_;
+    std::unique_ptr<tr_metadata_download> metadata_download_;
 
     tr_bandwidth bandwidth_;
 

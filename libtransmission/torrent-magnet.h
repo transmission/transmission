@@ -29,7 +29,7 @@ inline constexpr auto MetadataPieceSize = 1024 * 16;
 
 using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
 
-class tr_incomplete_metadata
+class tr_metadata_download
 {
 public:
     struct Mediator
@@ -39,7 +39,7 @@ public:
         [[nodiscard]] virtual std::string log_name() const noexcept = 0;
     };
 
-    tr_incomplete_metadata(std::unique_ptr<Mediator> mediator, int64_t size);
+    tr_metadata_download(std::unique_ptr<Mediator> mediator, int64_t size);
 
     [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
     {

@@ -1059,7 +1059,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* look for metainfo size (BEP 9) */
     if (auto metadata_size = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
     {
-        if (!tr_incomplete_metadata::is_valid_metadata_size(metadata_size))
+        if (!tr_metadata_download::is_valid_metadata_size(metadata_size))
         {
             msgs->peerSupportsMetadataXfer = false;
         }
