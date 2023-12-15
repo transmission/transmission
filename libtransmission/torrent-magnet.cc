@@ -342,7 +342,17 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
     return {};
 }
 
-double tr_torrent::get_metadata_percent() const noexcept
+[[nodiscard]] double tr_incomplete_metadata::get_metadata_percent() const noexcept
+{
+    if (auto const n = piece_count; n != 0)
+    {
+        return (n - std::size(pieces_needed)) / static_cast<double>(n);
+    }
+
+    return 0.0;
+}
+
+[[nodiscard]] double tr_torrent::get_metadata_percent() const noexcept
 {
     if (has_metainfo())
     {
@@ -351,10 +361,7 @@ double tr_torrent::get_metadata_percent() const noexcept
 
     if (auto const& m = incomplete_metadata; m)
     {
-        if (auto const n = m->piece_count; n != 0)
-        {
-            return (n - std::size(m->pieces_needed)) / static_cast<double>(n);
-        }
+        return m->get_metadata_percent();
     }
 
     return 0.0;

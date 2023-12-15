@@ -626,7 +626,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     [[nodiscard]] std::optional<int> get_next_metadata_request(time_t now) noexcept;
 
-    double get_metadata_percent() const noexcept;
+    [[nodiscard]] double get_metadata_percent() const noexcept;
 
     ///
 

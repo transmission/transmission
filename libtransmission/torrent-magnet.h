@@ -62,6 +62,8 @@ struct tr_incomplete_metadata
 
     [[nodiscard]] std::optional<int> get_next_metadata_request(time_t now) noexcept;
 
+    [[nodiscard]] double get_metadata_percent() const noexcept;
+
     [[nodiscard]] auto log_name() const noexcept
     {
         return mediator_->log_name();
