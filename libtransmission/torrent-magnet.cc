@@ -72,7 +72,7 @@ tr_incomplete_metadata::tr_incomplete_metadata(std::unique_ptr<Mediator> mediato
 
 void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 {
-    if (has_metainfo() || incomplete_metadata)
+    if (has_metainfo() || incomplete_metadata_)
     {
         return;
     }
@@ -83,7 +83,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
         return;
     }
 
-    incomplete_metadata = std::make_unique<tr_incomplete_metadata>(std::make_unique<MagnetMediator>(*this), size);
+    incomplete_metadata_ = std::make_unique<tr_incomplete_metadata>(std::make_unique<MagnetMediator>(*this), size);
 }
 
 [[nodiscard]] std::optional<tr_metadata_piece> tr_torrent::get_metadata_piece(int const piece) const
@@ -137,7 +137,7 @@ bool tr_torrent::use_metainfo_from_file(tr_torrent_metainfo const* metainfo, cha
     // tor should keep this metainfo
     set_metainfo(*metainfo);
 
-    incomplete_metadata.reset();
+    incomplete_metadata_.reset();
 
     return true;
 }
@@ -196,7 +196,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 {
     using namespace set_metadata_piece_helpers;
 
-    auto const& m = incomplete_metadata;
+    auto const& m = incomplete_metadata_;
     TR_ASSERT(m);
 
     // test the info_dict checksum
@@ -248,7 +248,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 
 void tr_torrent::on_have_all_metainfo()
 {
-    auto& m = incomplete_metadata;
+    auto& m = incomplete_metadata_;
     TR_ASSERT(m);
 
     if (auto error = tr_error{}; !use_new_metainfo(&error)) /* drat. */
@@ -304,7 +304,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
     tr_logAddDebugTor(this, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
-    if (auto& m = incomplete_metadata; m && m->set_metadata_piece(piece, data, len))
+    if (auto& m = incomplete_metadata_; m && m->set_metadata_piece(piece, data, len))
     {
         tr_logAddDebugTor(this, fmt::format("we now have all the metainfo!"));
         on_have_all_metainfo();
@@ -331,7 +331,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
 
 [[nodiscard]] std::optional<int> tr_torrent::get_next_metadata_request(time_t const now) noexcept
 {
-    if (auto& m = incomplete_metadata; m)
+    if (auto& m = incomplete_metadata_; m)
     {
         return m->get_next_metadata_request(now);
     }
@@ -356,7 +356,7 @@ void tr_torrent::set_metadata_piece(int const piece, void const* data, size_t co
         return 1.0;
     }
 
-    if (auto const& m = incomplete_metadata; m)
+    if (auto const& m = incomplete_metadata_; m)
     {
         return m->get_metadata_percent();
     }

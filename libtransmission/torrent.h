@@ -974,11 +974,6 @@ struct tr_torrent final : public tr_completion::torrent_view
     CumulativeCount bytes_downloaded_;
     CumulativeCount bytes_uploaded_;
 
-    /* Used when the torrent has been created with a magnet link
-     * and we're in the process of downloading the metainfo from
-     * other peers */
-    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata;
-
     tr_session* session = nullptr;
 
     tr_torrent_announcer* torrent_announcer = nullptr;
@@ -1291,6 +1286,11 @@ private:
     labels_t labels_;
 
     tr_torrent_metainfo metainfo_;
+
+    /* Used when the torrent has been created with a magnet link
+     * and we're in the process of downloading the metainfo from
+     * other peers */
+    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata_;
 
     tr_bandwidth bandwidth_;
 
