@@ -148,7 +148,6 @@ struct tr_torrent final : public tr_completion::torrent_view
         uint64_t cur_ = {};
     };
 
-public:
     using labels_t = std::vector<tr_interned_string>;
 
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
@@ -174,6 +173,20 @@ public:
     private:
         tr_torrent* const tor_;
         std::optional<time_t> time_started_;
+    };
+
+    class MagnetMediator : public tr_incomplete_metadata::Mediator
+    {
+    public:
+        explicit MagnetMediator(tr_torrent const& tor)
+            : tor_{ tor }
+        {
+        }
+
+        [[nodiscard]] std::string log_name() const noexcept override;
+
+    private:
+        tr_torrent const& tor_;
     };
 
     // ---

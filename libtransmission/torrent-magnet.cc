@@ -79,7 +79,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
     tr_logAddDebugTor(this, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
     auto& m = incomplete_metadata;
-    m = std::make_unique<tr_incomplete_metadata>();
+    m = std::make_unique<tr_incomplete_metadata>(std::make_unique<MagnetMediator>(*this));
     m->piece_count = n;
     m->metadata.resize(size);
     m->pieces_needed = create_all_needed(n);

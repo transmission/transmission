@@ -14,6 +14,7 @@
 #include <ctime> // time_t
 #include <deque>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -30,11 +31,23 @@ using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
 
 struct tr_incomplete_metadata
 {
+    struct Mediator
+    {
+        virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual std::string log_name() const noexcept = 0;
+    };
+
     struct metadata_node
     {
         time_t requested_at = 0U;
         int piece = 0;
     };
+
+    explicit tr_incomplete_metadata(std::unique_ptr<Mediator> mediator)
+        : mediator_{ std::move(mediator) }
+    {
+    }
 
     [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
     {
@@ -54,6 +67,8 @@ struct tr_incomplete_metadata
     std::deque<metadata_node> pieces_needed;
 
     int piece_count = 0;
+
+    std::unique_ptr<Mediator> mediator_;
 };
 
 void tr_torrentMagnetDoIdleWork(tr_torrent* tor);
