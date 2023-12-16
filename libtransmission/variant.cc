@@ -59,7 +59,7 @@ template<typename T>
     if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
     {
         map->erase(key);
-        return &map->try_emplace(key, std::move(val)).first;
+        return &map->try_emplace(key, std::forward<T>(val)).first;
     }
 
     return {};
@@ -73,7 +73,7 @@ template<typename T>
 
     if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr; vec != nullptr)
     {
-        return &vec->emplace_back(std::move(val));
+        return &vec->emplace_back(std::forward<T>(val));
     }
 
     return {};
