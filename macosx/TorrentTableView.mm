@@ -877,7 +877,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     CGFloat width = NSWidth(rect);
 
-    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.frame) - NSMinX(self.window.frame) < 72)
+    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.visibleFrame) - NSMinX(self.window.frame) < 72)
     {
         // Ugly hack to hide NSPopover arrow.
         self.fPositioningView = [[NSView alloc] initWithFrame:rect];
