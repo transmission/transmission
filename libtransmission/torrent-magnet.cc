@@ -263,27 +263,16 @@ void on_have_all_metainfo(tr_torrent* tor)
     auto error = tr_error{};
     auto& m = tor->incomplete_metadata;
     TR_ASSERT(m);
-    if (use_new_metainfo(tor, &error))
-    {
-        m.reset();
-    }
-    else /* drat. */
-    {
-        auto const n = m->piece_count;
 
-        m->pieces_needed = create_all_needed(n);
-
+    if (!use_new_metainfo(tor, &error)) /* drat. */
+    {
         auto msg = std::string_view{ error && !std::empty(error.message()) ? error.message() : "unknown error" };
         tr_logAddWarnTor(
             tor,
-            fmt::format(
-                tr_ngettext(
-                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece",
-                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces",
-                    n),
-                fmt::arg("error", msg),
-                fmt::arg("piece_count", n)));
+            fmt::format("Couldn't parse magnet metainfo: '{error}'. Redownloading metadata", fmt::arg("error", msg)));
     }
+
+    m.reset();
 }
 } // namespace set_metadata_piece_helpers
 } // namespace
