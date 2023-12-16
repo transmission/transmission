@@ -178,7 +178,7 @@ bool change(TrackerStat& setme, tr_variant const* value)
         changed = true;
     }
 
-    if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty())
+    if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty() && trApp != nullptr)
     {
         setme.announce = trApp->intern(setme.announce);
         trApp->load_favicon(setme.announce);
