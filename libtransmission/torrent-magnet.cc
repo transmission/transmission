@@ -114,8 +114,9 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
         return {};
     }
 
-    auto const piece_len = offset_in_info_dict + MetadataPieceSize <= info_dict_size ? MetadataPieceSize :
-                                                                                       info_dict_size - offset_in_info_dict;
+    auto const piece_len = static_cast<size_t>(offset_in_info_dict + MetadataPieceSize) <= info_dict_size ?
+        MetadataPieceSize :
+        info_dict_size - offset_in_info_dict;
     if (auto ret = tr_metadata_piece(piece_len); in.read(reinterpret_cast<char*>(std::data(ret)), std::size(ret)))
     {
         return ret;
