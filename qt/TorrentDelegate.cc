@@ -318,7 +318,7 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
             //: %1 is duration,
             //: notice that leading space (before the dash) is included here
             str += QStringLiteral("    ");
-            str += tr("%1 left").arg(Formatter::get().timeToString(tor.getETA()));
+            str += tr("%1 left").arg(Formatter::time_to_string(tor.getETA()));
         }
         else
         {
