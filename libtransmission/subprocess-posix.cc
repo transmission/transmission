@@ -164,7 +164,7 @@ bool tr_spawn_async(
 
         if (!tr_spawn_async_in_child(cmd, env, work_dir))
         {
-            (void)!write(pipe_fds[1], &errno, sizeof(errno));
+            (void)write(pipe_fds[1], &errno, sizeof(errno));
             _exit(0);
         }
     }
