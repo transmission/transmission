@@ -72,16 +72,19 @@ TEST_F(TorrentMagnetTest, setMetadataPiece)
     auto* const tor = zeroTorrentMagnetInit();
     EXPECT_NE(nullptr, tor);
     EXPECT_FALSE(tor->has_metainfo());
+    session_->run_in_session_thread(
+        [tor]()
+        {
+            auto const metainfo_benc = tr_base64_decode(InfoDictBase64);
+            auto const metainfo_size = std::size(metainfo_benc);
+            EXPECT_LE(metainfo_size, MetadataPieceSize);
 
-    auto const metainfo_benc = tr_base64_decode(InfoDictBase64);
-    auto const metainfo_size = std::size(metainfo_benc);
-    EXPECT_LE(metainfo_size, MetadataPieceSize);
-    tor->maybe_start_metadata_transfer(metainfo_size);
-    tor->set_metadata_piece(0, std::data(metainfo_benc), metainfo_size);
-
-    EXPECT_TRUE(tor->has_metainfo());
-    EXPECT_EQ(tor->info_dict_size(), metainfo_size);
-    EXPECT_EQ(tor->get_metadata_percent(), 1.0);
+            tor->maybe_start_metadata_transfer(metainfo_size);
+            tor->set_metadata_piece(0, std::data(metainfo_benc), metainfo_size);
+            EXPECT_TRUE(tor->has_metainfo());
+            EXPECT_EQ(tor->info_dict_size(), metainfo_size);
+            EXPECT_EQ(tor->get_metadata_percent(), 1.0);
+        });
 }
 
 } // namespace libtransmission::test
