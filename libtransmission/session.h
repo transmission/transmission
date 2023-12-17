@@ -43,6 +43,7 @@
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
+#include "libtransmission/file.h"
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_t
@@ -980,7 +981,11 @@ private:
     friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
-    friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings);
+    friend tr_session* tr_sessionInit(
+        char const* config_dir,
+        bool message_queueing_enabled,
+        tr_variant const& client_settings,
+        tr_error* error);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
@@ -1089,6 +1094,8 @@ private:
     tr_port advertised_peer_port_;
 
     bool is_closing_ = false;
+
+    tr_sys_file_t lockfile_fd_;
 
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others

@@ -694,5 +694,6 @@ int tr_main(int argc, char** argv)
     InteropHelper::initialize();
 
     Application const app(argc, argv);
+    app.setDesktopFileName(QStringLiteral("com.transmissionbt.transmission.qt"));
     return QApplication::exec();
 }

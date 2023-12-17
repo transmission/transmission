@@ -301,6 +301,8 @@ TEST_F(SessionTest, honorsSettings)
     EXPECT_FALSE(tr_sessionUsesAltSpeedTime(session_));
     EXPECT_FALSE(tr_sessionIsRPCEnabled(session_));
 
+    tr_sessionClose(session_);
+
     // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
     // These are all `false` by default
     auto settings = tr_sessionGetDefaultSettings();
@@ -309,14 +311,14 @@ TEST_F(SessionTest, honorsSettings)
         tr_variantDictRemove(&settings, key);
         tr_variantDictAddBool(&settings, key, true);
     }
-    auto* session = tr_sessionInit(sandboxDir().data(), false, settings);
+    session_ = tr_sessionInit(sandboxDir().data(), false, settings, nullptr);
+
+    EXPECT_TRUE(session_ != nullptr);
 
     // confirm that these settings were enabled
-    EXPECT_TRUE(session->isPortRandom());
-    EXPECT_TRUE(tr_sessionUsesAltSpeedTime(session));
-    EXPECT_TRUE(tr_sessionIsRPCEnabled(session));
-
-    tr_sessionClose(session);
+    EXPECT_TRUE(session_->isPortRandom());
+    EXPECT_TRUE(tr_sessionUsesAltSpeedTime(session_));
+    EXPECT_TRUE(tr_sessionIsRPCEnabled(session_));
 }
 
 TEST_F(SessionTest, savesSettings)

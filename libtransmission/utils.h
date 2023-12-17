@@ -17,6 +17,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "libtransmission/file.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/values.h"
@@ -69,6 +70,10 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
 bool tr_file_move(std::string_view oldpath, std::string_view newpath, tr_error* error = nullptr);
 
 bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error = nullptr);
+
+tr_sys_file_t tr_create_lockfile(char const* path);
+
+void tr_destroy_lockfile(tr_sys_file_t lockfile_fd, char const* path);
 
 template<typename ContiguousRange>
 constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error* error = nullptr)

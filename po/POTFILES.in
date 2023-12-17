@@ -15,8 +15,8 @@ gtk/open-dialog.c
 gtk/relocate.c
 gtk/stats.c
 gtk/torrent-cell-renderer.c
-gtk/transmission-gtk.metainfo.xml.in
-gtk/transmission-gtk.desktop.in
+gtk/com.transmissionbt.transmission.gtk.metainfo.xml.in
+gtk/com.transmissionbt.transmission.gtk.desktop.in
 gtk/tr-core.c
 gtk/tr-icon.c
 gtk/tr-prefs.c

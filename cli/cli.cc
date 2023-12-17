@@ -231,7 +231,14 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    auto* const h = tr_sessionInit(config_dir.c_str(), false, settings);
+    auto error = tr_error{};
+    auto* const h = tr_sessionInit(config_dir.c_str(), false, settings, &error);
+    if (h == nullptr)
+    {
+        fmt::print(stderr, "{:s}\n", error.message());
+        return EXIT_FAILURE;
+    }
+
     auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);

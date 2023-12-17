@@ -541,12 +541,34 @@ struct tr_session::init_data
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
+static void get_lockfile_path(char const* config_dir, tr_pathbuf& path)
+{
+    fmt::format_to(std::back_inserter(path), "{}/transmission.lock", config_dir);
+}
+
+tr_session* tr_sessionInit(
+    char const* config_dir,
+    bool message_queueing_enabled,
+    tr_variant const& client_settings,
+    tr_error* error)
 {
     using namespace bandwidth_group_helpers;
 
     TR_ASSERT(config_dir != nullptr);
     TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
+
+    auto lockfile_path = tr_pathbuf{};
+    get_lockfile_path(config_dir, lockfile_path);
+
+    auto lockfile_fd = tr_create_lockfile(lockfile_path);
+    if (lockfile_fd == TR_BAD_SYS_FILE)
+    {
+        if (error != nullptr)
+        {
+            error->set(ENOTUNIQ, "Can't lock a configuration directory for exclusive access");
+        }
+        return nullptr;
+    }
 
     tr_timeUpdate(time(nullptr));
 
@@ -568,6 +590,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     // initialize the bare skeleton of the session object
     auto* const session = new tr_session{ config_dir, tr_variant::make_map() };
+    session->lockfile_fd_ = lockfile_fd;
     bandwidthGroupRead(session, config_dir);
 
     // run initImpl() in the libtransmission thread
@@ -1415,6 +1438,10 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs)
     session->runInSessionThread([&closed_promise, deadline, session]() { session->closeImplPart1(&closed_promise, deadline); });
     closed_future.wait();
 
+    auto lockfile_path = tr_pathbuf{};
+    get_lockfile_path(session->configDir().c_str(), lockfile_path);
+
+    tr_destroy_lockfile(session->lockfile_fd_, lockfile_path);
     delete session;
 }
 

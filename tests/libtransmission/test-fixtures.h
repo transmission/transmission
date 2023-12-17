@@ -337,7 +337,7 @@ private:
         settings_map->try_emplace(TR_KEY_dht_enabled, false);
         settings_map->try_emplace(TR_KEY_message_level, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
-        return tr_sessionInit(sandboxDir().data(), !verbose, settings);
+        return tr_sessionInit(sandboxDir().data(), !verbose, settings, nullptr);
     }
 
     void sessionClose(tr_session* session)
@@ -485,6 +485,7 @@ protected:
         init_mgr_ = tr_lib_init();
 
         session_ = sessionInit(*settings());
+        EXPECT_TRUE(session_ != nullptr);
     }
 
     virtual void TearDown() override

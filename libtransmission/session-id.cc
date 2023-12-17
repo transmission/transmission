@@ -21,7 +21,7 @@
 #include "libtransmission/platform.h"
 #include "libtransmission/session-id.h"
 #include "libtransmission/tr-strbuf.h" // for tr_pathbuf
-#include "libtransmission/utils.h" // for _()
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -43,50 +43,15 @@ tr_sys_file_t create_lockfile(std::string_view session_id)
     auto lockfile_path = tr_pathbuf{};
     get_lockfile_path(session_id, lockfile_path);
 
-    auto error = tr_error{};
-    auto lockfile_fd = tr_sys_file_open(lockfile_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
-
-    if (lockfile_fd != TR_BAD_SYS_FILE)
-    {
-        if (tr_sys_file_lock(lockfile_fd, TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB, &error))
-        {
-#ifndef _WIN32
-            /* Allow any user to lock the file regardless of current umask */
-            fchmod(lockfile_fd, 0644);
-#endif
-        }
-        else
-        {
-            tr_sys_file_close(lockfile_fd);
-            lockfile_fd = TR_BAD_SYS_FILE;
-        }
-    }
-
-    if (error)
-    {
-        tr_logAddWarn(fmt::format(
-            _("Couldn't create '{path}': {error} ({error_code})"),
-            fmt::arg("path", lockfile_path),
-            fmt::arg("error", error.message()),
-            fmt::arg("error_code", error.code())));
-    }
-
-    return lockfile_fd;
+    return tr_create_lockfile(lockfile_path);
 }
 
 void destroy_lockfile(tr_sys_file_t lockfile_fd, std::string_view session_id)
 {
-    if (lockfile_fd != TR_BAD_SYS_FILE)
-    {
-        tr_sys_file_close(lockfile_fd);
-    }
+    auto lockfile_path = tr_pathbuf{};
+    get_lockfile_path(session_id, lockfile_path);
 
-    if (!std::empty(session_id))
-    {
-        auto lockfile_path = tr_pathbuf{};
-        get_lockfile_path(session_id, lockfile_path);
-        tr_sys_path_remove(lockfile_path);
-    }
+    tr_destroy_lockfile(lockfile_fd, lockfile_path);
 }
 
 #ifndef _WIN32

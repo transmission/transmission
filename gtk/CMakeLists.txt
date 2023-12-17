@@ -143,18 +143,18 @@ tr_target_glib_resources(${TR_NAME}-gtk
     ${UI_SUBDIR}/transmission-ui.gresource.xml)
 
 if(ENABLE_NLS)
-    set(DESKTOP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
+    set(DESKTOP_FILE "${CMAKE_CURRENT_BINARY_DIR}/com.transmissionbt.transmission.gtk.desktop")
     tr_gettext_msgfmt(${TR_NAME}-gtk
         ${DESKTOP_FILE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.desktop.in)
+        ${CMAKE_CURRENT_SOURCE_DIR}/com.transmissionbt.transmission.gtk.desktop.in)
     target_sources(${TR_NAME}-gtk
         PRIVATE
             ${DESKTOP_FILE})
 
-    set(METAINFO_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
+    set(METAINFO_FILE "${CMAKE_CURRENT_BINARY_DIR}/com.transmissionbt.transmission.gtk.metainfo.xml")
     tr_gettext_msgfmt(${TR_NAME}-gtk
         ${METAINFO_FILE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in)
+        ${CMAKE_CURRENT_SOURCE_DIR}/com.transmissionbt.transmission.gtk.metainfo.xml.in)
     target_sources(${TR_NAME}-gtk
         PRIVATE
             ${METAINFO_FILE})
@@ -246,7 +246,7 @@ if(ENABLE_NLS)
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 else()
     install(
-        FILES transmission-gtk.desktop.in
+        FILES com.transmissionbt.transmission.gtk.desktop.in
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
-        RENAME ${TR_NAME}-gtk.desktop)
+        RENAME com.transmissionbt.transmission.gtk.desktop)
 endif()
