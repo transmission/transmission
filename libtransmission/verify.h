@@ -72,7 +72,7 @@ private:
         tr_priority_t priority_;
     };
 
-    static void verify_torrent(Mediator& verify_mediator, bool abort_flag);
+    static void verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag);
 
     void verify_thread_func();
 
