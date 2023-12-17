@@ -44,12 +44,6 @@
 #define IF_GTKMM4(ThenValue, ElseValue) ElseValue
 #endif
 
-#if GTKMM_CHECK_VERSION(4, 10, 0)
-#define IF_GTKMM4_10(ThenValue, ElseValue) ThenValue
-#else
-#define IF_GTKMM4_10(ThenValue, ElseValue) ElseValue
-#endif
-
 #if GLIBMM_CHECK_VERSION(2, 68, 0)
 #define IF_GLIBMM2_68(ThenValue, ElseValue) ThenValue
 #else
