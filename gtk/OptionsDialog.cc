@@ -338,7 +338,16 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
         bool const do_prompt = get_choice(std::string(ShowOptionsDialogChoice)) == "true";
         bool const do_notify = false;
 
-        auto const files = IF_GTKMM4(get_files2, get_files)();
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+        auto files = std::vector<Glib::RefPtr<Gio::File>>();
+        auto files_model = get_files();
+        for (auto i = guint{ 0 }; i < files_model->get_n_items(); ++i)
+        {
+            files.push_back(gtr_ptr_dynamic_cast<Gio::File>(files_model->get_object(i)));
+        }
+#else
+        auto const files = get_files();
+#endif
         g_assert(!files.empty());
 
         /* remember this folder the next time we use this dialog */
