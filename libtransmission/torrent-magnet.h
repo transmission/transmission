@@ -20,6 +20,8 @@
 
 #include <small/vector.hpp>
 
+#include "libtransmission/tr-macros.h"
+
 struct tr_error;
 struct tr_torrent;
 struct tr_torrent_metainfo;
@@ -32,14 +34,7 @@ using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
 class tr_metadata_download
 {
 public:
-    struct Mediator
-    {
-        virtual ~Mediator() = default;
-
-        [[nodiscard]] virtual std::string log_name() const noexcept = 0;
-    };
-
-    tr_metadata_download(std::unique_ptr<Mediator> mediator, int64_t size);
+    tr_metadata_download(std::string_view log_name, int64_t size);
 
     [[nodiscard]] static constexpr auto is_valid_metadata_size(int64_t const size) noexcept
     {
@@ -64,9 +59,9 @@ public:
         return metadata_;
     }
 
-    [[nodiscard]] auto log_name() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 std::string_view log_name() const noexcept
     {
-        return mediator_->log_name();
+        return log_name_;
     }
 
 private:
@@ -82,5 +77,5 @@ private:
     std::deque<metadata_node> pieces_needed_;
     int64_t piece_count_ = {};
 
-    std::unique_ptr<Mediator> mediator_;
+    std::string log_name_;
 };

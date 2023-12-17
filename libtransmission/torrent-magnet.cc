@@ -57,8 +57,8 @@ void tr_metadata_download::create_all_needed(int64_t n_pieces) noexcept
     }
 }
 
-tr_metadata_download::tr_metadata_download(std::unique_ptr<Mediator> mediator, int64_t const size)
-    : mediator_{ std::move(mediator) }
+tr_metadata_download::tr_metadata_download(std::string_view log_name, int64_t const size)
+    : log_name_{ std::string{ log_name } }
 {
     TR_ASSERT(is_valid_metadata_size(size));
 
@@ -83,7 +83,7 @@ void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
         return;
     }
 
-    metadata_download_ = std::make_unique<tr_metadata_download>(std::make_unique<MagnetMediator>(*this), size);
+    metadata_download_ = std::make_unique<tr_metadata_download>(name(), size);
 }
 
 [[nodiscard]] std::optional<tr_metadata_piece> tr_torrent::get_metadata_piece(int64_t const piece) const

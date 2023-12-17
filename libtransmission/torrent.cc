@@ -2693,10 +2693,3 @@ std::vector<time_t> const& tr_torrent::ResumeHelper::file_mtimes() const noexcep
 {
     return tor_.file_mtimes_;
 }
-
-// --- MagnetMediator
-
-std::string tr_torrent::MagnetMediator::log_name() const noexcept
-{
-    return tor_.name();
-}

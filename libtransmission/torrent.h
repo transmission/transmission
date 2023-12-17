@@ -175,20 +175,6 @@ struct tr_torrent final : public tr_completion::torrent_view
         std::optional<time_t> time_started_;
     };
 
-    class MagnetMediator : public tr_metadata_download::Mediator
-    {
-    public:
-        explicit MagnetMediator(tr_torrent const& tor)
-            : tor_{ tor }
-        {
-        }
-
-        [[nodiscard]] std::string log_name() const noexcept override;
-
-    private:
-        tr_torrent const& tor_;
-    };
-
     // ---
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
