@@ -44,11 +44,21 @@ protected:
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
 
-        size_t const min_size = n_files == 1U ? 1U : 0U;
-        for (size_t i = 0; i < n_files; ++i)
+        auto file_sizes = std::vector<size_t>(n_files);
+        EXPECT_EQ(std::size(file_sizes), n_files);
+        while (
+            std::all_of(std::begin(file_sizes), std::end(file_sizes), [](size_t const file_size) { return file_size == 0U; }))
+        {
+            for (auto& file_size : file_sizes)
+            {
+                file_size = tr_rand_int(max_size);
+            }
+        }
+
+        for (size_t i = 0U; i < n_files; ++i)
         {
             auto payload = std::vector<std::byte>{};
-            payload.resize(std::max(tr_rand_int(max_size), min_size));
+            payload.resize(file_sizes[i]);
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
