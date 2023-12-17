@@ -1,34 +1,25 @@
+# IDE directories
 .idea
 .vscode
+
+# macOS hidden files
 .DS_Store
 
-/beta
-/build
+# Xcode project files
 Transmission.xcodeproj/*.xcworkspace
 Transmission.xcodeproj/xcuserdata
-/cli/transmissioncli
-/daemon/transmission-daemon
-/daemon/transmission-proxy
-/daemon/transmission-remote
-/gtk/defines.h
-/gtk/transmission-gtk
-/libtransmission/*.a
-/libtransmission/version.h
+
+# files Xcode creates
 /macosx/Info.plist
-/macosx/**/*~.nib
-node_modules/
-/po/*.mo
-/REVISION
-/tests/**/*.out
-/third-party/miniupnp/miniupnpcstrings.h
-/third-party/suffixes_dafsa.h
-/web/public_html/transmission-app.js.map
+libtransmission/version.h
+third-party/suffixes_dafsa.h
+
+# npm files
+web/node_modules/**
+web/public_html/transmission-app.js.map
 
 # clangd compile commands
 compile_commands.json
-
-# CLion IDE build directory
-/cmake-build-*/
 
 # CMake user presets
 CMakeUserPresets.json
