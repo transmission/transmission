@@ -16,15 +16,13 @@
 #include <limits>
 #include <memory>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <small/vector.hpp>
 
 #include "libtransmission/tr-macros.h"
-
-struct tr_error;
-struct tr_torrent;
-struct tr_torrent_metainfo;
 
 // defined by BEP #9
 inline constexpr auto MetadataPieceSize = 1024 * 16;
