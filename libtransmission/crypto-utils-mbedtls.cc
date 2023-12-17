@@ -229,6 +229,21 @@ bool tr_rand_buffer_crypto(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
+    auto constexpr ChunkSize = size_t{ MBEDTLS_CTR_DRBG_MAX_REQUEST };
+    static_assert(ChunkSize > 0U);
+
     auto const lock = std::lock_guard(rng_mutex_);
-    return check_result(mbedtls_ctr_drbg_random(get_rng(), static_cast<unsigned char*>(buffer), length));
+
+    for (auto offset = size_t{ 0 }; offset < length; offset += ChunkSize)
+    {
+        if (!check_result(mbedtls_ctr_drbg_random(
+                get_rng(),
+                static_cast<unsigned char*>(buffer) + offset,
+                std::min(ChunkSize, length - offset))))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

@@ -154,9 +154,10 @@ std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cach
 tr_global_ip_cache::~tr_global_ip_cache()
 {
     // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
-    auto const locks = std::scoped_lock{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
-                                         global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
-                                         source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
+    auto const locks = std::scoped_lock{ global_addr_mutex_[TR_AF_INET],
+                                         global_addr_mutex_[TR_AF_INET6],
+                                         source_addr_mutex_[TR_AF_INET],
+                                         source_addr_mutex_[TR_AF_INET6] };
 
     if (!std::all_of(
             std::begin(is_updating_),
@@ -178,8 +179,7 @@ bool tr_global_ip_cache::try_shutdown() noexcept
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
-        auto const lock = std::unique_lock{ is_updating_mutex_[i], std::try_to_lock };
-        if (!lock.owns_lock() || is_updating_[i] == is_updating_t::YES)
+        if (is_updating_[i] == is_updating_t::YES)
         {
             return false;
         }
@@ -363,25 +363,16 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 
 bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
 {
-    auto lock = std::unique_lock{ is_updating_mutex_[type] };
-    is_updating_cv_[type].wait(
-        lock,
-        [this, type]() { return is_updating_[type] == is_updating_t::NO || is_updating_[type] == is_updating_t::ABORT; });
     if (is_updating_[type] != is_updating_t::NO)
     {
         return false;
     }
     is_updating_[type] = is_updating_t::YES;
-    lock.unlock();
-    is_updating_cv_[type].notify_one();
     return true;
 }
 
 void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
 {
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-    auto lock = std::unique_lock{ is_updating_mutex_[type] };
     is_updating_[type] = is_updating_t::NO;
-    lock.unlock();
-    is_updating_cv_[type].notify_one();
 }
