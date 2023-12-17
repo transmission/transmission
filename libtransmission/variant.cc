@@ -35,12 +35,12 @@ using namespace std::literals;
 
 namespace
 {
-constexpr bool variant_is_container(tr_variant const* const var)
+[[nodiscard]] constexpr bool variant_is_container(tr_variant const* const var)
 {
     return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
 }
 
-constexpr int variant_index(tr_variant const* const var)
+[[nodiscard]] constexpr int variant_index(tr_variant const* const var)
 {
     if (var != nullptr)
     {
@@ -48,6 +48,35 @@ constexpr int variant_index(tr_variant const* const var)
     }
 
     return tr_variant::NoneIndex;
+}
+
+template<typename T>
+[[nodiscard]] tr_variant* dict_set(tr_variant* const var, tr_quark const key, T&& val)
+{
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
+
+    if (auto* const map = var != nullptr ? var->get_if<tr_variant::MapIndex>() : nullptr; map != nullptr)
+    {
+        map->erase(key);
+        return &map->try_emplace(key, std::forward<T>(val)).first;
+    }
+
+    return {};
+}
+
+template<typename T>
+[[nodiscard]] tr_variant* vec_add(tr_variant* const var, T&& val)
+{
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
+
+    if (auto* const vec = var != nullptr ? var->get_if<tr_variant::VectorIndex>() : nullptr; vec != nullptr)
+    {
+        return &vec->emplace_back(std::forward<T>(val));
+    }
+
+    return {};
 }
 } // namespace
 
@@ -119,15 +148,19 @@ void tr_variant::Merge::operator()(tr_variant::Vector const& src)
 
 void tr_variant::Merge::operator()(tr_variant::Map const& src)
 {
+    // if tgt_ isn't already a map, make it one
     if (tgt_.index() != tr_variant::MapIndex)
     {
         tgt_.val_.emplace<tr_variant::Map>();
     }
-    auto& tgt = *tgt_.get_if<tr_variant::MapIndex>();
-    tgt.reserve(std::size(tgt) + std::size(src));
-    for (auto const& [key, val] : src)
+
+    if (auto* tgt = tgt_.get_if<tr_variant::MapIndex>(); tgt != nullptr)
     {
-        std::visit(Merge{ tgt[key] }, val.val_);
+        tgt->reserve(std::size(*tgt) + std::size(src));
+        for (auto const& [key, val] : src)
+        {
+            std::visit(Merge{ (*tgt)[key] }, val.val_);
+        }
     }
 }
 
@@ -399,62 +432,44 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
     return nullptr;
 }
 
-tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t value)
+tr_variant* tr_variantListAddInt(tr_variant* const var, int64_t const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddReal(tr_variant* const var, double value)
+tr_variant* tr_variantListAddReal(tr_variant* const var, double const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddBool(tr_variant* const var, bool value)
+tr_variant* tr_variantListAddBool(tr_variant* const var, bool const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, value);
 }
 
-tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view value)
+tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view const value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = value;
-    return child;
+    return vec_add(var, std::string{ value });
 }
 
 tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view value)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = tr_variant::unmanaged_string(value);
-    return child;
+    return vec_add(var, tr_variant::unmanaged_string(value));
 }
 
 tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t n_bytes)
 {
-    auto* const child = tr_variantListAdd(var);
-    *child = tr_variant::make_raw(value, n_bytes);
-    return child;
+    return vec_add(var, tr_variant::make_raw(value, n_bytes));
 }
 
-tr_variant* tr_variantListAddList(tr_variant* const var, size_t n_reserve)
+tr_variant* tr_variantListAddList(tr_variant* const var, size_t const n_reserve)
 {
-    auto* const child = tr_variantListAdd(var);
-    auto vec = tr_variant::Vector{};
-    vec.reserve(n_reserve);
-    *child = std::move(vec);
-    return child;
+    return vec_add(var, tr_variant::make_vector(n_reserve));
 }
 
-tr_variant* tr_variantListAddDict(tr_variant* const var, size_t n_reserve)
+tr_variant* tr_variantListAddDict(tr_variant* const var, size_t const n_reserve)
 {
-    auto* const child = tr_variantListAdd(var);
-    tr_variantInitDict(child, n_reserve);
-    return child;
+    return vec_add(var, tr_variant::make_map(n_reserve));
 }
 
 tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
@@ -470,66 +485,44 @@ tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
     return {};
 }
 
-tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark key, int64_t val)
+tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark const key, int64_t const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    *child = val;
-    return child;
+    return dict_set(var, key, val);
 }
 
 tr_variant* tr_variantDictAddBool(tr_variant* const var, tr_quark key, bool val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    *child = val;
-    return child;
+    return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark key, double val)
+tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark const key, double const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    *child = val;
-    return child;
+    return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark key, std::string_view val)
+tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark const key, std::string_view const val)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    *child = val;
-    return child;
+    return dict_set(var, key, val);
 }
 
-tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark key, std::string_view val)
+tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark const key, void const* const value, size_t const n_bytes)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    *child = tr_variant::unmanaged_string(val);
-    return child;
+    return dict_set(var, key, std::string{ static_cast<char const*>(value), n_bytes });
 }
 
-tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark key, void const* value, size_t n_bytes)
+tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark const key, size_t const n_reserve)
 {
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    *child = tr_variant::make_raw(value, n_bytes);
-    return child;
+    return dict_set(var, key, tr_variant::make_vector(n_reserve));
 }
 
-tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark key, size_t n_reserve)
+tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark const key, std::string_view const val)
 {
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitList(child, n_reserve);
-    return child;
+    return dict_set(var, key, tr_variant::unmanaged_string(val));
 }
 
 tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t n_reserve)
 {
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitDict(child, n_reserve);
-    return child;
+    return dict_set(var, key, tr_variant::make_map(n_reserve));
 }
 
 bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
@@ -683,7 +676,11 @@ public:
     void pop()
     {
         TR_ASSERT(!std::empty(stack_));
-        stack_.resize(std::size(stack_) - 1U);
+
+        if (auto const size = std::size(stack_); size != 0U)
+        {
+            stack_.resize(size - 1U);
+        }
     }
 
     [[nodiscard]] bool empty() const noexcept
