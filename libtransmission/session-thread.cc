@@ -107,7 +107,7 @@ unsigned long thread_current_id()
     return hashed;
 }
 
-void initEvthreadsOnce()
+void init_evthreads_once()
 {
     evthread_lock_callbacks constexpr LockCbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
@@ -126,7 +126,7 @@ void initEvthreadsOnce()
 
 } // namespace tr_evthread_init_helpers
 
-auto makeEventBase()
+auto make_event_base()
 {
     tr_session_thread::tr_evthread_init();
 
@@ -142,7 +142,7 @@ void tr_session_thread::tr_evthread_init()
     using namespace tr_evthread_init_helpers;
 
     static auto evthread_flag = std::once_flag{};
-    std::call_once(evthread_flag, initEvthreadsOnce);
+    std::call_once(evthread_flag, init_evthreads_once);
 }
 
 class tr_session_thread_impl final : public tr_session_thread
@@ -152,7 +152,7 @@ public:
     {
         auto lock = std::unique_lock(is_looping_mutex_);
 
-        thread_ = std::thread(&tr_session_thread_impl::sessionThreadFunc, this, event_base());
+        thread_ = std::thread(&tr_session_thread_impl::session_thread_func, this, event_base());
         thread_id_ = thread_.get_id();
 
         // wait for the session thread's main loop to start
@@ -170,7 +170,7 @@ public:
         TR_ASSERT(is_looping_);
 
         // Stop the first event loop. This is the steady-state loop that runs
-        // continuously, even when there are no events. See: sessionThreadFunc()
+        // continuously, even when there are no events. See: session_thread_func()
         is_shutting_down_ = true;
         event_base_loopexit(event_base(), nullptr);
 
@@ -218,7 +218,7 @@ private:
     using callback = std::function<void(void)>;
     using work_queue_t = std::list<callback>;
 
-    void sessionThreadFunc(struct event_base* evbase)
+    void session_thread_func(struct event_base* evbase)
     {
 #ifndef _WIN32
         /* Don't exit when writing on a broken socket */
@@ -252,11 +252,11 @@ private:
         ToggleLooping({}, {}, this);
     }
 
-    static void onWorkAvailableStatic(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
+    static void on_work_available_static(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
     {
-        static_cast<tr_session_thread_impl*>(vself)->onWorkAvailable();
+        static_cast<tr_session_thread_impl*>(vself)->on_work_available();
     }
-    void onWorkAvailable()
+    void on_work_available()
     {
         TR_ASSERT(am_in_session_thread());
 
@@ -273,9 +273,9 @@ private:
         }
     }
 
-    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ makeEventBase() };
+    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ make_event_base() };
     libtransmission::evhelpers::event_unique_ptr const work_queue_event_{
-        event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this)
+        event_new(evbase_.get(), -1, 0, on_work_available_static, this)
     };
 
     work_queue_t work_queue_;

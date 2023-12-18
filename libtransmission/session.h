@@ -367,13 +367,13 @@ public:
     }
 
     template<typename Func, typename... Args>
-    void queueSessionThread(Func&& func, Args&&... args)
+    void queue_session_thread(Func&& func, Args&&... args)
     {
         session_thread_->queue(std::forward<Func>(func), std::forward<Args>(args)...);
     }
 
     template<typename Func, typename... Args>
-    void runInSessionThread(Func&& func, Args&&... args)
+    void run_in_session_thread(Func&& func, Args&&... args)
     {
         session_thread_->run(std::forward<Func>(func), std::forward<Args>(args)...);
     }
