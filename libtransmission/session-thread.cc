@@ -193,6 +193,15 @@ public:
         return thread_id_ == std::this_thread::get_id();
     }
 
+    void queue(std::function<void(void)>&& func) override
+    {
+        work_queue_mutex_.lock();
+        work_queue_.emplace_back(std::move(func));
+        work_queue_mutex_.unlock();
+
+        event_active(work_queue_event_.get(), 0, {});
+    }
+
     void run(std::function<void(void)>&& func) override
     {
         if (am_in_session_thread())
@@ -201,11 +210,7 @@ public:
         }
         else
         {
-            work_queue_mutex_.lock();
-            work_queue_.emplace_back(std::move(func));
-            work_queue_mutex_.unlock();
-
-            event_active(work_queue_event_.get(), 0, {});
+            queue(std::move(func));
         }
     }
 
