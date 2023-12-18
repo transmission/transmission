@@ -753,6 +753,7 @@ void tr_torrent::stop_now()
 
     is_running_ = false;
     is_stopping_ = false;
+    mark_changed();
 
     if (!session->isClosing())
     {
