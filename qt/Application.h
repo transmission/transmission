@@ -97,6 +97,8 @@ private:
     void quitLater() const;
     void notifyTorrentAdded(Torrent const*) const;
 
+    std::unordered_set<QString> interned_strings_;
+
     std::unique_ptr<Prefs> prefs_;
     std::unique_ptr<Session> session_;
     std::unique_ptr<TorrentModel> model_;
@@ -113,8 +115,6 @@ private:
 
     QString const config_name_ = QStringLiteral("transmission");
     QString const display_name_ = QStringLiteral("transmission-qt");
-
-    std::unordered_set<QString> interned_strings_;
 
 #ifdef QT_DBUS_LIB
     QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
