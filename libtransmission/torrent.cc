@@ -862,6 +862,7 @@ void torrentStop(tr_torrent* const tor)
 
     tor->isRunning = false;
     tor->isStopping = false;
+    tor->markChanged();
 
     if (!tor->session->isClosing())
     {
