@@ -501,14 +501,8 @@ a {
       }
     }
 
-    &.selected {
-      &.torrent-name {
-        color: var(--color-fg-primary);
-      }
-    }
-
-    &:not(.selected) .paused {
-      &.torrent-name {
+    &:not(.selected) {
+      .torrent-name.paused {
         color: var(--color-fg-disabled);
       }
     }
