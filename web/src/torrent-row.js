@@ -219,7 +219,6 @@ export class TorrentRendererFull {
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     const is_stopped = t.isStopped();
-    root.classList.toggle('paused', is_stopped);
 
     // name
     let e = root._name_container;
@@ -333,12 +332,9 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
-    const is_stopped = t.isStopped();
-    root.classList.toggle('paused', is_stopped);
-
     // name
     let e = root._name_container;
-    e.classList.toggle('paused', is_stopped);
+    e.classList.toggle('paused', t.isStopped());
     setTextContent(e, t.getName());
 
     // labels
