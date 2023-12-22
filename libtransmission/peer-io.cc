@@ -389,17 +389,14 @@ void tr_peerIo::can_read_wrapper()
         auto const used = old_len - read_buffer_size();
         auto const overhead = socket_.guess_packet_overhead(used);
 
-        if (piece != 0U || piece != used)
+        if (piece != 0U)
         {
-            if (piece != 0U)
-            {
-                bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
-            }
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
+        }
 
-            if (used != piece)
-            {
-                bandwidth().notify_bandwidth_consumed(TR_DOWN, used - piece, false, now);
-            }
+        if (used != piece)
+        {
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, used - piece, false, now);
         }
 
         if (overhead > 0U)
