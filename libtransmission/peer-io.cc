@@ -736,16 +736,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto const* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                // We use this callback to enforce speed limits by telling
-                // libutp to read no more than `target_dl_bytes` bytes.
-                auto const target_dl_bytes = io->bandwidth_.clamp(TR_DOWN, RcvBuf);
-
-                // libutp's private function get_rcv_window() allows libutp
-                // to read up to (UTP_RCVBUF - READ_BUFFER_SIZE) bytes and
-                // UTP_RCVBUF is set to `RcvBuf` by tr_peerIo::utp_init().
-                // So to limit dl to `target_dl_bytes`, we need to return
-                // N where (`target_dl_bytes` == RcvBuf - N).
-                return RcvBuf - target_dl_bytes;
+                return io->read_buffer_size();
             }
             return {};
         });
