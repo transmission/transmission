@@ -71,7 +71,7 @@ TEST_F(NetTest, compact4)
     EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again
-    auto buf = std::array<std::byte, 64U>{};
+    auto buf = std::array<std::byte, tr_address::CompactAddrMaxBytes>{};
     auto out = std::data(buf);
     out = socket_address.to_compact(out);
     EXPECT_EQ(std::size(Compact4), static_cast<size_t>(out - std::data(buf)));
