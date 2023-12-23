@@ -588,7 +588,8 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     // labels
     int width_used = 0;
-    for (auto label_text : tor.labels()) {
+    for (auto label_text : tor.labels())
+    {
         QRect label_rect = QFontMetrics{ layout.labels_font }.boundingRect(label_text);
         label_rect.moveTopLeft(layout.labels_rect.topLeft() + QPoint{ width_used, 0 });
         width_used += label_rect.width();

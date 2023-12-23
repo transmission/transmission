@@ -26,6 +26,7 @@
 #include <QRegularExpression>
 #include <QStringList>
 #include <QStyle>
+#include <QString>
 #include <QTreeWidgetItem>
 
 #include <libtransmission/transmission.h>
@@ -867,15 +868,16 @@ void DetailsDialog::refreshUI()
 
     // myLabelsTextEdit
     string = none;
-    bool is_labels_mixed = false;
 
     if (single && ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
     {
         auto labels = torrents[0]->labels();
         string.clear();
 
-        for (int i = 0; i < labels.size(); ++i) {
-            if (i != 0) {
+        for (int i = 0; i < labels.size(); ++i)
+        {
+            if (i != 0)
+            {
                 string += QStringLiteral(", ");
             }
 
