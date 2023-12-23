@@ -415,6 +415,11 @@ public:
 
     bool includesTracker(QString const& sitename) const;
 
+    [[nodiscard]] constexpr auto const& labels() const noexcept
+    {
+        return labels_;
+    }
+
     [[nodiscard]] constexpr auto const& sitenames() const noexcept
     {
         return sitenames_;
@@ -588,6 +593,7 @@ public:
         IS_FINISHED,
         IS_PRIVATE,
         IS_STALLED,
+        LABELS,
         LEFT_UNTIL_DONE,
         MANUAL_ANNOUNCE_TIME,
         METADATA_PERCENT_COMPLETE,
@@ -690,6 +696,7 @@ private:
     PeerList peers_;
     FileList files_;
 
+    std::vector<QString> labels_;
     std::vector<QString> sitenames_;
     TrackerStatsList tracker_stats_;
 

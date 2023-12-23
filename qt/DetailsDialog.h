@@ -66,6 +66,9 @@ private slots:
     void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
     void onSessionCalled(Session::Tag tag);
 
+    // Details tab
+    void onButtonBoxClicked(QAbstractButton* button);
+
     // Tracker tab
     void onTrackerSelectionChanged();
     void onAddTrackerClicked();

@@ -282,6 +282,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     // set up the debounce timer
     connect(&ui_debounce_timer_, &QTimer::timeout, this, &DetailsDialog::refreshUI);
     ui_debounce_timer_.setSingleShot(true);
+
+    // set labels
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &DetailsDialog::onButtonBoxClicked);
 }
 
 DetailsDialog::~DetailsDialog()
@@ -383,6 +386,17 @@ void DetailsDialog::onSessionCalled(Session::Tag tag)
         pending_changes_connection_ = {};
 
         refreshModel();
+    }
+}
+
+void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
+{
+    if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
+    {
+        auto labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+        QStringList labels_list = labels_text.split(QStringLiteral(", "));
+
+        torrentSet(TR_KEY_labels, labels_list);
     }
 }
 
@@ -849,6 +863,26 @@ void DetailsDialog::refreshUI()
 
     ui_.privacyValueLabel->setText(string);
 
+    // myLabelsTextEdit
+    string = none;
+    bool is_labels_mixed = false;
+
+    if (torrents.size() == 1 && ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
+    {
+        auto labels = torrents[0]->labels();
+        string.clear();
+
+        for (int i = 0; i < labels.size(); ++i) {
+            if (i != 0) {
+                string += QStringLiteral(", ");
+            }
+
+            string += labels[i];
+        }
+
+        ui_.labelsTextEdit->setText(string);
+    }
+
     // myCommentBrowser
     string = none;
     bool is_comment_mixed = false;
@@ -1250,8 +1284,12 @@ void DetailsDialog::setEnabled(bool enabled)
 
 void DetailsDialog::initInfoTab()
 {
-    int const h = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
-    ui_.commentBrowser->setFixedHeight(h);
+    int const cbh = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
+    ui_.commentBrowser->setFixedHeight(cbh);
+
+    int const lteh = QFontMetrics{ ui_.labelsTextEdit->font() }.lineSpacing() * 2;
+    ui_.labelsTextEdit->setFixedHeight(lteh);
+    ui_.labelsTextEdit->setText(QStringLiteral("Initializing..."));
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);

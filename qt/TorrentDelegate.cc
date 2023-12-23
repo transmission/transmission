@@ -43,6 +43,7 @@ public:
     QFont name_font;
     QFont status_font;
     QFont progress_font;
+    QFont labels_font;
 
     QRect icon_rect;
     QRect emblem_rect;
@@ -50,6 +51,7 @@ public:
     QRect status_rect;
     QRect bar_rect;
     QRect progress_rect;
+    QRect labels_rect;
 
     ItemLayout(
         QString name_text,
@@ -103,6 +105,7 @@ ItemLayout::ItemLayout(
     , name_font{ base_font }
     , status_font{ base_font }
     , progress_font{ base_font }
+    , labels_font{ base_font }
 {
     QStyle const* style = QApplication::style();
     int const icon_size(style->pixelMetric(QStyle::PM_LargeIconSize));
@@ -122,7 +125,10 @@ ItemLayout::ItemLayout(
     auto base_rect = QRect{ top_left, QSize{ width, 0 } };
     Utils::narrowRect(base_rect, icon_size + GUI_PAD, 0, direction);
 
-    name_rect = base_rect.adjusted(0, 0, 0, name_size.height());
+    auto const name_rect_width = name_fm.horizontalAdvance(name_text_);
+
+    name_rect = base_rect.adjusted(0, 0, name_rect_width, name_size.height());
+    labels_rect = base_rect.adjusted(name_rect_width, 0, 0, name_size.height());
     status_rect = name_rect.adjusted(0, name_rect.height() + 1, 0, status_size.height() + 1);
     bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, BAR_HEIGHT + 1);
     progress_rect = bar_rect.adjusted(0, bar_rect.height() + 1, 0, progress_size.height() + 1);
@@ -578,6 +584,23 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     painter->setFont(layout.name_font);
     painter->drawText(layout.name_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.nameText());
+    painter->setFont(layout.labels_font);
+
+    // labels
+    int width_used = 0;
+    for (auto label_text : tor.labels()) {
+        auto const label_width = QFontMetrics{ layout.labels_font }.horizontalAdvance(label_text);
+        QRect label_rect = { layout.labels_rect.left() + width_used, layout.labels_rect.top(),
+                             label_width, layout.labels_rect.height() };
+        width_used += label_width;
+
+        // gap between labels
+        width_used += 5;
+
+        painter->drawText(label_rect, Qt::AlignCenter, label_text);
+        painter->drawRoundedRect(label_rect, 1.0, 1.0);
+    }
+
     painter->setFont(layout.status_font);
     painter->drawText(layout.status_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
     painter->setFont(layout.progress_font);

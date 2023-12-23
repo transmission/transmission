@@ -536,7 +536,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // changing fields needed by the main window
-        static auto constexpr MainStatKeys = std::array<tr_quark, 25>{
+        static auto constexpr MainStatKeys = std::array<tr_quark, 26>{
             TR_KEY_downloadedEver,
             TR_KEY_editDate,
             TR_KEY_error,
@@ -545,6 +545,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_haveUnchecked,
             TR_KEY_haveValid,
             TR_KEY_isFinished,
+            TR_KEY_labels,
             TR_KEY_leftUntilDone,
             TR_KEY_manualAnnounceTime,
             TR_KEY_metadataPercentComplete,
