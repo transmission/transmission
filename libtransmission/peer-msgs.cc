@@ -1860,7 +1860,7 @@ namespace peer_pulse_helpers
     return {};
 }
 
-[[nodiscard]] size_t fill_output_buffer(tr_peerMsgsImpl* msgs, time_t now)
+[[nodiscard]] size_t fill_output_buffer(tr_peerMsgsImpl* msgs, time_t now_sec, uint64_t now_msec)
 {
     auto n_bytes_written = size_t{};
 
@@ -1879,14 +1879,14 @@ namespace peer_pulse_helpers
     for (;;)
     {
         auto const old_len = n_bytes_written;
-        n_bytes_written += add_next_piece(msgs, now);
+        n_bytes_written += add_next_piece(msgs, now_msec);
         if (old_len == n_bytes_written)
         {
             break;
         }
     }
 
-    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
+    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now_sec - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
     {
         n_bytes_written += protocol_send_keepalive(msgs);
     }
@@ -1900,15 +1900,16 @@ void peerPulse(void* vmsgs)
     using namespace peer_pulse_helpers;
 
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-    auto const now = tr_time();
+    auto const now_sec = tr_time();
+    auto const now_msec = tr_time_msec();
 
     updateDesiredRequestCount(msgs);
     updateBlockRequests(msgs);
-    updateMetadataRequests(msgs, now);
+    updateMetadataRequests(msgs, now_sec);
 
     for (;;)
     {
-        if (fill_output_buffer(msgs, now) == 0U)
+        if (fill_output_buffer(msgs, now_sec, now_msec) == 0U)
         {
             break;
         }
