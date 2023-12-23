@@ -394,9 +394,11 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
     if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
     {
         auto labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
-        QStringList labels_list = labels_text.split(QStringLiteral(", "));
+        QString re = QStringLiteral("((,|;)\\s*)");
+        QStringList labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
 
         torrentSet(TR_KEY_labels, labels_list);
+        refreshModel();
     }
 }
 
@@ -867,7 +869,7 @@ void DetailsDialog::refreshUI()
     string = none;
     bool is_labels_mixed = false;
 
-    if (torrents.size() == 1 && ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
+    if (single && ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
     {
         auto labels = torrents[0]->labels();
         string.clear();
