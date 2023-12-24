@@ -394,12 +394,39 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
 {
     if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
     {
-        auto labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+        QString labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
         QString re = QStringLiteral("((,|;)\\s*)");
-        QStringList labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
 
-        torrentSet(TR_KEY_labels, labels_list);
-        refreshModel();
+        //see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
+        #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+            QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
+        #else
+            QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
+        #endif
+
+        // build a list of torrents
+        auto torrents = QList<Torrent const*>{};
+        for (int const id : ids_)
+        {
+            Torrent const* tor = model_.getTorrentFromId(id);
+
+            if (tor != nullptr)
+            {
+                torrents << tor;
+            }
+        }
+
+        if (!torrents.empty() && torrents[0]->labels() != labels_list)
+        {
+            if (auto const& baseline = torrents[0]->labels(); std::all_of(
+                 std::begin(torrents),
+                 std::end(torrents),
+                 [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+            {
+                torrentSet(TR_KEY_labels, labels_list);
+                refreshModel();
+            }
+        }
     }
 }
 
@@ -869,22 +896,29 @@ void DetailsDialog::refreshUI()
     // myLabelsTextEdit
     string = none;
 
-    if (single && ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
+    if (ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
     {
-        auto labels = torrents[0]->labels();
-        string.clear();
-
-        for (int i = 0; i < labels.size(); ++i)
+        if (torrents.empty())
         {
-            if (i != 0)
-            {
-                string += QStringLiteral(", ");
-            }
-
-            string += labels[i];
+            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(true);
         }
-
-        ui_.labelsTextEdit->setText(string);
+        else if (auto const& baseline = torrents[0]->labels(); std::all_of(
+                     std::begin(torrents),
+                     std::end(torrents),
+                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+        {
+            ui_.labelsTextEdit->setText(baseline.join(QStringLiteral(", ")));
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(false);
+        }
+        else // mixed
+        {
+            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlaceholderText(mixed);
+            ui_.labelsTextEdit->setReadOnly(true);
+        }
     }
 
     // myCommentBrowser

@@ -16,6 +16,7 @@
 #include <QMetaType>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 
 #include <libtransmission/transmission.h>
 
@@ -696,7 +697,7 @@ private:
     PeerList peers_;
     FileList files_;
 
-    std::vector<QString> labels_;
+    QStringList labels_;
     std::vector<QString> sitenames_;
     TrackerStatsList tracker_stats_;
 
