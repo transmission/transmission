@@ -397,12 +397,12 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
         QString labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
         QString re = QStringLiteral("((,|;)\\s*)");
 
-        //see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
-        #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-            QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
-        #else
-            QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
-        #endif
+//see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+    QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
+#else
+    QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
+#endif
 
         // build a list of torrents
         auto torrents = QList<Torrent const*>{};
@@ -905,9 +905,9 @@ void DetailsDialog::refreshUI()
             ui_.labelsTextEdit->setReadOnly(true);
         }
         else if (auto const& baseline = torrents[0]->labels(); std::all_of(
-                     std::begin(torrents),
-                     std::end(torrents),
-                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+                    std::begin(torrents),
+                    std::end(torrents),
+                    [&baseline](auto const* tor) { return tor->labels() == baseline; }))
         {
             ui_.labelsTextEdit->setText(baseline.join(QStringLiteral(", ")));
             ui_.labelsTextEdit->setPlaceholderText(none);
