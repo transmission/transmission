@@ -61,7 +61,7 @@ using tr_socket_t = int;
 #endif
 
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/utils.h" // for tr_compare_3way()
 
 /**
  * Literally just a port number.
