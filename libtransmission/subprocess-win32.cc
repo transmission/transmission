@@ -144,12 +144,14 @@ auto get_current_env()
 
 void append_argument(std::string& arguments, char const* argument)
 {
+    TR_ASSERT(argument != nullptr);
+
     if (!std::empty(arguments))
     {
         arguments += ' ';
     }
 
-    if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == nullptr)
+    if (*argument != '\0' && strpbrk(argument, " \t\n\v\"") == nullptr)
     {
         arguments += argument;
         return;
