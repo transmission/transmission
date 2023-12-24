@@ -597,8 +597,12 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         // gap between labels
         width_used += 5;
 
-        painter->drawText(label_rect, Qt::AlignCenter, label_text);
+        auto saved_brush = painter->brush();
+        painter->setBrush(QBrush{ "lightgrey" });
         painter->drawRoundedRect(label_rect, 1.0, 1.0);
+        painter->setBrush(saved_brush);
+
+        painter->drawText(label_rect, Qt::AlignCenter, label_text);
     }
 
     painter->setFont(layout.status_font);
