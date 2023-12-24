@@ -394,8 +394,13 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
 {
     if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
     {
-        QString labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
-        QString re = QStringLiteral("((,|;)\\s*)");
+        if (ui_.labelsTextEdit->isReadOnly()) // mixed -> no edits could have been made
+        {
+            return;
+        }
+
+        QString const labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+        QString const re = QStringLiteral("((,|;)\\s*)");
 
 //see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
@@ -896,7 +901,7 @@ void DetailsDialog::refreshUI()
     // myLabelsTextEdit
     string = none;
 
-    if (ui_.labelsTextEdit->toPlainText() == QStringLiteral("Initializing..."))
+    if (first_refresh_)
     {
         if (torrents.empty())
         {
@@ -1309,6 +1314,8 @@ void DetailsDialog::refreshUI()
     }
 
     setEnabled(true);
+
+    first_refresh_ = false;
 }
 
 void DetailsDialog::setEnabled(bool enabled)
