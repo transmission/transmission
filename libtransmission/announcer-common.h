@@ -23,6 +23,7 @@
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // tr_pex
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 
 struct tr_url_parsed_t;
 

@@ -8,7 +8,6 @@
 #include <cmath>
 #include <ctime> // time()
 #include <iterator>
-#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -370,6 +369,11 @@ std::string tr_metainfo_builder::benc(tr_error* error) const
 
     top.try_emplace(TR_KEY_info, std::move(info_dict));
     return tr_variant_serde::benc().to_string(tr_variant{ std::move(top) });
+}
+
+bool tr_metainfo_builder::save(std::string_view filename, tr_error* error) const
+{
+    return tr_file_save(filename, benc(error), error);
 }
 
 uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
