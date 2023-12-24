@@ -100,11 +100,6 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
 // ---
 
-[[nodiscard]] constexpr bool tr_str_is_empty(char const* value)
-{
-    return value == nullptr || *value == '\0';
-}
-
 /** @brief Portability wrapper for `strlcpy()` that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
