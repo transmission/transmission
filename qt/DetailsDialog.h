@@ -135,6 +135,7 @@ private:
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
     bool first_refresh_ = true;
+    QString labels_baseline_;
 
     std::shared_ptr<TrackerModel> tracker_model_;
     std::shared_ptr<TrackerModelFilter> tracker_filter_;
