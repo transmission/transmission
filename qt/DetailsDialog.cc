@@ -304,6 +304,8 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
         session_.refreshDetailInfo(ids_);
         tracker_model_->refresh(model_, ids_);
 
+        labels_need_refresh_ = true;
+
         refreshModel();
         refreshUI();
     }
@@ -394,7 +396,7 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
 {
     if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
     {
-        if (ui_.labelsTextEdit->isReadOnly()) // mixed -> no edits could have been made
+        if (ui_.labelsTextEdit->isReadOnly()) // no edits could have been made
         {
             return;
         }
@@ -890,13 +892,15 @@ void DetailsDialog::refreshUI()
     // myLabelsTextEdit
     string = none;
 
-    if (first_refresh_)
+    if (labels_need_refresh_)
     {
         if (torrents.empty())
         {
+            labels_baseline_.clear();
             ui_.labelsTextEdit->setText({});
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(true);
+            ui_.labelsTextEdit->setEnabled(true);
         }
         else if (auto const& baseline = torrents[0]->labels(); std::all_of(
                      std::begin(torrents),
@@ -907,9 +911,11 @@ void DetailsDialog::refreshUI()
             ui_.labelsTextEdit->setText(labels_baseline_);
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(false);
+            ui_.labelsTextEdit->setEnabled(true);
         }
         else // mixed
         {
+            labels_baseline_.clear();
             ui_.labelsTextEdit->setText({});
             ui_.labelsTextEdit->setPlaceholderText(mixed);
             ui_.labelsTextEdit->setDisabled(true);
@@ -1305,7 +1311,7 @@ void DetailsDialog::refreshUI()
 
     setEnabled(true);
 
-    first_refresh_ = false;
+    labels_need_refresh_ = false;
 }
 
 void DetailsDialog::setEnabled(bool enabled)
