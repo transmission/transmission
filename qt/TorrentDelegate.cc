@@ -597,15 +597,21 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         // gap between labels
         width_used += 5;
 
+        QPalette::ColorGroup cg = is_item_enabled ? QPalette::Normal : QPalette::Disabled;
         QPalette::ColorRole cr = (option.features & QStyleOptionViewItem::ViewItemFeature::Alternate) ? QPalette::Base :
                                                                                                         QPalette::AlternateBase;
+
+        if (cg == QPalette::Normal && !is_item_active)
+        {
+            cg = QPalette::Inactive;
+        }
 
         if (is_item_selected)
         {
             cr = QPalette::Highlight;
         }
 
-        painter->setBrush(option.palette.brush(QPalette::Current, cr));
+        painter->setBrush(option.palette.brush(cg, cr));
         painter->drawRoundedRect(label_rect, 1.0, 1.0);
         painter->drawText(label_rect, Qt::AlignCenter, label_text);
     }
