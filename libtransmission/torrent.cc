@@ -422,7 +422,7 @@ namespace script_helpers
     {
         buf << tr_torrentTracker(tor, i).host;
 
-        if (++i < n)
+        if (i < n)
         {
             buf << ',';
         }
