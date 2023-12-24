@@ -386,7 +386,7 @@ void useFetchedBlocks(tr_webseed_task* task)
             auto block_buf = std::make_unique<Cache::BlockData>(block_size);
             evbuffer_remove(task->content(), std::data(*block_buf), std::size(*block_buf));
             auto* const data = new write_block_data{ session, tor->id(), task->loc.block, std::move(block_buf), webseed };
-            session->runInSessionThread(&write_block_data::write_block_func, data);
+            session->run_in_session_thread(&write_block_data::write_block_func, data);
         }
 
         task->loc = tor->byte_loc(task->loc.byte + block_size);

@@ -366,15 +366,16 @@ public:
         return session_thread_->am_in_session_thread();
     }
 
-    void runInSessionThread(std::function<void(void)>&& func)
+    template<typename Func, typename... Args>
+    void queue_session_thread(Func&& func, Args&&... args)
     {
-        session_thread_->run(std::move(func));
+        session_thread_->queue(std::forward<Func>(func), std::forward<Args>(args)...);
     }
 
     template<typename Func, typename... Args>
-    void runInSessionThread(Func&& func, Args&&... args)
+    void run_in_session_thread(Func&& func, Args&&... args)
     {
-        session_thread_->run(std::forward<Func&&>(func), std::forward<Args>(args)...);
+        session_thread_->run(std::forward<Func>(func), std::forward<Args>(args)...);
     }
 
     [[nodiscard]] auto* event_base() noexcept
