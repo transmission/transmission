@@ -399,9 +399,9 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
 
 //see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
 #else
-    QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
 #endif
 
         // build a list of torrents
@@ -419,9 +419,9 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
         if (!torrents.empty() && torrents[0]->labels() != labels_list)
         {
             if (auto const& baseline = torrents[0]->labels(); std::all_of(
-                 std::begin(torrents),
-                 std::end(torrents),
-                 [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+                    std::begin(torrents),
+                    std::end(torrents),
+                    [&baseline](auto const* tor) { return tor->labels() == baseline; }))
             {
                 torrentSet(TR_KEY_labels, labels_list);
                 refreshModel();
@@ -905,9 +905,9 @@ void DetailsDialog::refreshUI()
             ui_.labelsTextEdit->setReadOnly(true);
         }
         else if (auto const& baseline = torrents[0]->labels(); std::all_of(
-                    std::begin(torrents),
-                    std::end(torrents),
-                    [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+                     std::begin(torrents),
+                     std::end(torrents),
+                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
         {
             ui_.labelsTextEdit->setText(baseline.join(QStringLiteral(", ")));
             ui_.labelsTextEdit->setPlaceholderText(none);
