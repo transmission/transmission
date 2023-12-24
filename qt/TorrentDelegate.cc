@@ -597,8 +597,16 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         // gap between labels
         width_used += 5;
 
-        auto saved_brush = painter->brush();
-        painter->setBrush(QBrush{ "lightgrey" });
+        QBrush const saved_brush = painter->brush();
+
+        if (option.features & QStyleOptionViewItem::ViewItemFeature::Alternate)
+        {
+            painter->setBrush(option.palette.brush(QPalette::Current, QPalette::Base));
+        }
+        else
+        {
+            painter->setBrush(option.palette.brush(QPalette::Current, QPalette::AlternateBase));
+        }
         painter->drawRoundedRect(label_rect, 1.0, 1.0);
         painter->setBrush(saved_brush);
 
