@@ -597,7 +597,8 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         // gap between labels
         width_used += 5;
 
-        QPalette::ColorRole cr = (option.features & QStyleOptionViewItem::ViewItemFeature::Alternate) ? QPalette::Base : QPalette::AlternateBase;
+        QPalette::ColorRole cr = (option.features & QStyleOptionViewItem::ViewItemFeature::Alternate) ? QPalette::Base :
+                                                                                                        QPalette::AlternateBase;
 
         if (is_item_selected)
         {
