@@ -1644,7 +1644,8 @@ namespace tracker_view_helpers
             view.lastScrapeTime = tier.lastScrapeTime;
             view.lastScrapeSucceeded = tier.lastScrapeSucceeded;
             view.lastScrapeTimedOut = tier.lastScrapeTimedOut;
-            tr_strlcpy(view.lastScrapeResult, tier.last_scrape_str.c_str(), sizeof(view.lastScrapeResult));
+            auto& buf = view.lastScrapeResult;
+            *fmt::format_to_n(buf, sizeof(buf) - 1, "{:s}", tier.last_scrape_str).out = '\0';
         }
 
         if (tier.isScraping)
@@ -1674,7 +1675,8 @@ namespace tracker_view_helpers
             view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;
             view.lastAnnounceTimedOut = tier.lastAnnounceTimedOut;
             view.lastAnnouncePeerCount = tier.lastAnnouncePeerCount;
-            tr_strlcpy(view.lastAnnounceResult, tier.last_announce_str.c_str(), sizeof(view.lastAnnounceResult));
+            auto& buf = view.lastScrapeResult;
+            *fmt::format_to_n(buf, sizeof(buf) - 1, "{:s}", tier.last_announce_str).out = '\0';
         }
 
         if (tier.isAnnouncing)
