@@ -1182,7 +1182,8 @@ void tr_torrent::set_location(std::string_view location, bool move_from_old_path
 void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from_old_path, int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(!tr_str_is_empty(location));
+    TR_ASSERT(location != nullptr);
+    TR_ASSERT(*location != '\0');
 
     tor->set_location(location, move_from_old_path, setme_state);
 }
