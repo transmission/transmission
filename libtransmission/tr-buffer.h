@@ -6,9 +6,9 @@
 #pragma once
 
 #include <algorithm> // for std::copy_n
-#include <cstddef>
-#include <iterator>
-#include <limits>
+#include <cstddef> // size_t
+#include <memory> // std::allocator
+#include <ratio>
 #include <string>
 #include <string_view>
 

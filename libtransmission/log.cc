@@ -10,6 +10,7 @@
 #include <iterator> // back_insert_iterator, empty
 #include <map>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>

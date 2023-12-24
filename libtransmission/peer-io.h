@@ -14,6 +14,7 @@
 #include <cstdint> // uintX_t
 #include <deque>
 #include <memory>
+#include <optional>
 #include <utility> // std::pair
 
 #include <event2/util.h> // for evutil_socket_t
