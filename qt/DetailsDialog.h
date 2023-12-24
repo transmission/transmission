@@ -134,6 +134,7 @@ private:
     torrent_ids_t ids_;
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
+    bool first_refresh_ = true;
 
     std::shared_ptr<TrackerModel> tracker_model_;
     std::shared_ptr<TrackerModelFilter> tracker_filter_;
