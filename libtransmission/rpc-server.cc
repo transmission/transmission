@@ -601,7 +601,7 @@ bool bindUnixSocket(
 #else
     auto addr = sockaddr_un{};
     addr.sun_family = AF_UNIX;
-    tr_strlcpy(addr.sun_path, path + std::size(TrUnixSocketPrefix), sizeof(addr.sun_path));
+    *fmt::format_to_n(addr.sun_path, sizeof(addr.sun_path) - 1, "{:s}", path + std::size(TrUnixSocketPrefix)).out = '\0';
 
     unlink(addr.sun_path);
 
