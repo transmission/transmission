@@ -37,6 +37,8 @@ The file contains the following **per-torrent** properties:
 <tr><td><tt>bitfield</tt></td><td></td></tr>
 </table>
 
+The file format is bencoding, as described in [bep_0003](https://www.bittorrent.org/beps/bep_0003.html).
+
 ## Constants
 <table>
 <tr><td>Maximum number of remembered peers</td><td><tt>MAX_REMEMBERED_PEERS</tt></td><td>200</td></tr>
