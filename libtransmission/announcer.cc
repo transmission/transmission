@@ -1675,7 +1675,7 @@ namespace tracker_view_helpers
             view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;
             view.lastAnnounceTimedOut = tier.lastAnnounceTimedOut;
             view.lastAnnouncePeerCount = tier.lastAnnouncePeerCount;
-            auto& buf = view.lastScrapeResult;
+            auto& buf = view.lastAnnounceResult;
             *fmt::format_to_n(buf, sizeof(buf) - 1, "{:s}", tier.last_announce_str).out = '\0';
         }
 
