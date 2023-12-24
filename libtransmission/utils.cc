@@ -269,26 +269,6 @@ uint64_t tr_time_msec()
 
 // ---
 
-/*
- * Copy src to string dst of size siz. At most siz-1 characters
- * will be copied. Always NUL terminates (unless siz == 0).
- * Returns strlen (src); if retval >= siz, truncation occurred.
- */
-size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
-{
-    auto* dst = static_cast<char*>(vdst);
-    auto const* const src = static_cast<char const*>(vsrc);
-
-    TR_ASSERT(dst != nullptr);
-    TR_ASSERT(src != nullptr);
-
-    auto const res = fmt::format_to_n(dst, siz - 1, "{:s}", src);
-    *res.out = '\0';
-    return res.size;
-}
-
-// ---
-
 double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)

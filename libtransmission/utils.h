@@ -100,9 +100,6 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
 // ---
 
-/** @brief Portability wrapper for `strlcpy()` that uses the system implementation if available */
-size_t tr_strlcpy(void* dst, void const* src, size_t siz);
-
 /** @brief Convenience wrapper around `strerorr()` guaranteed to not return nullptr
     @param errnum the error number to describe */
 [[nodiscard]] char const* tr_strerror(int errnum);
