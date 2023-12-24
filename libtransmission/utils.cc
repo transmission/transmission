@@ -567,9 +567,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
     if ((int)ratio == TR_RATIO_INF)
     {
-        auto buf = std::array<char, 64>{};
-        tr_strlcpy(std::data(buf), infinity, std::size(buf));
-        return std::data(buf);
+        return infinity != nullptr ? infinity : "";
     }
 
     return tr_strpercent(ratio);
