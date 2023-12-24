@@ -400,6 +400,12 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
         }
 
         QString const labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+
+        if (labels_text == labels_baseline_) // no edits have been made
+        {
+            return;
+        }
+
         QString const re = QStringLiteral("((,|;)\\s*)");
 
 //see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
@@ -409,28 +415,11 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
         QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
 #endif
 
-        // build a list of torrents
-        auto torrents = QList<Torrent const*>{};
-        for (int const id : ids_)
-        {
-            Torrent const* tor = model_.getTorrentFromId(id);
+        torrentSet(TR_KEY_labels, labels_list);
 
-            if (tor != nullptr)
-            {
-                torrents << tor;
-            }
-        }
-
-        if (!torrents.empty() && torrents[0]->labels() != labels_list)
+        if (!ids_.empty())
         {
-            if (auto const& baseline = torrents[0]->labels(); std::all_of(
-                    std::begin(torrents),
-                    std::end(torrents),
-                    [&baseline](auto const* tor) { return tor->labels() == baseline; }))
-            {
-                torrentSet(TR_KEY_labels, labels_list);
-                refreshModel();
-            }
+            session_.refreshDetailInfo(ids_);
         }
     }
 }
@@ -914,7 +903,8 @@ void DetailsDialog::refreshUI()
                      std::end(torrents),
                      [&baseline](auto const* tor) { return tor->labels() == baseline; }))
         {
-            ui_.labelsTextEdit->setText(baseline.join(QStringLiteral(", ")));
+            labels_baseline_ = baseline.join(QStringLiteral(", "));
+            ui_.labelsTextEdit->setText(labels_baseline_);
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(false);
         }
@@ -922,7 +912,7 @@ void DetailsDialog::refreshUI()
         {
             ui_.labelsTextEdit->setText({});
             ui_.labelsTextEdit->setPlaceholderText(mixed);
-            ui_.labelsTextEdit->setReadOnly(true);
+            ui_.labelsTextEdit->setDisabled(true);
         }
     }
 
