@@ -167,5 +167,6 @@ public:
     bool is_password_enabled_ = false;
 
 private:
+    void stop();
     void restart();
 };

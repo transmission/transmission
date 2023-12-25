@@ -721,39 +721,39 @@ void start_server(tr_rpc_server* server)
 
     rpc_server_start_retry_cancel(server);
 }
+} // namespace
 
-void stop_server(tr_rpc_server* server)
+void tr_rpc_server::stop()
 {
-    auto const lock = server->session_->unique_lock();
+    auto const lock = session_->unique_lock();
 
-    rpc_server_start_retry_cancel(server);
+    rpc_server_start_retry_cancel(this);
 
-    auto& httpd = server->httpd_;
+    auto& httpd = httpd_;
     if (!httpd)
     {
         return;
     }
 
-    auto const address = server->get_bind_address();
+    auto const address = get_bind_address();
 
     httpd.reset();
 
-    if (server->bind_address_->is_unix_addr())
+    if (bind_address_->is_unix_addr())
     {
         unlink(address.c_str() + std::size(TrUnixSocketPrefix));
     }
 
     tr_logAddInfo(fmt::format(
         _("Stopped listening for RPC and Web requests on '{address}'"),
-        fmt::arg("address", server->bind_address_->to_string(server->port()))));
+        fmt::arg("address", bind_address_->to_string(port()))));
 }
-} // namespace
 
 void tr_rpc_server::restart()
 {
     if (is_enabled())
     {
-        stop_server(this);
+        stop();
         start_server(this);
     }
 }
@@ -767,7 +767,7 @@ void tr_rpc_server::set_enabled(bool is_enabled)
         {
             if (!is_enabled_)
             {
-                stop_server(this);
+                stop();
             }
             else
             {
@@ -938,5 +938,5 @@ tr_variant tr_rpc_server::default_settings()
 
 tr_rpc_server::~tr_rpc_server()
 {
-    stop_server(this);
+    stop();
 }
