@@ -490,7 +490,55 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
     return server->username() == username && tr_ssha1_matches(server->salted_password_, password);
 }
 
-void handle_request(struct evhttp_request* req, void* arg)
+auto constexpr ServerStartRetryCount = int{ 10 };
+auto constexpr ServerStartRetryDelayIncrement = 5s;
+auto constexpr ServerStartRetryMaxDelay = 60s;
+
+bool bindUnixSocket(
+    [[maybe_unused]] struct event_base* base,
+    [[maybe_unused]] struct evhttp* httpd,
+    [[maybe_unused]] char const* path,
+    [[maybe_unused]] tr_mode_t socket_mode)
+{
+#ifdef _WIN32
+    tr_logAddError(fmt::format(
+        _("Unix sockets are unsupported on Windows. Please change '{key}' in your settings."),
+        fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address))));
+    return false;
+#else
+    auto addr = sockaddr_un{};
+    addr.sun_family = AF_UNIX;
+    *fmt::format_to_n(addr.sun_path, sizeof(addr.sun_path) - 1, "{:s}", path + std::size(TrUnixSocketPrefix)).out = '\0';
+
+    unlink(addr.sun_path);
+
+    struct evconnlistener* lev = evconnlistener_new_bind(
+        base,
+        nullptr,
+        nullptr,
+        LEV_OPT_CLOSE_ON_FREE,
+        -1,
+        reinterpret_cast<sockaddr const*>(&addr),
+        sizeof(addr));
+
+    if (lev == nullptr)
+    {
+        return false;
+    }
+
+    if (chmod(addr.sun_path, socket_mode) != 0)
+    {
+        tr_logAddWarn(
+            fmt::format(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
+    }
+
+    return evhttp_bind_listener(httpd, lev) != nullptr;
+#endif
+}
+} // namespace
+
+// static
+void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
 {
     auto constexpr HttpErrorUnauthorized = 401;
     auto constexpr HttpErrorForbidden = 403;
@@ -602,53 +650,6 @@ void handle_request(struct evhttp_request* req, void* arg)
         }
     }
 }
-
-auto constexpr ServerStartRetryCount = int{ 10 };
-auto constexpr ServerStartRetryDelayIncrement = 5s;
-auto constexpr ServerStartRetryMaxDelay = 60s;
-
-bool bindUnixSocket(
-    [[maybe_unused]] struct event_base* base,
-    [[maybe_unused]] struct evhttp* httpd,
-    [[maybe_unused]] char const* path,
-    [[maybe_unused]] tr_mode_t socket_mode)
-{
-#ifdef _WIN32
-    tr_logAddError(fmt::format(
-        _("Unix sockets are unsupported on Windows. Please change '{key}' in your settings."),
-        fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address))));
-    return false;
-#else
-    auto addr = sockaddr_un{};
-    addr.sun_family = AF_UNIX;
-    *fmt::format_to_n(addr.sun_path, sizeof(addr.sun_path) - 1, "{:s}", path + std::size(TrUnixSocketPrefix)).out = '\0';
-
-    unlink(addr.sun_path);
-
-    struct evconnlistener* lev = evconnlistener_new_bind(
-        base,
-        nullptr,
-        nullptr,
-        LEV_OPT_CLOSE_ON_FREE,
-        -1,
-        reinterpret_cast<sockaddr const*>(&addr),
-        sizeof(addr));
-
-    if (lev == nullptr)
-    {
-        return false;
-    }
-
-    if (chmod(addr.sun_path, socket_mode) != 0)
-    {
-        tr_logAddWarn(
-            fmt::format(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
-    }
-
-    return evhttp_bind_listener(httpd, lev) != nullptr;
-#endif
-}
-} // namespace
 
 std::chrono::seconds tr_rpc_server::start_retry()
 {
@@ -894,7 +895,7 @@ void tr_rpc_server::load(tr_variant const& src)
     {
         auto const rpc_uri = bind_address_->to_string(this->port()) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        session_->run_in_session_thread([this](){ start(); });
+        session_->run_in_session_thread([this]() { start(); });
 
         if (this->is_whitelist_enabled())
         {

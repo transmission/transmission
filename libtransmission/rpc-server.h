@@ -168,6 +168,8 @@ public:
     bool is_password_enabled_ = false;
 
 private:
+    static void handle_request(struct evhttp_request* req, void* arg);
+
     void start();
     [[nodiscard]] std::chrono::seconds start_retry();
     void start_retry_cancel();
