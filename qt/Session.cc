@@ -524,11 +524,12 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
     if (names.empty())
     {
         // unchanging fields needed by the main window
-        static auto constexpr MainInfoKeys = std::array<tr_quark, 8>{
+        static auto constexpr MainInfoKeys = std::array<tr_quark, 9>{
             TR_KEY_addedDate, //
             TR_KEY_downloadDir, //
             TR_KEY_file_count, //
             TR_KEY_hashString, //
+            TR_KEY_labels, //
             TR_KEY_name, //
             TR_KEY_primary_mime_type, //
             TR_KEY_totalSize, //
@@ -565,12 +566,13 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // unchanging fields needed by the details dialog
-        static auto constexpr DetailInfoKeys = std::array<tr_quark, 9>{
+        static auto constexpr DetailInfoKeys = std::array<tr_quark, 10>{
             TR_KEY_comment, //
             TR_KEY_creator, //
             TR_KEY_dateCreated, //
             TR_KEY_files, //
             TR_KEY_isPrivate, //
+            TR_KEY_labels, //
             TR_KEY_pieceCount, //
             TR_KEY_pieceSize, //
             TR_KEY_trackerList, //

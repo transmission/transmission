@@ -66,6 +66,9 @@ private slots:
     void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
     void onSessionCalled(Session::Tag tag);
 
+    // Details tab
+    void onButtonBoxClicked(QAbstractButton* button);
+
     // Tracker tab
     void onTrackerSelectionChanged();
     void onAddTrackerClicked();
@@ -131,6 +134,8 @@ private:
     torrent_ids_t ids_;
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
+    bool labels_need_refresh_ = true;
+    QString labels_baseline_;
 
     std::shared_ptr<TrackerModel> tracker_model_;
     std::shared_ptr<TrackerModelFilter> tracker_filter_;
