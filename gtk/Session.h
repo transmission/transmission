@@ -31,8 +31,8 @@ class Session : public Glib::Object
 public:
     enum ErrorCode
     {
-        ERR_ADD_TORRENT_ERR = TR_PARSE_ERR,
-        ERR_ADD_TORRENT_DUP = TR_PARSE_DUPLICATE,
+        ERR_ADD_TORRENT_ERR = 1,
+        ERR_ADD_TORRENT_DUP = 2,
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
     };
 

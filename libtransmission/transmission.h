@@ -808,14 +808,6 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
            or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
 
-// TODO(ckerr) remove
-enum tr_parse_result
-{
-    TR_PARSE_OK,
-    TR_PARSE_ERR,
-    TR_PARSE_DUPLICATE
-};
-
 /**
  * Instantiate a single torrent.
  *
