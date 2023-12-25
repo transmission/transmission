@@ -20,7 +20,6 @@
 
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 
 struct tr_error;

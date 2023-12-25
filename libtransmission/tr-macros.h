@@ -6,8 +6,8 @@
 #pragma once
 
 #include <array>
-#include <cstddef> // size_t
-#include <cstdint> // uint32_t
+#include <cstddef> // for std::byte
+#include <cstdint> // for uint32_t
 
 // ---
 

@@ -18,7 +18,6 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-#include "libtransmission/utils.h"
 
 struct tr_block_info;
 struct tr_torrent_metainfo;

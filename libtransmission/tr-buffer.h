@@ -6,9 +6,9 @@
 #pragma once
 
 #include <algorithm> // for std::copy_n
-#include <cstddef>
-#include <iterator>
-#include <limits>
+#include <cstddef> // size_t
+#include <memory> // std::allocator
+#include <ratio>
 #include <string>
 #include <string_view>
 
@@ -16,6 +16,8 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission

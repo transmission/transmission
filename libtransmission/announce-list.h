@@ -14,7 +14,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/interned-string.h"
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
 

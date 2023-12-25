@@ -25,8 +25,8 @@ $ esbuild \
   --allow-overwrite \
   --bundle \
   --legal-comments=external \
-  --loader:.png=binary \
-  --loader:.svg=binary \
+  --loader:.png=dataurl \
+  --loader:.svg=dataurl \
   --minify \
   --outfile=public_html/transmission-app.js \
   src/main.js

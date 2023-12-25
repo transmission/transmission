@@ -193,6 +193,11 @@ std::string tr_magnet_metainfo::magnet() const
     return std::string{ buf.sv() };
 }
 
+void tr_magnet_metainfo::set_name(std::string_view name)
+{
+    name_ = tr_strv_convert_utf8(name);
+}
+
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 {
     if (!tr_urlIsValid(webseed))

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef> // size_t
 #include <cmath> // for std::fabs(), std::floor()
 #include <cstdint> // for uint64_t
 #include <string>
