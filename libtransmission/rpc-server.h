@@ -131,8 +131,6 @@ public:
         anti_brute_force_limit_ = limit;
     }
 
-    std::unique_ptr<libdeflate_compressor, void (*)(libdeflate_compressor*)> compressor;
-
     [[nodiscard]] constexpr auto const& url() const noexcept
     {
         return url_;
@@ -151,15 +149,17 @@ public:
     RPC_SETTINGS_FIELDS(V)
 #undef V
 
+    std::unique_ptr<libdeflate_compressor, void (*)(libdeflate_compressor*)> compressor_;
+
     std::vector<std::string> host_whitelist_;
     std::vector<std::string> whitelist_;
     std::string const web_client_dir_;
 
     std::unique_ptr<tr_rpc_address> bind_address_;
 
-    std::unique_ptr<libtransmission::Timer> start_retry_timer;
-    libtransmission::evhelpers::evhttp_unique_ptr httpd;
-    tr_session* const session;
+    std::unique_ptr<libtransmission::Timer> start_retry_timer_;
+    libtransmission::evhelpers::evhttp_unique_ptr httpd_;
+    tr_session* const session_;
 
     size_t login_attempts_ = 0U;
     int start_retry_counter = 0;

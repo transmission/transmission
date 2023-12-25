@@ -233,13 +233,13 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
     }
     else
     {
-        auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor.get(), std::size(content));
+        auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor_.get(), std::size(content));
 
         auto iov = evbuffer_iovec{};
         evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iov, 1);
 
         auto const compressed_len = libdeflate_gzip_compress(
-            server->compressor.get(),
+            server->compressor_.get(),
             std::data(content),
             std::size(content),
             iov.iov_base,
@@ -362,7 +362,11 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
 {
     auto otop = tr_variant_serde::json().inplace().parse(json);
 
-    tr_rpc_request_exec_json(server->session, otop ? &*otop : nullptr, rpc_response_func, new rpc_response_data{ req, server });
+    tr_rpc_request_exec_json(
+        server->session_,
+        otop ? &*otop : nullptr,
+        rpc_response_func,
+        new rpc_response_data{ req, server });
 }
 
 void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
@@ -442,7 +446,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
 bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
 {
     char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
-    return session_id != nullptr && server->session->sessionId() == session_id;
+    return session_id != nullptr && server->session_->sessionId() == session_id;
 }
 
 bool is_authorized(tr_rpc_server const* server, char const* auth_header)
@@ -553,7 +557,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 #ifdef REQUIRE_SESSION_ID
         else if (!test_session_id(server, req))
         {
-            auto const session_id = std::string{ server->session->sessionId() };
+            auto const session_id = std::string{ server->session_->sessionId() };
             auto const tmp = fmt::format(
                 "<p>Your request had an invalid session-id header.</p>"
                 "<p>To fix this, follow these steps:"
@@ -633,31 +637,31 @@ void start_server(tr_rpc_server* server);
 
 auto rpc_server_start_retry(tr_rpc_server* server)
 {
-    if (!server->start_retry_timer)
+    if (!server->start_retry_timer_)
     {
-        server->start_retry_timer = server->session->timerMaker().create([server]() { start_server(server); });
+        server->start_retry_timer_ = server->session_->timerMaker().create([server]() { start_server(server); });
     }
 
     ++server->start_retry_counter;
     auto const interval = std::min(ServerStartRetryDelayIncrement * server->start_retry_counter, ServerStartRetryMaxDelay);
-    server->start_retry_timer->start_single_shot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    server->start_retry_timer_->start_single_shot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
     return interval;
 }
 
 void rpc_server_start_retry_cancel(tr_rpc_server* server)
 {
-    server->start_retry_timer.reset();
+    server->start_retry_timer_.reset();
     server->start_retry_counter = 0;
 }
 
 void start_server(tr_rpc_server* server)
 {
-    if (server->httpd)
+    if (server->httpd_)
     {
         return;
     }
 
-    auto* const base = server->session->event_base();
+    auto* const base = server->session_->event_base();
     auto* const httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
@@ -694,7 +698,7 @@ void start_server(tr_rpc_server* server)
     else
     {
         evhttp_set_gencb(httpd, handle_request, server);
-        server->httpd.reset(httpd);
+        server->httpd_.reset(httpd);
 
         tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }
@@ -704,11 +708,11 @@ void start_server(tr_rpc_server* server)
 
 void stop_server(tr_rpc_server* server)
 {
-    auto const lock = server->session->unique_lock();
+    auto const lock = server->session_->unique_lock();
 
     rpc_server_start_retry_cancel(server);
 
-    auto& httpd = server->httpd;
+    auto& httpd = server->httpd_;
     if (!httpd)
     {
         return;
@@ -759,7 +763,7 @@ void tr_rpc_server::set_enabled(bool is_enabled)
 {
     is_enabled_ = is_enabled;
 
-    session->run_in_session_thread(
+    session_->run_in_session_thread(
         [this]()
         {
             if (!is_enabled_)
@@ -784,7 +788,7 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 
     if (is_enabled())
     {
-        session->run_in_session_thread(&restart_server, this);
+        session_->run_in_session_thread(&restart_server, this);
     }
 }
 
@@ -840,10 +844,10 @@ void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 // --- LIFECYCLE
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant const& settings)
-    : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
+    : compressor_{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
     , bind_address_{ std::make_unique<class tr_rpc_address>() }
-    , session{ session_in }
+    , session_{ session_in }
 {
     load(settings);
 }
@@ -894,7 +898,7 @@ void tr_rpc_server::load(tr_variant const& src)
     {
         auto const rpc_uri = bind_address_->to_string(this->port()) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        session->run_in_session_thread(start_server, this);
+        session_->run_in_session_thread(start_server, this);
 
         if (this->is_whitelist_enabled())
         {
