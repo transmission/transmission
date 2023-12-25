@@ -25,8 +25,8 @@
 #include <QResizeEvent>
 #include <QRegularExpression>
 #include <QStringList>
-#include <QStyle>
 #include <QString>
+#include <QStyle>
 #include <QTreeWidgetItem>
 
 #include <libtransmission/transmission.h>
@@ -890,10 +890,10 @@ void DetailsDialog::refreshUI()
     ui_.privacyValueLabel->setText(string);
 
     // myLabelsTextEdit
-    string = none;
-
     if (labels_need_refresh_)
     {
+        labels_need_refresh_ = false;
+
         if (torrents.empty())
         {
             labels_baseline_.clear();
@@ -918,7 +918,7 @@ void DetailsDialog::refreshUI()
             labels_baseline_.clear();
             ui_.labelsTextEdit->setText({});
             ui_.labelsTextEdit->setPlaceholderText(mixed);
-            ui_.labelsTextEdit->setDisabled(true);
+            ui_.labelsTextEdit->setEnabled(false);
         }
     }
 
@@ -1310,8 +1310,6 @@ void DetailsDialog::refreshUI()
     }
 
     setEnabled(true);
-
-    labels_need_refresh_ = false;
 }
 
 void DetailsDialog::setEnabled(bool enabled)
