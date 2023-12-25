@@ -150,6 +150,27 @@ public:
     RPC_SETTINGS_FIELDS(V)
 #undef V
 
+private:
+    static void handle_request(struct evhttp_request* req, void* arg);
+    static void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data);
+
+    void handle_web_client(struct evhttp_request* req);
+    void handle_rpc_from_json(struct evhttp_request* req, std::string_view json);
+    void handle_rpc(struct evhttp_request* req);
+    [[nodiscard]] bool test_session_id(struct evhttp_request const* req);
+
+    void serve_file(struct evhttp_request* req, std::string_view filename);
+    [[nodiscard]] struct evbuffer* make_response(struct evhttp_request* req, std::string_view content);
+
+    [[nodiscard]] bool is_address_allowed(std::string_view address) const noexcept;
+    [[nodiscard]] bool is_hostname_allowed(evhttp_request const* req) const noexcept;
+
+    void start();
+    [[nodiscard]] std::chrono::seconds start_retry();
+    void start_retry_cancel();
+    void stop();
+    void restart();
+
     std::unique_ptr<libdeflate_compressor, void (*)(libdeflate_compressor*)> compressor_;
 
     std::vector<std::string> host_whitelist_;
@@ -166,13 +187,4 @@ public:
     int start_retry_counter_ = 0;
 
     bool is_password_enabled_ = false;
-
-private:
-    static void handle_request(struct evhttp_request* req, void* arg);
-
-    void start();
-    [[nodiscard]] std::chrono::seconds start_retry();
-    void start_retry_cancel();
-    void stop();
-    void restart();
 };

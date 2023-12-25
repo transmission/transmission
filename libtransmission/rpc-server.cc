@@ -236,124 +236,10 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
     return "application/octet-stream";
 }
 
-[[nodiscard]] evbuffer* make_response(struct evhttp_request* req, tr_rpc_server const* server, std::string_view content)
-{
-    auto* const out = evbuffer_new();
-
-    char const* key = "Accept-Encoding";
-    char const* encoding = evhttp_find_header(req->input_headers, key);
-
-    if (bool const do_compress = encoding != nullptr && tr_strv_contains(encoding, "gzip"sv); !do_compress)
-    {
-        evbuffer_add(out, std::data(content), std::size(content));
-    }
-    else
-    {
-        auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor_.get(), std::size(content));
-
-        auto iov = evbuffer_iovec{};
-        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iov, 1);
-
-        auto const compressed_len = libdeflate_gzip_compress(
-            server->compressor_.get(),
-            std::data(content),
-            std::size(content),
-            iov.iov_base,
-            iov.iov_len);
-        if (0 < compressed_len && compressed_len < std::size(content))
-        {
-            iov.iov_len = compressed_len;
-            evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
-        }
-        else
-        {
-            std::copy(std::begin(content), std::end(content), static_cast<char*>(iov.iov_base));
-            iov.iov_len = std::size(content);
-        }
-
-        evbuffer_commit_space(out, &iov, 1);
-    }
-
-    return out;
-}
-
 void add_time_header(struct evkeyvalq* headers, char const* key, time_t now)
 {
     // RFC 2616 says this must follow RFC 1123's date format, so use gmtime instead of localtime
     evhttp_add_header(headers, key, fmt::format("{:%a %b %d %T %Y%n}", fmt::gmtime(now)).c_str());
-}
-
-void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::string_view filename)
-{
-    if (req->type != EVHTTP_REQ_GET)
-    {
-        evhttp_add_header(req->output_headers, "Allow", "GET");
-        send_simple_response(req, HTTP_BADMETHOD);
-        return;
-    }
-
-    auto content = std::vector<char>{};
-
-    if (auto error = tr_error{}; !tr_file_read(filename, content, &error))
-    {
-        send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error.message()).c_str());
-        return;
-    }
-
-    auto const now = tr_time();
-    add_time_header(req->output_headers, "Date", now);
-    add_time_header(req->output_headers, "Expires", now + (24 * 60 * 60));
-    evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess(filename));
-
-    auto* const response = make_response(req, server, std::string_view{ std::data(content), std::size(content) });
-    evhttp_send_reply(req, HTTP_OK, "OK", response);
-    evbuffer_free(response);
-}
-
-void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
-{
-    if (std::empty(server->web_client_dir_))
-    {
-        send_simple_response(
-            req,
-            HTTP_NOTFOUND,
-            "<p>Couldn't find Transmission's web interface files!</p>"
-            "<p>Users: to tell Transmission where to look, "
-            "set the TRANSMISSION_WEB_HOME environment "
-            "variable to the folder where the web interface's "
-            "index.html is located.</p>"
-            "<p>Package Builders: to set a custom default at compile time, "
-            "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
-            "or tweak tr_getClutchDir() by hand.</p>");
-    }
-    else
-    {
-        // convert `req->uri` (ex: "/transmission/web/images/favicon.png")
-        // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
-
-        // remove the "/transmission/web/" prefix
-        static auto constexpr Web = "web/"sv;
-        auto subpath = std::string_view{ req->uri }.substr(std::size(server->url()) + std::size(Web));
-
-        // remove any trailing query / fragment
-        subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
-
-        // if the query is empty, use the default
-        static auto constexpr DefaultPage = "index.html"sv;
-        if (std::empty(subpath))
-        {
-            subpath = DefaultPage;
-        }
-
-        if (tr_strv_contains(subpath, ".."sv))
-        {
-            send_simple_response(req, HTTP_NOTFOUND);
-        }
-        else
-        {
-            serve_file(req, server, tr_pathbuf{ server->web_client_dir_, '/', subpath });
-        }
-    }
 }
 
 struct rpc_response_data
@@ -362,53 +248,6 @@ struct rpc_response_data
     tr_rpc_server* server;
 };
 
-void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data)
-{
-    auto* data = static_cast<struct rpc_response_data*>(user_data);
-
-    auto* const response = make_response(data->req, data->server, tr_variant_serde::json().compact().to_string(*content));
-    evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
-    evhttp_send_reply(data->req, HTTP_OK, "OK", response);
-    evbuffer_free(response);
-
-    delete data;
-}
-
-void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
-{
-    auto otop = tr_variant_serde::json().inplace().parse(json);
-
-    tr_rpc_request_exec_json(
-        server->session_,
-        otop ? &*otop : nullptr,
-        rpc_response_func,
-        new rpc_response_data{ req, server });
-}
-
-void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
-{
-    if (req->type == EVHTTP_REQ_POST)
-    {
-        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(req->input_buffer, -1)),
-                                      evbuffer_get_length(req->input_buffer) };
-        handle_rpc_from_json(req, server, json);
-        return;
-    }
-
-    send_simple_response(req, HTTP_BADMETHOD);
-}
-
-bool is_address_allowed(tr_rpc_server const* server, char const* address)
-{
-    if (!server->is_whitelist_enabled())
-    {
-        return true;
-    }
-
-    auto const& src = server->whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
-}
-
 bool isIPAddressWithOptionalPort(char const* host)
 {
     auto address = sockaddr_storage{};
@@ -416,53 +255,6 @@ bool isIPAddressWithOptionalPort(char const* host)
 
     /* TODO: move to net.{c,h} */
     return evutil_parse_sockaddr_port(host, reinterpret_cast<sockaddr*>(&address), &address_len) != -1;
-}
-
-bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
-{
-    /* If password auth is enabled, any hostname is permitted. */
-    if (server->is_password_enabled())
-    {
-        return true;
-    }
-
-    /* If whitelist is disabled, no restrictions. */
-    if (!server->is_host_whitelist_enabled_)
-    {
-        return true;
-    }
-
-    char const* const host = evhttp_find_header(req->input_headers, "Host");
-
-    /* No host header, invalid request. */
-    if (host == nullptr)
-    {
-        return false;
-    }
-
-    /* IP address is always acceptable. */
-    if (isIPAddressWithOptionalPort(host))
-    {
-        return true;
-    }
-
-    /* Host header might include the port. */
-    auto const hostname = std::string(host, strcspn(host, ":"));
-
-    /* localhost is always acceptable. */
-    if (hostname == "localhost" || hostname == "localhost.")
-    {
-        return true;
-    }
-
-    auto const& src = server->host_whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&hostname](auto const& str) { return tr_wildmat(hostname, str); });
-}
-
-bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
-{
-    char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
-    return session_id != nullptr && server->session_->sessionId() == session_id;
 }
 
 bool is_authorized(tr_rpc_server const* server, char const* auth_header)
@@ -537,6 +329,198 @@ bool bindUnixSocket(
 }
 } // namespace
 
+void tr_rpc_server::rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data)
+{
+    auto* data = static_cast<struct rpc_response_data*>(user_data);
+
+    auto* const response = data->server->make_response(data->req, tr_variant_serde::json().compact().to_string(*content));
+    evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
+    evhttp_send_reply(data->req, HTTP_OK, "OK", response);
+    evbuffer_free(response);
+
+    delete data;
+}
+
+bool tr_rpc_server::test_session_id(struct evhttp_request const* req)
+{
+    char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
+    return session_id != nullptr && session_->sessionId() == session_id;
+}
+
+bool tr_rpc_server::is_hostname_allowed(evhttp_request const* req) const noexcept
+{
+    // if password auth is enabled, any hostname is permitted
+    if (is_password_enabled())
+    {
+        return true;
+    }
+
+    // if whitelist is disabled, no restrictions
+    if (!is_host_whitelist_enabled_)
+    {
+        return true;
+    }
+
+    // no host header, invalid request
+    char const* const host = evhttp_find_header(req->input_headers, "Host");
+    if (host == nullptr)
+    {
+        return false;
+    }
+
+    // IP address is always acceptable
+    if (isIPAddressWithOptionalPort(host))
+    {
+        return true;
+    }
+
+    // host header might include the port
+    auto const hostname = std::string(host, strcspn(host, ":"));
+
+    // localhost is always acceptable
+    if (hostname == "localhost" || hostname == "localhost.")
+    {
+        return true;
+    }
+
+    auto const& src = host_whitelist_;
+    return std::any_of(std::begin(src), std::end(src), [&hostname](auto const& str) { return tr_wildmat(hostname, str); });
+}
+
+void tr_rpc_server::handle_rpc_from_json(struct evhttp_request* req, std::string_view json)
+{
+    auto otop = tr_variant_serde::json().inplace().parse(json);
+
+    tr_rpc_request_exec_json(session_, otop ? &*otop : nullptr, rpc_response_func, new rpc_response_data{ req, this });
+}
+
+void tr_rpc_server::handle_rpc(struct evhttp_request* req)
+{
+    if (req->type == EVHTTP_REQ_POST)
+    {
+        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(req->input_buffer, -1)),
+                                      evbuffer_get_length(req->input_buffer) };
+        handle_rpc_from_json(req, json);
+        return;
+    }
+
+    send_simple_response(req, HTTP_BADMETHOD);
+}
+
+void tr_rpc_server::handle_web_client(struct evhttp_request* req)
+{
+    if (std::empty(web_client_dir_))
+    {
+        send_simple_response(
+            req,
+            HTTP_NOTFOUND,
+            "<p>Couldn't find Transmission's web interface files!</p>"
+            "<p>Users: to tell Transmission where to look, "
+            "set the TRANSMISSION_WEB_HOME environment "
+            "variable to the folder where the web interface's "
+            "index.html is located.</p>"
+            "<p>Package Builders: to set a custom default at compile time, "
+            "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
+            "or tweak tr_getClutchDir() by hand.</p>");
+    }
+    else
+    {
+        // convert `req->uri` (ex: "/transmission/web/images/favicon.png")
+        // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
+
+        // remove the "/transmission/web/" prefix
+        static auto constexpr Web = "web/"sv;
+        auto subpath = std::string_view{ req->uri }.substr(std::size(url()) + std::size(Web));
+
+        // remove any trailing query / fragment
+        subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
+
+        // if the query is empty, use the default
+        static auto constexpr DefaultPage = "index.html"sv;
+        if (std::empty(subpath))
+        {
+            subpath = DefaultPage;
+        }
+
+        if (tr_strv_contains(subpath, ".."sv))
+        {
+            send_simple_response(req, HTTP_NOTFOUND);
+        }
+        else
+        {
+            serve_file(req, tr_pathbuf{ web_client_dir_, '/', subpath });
+        }
+    }
+}
+
+void tr_rpc_server::serve_file(struct evhttp_request* req, std::string_view filename)
+{
+    if (req->type != EVHTTP_REQ_GET)
+    {
+        evhttp_add_header(req->output_headers, "Allow", "GET");
+        send_simple_response(req, HTTP_BADMETHOD);
+        return;
+    }
+
+    auto content = std::vector<char>{};
+
+    if (auto error = tr_error{}; !tr_file_read(filename, content, &error))
+    {
+        send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error.message()).c_str());
+        return;
+    }
+
+    auto const now = tr_time();
+    add_time_header(req->output_headers, "Date", now);
+    add_time_header(req->output_headers, "Expires", now + (24 * 60 * 60));
+    evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess(filename));
+
+    auto* const response = make_response(req, std::string_view{ std::data(content), std::size(content) });
+    evhttp_send_reply(req, HTTP_OK, "OK", response);
+    evbuffer_free(response);
+}
+
+evbuffer* tr_rpc_server::make_response(struct evhttp_request* req, std::string_view content)
+{
+    auto* const out = evbuffer_new();
+
+    char const* key = "Accept-Encoding";
+    char const* encoding = evhttp_find_header(req->input_headers, key);
+
+    if (bool const do_compress = encoding != nullptr && tr_strv_contains(encoding, "gzip"sv); !do_compress)
+    {
+        evbuffer_add(out, std::data(content), std::size(content));
+    }
+    else
+    {
+        auto const max_compressed_len = libdeflate_deflate_compress_bound(compressor_.get(), std::size(content));
+
+        auto iov = evbuffer_iovec{};
+        evbuffer_reserve_space(out, std::max(std::size(content), max_compressed_len), &iov, 1);
+
+        auto const compressed_len = libdeflate_gzip_compress(
+            compressor_.get(),
+            std::data(content),
+            std::size(content),
+            iov.iov_base,
+            iov.iov_len);
+        if (0 < compressed_len && compressed_len < std::size(content))
+        {
+            iov.iov_len = compressed_len;
+            evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
+        }
+        else
+        {
+            std::copy(std::begin(content), std::end(content), static_cast<char*>(iov.iov_base));
+            iov.iov_len = std::size(content);
+        }
+
+        evbuffer_commit_space(out, &iov, 1);
+    }
+
+    return out;
+}
+
 // static
 void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
 {
@@ -555,7 +539,7 @@ void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
-        if (!is_address_allowed(server, req->remote_host))
+        if (!server->is_address_allowed(req->remote_host))
         {
             send_simple_response(req, HttpErrorForbidden);
             return;
@@ -601,9 +585,9 @@ void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
         }
         else if (tr_strv_starts_with(location, "web/"sv))
         {
-            handle_web_client(req, server);
+            server->handle_web_client(req);
         }
-        else if (!isHostnameAllowed(server, req))
+        else if (!server->is_hostname_allowed(req))
         {
             char const* const tmp =
                 "<p>Transmission received your request, but the hostname was unrecognized.</p>"
@@ -619,7 +603,7 @@ void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
             send_simple_response(req, 421, tmp);
         }
 #ifdef REQUIRE_SESSION_ID
-        else if (!test_session_id(server, req))
+        else if (!server->test_session_id(req))
         {
             auto const session_id = std::string{ server->session_->sessionId() };
             auto const tmp = fmt::format(
@@ -642,13 +626,20 @@ void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
 #endif
         else if (tr_strv_starts_with(location, "rpc"sv))
         {
-            handle_rpc(req, server);
+            server->handle_rpc(req);
         }
         else
         {
             send_simple_response(req, HTTP_NOTFOUND, req->uri);
         }
     }
+}
+
+bool tr_rpc_server::is_address_allowed(std::string_view address) const noexcept
+{
+    auto& src = whitelist_;
+    return is_whitelist_enabled() &&
+        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
 }
 
 std::chrono::seconds tr_rpc_server::start_retry()
