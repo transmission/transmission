@@ -165,4 +165,7 @@ public:
     int start_retry_counter = 0;
 
     bool is_password_enabled_ = false;
+
+private:
+    void restart();
 };

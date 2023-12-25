@@ -175,6 +175,22 @@ namespace
 {
 int constexpr DeflateLevel = 6; // medium / default
 
+auto parse_whitelist(std::string_view whitelist)
+{
+    auto list = std::vector<std::string>{};
+
+    while (!std::empty(whitelist))
+    {
+        auto const pos = whitelist.find_first_of(" ,;"sv);
+        auto const token = tr_strv_strip(whitelist.substr(0, pos));
+        list.emplace_back(token);
+        tr_logAddInfo(fmt::format(_("Added '{entry}' to host whitelist"), fmt::arg("entry", token)));
+        whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
+    }
+
+    return list;
+}
+
 // ---
 
 void send_simple_response(struct evhttp_request* req, int code, char const* text = nullptr)
@@ -731,33 +747,16 @@ void stop_server(tr_rpc_server* server)
         _("Stopped listening for RPC and Web requests on '{address}'"),
         fmt::arg("address", server->bind_address_->to_string(server->port()))));
 }
-
-void restart_server(tr_rpc_server* const server)
-{
-    if (server->is_enabled())
-    {
-        stop_server(server);
-        start_server(server);
-    }
-}
-
-auto parse_whitelist(std::string_view whitelist)
-{
-    auto list = std::vector<std::string>{};
-
-    while (!std::empty(whitelist))
-    {
-        auto const pos = whitelist.find_first_of(" ,;"sv);
-        auto const token = tr_strv_strip(whitelist.substr(0, pos));
-        list.emplace_back(token);
-        tr_logAddInfo(fmt::format(_("Added '{entry}' to host whitelist"), fmt::arg("entry", token)));
-        whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
-    }
-
-    return list;
-}
-
 } // namespace
+
+void tr_rpc_server::restart()
+{
+    if (is_enabled())
+    {
+        stop_server(this);
+        start_server(this);
+    }
+}
 
 void tr_rpc_server::set_enabled(bool is_enabled)
 {
@@ -788,7 +787,7 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 
     if (is_enabled())
     {
-        session_->run_in_session_thread(&restart_server, this);
+        session_->run_in_session_thread([this]() { restart(); });
     }
 }
 
