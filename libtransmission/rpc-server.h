@@ -132,11 +132,7 @@ public:
         anti_brute_force_limit_ = limit;
     }
 
-    [[nodiscard]] constexpr auto const& url() const noexcept
-    {
-        return url_;
-    }
-
+private:
     void set_url(std::string_view url);
 
     [[nodiscard]] std::string get_bind_address() const;
@@ -146,11 +142,11 @@ public:
         return socket_mode_;
     }
 
-#define V(key, name, type, default_value, comment) type name = type{ default_value };
-    RPC_SETTINGS_FIELDS(V)
-#undef V
+    [[nodiscard]] constexpr auto const& url() const noexcept
+    {
+        return url_;
+    }
 
-private:
     static void handle_request(struct evhttp_request* req, void* arg);
     static void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data);
 
@@ -164,12 +160,17 @@ private:
 
     [[nodiscard]] bool is_address_allowed(std::string_view address) const noexcept;
     [[nodiscard]] bool is_hostname_allowed(evhttp_request const* req) const noexcept;
+    [[nodiscard]] bool is_authorized(char const* auth_header) const noexcept;
 
     void start();
     [[nodiscard]] std::chrono::seconds start_retry();
     void start_retry_cancel();
     void stop();
     void restart();
+
+#define V(key, name, type, default_value, comment) type name = type{ default_value };
+    RPC_SETTINGS_FIELDS(V)
+#undef V
 
     std::unique_ptr<libdeflate_compressor, void (*)(libdeflate_compressor*)> compressor_;
 

@@ -257,31 +257,6 @@ bool isIPAddressWithOptionalPort(char const* host)
     return evutil_parse_sockaddr_port(host, reinterpret_cast<sockaddr*>(&address), &address_len) != -1;
 }
 
-bool is_authorized(tr_rpc_server const* server, char const* auth_header)
-{
-    if (!server->is_password_enabled())
-    {
-        return true;
-    }
-
-    // https://datatracker.ietf.org/doc/html/rfc7617
-    // `Basic ${base64(username)}:${base64(password)}`
-
-    auto constexpr Prefix = "Basic "sv;
-    auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
-    if (!tr_strv_starts_with(auth, Prefix))
-    {
-        return false;
-    }
-
-    auth.remove_prefix(std::size(Prefix));
-    auto const decoded_str = tr_base64_decode(auth);
-    auto decoded = std::string_view{ decoded_str };
-    auto const username = tr_strv_sep(&decoded, ':');
-    auto const password = decoded;
-    return server->username() == username && tr_ssha1_matches(server->salted_password_, password);
-}
-
 auto constexpr ServerStartRetryCount = int{ 10 };
 auto constexpr ServerStartRetryDelayIncrement = 5s;
 auto constexpr ServerStartRetryMaxDelay = 60s;
@@ -328,6 +303,31 @@ bool bindUnixSocket(
 #endif
 }
 } // namespace
+
+bool tr_rpc_server::is_authorized(char const* auth_header) const noexcept
+{
+    if (!is_password_enabled())
+    {
+        return true;
+    }
+
+    // https://datatracker.ietf.org/doc/html/rfc7617
+    // `Basic ${base64(username)}:${base64(password)}`
+
+    auto constexpr Prefix = "Basic "sv;
+    auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
+    if (!tr_strv_starts_with(auth, Prefix))
+    {
+        return false;
+    }
+
+    auth.remove_prefix(std::size(Prefix));
+    auto const decoded_str = tr_base64_decode(auth);
+    auto decoded = std::string_view{ decoded_str };
+    auto const username = tr_strv_sep(&decoded, ':');
+    auto const password = decoded;
+    return this->username() == username && tr_ssha1_matches(salted_password_, password);
+}
 
 void tr_rpc_server::rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data)
 {
@@ -560,7 +560,7 @@ void tr_rpc_server::handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
-        if (!is_authorized(server, evhttp_find_header(req->input_headers, "Authorization")))
+        if (!server->is_authorized(evhttp_find_header(req->input_headers, "Authorization")))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             if (server->is_anti_brute_force_enabled())
