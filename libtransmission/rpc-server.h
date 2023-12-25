@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <chrono>
 #include <cstddef> // size_t
 #include <memory>
 #include <string>
@@ -162,11 +163,14 @@ public:
     tr_session* const session_;
 
     size_t login_attempts_ = 0U;
-    int start_retry_counter = 0;
+    int start_retry_counter_ = 0;
 
     bool is_password_enabled_ = false;
 
 private:
+    void start();
+    [[nodiscard]] std::chrono::seconds start_retry();
+    void start_retry_cancel();
     void stop();
     void restart();
 };

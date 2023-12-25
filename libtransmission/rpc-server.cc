@@ -648,56 +648,54 @@ bool bindUnixSocket(
     return evhttp_bind_listener(httpd, lev) != nullptr;
 #endif
 }
+} // namespace
 
-void start_server(tr_rpc_server* server);
-
-auto rpc_server_start_retry(tr_rpc_server* server)
+std::chrono::seconds tr_rpc_server::start_retry()
 {
-    if (!server->start_retry_timer_)
+    if (!start_retry_timer_)
     {
-        server->start_retry_timer_ = server->session_->timerMaker().create([server]() { start_server(server); });
+        start_retry_timer_ = session_->timerMaker().create([this]() { start(); });
     }
 
-    ++server->start_retry_counter;
-    auto const interval = std::min(ServerStartRetryDelayIncrement * server->start_retry_counter, ServerStartRetryMaxDelay);
-    server->start_retry_timer_->start_single_shot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    ++start_retry_counter_;
+    auto const interval = std::min(ServerStartRetryDelayIncrement * start_retry_counter_, ServerStartRetryMaxDelay);
+    start_retry_timer_->start_single_shot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
     return interval;
 }
 
-void rpc_server_start_retry_cancel(tr_rpc_server* server)
+void tr_rpc_server::start_retry_cancel()
 {
-    server->start_retry_timer_.reset();
-    server->start_retry_counter = 0;
+    start_retry_timer_.reset();
+    start_retry_counter_ = 0;
 }
 
-void start_server(tr_rpc_server* server)
+void tr_rpc_server::start()
 {
-    if (server->httpd_)
+    if (httpd_)
     {
         return;
     }
 
-    auto* const base = server->session_->event_base();
+    auto* const base = session_->event_base();
     auto* const httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 
-    auto const address = server->get_bind_address();
-    auto const port = server->port();
+    auto const address = get_bind_address();
+    auto const port = this->port();
 
-    bool const success = server->bind_address_->is_unix_addr() ?
-        bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_) :
-        (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
+    bool const success = bind_address_->is_unix_addr() ? bindUnixSocket(base, httpd, address.c_str(), socket_mode_) :
+                                                         (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
 
-    auto const addr_port_str = server->bind_address_->to_string(port);
+    auto const addr_port_str = bind_address_->to_string(port);
 
     if (!success)
     {
         evhttp_free(httpd);
 
-        if (server->start_retry_counter < ServerStartRetryCount)
+        if (start_retry_counter_ < ServerStartRetryCount)
         {
-            auto const retry_delay = rpc_server_start_retry(server);
+            auto const retry_delay = start_retry();
             auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(retry_delay).count();
             tr_logAddDebug(fmt::format("Couldn't bind to {}, retrying in {} seconds", addr_port_str, seconds));
             return;
@@ -713,21 +711,20 @@ void start_server(tr_rpc_server* server)
     }
     else
     {
-        evhttp_set_gencb(httpd, handle_request, server);
-        server->httpd_.reset(httpd);
+        evhttp_set_gencb(httpd, handle_request, this);
+        httpd_.reset(httpd);
 
         tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }
 
-    rpc_server_start_retry_cancel(server);
+    start_retry_cancel();
 }
-} // namespace
 
 void tr_rpc_server::stop()
 {
     auto const lock = session_->unique_lock();
 
-    rpc_server_start_retry_cancel(this);
+    start_retry_cancel();
 
     auto& httpd = httpd_;
     if (!httpd)
@@ -754,7 +751,7 @@ void tr_rpc_server::restart()
     if (is_enabled())
     {
         stop();
-        start_server(this);
+        start();
     }
 }
 
@@ -771,7 +768,7 @@ void tr_rpc_server::set_enabled(bool is_enabled)
             }
             else
             {
-                start_server(this);
+                start();
             }
         });
 }
@@ -897,7 +894,7 @@ void tr_rpc_server::load(tr_variant const& src)
     {
         auto const rpc_uri = bind_address_->to_string(this->port()) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        session_->run_in_session_thread(start_server, this);
+        session_->run_in_session_thread([this](){ start(); });
 
         if (this->is_whitelist_enabled())
         {
