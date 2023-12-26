@@ -1,0 +1,54 @@
+
+/* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
+"15.title" = "下载至:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
+"16.title" = "更改…";
+
+/* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
+"18.title" = "添加后直接开始";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
+"20.title" = "添加";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
+"22.title" = "取消";
+
+/* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
+"41.title" = "组:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Rank"; ObjectID = "47"; */
+"47.headerCell.title" = "优先级";
+
+/* Class = "NSTableColumn"; headerCell.title = "DL"; ObjectID = "48"; */
+"48.headerCell.title" = "下载";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "49"; */
+"49.headerCell.title" = "Name";
+
+/* Class = "NSButtonCell"; title = "Trash torrent file"; ObjectID = "59"; */
+"59.title" = "删除torrent文件";
+
+/* Class = "NSButtonCell"; title = "Verify Local Data"; ObjectID = "66"; */
+"66.title" = "验证本地数据";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
+"88.title" = "低";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
+"89.title" = "正常";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "90"; */
+"90.title" = "高";
+
+/* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
+"91.title" = "优先级:";
+
+/* Class = "NSButtonCell"; title = "All"; ObjectID = "104"; */
+"104.title" = "全部";
+
+/* Class = "NSButtonCell"; title = "None"; ObjectID = "105"; */
+"105.title" = "None";
+
+/* Class = "NSSearchFieldCell"; placeholderString = "Filter"; ObjectID = "113"; */
+"113.placeholderString" = "过滤";

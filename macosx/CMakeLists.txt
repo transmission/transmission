@@ -346,7 +346,8 @@ set(LINGUAS
     nl
     pt_PT
     ru
-    tr)
+    tr
+    zh-Hans)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -635,6 +635,20 @@
 		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = getgateway.h; sourceTree = "<group>"; };
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = natpmp.c; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
+		3F93C17D2B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		3F93C17E2B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		3F93C17F2B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		3F93C1802B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PrefsWindow.strings"; sourceTree = "<group>"; };
+		3F93C1812B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Creator.strings"; sourceTree = "<group>"; };
+		3F93C1822B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AddWindow.strings"; sourceTree = "<group>"; };
+		3F93C1832B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AddMagnetWindow.strings"; sourceTree = "<group>"; };
+		3F93C1842B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/GroupRules.strings"; sourceTree = "<group>"; };
+		3F93C1852B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoGeneralView.strings"; sourceTree = "<group>"; };
+		3F93C1862B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoActivityView.strings"; sourceTree = "<group>"; };
+		3F93C1872B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoOptionsView.strings"; sourceTree = "<group>"; };
+		3F93C1882B3AC49400FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/GlobalOptionsPopover.strings"; sourceTree = "<group>"; };
+		3F93C1892B3AC49500FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		3F93C18A2B3AC49500FFAF95 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		4521532929AF891E009331B0 /* GroupCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupCell.mm; sourceTree = "<group>"; };
 		4521532A29AF891F009331B0 /* GroupCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupCell.h; sourceTree = "<group>"; };
 		4521532C29AF9D60009331B0 /* TorrentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCell.h; sourceTree = "<group>"; };
@@ -2786,6 +2800,7 @@
 				"pt-PT",
 				pt_PT,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -3430,6 +3445,7 @@
 				A2613F9811B3383200472893 /* pt_PT */,
 				A263C5671560A4210082A3D1 /* da */,
 				A2A9D11A187DD75200C52A1F /* tr */,
+				3F93C18A2B3AC49500FFAF95 /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -3447,6 +3463,7 @@
 				45C688E82875B19000A2EB25 /* ru */,
 				45C688E92875B19200A2EB25 /* es */,
 				45C688EA2875B19500A2EB25 /* tr */,
+				3F93C1862B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = InfoActivityView.xib;
 			sourceTree = "<group>";
@@ -3464,6 +3481,7 @@
 				45C688DF2875B06D00A2EB25 /* ru */,
 				45C688E02875B06F00A2EB25 /* es */,
 				45C688E12875B07300A2EB25 /* tr */,
+				3F93C1852B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
@@ -3481,6 +3499,7 @@
 				45C688F12875B2CA00A2EB25 /* ru */,
 				45C688F22875B2CD00A2EB25 /* es */,
 				45C688F32875B2CF00A2EB25 /* tr */,
+				3F93C1872B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
@@ -3498,6 +3517,7 @@
 				45C688D62875AE0500A2EB25 /* tr */,
 				45C688D72875AE0800A2EB25 /* fr */,
 				45C688D82875AE0C00A2EB25 /* nl */,
+				3F93C1842B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = GroupRules.xib;
 			sourceTree = "<group>";
@@ -3515,6 +3535,7 @@
 				45C688CD2875AC8D00A2EB25 /* ru */,
 				45C688CE2875AC8F00A2EB25 /* es */,
 				45C688CF2875AC9200A2EB25 /* tr */,
+				3F93C1832B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";
@@ -3532,6 +3553,7 @@
 				45C688FA2875B40300A2EB25 /* ru */,
 				45C688FB2875B40600A2EB25 /* es */,
 				45C688FC2875B40900A2EB25 /* tr */,
+				3F93C1882B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
@@ -3549,6 +3571,7 @@
 				A2613F9911B3383200472893 /* pt_PT */,
 				A263C5661560A3CF0082A3D1 /* da */,
 				A2A9D119187DD75100C52A1F /* tr */,
+				3F93C1892B3AC49500FFAF95 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3566,6 +3589,7 @@
 				455C093F287767350003A078 /* ru */,
 				455C0940287767380003A078 /* es */,
 				455C09412877673A0003A078 /* tr */,
+				3F93C1802B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -3583,6 +3607,7 @@
 				457DC1E72873931500ED04C4 /* ru */,
 				457DC1E82873931900ED04C4 /* es */,
 				457DC1E92873931E00ED04C4 /* tr */,
+				3F93C17F2B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -3600,6 +3625,7 @@
 				A27F4483160B4AF50048CD4C /* fr */,
 				A28B3A2D160E1BC900D4A2BC /* pt_PT */,
 				A2CA772B187F063A00154956 /* tr */,
+				3F93C17D2B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3617,6 +3643,7 @@
 				45C6890328762FFD00A2EB25 /* ru */,
 				45C6890428762FFF00A2EB25 /* es */,
 				45C689052876300200A2EB25 /* tr */,
+				3F93C1822B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
@@ -3634,6 +3661,7 @@
 				45C6890C28763C3F00A2EB25 /* ru */,
 				45C6890D28763C4300A2EB25 /* es */,
 				45C6890E28763C4600A2EB25 /* tr */,
+				3F93C1812B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";
@@ -3642,6 +3670,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2F35BC715C5A0A100EBF632 /* en */,
+				3F93C17E2B3AC49400FFAF95 /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
