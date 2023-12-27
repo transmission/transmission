@@ -200,14 +200,14 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
     TR_ASSERT(m);
 
     // test the info_dict checksum
-    if (tr_sha1::digest(m->metadata()) != info_hash())
+    if (tr_sha1::digest(m->get_metadata()) != info_hash())
     {
         return false;
     }
 
     // checksum passed; now try to parse it as benc
     auto serde = tr_variant_serde::benc().inplace();
-    auto info_dict_v = serde.parse(m->metadata());
+    auto info_dict_v = serde.parse(m->get_metadata());
     if (!info_dict_v)
     {
         if (error != nullptr)

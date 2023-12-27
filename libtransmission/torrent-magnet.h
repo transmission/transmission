@@ -39,20 +39,13 @@ public:
         return size > 0 && size <= std::numeric_limits<int>::max();
     }
 
-    [[nodiscard]] constexpr size_t get_piece_length(int64_t const piece) const noexcept
-    {
-        return piece + 1 == piece_count_ ? // last piece
-            std::size(metadata_) - (piece * MetadataPieceSize) :
-            MetadataPieceSize;
-    }
-
     bool set_metadata_piece(int64_t piece, void const* data, size_t len);
 
     [[nodiscard]] std::optional<int64_t> get_next_metadata_request(time_t now) noexcept;
 
     [[nodiscard]] double get_metadata_percent() const noexcept;
 
-    [[nodiscard]] constexpr auto const& metadata() const noexcept
+    [[nodiscard]] constexpr auto const& get_metadata() const noexcept
     {
         return metadata_;
     }
@@ -68,6 +61,13 @@ private:
         time_t requested_at = {};
         int64_t piece = {};
     };
+
+    [[nodiscard]] constexpr size_t get_piece_length(int64_t const piece) const noexcept
+    {
+        return piece + 1 == piece_count_ ? // last piece
+            std::size(metadata_) - (piece * MetadataPieceSize) :
+            MetadataPieceSize;
+    }
 
     void create_all_needed(int64_t n_pieces) noexcept;
 
