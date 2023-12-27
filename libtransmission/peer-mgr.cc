@@ -2002,7 +2002,7 @@ void tr_peerMgr::rechoke_pulse() const
 
     for (auto* const tor : torrents_)
     {
-        if (tor->is_running())
+        if (tor->is_running() && session->isIdleLimited())
         {
             // possibly stop torrents that have seeded enough
             tor->stop_if_seed_limit_reached();
