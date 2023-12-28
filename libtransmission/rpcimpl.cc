@@ -569,6 +569,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode:
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
+    case TR_KEY_sequentialDownload:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
     case TR_KEY_startDate:
