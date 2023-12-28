@@ -1504,7 +1504,7 @@ static void printTorrentList(tr_variant* top)
                 auto const eta_str = leftUntilDone != 0 || eta != -1 ? etaToString(eta) : "Done";
                 auto const error_mark = tr_variantDictFindInt(d, TR_KEY_error, &error) && error ? '*' : ' ';
                 auto const done_str = sizeWhenDone != 0 ?
-                    fmt::format(FMT_STRING("{:.0f}%"), (100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone)) :
+                    strlpercent(100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone) + '%' :
                     std::string{ "n/a" };
 
                 fmt::print(
