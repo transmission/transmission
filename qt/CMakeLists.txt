@@ -159,7 +159,7 @@ set(LINGUAS
     fr
     hu
     id
-    it_IT
+    it
     ja
     ka
     kk
