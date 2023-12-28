@@ -25,6 +25,7 @@
 #include <QResizeEvent>
 #include <QRegularExpression>
 #include <QStringList>
+#include <QString>
 #include <QStyle>
 #include <QTreeWidgetItem>
 
@@ -282,6 +283,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     // set up the debounce timer
     connect(&ui_debounce_timer_, &QTimer::timeout, this, &DetailsDialog::refreshUI);
     ui_debounce_timer_.setSingleShot(true);
+
+    // set labels
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &DetailsDialog::onButtonBoxClicked);
 }
 
 DetailsDialog::~DetailsDialog()
@@ -299,6 +303,8 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
         ids_ = ids;
         session_.refreshDetailInfo(ids_);
         tracker_model_->refresh(model_, ids_);
+
+        labels_need_refresh_ = true;
 
         refreshModel();
         refreshUI();
@@ -383,6 +389,40 @@ void DetailsDialog::onSessionCalled(Session::Tag tag)
         pending_changes_connection_ = {};
 
         refreshModel();
+    }
+}
+
+void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
+{
+    if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
+    {
+        if (ui_.labelsTextEdit->isReadOnly()) // no edits could have been made
+        {
+            return;
+        }
+
+        QString const labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+
+        if (labels_text == labels_baseline_) // no edits have been made
+        {
+            return;
+        }
+
+        QString const re = QStringLiteral("((,|;)\\s*)");
+
+//see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
+#else
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
+#endif
+
+        torrentSet(TR_KEY_labels, labels_list);
+
+        if (!ids_.empty())
+        {
+            session_.refreshDetailInfo(ids_);
+        }
     }
 }
 
@@ -849,6 +889,39 @@ void DetailsDialog::refreshUI()
 
     ui_.privacyValueLabel->setText(string);
 
+    // myLabelsTextEdit
+    if (labels_need_refresh_)
+    {
+        labels_need_refresh_ = false;
+
+        if (torrents.empty())
+        {
+            labels_baseline_.clear();
+            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(true);
+            ui_.labelsTextEdit->setEnabled(true);
+        }
+        else if (auto const& baseline = torrents[0]->labels(); std::all_of(
+                     std::begin(torrents),
+                     std::end(torrents),
+                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+        {
+            labels_baseline_ = baseline.join(QStringLiteral(", "));
+            ui_.labelsTextEdit->setText(labels_baseline_);
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(false);
+            ui_.labelsTextEdit->setEnabled(true);
+        }
+        else // mixed
+        {
+            labels_baseline_.clear();
+            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlaceholderText(mixed);
+            ui_.labelsTextEdit->setEnabled(false);
+        }
+    }
+
     // myCommentBrowser
     string = none;
     bool is_comment_mixed = false;
@@ -1250,8 +1323,12 @@ void DetailsDialog::setEnabled(bool enabled)
 
 void DetailsDialog::initInfoTab()
 {
-    int const h = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
-    ui_.commentBrowser->setFixedHeight(h);
+    int const cbh = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
+    ui_.commentBrowser->setFixedHeight(cbh);
+
+    int const lteh = QFontMetrics{ ui_.labelsTextEdit->font() }.lineSpacing() * 2;
+    ui_.labelsTextEdit->setFixedHeight(lteh);
+    ui_.labelsTextEdit->setText(QStringLiteral("Initializing..."));
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);

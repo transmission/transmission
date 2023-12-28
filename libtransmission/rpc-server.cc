@@ -601,7 +601,7 @@ bool bindUnixSocket(
 #else
     auto addr = sockaddr_un{};
     addr.sun_family = AF_UNIX;
-    tr_strlcpy(addr.sun_path, path + std::size(TrUnixSocketPrefix), sizeof(addr.sun_path));
+    *fmt::format_to_n(addr.sun_path, sizeof(addr.sun_path) - 1, "{:s}", path + std::size(TrUnixSocketPrefix)).out = '\0';
 
     unlink(addr.sun_path);
 
@@ -759,7 +759,7 @@ void tr_rpc_server::set_enabled(bool is_enabled)
 {
     is_enabled_ = is_enabled;
 
-    session->runInSessionThread(
+    session->run_in_session_thread(
         [this]()
         {
             if (!is_enabled_)
@@ -784,7 +784,7 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 
     if (is_enabled())
     {
-        session->runInSessionThread(&restart_server, this);
+        session->run_in_session_thread(&restart_server, this);
     }
 }
 
@@ -894,7 +894,7 @@ void tr_rpc_server::load(tr_variant const& src)
     {
         auto const rpc_uri = bind_address_->to_string(this->port()) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        session->runInSessionThread(start_server, this);
+        session->run_in_session_thread(start_server, this);
 
         if (this->is_whitelist_enabled())
         {

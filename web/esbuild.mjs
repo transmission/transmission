@@ -7,8 +7,8 @@ const ctx = await esbuild.context({
   entryPoints: ['./src/main.js'],
   legalComments: 'external',
   loader: {
-    '.png': 'binary',
-    '.svg': 'binary' },
+    '.png': 'dataurl',
+    '.svg': 'dataurl' },
   minify: true,
   outfile: './public_html/transmission-app.js',
   plugins: [sassPlugin()],

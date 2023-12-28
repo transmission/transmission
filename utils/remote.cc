@@ -679,23 +679,28 @@ static void setGroup(tr_variant* args, std::string_view group)
     tr_variantDictAddStrView(args, TR_KEY_group, group);
 }
 
-static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
+[[nodiscard]] auto make_files_list(char const* const str_in)
 {
-    tr_variant* files = tr_variantDictAddList(args, key, 100);
+    auto str = std::string_view{ str_in != nullptr ? str_in : "" };
 
-    if (tr_str_is_empty(arg))
+    if (std::empty(str))
     {
         fmt::print(stderr, "No files specified!\n");
-        arg = "-1"; /* no file will have this index, so should be a no-op */
+        str = "-1"sv; // no file will have this index, so should be a no-op
     }
 
-    if (strcmp(arg, "all") != 0)
+    auto files = tr_variant::Vector{};
+
+    if (str != "all"sv)
     {
-        for (auto const& idx : tr_num_parse_range(arg))
+        files.reserve(100U);
+        for (auto const& idx : tr_num_parse_range(str))
         {
-            tr_variantListAddInt(files, idx);
+            files.emplace_back(idx);
         }
     }
+
+    return files;
 }
 
 // clang-format off
@@ -2935,11 +2940,11 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Re
             switch (c)
             {
             case 'g':
-                addFiles(args, TR_KEY_files_wanted, optarg);
+                *tr_variantDictAdd(args, TR_KEY_files_wanted) = make_files_list(optarg);
                 break;
 
             case 'G':
-                addFiles(args, TR_KEY_files_unwanted, optarg);
+                *tr_variantDictAdd(args, TR_KEY_files_unwanted) = make_files_list(optarg);
                 break;
 
             case 'L':
@@ -2955,15 +2960,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Re
                 break;
 
             case 900:
-                addFiles(args, TR_KEY_priority_high, optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_high) = make_files_list(optarg);
                 break;
 
             case 901:
-                addFiles(args, TR_KEY_priority_normal, optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_normal) = make_files_list(optarg);
                 break;
 
             case 902:
-                addFiles(args, TR_KEY_priority_low, optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_low) = make_files_list(optarg);
                 break;
 
             case 700:

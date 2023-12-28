@@ -79,7 +79,7 @@ public:
     void torrents_added();
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
-    int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
+    void add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
 
@@ -690,12 +690,12 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
     return Torrent::create(tor);
 }
 
-int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
+void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 {
     auto const* metainfo = tr_ctorGetMetainfo(ctor);
     if (metainfo == nullptr)
     {
-        return TR_PARSE_ERR;
+        return;
     }
 
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
@@ -709,18 +709,17 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         }
 
         tr_ctorFree(ctor);
-        return TR_PARSE_DUPLICATE;
+        return;
     }
 
     if (!do_prompt)
     {
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
-        return 0;
+        return;
     }
 
     signal_add_prompt_.emit(ctor);
-    return 0;
 }
 
 namespace

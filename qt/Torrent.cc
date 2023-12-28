@@ -202,6 +202,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(isFinished, is_finished, IS_FINISHED)
             HANDLE_KEY(isPrivate, is_private, IS_PRIVATE)
             HANDLE_KEY(isStalled, is_stalled, IS_STALLED)
+            HANDLE_KEY(labels, labels, LABELS)
             HANDLE_KEY(leftUntilDone, left_until_done, LEFT_UNTIL_DONE)
             HANDLE_KEY(manualAnnounceTime, manual_announce_time, MANUAL_ANNOUNCE_TIME)
             HANDLE_KEY(metadataPercentComplete, metadata_percent_complete, METADATA_PERCENT_COMPLETE)
