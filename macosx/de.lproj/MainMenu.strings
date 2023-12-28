@@ -338,17 +338,8 @@
 /* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
 "3078.title" = "Gruppen verwenden";
 
-/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "3093"; */
+/* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
 "3093.headerCell.title" = "Farbe";
-
-/* Class = "NSTableColumn"; headerCell.title = "DL Speed"; ObjectID = "3126"; */
-"3126.headerCell.title" = "Empfangsgeschwindigkeit";
-
-/* Class = "NSTableColumn"; headerCell.title = "UL Speed"; ObjectID = "3135"; */
-"3135.headerCell.title" = "Sendegeschwindigkeit";
-
-/* Class = "NSTableColumn"; headerCell.title = "Group"; ObjectID = "3140"; */
-"3140.headerCell.title" = "Gruppe";
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
 "3166.title" = "Übersicht";
@@ -419,8 +410,35 @@
 /* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "Cay-iU-bH4"; */
 "Cay-iU-bH4.title" = "Torrent-Datei bereitstellen";
 
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
+/* "HmT-FI-amY.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
+/* "Zmj-A9-NPf.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
+/* "kbX-Av-eP4.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
+/* "lmp-Y3-ZQO.title" = ""; */
+
 /* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
 "lvU-Va-GzM.title" = "Torrent-Datei bereitstellen";
 
+/* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
+/* "oSz-TE-8jj.title" = ""; */
+
 /* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
 "s5v-VO-G2y.title" = "Torrent-Datei bereitstellen";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
+/* "x8g-Nv-jcD.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
+/* "y9O-gd-sXA.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
+/* "zIM-6D-jsa.title" = ""; */
+
+/* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
+/* "zLF-YR-Oq6.title" = ""; */
