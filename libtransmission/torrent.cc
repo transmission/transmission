@@ -904,7 +904,7 @@ void tr_torrent::on_metainfo_completed()
         }
         else if (is_running())
         {
-            tr_torrentStop(this);
+            stop_soon();
         }
     }
 }
