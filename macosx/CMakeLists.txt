@@ -355,7 +355,7 @@ set(LINGUAS
     sv
     tr
     uk
-    zh_CN
+    zh-CN
     zh_TW)
 
 if(ENABLE_NLS)
