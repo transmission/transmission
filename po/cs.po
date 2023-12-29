@@ -2645,9 +2645,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Neplatná metadata"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Nenalezena žádná data! Ujistěte se, že jednotky jsou připojeny nebo zvolte \"Nastavit umístění\". Pro opětovné stažení torrent odstraňte a znovu jej přidejte."

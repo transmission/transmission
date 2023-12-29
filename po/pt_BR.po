@@ -7,12 +7,14 @@
 # Rodrigo Piñero <rodrigo.pinero@yahoo.com.br>, 2017
 # Gustavo Costa <xfgusta@gmail.com>, 2022
 # Gabriel P Machado <machado.gp@gmail.com>, 2022
-# Alex, 2022
+# 380125ae2590f93d3e1eff2258abdf75_6979c31, 2022
 # Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2022
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
+# Alex Wender, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# luquita39, 2023
 #
 #, fuzzy
 msgid ""
@@ -21,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: luquita39, 2023\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -558,9 +560,9 @@ msgstr "{torrent_name} Propriedades"
 #: ../gtk/DetailsDialog.cc:2632
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Propriedades - {torrent_count:L}Torrent"
+msgstr[1] "Propriedades - {torrent_count:L}Torrents"
+msgstr[2] "Propriedades - {torrent_count:L}Torrents"
 
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
@@ -1058,7 +1060,7 @@ msgid "Downloading from {active_count} of {connected_count} connected peer and w
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] "Baixando de {active_count}de {connected_count}peers e webseeds conectados"
 msgstr[1] "Baixando de {active_count}de {connected_count} peers e webseeds conectados"
-msgstr[2] "Baixando {active_count}de {connected_count}peers e webseeds conectados"
+msgstr[2] "Baixando {active_count} de {connected_count} peers e webseeds conectados"
 
 #: ../gtk/Torrent.cc:692
 msgid "Downloading from {active_count} webseed"
@@ -1072,14 +1074,14 @@ msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] "Baixando de {active_count}de {connected_count}peers conectados"
 msgstr[1] "Baixando de {active_count}de {connected_count}peers conectados"
-msgstr[2] "Baixando de {active_count}de {connected_count}peers conectados"
+msgstr[2] "Baixando de {active_count} de {connected_count} peers conectados"
 
 #: ../gtk/Torrent.cc:709
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] "Enviando para {active_count}de {connected_count}peers conectados"
 msgstr[1] "Enviando para {active_count}de {connected_count}peers conectados "
-msgstr[2] "Enviando para {active_count}de {connected_count}peers conectados"
+msgstr[2] "Enviando para {active_count} de {connected_count} peers conectados"
 
 #: ../gtk/Utils.cc:134
 msgid "{days_from_now:L} day from now"
@@ -2022,7 +2024,7 @@ msgstr "Máximo _global de pares:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Habilitar µ_TP para comunicação entre pares"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
@@ -2241,14 +2243,14 @@ msgstr "Sucesso"
 #: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:401
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Blocklist '{path}' possui {count}entrada"
+msgstr[1] "Blocklist '{path}' possui {count} entradas"
+msgstr[2] "Blocklist '{path}' possui {count}entradas"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:257
 msgid "Couldn't parse line: '{line}'"
-msgstr ""
+msgstr "Não foi possível interpretar linha: '{line}'"
 
 #: ../libtransmission/blocklist.cc:385
 msgid "Rewriting old blocklist file format to new format"
@@ -2256,7 +2258,7 @@ msgstr ""
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:42 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:45
 msgid "{crypto_library} error: {error} ({error_code})"
-msgstr ""
+msgstr "{crypto_library}erro: {error}({error_code})"
 
 #: ../libtransmission/global-ip-cache.cc:277
 msgid "Successfully updated source {protocol} address to {ip}"
@@ -2272,15 +2274,15 @@ msgstr ""
 
 #: ../libtransmission/inout.cc:119
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Não foi possível recuperar '{path}': {error}({error_code})"
 
 #: ../libtransmission/log.cc:274
 msgid "Too many messages like this! I won't log this message anymore this session."
-msgstr ""
+msgstr "Muitas mensagens iguais! Não vou mais logar essa mensagem durante essa sessão."
 
 #: ../libtransmission/makemeta.cc:80 ../libtransmission/watchdir.cc:52
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Pulando '{path}': {error}({error_code}) "
 
 #: ../libtransmission/net.cc:186
 msgid "Couldn't create socket: {error} ({error_code})"
@@ -2320,7 +2322,7 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding-natpmp.cc:90
 msgid "Found public address '{address}'"
-msgstr ""
+msgstr "Encontrado endereço público '{address}'"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:127
 msgid "Port {port} is no longer forwarded"
@@ -2336,7 +2338,7 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding-upnp.cc:282
 msgid "Local Address is '{address}'"
-msgstr ""
+msgstr "Endereço Local é{address}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:306
 msgid "Port {port} is not forwarded"
@@ -2653,18 +2655,3 @@ msgid_plural "days"
 msgstr[0] "dia"
 msgstr[1] "dias"
 msgstr[2] "dias"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Anunciar erro: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Anunciar erro: {error}(Tentando novamente em {count}segundo)"
-#~ msgstr[1] "Anunciar erro: {error}(Tentando novamente em {count}segundos)"
-#~ msgstr[2] "Anunciar erro: {error}(Tentando novamente em {count}segundos)"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Metadados inválidos"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Nenhum dado encontrado! Veja se os discos estão conectados ou use \"Definir local\". Para baixar novamente é preciso remover e adicioná-lo de novo"

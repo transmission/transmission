@@ -2490,9 +2490,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Туура эмес метамаалыматтар"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Маалыматтар табылган жок! Кайта жүктөө, торрентти өчүрүү же кайтадан кошуу үчүн. Дисктериңиздин кошулуп турганын текшериңиз, же \"Жайгашкан жерин орнотуу\"ну колдонуңуз."

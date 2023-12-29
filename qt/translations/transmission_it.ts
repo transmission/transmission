@@ -16,7 +16,7 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Un client BitTorrent semplice e veloce</translation>
+        <translation>Un client BitTorrent facile e veloce</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -54,90 +54,90 @@
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Quando avvii un torrent, i suoi dati saranno resi disponibili a terzi tramite upload. Qualsiasi contenuto condividerai è di tua sola responsabilità.</translation>
+        <translation>Quando avvii un torrent, i contenuti dei torrent saranno messi a disposizione di altri utenti attraverso l&apos;invio di dati. Qualsiasi contenuto tu condivida è di tua diretta responsabilità.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
-        <translation>&amp;Accetto</translation>
+        <translation>I &amp;Accetto</translation>
     </message>
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">B/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">kB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">GB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">TB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">kB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">GB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">TB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent Completato</numerusform>
+            <numerusform>Torrent Completati</numerusform>
         </translation>
     </message>
     <message>
@@ -167,7 +167,7 @@
     <message>
         <location line="-210"/>
         <source>Finished</source>
-        <translation>Finito</translation>
+        <translation>Completato</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -177,12 +177,12 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 scartati per controllo non riuscito)</translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Active now</source>
-        <translation>Attivo</translation>
+        <translation>Attualmente attivo</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -208,7 +208,7 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privato a questo tracker -- DHT e PEX disabilitati</translation>
+        <translation>Privato per questo server traccua -- DHT e PEX disabilitati</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -223,7 +223,7 @@
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>Creato il %1</translation>
+        <translation>Creato in data %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -234,57 +234,57 @@
         <location line="+207"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
-        <translation>Connessione crittografata</translation>
+        <translation>Connessione cifrata</translation>
     </message>
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation>Optimistic unchoke</translation>
+        <translation>Sblocco ottimistico</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Downloading from this peer</source>
-        <translation>Download da questo peer</translation>
+        <translation>In ricezione dal peer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Vorremmo scaricare da questo peer se ce lo permettono</translation>
+        <translation>Se ce lo consente, scaricheremmo da questo peer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Uploading to peer</source>
-        <translation>Upload al peer</translation>
+        <translation>In invio al peer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Vorremmo caricare a questo peer se ce lo chiede</translation>
+        <translation>Se richiesto, invieremmo a questo peer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>Il peer ci ha &quot;unchoked&quot;, ma non siamo interessati</translation>
+        <translation>Il peer ci ha sbloccati, ma non siamo interessati interessati</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>Abbiamo &quot;unchoked&quot; questo peer, ma non sono interessati</translation>
+        <translation>Abbiamo sbloccato questo peer, ma non è interessato</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Il peer è stato scoperto attraverso DHT</translation>
+        <translation>Il peer è stato trovato tramite DHT</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>Il peer è stato trovato attraverso il Peer Exchange (PEX)</translation>
+        <translation>Il peer è stato trovato tramite Peer Exchange (PEX)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer is an incoming connection</source>
-        <translation>Il peer è una connessione in ingresso</translation>
+        <translation>Il peer è una connessione in entrata</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -347,7 +347,7 @@
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi URL</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -373,32 +373,32 @@
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>Fai seed indipendentemente dal rapporto</translation>
+        <translation>Continua il seeding indipendentemente dal rapporto</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Ferma al rapporto di seed:</translation>
+        <translation>Ferma il seeding al rapporto:</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Seed regardless of activity</source>
-        <translation>Fai seed indipendentemente dall&apos;attività</translation>
+        <translation>Continua il seeding indipendentemente dall&apos;attività</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Ferma il seed se inattivo per:</translation>
+        <translation>Ferma il seeding se inattivo per:</translation>
     </message>
     <message>
         <location line="+77"/>
         <source>Up</source>
-        <translation>Up</translation>
+        <translation>Su</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Down</source>
-        <translation>Down</translation>
+        <translation>Giù</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -423,7 +423,7 @@
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Proprietà torrent</translation>
+        <translation>Proprietà del torrent</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -438,7 +438,7 @@
     <message>
         <location line="+12"/>
         <source>Have:</source>
-        <translation>Possiede:</translation>
+        <translation>Hai:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -448,12 +448,12 @@
     <message>
         <location line="+26"/>
         <source>Uploaded:</source>
-        <translation>Caricato:</translation>
+        <translation>Inviati:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>Scaricato:</translation>
+        <translation>Ricevuti:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -463,7 +463,7 @@
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>Tempo trascorso:</translation>
+        <translation>Tempo di attività:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -478,7 +478,7 @@
     <message>
         <location line="+26"/>
         <source>Error:</source>
-        <translation>Errori:</translation>
+        <translation>Errore:</translation>
     </message>
     <message>
         <location line="+47"/>
@@ -523,17 +523,17 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiunto:</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Comment:</source>
-        <translation>Commento:</translation>
+        <translation>Commento</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Peers</source>
-        <translation>Peer</translation>
+        <translation>Peers</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -543,27 +543,27 @@
     <message>
         <location line="+22"/>
         <source>Add Tracker</source>
-        <translation>Aggiungi tracker</translation>
+        <translation>Aggiungi Tracker</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Remove Trackers</source>
-        <translation>Rimuovi tracker</translation>
+        <translation>Rimuovi Tracker</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Show &amp;more details</source>
-        <translation>Mostra &amp;più dettagli</translation>
+        <translation>Mostra &amp;more dettagli</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Mostra i tracker di &amp;backup</translation>
+        <translation>Mostra &amp;backup trackers</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Files</source>
-        <translation>File</translation>
+        <translation>Files</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -578,47 +578,47 @@
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>Rispetta i &amp;limiti globali</translation>
+        <translation>Onora &amp;limits globali</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Limit &amp;download speed:</source>
-        <translation>Limita velocità in &amp;download:</translation>
+        <translation>Limita velocità di &amp;download</translation>
     </message>
     <message>
         <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>Limita velocità in &amp;upload:</translation>
+        <translation>Limita velocità di &amp;upload</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Torrent &amp;priority:</source>
-        <translation>&amp;Priorità torrent:</translation>
+        <translation>&amp;priority torrent:</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Seeding Limits</source>
-        <translation>Limiti di seed</translation>
+        <translation>Limiti di seeding</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Ratio:</source>
-        <translation>&amp;Rapporto:</translation>
+        <translation>&amp;Ratio</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>&amp;Idle:</source>
-        <translation>&amp;Inattività:</translation>
+        <translation>&amp;Idle</translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Peer Connections</source>
-        <translation>Connessioni ai peer</translation>
+        <translation>Connessioni dei peer</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>Peer &amp;massimi:</translation>
+        <translation>Peer &amp;Maximum:</translation>
     </message>
 </context>
 <context>
@@ -648,7 +648,7 @@
         <location line="+3"/>
         <location filename="../FileTreeView.cc" line="-253"/>
         <source>Mixed</source>
-        <translation>Mista</translation>
+        <translation> Mista</translation>
     </message>
 </context>
 <context>
@@ -661,12 +661,12 @@
     <message>
         <location line="+3"/>
         <source>Size</source>
-        <translation>Dimensione</translation>
+        <translation>Dimensioni</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Progress</source>
-        <translation>Avanzamento</translation>
+        <translation>Progresso</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -709,7 +709,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Rinomina...</translation>
     </message>
 </context>
 <context>
@@ -753,17 +753,17 @@
     <message>
         <location line="+4"/>
         <source>Error</source>
-        <translation>Errori</translation>
+        <translation>Errore</translation>
     </message>
     <message>
         <location line="+151"/>
         <source>Show:</source>
-        <translation>Mostra:</translation>
+        <translation>Mostra</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerca...</translation>
     </message>
 </context>
 <context>
@@ -772,7 +772,7 @@
         <location filename="../Formatter.cc" line="+21"/>
         <location line="+25"/>
         <source>Unknown</source>
-        <translation>Sconosciuta</translation>
+        <translation>Sconosciuto</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -818,7 +818,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Calcolo dello spazio libero in corso...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -849,17 +849,17 @@
     <message>
         <location line="+30"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Modifica</translation>
+        <translation>&amp;Edit</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Help</source>
-        <translation>&amp;Aiuto</translation>
+        <translation>&amp;Help</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>&amp;Visualizza</translation>
+        <translation>&amp;View</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -874,17 +874,17 @@
     <message>
         <location line="+8"/>
         <source>&amp;Properties</source>
-        <translation>&amp;Proprietà</translation>
+        <translation>&amp;Properties</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>Mostra le proprietà del torrent</translation>
+        <translation>Mostra proprietà del torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
-        <translation>Apri la cartella del torrent</translation>
+        <translation>Apri cartella del torrent</translation>
     </message>
     <message>
         <location line="-161"/>
@@ -899,12 +899,12 @@
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistiche</translation>
+        <translation>Statistiche</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Apri...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -924,12 +924,12 @@
     <message>
         <location line="+22"/>
         <source>Open Fold&amp;er</source>
-        <translation>Apri cart&amp;ella</translation>
+        <translation>Apri Fold&amp;er</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Start</source>
-        <translation>&amp;Avvia</translation>
+        <translation>&amp;Start</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -939,27 +939,27 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Chiedi al tracker per &amp;più peer</translation>
+        <translation>Chiedi &amp;More peers al tracker</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Chiedi al tracker per più peer</translation>
+        <translation>Chiedi altri peer al tracker</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause</source>
-        <translation>&amp;Pausa</translation>
+        <translation>&amp;Pause</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>Metti torrent in pausa</translation>
+        <translation>Pausa torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Verify Local Data</source>
-        <translation>&amp;Verifica dati locali</translation>
+        <translation>&amp;Verify dati locali</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -969,7 +969,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Remove</source>
-        <translation>&amp;Rimuovi</translation>
+        <translation>&amp;Remove</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -979,47 +979,47 @@
     <message>
         <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
-        <translation>&amp;Cancella file e rimuovi</translation>
+        <translation>&amp;Delete Files e Rimuovi</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>Rimuovi torrent e cancella i suoi file</translation>
+        <translation>Rimuovi il torrent e cancella i suoi files</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Start All</source>
-        <translation>&amp;Avvia tutti</translation>
+        <translation>&amp;Start tutti</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause All</source>
-        <translation>&amp;Pausa tutti</translation>
+        <translation>&amp;Pause tutti</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Esci</translation>
+        <translation>&amp;Quit</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Select All</source>
-        <translation>&amp;Seleziona tutti</translation>
+        <translation>&amp;Select tutti</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Deselect All</source>
-        <translation>&amp;Deseleziona tutti</translation>
+        <translation>&amp;Deselect tutti</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Preferences</source>
-        <translation>&amp;Preferenze</translation>
+        <translation>&amp;Preferences</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Compact View</source>
-        <translation>Vista &amp;compatta</translation>
+        <translation>Vista &amp;Compact</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1035,57 +1035,57 @@
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>Barra dei &amp;filtri</translation>
+        <translation>&amp;Filterbar</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Statusbar</source>
-        <translation>Barra di &amp;stato</translation>
+        <translation>&amp;Statusbar</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Activity</source>
-        <translation>Ordina per &amp;attività</translation>
+        <translation>Ordina per &amp;Activity</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>Ordina per &amp;Età</translation>
+        <translation>Ordina per A&amp;ge</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>Ordina per tempo &amp;rimanente</translation>
+        <translation>Ordina per tempo &amp;Left</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Name</source>
-        <translation>Ordina per &amp;Nome</translation>
+        <translation>Ordina per &amp;Name</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Ordina per A&amp;vanzamento</translation>
+        <translation>Ordina per &amp;Progress</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>Ordina per rapp&amp;orto</translation>
+        <translation>Ordina per Rati&amp;o</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>Ordina per &amp;dimensione</translation>
+        <translation>Ordina per Si&amp;ze</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>Ordina per &amp;stato</translation>
+        <translation>Ordina per Stat&amp;e</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>Ordina per t&amp;racker</translation>
+        <translation>Ordina per T&amp;racker</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1095,32 +1095,32 @@
     <message>
         <location line="+8"/>
         <source>&amp;Statistics</source>
-        <translation>&amp;Statistiche</translation>
+        <translation>&amp;Statistics</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Contents</source>
-        <translation>&amp;Contenuti</translation>
+        <translation>&amp;Contents</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;About</source>
-        <translation>&amp;Informazioni</translation>
+        <translation>&amp;About</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>In&amp;verti ordinamento</translation>
+        <translation>Re&amp;verse ordinamento</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Name</source>
-        <translation>&amp;Nome</translation>
+        <translation>&amp;Name</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Files</source>
-        <translation>&amp;File</translation>
+        <translation>&amp;Files</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1135,32 +1135,32 @@
     <message>
         <location line="+8"/>
         <source>Session Ratio</source>
-        <translation>Rapporto di sessione</translation>
+        <translation>Rapporto della sessione</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Trasferimento totale</translation>
+        <translation>Trasferimenti totali</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Transfer</source>
-        <translation>Trasferimento di sessione</translation>
+        <translation>Trasferimenti della sessione</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Main Window</source>
-        <translation>&amp;Finestra principale</translation>
+        <translation>Finestra &amp;Main</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tray &amp;Icon</source>
-        <translation>&amp;Icona nell&apos;area di notifica</translation>
+        <translation>&amp;Icon di stato</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Cambia sessione...</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1181,47 +1181,47 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>&amp;Copia link magnetico negli appunti</translation>
+        <translation>&amp;Copy Link Magnet negli appunti</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Donate</source>
-        <translation>&amp;Dona</translation>
+        <translation>&amp;Donate</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Start &amp;Now</source>
-        <translation>Avvia &amp;Ora</translation>
+        <translation>Avvia &amp;Now</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Bypass the queue and start now</source>
-        <translation>Ignora la coda e avvia ora</translation>
+        <translation>Salta la coda e avvia ora</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>Sposta in &amp;cima</translation>
+        <translation>Sposta &amp;Top</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move &amp;Up</source>
-        <translation>Sposta &amp;su</translation>
+        <translation>Sposta &amp;Up</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move &amp;Down</source>
-        <translation>Sposta &amp;giù</translation>
+        <translation>Sposta Down</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>Sposta in &amp;basso</translation>
+        <translation>Sposta in &amp;Bottom</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Ordina per &amp;coda</translation>
+        <translation>Ordina per &amp;Queue</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+468"/>
@@ -1302,7 +1302,7 @@
     <message>
         <location line="-1012"/>
         <source>Speed Limits</source>
-        <translation>Limiti di velocità</translation>
+        <translation type="unfinished">Limiti di banda</translation>
     </message>
     <message>
         <location line="+537"/>
@@ -1336,25 +1336,25 @@
     <message numerus="yes">
         <location line="-4"/>
         <source>Remove %Ln torrent(s)?</source>
-        <translation>
-            <numerusform>Rimuovere %Ln torrent?</numerusform>
-            <numerusform>Rimuovere %Ln torrent?</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="-510"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
-        <translation>
-            <numerusform>Visualizzazione %L1 del %Ln torrent</numerusform>
-            <numerusform>Visualizzazione %L1 dei %Ln torrent</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+515"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
-        <translation>
-            <numerusform>Rimuovere i file scaricati da questo %Ln torrent?</numerusform>
-            <numerusform>Rimuovere i file scaricati da questi %Ln torrent?</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1385,7 +1385,7 @@
     <message>
         <location line="+0"/>
         <source>These torrents are connected to peers.</source>
-        <translation>Questi torrent sono connessi ai peer.</translation>
+        <translation>Questi torrent sono connessi ai nodi.</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -1443,17 +1443,17 @@
     <message numerus="yes">
         <location line="+5"/>
         <source>%Ln File(s)</source>
-        <translation>
-            <numerusform>%Ln File</numerusform>
-            <numerusform>%Ln File</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
-        <translation>
-            <numerusform>%Ln pezzo</numerusform>
-            <numerusform>%Ln pezzi</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1464,7 +1464,7 @@
     <message>
         <location filename="../MakeDialog.ui" line="+9"/>
         <source>Files</source>
-        <translation>File</translation>
+        <translation type="unfinished">Files</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -1526,7 +1526,7 @@ una riga vuota.</translation>
     <message>
         <location filename="../MakeProgressDialog.ui" line="+14"/>
         <source>New Torrent</source>
-        <translation>Nuovo torrent</translation>
+        <translation type="unfinished">Nuovo torrent</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="-184"/>
@@ -1574,17 +1574,17 @@ una riga vuota.</translation>
     <message>
         <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
-        <translation>Alta</translation>
+        <translation type="unfinished">Alta</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Normal</source>
-        <translation>Normale</translation>
+        <translation type="unfinished">Normale</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Bassa</translation>
+        <translation type="unfinished">Bassa</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+35"/>
@@ -1661,7 +1661,7 @@ una riga vuota.</translation>
     <message>
         <location line="-1234"/>
         <source>Speed Limits</source>
-        <translation>Limiti di velocità</translation>
+        <translation>Limiti di banda</translation>
     </message>
     <message>
         <location line="+99"/>
@@ -1790,7 +1790,7 @@ una riga vuota.</translation>
     <message>
         <location line="+107"/>
         <source>Options</source>
-        <translation>Opzioni</translation>
+        <translation type="unfinished">Opzioni</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="-242"/>
@@ -1835,7 +1835,7 @@ una riga vuota.</translation>
     <message>
         <location line="+79"/>
         <source>Seeding</source>
-        <translation>Seeding</translation>
+        <translation type="unfinished">In seed</translation>
     </message>
     <message>
         <location line="+622"/>
@@ -1845,9 +1845,9 @@ una riga vuota.</translation>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="+184"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
-        <translation>
-            <numerusform>&lt;i&gt;La lista dei bloccati contiene %Ln regola&lt;/i&gt;</numerusform>
-            <numerusform>&lt;i&gt;La lista dei bloccati contiene %Ln regole&lt;/i&gt;</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2128,7 +2128,7 @@ una riga vuota.</translation>
     <message>
         <location line="-156"/>
         <source>Downloading</source>
-        <translation>Scaricamento</translation>
+        <translation type="unfinished">In scaricamento</translation>
     </message>
     <message>
         <location line="+215"/>
@@ -2163,7 +2163,7 @@ una riga vuota.</translation>
     <message>
         <location line="+16"/>
         <source>Speed</source>
-        <translation>Velocità</translation>
+        <translation type="unfinished">Velocità</translation>
     </message>
     <message>
         <location line="+735"/>
@@ -2315,7 +2315,7 @@ una riga vuota.</translation>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2323,7 +2323,7 @@ una riga vuota.</translation>
     <message>
         <location filename="../StatsDialog.ui" line="+14"/>
         <source>Statistics</source>
-        <translation>Statistiche</translation>
+        <translation type="unfinished">Statistiche</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2334,13 +2334,13 @@ una riga vuota.</translation>
         <location line="+12"/>
         <location line="+96"/>
         <source>Uploaded:</source>
-        <translation>Caricato:</translation>
+        <translation type="unfinished">Inviati:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Downloaded:</source>
-        <translation>Scaricato:</translation>
+        <translation type="unfinished">Ricevuti:</translation>
     </message>
     <message>
         <location line="-82"/>
@@ -2362,9 +2362,9 @@ una riga vuota.</translation>
     <message numerus="yes">
         <location filename="../StatsDialog.cc" line="+63"/>
         <source>Started %Ln time(s)</source>
-        <translation>
-            <numerusform>Avviato %Ln volta</numerusform>
-            <numerusform>Avviato %Ln volte</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2378,12 +2378,12 @@ una riga vuota.</translation>
     <message>
         <location line="+6"/>
         <source>Downloading</source>
-        <translation>In download</translation>
+        <translation type="unfinished">In scaricamento</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Seeding</source>
-        <translation>In seeding</translation>
+        <translation type="unfinished">In seed</translation>
     </message>
     <message>
         <location line="-18"/>
@@ -2393,7 +2393,7 @@ una riga vuota.</translation>
     <message>
         <location line="+0"/>
         <source>Paused</source>
-        <translation>In pausa</translation>
+        <translation type="unfinished">In pausa</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2438,7 +2438,7 @@ una riga vuota.</translation>
         <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
-        <translation>%1 di %2 (%3%)</translation>
+        <translation type="unfinished">%1 di %2 (%3%)</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2495,17 +2495,17 @@ una riga vuota.</translation>
         <location line="+40"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation>
-            <numerusform>Scaricamento da %Ln peer</numerusform>
-            <numerusform>Scaricamento da %Ln peer</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
-        <translation>
-            <numerusform>Seeding a %Ln peer</numerusform>
-            <numerusform>Seeding a %Ln peer</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2516,35 +2516,35 @@ una riga vuota.</translation>
     <message numerus="yes">
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
-        <translation>
-            <numerusform>Scaricamento metadati da %Ln peer (%1% completato)</numerusform>
-            <numerusform>Scaricamento metadati da %Ln peer (%1% completato)</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+15"/>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation>
-            <numerusform>Scaricamento da %1 di %Ln peer connesso</numerusform>
-            <numerusform>Scaricamento da %1 di %Ln peer connessi</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation>
-            <numerusform> e %Ln web seed</numerusform>
-            <numerusform> e %Ln web seed</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
-        <translation>
-            <numerusform>Seeding a %1 di %Ln peer connesso</numerusform>
-            <numerusform>Seeding a %1 di %Ln peer connessi</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2559,9 +2559,9 @@ una riga vuota.</translation>
         <location filename="../TrackerDelegate.cc" line="+213"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>
-            <numerusform>Ottenuta una lista di%1 %Ln peer%2 %3 fa</numerusform>
-            <numerusform>Ottenuta una lista di%1 %Ln peer%2 %3 fa</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2602,18 +2602,18 @@ una riga vuota.</translation>
         <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
-        <translation>
-            <numerusform>Il tracker ha%1 %Ln seeder%2</numerusform>
-            <numerusform>Il tracker ha%1 %Ln seeder%2</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation>
-            <numerusform> e%1 %Ln leecher%2 %3 fa</numerusform>
-            <numerusform> e%1 %Ln leecher%2 %3 fa</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2638,7 +2638,7 @@ una riga vuota.</translation>
         <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Richeista del conto dei peer tra %1</translation>
+        <translation>Richiesta del conteggio dei nodi tra %1</translation>
     </message>
     <message>
         <location line="+5"/>

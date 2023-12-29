@@ -450,7 +450,7 @@
 "Hide Status Bar" = "Skjul statuslinje";
 
 /* View menu -> Toolbar */
-/* "Hide Toolbar" = ""; */
+"Hide Toolbar" = "Skjul værktøjslinje";
 
 /* File Outline -> Priority Menu */
 "High" = "Høj";
@@ -694,7 +694,7 @@
 "Port is open" = "Port åben";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Port: %@";
+/* "Port: %@" = ""; */
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";

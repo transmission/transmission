@@ -339,7 +339,7 @@
 "3078.title" = "Usar grupos";
 
 /* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
-"3093.headerCell.title" = "Cor";
+/* "3093.headerCell.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
 "3166.title" = "Vista rápida";
@@ -426,7 +426,7 @@
 "lvU-Va-GzM.title" = "Partilhar ficheiro torrent";
 
 /* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
-/* "oSz-TE-8jj.title" = ""; */
+"oSz-TE-8jj.title" = "Progresso";
 
 /* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
 "s5v-VO-G2y.title" = "Partilhar ficheiro torrent";

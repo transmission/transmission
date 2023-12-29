@@ -154,7 +154,7 @@ msgstr "Copyright © The Transmission Project"
 #. dialog
 #: ../gtk/Application.cc:1423
 msgid "translator-credits"
-msgstr "Transifex-bidragsgivare https://www.transifex.com/transmissionbt/transmissionbt"
+msgstr "Transifex-bidragsgivare https://app.transifex.com/transmissionbt/transmissionbt"
 
 #: ../gtk/DetailsDialog.cc:520 ../gtk/DetailsDialog.cc:538
 msgid "Use global settings"
@@ -302,7 +302,7 @@ msgstr "Hämtar från denna jämlike"
 
 #: ../gtk/DetailsDialog.cc:1502
 msgid "We would download from this peer if they would let us"
-msgstr "Vi skulle hämta från denna jämlike om de tillät oss"
+msgstr "Vi skulle hämta från denna jämlike om den tillät oss"
 
 #: ../gtk/DetailsDialog.cc:1506
 msgid "Uploading to peer"
@@ -310,7 +310,7 @@ msgstr "Skickar till jämlike"
 
 #: ../gtk/DetailsDialog.cc:1510
 msgid "We would upload to this peer if they asked"
-msgstr "Vi skulle skicka till den här jämliken om den frågade"
+msgstr "Vi skulle skicka till denna jämlike om den frågade"
 
 #: ../gtk/DetailsDialog.cc:1514
 msgid "Peer has unchoked us, but we're not interested"
@@ -318,7 +318,7 @@ msgstr "Jämliken har tagit bort strypning för oss, men vi är inte intresserad
 
 #: ../gtk/DetailsDialog.cc:1518
 msgid "We unchoked this peer, but they're not interested"
-msgstr "Vi tog bort strypning för den här jämliken, men de är inte intresserade"
+msgstr "Vi tog bort strypning från denna jämlike, men den är inte intresserad"
 
 #: ../gtk/DetailsDialog.cc:1522
 msgid "Encrypted connection"
@@ -466,7 +466,7 @@ msgstr "{torrent_name} - Redigera spårare"
 
 #: ../gtk/DetailsDialog.cc:2254
 msgid "List contains invalid URLs"
-msgstr "Listan innehåller ogiltiga webbadresser"
+msgstr "Listan innehåller ogiltiga URL:er"
 
 #: ../gtk/DetailsDialog.cc:2259 ../gtk/FileList.cc:850
 msgid "Please correct the errors and try again."
@@ -511,8 +511,8 @@ msgstr[1] "När de har tagits bort kommer torrentfilerna eller magnetlänkarna a
 #: ../gtk/Dialogs.cc:72
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] "Den här torrenten har inte hämtats klart."
-msgstr[1] "De här torrenterna har inte hämtats klart."
+msgstr[0] "Denna torrent har inte hämtats klart."
+msgstr[1] "Dessa torrenter har inte hämtats klart."
 
 #: ../gtk/Dialogs.cc:78
 msgid "This torrent is connected to peers."
@@ -907,7 +907,7 @@ msgstr "_Återställ"
 
 #: ../gtk/StatsDialog.cc:113
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
-msgstr "Den här statistiken är endast för din information. Återställning av den påverkar inte statistiken som loggas av dina BitTorrent-spårare."
+msgstr "Denna statistik är endast för din information. Återställning av den påverkar inte statistiken som loggas av dina BitTorrent-spårare."
 
 #: ../gtk/SystemTrayIcon.cc:217
 msgid "{upload_speed} ▲ {download_speed} ▼"
@@ -1113,7 +1113,7 @@ msgstr "Det gick inte att öppna '{url}'"
 
 #: ../gtk/Utils.cc:860 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
-msgstr "Webbadress som inte stöds: '{url}'"
+msgstr "URL som inte stöds: '{url}'"
 
 #. modal
 #: ../gtk/Utils.cc:866
@@ -1147,7 +1147,7 @@ msgstr "Visa versionsnummer och avsluta"
 
 #: ../gtk/main.cc:90
 msgid "[torrent files or urls]"
-msgstr "[torrentfiler eller webbadresser]"
+msgstr "[torrentfiler eller URL:er]"
 
 #: ../gtk/main.cc:106
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
@@ -1240,11 +1240,11 @@ msgstr "Öppna en torrent"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "Öppna _webbadress…"
+msgstr "Öppna _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Öppna webbadress…"
+msgstr "Öppna URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
@@ -1476,7 +1476,7 @@ msgstr "Spårare"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
-msgstr "_Annonseringswebbadress:"
+msgstr "_Annonserings-URL:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
@@ -1620,15 +1620,15 @@ msgstr "Alternativ"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:18
 msgid "Tracker Announce URLs"
-msgstr "Annonseringswebbadresser för spårare"
+msgstr "Annonserings-URL:er för spårare"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:88 ../gtk/ui/gtk3/MakeDialog.ui:315 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:199
 msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
-"För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.\n"
-"För att lägga till en ny primär webbadress, lägg till den efter en tom rad."
+"För att lägga till en reserv URL, lägg till den på nästa rad efter en primär URL.\n"
+"För att lägga till en ny primär URL, lägg till den efter en tom rad."
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:123 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
@@ -1963,8 +1963,8 @@ msgid ""
 msgstr ""
 "Spårare att använda på alla publika torrenter.\n"
 "\n"
-"För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.\n"
-"För att lägga till en ny primär webbadress, lägg till den efter en tom rad."
+"För att lägga till en reserv URL, lägg till den på nästa rad efter en primär URL.\n"
+"För att lägga till en ny primär URL, lägg till den efter en tom rad."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
 msgid "Network"
@@ -2084,15 +2084,15 @@ msgstr "Totalt"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:8 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
 msgid "Open URL"
-msgstr "Öppna webbadress"
+msgstr "Öppna URL"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:64 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:18
 msgid "Open torrent from URL"
-msgstr "Öppna torrent från webbadress"
+msgstr "Öppna torrent från URL"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:88 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
 msgid "_URL"
-msgstr "_Webbadress"
+msgstr "_URL"
 
 #: ../libtransmission/announcer-http.cc:441
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2389,7 +2389,7 @@ msgstr "Anropar skriptet '{path}'"
 
 #: ../libtransmission/torrent.cc:408
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr "Det gick inte att anropa skript '{path}': {error} ({error_code})"
+msgstr "Det gick inte att anropa skriptet '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:442
 msgid "Seed ratio reached; pausing torrent"
@@ -2542,22 +2542,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Annonseringsfel: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Annonseringsfel: {error} (försöker igen om {count} sekund)"
-#~ msgstr[1] "Annonseringsfel: {error} (försöker igen om {count} sekunder)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Det gick inte att tolka magnetmetainfo: '{error}'. Hämtar {piece_count} del igen"
-#~ msgstr[1] "Det gick inte att tolka magnetmetainfo: '{error}'. Hämtar {piece_count} delar igen"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Ogiltiga metadata"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Inga data hittades! Försäkra dig om att dina enheter är anslutna eller använd \"Ställ in plats\". För att hämta igen, ta bort torrenten och lägg till den igen."

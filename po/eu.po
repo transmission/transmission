@@ -8,9 +8,9 @@
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
 # Sendoa Sojo <sendoasojo@gmail.com>, 2022
 # Alexander Gabilondo <alexgabi@disroot.org>, 2022
-# Iñigo Zendegi Urzelai, 2022
 # Xabier Aramendi <azpidatziak@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Iñigo Zendegi Urzelai, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Iñigo Zendegi Urzelai, 2023\n"
 "Language-Team: Basque (https://app.transifex.com/transmissionbt/teams/33778/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -2437,7 +2437,7 @@ msgstr ""
 
 #: ../libtransmission/tr-dht.cc:540
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Ezin da parekatu '{filename}' errenkada: '{line}'"
 
 #: ../libtransmission/tr-lpd.cc:255
 msgid "Couldn't initialize LPD: {error} ({error_code})"
@@ -2449,7 +2449,7 @@ msgstr "Ezin izan da IPv4 socket-a  {address} lotu: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:199
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Ezin izan da IPv6 socket-a {address} lotu: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2554,22 +2554,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Iragarpen errorea: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Iragarpen errorea: {error} (Berriz saiatuko da {count} segundotan)"
-#~ msgstr[1] "Iragarpen errorea: {error} (Berriz saiatuko da {count} segundotan)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Ezin izan da magnet-aren metadata aztertu: '{error}'. Berriz deskargatzen{piece_count} zati"
-#~ msgstr[1] "Ezin izan da magnet-aren metadata aztertu: '{error}'. Berriz deskargatzen {piece_count} zati"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Baliogabeko metadatuak"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Ez da daturik aurkitu! Segurtatu zure gailuak konektatuta daudela edo erabili \"Ezarri kokapena\". Berriro kargatzeko, kendu torrent-a eta berriro gehitu programara."

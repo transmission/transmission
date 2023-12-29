@@ -2485,9 +2485,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Data meta tidak sah"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Tiada data ditemui! Pastikan pemacu anda bersambung atau guna \"Tetapkan Lokasi\". Untuk muat turun semula, buang torrent dan tambah sekali lagi."

@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">B/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">kB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">GB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">TB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">kB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">GB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">TB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -2294,7 +2294,7 @@ Másik elsődleges webcímet egy üres sor hozzáadása után adhatsz hozzá.</t
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2462,12 +2462,12 @@ Másik elsődleges webcímet egy üres sor hozzáadása után adhatsz hozzá.</t
     <message>
         <location line="+18"/>
         <source>%1 left</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van hátra</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remaining time unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Hátralévő idő ismeretlen</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

@@ -2503,9 +2503,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "잘못된 메타 정보"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "데이터를 찾을 수 없습니다. 드라이브가 연결 되었는지 확인하시거나 \"위치 설정\"을 사용하십시오. 다시 다운로드하려면  토렌트를 제거한 후 다시 추가하십시오."

@@ -2546,9 +2546,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Vigased metaandmed"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Andmed ei leitud! Veendu, et kettad on ühendatud või määra torrenti asukoht. Uuesti allalaadimiseks eemalda torrent ja lisa uuesti."

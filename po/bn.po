@@ -2539,9 +2539,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "অকার্যকর মেটাডাটা"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "কোন উপাত্ত পাওয়া যায়নি! আপনার ড্রাইভ সংযুক্ত কিনা তা নিশ্চত করুন অথবা ব্যবহার করুন \"Set Location\"। পুনরায় ডাউনলোডের জন্য টরেন্ট অপসারণ করুন এবং পুনরায় যোগ করুন।"

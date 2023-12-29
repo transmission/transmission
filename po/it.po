@@ -7,6 +7,7 @@
 # Joe Mauri <asbruff@gmail.com>, 2022
 # Milo Casagrande <milo@ubuntu.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Marco Usai, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Marco Usai, 2023\n"
 "Language-Team: Italian (https://app.transifex.com/transmissionbt/teams/33778/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -53,7 +54,7 @@ msgstr "Impossibile leggere il livello «{level}» del registro"
 
 #: ../daemon/daemon.cc:650
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "seeders"
 
 #: ../daemon/daemon.cc:664
 msgid "Reloading settings from '{path}'"
@@ -451,7 +452,7 @@ msgstr "Nessun aggiornamento pianificato"
 
 #: ../gtk/DetailsDialog.cc:1853
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Alla ricerca di altri peers {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1860
 msgid "Queued to ask for more peers"
@@ -500,7 +501,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:2220
 msgid "{torrent_name} - Edit Trackers"
-msgstr ""
+msgstr "{torrent_name} - Modifica Tracker"
 
 #: ../gtk/DetailsDialog.cc:2254
 msgid "List contains invalid URLs"
@@ -512,7 +513,7 @@ msgstr "Correggere gli errori e provare nuovamente"
 
 #: ../gtk/DetailsDialog.cc:2339
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - Aggiungi Tracker"
 
 #: ../gtk/DetailsDialog.cc:2448 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
 msgid "Trackers"
@@ -520,7 +521,7 @@ msgstr "Server traccia"
 
 #: ../gtk/DetailsDialog.cc:2627
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "{torrent_name} Proprietà"
 
 #: ../gtk/DetailsDialog.cc:2632
 msgid "Properties - {torrent_count:L} Torrent"
@@ -772,17 +773,17 @@ msgstr ""
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Errore"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Attenzione"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Informazione"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
@@ -835,7 +836,7 @@ msgstr ""
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "Seleziona un file"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
@@ -1166,7 +1167,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:276
 msgid "Couldn't open torrent"
-msgstr ""
+msgstr "Impossibile aprire il torrent"
 
 #: ../gtk/Utils.cc:536
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
@@ -2617,9 +2618,3 @@ msgid_plural "days"
 msgstr[0] "giorno"
 msgstr[1] "giorni"
 msgstr[2] "giorni"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Metadati non validi"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Nessun dato trovato. Verificare che le unità siano connesse oppure usare «Imposta posizione». Per scaricare ripartendo da zero, rimuovere il torrent e aggiungerlo nuovamente."

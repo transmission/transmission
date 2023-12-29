@@ -2643,9 +2643,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Neveljavni metapodatki"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Podatkov ni mogoče najti. Prepričajte se, da so vaši pogoni povezani ali uporabite \"Nastavi mesto\". Za ponoven prejem odstranite torrent in ga znova dodajte."

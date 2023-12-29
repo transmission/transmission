@@ -450,7 +450,7 @@
 "Hide Status Bar" = "Statusleiste ausblenden";
 
 /* View menu -> Toolbar */
-/* "Hide Toolbar" = ""; */
+"Hide Toolbar" = "Symbolleiste ausblenden";
 
 /* File Outline -> Priority Menu */
 "High" = "Hoch";
@@ -694,7 +694,7 @@
 "Port is open" = "Port ist geöffnet.";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Port: %@";
+/* "Port: %@" = ""; */
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "748";

@@ -312,7 +312,7 @@
 "2122.title" = "Opdater Tracker";
 
 /* Class = "NSMenuItem"; title = "Pieces Bar"; ObjectID = "2185"; */
-"2185.title" = "Vis stykker";
+/* "2185.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Availability"; ObjectID = "2279"; */
 "2279.title" = "Vis tilgængelighed";
@@ -339,10 +339,10 @@
 "3078.title" = "Brug grupper";
 
 /* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
-"3093.headerCell.title" = "Color";
+/* "3093.headerCell.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
-"3166.title" = "Vis";
+/* "3166.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
 "3170.title" = "Support og udvikling";
@@ -426,7 +426,7 @@
 "lvU-Va-GzM.title" = "Del";
 
 /* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
-/* "oSz-TE-8jj.title" = ""; */
+"oSz-TE-8jj.title" = "Fremskridt";
 
 /* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
 "s5v-VO-G2y.title" = "Del";

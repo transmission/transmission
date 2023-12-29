@@ -9,6 +9,7 @@
 # Michalis Zisis <mixasgr@greeklug.gr>, 2022
 # 49b67765f7beecf7587147363d590d62, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# 3594141e28bdaa52cc9a5bd6ed314e0a_76a7721 <b9d2e0e012c5758f696048d590b6c558_1102917>, 2023
 #
 #, fuzzy
 msgid ""
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: 3594141e28bdaa52cc9a5bd6ed314e0a_76a7721 <b9d2e0e012c5758f696048d590b6c558_1102917>, 2023\n"
 "Language-Team: Greek (https://app.transifex.com/transmissionbt/teams/33778/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -31,27 +32,27 @@ msgstr "Κανένα"
 
 #: ../cli/cli.cc:92
 msgid "Inf"
-msgstr ""
+msgstr "Άπειρο"
 
 #: ../daemon/daemon.cc:229 ../gtk/Session.cc:793 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:238 ../libtransmission/blocklist.cc:336 ../libtransmission/blocklist.cc:351 ../libtransmission/inout.cc:160 ../libtransmission/utils.cc:125 ../libtransmission/utils.cc:144 ../libtransmission/utils.cc:155 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:254 ../gtk/Session.cc:844 ../gtk/Utils.cc:271 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Αδυναμία προσθήκης αρχείου torrent '{path}'"
 
 #: ../daemon/daemon.cc:263
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Αφαιρείται το αρχείο torrent '{path}'"
 
 #: ../daemon/daemon.cc:268 ../gtk/Utils.cc:554 ../libtransmission/utils.cc:607
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία αφαίρεσης '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:603
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Αδυναμία συνακτικής ανάλυσης επιπέδου καταγραφής '{level}'"
 
 #: ../daemon/daemon.cc:650
 msgid "Deferring reload until session is fully started."
@@ -2565,9 +2566,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Μη έγκυρα μεταδεδομένα"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Δεν βρέθηκαν δεδομένα! Βεβαιώστε ότι οι δίσκοι σας είναι συνδεδεμένοι ή χρησιμοποιήστε το \"Ορισμός Τοποθεσίας\". Για να ξανά κατεβάσετε, αφαιρέστε το torrent και προσθέστε το ξανά."

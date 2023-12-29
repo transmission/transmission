@@ -2666,26 +2666,3 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Помилка анонсу: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Помилка анонсу: {error} (Повторна спроба через {count} секунду)"
-#~ msgstr[1] "Помилка анонсу: {error} (Повторна спроба через {count} секунди)"
-#~ msgstr[2] "Помилка анонсу: {error} (Повторна спроба через {count} секунд)"
-#~ msgstr[3] "Помилка анонсу: {error} (Повторна спроба через {count} секунди)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Не вдалося розпізнати метадані magnet: «{error}». Перезавантаження {piece_count} частини"
-#~ msgstr[1] "Не вдалося розпізнати метадані magnet: «{error}». Перезавантаження {piece_count} частин"
-#~ msgstr[2] "Не вдалося розпізнати метадані magnet: «{error}». Перезавантаження {piece_count} частин"
-#~ msgstr[3] "Не вдалося розпізнати метадані magnet: «{error}». Перезавантаження {piece_count} частин"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Помилкові метадані"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Не знайдено даних! З’єднайте з комп’ютером Ваші носії даних або скористайтеся пунктом «Встановити розташування». Щоб завантажити торент від початку, вилучіть його запис, а потім знову додайте його."

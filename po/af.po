@@ -6,6 +6,7 @@
 # Translators:
 # Pieter Schalk Schoeman <pieter@sonbesie.co.za>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Adriaan Joubert, 2023
 # Gideon Wentink <gjwentink@gmail.com>, 2023
 #
 #, fuzzy
@@ -727,27 +728,27 @@ msgstr "Tyd"
 #: ../gtk/MessageLogWindow.cc:483
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Krities"
 
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Fout"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Waarskuwing"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Inligting"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Ontfout"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
@@ -767,7 +768,7 @@ msgstr "Torrent Voltooid"
 
 #: ../gtk/Notify.cc:274
 msgid "Start Now"
-msgstr ""
+msgstr "Begin nou"
 
 #: ../gtk/Notify.cc:286
 msgid "Torrent Added"
@@ -795,11 +796,11 @@ msgstr ""
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "Kies ’n lêer"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
-msgstr ""
+msgstr "(Geen)"
 
 #: ../gtk/PrefsDialog.cc:308
 msgid "Allow encryption"
@@ -952,7 +953,7 @@ msgstr ""
 
 #: ../gtk/Torrent.cc:629
 msgid "Stalled"
-msgstr "Gestaak"
+msgstr "Stilstaande"
 
 #: ../gtk/Torrent.cc:640
 msgid "Tracker warning: '{warning}'"
@@ -964,7 +965,7 @@ msgstr ""
 
 #: ../gtk/Torrent.cc:646
 msgid "Local error: '{error}'"
-msgstr ""
+msgstr "Lokale fout: ‘{error}’"
 
 #: ../gtk/Torrent.cc:670
 #, no-c-format
@@ -1023,95 +1024,95 @@ msgstr[1] ""
 
 #: ../gtk/Utils.cc:159 ../gtk/Utils.cc:190 ../gtk/Utils.cc:217 ../gtk/Utils.cc:250
 msgid "now"
-msgstr ""
+msgstr "nou"
 
 #: ../gtk/Utils.cc:166
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_ago:L} dag gelede"
+msgstr[1] "{days_ago:L} dae gelede"
 
 #: ../gtk/Utils.cc:172
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_ago:L} uur gelede"
+msgstr[1] "{hours_ago:L} uur gelede"
 
 #: ../gtk/Utils.cc:179
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_ago:L} minuut gelede"
+msgstr[1] "{minutes_ago:L} minute gelede"
 
 #: ../gtk/Utils.cc:186
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_ago:L} sekonde gelede"
+msgstr[1] "{seconds_ago:L} sekondes gelede"
 
 #: ../gtk/Utils.cc:199
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days:L} dag"
+msgstr[1] "{days:L} dae"
 
 #: ../gtk/Utils.cc:204
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} uur"
+msgstr[1] "{hours:L} uur"
 
 #: ../gtk/Utils.cc:209
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} minuut"
+msgstr[1] "{minutes:L} minute"
 
 #: ../gtk/Utils.cc:214
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} sekonde"
+msgstr[1] "{seconds:L} sekondes"
 
 #: ../gtk/Utils.cc:225
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_left:L} dag oor"
+msgstr[1] "{days_left:L} dae oor"
 
 #: ../gtk/Utils.cc:232
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_left:L} uur oor"
+msgstr[1] "{hours_left:L} uur oor"
 
 #: ../gtk/Utils.cc:239
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_left:L} minuut oor"
+msgstr[1] "{minutes_left:L} minute oor"
 
 #: ../gtk/Utils.cc:246
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_left:L} sekonde oor"
+msgstr[1] "{seconds_left:L} sekondes oor"
 
 #: ../gtk/Utils.cc:265
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr ""
+msgstr "Die torrent-lêer ‘{path}’ word reeds deur ‘{torrent_name}’ gebruik."
 
 #: ../gtk/Utils.cc:276
 msgid "Couldn't open torrent"
-msgstr ""
+msgstr "Kon nie torrent open nie"
 
 #: ../gtk/Utils.cc:536
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie {path}’ na asblik skuif nie: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:643
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Kon nie ‘{url}’ open nie"
 
 #: ../gtk/Utils.cc:860 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
@@ -1120,11 +1121,11 @@ msgstr ""
 #. modal
 #: ../gtk/Utils.cc:866
 msgid "Transmission doesn't know how to use '{url}'"
-msgstr ""
+msgstr "Transmission weet nie hoe om ‘{url}’ te gebruik nie"
 
 #: ../gtk/Utils.cc:871
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Hierdie magneetskakel blyk vir iets anders as BitTorrent bedoel te wees."
 
 #: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1664,7 +1665,7 @@ msgstr "Bron_lêer:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:193 ../gtk/ui/gtk4/MakeDialog.ui:115
 msgid "Piece size:"
-msgstr ""
+msgstr "Stukgrootte:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:244 ../gtk/ui/gtk4/MakeDialog.ui:150
 msgid "Properties"
@@ -2538,14 +2539,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dae"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Kon nie magneet-metainligting parsee nier: ‘{error}’. Laai weer {piece_count} deel af"
-#~ msgstr[1] "Kon nie magneet-metainligting parsee nier: ‘{error}’. Laai weer {piece_count} dele af"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Ongeldige metadata"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Geen data gevind! Maak seker u skywe is verbind of gebruik “Stel Ligging”. Verwyder die torrent en voeg dit weer toe om dit weer af te laai."

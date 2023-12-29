@@ -2575,22 +2575,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dg"
 msgstr[1] "dagen"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Aankondigingsfout:{error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Aankondigingsfout: {error} (Opnieuw proberen in {count} seconde)"
-#~ msgstr[1] "Aankondigingsfout: {error} (Opnieuw proberen in {count} seconden)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Kon magneet metainfo niet parseren: '{error}'. Opnieuw downloaden van {piece_count} stukje"
-#~ msgstr[1] "Kon magneet metainfo niet parseren: '{error}'. Opnieuw downloaden van {piece_count} fragmenten"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Ongeldige metagegevens"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Geen gegevens gevonden! Ga na of uw stations zijn aangesloten of gebruik ‘Locatie instellen’, of wis de torrent en begin opnieuw."

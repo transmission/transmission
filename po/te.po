@@ -2535,9 +2535,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "చెల్లని మెటాడేటా"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "ఏ దత్తాంశాలు కనబడలేదు. మీ హార్డుడ్రైవులన్నీ అనుసంధానించి ఉన్నాయేమో చూడండి, లేదా వాటి \"స్థానాన్ని అమర్చండి\". మళ్ళీ దించుకోవడానికి, టోరెంట్ తీసివేసి, మళ్ళీ జతచేయండి."

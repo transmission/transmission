@@ -2589,9 +2589,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Неисправни метаподаци"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Нисам пронашао никакве податке! Уверите се да су ваши уређаји повезани или користите „Постави локацију“. Да поново преузмете торент, уклоните га и затим га поново додајте."

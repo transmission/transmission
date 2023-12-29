@@ -5,8 +5,8 @@
 #
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
-# maboroshin, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# maboroshin, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: maboroshin, 2023\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -151,8 +151,10 @@ msgstr "Copyright © The Transmission Project"
 #: ../gtk/Application.cc:1423
 msgid "translator-credits"
 msgstr ""
-"Transifex 翻訳者::\n"
-"  maboroshin https://github.com/maboroshin"
+"Transifex:\n"
+"  maboroshin https://github.com/maboroshin\n"
+"\n"
+"Launchpad: Akira Tanaka https://launchpad.net/~popo1897 Chris Coulson https://launchpad.net/~chrisccoulson Daiki Takeda https://launchpad.net/~blue-transparancy Dereck Wonnacott https://launchpad.net/~dereck Fumihito YOSHIDA https://launchpad.net/~hito Hidehiko Tsushima https://launchpad.net/~hidehiko-betsukai Hiroshi Tagawa https://launchpad.net/~kuponuga ISHII Hironaga https://launchpad.net/~hinomiya-gla José Lou Chang https://launchpad.net/~obake Jun Kobayashi https://launchpad.net/~jkbys Kenichi Ito https://launchpad.net/~ken-i54k Kentaro Kazuhama https://launchpad.net/~kazken3 Koichi Akabe https://launchpad.net/~vbkaisetsu Krzysztof Klimonda https://launchpad.net/~kklimonda Makoto Kato https://launchpad.net/~makoto-kt Masato HASHIMOTO https://launchpad.net/~hashimo Masatoshi Haraoka https://launchpad.net/~f99aq8ove Mitsuya Shibata https://launchpad.net/~cosmos-door N.Nakata https://launchpad.net/~nnakata OKANO Takayoshi https://launchpad.net/~kano Ryunosuke Tanaka https://launchpad.net/~ryunosuke-tnk Shota Mihara https://launchpad.net/~amg966 Shushi Kurose https://launchpad.net/~kuromabo Toshiharu Kudoh https://launchpad.net/~toshi-kd2 Tosiki Iga https://launchpad.net/~tosiki-iga Y.Nishiwaki https://launchpad.net/~y.nishiwaki Yuji Kaneko https://launchpad.net/~yujikaneko ahfuji https://launchpad.net/~ahfuji epii https://launchpad.net/~epii sunatomo https://launchpad.net/~naiyu"
 
 #: ../gtk/DetailsDialog.cc:520 ../gtk/DetailsDialog.cc:538
 msgid "Use global settings"
@@ -2494,20 +2496,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "アナウンスのエラー: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "アナウンスのエラー: {error} ({count}秒後に再試行)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "マグネットのメタ情報を解析できません:「{error}」。{piece_count} ピースを再ダウンロード"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "無効なメタデータ"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "データが見つかりません!ドライブの接続を確認するか、「場所の設定」を使用してください。もう一度ダウンロードするには、トレントを削除しそれを再び追加してください。"

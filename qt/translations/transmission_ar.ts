@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">بايت\ث</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">ك.ب\ث</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">م.ب\ث</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">ج.ب\ث</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">ت.ب\ث</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">بايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">كيبيبايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">ميبيابيت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">جيبيبايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">تيبيبايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">كيلوبايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">ميجابايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">جيجابايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">تيرابايت</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -2389,7 +2389,7 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

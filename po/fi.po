@@ -5,9 +5,9 @@
 #
 # Translators:
 # Otto Koskelah <otto@nise.fi>, 2017
-# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2023\n"
 "Language-Team: Finnish (https://app.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +102,7 @@ msgstr "Transmissionia ei voitu rekisteröidä {content_type} käsittelijä: {er
 
 #: ../gtk/Application.cc:554
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Lopetuspyyntö saatu, sammutetaan siististi alas. Pyydä uudellen, jos ei tapahdu mitään."
 
 #: ../gtk/Application.cc:780
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -912,7 +912,7 @@ msgstr "Työpöydän lepotilaan siirtymisen salliminen"
 
 #: ../gtk/Session.cc:1182
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Tunnisteelle ei ole odottavaa RPC pyyntöä {tag}"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -2400,7 +2400,7 @@ msgstr "Migrated torrent tiedosto kohteesta '{old_path}' polkuun '{path}'"
 
 #: ../libtransmission/torrent.cc:138
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Metatietoa ei voitu käyttää '{path}' kohteesta '{magnet}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:167
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
@@ -2565,22 +2565,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Ilmoitus virheestä: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Ilmoitus virheestä: {error} (uudelleen {count} sekunnissa)"
-#~ msgstr[1] "Ilmoitus virheestä: {error} (uudelleen {count} sekunnissa)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Magnet-metatietoa ei voitu jäsentää: '{error}'. Ladataan {piece_count} osa uudelleen"
-#~ msgstr[1] "Magnet-metatietoa ei voitu jäsentää: '{error}'. Ladataan {piece_count} osaa uudelleen"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Virheellinen metadata"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Dataa ei löydy. Varmista että asemat on kytketty käyttöön tai käytä ”Aseta sijainti” -valintaa. Ladataksesi uudelleen, poista torrent ja lisää se uudelleen."

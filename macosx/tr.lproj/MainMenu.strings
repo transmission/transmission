@@ -159,7 +159,7 @@
 "1561.title" = "Transmission Yardımı";
 
 /* Class = "NSMenuItem"; title = "Speed Limit"; ObjectID = "1566"; */
-"1566.title" = "Hız Limiti";
+"1566.title" = "Hız Sınırı";
 
 /* Class = "NSMenuItem"; title = "Compact View"; ObjectID = "1578"; */
 "1578.title" = "Küçük Görüntü";
@@ -339,7 +339,7 @@
 "3078.title" = "Öbekleri Kullan";
 
 /* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
-"3093.headerCell.title" = "Renk";
+/* "3093.headerCell.title" = ""; */
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
 "3166.title" = "Göz At";
@@ -426,7 +426,7 @@
 "lvU-Va-GzM.title" = "Torrent Dosyasını Paylaş";
 
 /* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
-/* "oSz-TE-8jj.title" = ""; */
+"oSz-TE-8jj.title" = "İndirme Durumu";
 
 /* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
 "s5v-VO-G2y.title" = "Torrent Dosyasını Paylaş";

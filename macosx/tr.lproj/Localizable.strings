@@ -32,7 +32,7 @@
 "%lu cache" = "%lu önbellek";
 
 /* Inspector -> Peers tab -> peers */
-"%lu Connected" = "%lu Bağlı";
+"%lu Connected" = "%lu bağlı";
 
 /* Inspector -> Peers tab -> peers */
 "%lu DHT" = "%lu DHT";
@@ -91,7 +91,7 @@
 "%u pieces, %@ each" = "%1$u parça, her biri %2$@";
 
 /* Inspector -> Peers tab -> peers */
-"1 Connected" = "1 Bağlı";
+"1 Connected" = "1 bağlı";
 
 /* Add torrent -> info
    Create torrent -> info
@@ -245,7 +245,7 @@
 "Change transfer settings" = "Aktarım ayarlarını değiştir";
 
 /* File Outline -> Menu */
-"Check Selected" = "Seçiliyi denetle";
+"Check Selected" = "Seçiliyi Denetle";
 
 /* Torrent -> status string */
 "Checking existing data" = "Var olan veri denetleniyor";
@@ -257,7 +257,7 @@
 "Client" = "İstemci";
 
 /* View menu -> Quick Look */
-"Close Quick Look" = "Göz At'ı kapat";
+"Close Quick Look" = "Göz At'ı Kapat";
 
 /* Blocklist -> message */
 "Connecting to site" = "Alana bağlanıyor";
@@ -450,7 +450,7 @@
 "Hide Status Bar" = "Durum Çubuğunu Gizle";
 
 /* View menu -> Toolbar */
-/* "Hide Toolbar" = ""; */
+"Hide Toolbar" = "Araç Çubuğunu Gizle";
 
 /* File Outline -> Priority Menu */
 "High" = "Yüksek";
@@ -694,7 +694,7 @@
 "Port is open" = "Kapı açık";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Kapı: %@";
+/* "Port: %@" = ""; */
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";
@@ -870,7 +870,7 @@
 "Share" = "Paylaş";
 
 /* Share toolbar item -> tooltip */
-"Share torrent file" = "Torrent dosyası paylaş";
+"Share torrent file" = "Torrent dosyasını paylaş";
 
 /* Main window -> 1st bottom left button (action) tooltip */
 "Shortcuts for changing global settings." = "Genel ayarları değiştirmek için kısayollar.";

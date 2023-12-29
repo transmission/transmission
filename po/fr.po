@@ -2595,18 +2595,3 @@ msgid_plural "days"
 msgstr[0] "jour"
 msgstr[1] "de jours"
 msgstr[2] "jours"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Erreur d’annonce : {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Erreur d’annonce : {error} (nouvel essai dans {count} seconde)"
-#~ msgstr[1] "Erreur d’annonce : {error} (nouvel essai dans {count} secondes)"
-#~ msgstr[2] "Erreur d’annonce : {error} (nouvel essai dans {count} secondes)"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Les métadonnées sont invalides"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Aucune donnée n’a été trouvée. Assurez-vous que vos disques sont connectés ou utilisez « Définir l’emplacement ». Pour retélécharger, supprimez le torrent, puis rajoutez-le."

@@ -450,7 +450,7 @@
 "Hide Status Bar" = "Verberg statusbalk";
 
 /* View menu -> Toolbar */
-/* "Hide Toolbar" = ""; */
+"Hide Toolbar" = "Verberg knoppenbalk";
 
 /* File Outline -> Priority Menu */
 "High" = "Hoog";
@@ -694,7 +694,7 @@
 "Port is open" = "Poort is open";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Poort: %@";
+/* "Port: %@" = ""; */
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";

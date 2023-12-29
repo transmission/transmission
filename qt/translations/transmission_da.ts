@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">B/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">kB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">GB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">TB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">kB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">GB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">TB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -709,7 +709,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Omdøb …</translation>
     </message>
 </context>
 <context>
@@ -763,7 +763,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Søg …</translation>
     </message>
 </context>
 <context>
@@ -818,7 +818,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Udregner ledig plads …&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -904,7 +904,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Åbn …</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -919,7 +919,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ny …</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1160,17 +1160,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Skift session …</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Angiv p&amp;lacering …</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Åbn &amp;URL …</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1353,8 +1353,8 @@
         <location line="+515"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>Slet denne torrents downloadede filer?</numerusform>
-            <numerusform>Slet disse %Ln torrents downloadede filer?</numerusform>
+            <numerusform>Slet de downloadede filer fra denne torrent?</numerusform>
+            <numerusform>Slet de downloadede filer fra disse %Ln torrents?</numerusform>
         </translation>
     </message>
     <message>
@@ -1484,7 +1484,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Stykkestørrelse:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1739,7 +1739,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Tester TCP-port …</translation>
     </message>
     <message numerus="yes">
         <location line="+105"/>
@@ -1838,7 +1838,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+622"/>
         <source>Remote</source>
-        <translation>Fjern</translation>
+        <translation>Fjernadgang</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="+184"/>
@@ -1917,7 +1917,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="-265"/>
         <source>Te&amp;st Port</source>
-        <translation>Te&amp;stport</translation>
+        <translation>Te&amp;st port</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -1987,17 +1987,17 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Registrer nye torrents fra udklipsholder</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kald &amp;script når download er fuldført:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kald &amp;script når seeding er fuldført:</translation>
     </message>
     <message>
         <location line="+342"/>
@@ -2007,12 +2007,12 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivér µ&amp;TP for modpartsforbindelser</translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Default Public Trackers</source>
-        <translation>Offentlige trackers (standard)</translation>
+        <translation>Offentlige trackere (standard)</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2313,7 +2313,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

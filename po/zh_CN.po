@@ -10,6 +10,8 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Dingzhong Chen <wsxy162@gmail.com>, 2023
 # pluwen <pluwen@gmail.com>, 2023
+# LIN, 2023
+# Wenbin Lv <wenbin816@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -18,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: pluwen <pluwen@gmail.com>, 2023\n"
+"Last-Translator: Wenbin Lv <wenbin816@gmail.com>, 2023\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +34,7 @@ msgstr "无"
 
 #: ../cli/cli.cc:92
 msgid "Inf"
-msgstr "Inf"
+msgstr "无限大"
 
 #: ../daemon/daemon.cc:229 ../gtk/Session.cc:793 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:238 ../libtransmission/blocklist.cc:336 ../libtransmission/blocklist.cc:351 ../libtransmission/inout.cc:160 ../libtransmission/utils.cc:125 ../libtransmission/utils.cc:144 ../libtransmission/utils.cc:155 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
@@ -120,11 +122,11 @@ msgstr "我同意(_A)"
 
 #: ../gtk/Application.cc:1016
 msgid "Closing Connections…"
-msgstr "正在关闭连接……"
+msgstr "正在关闭连接…"
 
 #: ../gtk/Application.cc:1021
 msgid "Sending upload/download totals to tracker…"
-msgstr "正在发送上传/下载统计到 Tracker……"
+msgstr "正在发送上传/下载统计到 Tracker…"
 
 #: ../gtk/Application.cc:1026
 msgid "_Quit Now"
@@ -146,7 +148,7 @@ msgstr "一个快速易用的 BitTorrent 客户端"
 
 #: ../gtk/Application.cc:1417
 msgid "Copyright © The Transmission Project"
-msgstr "Copyright © Transmission 项目"
+msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -158,6 +160,7 @@ msgstr ""
 "玉堂白鹤 <yjwork@qq.com>,2020\n"
 "Dingzhong Chen <wsxy162@gmail.com>, 2020-2022\n"
 "Pluwen Chen <pluwen@gmail.com>, 2023\n"
+"Wenbin Lv <wenbin816@gmail.com>, 2023\n"
 "Launchpad 贡献者：\n"
 "  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
 "  Andrew Starr-Bochicchio https://launchpad.net/~andrewsomething\n"
@@ -267,7 +270,7 @@ msgstr "未选择种子"
 
 #: ../gtk/DetailsDialog.cc:654
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "当前 Tracker 设置为私有——已禁用 DHT 和 PEX"
+msgstr "当前 Tracker 的私有种子——已禁用 DHT 和 PEX"
 
 #: ../gtk/DetailsDialog.cc:654
 msgid "Public torrent"
@@ -540,7 +543,7 @@ msgstr[0] "删除这 {count:L} 个种子下载的文件吗？"
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "一旦移除，继续传输将需要种子文件或磁力链接。"
+msgstr[0] "一旦移除，继续传输将需要 Torrent 文件或磁力链接。"
 
 #: ../gtk/Dialogs.cc:72
 msgid "This torrent has not finished downloading."
@@ -884,7 +887,7 @@ msgstr "端口{markup_begin}已打开{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:927
 msgid "Testing TCP port…"
-msgstr "正在测试 TCP 端口……"
+msgstr "正在测试 TCP 端口…"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
@@ -896,7 +899,7 @@ msgstr "无法移动种子"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "这可能需要花费一点时间……"
+msgstr "这可能需要花费一点时间…"
 
 #: ../gtk/Session.cc:779 ../libtransmission/watchdir-win32.cc:154 ../libtransmission/watchdir-win32.cc:162
 msgid "Couldn't read '{path}'"
@@ -1154,7 +1157,7 @@ msgstr "显示版本并退出"
 
 #: ../gtk/main.cc:90
 msgid "[torrent files or urls]"
-msgstr "[种子文件或网址]"
+msgstr "[Torrent 文件或网址]"
 
 #: ../gtk/main.cc:106
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
@@ -1247,7 +1250,7 @@ msgstr "打开种子"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "打开网址…"
+msgstr "打开网址(_U)…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
@@ -1327,7 +1330,7 @@ msgstr "立即开始任务"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr "向 Traker 请求更多节点（_M）"
+msgstr "向 Tracker 请求更多节点(_M)"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
@@ -1483,7 +1486,7 @@ msgstr "Tracker"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
-msgstr "公告网址（_A）："
+msgstr "公告网址(_A)："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
@@ -1607,7 +1610,7 @@ msgstr "做种限制"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:998 ../gtk/ui/gtk4/DetailsDialog.ui:715
 msgid "_Ratio:"
-msgstr "分享率（_R）："
+msgstr "分享率(_R)："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1012 ../gtk/ui/gtk4/DetailsDialog.ui:727
 msgid "_Idle:"
@@ -1659,7 +1662,7 @@ msgstr "新建(_N)"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
 msgid "Sa_ve to:"
-msgstr "保存到（_V）："
+msgstr "保存到(_V)："
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:116 ../gtk/ui/gtk4/MakeDialog.ui:55
 msgid "Source F_older:"
@@ -1691,11 +1694,11 @@ msgstr "来源(_S)"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:387 ../gtk/ui/gtk4/MakeDialog.ui:258
 msgid "_Private torrent"
-msgstr "私有种子（_P）"
+msgstr "私有种子(_P)"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "正在创建种子……"
+msgstr "正在创建种子…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"
@@ -1769,7 +1772,7 @@ msgstr "速度限制"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:219 ../gtk/ui/gtk4/PrefsDialog.ui:119
 msgid "Override normal speed limits manually or at scheduled times"
-msgstr "手动或者定时覆盖正常速度限制设置"
+msgstr "手动或定时覆盖正常速度限制设置"
 
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:235 ../gtk/ui/gtk4/PrefsDialog.ui:133
@@ -1833,7 +1836,7 @@ msgstr "未完成"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:699 ../gtk/ui/gtk4/PrefsDialog.ui:472
 msgid "Append \"._part\" to incomplete files' names"
-msgstr "在未完成的文件名附加“.part”扩展名（_P）"
+msgstr "在未完成的文件名附加“.part”扩展名(_P)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:716 ../gtk/ui/gtk4/PrefsDialog.ui:486
 msgid "Keep _incomplete torrents in:"
@@ -1871,7 +1874,7 @@ msgstr "做种"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:941 ../gtk/ui/gtk3/PrefsDialog.ui:1148 ../gtk/ui/gtk4/PrefsDialog.ui:654 ../gtk/ui/gtk4/PrefsDialog.ui:792
 msgid "Privacy"
-msgstr "类型"
+msgstr "隐私"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:965 ../gtk/ui/gtk4/PrefsDialog.ui:668
 msgid "_Encryption mode:"
@@ -1883,7 +1886,7 @@ msgstr "屏蔽列表"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1031 ../gtk/ui/gtk4/PrefsDialog.ui:710
 msgid "Enable _blocklist:"
-msgstr "启用屏蔽列表（_B）："
+msgstr "启用屏蔽列表(_B)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1046 ../gtk/ui/gtk4/PrefsDialog.ui:723
 msgid "Enable _automatic updates"
@@ -1903,7 +1906,7 @@ msgstr "用于入站连接的端口(_P)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1203 ../gtk/ui/gtk4/PrefsDialog.ui:834
 msgid "Pick a _random port every time Transmission is started"
-msgstr "在 Transmission 启动时随机选择端口（_R）"
+msgstr "在 Transmission 启动时随机选择端口(_R)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1220 ../gtk/ui/gtk4/PrefsDialog.ui:848
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1919,15 +1922,15 @@ msgstr "节点限制"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1348 ../gtk/ui/gtk4/PrefsDialog.ui:931
 msgid "Maximum peers per _torrent:"
-msgstr "单个种子最大节点数（_T）："
+msgstr "单个种子最大节点数(_T)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1362 ../gtk/ui/gtk4/PrefsDialog.ui:943
 msgid "Maximum peers _overall:"
-msgstr "全局最大节点数（_O）："
+msgstr "全局最大节点数(_O)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
-msgstr "为节点通信启用 µTP（_T）"
+msgstr "为节点通信启用 µ_TP"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
@@ -1983,7 +1986,7 @@ msgstr "桌面"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1635 ../gtk/ui/gtk4/PrefsDialog.ui:1136
 msgid "_Inhibit hibernation when torrents are active"
-msgstr "种子活跃时禁止休眠（_I）"
+msgstr "种子活跃时禁止休眠(_I)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1652 ../gtk/ui/gtk4/PrefsDialog.ui:1150
 msgid "Show Transmission icon in the _notification area"
@@ -2019,7 +2022,7 @@ msgstr "打开 Web 客户端(_O)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1865 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "HTTP _port:"
-msgstr "HTTP 端口（_P）："
+msgstr "HTTP 端口(_P)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1877 ../gtk/ui/gtk4/PrefsDialog.ui:1303
 msgid "Use _authentication"
@@ -2035,7 +2038,7 @@ msgstr "密码(_W)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1923 ../gtk/ui/gtk4/PrefsDialog.ui:1342
 msgid "Only allow these IP a_ddresses:"
-msgstr "只允许这些 IP 地址（_D）："
+msgstr "只允许这些 IP 地址(_D)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1945 ../gtk/ui/gtk4/PrefsDialog.ui:1358
 msgid "Addresses:"
@@ -2055,7 +2058,7 @@ msgstr "设定种子位置"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:36 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
-msgstr "接受(_A)"
+msgstr "应用(_A)"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:67 ../gtk/ui/gtk4/RelocateDialog.ui:19
 msgid "Location"
@@ -2063,7 +2066,7 @@ msgstr "位置"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:92 ../gtk/ui/gtk4/RelocateDialog.ui:34
 msgid "Torrent _location:"
-msgstr "Torrent 位置（_L）："
+msgstr "Torrent 位置(_L)："
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:117 ../gtk/ui/gtk4/RelocateDialog.ui:57
 msgid "_Move from the current folder"
@@ -2099,7 +2102,7 @@ msgstr "从网址打开种子"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:88 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
 msgid "_URL"
-msgstr "_URL"
+msgstr "网址(_U)"
 
 #: ../libtransmission/announcer-http.cc:441
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2539,20 +2542,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "公告错误：{error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "公告错误：{error}。（将在 {count} 秒后重试）"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "无法解析磁力链接元信息：“{error}”。正在重新下载 {piece_count} 个分片"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "无效的元数据"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "未找到数据！请确保你的驱动器已经连接，或使用“设定位置”进行选择。如需重新下载，请移除此任务后重新添加。"

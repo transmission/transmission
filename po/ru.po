@@ -8,10 +8,10 @@
 # Stas Solovey <whats_up@tut.by>, 2022
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
 # hlm hlmfn, 2022
-# Виктор, 2023
-# Andrei Stepanov, 2023
-# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
+# Victor, 2023
+# Темак, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Andrei Stepanov, 2023
 #
 #, fuzzy
 msgid ""
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Andrei Stepanov, 2023\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -38,19 +38,19 @@ msgstr "Инф."
 
 #: ../daemon/daemon.cc:229 ../gtk/Session.cc:793 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:238 ../libtransmission/blocklist.cc:336 ../libtransmission/blocklist.cc:351 ../libtransmission/inout.cc:160 ../libtransmission/utils.cc:125 ../libtransmission/utils.cc:144 ../libtransmission/utils.cc:155 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr "Не удалось прочитать \"{path}\": {error} ({error_code})"
+msgstr "Не удалось прочитать «{path}»: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:254 ../gtk/Session.cc:844 ../gtk/Utils.cc:271 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
-msgstr "Не удалось добавить торрент-файл \"{path}\""
+msgstr "Не удалось добавить торрент-файл «{path}»"
 
 #: ../daemon/daemon.cc:263
 msgid "Removing torrent file '{path}'"
-msgstr "Удаление торрент-файла \"{path}\""
+msgstr "Удаляется торрент-файл «{path}»"
 
 #: ../daemon/daemon.cc:268 ../gtk/Utils.cc:554 ../libtransmission/utils.cc:607
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr "Не удалось удалить \"{path}\": {error} ({error_code})"
+msgstr "Не удалось удалить «{path}»: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:603
 msgid "Couldn't parse log level '{level}'"
@@ -62,7 +62,7 @@ msgstr "Откладывание перезагрузки до полного з
 
 #: ../daemon/daemon.cc:664
 msgid "Reloading settings from '{path}'"
-msgstr "Повторная загрузка настроек из \"{path}\""
+msgstr "Перезагрузка настроек из «{path}»"
 
 #: ../daemon/daemon.cc:699
 msgid "Couldn't initialize daemon: {error} ({error_code})"
@@ -70,7 +70,7 @@ msgstr "Не удалось запустить службу: {error} ({error_cod
 
 #: ../daemon/daemon.cc:710
 msgid "Loading settings from '{path}'"
-msgstr "Загрузка настроек из \"{path}\""
+msgstr "Загрузка настроек из «{path}»"
 
 #: ../daemon/daemon.cc:730
 msgid "Saved pidfile '{path}'"
@@ -78,7 +78,7 @@ msgstr "Файл pid сохранён «{path}»"
 
 #: ../daemon/daemon.cc:736 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:471 ../libtransmission/inout.cc:155 ../libtransmission/rpcimpl.cc:1306 ../libtransmission/torrent.cc:1029 ../libtransmission/torrent.cc:1990 ../libtransmission/variant.cc:855
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr "Не удалось сохранить \"{path}\": {error} ({error_code})"
+msgstr "Не удалось сохранить «{path}»: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:745
 msgid "Requiring authentication"
@@ -86,7 +86,7 @@ msgstr "Требование аутентификации"
 
 #: ../daemon/daemon.cc:766
 msgid "Watching '{path}' for new torrent files"
-msgstr "Отслеживание \"{path}\" для новых торрент-файлов"
+msgstr "Отслеживание «{path}» для новых торрент-файлов"
 
 #: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:181
 msgid "Couldn't create event: {error} ({error_code})"
@@ -114,7 +114,7 @@ msgstr "Transmission — программа для обмена файлами. 
 
 #: ../gtk/Application.cc:786 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:372 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
-msgstr "_Отменить"
+msgstr "_Отмена"
 
 #: ../gtk/Application.cc:787
 msgid "I _Agree"
@@ -590,7 +590,7 @@ msgstr "Низкий"
 
 #: ../gtk/FileList.cc:841 ../gtk/Session.cc:311
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr "Не удалось переименовать \"{old_path}\" в \"{path}\": {error} ({error_code})"
+msgstr "Не удалось переименовать «{old_path}» в «{path}»: {error} ({error_code})"
 
 #: ../gtk/FileList.cc:954 ../gtk/MessageLogWindow.cc:327
 msgid "Name"
@@ -724,15 +724,15 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:190
 msgid "Creating '{path}'"
-msgstr "Создание \"{path}\""
+msgstr "Создаётся «{path}»"
 
 #: ../gtk/MakeDialog.cc:203
 msgid "Created '{path}'"
-msgstr "\"{path}\" создан"
+msgstr "«{path}» создан"
 
 #: ../gtk/MakeDialog.cc:209 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
 msgid "Couldn't create '{path}': {error} ({error_code})"
-msgstr "Не удалось создать \"{path}\": {error} ({error_code})"
+msgstr "Не удалось создать «{path}»: {error} ({error_code})"
 
 #: ../gtk/MakeDialog.cc:227
 msgid "Scanned {file_size}"
@@ -909,7 +909,7 @@ msgstr "Пожалуйста, подождите…"
 
 #: ../gtk/Session.cc:779 ../libtransmission/watchdir-win32.cc:154 ../libtransmission/watchdir-win32.cc:162
 msgid "Couldn't read '{path}'"
-msgstr "Не удалось прочитать \"{path}\""
+msgstr "Не удалось прочитать «{path}»"
 
 #. logging
 #: ../gtk/Session.cc:1037
@@ -1179,7 +1179,7 @@ msgstr[3] "{seconds_left:L} секунд осталось"
 
 #: ../gtk/Utils.cc:265
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr "Торрент-файл \"{path}\" уже используется \"{torrent_name}\"."
+msgstr "Торрент-файл «{path}» уже используется «{torrent_name}»."
 
 #: ../gtk/Utils.cc:276
 msgid "Couldn't open torrent"
@@ -2255,7 +2255,7 @@ msgstr ""
 
 #: ../libtransmission/inout.cc:119
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr "Не удалось получить \"{path}\": {error} ({error_code})"
+msgstr "Не удалось получить «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/log.cc:274
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2263,7 +2263,7 @@ msgstr "Слишком много таких сообщений! Это сооб
 
 #: ../libtransmission/makemeta.cc:80 ../libtransmission/watchdir.cc:52
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr "Пропуск \"{path}\": {error} ({error_code})"
+msgstr "Пропускается «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:186
 msgid "Couldn't create socket: {error} ({error_code})"
@@ -2287,11 +2287,11 @@ msgstr "Не удалось привязать порт {port} на {address}: {
 
 #: ../libtransmission/open-files.cc:192
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr "Не удалось открыть \"{path}\": {error} ({error_code})"
+msgstr "Не удалось открыть «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:220
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
-msgstr "Не удалось предварительно распределить «{path}»: {error} ({error_code})"
+msgstr "Не удалось предраспределить «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:239
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
@@ -2463,7 +2463,7 @@ msgstr[3] "Загружено {count} торрентов"
 
 #: ../libtransmission/torrent-metainfo.cc:713
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr "Торрент-файл перенесен из \"{old_path}\" в \"{path}\""
+msgstr "Торрент-файл перенесён из «{old_path}» в «{path}»"
 
 #: ../libtransmission/torrent.cc:138
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
@@ -2503,7 +2503,7 @@ msgstr "Удаление торрента"
 
 #: ../libtransmission/torrent.cc:1121 ../libtransmission/torrent.cc:2159
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
-msgstr "Не удалось переместить \"{old_path}\" в \"{path}\": {error} ({error_code})"
+msgstr "Не удалось переместить «{old_path}» в «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1569
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
@@ -2543,7 +2543,7 @@ msgstr "Не удалось разобрать JSON в позиции {position}
 
 #: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
 msgid "Couldn't watch '{path}': {error} ({error_code})"
-msgstr "Не удалось посмотреть \"{path}\": {error} ({error_code})"
+msgstr "Не удалось посмотреть «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:270
 msgid "Couldn't read event: {error} ({error_code})"
@@ -2644,26 +2644,3 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Ошибка анонса: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Ошибка анонса: {error} (повторная попытка через {count} секунду)"
-#~ msgstr[1] "Ошибка анонса: {error} (повторная попытка через {count} секунды)"
-#~ msgstr[2] "Ошибка анонса: {error} (повторная попытка через {count} секунд)"
-#~ msgstr[3] "Ошибка анонса: {error} (повторная попытка через {count} секунд)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Не удалось разобрать метаданные магнет-ссылки: «{error}». Повторная загрузка {piece_count} части"
-#~ msgstr[1] "Не удалось разобрать метаданные магнет-ссылки: «{error}». Повторная загрузка {piece_count} частей"
-#~ msgstr[2] "Не удалось разобрать метаданные магнет-ссылки: «{error}». Повторная загрузка {piece_count} частей"
-#~ msgstr[3] "Не удалось разобрать метаданные магнет-ссылки: «{error}». Повторная загрузка {piece_count} частей"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Некорректные метаданные"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Данные не обнаружены! Убедитесь, что диски подключены, или используйте пункт меню «Указать расположение». Для повторной загрузки, удалите торрент, а затем добавьте его снова."

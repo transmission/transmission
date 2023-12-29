@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minuti";
 
 /* stats window -> times opened */
-/* "%llu times" = ""; */
+"%llu times" = "%llu volte";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -450,7 +450,7 @@
 "Hide Status Bar" = "Nascondi la barra di stato";
 
 /* View menu -> Toolbar */
-/* "Hide Toolbar" = ""; */
+"Hide Toolbar" = "Nascondi la barra degli strumenti";
 
 /* File Outline -> Priority Menu */
 "High" = "Alta";
@@ -694,7 +694,7 @@
 "Port is open" = "La porta è aperta";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Porta: %@";
+/* "Port: %@" = ""; */
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";
@@ -1047,7 +1047,7 @@
 "Total Transfer" = "Trasferimento totale";
 
 /* Message window -> level */
-/* "Trace" = ""; */
+"Trace" = "Traccia";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Server traccia";
@@ -1127,7 +1127,7 @@
 
 /* Message window -> level
    Message window -> level string */
-/* "Warning" = ""; */
+"Warning" = "Avviso";
 
 /* Drag overlay -> url */
 "Web Address" = "Sito web";

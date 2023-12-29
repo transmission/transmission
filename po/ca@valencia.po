@@ -2532,9 +2532,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Metadades invàlides"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "No s'han trobat dades. Assegureu-vos que les unitats estan connectades o utilitzeu «Estableix la ubicació». Per tornar a baixar-lo, suprimiu el torrent i torneu a afegir-lo."

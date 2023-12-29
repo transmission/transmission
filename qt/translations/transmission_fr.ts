@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">o/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">ko/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">Mo/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">Go/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">To/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">o</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">Kio</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">Mio</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">Gio</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">Tio</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">ko</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">Mo</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">Go</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">To</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -289,7 +289,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Le pair est connecté via µTP</translation>
     </message>
     <message>
         <location line="+165"/>
@@ -347,7 +347,7 @@
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter une/des URL(s)</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -709,7 +709,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Renommer…</translation>
     </message>
 </context>
 <context>
@@ -763,7 +763,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Chercher…</translation>
     </message>
 </context>
 <context>
@@ -818,7 +818,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Calcul de l’espace libre…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -904,7 +904,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ouvrir…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -919,7 +919,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nouveau…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1160,7 +1160,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Changer de session…</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1170,7 +1170,7 @@
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir une &amp;URL…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1539,7 +1539,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de créer «&#xa0;%1$s&#xa0;»&#xa0;: %2$s</translation>
     </message>
 </context>
 <context>
@@ -1739,7 +1739,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Test du port TCP…</translation>
     </message>
     <message numerus="yes">
         <location line="+105"/>
@@ -2313,7 +2313,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2482,12 +2482,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+18"/>
         <source>%1 left</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 restant</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remaining time unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps restant inconnu</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

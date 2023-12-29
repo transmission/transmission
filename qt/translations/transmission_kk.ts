@@ -2485,7 +2485,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Remaining time unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Қалған уақыты белгісіз</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

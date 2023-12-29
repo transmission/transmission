@@ -2589,6 +2589,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Нема пронађених података! Уверите се да су ваши уређаји повезани или користите „Постави локацију“. Да поново преузмете торрент, уклоните га и затим га поново додајте."

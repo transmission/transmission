@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">B/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">kB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">GB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">TB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">kB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">GB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">TB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -208,7 +208,7 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privat för den här spåraren -- DHT och PEX inaktiverat</translation>
+        <translation>Privat för denna spårare -- DHT och PEX inaktiverat</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -249,7 +249,7 @@
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Vi skulle vilja hämta från den här jämliken om de tillät det</translation>
+        <translation>Vi skulle hämta från denna jämlike om den tillät oss</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -259,7 +259,7 @@
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Vi skulle skicka till den här jämliken om den frågade</translation>
+        <translation>Vi skulle skicka till denna jämlike om den frågade</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -269,7 +269,7 @@
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>Vi tog bort strypning för den här jämliken, men de är inte intresserade</translation>
+        <translation>Vi tog bort strypning från denna jämlike, men den är inte intresserad</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -294,7 +294,7 @@
     <message>
         <location line="+165"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation>Lägg till webbadresser för spårningsannonser, en per rad:</translation>
+        <translation>Lägg till annonserings-URL:er för spårare, en per rad:</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -304,7 +304,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation>Inga nya webbadresser hittades.</translation>
+        <translation>Inga nya URL:er hittades.</translation>
     </message>
     <message>
         <location line="-881"/>
@@ -347,7 +347,7 @@
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation>Lägg till webbadresser</translation>
+        <translation>Lägg till URL:er</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -1170,7 +1170,7 @@
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>Öppna &amp;webbadress…</translation>
+        <translation>Öppna &amp;URL…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1331,7 +1331,7 @@
     <message>
         <location line="+4"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>Ta bort den här torrentens hämtade filer?</translation>
+        <translation>Ta bort denna torrentens hämtade filer?</translation>
     </message>
     <message numerus="yes">
         <location line="-4"/>
@@ -1370,7 +1370,7 @@
     <message>
         <location line="+4"/>
         <source>This torrent has not finished downloading.</source>
-        <translation>Den här torrenten har inte hämtats klart.</translation>
+        <translation>Denna torrent har inte hämtats klart.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1380,7 +1380,7 @@
     <message>
         <location line="+4"/>
         <source>This torrent is connected to peers.</source>
-        <translation>Den här torrenten är ansluten till jämlikar.</translation>
+        <translation>Denna torrent är ansluten till jämlikar.</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1500,8 +1500,8 @@
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>För att lägga till en webbadress för reservspårare lägger du till den på raden efter den primära webbadressen.
-För att lägga till ytterligare en primär webbadress lägger du till den efter en tom rad.</translation>
+        <translation>För att lägga till en reserv URL, lägg till den på raden efter den primära URL:en.
+För att lägga till ytterligare en primär URL, lägg till den efter en tom rad.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1557,7 +1557,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Öppna torrent från webbadress eller magnetlänk</translation>
+        <translation>Öppna torrent från URL eller magnetlänk</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -2017,7 +2017,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spårare att använda på alla publika torrenter.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.&lt;/p&gt;&lt;p&gt;För att lägga till en ny primär webbadress, lägg till den efter en tom rad.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spårare att använda på alla publika torrenter.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;För att lägga till en reserv URL, lägg till den på nästa rad efter en primär URL.&lt;/p&gt;&lt;p&gt;För att lägga till en ny primär URL, lägg till den efter en tom rad.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2313,7 +2313,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2654,17 +2654,17 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation>Annonseringswebbadresser för spårare</translation>
+        <translation>Annonserings-URL:er för spårare</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation>För att lägga till en ny primär webbadress, lägg till den efter en tom rad.</translation>
+        <translation>För att lägga till en ny primär URL, lägg till den efter en tom rad.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;För att lägga till en reserv URL, lägg till den på nästa rad efter en primär webbadress.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>

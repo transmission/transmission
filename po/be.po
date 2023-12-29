@@ -2642,9 +2642,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Хібныя метаданыя"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Дадзеныя не знойдзены! Пераканаецеся, што вашы дыскі падлучаны ці выкарыстоўваецца \"Паказаць Месца\". Каб паўторна загрузіць, выдаліце торэнт і зноў дадайце яго."

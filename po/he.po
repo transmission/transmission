@@ -5,9 +5,9 @@
 #
 # Translators:
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2022
-# Avi Markovitz <avi.markovitz@gmail.com>, 2022
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Avi Markovitz <avi.markovitz@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Avi Markovitz <avi.markovitz@gmail.com>, 2023\n"
 "Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -2542,7 +2542,7 @@ msgstr "לא ניתן להתאגד לשקע IPv4 {address}: {error} ({error_code
 
 #: ../libtransmission/tr-udp.cc:199
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "לא ניתן לקשור שקע IPv6 {address}: {error}{error_code}"
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
@@ -2659,26 +2659,3 @@ msgstr[0] "יום"
 msgstr[1] "יומיים"
 msgstr[2] "ימים"
 msgstr[3] "ימים"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "שגיאת הכרזה: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "שגיאת הכרזה: {error} (יתבצע ניסיון חוזר בעוד שנייה)"
-#~ msgstr[1] "שגיאת הכרזה: {error} (יתבצע ניסיון חוזר בעוד {count} שניות)"
-#~ msgstr[2] "שגיאת הכרזה: {error} (יתבצע ניסיון חוזר בעוד {count} שניות)"
-#~ msgstr[3] "שגיאת הכרזה: {error} (יתבצע ניסיון חוזר בעוד {count} שניות)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "לא ניתן לפענח את נתוני העל של קישור המגנט: ‚{error}’. חלק אחד מתקבל מחדש"
-#~ msgstr[1] "לא ניתן לפענח את נתוני העל של קישור המגנט: ‚{error}’. {piece_count} חלקים מתקבלים מחדש"
-#~ msgstr[2] "לא ניתן לפענח את נתוני העל של קישור המגנט: ‚{error}’. {piece_count} חלקים מתקבלים מחדש"
-#~ msgstr[3] "לא ניתן לפענח את נתוני העל של קישור המגנט: ‚{error}’. {piece_count} חלקים מתקבלים מחדש"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "נתוני על שגויים"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "לא נמצאו נתונים! נא לוודא שהכוננים שלך מחוברים או להשתמש ב„הגדרת מיקום”. כדי להוריד מחדש, יש להסיר את הטורנט ולהוסיף אותו מחדש."

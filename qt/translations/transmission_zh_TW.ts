@@ -11,37 +11,37 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>快速簡潔的 BitTorrent 客戶端</translation>
+        <translation>簡單快速的 BitTorrent 用戶端</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">客戶端</translation>
+        <translation>用戶端</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>C&amp;redits</source>
-        <translation>貢獻 (&amp;R)</translation>
+        <translation>致謝 (&amp;C)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;License</source>
-        <translation>使用條款 (&amp;L)</translation>
+        <translation>授權 (&amp;L)</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Credits</source>
-        <translation>貢獻</translation>
+        <translation>致謝</translation>
     </message>
 </context>
 <context>
@@ -54,7 +54,7 @@
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>當您在執行 Torrent 時，其資料將透過上傳的方式提供給其他人。任何您分享的任何內容皆須負起相關責任。</translation>
+        <translation>當您執行 torrent 時，其資料將以上傳的方式提供給其他人。您必須為自己分享的內容負起所有責任。</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -64,85 +64,85 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">B/秒</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">kB/秒</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MB/秒</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">GB/秒</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">TB/秒</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">kB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">GB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">TB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>已完成的 torrents</numerusform>
         </translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>已加入的 torrent</translation>
     </message>
 </context>
 <context>
@@ -155,13 +155,13 @@
     <message>
         <location line="+1"/>
         <source>Mixed</source>
-        <translation>混合的</translation>
+        <translation>混合</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+268"/>
         <source>Unknown</source>
-        <translation>未知的</translation>
+        <translation>未知</translation>
     </message>
     <message>
         <location line="-210"/>
@@ -176,17 +176,17 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 於校驗失敗後捨棄)</translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Active now</source>
-        <translation>立即啟動</translation>
+        <translation>活躍中</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 ago</source>
-        <translation>%1 前</translation>
+        <translation>%1 之前</translation>
     </message>
     <message numerus="yes">
         <location line="+63"/>
@@ -205,12 +205,12 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>將此追蹤器設為私人－已停用 DHT 與 PEX</translation>
+        <translation>指定為此追蹤器私有 -- 已停用 DHT 與 PEX</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Public torrent</source>
-        <translation>公開 Torrent</translation>
+        <translation>公開 torrent</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -220,12 +220,12 @@
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>在 %1 建立</translation>
+        <translation>於 %1 建立</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created by %1 on %2</source>
-        <translation>由 %1 在 %2 建立</translation>
+        <translation>由 %1 於 %2 建立</translation>
     </message>
     <message>
         <location line="+207"/>
@@ -236,62 +236,62 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation type="unfinished"></translation>
+        <translation>積極性禮尚往來 (Optimistic unchoke)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Downloading from this peer</source>
-        <translation>正在從此共享端下載</translation>
+        <translation>正在從該節點下載</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>如果對方允許，我們將從此共享端下載</translation>
+        <translation>如果對方允許，我們將從該節點下載</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Uploading to peer</source>
-        <translation>正在上傳到共享端</translation>
+        <translation>正在上傳到該節點</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>如果對方要求，我們將上傳至此共享端</translation>
+        <translation>如果對方請求，我們將上傳到該節點</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>共享端已解除封鎖，但我方不感興趣</translation>
+        <translation>該節點已宣告暢通，但我們不感興趣</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>我們已解除封鎖此共享端，但對方不感興趣</translation>
+        <translation>我們已向該節點宣告暢通，但對方不感興趣</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>已透過 DHT 探索到共享端</translation>
+        <translation>透過 DHT 探索到的節點</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation type="unfinished"></translation>
+        <translation>透過節點交換 (PEX) 探索到的節點</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer is an incoming connection</source>
-        <translation>此共享端為一個傳入連線</translation>
+        <translation>該節點為傳入連線</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>該節點為 µTP 連線</translation>
     </message>
     <message>
         <location line="+165"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>加入追蹤器宣告 URL，一行一個：</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -301,7 +301,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>沒有找到新的 URL。</translation>
     </message>
     <message>
         <location line="-881"/>
@@ -324,7 +324,7 @@
     <message>
         <location line="+70"/>
         <source>%1 (Ratio: %2)</source>
-        <translation>%1 (比例: %2)</translation>
+        <translation>%1 (分享率：%2)</translation>
     </message>
     <message>
         <location line="+308"/>
@@ -343,7 +343,7 @@
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>加入 URL</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -369,22 +369,22 @@
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>無論比例多少皆播種</translation>
+        <translation>無論分享率限制，持續做種</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>達到以下比例時停止播種:</translation>
+        <translation>達到分享率時停止做種：</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Seed regardless of activity</source>
-        <translation type="unfinished"></translation>
+        <translation>無論是否有活動，持續做種</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>如果以下閒置則停止播種:</translation>
+        <translation>閒置超過時間時停止做種：</translation>
     </message>
     <message>
         <location line="+77"/>
@@ -434,47 +434,47 @@
     <message>
         <location line="+12"/>
         <source>Have:</source>
-        <translation>擁有:</translation>
+        <translation>擁有：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Availability:</source>
-        <translation>可用:</translation>
+        <translation>可用：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Uploaded:</source>
-        <translation>已上傳:</translation>
+        <translation>已上傳：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>已下載:</translation>
+        <translation>已下載：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>State:</source>
-        <translation>州:</translation>
+        <translation>狀態：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>執行時間:</translation>
+        <translation>執行時間：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Remaining time:</source>
-        <translation>剩餘時間:</translation>
+        <translation>剩餘時間：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Last activity:</source>
-        <translation>最後活動:</translation>
+        <translation>最後活動於：</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Error:</source>
-        <translation>錯誤:</translation>
+        <translation>錯誤：</translation>
     </message>
     <message>
         <location line="+47"/>
@@ -484,12 +484,12 @@
     <message>
         <location line="+109"/>
         <source>Size:</source>
-        <translation>容量:</translation>
+        <translation>大小：</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Location:</source>
-        <translation>位置:</translation>
+        <translation>位置：</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -499,37 +499,37 @@
     <message>
         <location line="+101"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>編輯追蹤器</translation>
     </message>
     <message>
         <location line="-207"/>
         <source>Hash:</source>
-        <translation>雜湊:</translation>
+        <translation>雜湊：</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Privacy:</source>
-        <translation>隱私權:</translation>
+        <translation>隱私權：</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Origin:</source>
-        <translation>來源:</translation>
+        <translation>來源：</translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>加入於：</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Comment:</source>
-        <translation>備註:</translation>
+        <translation>備註：</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Peers</source>
-        <translation>共享端</translation>
+        <translation>節點</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -554,7 +554,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>顯示備份追蹤器 (&amp;B)</translation>
+        <translation>顯示備用追蹤器 (&amp;B)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -574,47 +574,47 @@
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>依照全域限制 (&amp;B)</translation>
+        <translation>優先使用全域限制 (&amp;L)</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Limit &amp;download speed:</source>
-        <translation>限制下載速度  (&amp;D):</translation>
+        <translation>限制下載速度 (&amp;D)：</translation>
     </message>
     <message>
         <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>限制上傳速度 (&amp;U):</translation>
+        <translation>限制上傳速度 (&amp;U)：</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Torrent &amp;priority:</source>
-        <translation>Torrent 優先性  (&amp;P):</translation>
+        <translation>Torrent 優先順序 (&amp;P)：</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Seeding Limits</source>
-        <translation>播種限制</translation>
+        <translation>做種限制</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Ratio:</source>
-        <translation>比例 (&amp;R):</translation>
+        <translation>分享率 (&amp;R)：</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>&amp;Idle:</source>
-        <translation>閒置 (&amp;I):</translation>
+        <translation>閒置 (&amp;I)：</translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Peer Connections</source>
-        <translation>共享端連接</translation>
+        <translation>已連線的節點</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>最大共享端 (&amp;M):</translation>
+        <translation>最大連線節點數量 (&amp;M)：</translation>
     </message>
 </context>
 <context>
@@ -657,7 +657,7 @@
     <message>
         <location line="+3"/>
         <source>Size</source>
-        <translation>容量</translation>
+        <translation>大小</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -672,7 +672,7 @@
     <message>
         <location line="+3"/>
         <source>Priority</source>
-        <translation>優先性</translation>
+        <translation>優先順序</translation>
     </message>
 </context>
 <context>
@@ -680,17 +680,17 @@
     <message>
         <location filename="../FileTreeView.cc" line="+245"/>
         <source>Check Selected</source>
-        <translation>選取所選項目</translation>
+        <translation>勾選已選取項目</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation>取消選取所選項目</translation>
+        <translation>取消勾選已選取項目</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation>僅選取所選項目</translation>
+        <translation>僅勾選已選取項目</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -700,12 +700,12 @@
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation>打開</translation>
+        <translation>開啟</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>重新命名…</translation>
     </message>
 </context>
 <context>
@@ -719,7 +719,7 @@
     <message>
         <location line="-147"/>
         <source>Active</source>
-        <translation>活動</translation>
+        <translation>活躍中</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -729,7 +729,7 @@
     <message>
         <location line="+4"/>
         <source>Seeding</source>
-        <translation>正在播種</translation>
+        <translation>正在做種</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -744,7 +744,7 @@
     <message>
         <location line="+4"/>
         <source>Verifying</source>
-        <translation>驗證中</translation>
+        <translation>正在驗證</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -754,12 +754,12 @@
     <message>
         <location line="+151"/>
         <source>Show:</source>
-        <translation>顯示:</translation>
+        <translation>顯示：</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>搜尋…</translation>
     </message>
 </context>
 <context>
@@ -768,7 +768,7 @@
         <location filename="../Formatter.cc" line="+21"/>
         <location line="+25"/>
         <source>Unknown</source>
-        <translation>未知的</translation>
+        <translation>未知</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -801,7 +801,7 @@
         <location line="-7"/>
         <source>%Ln second(s)</source>
         <translation>
-            <numerusform>%Ln 秒鐘</numerusform>
+            <numerusform>%Ln 秒</numerusform>
         </translation>
     </message>
 </context>
@@ -810,12 +810,12 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;正在計算可用空間…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>%1 free</source>
-        <translation>剩餘 %1</translation>
+        <translation>%1 可用</translation>
     </message>
 </context>
 <context>
@@ -861,7 +861,7 @@
     <message>
         <location line="+69"/>
         <source>Create a new torrent</source>
-        <translation>建立新 Torrent</translation>
+        <translation>建立新的 torrent</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -871,52 +871,52 @@
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>顯示 Torrent 內容</translation>
+        <translation>顯示 torrent 內容</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
-        <translation>打開 Torrent 的檔案夾</translation>
+        <translation>開啟 torrent 資料夾</translation>
     </message>
     <message>
         <location line="-161"/>
         <source>Queue</source>
-        <translation>佇列</translation>
+        <translation>排程</translation>
     </message>
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">選項</translation>
+        <translation>選項</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">統計</translation>
+        <translation>統計資料</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>開啟… (&amp;O)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Open</source>
-        <translation>打開</translation>
+        <translation>開啟</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Open a torrent</source>
-        <translation>打開 Torrent</translation>
+        <translation>開啟 torrent</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>新增… (&amp;N)</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Open Fold&amp;er</source>
-        <translation>打開檔案夾 (&amp;E)</translation>
+        <translation>開啟資料夾 (&amp;E)</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -926,17 +926,17 @@
     <message>
         <location line="+3"/>
         <source>Start torrent</source>
-        <translation>開始 Torrent</translation>
+        <translation>開始執行 torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>詢問追蹤器以取得更多共享端 (&amp;M)</translation>
+        <translation>向追蹤器請求更多節點 (&amp;M)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>詢問追蹤器以取得更多共享端</translation>
+        <translation>向追蹤器請求更多節點</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -946,7 +946,7 @@
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>暫停 Torrent</translation>
+        <translation>暫停執行 torrent</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -966,7 +966,7 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>移除 Torrent</translation>
+        <translation>移除 torrent</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -976,7 +976,7 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>移除 Torrents 並移除相關檔案</translation>
+        <translation>移除該 torrent 及其檔案</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -996,12 +996,12 @@
     <message>
         <location line="+11"/>
         <source>&amp;Select All</source>
-        <translation>全部選取 (&amp;S)</translation>
+        <translation>全選 (&amp;S)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Deselect All</source>
-        <translation>全部取消選取 (&amp;D)</translation>
+        <translation>取消全選 (&amp;D)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1011,13 +1011,13 @@
     <message>
         <location line="+11"/>
         <source>&amp;Compact View</source>
-        <translation>緊密顯示 (&amp;C)</translation>
+        <translation>精簡檢視 (&amp;C)</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+3"/>
         <source>Compact View</source>
-        <translation>緊密顯示</translation>
+        <translation>精簡檢視</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1027,7 +1027,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>過濾列 (&amp;F)</translation>
+        <translation>篩選器 (&amp;F)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1042,7 +1042,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>依新舊排序 (&amp;A)</translation>
+        <translation>依新舊排序 (&amp;G)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1062,17 +1062,17 @@
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>依比例排序 (&amp;R)</translation>
+        <translation>依分享率排序 (&amp;O)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>依容量排序 (&amp;Z)</translation>
+        <translation>依大小排序 (&amp;Z)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>依州省排序 (&amp;E)</translation>
+        <translation>依狀態排序 (&amp;E)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1087,7 +1087,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Statistics</source>
-        <translation>統計 (&amp;S)</translation>
+        <translation>統計資料 (&amp;S)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1122,12 +1122,12 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>總比例</translation>
+        <translation>總分享率</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Ratio</source>
-        <translation>作業階段比例</translation>
+        <translation>工作階段分享率</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1137,7 +1137,7 @@
     <message>
         <location line="+8"/>
         <source>Session Transfer</source>
-        <translation>作業階段傳輸</translation>
+        <translation>工作階段傳輸</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1147,38 +1147,38 @@
     <message>
         <location line="+8"/>
         <source>Tray &amp;Icon</source>
-        <translation>托盤圖示 (&amp;I)</translation>
+        <translation>通知區域圖示 (&amp;I)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>變更工作階段… (&amp;C)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>設定位置… (&amp;L)</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>開啟 URL… (&amp;U)</translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
-        <translation>選擇作業階段</translation>
+        <translation>選擇工作階段</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>拷貝磁力連結到剪貼簿 (&amp;C)</translation>
+        <translation>複製磁力連結到剪貼簿 (&amp;C)</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Donate</source>
-        <translation>贊助 (&amp;D)</translation>
+        <translation>捐助 (&amp;D)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1188,12 +1188,12 @@
     <message>
         <location line="+3"/>
         <source>Bypass the queue and start now</source>
-        <translation>忽略佇列並立即開始</translation>
+        <translation>忽略排程並立即開始</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>移至頂端 (&amp;T)</translation>
+        <translation>移動到頂端 (&amp;T)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1208,12 +1208,12 @@
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>移至底端 (&amp;B)</translation>
+        <translation>移動到底部 (&amp;B)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>依佇列排序 (&amp;Q)</translation>
+        <translation>依排程排序 (&amp;Q)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+468"/>
@@ -1240,18 +1240,18 @@
     <message>
         <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>達到以下比例時停止播種</translation>
+        <translation>達到以下分享率時，停止做種</translation>
     </message>
     <message>
         <location line="-40"/>
         <source>Seed Forever</source>
-        <translation>永久性種子</translation>
+        <translation>永遠做種</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+749"/>
         <source>Stop at Ratio (%1)</source>
-        <translation>達到以下比例時停止 (%1)</translation>
+        <translation>達到分享率時停止 (%1)</translation>
     </message>
     <message>
         <location line="-403"/>
@@ -1268,7 +1268,7 @@
         <location line="+28"/>
         <location line="+19"/>
         <source>Ratio: %1</source>
-        <translation>比例: %1</translation>
+        <translation>分享率：%1</translation>
     </message>
     <message>
         <location line="-14"/>
@@ -1284,12 +1284,12 @@
     <message>
         <location line="+6"/>
         <source>Show &amp;options dialog</source>
-        <translation>顯示選項對話框 (&amp;O)</translation>
+        <translation>顯示選項對話方塊 (&amp;O)</translation>
     </message>
     <message>
         <location line="-8"/>
         <source>Open Torrent</source>
-        <translation>打開 Torrent</translation>
+        <translation>開啟 Torrent</translation>
     </message>
     <message>
         <location line="-1012"/>
@@ -1305,15 +1305,15 @@
         <location line="+444"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>點按來停用 Temporary 速度限制
+        <translation>點選以停用暫時速度限制
  (%1 下載，%2 上傳)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>點按來啟用 Temporary 速度限制
-(%1 下載，%2 上傳)</translation>
+        <translation>點選以啟用暫時速度限制
+ (%1 下載，%2 上傳)</translation>
     </message>
     <message>
         <location line="+133"/>
@@ -1323,7 +1323,7 @@
     <message>
         <location line="+4"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>刪除此 Torrent 的下載檔案?</translation>
+        <translation>刪除這個 torrent 已下載的檔案？</translation>
     </message>
     <message numerus="yes">
         <location line="-4"/>
@@ -1336,70 +1336,70 @@
         <location line="-510"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>正在顯示 %L1 之 %Ln 個 Torrent</numerusform>
+            <numerusform>正在顯示 %L1 中的 %Ln 個 torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+515"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>刪除這些 %Ln Torrent 的下載檔案?</numerusform>
+            <numerusform>刪除這些 torrents 已下載的檔案？</numerusform>
         </translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>一旦移除，將會要求 Torrent 檔案或磁力連結來繼續此轉換。</translation>
+        <translation>若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>一旦移除，將會要求 Torrent 檔案或磁力連結來繼續此轉換。</translation>
+        <translation>若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>This torrent has not finished downloading.</source>
-        <translation>此 Torrent 並未完成下載。</translation>
+        <translation>這個 torrent 尚未完成下載。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
-        <translation>這些 Torrents 並未完成下載。</translation>
+        <translation>這些 torrents 尚未完成下載。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>This torrent is connected to peers.</source>
-        <translation>此 Torrent 已連線到共享端。</translation>
+        <translation>這個 torrent 已連線到節點。</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>These torrents are connected to peers.</source>
-        <translation>這些 Torrent 已連線到共享端。</translation>
+        <translation>這些 torrents 已連線到節點。</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>這些 Torrent 的其中之一個已連線到共享端。</translation>
+        <translation>這些 torrents 的其中一個已連線到節點。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>這些 Torrent 的其中有些已連線到共享端。</translation>
+        <translation>這些 torrents 其中有一些已連線到節點。</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>One of these torrents has not finished downloading.</source>
-        <translation>這些 Torrent 的其中之一個並未完成下載。</translation>
+        <translation>這些 torrents 的其中一個尚未完成下載。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
-        <translation>這些 Torrent 的其中有些並未完成下載。</translation>
+        <translation>這些 torrents 其中有一些尚未完成下載。</translation>
     </message>
     <message>
         <location line="+69"/>
         <source>%1 has not responded yet</source>
-        <translation>%1 至今尚未回應</translation>
+        <translation>%1 尚未回應</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1409,7 +1409,7 @@
     <message>
         <location line="+4"/>
         <source>%1 last responded %2 ago</source>
-        <translation>%1 最後回應於 %2 前</translation>
+        <translation>%1 最後回應於 %2 之前</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1422,7 +1422,7 @@
     <message>
         <location filename="../MakeDialog.ui" line="+17"/>
         <source>New Torrent</source>
-        <translation>新 Torrent</translation>
+        <translation>新增 Torrent</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="+307"/>
@@ -1456,22 +1456,22 @@
     <message>
         <location line="+12"/>
         <source>Sa&amp;ve to:</source>
-        <translation>儲存到  (&amp;V):</translation>
+        <translation>儲存到 (&amp;V)：</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>來源檔案夾 (&amp;O):</translation>
+        <translation>來源資料夾 (&amp;O)：</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Source &amp;file:</source>
-        <translation>來源檔案 (&amp;F):</translation>
+        <translation>來源檔案 (&amp;F)：</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>區塊大小 (&amp;I)：</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1481,29 +1481,29 @@
     <message>
         <location line="+12"/>
         <source>&amp;Trackers:</source>
-        <translation>追蹤器 (&amp;T):</translation>
+        <translation>追蹤器 (&amp;T)：</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>若要新增備份 URL，請在主要 URL 列後加入。
-若要新增其他主要 URL，請在空白列後加入。</translation>
+        <translation>若要加入備用 URL，請填寫於主要 URL 的下一行。
+若要加入其他主要 URL，請空一行再填寫。</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Co&amp;mment:</source>
-        <translation>評論 (&amp;M):</translation>
+        <translation>備註 (&amp;M)：</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">來源 (&amp;S):</translation>
+        <translation>來源 (&amp;S)：</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&amp;Private torrent</source>
-        <translation>私人 Torrent (&amp;P)</translation>
+        <translation>私有 torrent (&amp;P)</translation>
     </message>
 </context>
 <context>
@@ -1511,22 +1511,22 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../MakeProgressDialog.ui" line="+14"/>
         <source>New Torrent</source>
-        <translation>新 Torrent</translation>
+        <translation>新增 Torrent</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>正在建立「%1」</translation>
+        <translation>正在建立 &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>已建立「%1」!</translation>
+        <translation>已建立 &quot;%1&quot;！</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>無法建立 &quot;%1&quot;：%2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1534,17 +1534,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../OptionsDialog.cc" line="+53"/>
         <source>Open Torrent</source>
-        <translation>打開 Torrent</translation>
+        <translation>開啟 Torrent</translation>
     </message>
     <message>
         <location line="-10"/>
         <source>Open Torrent from File</source>
-        <translation>從檔案打開 Torrent</translation>
+        <translation>從檔案開啟 Torrent</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>從 URL 或磁力連結打開 Torrent</translation>
+        <translation>從 URL 或磁力連結開啟 Torrent</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1554,7 +1554,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+22"/>
         <source>&amp;Destination folder:</source>
-        <translation>目標檔案夾 (&amp;D):</translation>
+        <translation>目標資料夾 (&amp;D)：</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+49"/>
@@ -1574,7 +1574,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../OptionsDialog.ui" line="+35"/>
         <source>&amp;Priority:</source>
-        <translation>優先性 (&amp;P):</translation>
+        <translation>優先順序 (&amp;P)：</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1594,7 +1594,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+24"/>
         <source>Select Destination</source>
-        <translation>選擇目標檔案夾</translation>
+        <translation>選擇目標資料夾</translation>
     </message>
 </context>
 <context>
@@ -1608,7 +1608,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+86"/>
         <source>Select Folder</source>
-        <translation>選擇檔案夾</translation>
+        <translation>選擇資料夾</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1626,22 +1626,22 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+10"/>
         <source>&amp;Username:</source>
-        <translation>使用者名稱 (&amp;A):</translation>
+        <translation>使用者名稱 (&amp;U)：</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>密碼 (&amp;P):</translation>
+        <translation>密碼 (&amp;W)：</translation>
     </message>
     <message>
         <location line="-53"/>
         <source>&amp;Open web client</source>
-        <translation>打開網頁客戶端 (&amp;O)</translation>
+        <translation>開啟網頁用戶端 (&amp;O)</translation>
     </message>
     <message>
         <location line="+80"/>
         <source>Addresses:</source>
-        <translation>位址:</translation>
+        <translation>位址：</translation>
     </message>
     <message>
         <location line="-1234"/>
@@ -1651,17 +1651,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+99"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;手動或在預定時間覆蓋正常速度限制。&lt;/small&gt;</translation>
+        <translation>&lt;small&gt;手動或定時覆蓋正常速度限制。&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>&amp;Scheduled times:</source>
-        <translation>預定時間 (&amp;S):</translation>
+        <translation>預定時段 (&amp;S)：</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>&amp;On days:</source>
-        <translation>整天 (&amp;O):</translation>
+        <translation>天數 (&amp;O)：</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+380"/>
@@ -1716,17 +1716,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+299"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
-        <translation>連接埠 &lt;b&gt;開啟&lt;/b&gt;</translation>
+        <translation>連接埠 &lt;b&gt;已開啟&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
-        <translation>連接埠 &lt;b&gt;關閉&lt;/b&gt;</translation>
+        <translation>連接埠 &lt;b&gt;已關閉&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>正在測試 TCP 連接埠…</translation>
     </message>
     <message numerus="yes">
         <location line="+105"/>
@@ -1747,12 +1747,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+16"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇 &quot;Torrent 下載完成&quot; 腳本</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
         <source>Incoming Peers</source>
-        <translation>匯入共享端</translation>
+        <translation>傳入的節點</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -1763,12 +1763,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>連入的連接埠 (&amp;P):</translation>
+        <translation>傳入的連接埠 (&amp;P)：</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
-        <translation>使用 UPnP 或 NAT-PMP 連接埠以從我的路由器導向 (&amp;Ｆ)</translation>
+        <translation>從我的路由器使用 UPnP 或 NAT-PMP 連接埠轉送 (&amp;F)</translation>
     </message>
     <message>
         <location line="+107"/>
@@ -1778,22 +1778,22 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="-242"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇 &quot;Torrent 做種完成&quot; 腳本</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>自動從以下位置加入 .torrent 檔案 (&amp;F):</translation>
+        <translation>自動從以下位置加入 .torrent 檔案 (&amp;F)：</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>顯示 Torrent 選項對話框 (&amp;D)</translation>
+        <translation>顯示 Torrent 選項對話方塊 (&amp;D)</translation>
     </message>
     <message>
         <location line="-17"/>
         <source>&amp;Start added torrents</source>
-        <translation>開始加入 Torrent (&amp;S)</translation>
+        <translation>開始已加入的 torrents (&amp;S)</translation>
     </message>
     <message>
         <location line="+24"/>
@@ -1803,12 +1803,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+62"/>
         <source>Download Queue</source>
-        <translation>下載佇列</translation>
+        <translation>下載排程</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>最大下載活動 (&amp;X):</translation>
+        <translation>最大活躍下載數 (&amp;X)：</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1818,7 +1818,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+79"/>
         <source>Seeding</source>
-        <translation>正在播種</translation>
+        <translation>正在做種</translation>
     </message>
     <message>
         <location line="+622"/>
@@ -1829,13 +1829,13 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../PrefsDialog.cc" line="+184"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;Blocklist 包含 %Ln 個規則&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;黑名單包含 %Ln 個規則&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-339"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
-        <translation>每次 Transmission 開始時隨機選擇一個連接埠 (&amp;R)</translation>
+        <translation>每次啟動 Transmission 時隨機選擇一個連接埠 (&amp;R)</translation>
     </message>
     <message>
         <location line="-274"/>
@@ -1845,17 +1845,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+321"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>每一共享端最大 Torrent (&amp;T):</translation>
+        <translation>每個 torrent 的最大連線節點數量 (&amp;T)：</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>每一最大整體共享端  (&amp;O):</translation>
+        <translation>總計最大連線節點數量 (&amp;O)：</translation>
     </message>
     <message>
         <location line="-193"/>
         <source>Blocklist</source>
-        <translation>Blocklist</translation>
+        <translation>黑名單</translation>
     </message>
     <message>
         <location line="+42"/>
@@ -1896,7 +1896,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>在通知區顯示 Transmission 圖示 (&amp;N)</translation>
+        <translation>在通知區域顯示 Transmission 圖示 (&amp;N)</translation>
     </message>
     <message>
         <location line="-265"/>
@@ -1906,17 +1906,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-101"/>
         <source>Enable &amp;blocklist:</source>
-        <translation>啟用 Blocklist (&amp;B):</translation>
+        <translation>啟用黑名單 (&amp;B)：</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Update</source>
-        <translation>上傳 (&amp;U)</translation>
+        <translation>更新 (&amp;U)</translation>
     </message>
     <message>
         <location line="-66"/>
         <source>&amp;Encryption mode:</source>
-        <translation>加密模式 (&amp;E):</translation>
+        <translation>加密模式 (&amp;E)：</translation>
     </message>
     <message>
         <location line="+505"/>
@@ -1931,22 +1931,22 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+20"/>
         <source>HTTP &amp;port:</source>
-        <translation>HTTP 連接埠 (&amp;P):</translation>
+        <translation>HTTP 連接埠 (&amp;P)：</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Only allow these IP a&amp;ddresses:</source>
-        <translation>僅允許下列 IP 位址 (&amp;D):</translation>
+        <translation>僅允許以下 IP 位址 (&amp;D)：</translation>
     </message>
     <message>
         <location line="-1212"/>
         <source>&amp;Upload:</source>
-        <translation>上傳 (&amp;U):</translation>
+        <translation>上傳 (&amp;U)：</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Download:</source>
-        <translation>下載 (&amp;D):</translation>
+        <translation>下載 (&amp;D)：</translation>
     </message>
     <message>
         <location line="+46"/>
@@ -1956,57 +1956,57 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+28"/>
         <source>U&amp;pload:</source>
-        <translation>上傳 (&amp;U):</translation>
+        <translation>上傳 (&amp;U)：</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Do&amp;wnload:</source>
-        <translation>下載 (&amp;D):</translation>
+        <translation>下載 (&amp;W)：</translation>
     </message>
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>從使用者的剪貼簿讀取 torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>從剪貼簿偵測新的 torrents</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>下載完成時呼叫腳本 (&amp;T)：</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>做種完成時呼叫腳本 (&amp;T)：</translation>
     </message>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP 是一個減少網路擁塞的工具。</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>為節點連線啟用 µTP (&amp;T)</translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>預設公開追蹤器</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;用於所有公開 torrents 的追蹤器。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;若要加入備用 URL，請填寫於主要 URL 的下一行。&lt;/p&gt;&lt;p&gt;若要加入其他主要 URL，請空一行再填寫。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Start &amp;minimized in notification area</source>
-        <translation>啟動時最小化到通知區 (&amp;M)</translation>
+        <translation>啟動時最小化到通知區域 (&amp;M)</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -2026,42 +2026,42 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>當 Torrent 完成時播放 &amp;音效</translation>
+        <translation>當 Torrent 完成時播放音效 (&amp;S)</translation>
     </message>
     <message>
         <location line="-281"/>
         <source>Peer Limits</source>
-        <translation>共享端限制</translation>
+        <translation>節點限制</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Use PE&amp;X to find more peers</source>
-        <translation>使用 PE&amp;X 來尋找更多共享端</translation>
+        <translation>使用 PEX 以尋找更多節點 (&amp;X)</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>PEX is a tool for exchanging peer lists with the peers you&apos;re connected to.</source>
-        <translation>PEX 是一個與你所連線的共享端交換共享端列表的工具。</translation>
+        <translation>PEX 是一項和您連線的節點交換節點清單的工具。</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;DHT to find more peers</source>
-        <translation>使用 &amp;DHT 來尋找更多共享端</translation>
+        <translation>使用 DHT 以尋找更多節點 (&amp;D)</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>DHT 是一個不需透過追蹤器即可尋找共享端的工具。</translation>
+        <translation>DHT 是一項不需要追蹤器也能尋找節點的工具。</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>使用 &amp;本機共享端探索來尋找更多共享端</translation>
+        <translation>使用本機節點探索以尋找更多節點 (&amp;L)</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>LPD is a tool for finding peers on your local network.</source>
-        <translation>LPD 是一個在您區域網路上尋找共享端的工具。</translation>
+        <translation>LPD 是一項在您的區域網路上尋找節點的工具。</translation>
     </message>
     <message>
         <location line="-325"/>
@@ -2071,29 +2071,29 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="+69"/>
         <source>Select Incomplete Directory</source>
-        <translation>選擇不完整的檔案夾</translation>
+        <translation>選擇尚未完成的資料夾</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>選擇 Watch 檔案夾</translation>
+        <translation>選擇監看資料夾</translation>
     </message>
     <message numerus="yes">
         <location line="-94"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;更新成功！&lt;/b&gt;&lt;p&gt;黑名單上現在有 %Ln 個規則。&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;更新黑名單&lt;/b&gt;&lt;p&gt;正在取得新的黑名單…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Select Destination</source>
-        <translation>選擇目標檔案夾</translation>
+        <translation>選擇目標資料夾</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-387"/>
@@ -2104,7 +2104,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
-        <translation>如果以下資料分享停止時則不進行下載活動 (&amp;N):</translation>
+        <translation>當停止資料分享時暫停下載 (&amp;N)：</translation>
     </message>
     <message>
         <location line="-156"/>
@@ -2114,27 +2114,27 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+215"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
-        <translation>將「.part 」附加到不完整的檔案名稱。 (&amp;P)</translation>
+        <translation>為尚未完成的檔案加上 &quot;.&amp;part&quot; 副檔名</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Keep &amp;incomplete files in:</source>
-        <translation>保留不完整的檔案於 (&amp;Ｉ):</translation>
+        <translation>保存尚未完成的檔案於 (&amp;I)：</translation>
     </message>
     <message>
         <location line="-201"/>
         <source>Save to &amp;Location:</source>
-        <translation>儲存到以下位置 (&amp;L):</translation>
+        <translation>儲存到以下位置 (&amp;L)：</translation>
     </message>
     <message>
         <location line="+282"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>到達以下 &amp;比例時停止播種:</translation>
+        <translation>達到分享率時停止做種 (&amp;R)：</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Stop seedi&amp;ng if idle for:</source>
-        <translation>如果以下閒置則停止播種 (&amp;N):</translation>
+        <translation>閒置超過時間時停止做種 (&amp;N)：</translation>
     </message>
     <message>
         <location line="-567"/>
@@ -2154,7 +2154,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="+116"/>
         <source>Not supported by remote sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>不支援遠端連線</translation>
     </message>
 </context>
 <context>
@@ -2167,7 +2167,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+325"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>立即開始</translation>
     </message>
 </context>
 <context>
@@ -2190,17 +2190,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>New &amp;location:</source>
-        <translation>新位置 (&amp;L):</translation>
+        <translation>新位置 (&amp;L)：</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Move from the current folder</source>
-        <translation>從目前的檔案夾移動 (&amp;M)</translation>
+        <translation>從目前的資料夾移動 (&amp;M)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Local data is &amp;already there</source>
-        <translation>本機資料已經存在 (&amp;A)</translation>
+        <translation>本機資料已存在 (&amp;A)</translation>
     </message>
 </context>
 <context>
@@ -2208,35 +2208,35 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Session.cc" line="+503"/>
         <source>Error Renaming Path</source>
-        <translation>重新命名路徑錯誤</translation>
+        <translation>無法重新命名路徑</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;無法重新命名「%1」為「%2」: %3。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;請修正錯誤後再試一次。&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;無法重新命名 &quot;%1&quot; 為 &quot;%2&quot;：%3。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;請修正錯誤後再試一次。&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+530"/>
         <source>Error Adding Torrent</source>
-        <translation>加入 Torrent 時錯誤</translation>
+        <translation>無法加入 Torrent</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2 的副本)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>重複的 torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>無法加入 %n 個重複的 torrents</numerusform>
         </translation>
     </message>
 </context>
@@ -2245,7 +2245,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../SessionDialog.ui" line="+14"/>
         <source>Change Session</source>
-        <translation type="unfinished"></translation>
+        <translation>變更工作階段</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2255,37 +2255,37 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Start &amp;Local Session</source>
-        <translation type="unfinished"></translation>
+        <translation>啟動本機工作階段 (&amp;L)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation type="unfinished"></translation>
+        <translation>連線到遠端工作階段 (&amp;R)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Host:</source>
-        <translation>主機 (&amp;H):</translation>
+        <translation>主機 (&amp;H)：</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Port:</source>
-        <translation>連接埠 (&amp;P):</translation>
+        <translation>連接埠 (&amp;P)：</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Authentication required</source>
-        <translation>需要驗證 (&amp;A)</translation>
+        <translation>需要認證 (&amp;A)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Username:</source>
-        <translation>使用者名稱 (&amp;U):</translation>
+        <translation>使用者名稱 (&amp;U)：</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>密碼 (&amp;P):</translation>
+        <translation>密碼 (&amp;W)：</translation>
     </message>
 </context>
 <context>
@@ -2294,7 +2294,7 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2302,36 +2302,36 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../StatsDialog.ui" line="+14"/>
         <source>Statistics</source>
-        <translation>統計</translation>
+        <translation>統計資料</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Current Session</source>
-        <translation type="unfinished"></translation>
+        <translation>目前的工作階段</translation>
     </message>
     <message>
         <location line="+12"/>
         <location line="+96"/>
         <source>Uploaded:</source>
-        <translation>已上傳:</translation>
+        <translation>已上傳：</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Downloaded:</source>
-        <translation>已下載:</translation>
+        <translation>已下載：</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Ratio:</source>
-        <translation>比例:</translation>
+        <translation>分享率：</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Duration:</source>
-        <translation>持續時間:</translation>
+        <translation>持續時間：</translation>
     </message>
     <message>
         <location line="-61"/>
@@ -2361,7 +2361,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>Seeding</source>
-        <translation>正在播種</translation>
+        <translation>正在做種</translation>
     </message>
     <message>
         <location line="-18"/>
@@ -2376,27 +2376,27 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+3"/>
         <source>Queued for verification</source>
-        <translation>等待審核</translation>
+        <translation>已排程驗證</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Queued for download</source>
-        <translation>等待下載</translation>
+        <translation>已排程下載</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Queued for seeding</source>
-        <translation>等待播種</translation>
+        <translation>已排程做種</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Tracker gave a warning: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>追蹤器出現警告：%1</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Tracker gave an error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>追蹤器出現錯誤：%1</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2410,7 +2410,7 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>磁力連結傳輸 - 檢索後設資料 (%1%)</translation>
+        <translation>磁力連結傳輸 - 正在擷取後設資料 (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2422,25 +2422,25 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1 之 %2 (%3%)，已上傳 %4 (比例: %5 目標: %6)</translation>
+        <translation>已下載 %2 中的 %1 (%3%)，已上傳 %4 (分享率：%5 目標：%6)</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
         <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
-        <translation>%1 之 %2 (%3%)，已上傳 %4 (比例: %5 目標: %6)</translation>
+        <translation>已下載 %2 中的 %1 (%3%)，已上傳 %4 (分享率：%5)</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
         <extracomment>First part of torrent progress string, %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1，已上傳 %2 (比例: %3 目標: %4)</translation>
+        <translation>已下載 %1，已上傳 %2 (分享率：%3 目標：%4)</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
         <extracomment>First part of torrent progress string, %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
-        <translation>%1，已上傳 %2 (比例: %3)</translation>
+        <translation>已下載 %1，已上傳 %2 (分享率：%3)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -2452,12 +2452,12 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation> - 未知的剩餘時間</translation>
+        <translation> - 剩餘時間未知</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Ratio: %1</source>
-        <translation>比例: %1</translation>
+        <translation>分享率：%1</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -2474,14 +2474,14 @@ To add another primary URL, add it after a blank line.</source>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>正在從 %Ln 個共享端下載</numerusform>
+            <numerusform>正在從 %Ln 個節點下載</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>正在播種到 %Ln 個共享端</numerusform>
+            <numerusform>正在為 %Ln 個節點做種</numerusform>
         </translation>
     </message>
     <message>
@@ -2493,7 +2493,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>正在從 %Ln 個共享端下載後設資料 (已完成 %1%)</numerusform>
+            <numerusform>正在從 %Ln 個節點下載後設資料 (已完成 %1%)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2501,7 +2501,7 @@ To add another primary URL, add it after a blank line.</source>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>正在從 %1 之 %Ln 個已連線的共享端下載</numerusform>
+            <numerusform>正在從 %Ln 中的 %1 個已連線的節點下載</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2509,20 +2509,20 @@ To add another primary URL, add it after a blank line.</source>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>及 %Ln 個共享端</numerusform>
+            <numerusform> 及 %Ln 個網路種子</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>正在播種到 %1 之 %Ln 個已連線的共享端</numerusform>
+            <numerusform>正在為 %Ln 中的 %1 個已連線的節點做種</numerusform>
         </translation>
     </message>
     <message>
         <location line="-96"/>
         <source>Verifying local data (%1% tested)</source>
-        <translation>正在驗證本機資料 (%1% 已測試)</translation>
+        <translation>正在驗證本機資料 (已測試 %1%)</translation>
     </message>
 </context>
 <context>
@@ -2532,20 +2532,20 @@ To add another primary URL, add it after a blank line.</source>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>取得 %1 列表 %Ln 共享端 %2 於 %3 前</numerusform>
+            <numerusform>已在 %3 之前取得%1%Ln 個節點%2的清單</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>請求共享端列表 %1超過 %2 %3 之前；即將再試一次</translation>
+        <translation>在 %3 之前請求節點清單%1逾時%2，正在重試。</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>取得錯誤 %1「%2」%3 %4 前</translation>
+        <translation>在 %4 之前發生錯誤 %1&quot;%2&quot;%3</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2556,63 +2556,63 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>在 %1 詢問更多共享端</translation>
+        <translation>將於 %1 內請求更多節點</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for more peers</source>
-        <translation>等待要求更多共享端</translation>
+        <translation>已排程請求更多節點</translation>
     </message>
     <message>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>正在請求節點數量… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>追蹤器 %1 有 %Ln 個播種者 %2</numerusform>
+            <numerusform>追蹤器有%1 %Ln 個做種者%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> 且在 %3 前有%1 %Ln 個下載者%2</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>追蹤器 %1沒有資訊 %2 於共享端量 %3 之前</translation>
+        <translation>於 %3 之前，追蹤器%1沒有關於節點數量的資訊%2</translation>
     </message>
     <message>
         <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>在 %4 之前發生擷取錯誤 %1&quot;%2&quot;%3</translation>
     </message>
     <message>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>正在請求更多節點… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>要求共享端數量於 %1</translation>
+        <translation>將於 %1 內請求節點數量</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
-        <translation>等待要求共享端數量</translation>
+        <translation>已排程請求節點數量</translation>
     </message>
 </context>
 <context>
@@ -2620,27 +2620,27 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>編輯追蹤器</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>追蹤器宣告 URL</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>若要加入其他主要 URL，請空一行再填寫。</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;若要加入備用 URL，請填寫於主要 URL 的下一行。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>另請參閱 編輯 &gt; 偏好設定 &gt; 網路 中的預設公開追蹤器</translation>
     </message>
 </context>
 </TS>

@@ -2493,9 +2493,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Siêu dữ liệu không hợp lệ"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Không tìm thấy dữ liệu! Hãy chắc chắn rằng ổ đĩa của bạn đã kết nối hoặc chọn \"Đặt lại vị trí trên máy\". Để tải lại từ đầu, hãy gỡ bỏ torrent và thêm torrent đó lại một lần nữa."

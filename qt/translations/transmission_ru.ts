@@ -16,7 +16,7 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Быстрый и простой BitTorrent-клиент</translation>
+        <translation>Быстрый и простой торрент-клиент</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">Б/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">КБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">МБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">ГБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">ТБ/с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">Б</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">КиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">МиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">ГиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">ТиБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">КБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">МБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">ГБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">ТБ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -1487,7 +1487,7 @@
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>Исходный к&amp;аталог:</translation>
+        <translation>Исходная п&amp;апка:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1662,7 +1662,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-53"/>
         <source>&amp;Open web client</source>
-        <translation>&amp;Открыть веб-клиент</translation>
+        <translation>&amp;Открыть сетевой клиент</translation>
     </message>
     <message>
         <location line="+80"/>
@@ -1788,7 +1788,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+32"/>
         <location filename="../PrefsDialog.cc" line="+207"/>
         <source>Status unknown</source>
-        <translation>Статус неизвестен</translation>
+        <translation>Состояние неизвестно</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -2103,12 +2103,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="+69"/>
         <source>Select Incomplete Directory</source>
-        <translation>Выбор каталога</translation>
+        <translation>Выбор папки</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>Выбор каталога</translation>
+        <translation>Выбор папки</translation>
     </message>
     <message numerus="yes">
         <location line="-94"/>
@@ -2332,7 +2332,7 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2502,12 +2502,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+18"/>
         <source>%1 left</source>
-        <translation type="unfinished"></translation>
+        <translation>осталось %1</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remaining time unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Оставшееся время неизвестно</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

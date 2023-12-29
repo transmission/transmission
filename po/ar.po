@@ -2745,9 +2745,3 @@ msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
-
-#~ msgid "Invalid metadata"
-#~ msgstr "البيانات الشارحة غير صالحة"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "لم يُعثر على أي ملفات! تأكد من أن محرّك الأقراص متصل، أو استخدم \"عيّن _مكانا...\" لتعيين مكان التنزيل. لإعادة التنزيل، أزِل التورنت وأضفه مجددا."

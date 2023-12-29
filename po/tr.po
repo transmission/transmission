@@ -2547,22 +2547,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "gün"
 msgstr[1] "gün"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Duyuru hatası: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Duyuru hatası: {error} ({count} saniye içinde yeniden deneniyor)"
-#~ msgstr[1] "Duyuru hatası: {error} ({count} saniye içinde yeniden deneniyor)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Mıktanıs üst veri bilgisi ayrıştırılamadı: '{error}'. {piece_count} parça yeniden indiriliyor"
-#~ msgstr[1] "Mıktanıs üst veri bilgisi ayrıştırılamadı: '{error}'. {piece_count} parça yeniden indiriliyor"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Geçersiz üst veri"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Veri bulunamadı! Sürücülerinizin bağlı olduğundan emin olun ya da \"Konum Ayarla\"yı kullanın. Yeniden indirmek için torrenti kaldırın ve yeniden ekleyin."

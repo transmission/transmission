@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiereg © Die Transmission-projek</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -26,7 +26,7 @@
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Bediener</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,80 +64,80 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished">G/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished">kG/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MG/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished">GG/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished">TG/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished">G</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished">KiG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished">GiG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished">TiG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished">kG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished">GG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished">TG</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent voltooi</numerusform>
+            <numerusform>Torrents voltooi</numerusform>
         </translation>
     </message>
     <message>
@@ -289,7 +289,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Eweknie is gekoppel oor µTP</translation>
     </message>
     <message>
         <location line="+165"/>
@@ -304,7 +304,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen nuwe bronadresse gevind.</translation>
     </message>
     <message>
         <location line="-881"/>
@@ -347,7 +347,7 @@
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg bronadres(se) toe</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -523,7 +523,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Toegevoeg:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -709,7 +709,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Hernoem…</translation>
     </message>
 </context>
 <context>
@@ -763,7 +763,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Soek…</translation>
     </message>
 </context>
 <context>
@@ -818,7 +818,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Bereken vry spasie…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -894,17 +894,17 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Opsies</translation>
+        <translation>Opsies</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistieke</translation>
+        <translation>Statistieke</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Open…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -919,7 +919,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nuut…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1160,17 +1160,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Verander sessie…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Stel &amp;Ligging…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Open &amp;Bronadres…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1484,7 +1484,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Stukg&amp;rootte:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1511,7 +1511,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Bron:</translation>
+        <translation>&amp;Bron:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1539,7 +1539,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
     <message>
         <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon nie “%1” skep nie. %2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1739,7 +1739,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Toets tans TCP-poort…</translation>
     </message>
     <message numerus="yes">
         <location line="+105"/>
@@ -2184,7 +2184,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
     <message>
         <location line="+325"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin nou</translation>
     </message>
 </context>
 <context>
@@ -2240,22 +2240,22 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
     <message>
         <location line="+38"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (kopie van %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Duplikaat-torrent</numerusform>
+            <numerusform>Duplikaat-torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kan nie %n duplikaat-torrent toevoeg nie</numerusform>
+            <numerusform>Kan nie %n duplikaat-torrents toevoeg nie</numerusform>
         </translation>
     </message>
 </context>
@@ -2313,7 +2313,7 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1 %2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

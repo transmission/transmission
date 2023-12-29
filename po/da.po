@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Lim Karsen, 2022
-# scootergrisen, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Lim Karsen, 2023
+# scootergrisen, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: scootergrisen, 2023\n"
 "Language-Team: Danish (https://app.transifex.com/transmissionbt/teams/33778/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -750,17 +750,17 @@ msgstr ""
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Fejl"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Advarsel"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
@@ -851,11 +851,11 @@ msgstr[1] ""
 
 #: ../gtk/PrefsDialog.cc:569
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "Blokeringsliste ajourført!"
 
 #: ../gtk/PrefsDialog.cc:569
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "Kunne ikke ajourføre blokeringslisten."
 
 #: ../gtk/PrefsDialog.cc:581
 msgid "Getting new blocklist…"
@@ -871,11 +871,11 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:916
 msgid "Port is {markup_begin}open{markup_end}"
-msgstr ""
+msgstr "Porten er {markup_begin}åben{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:927
 msgid "Testing TCP port…"
-msgstr ""
+msgstr "Tester TCP-port …"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
@@ -927,7 +927,7 @@ msgstr "_Nulstil"
 
 #: ../gtk/StatsDialog.cc:113
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
-msgstr "Disse statistikker er udelukkende til information. Nulstilling påvirker ikke statistik gemt af din BitTorrent-tracker."
+msgstr "Disse statistikker er udelukkende til information. Nulstilling påvirker ikke statistik gemt af dine BitTorrent-trackere."
 
 #: ../gtk/SystemTrayIcon.cc:217
 msgid "{upload_speed} ▲ {download_speed} ▼"
@@ -1121,7 +1121,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:276
 msgid "Couldn't open torrent"
-msgstr ""
+msgstr "Kunne ikke åbne torrent"
 
 #: ../gtk/Utils.cc:536
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
@@ -1129,7 +1129,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:643
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Kunne ikke åbne '{url}'"
 
 #: ../gtk/Utils.cc:860 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
@@ -1682,7 +1682,7 @@ msgstr "Kilde_fil:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:193 ../gtk/ui/gtk4/MakeDialog.ui:115
 msgid "Piece size:"
-msgstr ""
+msgstr "Stykkestørrelse:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:244 ../gtk/ui/gtk4/MakeDialog.ui:150
 msgid "Properties"
@@ -1698,7 +1698,7 @@ msgstr "Ko_mmentar:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:360 ../gtk/ui/gtk4/MakeDialog.ui:235
 msgid "_Source:"
-msgstr ""
+msgstr "_Kilde:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:387 ../gtk/ui/gtk4/MakeDialog.ui:258
 msgid "_Private torrent"
@@ -1852,7 +1852,7 @@ msgstr "Behold ufuldstændige torrents _i:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:731 ../gtk/ui/gtk4/PrefsDialog.ui:498
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Kald _script når download er færdig:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:787 ../gtk/ui/gtk4/PrefsDialog.ui:537
 msgctxt "Gerund"
@@ -1873,7 +1873,7 @@ msgstr "Stop med at seede efter X minutters inaktivitet:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:857 ../gtk/ui/gtk4/PrefsDialog.ui:590
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Kald _script når seeding er færdig:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:923 ../gtk/ui/gtk4/PrefsDialog.ui:639
 msgctxt "Gerund"
@@ -1938,7 +1938,7 @@ msgstr "Maksimalt antal modparter i _alt:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Aktivér µ_TP for modpartskommunikation"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
@@ -1970,7 +1970,7 @@ msgstr "LPD er et værktøj til at finde modparter på dit lokale netværk."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
 msgid "Default Public Trackers"
-msgstr "Offentlige trackers (standard)"
+msgstr "Offentlige trackere (standard)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1565 ../gtk/ui/gtk4/PrefsDialog.ui:1087
 msgid ""
@@ -2054,7 +2054,7 @@ msgstr "IP-adresser kan bruge jokertegn, eksempelvis 192.168.*.*"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:2085 ../gtk/ui/gtk4/PrefsDialog.ui:1465
 msgid "Remote"
-msgstr "Fjern"
+msgstr "Fjernadgang"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:8 ../gtk/ui/gtk4/RelocateDialog.ui:5
 msgid "Set Torrent Location"
@@ -2215,7 +2215,7 @@ msgstr ""
 
 #: ../libtransmission/open-files.cc:192
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke åbne '{path}': {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:220
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
@@ -2399,7 +2399,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.cc:400
 msgid "Calling script '{path}'"
-msgstr ""
+msgstr "Kalder scriptet '{path}'"
 
 #: ../libtransmission/torrent.cc:408
 msgid "Couldn't call script '{path}': {error} ({error_code})"
@@ -2556,9 +2556,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "døgn"
 msgstr[1] "døgn"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Ugyldig metadata"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Ingen data fundet! Sørg for at dine drev er forbundet eller bruge \"Angiv placering\". Fjern torrenten og tilføj den igen, for at downloade den igen."

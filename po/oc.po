@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Quentin PAGÈS, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Quentin PAGÈS, 2023
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Quentin PAGÈS, 2023\n"
 "Language-Team: Occitan (post 1500) (https://app.transifex.com/transmissionbt/teams/33778/oc/)\n"
 "Language: oc\n"
 "MIME-Version: 1.0\n"
@@ -310,7 +310,7 @@ msgstr "Mandadís al par"
 
 #: ../gtk/DetailsDialog.cc:1510
 msgid "We would upload to this peer if they asked"
-msgstr "Mandariam cap a aqueste par se nos o demandián"
+msgstr "Mandariam cap a aqueste par se nos o demandava"
 
 #: ../gtk/DetailsDialog.cc:1514
 msgid "Peer has unchoked us, but we're not interested"
@@ -2532,9 +2532,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "jorn"
 msgstr[1] "jorns"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Metadonadas invalidas"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Cap de donada pas trobada ! Asseguratz-vos que vòstres disques son connectats o utilizatz « Definir l'emplaçament ». Per tornar telecargar, levatz lo torrent e apondètz-lo tornamai."

@@ -2550,22 +2550,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dagur"
 msgstr[1] "dagar"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Villa í tilkynningu: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Villa í tilkynningu: {error} (Reyni aftur eftir {count} sekúndu)"
-#~ msgstr[1] "Villa í tilkynningu: {error} (Reyni aftur eftir {count} sekúndur)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Gat ekki túlkað lýsigögn segultengils: '{error}'. Sæki aftur {piece_count} bút"
-#~ msgstr[1] "Gat ekki túlkað lýsigögn segultengils: '{error}'. Sæki aftur {piece_count} búta"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Ógild lýsigögn"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Engin gögn fundust! Gakktu úr skugga um að alli gagnamiðlar séu tengdir eða notaðu \"Stilla staðsetningu\". Til að ná aftur í gögnin, fjarlægðu þá torrent-skrána og bættu henni svo við aftur."

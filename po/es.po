@@ -6,7 +6,7 @@
 # Translators:
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
 # Adolfo Jayme-Barrientos, 2021
-# GPL-advocate <adrlopgal@disroot.org>, 2022
+# Julvenzor <adrlopgal@disroot.org>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # picodotdev <pico.dev@gmail.com>, 2023
@@ -2675,24 +2675,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Error de anuncio: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Error de anuncio: {error} (Reintentando en {count} segundo)"
-#~ msgstr[1] "Error de anuncio: {error} (Reintentando en {count} segundos)"
-#~ msgstr[2] "Error de anuncio: {error} (Reintentando en {count} segundos)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} pieza"
-#~ msgstr[1] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} piezas"
-#~ msgstr[2] "No se pudo analizar la metainformación del enlace magnético «{error}». Redescargando {piece_count} piezas"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Metadatos no válidos"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "No se encontraron datos. Asegúrese de que sus unidades estén conectadas o use «Establecer ubicación». Para volver a descargar, quite el torrent y vuelva a añadirlo."

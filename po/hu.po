@@ -2577,22 +2577,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Bejelentési hiba: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc múlva)"
-#~ msgstr[1] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc múlva)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "A mágneslink metainformációi nem dolgozhatók fel: „{error}”. {piece_count} szelet újbóli letöltése."
-#~ msgstr[1] "A magnet link meta információi nem dolgozhatók fel: '{error}'. {piece_count} szelet újbóli letöltése"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Érvénytelen metaadat"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Nem található adat! Ellenőrizze, hogy csatolta-e a meghajtót vagy válassza a \"Hely megadása\" lehetőséget. Újbóli letöltéshez távolítsa el, majd adja hozzá újra a torrent fájlt."

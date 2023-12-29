@@ -450,7 +450,7 @@
 "Hide Status Bar" = "Ocultar barra de estado";
 
 /* View menu -> Toolbar */
-/* "Hide Toolbar" = ""; */
+"Hide Toolbar" = "Ocultar barra de tareas";
 
 /* File Outline -> Priority Menu */
 "High" = "Alta";
@@ -694,7 +694,7 @@
 "Port is open" = "El puerto está abierto";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Puerto: %@";
+/* "Port: %@" = ""; */
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";

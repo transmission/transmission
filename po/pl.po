@@ -1770,7 +1770,7 @@ msgstr "_Nowy"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
 msgid "Sa_ve to:"
-msgstr "_Zapisanie do:"
+msgstr "_Zapisanie w:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:116 ../gtk/ui/gtk4/MakeDialog.ui:55
 msgid "Source F_older:"
@@ -2680,26 +2680,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#~ msgid "Announce error: {error}"
-#~ msgstr "Błąd ogłoszenia: {error}"
-
-#~ msgid "Announce error: {error} (Retrying in {count} second)"
-#~ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-#~ msgstr[0] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekundę)"
-#~ msgstr[1] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekundy)"
-#~ msgstr[2] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekund)"
-#~ msgstr[3] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekund)"
-
-#~ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-#~ msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-#~ msgstr[0] "Nie można przetworzyć metainformacji magnet: „{error}”. Ponowne pobieranie {piece_count}. części"
-#~ msgstr[1] "Nie można przetworzyć metainformacji magnet: „{error}”. Ponowne pobieranie {piece_count}. części"
-#~ msgstr[2] "Nie można przetworzyć metainformacji magnet: „{error}”. Ponowne pobieranie {piece_count}. części"
-#~ msgstr[3] "Nie można przetworzyć metainformacji magnet: „{error}”. Ponowne pobieranie {piece_count}. części"
-
-#~ msgid "Invalid metadata"
-#~ msgstr "Nieprawidłowe metadane"
-
-#~ msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-#~ msgstr "Nie odnaleziono żadnych danych. Proszę się upewnić, że napędy są podłączone lub użyć opcji „Ustaw położenie”. Aby ponownie pobrać, należy usunąć torrent i dodać go ponownie."
