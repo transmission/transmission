@@ -703,8 +703,6 @@ static void setGroup(tr_variant* args, std::string_view group)
     return files;
 }
 
-// clang-format off
-
 static auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_files,
     TR_KEY_name,
@@ -712,7 +710,7 @@ static auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_wanted,
 };
 
-static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
+static auto constexpr DetailsKeys = std::array<tr_quark, 53>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -754,6 +752,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_secondsSeeding,
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
+    TR_KEY_sequentialDownload,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -764,7 +763,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_uploadLimited,
     TR_KEY_uploadRatio,
     TR_KEY_webseeds,
-    TR_KEY_webseedsSendingToUs
+    TR_KEY_webseedsSendingToUs,
 };
 
 static auto constexpr ListKeys = std::array<tr_quark, 15>{
@@ -782,10 +781,8 @@ static auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_rateUpload,
     TR_KEY_sizeWhenDone,
     TR_KEY_status,
-    TR_KEY_uploadRatio
+    TR_KEY_uploadRatio,
 };
-
-// clang-format on
 
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
