@@ -349,7 +349,7 @@ set(LINGUAS
     ja
     nl
     pl
-    pt_BR
+    pt-BR
     pt-PT
     ru
     sv
