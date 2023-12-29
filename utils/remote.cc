@@ -1445,8 +1445,8 @@ static void printTorrentList(tr_variant* top)
         double total_up = 0;
         double total_down = 0;
 
-        printf(
-            "%6s   %-4s  %9s  %-9s  %6s  %6s  %-5s  %-11s  %s\n",
+        fmt::print(
+            "{:>6s}   {:>5s}  {:>9s}  {:<9s}  {:>6s}  {:>6s}  {:<5s}  {:<11s}  {:<s}\n",
             "ID",
             "Done",
             "Have",
@@ -1504,11 +1504,11 @@ static void printTorrentList(tr_variant* top)
                 auto const eta_str = leftUntilDone != 0 || eta != -1 ? etaToString(eta) : "Done";
                 auto const error_mark = tr_variantDictFindInt(d, TR_KEY_error, &error) && error ? '*' : ' ';
                 auto const done_str = sizeWhenDone != 0 ?
-                    fmt::format(FMT_STRING("{:.0f}%"), (100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone)) :
+                    strlpercent(100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone) + '%' :
                     std::string{ "n/a" };
 
                 fmt::print(
-                    FMT_STRING("{:6d}{:c}  {:>4s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:s}\n"),
+                    FMT_STRING("{:>6d}{:c}  {:>5s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:<s}\n"),
                     torId,
                     error_mark,
                     done_str,
@@ -1527,7 +1527,7 @@ static void printTorrentList(tr_variant* top)
         }
 
         fmt::print(
-            FMT_STRING("Sum:           {:>9s}             {:6.1f}  {:6.1f}\n"),
+            FMT_STRING("Sum:            {:>9s}             {:6.1f}  {:6.1f}\n"),
             strlsize(total_size).c_str(),
             Speed{ total_up, Speed::Units::Byps }.count(Speed::Units::KByps),
             Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
