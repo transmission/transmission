@@ -39,8 +39,8 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
 /// This is a simple model class used to hold info about each path we watch.
 @interface VDKQueuePathEntry : NSObject
 
-@property(atomic, copy) NSString* path;
-@property(atomic, assign) int watchedFD;
+@property(atomic, copy, readonly) NSString* path;
+@property(atomic, assign, readonly) int watchedFD;
 @property(atomic, assign) u_int subscriptionFlags;
 
 @end
@@ -69,7 +69,6 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
     {
         close(_watchedFD);
     }
-    _watchedFD = -1;
 }
 
 @end
