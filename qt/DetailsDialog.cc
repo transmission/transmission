@@ -649,6 +649,37 @@ void DetailsDialog::refreshUI()
 
     ui_.downloadedValueLabel->setText(string);
 
+    // myDownloadedThisSessionLabel
+    if (torrents.empty())
+    {
+        string = none;
+    }
+    else
+    {
+        auto d = uint64_t{};
+        auto f = uint64_t{};
+
+        for (Torrent const* const t : torrents)
+        {
+            d += t->downloadedThisSession();
+            f += t->failedThisSession();
+        }
+
+        QString const dstr = Formatter::storage_to_string(d);
+        QString const fstr = Formatter::storage_to_string(f);
+
+        if (f != 0)
+        {
+            string = tr("%1 (+%2 discarded after failed checksum)").arg(dstr).arg(fstr);
+        }
+        else
+        {
+            string = dstr;
+        }
+    }
+
+    ui_.downloadedThisSessionValueLabel->setText(string);
+
     //  myUploadedLabel
     if (torrents.empty())
     {
@@ -671,6 +702,25 @@ void DetailsDialog::refreshUI()
     }
 
     ui_.uploadedValueLabel->setText(string);
+
+    //  myUploadedThisSessionLabel
+    if (torrents.empty())
+    {
+        string = none;
+    }
+    else
+    {
+        auto uploaded_this_session = uint64_t{};
+
+        for (Torrent const* const t : torrents)
+        {
+            uploaded_this_session += t->uploadedThisSession();
+        }
+
+        string = tr("%1").arg(Formatter::storage_to_string(uploaded_this_session));
+    }
+
+    ui_.uploadedThisSessionValueLabel->setText(string);
 
     // myRunTimeLabel
     if (torrents.empty())
