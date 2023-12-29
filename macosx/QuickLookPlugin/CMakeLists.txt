@@ -15,12 +15,22 @@ set(LINGUAS
     de
     en
     es
+    eu
     fr
+    he
+    hu
     it
+    ja
     nl
-    pt_PT
+    pl
+    pt-BR
+    pt-PT
     ru
-    tr)
+    sv
+    tr
+    uk
+    zh-CN
+    zh-TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})
