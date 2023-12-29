@@ -85,8 +85,6 @@ private:
     [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
-    static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
-
     std::optional<QNetworkRequest> request_;
 
     tr_session* session_ = {};

@@ -1186,7 +1186,7 @@ bool core_read_rpc_response_idle(tr_variant& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
+void core_read_rpc_response(tr_session* /*session*/, tr_variant* response)
 {
     auto owned_response = std::make_shared<tr_variant>();
     *owned_response.get() = false;
@@ -1216,7 +1216,7 @@ void Session::Impl::send_rpc_request(
         gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
 #endif
 
-        tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);
+        tr_rpc_request_exec_json(session_, request, core_read_rpc_response);
     }
 }
 

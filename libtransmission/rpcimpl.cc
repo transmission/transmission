@@ -71,7 +71,6 @@ struct tr_rpc_idle_data
     tr_session* session = nullptr;
     tr_variant* args_out = nullptr;
     tr_rpc_response_func callback = nullptr;
-    void* callback_user_data = nullptr;
 };
 
 auto constexpr SuccessResult = "success"sv;
@@ -80,7 +79,7 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
 {
     tr_variantDictAddStr(&data->response, TR_KEY_result, result);
 
-    (*data->callback)(data->session, &data->response, data->callback_user_data);
+    (data->callback)(data->session, &data->response);
 
     delete data;
 }
@@ -2344,17 +2343,13 @@ auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "torrent-verify"sv, true, torrentVerify },
 } };
 
-void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/, void* /*user_data*/)
+void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/)
 {
 }
 
 } // namespace
 
-void tr_rpc_request_exec_json(
-    tr_session* session,
-    tr_variant const* request,
-    tr_rpc_response_func callback,
-    void* callback_user_data)
+void tr_rpc_request_exec_json(tr_session* session, tr_variant const* request, tr_rpc_response_func&& callback)
 {
     auto const lock = session->unique_lock();
 
@@ -2400,7 +2395,7 @@ void tr_rpc_request_exec_json(
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
 
-        (*callback)(session, &response, callback_user_data);
+        (callback)(session, &response);
     }
     else if (method->immediate)
     {
@@ -2421,7 +2416,7 @@ void tr_rpc_request_exec_json(
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
 
-        (*callback)(session, &response, callback_user_data);
+        (callback)(session, &response);
     }
     else
     {
@@ -2436,7 +2431,6 @@ void tr_rpc_request_exec_json(
 
         data->args_out = tr_variantDictAddDict(&data->response, TR_KEY_arguments, 0);
         data->callback = callback;
-        data->callback_user_data = callback_user_data;
         result = (*method->func)(session, args_in, data->args_out, data);
 
         /* Async operation failed prematurely? Invoke callback or else client will not get a reply */

@@ -162,15 +162,37 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     }
 }
 
-void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
 {
     if (verbose_)
     {
-        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*json));
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*req));
     }
 
     local_requests_.try_emplace(tag, promise);
-    tr_rpc_request_exec_json(session_, json.get(), localSessionCallback, this);
+    tr_rpc_request_exec_json(
+        session_,
+        req.get(),
+        [this](tr_session* /*sesson*/, tr_variant* response)
+        {
+            if (verbose_)
+            {
+                fmt::print(
+                    "{:s}:{:d} got response:\n{:s}\n",
+                    __FILE__,
+                    __LINE__,
+                    tr_variant_serde::json().to_string(*response));
+            }
+
+            TrVariantPtr const resp = createVariant();
+            std::swap(*resp, *response);
+
+            variantInit(response, false);
+
+            // this callback is invoked in the libtransmission thread, so we don't want
+            // to process the response here... let's push it over to the Qt thread.
+            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, resp));
+        });
 }
 
 RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
@@ -208,27 +230,6 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
     }
 
     return nam_;
-}
-
-void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept
-{
-    Q_UNUSED(s)
-
-    auto* self = static_cast<RpcClient*>(vself);
-
-    if (self->verbose_)
-    {
-        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*response));
-    }
-
-    TrVariantPtr const json = createVariant();
-    std::swap(*json, *response);
-
-    variantInit(response, false);
-
-    // this callback is invoked in the libtransmission thread, so we don't want
-    // to process the response here... let's push it over to the Qt thread.
-    QMetaObject::invokeMethod(self, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, json));
 }
 
 void RpcClient::networkRequestFinished(QNetworkReply* reply)
