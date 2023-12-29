@@ -86,6 +86,8 @@
 //
 //  - macOS 10.10+: DispatchSource API (makeFileSystemObjectSource)
 //  (https://developer.apple.com/documentation/dispatch/dispatchsource/2300040-makefilesystemobjectsource)
+//  "DispatchSource is just the Swift version of gcd dispatch sources"
+//  (https://github.com/bdkjones/VDKQueue/pull/22#issuecomment-1871623127)
 //
 //  Example: SFSMonitor (https://github.com/ClassicalDude/SFSMonitor)
 
