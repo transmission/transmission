@@ -694,7 +694,7 @@
 "Port is open" = "Poort is open";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "Poort: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";

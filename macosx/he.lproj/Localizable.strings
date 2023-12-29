@@ -53,7 +53,7 @@
 "%lu IP address rules in list" = "%lu כללי כתובות IP ברשימה";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu ידועים:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu איתור מקומי";
@@ -218,7 +218,7 @@
 "Available" = "זמין";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "ב׳/שנ׳";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "רוחב פס";
@@ -487,7 +487,7 @@
 "KB/s" = "ק״ב/שנייה";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "ידועים:";
 
 /* Tracker last announce */
 "Last Announce" = "הכרזה אחרונה";
@@ -694,7 +694,7 @@
 "Port is open" = "הפתחה פתוחה";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "פתחה: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "גודל חלון העדפות";
@@ -894,7 +894,7 @@
 "Show the data file in Finder" = "הצגת קובץ הנתונים ב־„מאתר”";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "הצגת סרגל כלים";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -1001,7 +1001,7 @@
 "This folder contains no files." = "תיקייה זו אינה מכילה קבצים.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "האפשרות הזאת לא זמינה אם מקום ברירת המחדל מוגדר לאותו מקום כמו קובץ הטורנט.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "ההעברה הזו פעילה. לאחר ההסרה, בחירה להמשיך בהעברה תדרוש את קובץ הטורנט או את קישור המגנט.";

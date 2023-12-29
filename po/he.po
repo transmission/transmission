@@ -5,9 +5,9 @@
 #
 # Translators:
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2022
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Avi Markovitz <avi.markovitz@gmail.com>, 2023
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Avi Markovitz <avi.markovitz@gmail.com>, 2023\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2023\n"
 "Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -1252,7 +1252,7 @@ msgstr "יש להריץ את ‚‎{program} --help’ כדי לצפות ברש�
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "ב׳/שנ׳"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1272,7 +1272,7 @@ msgstr "ק״ב/שנייה"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "ב׳"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2213,15 +2213,15 @@ msgstr "לא ניתן לאתר את ‚‎{address}:{port}‎’: {error} ({erro
 
 #: ../libtransmission/announcer.cc:884
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "שגיאת הכרזה: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:894
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "שגיאת הכרזה: {error} (ניסיון נוסף בעוד שנייה) ({url})"
+msgstr[1] "שגיאת הכרזה: {error} (ניסיון נוסף בעוד שתי שניות) ({url})"
+msgstr[2] "שגיאת הכרזה: {error} (ניסיון נוסף בעוד {count} שניות) ({url})"
+msgstr[3] "שגיאת הכרזה: {error} (ניסיון נוסף בעוד {count} שניות) ({url})"
 
 #: ../libtransmission/announcer.cc:1019 ../libtransmission/announcer.cc:1347
 msgid "Could not connect to tracker"
@@ -2258,15 +2258,15 @@ msgstr "שגיאת {crypto_library}‏: {error} ‏({error_code})"
 
 #: ../libtransmission/global-ip-cache.cc:277
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "כתובת המקור {protocol} עודכנה בהצלחה לכדי {ip}"
 
 #: ../libtransmission/global-ip-cache.cc:291
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "המכונה שלך לא תומכת ב־{protocol}"
 
 #: ../libtransmission/global-ip-cache.cc:315
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "הכתובת הגלובלית {type} עודכנה בהצלחה ל־{ip} באמצעות {url}"
 
 #: ../libtransmission/inout.cc:119
 msgid "Couldn't get '{path}': {error} ({error_code})"
@@ -2486,7 +2486,7 @@ msgstr "לא ניתן להשתמש בנתוני העל מתוך ‚{path}’ ע�
 
 #: ../libtransmission/torrent.cc:167
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "לא נמצאו נתונים! נא לוודא שהכוננים שלך מחוברים או להשתמש ב„הגדרות מקום”. כדי להוריד מחדש יש להשתמש ב„אימות נתונים מקומיים” ולאחר מכן להפעיל את הטורנט."
 
 #: ../libtransmission/torrent.cc:400
 msgid "Calling script '{path}'"
@@ -2522,11 +2522,11 @@ msgstr "לא ניתן להעביר את ‚{old_path}’ אל ‚{path}’: {err
 
 #: ../libtransmission/torrent.cc:1569
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "הטורנטים מושהים כי לא נמצא נתונים! נא לוודא שהכוננים שלך מחוברים או להשתמש ב„הגדרות מקום”, לאחר מכן להשתמש ב„אימות נתונים מקומיים” שוב. כדי להוריד מחדש, יש להפעיל את הטורנט."
 
 #: ../libtransmission/torrent.cc:2043
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "אזהרת עוקב: ‚{warning}’ ({url})"
 
 #: ../libtransmission/tr-dht.cc:540
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2610,7 +2610,7 @@ msgstr "נ״ב: אישורים שגויים מופיעים בתור ‚לא ני
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "לא ניתן למשוך את ‚{url}’: קוד ה־HTTP הצפוי הוא {expected_code}, התקבל {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"

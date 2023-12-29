@@ -5,8 +5,8 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Marek Adamski, 2023
 # Piotr Drąg <piotrdrag@gmail.com>, 2023
+# Marek Adamski, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2023\n"
+"Last-Translator: Marek Adamski, 2023\n"
 "Language-Team: Polish (https://app.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1273,7 +1273,7 @@ msgstr "Polecenie „{program} --help” wyświetli pełną listę dostępnych o
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1293,7 +1293,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2234,15 +2234,15 @@ msgstr "Nie można wyszukać „{address}:{port}”: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:884
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Błąd ogłoszenia: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:894
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekundę) ({url})"
+msgstr[1] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekundy) ({url})"
+msgstr[2] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekund) ({url})"
+msgstr[3] "Błąd ogłoszenia: {error} (ponowna próba za {count} sekund) ({url})"
 
 #: ../libtransmission/announcer.cc:1019 ../libtransmission/announcer.cc:1347
 msgid "Could not connect to tracker"
@@ -2279,15 +2279,15 @@ msgstr "Błąd biblioteki {crypto_library}: {error} ({error_code})"
 
 #: ../libtransmission/global-ip-cache.cc:277
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Pomyślnie zaktualizowano adres źródłowy {protocol} na {ip}"
 
 #: ../libtransmission/global-ip-cache.cc:291
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Ta maszyna nie obsługuje {protocol}"
 
 #: ../libtransmission/global-ip-cache.cc:315
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Pomyślnie zaktualizowano globalny adres {type} na {ip} przy użyciu {url}"
 
 #: ../libtransmission/inout.cc:119
 msgid "Couldn't get '{path}': {error} ({error_code})"
@@ -2507,7 +2507,7 @@ msgstr "Nie można użyć metainformacji z „{path}” dla „{magnet}”: {er
 
 #: ../libtransmission/torrent.cc:167
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Nie znaleziono danych! Upewnij się, że dyski są podłączone lub użyj opcji „Ustaw położenie”. Aby pobrać ponownie, użyj opcji „Sprawdź pobrane dane”, a następnie uruchom torrent."
 
 #: ../libtransmission/torrent.cc:400
 msgid "Calling script '{path}'"
@@ -2543,11 +2543,11 @@ msgstr "Nie można przenieść „{old_path}” do „{path}”: {error} ({error
 
 #: ../libtransmission/torrent.cc:1569
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Wstrzymano torrent, ponieważ nie znaleziono żadnych danych! Upewnij się, że dyski są podłączone lub użyj opcji „Ustaw położenie”, a następnie ponownie użyj opcji „Sprawdź pobrane dane”. Aby pobrać ponownie, uruchom torrent."
 
 #: ../libtransmission/torrent.cc:2043
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Ostrzeżenie serwera śledzącego: „{warning}” ({url})"
 
 #: ../libtransmission/tr-dht.cc:540
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2631,7 +2631,7 @@ msgstr "Uwaga: nieprawidłowe certyfikaty będą wyświetlane jako „Nie można
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Nie można pobrać „{url}”: oczekiwano kodu odpowiedzi HTTP {expected_code}, otrzymano {actual_code} "
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"

@@ -393,7 +393,7 @@
 "2123.title" = "חל על העברות חדשות שנוספות";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "פתיחת קובצי טורנט:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "הגדרה כיישום ברירת המחדל";

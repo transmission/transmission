@@ -64,73 +64,73 @@
     <message>
         <location line="+74"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+3"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>KiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>MiB</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>GiB</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>TiB</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>kB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message numerus="yes">
         <location line="+43"/>
@@ -342,10 +342,10 @@
         <location line="+362"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minutę</numerusform>
+            <numerusform>%1 minuty</numerusform>
+            <numerusform>%1 minut</numerusform>
         </translation>
     </message>
     <message>
@@ -502,7 +502,7 @@
     <message>
         <location line="+40"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etykiety:</translation>
     </message>
     <message>
         <location line="+101"/>
@@ -1758,20 +1758,20 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+105"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minutę</numerusform>
+            <numerusform>%1 minuty</numerusform>
+            <numerusform>%1 minut</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minutę temu</numerusform>
+            <numerusform>%1 minuty temu</numerusform>
+            <numerusform>%1 minut temu</numerusform>
         </translation>
     </message>
     <message>
@@ -2332,7 +2332,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2502,12 +2502,12 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+18"/>
         <source>%1 left</source>
-        <translation type="unfinished"></translation>
+        <translation>pozostało: %1</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remaining time unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozostały czas jest nieznany</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
