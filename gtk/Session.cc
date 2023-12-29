@@ -1186,12 +1186,9 @@ bool core_read_rpc_response_idle(tr_variant& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant* response)
+void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 {
-    auto owned_response = std::make_shared<tr_variant>();
-    *owned_response.get() = false;
-    std::swap(*owned_response, *response);
-
+    auto owned_response = std::make_shared<tr_variant>(std::move(response));
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
 }
 

@@ -173,21 +173,15 @@ void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse>
     tr_rpc_request_exec_json(
         session_,
         req.get(),
-        [this](tr_session* /*sesson*/, tr_variant* response)
+        [this](tr_session* /*sesson*/, tr_variant&& response)
         {
             if (verbose_)
             {
-                fmt::print(
-                    "{:s}:{:d} got response:\n{:s}\n",
-                    __FILE__,
-                    __LINE__,
-                    tr_variant_serde::json().to_string(*response));
+                fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(response));
             }
 
             TrVariantPtr const resp = createVariant();
-            std::swap(*resp, *response);
-
-            variantInit(response, false);
+            *resp = std::move(response);
 
             // this callback is invoked in the libtransmission thread, so we don't want
             // to process the response here... let's push it over to the Qt thread.

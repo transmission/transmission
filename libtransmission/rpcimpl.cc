@@ -79,7 +79,7 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
 {
     tr_variantDictAddStr(&data->response, TR_KEY_result, result);
 
-    (data->callback)(data->session, &data->response);
+    (data->callback)(data->session, std::move(data->response));
 
     delete data;
 }
@@ -2343,7 +2343,7 @@ auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "torrent-verify"sv, true, torrentVerify },
 } };
 
-void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/)
+void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
 {
 }
 
@@ -2395,7 +2395,7 @@ void tr_rpc_request_exec_json(tr_session* session, tr_variant const* request, tr
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
 
-        (callback)(session, &response);
+        (callback)(session, std::move(response));
     }
     else if (method->immediate)
     {
@@ -2416,7 +2416,7 @@ void tr_rpc_request_exec_json(tr_session* session, tr_variant const* request, tr
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
 
-        (callback)(session, &response);
+        (callback)(session, std::move(response));
     }
     else
     {

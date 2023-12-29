@@ -347,9 +347,9 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
     tr_rpc_request_exec_json(
         server->session,
         otop ? &*otop : nullptr,
-        [req, server](tr_session* /*session*/, tr_variant* content)
+        [req, server](tr_session* /*session*/, tr_variant&& content)
         {
-            auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(*content));
+            auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(content));
             evhttp_add_header(req->output_headers, "Content-Type", "application/json; charset=UTF-8");
             evhttp_send_reply(req, HTTP_OK, "OK", response);
             evbuffer_free(response);

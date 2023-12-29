@@ -81,7 +81,7 @@ TEST_F(RpcTest, sessionGet)
     tr_rpc_request_exec_json(
         session_,
         &request,
-        [&response](tr_session* /*session*/, tr_variant* resp) { std::swap(response, *resp); });
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
@@ -200,7 +200,7 @@ TEST_F(RpcTest, torrentGet)
     tr_rpc_request_exec_json(
         session_,
         &request,
-        [&response](tr_session* /*session*/, tr_variant* resp) { std::swap(response, *resp); });
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
