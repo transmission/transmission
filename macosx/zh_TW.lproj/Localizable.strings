@@ -1,0 +1,1152 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@ 之 %2$@";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "已檢索 %@ 個 Torrent 的後設資料";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "已選取 %@ 個";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ 全部";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "已驗證 %@";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/秒";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld 分鐘";
+
+/* stats window -> times opened */
+"%llu times" = "%llu 次";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu 快取";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu 已連線";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu 個 DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu 正在下載";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu 個檔案";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu 個傳入連線";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "清單中有 %lu 個 IP 位置規則";
+
+/* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu 本機探索";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu 個 LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu 個磁力連結傳輸";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu 個 PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu 正在做種";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu 個 torrent 檔案";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "已選取 %lu 個 Torrents";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "%lu 個追蹤器";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu 個傳輸";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu 個網路種子";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "總計 %1$u 個區塊，區塊大小為 %2$@";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "1 個已連線";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "1 個檔案";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "1 個磁力連結傳輸";
+
+/* Info options -> global setting */
+"1 minute" = "1 分鐘";
+
+/* Create torrent -> info */
+"1 piece, %@" = "1 個區塊，共 %@ 塊";
+
+/* stats window -> times opened */
+"1 time" = "1 次";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "1 個傳輸";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "\"%@\" 是無效的 Torrent 檔案。";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "必須先完成下載黑名單";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "在 \"%2$@\" 資料夾中已存在名稱為 \"%1$@\" 的檔案。請選擇一個新名稱或資料夾以建立 torrent 檔案。";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "不能將資料夾移動到其本身之中。";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "無法使用沒有容量的檔案來建立 torrent 檔案。";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "無法建立包含該名稱與資料夾的 torrent 檔案。";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "標記為私有且沒有追蹤器位址的傳輸將無法連線到節點。只有在您計劃將該 torrent 檔案上傳到會主動為您加入位址的追蹤器網站時，該 torrent 檔案才有用。";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "\"%@\" 的傳輸已存在。";
+
+/* Filter Bar -> filter button */
+"Active" = "活躍中";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "活動";
+
+/* Add torrent -> same name -> button */
+"Add" = "加入";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "加入追蹤器";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "無法加入磁力連結傳輸。";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "全部";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "所有群組";
+
+/* Tracker last announce */
+"Announce error" = "宣告錯誤";
+
+/* Tracker next announce */
+"Announce in progress" = "正在宣告";
+
+/* Tracker next announce */
+"Announce is queued" = "已排程宣告";
+
+/* Tracker next announce */
+"Announce not scheduled" = "未排程宣告";
+
+/* Tracker last announce */
+"Announce timed out" = "宣告已逾時";
+
+/* All toolbar item -> label */
+"Apply All" = "全部套用";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "套用到已選取項目";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "您確定要結束嗎？";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "您確定要從傳輸清單中移除 %lu 個已完成的傳輸嗎？";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "您確定要移除 %lu 個追蹤器嗎？";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "您確定要從傳輸清單中刪除 %lu 個傳輸，並將資料檔案移動到垃圾桶嗎？";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "您確定要從傳輸清單中移除 %lu 個傳輸嗎？";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "您確定要從傳輸清單中移除 \"%@\"，並將資料檔案移動到垃圾桶嗎？";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "您確定要從傳輸清單中移除 \"%@\" 嗎？";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "您確定要移除此追蹤器嗎？";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "您確定要重設用量統計資料嗎？";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "可用";
+
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "頻寬";
+
+/* notification description */
+"Bandwidth settings changed" = "已變更頻寬設定";
+
+/* Groups -> Name */
+"Blue" = "藍色";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "取消";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "變更傳輸設定";
+
+/* File Outline -> Menu */
+"Check Selected" = "勾選已選取項目";
+
+/* Torrent -> status string */
+"Checking existing data" = "正在檢查現有資料";
+
+/* Message window -> save button */
+"Clear" = "清除";
+
+/* inspector -> peer table -> header */
+"Client" = "用戶端";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "關閉 Quick Look";
+
+/* Blocklist -> message */
+"Connecting to site" = "正在連線到網站";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "無法建立 \"%@\" 的副本";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "建立";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "建立一個 Torrent 檔案";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "建立 Torrent 檔案";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "建立 Torrent 檔案";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "無法建立 \"%@\"。";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "正在下載 (有興趣，且宣告暢通)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "正在上傳 (有興趣，且宣告暢通)";
+
+/* Message window -> table column */
+"Date" = "日期";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "偵錯";
+
+/* Info options -> global setting */
+"disabled" = "停用";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "下載";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "從 %lu 下載";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "不再檢查磁碟空間";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "不再提醒我這個錯誤。";
+
+/* files tab -> tooltip */
+"Don't Download" = "不要下載";
+
+/* Donation beg -> button */
+"Donate" = "贊助";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "無論是否捐助，都不會影響您的使用體驗。";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "下載";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "無論如何下載";
+
+/* notification title */
+"Download Complete" = "下載完成";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "無法下載黑名單。";
+
+/* files tab -> tooltip */
+"Download Some" = "下載相同項目";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "下載速度";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "已下載";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "正在下載";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "正在下載黑名單";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "正在從 %1$lu 個節點下載，總計 %2$lu 個可用節點。";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = "正在從 1 個節點中的 %lu 下載";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "正在從該節點下載";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "正在從網路種子下載";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "已加密";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "加密的連線";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "錯誤";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "檔案";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "篩選器";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "從：快取";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "從：分散式雜湊表";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "從：傳入連線";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "從：libtorrent 延伸協定交握";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "從：本機節點探索";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "從：節點交換";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "從：追蹤器";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "GB/s";
+
+/* Preferences -> toolbar item title */
+"General" = "一般";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "一般資訊";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "全域下載限制";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "全域上傳限制";
+
+/* Tracker last announce */
+"got %lu peers" = "總計 %lu 個節點";
+
+/* Tracker last announce */
+"got 1 peer" = "找到 1 個節點";
+
+/* Groups -> Name */
+"Gray" = "灰色";
+
+/* Groups -> Name */
+"Green" = "綠色";
+
+/* Groups -> Button */
+"Group" = "群組";
+
+/* Preferences -> toolbar item title */
+"Groups" = "群組";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "隱藏篩選器";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "隱藏檢測器";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "隱藏狀態列";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "隱藏工具列";
+
+/* File Outline -> Priority Menu */
+"High" = "高";
+
+/* files tab -> tooltip */
+"High Priority" = "高優先性";
+
+/* Legal alert -> button */
+"I Accept" = "我同意";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "若您想使用已存在的資料，應該將資料根目錄放在目標資料夾中。";
+
+/* Torrent -> eta string */
+"inactive" = "閒置中";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "資訊";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "檢測器";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "Torrent 檔案網址：";
+
+/* inspector -> peer table -> header */
+"IP Address" = "IP 位址";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "來自 %2$@ 的檔案「%1$@」可能不是 Torrent 檔案。";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "KB/秒";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
+
+/* Tracker last announce */
+"Last Announce" = "最後宣告於";
+
+/* Tracker last scrape */
+"Last Scrape" = "最後擷取於";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "最後更新於";
+
+/* tracker peer stat */
+"Leechers" = "下載者";
+
+/* About window -> license button */
+"License" = "授權";
+
+/* torrent action menu -> upload/download limit */
+"Limit (%ld KB/s)" = "限制 (%ld KB/s)";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "無法儲存日誌";
+
+/* File Outline -> Priority Menu */
+"Low" = "低";
+
+/* files tab -> tooltip */
+"Low Priority" = "低優先性";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "該磁力連結與已存在的傳輸重複。";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "磁力傳輸";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "MB/s";
+
+/* Message window -> table column */
+"Message" = "訊息";
+
+/* Message window -> title */
+"Message Log" = "訊息日誌";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "多重優先性";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "不明";
+
+/* Filter Bar -> filter menu */
+"Name" = "檔名";
+
+/* Preferences -> toolbar item title */
+"Network" = "網路";
+
+/* Prefs -> blocklist -> message */
+"Never" = "永不";
+
+/* Inspector -> tracker table */
+"New Tier" = "新層級";
+
+/* Tracker next announce */
+"Next announce in %@" = "下一次宣告於 %@";
+
+/* Group table row */
+"No Group" = "沒有群組";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "未選取 Torrents";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "無";
+
+/* Donation beg -> button */
+"Nope" = "無";
+
+/* File Outline -> Priority Menu */
+"Normal" = "中";
+
+/* files tab -> tooltip */
+"Normal Priority" = "正常優先性";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "剩餘磁碟空間不足，無法完整下載 \"%@\"。";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "好";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "若您將其移除，Transmission 將停止與該節點的連線。此操作無法還原。";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "若您將其移除，Transmission 將停止與這些節點的連線。此操作無法還原。";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "僅勾選已選取項目";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "開啟";
+
+/* Open address toolbar item -> label */
+"Open Address" = "開啟位址";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "開啟 Torrent 位址";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "開啟 torrent 檔案";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "開啟 torrent 檔案";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "開啟 torrent 網址";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "選項";
+
+/* Groups -> Name */
+"Orange" = "橘色";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "部分種子";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "全部暫停 / 繼續";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "暫停 / 繼續已選取項目";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "全部暫停";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "暫停所有傳輸";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "暫停已選取項目";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "暫停已選取的傳輸";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "暫停此傳輸";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "已暫停";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "該節點已宣告暢通，但您不感興趣";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "該節點希望您上傳，但您不感興趣 (有興趣，但未宣告暢通)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "節點";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "已關閉連接埠檢查";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "連接埠已關閉";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "連接埠已開啟";
+
+/* Inspector -> Peers tab -> table row tooltip */
+/* "Port: %@" = ""; */
+
+/* No comment provided by engineer. */
+"PrefWindowSize" = "視窗大小偏好設定";
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "優先順序";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "無法使用優先性";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "私有 torrent，已停用無追蹤器的節點探索";
+
+/* Message window -> table column */
+"Process" = "進度";
+
+/* Blocklist -> message */
+"Processing blocklist" = "正在處理黑名單";
+
+/* Stats window -> label */
+"Program Started" = "程式已啟動";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "進度: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "協定: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "公開 torrent";
+
+/* Groups -> Name */
+"Purple" = "紫色";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "Quick Look";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "結束";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "分享率";
+
+/* Groups -> Name */
+"Red" = "紅色";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "剩餘時間未知";
+
+/* Preferences -> toolbar item title */
+"Remote" = "遠端";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "移除";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "移除所有已完成做種的傳輸。";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "移除已選取項目";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "移除已選取的追蹤器";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "移除已選取的追蹤器";
+
+/* rename sheet button */
+"Rename" = "重新命名";
+
+/* File Outline -> Menu */
+"Rename File" = "重新命名檔案";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "重新命名檔案 \"%@\" 為：";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "重設";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "全部繼續";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "繼續所有傳輸";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "繼續已選取項目";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "繼續已選取的傳輸";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "繼續此傳輸";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "立即繼續傳輸";
+
+/* Stats window -> label */
+"Running Time" = "執行時間";
+
+/* Message window -> save button */
+"Save" = "儲存";
+
+/* Tracker last scrape */
+"Scrape error" = "擷取錯誤";
+
+/* Tracker last scrape */
+"Scrape timed out" = "擷取已逾時";
+
+/* tracker peer stat */
+"Seeders" = "做種者";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "正在做種";
+
+/* Torrent -> status string */
+"Seeding complete" = "做種完成";
+
+/* notification title */
+"Seeding Complete" = "做種完成";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "正在為 %2$lu 中的 %1$lu 個節點做種";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = "正在為 1 個節點中的 %u 做種";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "選取";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "選擇 torrent 檔案或資料夾。";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "選擇 \"%@\" 的下載資料夾";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "選擇 torrent 檔案的位置與名稱。";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "選擇儲存 %lu 個資料檔案的新資料夾。";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "選擇 \"%@\" 的新資料夾。";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "工作階段分享率";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "工作階段傳輸";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "分享";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "分享 Torrent 檔案";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "變更全域設定的捷徑";
+
+/* notification button */
+"Show" = "顯示";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "顯示篩選器";
+
+/* File Outline -> Menu */
+"Show in Finder" = "在 Finder 中顯示";
+
+/* View menu -> Inspector */
+"Show Inspector" = "顯示檢測器";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "顯示狀態列";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "在 Finder 中顯示資料檔案";
+
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "速度限制";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "自動停用速度限制";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "自動停用速度限制";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "以個別速度限制覆蓋總頻寬速度限制。";
+
+/* Torrent -> status string */
+"Stalled" = "已停滯";
+
+/* Stats window -> title */
+"Statistics" = "統計資料";
+
+/* torrent action menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "達到分享率時停止 (%.2f)";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "停止等待啟動";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "支援開放原始碼獨立軟體";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "TB/s";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "選擇的 torrent 檔案位置不存在。";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "目標資料夾與資料根目錄名稱相同。";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "資料夾 \"%@\" 目前不存在。請建立此資料夾或選擇其他資料夾來建立 torrent 檔案。";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "無法加入磁力連結 \"%@\"，因為其與已存在的傳輸重複。";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "無法移動 \"%@\"。";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "指定的黑名單不包含有效的規則。";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "無法從 %1$@ 下載 torrent：%2$@。";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "找不到 torrent 檔案 (%@)。";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "無法開啟 torrent 檔案，因為其包含無效資料。";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "總檔案大小為 0 位元組。";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "無法加入傳輸，因為其與已存在的傳輸重複。";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "傳輸已暫停。請清理 %@ 的空間或在 torrent 檢測器中取消選取檔案以繼續。";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "此傳輸不會使用追蹤器來探索節點，只會完全依賴如 PEX 及 DHT 等無追蹤器的節點探索方式來下載與做種。";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "總計 %1$lu 個傳輸 (%2$lu 個活躍中)";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "目前有 %lu 個正在傳輸的檔案，當您結束程式時將暫停傳輸。這些傳輸會在下次啟動時自動繼續。";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "目前有 %lu 個正在傳輸的檔案。";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "沒有追蹤器位址。";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "已有另一個執行中的 Transmission 程式。在該執行個體結束前，無法開啟本程式。";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "結束時已暫停一個活躍中的傳輸。將於下次啟動時自動繼續該傳輸。";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "資料夾中至少必須有一個檔案，才能建立 torrrent 檔案。";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "建立檔案 \"%@\" 時發生問題。";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "移動資料檔案時發生錯誤。";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "加入磁力連結 \"%@\" 時發生錯誤。將不會進行傳輸。";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "該資料夾中沒有檔案。";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "這個傳輸仍在活躍中。若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "將會清除 Transmission 顯示的全域統計資料。個別傳輸的統計資料不會受影響。";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "層級 %ld";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "切換篩選器";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "切換檢測器";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "切換篩選器";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "切換 torrent 檢測器";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "無法下載 Torrent";
+
+/* notification title */
+"Torrent File Auto Added" = "自動加入 torrent 檔案";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Torrent 檢測器";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "需要 Torrent 後設資料";
+
+/* stats total */
+"Total N/A" = "全部不明";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "總分享率";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "總傳輸";
+
+/* Message window -> level */
+"Trace" = "追蹤";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "追蹤器";
+
+/* Torrent -> status string */
+"Tracker returned error" = "追蹤器回傳錯誤";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "追蹤器回傳警告";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "將該追蹤器做為備用";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "追蹤器";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "傳輸閒置中";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "傳輸";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "傳輸閒置中";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission 是一個檔案分享程式。當您執行 torrent 時，其資料將以上傳的方式提供給其他人。您必須負責做出正確判斷，並遵循當地法律。";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission 是一套全方位 Torrent 應用程式。我們投入大量的時間進行開發、編碼與最佳化。如果您喜歡此應用程式，請考慮捐助我們來表達您的喜愛。";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Transmission 已在執行中。";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "上傳";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "上傳到 %lu";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "取消勾選已選取項目";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "無限制";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "無法讀取的錯誤";
+
+/* Save log panel -> default file name */
+"untitled" = "未命名";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "上傳速度";
+
+/* Stats window -> label */
+"Uploaded" = "已上傳";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "已上傳 %1$@ (比例: %2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "正在上傳到該節點";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "正在等待以檢查現有資料";
+
+/* Torrent -> status string */
+"Waiting to download" = "正在等待下載";
+
+/* Torrent -> status string */
+"Waiting to seed" = "正在等待做種";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "警告";
+
+/* Drag overlay -> url */
+"Web Address" = "網址";
+
+/* Torrent -> status string */
+"web seed" = "網路種子";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "網路種子";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "歡迎來到 Transmission";
+
+/* Groups -> Name */
+"Yellow" = "黃色";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "您已向該節點宣告暢通，但對方不感興趣";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "您想要下載，但該節點不想做種 (有興趣，但未宣告暢通)";
+

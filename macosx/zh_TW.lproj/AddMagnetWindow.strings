@@ -1,0 +1,36 @@
+
+/* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
+"15.title" = "下載到：";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
+"16.title" = "變更…";
+
+/* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
+"18.title" = "加入時開始";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
+"20.title" = "加入";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
+"22.title" = "取消";
+
+/* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
+"41.title" = "群組：";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
+"88.title" = "低";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
+"89.title" = "中";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "90"; */
+"90.title" = "高";
+
+/* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
+"91.title" = "優先順序：";
+
+/* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
+"101.title" = "磁力連結";
+
+/* Class = "NSMenuItem"; title = "None"; ObjectID = "2zq-5y-smI"; */
+"2zq-5y-smI.title" = "無";

@@ -1,0 +1,33 @@
+
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
+"22.title" = "做种限制";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
+"23.title" = "传输带宽";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "KB/s";
+
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
+"43.title" = "上传限制：";
+
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
+"44.title" = "下载限制：";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
+"98.title" = "分钟";
+
+/* Class = "NSButtonCell"; title = "Status of selected files"; ObjectID = "114"; */
+"114.title" = "所选文件状态";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "116"; */
+"116.title" = "达到以下分享率停止做种：";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "118"; */
+"118.title" = "当闲置时间达到以下时间时停止做种：";
+
+/* Class = "NSButtonCell"; title = "Remaining time"; ObjectID = "130"; */
+"130.title" = "剩余时间";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "180"; */
+"180.title" = "KB/s";
