@@ -1841,13 +1841,21 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
     auto const n = std::size(peers);
     auto* const ret = new tr_peer_stat[n];
 
-    auto const now = tr_time();
-    auto const now_msec = tr_time_msec();
-    std::transform(
-        std::begin(peers),
-        std::end(peers),
-        ret,
-        [&now, &now_msec](auto const* peer) { return get_peer_stats(peer, now, now_msec); });
+    auto done_promise = std::promise<void>{};
+    auto done_future = done_promise.get_future();
+    tor->session->run_in_session_thread(
+        [&peers, &ret, &done_promise]()
+        {
+            auto const now = tr_time();
+            auto const now_msec = tr_time_msec();
+            std::transform(
+                std::begin(peers),
+                std::end(peers),
+                ret,
+                [&now, &now_msec](auto const* peer) { return get_peer_stats(peer, now, now_msec); });
+            done_promise.set_value();
+        });
+    done_future.wait();
 
     *setme_count = n;
     return ret;
