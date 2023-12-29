@@ -356,7 +356,7 @@ set(LINGUAS
     tr
     uk
     zh-CN
-    zh_TW)
+    zh-TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})
