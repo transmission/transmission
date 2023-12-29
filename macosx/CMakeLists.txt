@@ -350,7 +350,7 @@ set(LINGUAS
     nl
     pl
     pt_BR
-    pt_PT
+    pt-PT
     ru
     sv
     tr
