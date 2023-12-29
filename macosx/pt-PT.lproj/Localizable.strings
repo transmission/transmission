@@ -53,6 +53,9 @@
 "%lu IP address rules in list" = "%lu regras de endereços IP na lista";
 
 /* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
+
+/* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu pesquisa local";
 
 /* Inspector -> Peers tab -> peers */
@@ -214,6 +217,9 @@
 /* inspector -> peer table -> header tool tip */
 "Available" = "Disponível";
 
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Largura de banda";
 
@@ -295,7 +301,6 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "DL" = "REC";
 
@@ -444,6 +449,9 @@
 /* View menu -> Status Bar */
 "Hide Status Bar" = "Ocultar barra de estado";
 
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Ocultar barra de ferramentas";
+
 /* File Outline -> Priority Menu */
 "High" = "Alta";
 
@@ -477,6 +485,9 @@
 
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
 
 /* Tracker last announce */
 "Last Announce" = "Último anúncio";
@@ -673,9 +684,6 @@
    Preferences -> toolbar item title */
 "Peers" = "Peers";
 
-/* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Porta: %@";
-
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Website de verificação inacessível";
 
@@ -684,6 +692,9 @@
 
 /* Preferences -> Network -> port status */
 "Port is open" = "A porta está aberta";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "Porta: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "655";
@@ -881,6 +892,9 @@
 
 /* Torrent cell -> button info */
 "Show the data file in Finder" = "Mostrar o ficheiro de dados no Finder";
+
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
 
 /* Dock item
    Status Bar -> speed tooltip */

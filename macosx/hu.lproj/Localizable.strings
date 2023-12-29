@@ -1,0 +1,1152 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@/%2$@";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "%@ torrent metaadat fogadva";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "%@ kiválasztva";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ összesen";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ ellenőrizve";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/s";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld perc";
+
+/* stats window -> times opened */
+"%llu times" = "%llu alkalommal";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu gyorsítótár";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu Kapcsolódott";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu Letöltés";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu fájl";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu bejövő";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu IP cím szabály a listában";
+
+/* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu helyi felfedezés";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu magnet átvitel";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu Megosztás";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu Torrent fájl";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu Kiválasztott torrent";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "%lu tracker";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu átvitel";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu web seed";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u szelet, egyenként %2$@";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "1 Kapcsolódva";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "1 fájl";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "1 magnet átvitel";
+
+/* Info options -> global setting */
+"1 minute" = "1 perc";
+
+/* Create torrent -> info */
+"1 piece, %@" = "1 szelet, %@";
+
+/* stats window -> times opened */
+"1 time" = "1 alkalommal";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "1 átvitel";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "'%@' nem egy érvényes torrent fájl.";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "A tiltólistát először le kell tölteni";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Egy '%1$@' nevű fájl már létezik a '%2$@' könyvtárban. Válasszon új nevet vagy könyvtárat a torrent fájl létrehozásához.";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "A mappa nem mozgatható saját magába.";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "Nem lehet üres fájlokból torrent fájlt készíteni.";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "Nem hozható létre torrent fájl ezzel a névvel és könyvtárral.";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Az átvitel privátnak van jelölve, tracker címek nélkül egy partner sem tud kapcsolódni. A torrent fájl csak akkor lesz hasznos ha az a terved, hogy feltöltöd a fájlt egy tracker oldalra ami hozzáadja a követő címet helyetted. ";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "\"%@\" átvitel már létezik.";
+
+/* Filter Bar -> filter button */
+"Active" = "Aktív";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "Tevékenység";
+
+/* Add torrent -> same name -> button */
+"Add" = "Hozzáad";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "Tracker hozzáadása";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "Magnet átvitel hozzáadása sikertelen.";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "Összes";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "Összes csoport";
+
+/* Tracker last announce */
+"Announce error" = "Bejelentési hiba";
+
+/* Tracker next announce */
+"Announce in progress" = "Bejelentés folyamatban";
+
+/* Tracker next announce */
+"Announce is queued" = "Bejelentés sorbaállítva";
+
+/* Tracker next announce */
+"Announce not scheduled" = "Bejelentés nincs beütemezve";
+
+/* Tracker last announce */
+"Announce timed out" = "Bejelentési időtúllépés";
+
+/* All toolbar item -> label */
+"Apply All" = "Mindet alkalmaz";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "Kiválasztottak alkalmazása";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "Biztos benne hogy ki szeretne lépni?";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Biztosan el szeretne távolítani %lu teljesített átvitelt az átviteli listából?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "Biztosan eltávolít %lu trackert?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Biztosan el szeretne távolítani %lu átvitelt az átviteli listából és kukázza az adat fájlokat?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "Biztosan el szeretne távolítani %lu átvitelt az átviteli listából?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Biztosan el szeretné távolítani \"%@\"-t az átviteli listából és kukázza az összes adat fájlt?";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Biztosan el szeretné távolítani \"%@\"-t az átviteli listából?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "Biztos, hogy eltávolítja ezt a trackert?";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "Biztos törölni szeretné a használati statisztikát?";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "Elérhető";
+
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "Sávszélesség";
+
+/* notification description */
+"Bandwidth settings changed" = "Sávszélesség beállítások megváltozott";
+
+/* Groups -> Name */
+"Blue" = "Kék";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "Mégse";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "Átviteli beállítás megváltoztatása";
+
+/* File Outline -> Menu */
+"Check Selected" = "Kiválasztottak ellenőrzése";
+
+/* Torrent -> status string */
+"Checking existing data" = "Meglévő adatok ellenőrzése";
+
+/* Message window -> save button */
+"Clear" = "Törlés";
+
+/* inspector -> peer table -> header */
+"Client" = "Kliens";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "Gyors nézet bezárása";
+
+/* Blocklist -> message */
+"Connecting to site" = "Kapcsolódás az oldalhoz";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "A(z) \"%@\" másolata nem hozható létre";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "Létrehozás";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "Torrent fájl létrehozása";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Torrent fájl létrehozása";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "Torrent fájl létrehozása";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "\"%@\" létrehozása sikertelen.";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "Jelenleg letöltődik (érdeklődő és nem elfojtott)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "Jelenleg feltöltődik (érdeklődő és nem elfojtott)";
+
+/* Message window -> table column */
+"Date" = "Dátum";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "Hibakeresés";
+
+/* Info options -> global setting */
+"disabled" = "letiltva";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "LE";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "LE innen: %lu";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "Ne ellenőrizze újra a lemezterületet";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "Ne zaklasson ezért többé.";
+
+/* files tab -> tooltip */
+"Don't Download" = "Ne töltse le";
+
+/* Donation beg -> button */
+"Donate" = "Támogatás";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "Támogat vagy sem, nem lesz változás az ön torrentezés élményében.";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "Letöltés";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "Letöltés mindenképp";
+
+/* notification title */
+"Download Complete" = "Letöltés kész";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "A tiltólista letöltése sikertelen.";
+
+/* files tab -> tooltip */
+"Download Some" = "Néhány letöltése";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "Letöltési sebesség";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "Letöltve";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "Letöltés alatt";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "Tiltólista letöltés alatt";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "Letöltés %1$lu partnertől az elérhető %2$lu partnerből";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = "Letöltés %lu partnertől az elérhető 1 partnerből";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "Letöltés partnertől";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "Letöltés webes partnertől";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "titkosítva";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "Titkosított kapcsolat";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "Hiba";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "Fájlok";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "Szűrés";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "Innen: gyorsítótár";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "Innen: Elosztott hash tábla";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "Innen: bejövő kapcsolat";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "Innen: libtorrent kiterjesztés protokoll kézfogás";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "Innen: helyi partnerek felderítése";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "Innen: partner csere";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "Innen: tracker";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "GB/s";
+
+/* Preferences -> toolbar item title */
+"General" = "Általános";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "Általános információ";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "Globális letöltési korlát";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "Globális fetöltési korlát";
+
+/* Tracker last announce */
+"got %lu peers" = "%lu partner elérhető";
+
+/* Tracker last announce */
+"got 1 peer" = "1 partner elérhető";
+
+/* Groups -> Name */
+"Gray" = "Szürke";
+
+/* Groups -> Name */
+"Green" = "Zöld";
+
+/* Groups -> Button */
+"Group" = "Csoport";
+
+/* Preferences -> toolbar item title */
+"Groups" = "Csoportok";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "Szűrősáv elrejtése";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "Szemlélő elrejtése";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "Állapotsáv elrejtése";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Eszköztár elrejtése";
+
+/* File Outline -> Priority Menu */
+"High" = "Magas";
+
+/* files tab -> tooltip */
+"High Priority" = "Magas prioritású";
+
+/* Legal alert -> button */
+"I Accept" = "Elfogadom";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Ha megpróbál meglévő adatokat használni, a gyökérkönyvtárnak a célkönyvtárban kell lennie.";
+
+/* Torrent -> eta string */
+"inactive" = "inaktív";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "Információ";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "Szemlélő";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "Torrent fájl internetcíme:";
+
+/* inspector -> peer table -> header */
+"IP Address" = "IP cím";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Úgy tűnik, hogy a %2$@ helyről származó \"%1$@\" fájl nem torrent fájl.";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "KB/s";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
+
+/* Tracker last announce */
+"Last Announce" = "Utolsó bejelentés";
+
+/* Tracker last scrape */
+"Last Scrape" = "Utolsó scrape";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "Utóljára frissítve";
+
+/* tracker peer stat */
+"Leechers" = "Letöltők";
+
+/* About window -> license button */
+"License" = "Licensz";
+
+/* torrent action menu -> upload/download limit */
+"Limit (%ld KB/s)" = "Korlát (%ld KB/s)";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "Naplófájl nem menthető";
+
+/* File Outline -> Priority Menu */
+"Low" = "Alacsony";
+
+/* files tab -> tooltip */
+"Low Priority" = "Alacsony prioritású";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "A magnet kapcsolat egy meglévő átvitel másolata.";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "Magnet átvitel";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "MB/s";
+
+/* Message window -> table column */
+"Message" = "Üzenet";
+
+/* Message window -> title */
+"Message Log" = "Üzenetnapló";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "Több prioritás";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "N/A";
+
+/* Filter Bar -> filter menu */
+"Name" = "Név";
+
+/* Preferences -> toolbar item title */
+"Network" = "Hálózat";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Soha";
+
+/* Inspector -> tracker table */
+"New Tier" = "Új szint";
+
+/* Tracker next announce */
+"Next announce in %@" = "Következő bejelentés %@";
+
+/* Group table row */
+"No Group" = "Nincs csoport";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "Nincs torrent kiválasztva";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "Nincs";
+
+/* Donation beg -> button */
+"Nope" = "Nem";
+
+/* File Outline -> Priority Menu */
+"Normal" = "Normál";
+
+/* files tab -> tooltip */
+"Normal Priority" = "Normál prioritású";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "Nincs elég szabad lemezterület \"%@\" teljes letöltéséhez.";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "OK";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "Az eltávolítás után az átvitel folytatásához torrent fájl vagy magnet link szükséges.";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "Az eltávolítás után az átvitelek folytatásához torrent fájlok vagy magnet linkek szükségesek.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Eltávolítás után, a Transmission többé nem próbálja meg felvenni a kapcsolatot. Ezt nem lehet visszacsinálni.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Eltávolítás után, a Transmission többé nem próbálja meg felvenni a kapcsolatot. Ezt nem lehet visszacsinálni.";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "Csak a kiválasztottak bejelölése";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "Megnyitás";
+
+/* Open address toolbar item -> label */
+"Open Address" = "Cím megnyitása";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "Torrent cím megnyitása";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Torrent fájlok megnyitása";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Torrent fájlok megnyitása";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "Torrent web cím megnyitása";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "Beállítások";
+
+/* Groups -> Name */
+"Orange" = "Narancssárga";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "Részleges megosztás";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "Összes szüneteltetése / folytatása";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "Kiválasztott szüneteltetése / folytatása";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "Összes szüneteltetése";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "Összes átvitel szüneteltetése";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "Kiválasztottak szüneteltetése";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "Kiválasztott átvitelek szüneteltetése";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "Átvitel szüneteltetése";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "Szüneteltetve";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "A partner feloldotta önt, de ön nem érdeklődik";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "A partner azt akarja, hogy töltsön fel, de ön nem akarja (érdekel és elfojtott)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "Partnerek";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "Port ellenőrző oldal nem elérhető";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "A port zárva van";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "A port nyitva van";
+
+/* Inspector -> Peers tab -> table row tooltip */
+/* "Port: %@" = ""; */
+
+/* No comment provided by engineer. */
+"PrefWindowSize" = "PrefWindowSize";
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "Prioritás";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "Prioritás nem elérhető";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "Privát torrent, a tracker nélküli partner felfedezés letiltva";
+
+/* Message window -> table column */
+"Process" = "Folyamat";
+
+/* Blocklist -> message */
+"Processing blocklist" = "Tiltólista feldolgozása";
+
+/* Stats window -> label */
+"Program Started" = "Program elindult";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "Folyamat: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "Protokoll: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "Nyilvános torrent";
+
+/* Groups -> Name */
+"Purple" = "Lila";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "Gyors nézet";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "Kilépés";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "Arány";
+
+/* Groups -> Name */
+"Red" = "Piros";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "hátralévő idő ismeretlen";
+
+/* Preferences -> toolbar item title */
+"Remote" = "Távoli";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "Eltávolít";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "Összes átvitel eltávolítása amely befejezte a megosztást.";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "Kiválasztottak eltávolítása";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "Kiválasztott trackerek eltávolítása";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "Kiválasztott átvitelek eltávolítása";
+
+/* rename sheet button */
+"Rename" = "Átnevezés";
+
+/* File Outline -> Menu */
+"Rename File" = "Fájl átnevezése";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "\"%@\" fájl átnevezése:";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "Visszaállítás";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "Összes Folytatása";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "Összes átvitel folytatása";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "Kiválasztottak folytatása";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "Kiválasztott átvitelek folytatása";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "Átvitel folytatása";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "Átvitel folytatása azonnal";
+
+/* Stats window -> label */
+"Running Time" = "Futási idő";
+
+/* Message window -> save button */
+"Save" = "Mentés";
+
+/* Tracker last scrape */
+"Scrape error" = "Scrape hiba";
+
+/* Tracker last scrape */
+"Scrape timed out" = "Scrape időtúllépés";
+
+/* tracker peer stat */
+"Seeders" = "Megosztók";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "Megosztás";
+
+/* Torrent -> status string */
+"Seeding complete" = "Megosztás kész";
+
+/* notification title */
+"Seeding Complete" = "Megosztás kész";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "Megosztás %1$lu partnernek a %2$lu partnerből";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = "Megosztás %u partnernek 1 partnerből";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "Kiválasztás";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "Válasszon fájlt vagy mappát a torrent fájlhoz.";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "Letöltések mappa kiválasztása \"%@\" számára";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "Válassza ki a torrent fájl nevét és helyét.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "Új mappa kiválasztása %lu adatfájloknak. ";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "Új mappa választása \"%@\" számára.";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "Munkamenet aránya";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "Munkamenet forgalma";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "Megosztás";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "Torrent fájl megosztása";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "Gyorsbillentyűk a globális beállítások módosításához.";
+
+/* notification button */
+"Show" = "Mutat";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "Szűrősáv megjelenítése";
+
+/* File Outline -> Menu */
+"Show in Finder" = "Megjelenítés Finderben";
+
+/* View menu -> Inspector */
+"Show Inspector" = "Szemlélő megjelenítése";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "Állapotsáv megjelenítése";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "Adatfájl megjelenítése Finderben";
+
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "Sebességkorlát";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "Sebességkorlátozás automatikusan letiltva";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "Sebességkorlátozás automatikusan engedélyezve";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "A sebesség korlát felülírja a teljes sávszélesség korlátot a saját korlátaival.";
+
+/* Torrent -> status string */
+"Stalled" = "Elakadt";
+
+/* Stats window -> title */
+"Statistics" = "Statisztika";
+
+/* torrent action menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "Leállítás arány elérésekor (%.2f)";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "Várakozás elkezdésének leállítása";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "Nyílt-forráskódú indie szoftver támogatása";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "TB/s";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "A kiválasztott torrent fájl helye nem létezik.";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "A célkönyvtár és a gyökérkönyvtár neve megegyezik.";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "A \"%@\" könyvtár jelenleg nem létezik. Hozza létre a könyvtárat, vagy válasszon másikat a torrent fájl létrehozásához.";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "A(z) \"%@\" magnet linket nem lehet hozzáadni, mert már létezik.";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "\"%@\" áthelyezése nem hajtható végre.";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "A megadott tiltólista fájl nem tartalmaz érvényes szabályokat.";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "A torrent nem tölthető le innen :%1$@: %2$@.";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "A torrent fájl (%@) nem található.";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "A torrent fájl nem nyitható meg, mert érvénytelen adatokat tartalmaz.";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "A teljes fájlméret 0 bájt.";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "Az átvitel nem adható hozzá, mert már létezik.";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Az átvitel szünetelni fog. Szabadítson fel területet a %@ lemezen, vagy távolítsa el a fájlokat a torrent-szemlélőben a folytatáshoz.";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Az átvitel nem fog kapcsolatba lépni a trackerekkel partnerek lekérése miatt, és kizárólag a tracker nélküli partnerfelfedezési módszerekre kell majd támaszkodnia. Mint például a PEX és a DHT lesz letöltésre és megosztáshoz használva.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "%1$lu átvitel van (%2$lu aktív).";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%lu aktív átvitel van, amelyek a kilépéskor leállításra kerülnek. Az átvitelek automatikusan újraindulnak a következő indításkor.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "%lu aktív átvitel van.";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "Nincsenek tracker címek.";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Már fut egy másik Transmission. Nem lehet megnyitni, amíg a másik példányt be nem zárja.";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Egy aktív átvitel van, amely szünetelni fog a kilépéskor. Az átvitel automatikusan folytatódik a következő indításkor.";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "A mappában legalább egy fájlnak lennie kell torrent fájl létrehozásához.";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "Probléma lépett fel a \"%@\" fájl létrehozásakor.";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "Hiba történt az adatfájl áthelyezésekor.";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Hiba történt a(z) \"%@\" magnet link hozzáadásakor. Az átvitel nem történik meg.";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "Ez a mappa nem tartalmaz fájlokat.";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Ez az átvitel aktív. Az eltávolítás után az átvitel folytatásához torrent fájl vagy magnet link szükséges.";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Ez törli a Transmission által megjelenített globális statisztikákat. Az egyéni átviteli statisztikákra nem lesz hatással.";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "Szint %ld";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "Szűrő kapcsolása";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "Szemlélő kapcsolása";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "Szűrősáv kapcsolása";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "Torrent-szemlélő kapcsolása";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "Torrent letöltése sikertelen";
+
+/* notification title */
+"Torrent File Auto Added" = "Torrent fájl automatikusan hozzáadva";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Torrent Szemlélő ";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "torrent metaadat szükséges";
+
+/* stats total */
+"Total N/A" = "Összesen N/A";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "Összesített arány";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "Összes átvitel";
+
+/* Message window -> level */
+"Trace" = "Nyomkövetés";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "Tracker";
+
+/* Torrent -> status string */
+"Tracker returned error" = "Tracker hibát jelzett vissza";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "Tracker figyelmeztetést jelzett vissza";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "Tracker tartalékként lesz használva";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "Trackerek";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "Átvitel nem aktív";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "Átvitelek";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "Átvitelek nem aktívak";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "A Transmission egy fájlmegosztó program. Egy torrent futtatása során a hozzá tartozó adatok elérhetővé válnak más felhasználók számára is. Minden megosztott tartalomért kizárólag Ön tartozik felelősséggel.";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "A Transmission egy teljes funkcionalitású torrent alkalmazás. Sok időbe és erőfeszítésbe telt a fejlesztése. Ha örömmel használja, kérjük, megbecsüléseként járuljon hozzá a fejlesztéshez anyagi támogatással.";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Transmisson már fut.";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "FEL";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "FEL ide: %lu";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "Kiválasztottak bejelölésének megszüntetése";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "korlátlan";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "olvashatatlan hiba";
+
+/* Save log panel -> default file name */
+"untitled" = "névtelen";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "Feltöltési sebesség";
+
+/* Stats window -> label */
+"Uploaded" = "Feltöltve";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "%1$@ feltöltve (Arány:%2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "Feltöltés partnereknek";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "Várakozás meglévő adatok ellenőrzésére";
+
+/* Torrent -> status string */
+"Waiting to download" = "Várakozás letöltésre";
+
+/* Torrent -> status string */
+"Waiting to seed" = "Várakozás megosztásra";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "Figyelmeztetés";
+
+/* Drag overlay -> url */
+"Web Address" = "Web cím";
+
+/* Torrent -> status string */
+"web seed" = "webes partner";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "Webes partnerek";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "Üdvözli a Transmission";
+
+/* Groups -> Name */
+"Yellow" = "Sárga";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "Feloldotta a partnert, de a partner nem érdekelt";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "Szeretne letölteni, de a partner nem szeretne küldeni (érdeklődő és elfojtott)";
+

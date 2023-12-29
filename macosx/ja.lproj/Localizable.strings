@@ -1,0 +1,1152 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@ / %2$@";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "%@のトレントメタ情報を取得";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "%@ 選択";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ 計";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ 検証済み";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/s";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld 分";
+
+/* stats window -> times opened */
+"%llu times" = "%llu 回";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu キャッシュ";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu 接続";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu ダウンロード中";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu ファイル";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu 着信";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "リスト内に %lu 個のIP アドレスの規則";
+
+/* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu ローカル探索";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu マグネット転送";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu シード中";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu トレントファイル";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu トレントを選択";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "%lu トラッカー";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu 転送";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu ウェブシード";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u ピース, 各 %2$@";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "1 接続";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "1 ファイル";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "1 マグネット転送";
+
+/* Info options -> global setting */
+"1 minute" = "1 分";
+
+/* Create torrent -> info */
+"1 piece, %@" = "1 ピース, %@";
+
+/* stats window -> times opened */
+"1 time" = "1 回";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "1 転送";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "「%@」は正しいトレントファイルではありません。";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "ブロックリストは最初にダウンロードしてください";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "「%1$@」というファイル名は、既にフォルダ「%2$@」に存在します。トレントファイルの作成には新しい名前やフォルダを選択してください。";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "フォルダ自身の中にフォルダを移動できません。";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "サイズのないファイルでトレントファイルは作成できません。";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "この名前とフォルダのトレントファイルは作成できません。";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "トラッカーアドレスがなく非公開になっている転送はピアに接続できません。トレントファイルは、アドレスを追加してくれるトラッカーウェブサイトにファイルをアップロードする場合にのみ役立ちます。";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "「%@」の転送項目は既に存在します。";
+
+/* Filter Bar -> filter button */
+"Active" = "稼働";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "稼働状況";
+
+/* Add torrent -> same name -> button */
+"Add" = "追加";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "トラッカーの追加";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "マグネット転送の追加に失敗";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "すべて";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "すべてのグループ";
+
+/* Tracker last announce */
+"Announce error" = "アナウンスのエラー";
+
+/* Tracker next announce */
+"Announce in progress" = "アナウンス進行中";
+
+/* Tracker next announce */
+"Announce is queued" = "アナウンスを処理待ちに追加";
+
+/* Tracker next announce */
+"Announce not scheduled" = "アナウンスの予定なし";
+
+/* Tracker last announce */
+"Announce timed out" = "アナウンスがタイムアウト";
+
+/* All toolbar item -> label */
+"Apply All" = "すべて適用";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "選択項目を適用";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "終了しますか？";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "転送一覧から %lu 個の完了済み転送項目を削除しますか？";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "%lu トラッカーを除去しますか？";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "転送一覧から %lu を除去しデータファイルをゴミ箱に移動しますか？";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "転送一覧から %lu 個の転送項目を削除しますか？";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "転送一覧から \"%@\" を除去しデータファイルをゴミ箱に移動しますか？";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "転送一覧から \"%@\" を除去しますか？";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "このトラッカーを削除しますか？";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "使用統計を初期化しますか？";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "入手可能";
+
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "帯域幅";
+
+/* notification description */
+"Bandwidth settings changed" = "帯域幅の設定を変更";
+
+/* Groups -> Name */
+"Blue" = "ブルー";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "キャンセル";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "転送設定を変更";
+
+/* File Outline -> Menu */
+"Check Selected" = "選択項目をチェック";
+
+/* Torrent -> status string */
+"Checking existing data" = "現在のデータを確認中";
+
+/* Message window -> save button */
+"Clear" = "初期化";
+
+/* inspector -> peer table -> header */
+"Client" = "クライアント";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "クイックルックを閉じる";
+
+/* Blocklist -> message */
+"Connecting to site" = "サイトへ接続中";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "「%@」のコピーを作成できません";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "作成";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "トレントファイルの作成";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "トレントファイルの作成";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "トレントファイルの作成";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "「%@」の作成に失敗しました。";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "ダウンロード中 (インタレストありチョークなし)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "アップロード中  (インタレストありチョークなし)";
+
+/* Message window -> table column */
+"Date" = "日時";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "デバッグ";
+
+/* Info options -> global setting */
+"disabled" = "無効";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "下り";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "%lu からDL";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "ディスク容量を再度確認しない";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "二度と邪魔しないで。";
+
+/* files tab -> tooltip */
+"Don't Download" = "ダウンロードしない";
+
+/* Donation beg -> button */
+"Donate" = "寄付";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "寄付をしなくてもトレント利用上の違いはありません。";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "ダウンロード";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "とにかくダウンロード";
+
+/* notification title */
+"Download Complete" = "ダウンロード完了";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "ブロックリストのダウンロードに失敗";
+
+/* files tab -> tooltip */
+"Download Some" = "一部ダウンロード";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "ダウンロード速度";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "ダウンロード";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "ダウンロード中";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "ブロックリストのダウンロード中";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "%2$lu ピアの %1$lu からダウンロード中";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = "1ピアの %lu からダウンロード中";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "ピアからダウンロード中";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "ウェブシードからダウンロード中";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "暗号化";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "暗号化接続";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "エラー";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "ファイル";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "絞り込み";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "キャッシュより";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "配布のハッシュテーブルより";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "応答接続より";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "libtorrent 拡張プロトコルのハンドシェイクより";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "ローカルピア探索より";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "ピア交換より";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "トラッカーより";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "GB/s";
+
+/* Preferences -> toolbar item title */
+"General" = "一般";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "全般情報";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "全体ダウンロード制限";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "全体アップロード制限";
+
+/* Tracker last announce */
+"got %lu peers" = "%lu ピア取得";
+
+/* Tracker last announce */
+"got 1 peer" = "1 ピア取得";
+
+/* Groups -> Name */
+"Gray" = "グレー";
+
+/* Groups -> Name */
+"Green" = "グリーン";
+
+/* Groups -> Button */
+"Group" = "グループ";
+
+/* Preferences -> toolbar item title */
+"Groups" = "グループ";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "絞り込みバーを隠す";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "インスペクタを隠す";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "ステータスバーを隠す";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "ツールバーを非表示";
+
+/* File Outline -> Priority Menu */
+"High" = "高";
+
+/* files tab -> tooltip */
+"High Priority" = "優先度高";
+
+/* Legal alert -> button */
+"I Accept" = "同意";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "取得済みのデータを使用するなら、ルートのデータフォルダは保存先のフォルダの中にあるべきです。";
+
+/* Torrent -> eta string */
+"inactive" = "未稼働";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "情報";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "インスペクタ";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "トレントファイルのアドレス:";
+
+/* inspector -> peer table -> header */
+"IP Address" = "IP アドレス";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "ファイル「%1$@」(%2$@) はトレントファイルではないようです。";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "KB/s";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
+
+/* Tracker last announce */
+"Last Announce" = "最終アナウンス";
+
+/* Tracker last scrape */
+"Last Scrape" = "最終スクレイプ";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "最終更新";
+
+/* tracker peer stat */
+"Leechers" = "リーチャー";
+
+/* About window -> license button */
+"License" = "ライセンス";
+
+/* torrent action menu -> upload/download limit */
+"Limit (%ld KB/s)" = "制限 (%ld KB/s)";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "ログを保存できません";
+
+/* File Outline -> Priority Menu */
+"Low" = "低";
+
+/* files tab -> tooltip */
+"Low Priority" = "優先度低";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "マグネットリンクは既に存在する転送と重複しています。";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "マグネット転送";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "MB/s";
+
+/* Message window -> table column */
+"Message" = "メッセージ";
+
+/* Message window -> title */
+"Message Log" = "メッセージログ";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "複数のプロパティ";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "なし";
+
+/* Filter Bar -> filter menu */
+"Name" = "名前";
+
+/* Preferences -> toolbar item title */
+"Network" = "ネットワーク";
+
+/* Prefs -> blocklist -> message */
+"Never" = "しない";
+
+/* Inspector -> tracker table */
+"New Tier" = "新規ティア";
+
+/* Tracker next announce */
+"Next announce in %@" = "%@ で次のアナウンス";
+
+/* Group table row */
+"No Group" = "グループなし";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "トレントの選択なし";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "なし";
+
+/* Donation beg -> button */
+"Nope" = "いいえ";
+
+/* File Outline -> Priority Menu */
+"Normal" = "通常";
+
+/* files tab -> tooltip */
+"Normal Priority" = "優先度通常";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "「%@」を完全にダウンロードするためにディスク容量が十分ではありません。";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "OK";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "一度削除すると、その転送を続行するにはトレントファイルかマグネットリンクが必要になります。";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "一度削除すると、その転送を続行するにはトレントファイルかマグネットリンクが必要になります。";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "一度削除すると、Transmission はそこへ通信しなくなります。これは元に戻せません。";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "一度削除すると、Transmission はそこへ通信しなくなります。これは元に戻せません。";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "選択項目のみチェック";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "開く";
+
+/* Open address toolbar item -> label */
+"Open Address" = "アドレスを開く";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "トレントのアドレスを開く";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "トレントのファイルを開く";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "トレントのファイルを開く";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "トレントのウェブアドレスを開く";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "オプション";
+
+/* Groups -> Name */
+"Orange" = "オレンジ";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "部分的シード";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "すべて停止/再開";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "選択項目を停止/再開";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "すべて停止";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "すべての転送を停止";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "選択を停止";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "選択した転送を停止";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "転送を停止";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "一時停止";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "ピアがあなたをアンチョークしているが影響なし";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "ピアはアップロードを望みますがあなたはそうしません (インタレストありチョークあり)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "ピア";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "ポート確認サイトの反応なし";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "ポートは閉じています";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "ポートは開いています";
+
+/* Inspector -> Peers tab -> table row tooltip */
+/* "Port: %@" = ""; */
+
+/* No comment provided by engineer. */
+/* "PrefWindowSize" = ""; */
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "優先度";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "優先度なし";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "非公開トレント、非トラッカーピア探索無効";
+
+/* Message window -> table column */
+"Process" = "処理";
+
+/* Blocklist -> message */
+"Processing blocklist" = "ブロックリストの処理中";
+
+/* Stats window -> label */
+"Program Started" = "プログラム実行";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "進行率: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "プロトコル: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "公開トレント";
+
+/* Groups -> Name */
+"Purple" = "パープル";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "クイックルック";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "終了";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "共有比";
+
+/* Groups -> Name */
+"Red" = "レッド";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "残り時間不明";
+
+/* Preferences -> toolbar item title */
+"Remote" = "リモート";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "除去";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "シード完了した転送項目をすべて除去";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "選択を除去";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "選択したトラッカーを削除";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "選択した転送を除去";
+
+/* rename sheet button */
+"Rename" = "名前の変更";
+
+/* File Outline -> Menu */
+"Rename File" = "ファイル名の変更";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "ファイル名「%@」の変更;";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "初期化";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "すべて再開";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "すべての転送を再開";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "選択項目を再開";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "選択した転送を再開";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "転送を再開";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "すぐに転送を再開";
+
+/* Stats window -> label */
+"Running Time" = "起動時間";
+
+/* Message window -> save button */
+"Save" = "保存";
+
+/* Tracker last scrape */
+"Scrape error" = "スクレイプのエラー";
+
+/* Tracker last scrape */
+"Scrape timed out" = "スクレイプがタイムアウト";
+
+/* tracker peer stat */
+"Seeders" = "シーダー";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "シード中";
+
+/* Torrent -> status string */
+"Seeding complete" = "シード完了";
+
+/* notification title */
+"Seeding Complete" = "シード完了";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "%2$lu ピアの %1$lu へシード中";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = "1ピアの %u へシード中";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "選択";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "トレントファイル用のファイルかフォルダを選択。";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "「%@」のダウンロードフォルダを選択";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "トレントファイルの名前と場所を選択";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "%lu データファイル用の新しいフォルダを選択";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "「%@」の新規フォルダを選択します。";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "セッション比率";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "セッション転送";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "共有";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "トレントファイルを共有";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "全体設定の変更用のショートカットです。";
+
+/* notification button */
+"Show" = "表示";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "絞り込みバーを表示";
+
+/* File Outline -> Menu */
+"Show in Finder" = "Finder で表示";
+
+/* View menu -> Inspector */
+"Show Inspector" = "インスペクタを表示";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "ステータスバーを表示";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "データファイルを Finder で表示";
+
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "速度制限";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "速度制限を自動で無効化";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "速度制限を自動で有効化";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "速度制限は、その制限にて総帯域幅制限が上書きされます。";
+
+/* Torrent -> status string */
+"Stalled" = "停滞";
+
+/* Stats window -> title */
+"Statistics" = "統計情報";
+
+/* torrent action menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "この共有比で停止 (%.2f)";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "開始の待機を停止";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "オープンソースの自主製作ソフトを支援";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "TB/s";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "選択されたファイルの場所が存在しません。";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "保存先のフォルダとルートのデータフォルダが同じ名前です。";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "フォルダ「%@」は存在しません。トレントファイルの作成には、このフォルダを作成するか別のフォルダを選択してください。";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "マグネットリンク 「%@」は追加できません。 既に存在する転送と重複しています。";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "「%@」の移動は完了しませんでした。";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "指定のブロックリストには正しい規則が含まれていませんでした。";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "トレントを %1$@ からダウンロードできません: %2$@。";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "トレントファイル「%@」が見つかりません。";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "トレントファイルが開けません。無効なデータが含まれます。";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "ファイルの合計サイズが0バイトです。";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "この転送は追加できません。 既に存在する転送と重複しています。";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "転送は停止されます。続行するには %@ の容量を空けるか、トレントのインスペクタからファイルの選択を外してください。";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "この転送は、ピアのためにトラッカーと通信せず、また PEX と DHT のようなダウンロードとシード用に非トラッカーのピア探索方法のみに頼ることになります。";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "%1$lu 転送項目あり(%2$lu 稼働).";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "終了時に一時停止される稼働中の %lu 個の転送項目があります。次回の起動時に自動で再開されます。";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "稼働中の %lu 個の転送項目。";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "トラッカーのアドレスがありません。";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "既に Transmission のプログラムが実行中です。そのプログラムが終了するまでこのコピーは起動できません。";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "終了時に停止された稼働中の転送があります。この転送は次回の起動時に自動的に再開されます。";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "トレントファイルの作成には 1つ以上のファイル化フォルダが必要です。";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "ファイル「%@」作成中に問題が発生しました。";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "データファイル移動中にエラーが発生。";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "マグネットリンク「%@」の追加時にエラーが発生しました。転送されません。";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "フォルダ内にファイルがありません。";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "転送中です。一度削除すると、その転送を続行するにはトレントファイルかマグネットリンクが必要になります。";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Transmission 全体統計を消去します。個々の転送の統計情報には影響ありません。";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "ティア %ld";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "絞り込みを切り替え";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "インスペクタの切り替え";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "絞り込みバーを切り替え";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "トレント・インスペクタを切り替え";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "トレントのダウンロード失敗";
+
+/* notification title */
+"Torrent File Auto Added" = "トレントファイルを自動で追加しました";
+
+/* Inspector -> title */
+"Torrent Inspector" = "トレント・インスペクタ";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "トレントメタ情報が必要";
+
+/* stats total */
+"Total N/A" = "合計なし";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "全体比率";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "総転送";
+
+/* Message window -> level */
+"Trace" = "トレース";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "トラッカー";
+
+/* Torrent -> status string */
+"Tracker returned error" = "トラッカーがエラーを返送";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "トラッカーが警告を返送";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "トラッカーはバックアップに使われます";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "トラッカー";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "転送未稼働";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "転送";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "転送未稼働";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission はファイル共有プログラムです。トレントを利用すると、アップロードを通じてそのデータを他者が入手できるようになります。適切に判断し現地の法律を遵守する責任は、あなた自身にあります。";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission は完全機能を備えたトレント用アプリです。開発、コードの作成また改良に多くの労力が費やされています。気に入っていただけているなら寄付によっていいね！することもできます。";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Transmission は既に実行中です。";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "上り";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "%lu へUL";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "選択項目のチェックを外す";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "無制限";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "読み取り不可能なエラー";
+
+/* Save log panel -> default file name */
+"untitled" = "無題";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "アップロード速度";
+
+/* Stats window -> label */
+"Uploaded" = "アップロード";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "アップロード %1$@ (共有比: %2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "ピアへアップロード中";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "取得済みデータ確認を待機中";
+
+/* Torrent -> status string */
+"Waiting to download" = "ダウンロードを待機中";
+
+/* Torrent -> status string */
+"Waiting to seed" = "シードを待機中";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "警告";
+
+/* Drag overlay -> url */
+"Web Address" = "ウェブアドレス";
+
+/* Torrent -> status string */
+"web seed" = "ウェブシード";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "ウェブシード";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "Transmission のご利用を歓迎します";
+
+/* Groups -> Name */
+"Yellow" = "イエロー";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "このピアをアンチョークしているがピアには影響なし";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "ダウンロードしたいがピアが送信しません (インタレストありチョークあり)";
+
