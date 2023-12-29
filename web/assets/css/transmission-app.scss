@@ -101,12 +101,12 @@
     --color-fg-disabled: #808088;
     --color-bg-warn: #cf6679;
     --color-fg-warn: var(--dark-mode-black);
-    --color-border: var(--dark-mode-white);
-    --color-border-selected: var(--grey-500);
+    --color-border-stark: var(--dark-mode-white);
+    --color-border-starkest: var(--grey-500);
     --color-fg-tertiary: var(--grey-500);
     --color-fg-selected: var(--dark-mode-white);
     --color-bg-selected: var(--default-accent-color-dark);
-    --color-default-border: var(--default-border-dark);
+    --color-border-default: var(--default-border-dark);
     --color-progressbar-seed-1: var(--green-100);
     --color-progressbar-seed-2: var(--green-400);
     --color-progressbar-paused: var(--grey-500);
@@ -125,15 +125,16 @@
       --color-fg-disabled: var(--white);
       --color-bg-warn: #cf6679;
       --color-fg-warn: var(--black);
-      --color-border: var(--white);
-      --color-border-selected: var(--white);
+      --color-border-default: var(--white);
+      --color-border-stark: var(--white);
+      --color-border-starkest: var(--white);
       --color-fg-tertiary: var(--white);
       --color-toolbar-background: var(--black);
       --color-fg-selected: var(--white);
       --color-bg-selected: var(--blue-300);
       --color-bg-tabs: var(--black);
       --color-fg-tabs: var(--white);
-      --color-default-border: var(--white);
+
       --color-progressbar-seed-1: var(--black);
       --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -161,15 +162,15 @@
     --color-fg-primary: #404040;
     --color-fg-on-popup: var(--grey-900);
     --color-fg-secondary: var(--grey-500);
-    --color-border: var(--grey-500);
-    --color-border-selected: #d0d7de;
+    --color-border-default: var(--default-border-light);
+    --color-border-stark: var(--grey-500);
+    --color-border-starkest: #d0d7de;
     --color-fg-tertiary: var(--grey-500);
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
     --color-fg-disabled: var(--grey-500);
     --color-fg-selected: var(--nice-grey);
     --color-bg-selected: var(--blue-300);
-    --color-default-border: var(--default-border-light);
     --color-dialog-border: var(--nice-grey);
     --color-progressbar-seed-1: var(--green-500);
     --color-progressbar-seed-2: var(--green-300);
@@ -187,15 +188,15 @@
       --color-fg-disabled: var(--black);
       --color-bg-warn: #cf6679;
       --color-fg-warn: var(--white);
-      --color-border: var(--black);
-      --color-border-selected: var(--black);
+      --color-border-stark: var(--black);
+      --color-border-starkest: var(--black);
       --color-fg-tertiary: var(--black);
       --color-toolbar-background: var(--white);
       --color-fg-selected: var(--white);
       --color-bg-selected: var(--blue-300);
       --color-bg-tabs: var(--white);
       --color-fg-tabs: var(--black);
-      --color-default-border: var(--black);
+      --color-border-default: var(--black);
       --color-progressbar-seed-1: var(--black);
       --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -277,7 +278,7 @@ a {
 #mainwin-toolbar {
   align-items: center;
   background: var(--color-toolbar-background);
-  border-bottom: 1px solid var(--color-default-border);
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   flex-direction: row;
   height: var(--toolbar-height);
@@ -319,7 +320,7 @@ a {
   }
 
   > .toolbar-separator {
-    border-left: 1px solid var(--color-default-border);
+    border-left: 1px solid var(--color-border-default);
     height: 25px;
     margin: 0 6px 0 0;
   }
@@ -356,7 +357,7 @@ a {
   white-space: nowrap;
   align-items: center;
   background: var(--color-toolbar-background);
-  border-bottom: 1px solid var(--color-default-border);
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   flex-direction: row;
   height: 30px;
@@ -434,7 +435,7 @@ a {
   }
 
   .torrent {
-    border-bottom: 1px solid var(--color-default-border);
+    border-bottom: 1px solid var(--color-border-default);
 
     .icon {
       // color the background svg fill
@@ -525,7 +526,7 @@ a {
       padding: 0 8px;
       margin: 0 2px;
       border-radius: 1em;
-      border: 1px solid var(--color-default-border);
+      border: 1px solid var(--color-border-default);
     }
 
     .torrent-progress-details.error,
@@ -660,7 +661,7 @@ a {
 
   .torrent-progress-bar {
     background-repeat: no-repeat;
-    border-color: var(--color-border-selected);
+    border-color: var(--color-border-starkest);
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
@@ -761,7 +762,7 @@ a {
     left: 0;
   }
   @include for-tablet-portrait-up {
-    border-left: 1px solid var(--color-default-border);
+    border-left: 1px solid var(--color-border-default);
     width: 570px;
   }
 }
@@ -942,7 +943,7 @@ a {
 .tabs-buttons {
   align-self: center;
   background-color: var(--color-bg-tabs);
-  border: 1px solid var(--color-border-selected);
+  border: 1px solid var(--color-border-starkest);
   border-radius: 6px;
   display: flex;
   margin: 10px 0;
@@ -1025,7 +1026,7 @@ a {
 
 .inspector-info-magnet {
   button {
-    background-color: var(--color-border);
+    background-color: var(--color-fg-primary);
 
     background-position: top;
     background-repeat: no-repeat;
@@ -1167,7 +1168,7 @@ a {
 // Peers Tab
 
 .peer-list {
-  --table-border: 1px solid var(--color-default-border);
+  --table-border: 1px solid var(--color-border-default);
 
   border: var(--table-border);
   border-collapse: collapse;
@@ -1201,7 +1202,7 @@ a {
 
   .encryption {
     &[data-encrypted='true'] {
-      background-color: var(--color-border-selected);
+      background-color: var(--color-border-starkest);
       -webkit-mask: var(--image-lock-fill) no-repeat center / 14px;
       mask: var(--image-lock-fill) no-repeat center / 14px;
       width: 10px;
@@ -1261,11 +1262,11 @@ a {
 
   > * {
     appearance: none;
-    background-color: var(--color-border-selected);
+    background-color: var(--color-border-starkest);
     background-position: center;
     background-repeat: no-repeat;
     background-size: 10px, 20px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-stark);
     border-radius: 0;
     height: 20px;
     margin: 0;
@@ -1542,7 +1543,7 @@ a {
   button {
     appearance: none;
     background: var(--color-bg-primary);
-    border: 1px solid var(--color-default-border);
+    border: 1px solid var(--color-border-default);
     border-radius: 5px;
     color: var(--color-fg-primary);
     margin-left: 8px;
@@ -1659,7 +1660,7 @@ dialog {
 
   th,
   td {
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-stark);
     padding: 5px 10px;
   }
 }
@@ -1730,7 +1731,7 @@ dialog {
 
 .dropzone {
   background: var(--color-bg-primary);
-  border: 2px dashed var(--color-border);
+  border: 2px dashed var(--color-border-stark);
   border-radius: 5px;
   color: var(--color-fg-primary);
   cursor: pointer;
