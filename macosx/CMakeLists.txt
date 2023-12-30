@@ -179,8 +179,6 @@ target_sources(${TR_NAME}-mac
         TrackerTableView.mm
         URLSheetWindowController.h
         URLSheetWindowController.mm
-        VersionComparator.h
-        VersionComparator.mm
         WebSeedTableView.h
         WebSeedTableView.mm)
 
