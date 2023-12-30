@@ -109,6 +109,11 @@ else()
     set(TR_STABLE_RELEASE 1)
 endif()
 
+# derived from above: lib version
+math(EXPR TR_LIB_VERSION_MAJOR "${TR_VERSION_MAJOR} + 14714")
+math(EXPR TR_LIB_VERSION_MINOR "${TR_VERSION_MINOR}")
+math(EXPR TR_LIB_VERSION_PATCH "${TR_VERSION_PATCH} * 100 + 0${TR_VERSION_BETA_NUMBER}")
+
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
 # '4.0.0-beta.1.dev' (a dev release between beta 1 and 2)
