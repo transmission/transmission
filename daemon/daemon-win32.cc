@@ -39,7 +39,7 @@ static void set_system_error(tr_error** error, DWORD code, char const* message)
 static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     auto const system_message = tr_win32_format_message(code);
-    tr_logAddMessage(file, line, level, "tr_daemon", fmt::format("[tr_daemon] {} ({:#x}): {}", message, code, system_message));
+    tr_logAddMessage(file, line, level, fmt::format("{} ({:#x}): {}", message, code, system_message), "tr_daemon");
 }
 
 #define log_system_error(level, code, message) \
