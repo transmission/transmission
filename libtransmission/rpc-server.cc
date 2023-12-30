@@ -881,8 +881,8 @@ void tr_rpc_server::load(tr_variant const& src)
         // NOTE: bind_address_ is default initialized to INADDR_ANY
         tr_logAddWarn(fmt::format(
             _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
-            fmt::format("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
-            fmt::format("value", bind_address_str_)));
+            fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
+            fmt::arg("value", bind_address_str_)));
     }
 
     if (bind_address_->is_unix_addr())
