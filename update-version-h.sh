@@ -21,6 +21,9 @@ if grep -q 'set[(]TR_VERSION_DEV TRUE)' CMakeLists.txt; then
 else
   is_dev=false
 fi
+if [ "$is_dev" != true ] && [ -z "${beta_number}" ]; then
+  release_number=1
+fi
 
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
@@ -90,7 +93,7 @@ cat > libtransmission/version.h.new << EOF
 #define SHORT_VERSION_STRING      "${user_agent_prefix}"
 #define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
 #define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
-#define BUILD_STRING_INFOPLIST    $((major_version + 14714)).${minor_version}.$((patch_version * 100 + beta_number))
+#define BUILD_STRING_INFOPLIST    $((major_version + 14714)).${minor_version}.$((patch_version * 100 + release_number * 99 + beta_number))
 #define MAJOR_VERSION             ${major_version}
 #define MINOR_VERSION             ${minor_version}
 #define PATCH_VERSION             ${patch_version}
