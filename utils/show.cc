@@ -47,7 +47,7 @@ auto constexpr TimeoutSecs = std::chrono::seconds{ 30 };
 char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 
-auto options = std::array<tr_option, 14>{
+auto options = std::array<tr_option, 15>{
     { { 'd', "header", "Show only header section", "d", false, nullptr },
       { 'i', "info", "Show only info section", "i", false, nullptr },
       { 't', "trackers", "Show only trackers section", "t", false, nullptr },
@@ -60,6 +60,7 @@ auto options = std::array<tr_option, 14>{
       { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
       { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
       { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
+      { 'v', "verify", "Verify the torrent", "v", true, "<dir>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
@@ -67,6 +68,7 @@ auto options = std::array<tr_option, 14>{
 struct app_opts
 {
     std::string_view filename;
+    char const* verify = nullptr;
     bool scrape = false;
     bool show_magnet = false;
     bool show_version = false;
@@ -145,6 +147,10 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 
         case 'u':
             opts.unsorted = true;
+            break;
+
+        case 'v':
+            opts.verify = optarg;
             break;
 
         case 'V':
@@ -261,7 +267,8 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     ***  Files
     **/
 
-    if (opts.print_files)
+    /* When */
+    if (opts.print_files && !opts.verify)
     {
         if (!opts.show_bytesize)
         {
@@ -399,11 +406,134 @@ void doScrape(tr_torrent_metainfo const& metainfo)
     }
 }
 
+namespace verify_cb
+{
+
+struct Status
+{
+    tr_file_index_t index;
+    bool ok;
+    std::vector<std::string> errors;
+};
+
+std::vector<Status> files;
+tr_file_index_t current_index;
+std::vector<std::string> errors;
+app_opts const* opts;
+tr_torrent_metainfo const* metainfo;
+
+void print_file(Status const& status)
+{
+    fmt::print(
+        "  {:s} {:s} {:s}\n",
+        status.ok ? "OK  " : "FAIL",
+        metainfo->file_subpath(status.index),
+        Storage{ metainfo->file_size(status.index), Storage::Units::Bytes }.to_string());
+    for (auto const& file_error : status.errors)
+    {
+        fmt::print("    {}\n", file_error);
+    }
+}
+
+void verify_callback(tr_file_index_t index, bool ok, std::string_view error)
+{
+    if (index != current_index)
+    {
+        if (!errors.empty())
+        {
+            Status status;
+            status.index = current_index;
+            status.ok = false;
+            status.errors = errors;
+            if (opts->unsorted)
+            {
+                print_file(status);
+            }
+            else
+            {
+                files.emplace_back(status);
+            }
+            errors.clear();
+        }
+        current_index = index;
+    }
+
+    if (ok)
+    {
+        if (opts->print_files)
+        {
+            Status status;
+            status.index = index;
+            status.ok = true;
+            if (opts->unsorted)
+            {
+                print_file(status);
+            }
+            else
+            {
+                files.emplace_back(status);
+            }
+        }
+    }
+    else
+    {
+        errors.push_back(std::string(error));
+    }
+}
+
+} // namespace verify_cb
+
+bool verify(app_opts const& opts, tr_torrent_metainfo const& metainfo)
+{
+    fmt::print("\nFILES\n\n");
+
+    verify_cb::current_index = 0;
+    verify_cb::opts = &opts;
+    verify_cb::metainfo = &metainfo;
+
+    std::string_view data_dir{ opts.verify };
+    bool all_ok = tr_torrentSynchronousVerify(metainfo, data_dir, verify_cb::verify_callback);
+    if (!verify_cb::errors.empty())
+    {
+        /* Last file has errors. Print or store the status as required. */
+        verify_cb::Status status;
+        status.index = verify_cb::current_index;
+        status.ok = false;
+        status.errors = verify_cb::errors;
+        if (opts.unsorted)
+        {
+            verify_cb::print_file(status);
+        }
+        else
+        {
+            verify_cb::files.emplace_back(status);
+        }
+    }
+
+    if (!opts.unsorted)
+    {
+        sort(
+            verify_cb::files.begin(),
+            verify_cb::files.end(),
+            [&metainfo](auto const& lhs, auto const& rhs)
+            { return metainfo.file_subpath(lhs.index) < metainfo.file_subpath(rhs.index); });
+
+        for (auto const& file : verify_cb::files)
+        {
+            verify_cb::print_file(file);
+        }
+    }
+
+    fmt::print("\nVerify: {:s}\n", all_ok ? "OK" : "FAIL");
+    return all_ok;
+}
+
 } // namespace
 
 int tr_main(int argc, char* argv[])
 {
     auto const init_mgr = tr_lib_init();
+    int exit_status = EXIT_SUCCESS;
 
     tr_locale_set_global("");
 
@@ -466,9 +596,17 @@ int tr_main(int argc, char* argv[])
         {
             showInfo(opts, metainfo);
         }
+        if (opts.verify)
+        {
+            bool ok = verify(opts, metainfo);
+            if (!ok)
+            {
+                exit_status = EXIT_FAILURE;
+            }
+        }
     }
 
     /* cleanup */
     putc('\n', stdout);
-    return EXIT_SUCCESS;
+    return exit_status;
 }
