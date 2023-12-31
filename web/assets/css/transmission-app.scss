@@ -104,6 +104,7 @@
     --color-border: var(--dark-mode-white);
     --color-border-selected: var(--grey-500);
     --color-fg-tertiary: var(--grey-500);
+    --color-fg-selected: var(--dark-mode-white);
     --color-bg-selected: var(--default-accent-color-dark);
     --color-default-border: var(--default-border-dark);
     --color-progressbar-seed-1: var(--green-100);
@@ -128,6 +129,7 @@
       --color-border-selected: var(--white);
       --color-fg-tertiary: var(--white);
       --color-toolbar-background: var(--black);
+      --color-fg-selected: var(--white);
       --color-bg-selected: var(--blue-300);
       --color-bg-tabs: var(--black);
       --color-fg-tabs: var(--white);
@@ -165,6 +167,7 @@
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
     --color-fg-disabled: var(--grey-500);
+    --color-fg-selected: var(--nice-grey);
     --color-bg-selected: var(--blue-300);
     --color-default-border: var(--default-border-light);
     --color-dialog-border: var(--nice-grey);
@@ -188,6 +191,7 @@
       --color-border-selected: var(--black);
       --color-fg-tertiary: var(--black);
       --color-toolbar-background: var(--white);
+      --color-fg-selected: var(--white);
       --color-bg-selected: var(--blue-300);
       --color-bg-tabs: var(--white);
       --color-fg-tabs: var(--black);
@@ -499,10 +503,6 @@ a {
         font-size: 1em;
         font-weight: normal;
       }
-
-      &:not(.paused) {
-        color: var(--color-fg-primary);
-      }
     }
 
     .torrent-labels {
@@ -535,7 +535,6 @@ a {
 
     .torrent-progress-details,
     .torrent-peer-details {
-      color: var(--color-fg-primary);
       font-size: small;
     }
 
@@ -584,12 +583,7 @@ a {
       }
 
       .torrent-name {
-        color: var(--color-fg-primary);
         grid-area: name;
-
-        &.paused {
-          color: var(--color-fg-disabled);
-        }
       }
 
       .torrent-labels {
@@ -615,8 +609,21 @@ a {
       }
     }
 
+    &.paused {
+      color: var(--color-fg-disabled);
+
+      .icon {
+        background-color: var(--color-fg-disabled);
+      }
+    }
+
     &.selected {
       background-color: var(--color-bg-selected);
+      color: var(--color-fg-selected);
+
+      .icon {
+        background-color: var(--color-fg-selected);
+      }
     }
   }
 
