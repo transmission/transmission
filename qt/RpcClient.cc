@@ -172,7 +172,7 @@ void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse>
     local_requests_.try_emplace(tag, promise);
     tr_rpc_request_exec_json(
         session_,
-        req.get(),
+        *req,
         [this](tr_session* /*sesson*/, tr_variant&& response)
         {
             if (verbose_)

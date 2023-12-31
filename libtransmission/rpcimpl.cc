@@ -2213,11 +2213,11 @@ void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
 
 } // namespace
 
-void tr_rpc_request_exec_json(tr_session* session, tr_variant const* request, tr_rpc_response_func&& callback)
+void tr_rpc_request_exec_json(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback)
 {
     auto const lock = session->unique_lock();
 
-    auto const* const request_map = request->get_if<tr_variant::Map>();
+    auto const* const request_map = request.get_if<tr_variant::Map>();
 
     if (callback == nullptr)
     {

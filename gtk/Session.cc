@@ -83,7 +83,7 @@ public:
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
 
-    void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
+    void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
 
     void commit_prefs_change(tr_quark key);
 
@@ -967,7 +967,7 @@ void Session::start_now(tr_torrent_id_t id)
     auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
-    exec(&top);
+    exec(top);
 }
 
 void Session::Impl::update()
@@ -1195,7 +1195,7 @@ void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 } // namespace
 
 void Session::Impl::send_rpc_request(
-    tr_variant const* request,
+    tr_variant const& request,
     int64_t tag,
     std::function<void(tr_variant&)> const& response_func)
 {
@@ -1231,7 +1231,7 @@ void Session::port_test()
     tr_variantDictAddStrView(&request, TR_KEY_method, "port-test");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        &request,
+        request,
         tag,
         [this](auto& response)
         {
@@ -1262,7 +1262,7 @@ void Session::blocklist_update()
     tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        &request,
+        request,
         tag,
         [this](auto& response)
         {
@@ -1288,7 +1288,7 @@ void Session::blocklist_update()
 ****
 ***/
 
-void Session::exec(tr_variant const* request)
+void Session::exec(tr_variant const& request)
 {
     auto const tag = nextTag;
     ++nextTag;

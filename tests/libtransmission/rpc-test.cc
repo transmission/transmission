@@ -80,7 +80,7 @@ TEST_F(RpcTest, sessionGet)
     auto response = tr_variant{};
     tr_rpc_request_exec_json(
         session_,
-        &request,
+        request,
         [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
@@ -199,7 +199,7 @@ TEST_F(RpcTest, torrentGet)
     auto response = tr_variant{};
     tr_rpc_request_exec_json(
         session_,
-        &request,
+        request,
         [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
@@ -211,7 +211,7 @@ TEST_F(RpcTest, torrentGet)
     EXPECT_EQ(1UL, tr_variantListSize(torrents));
 
     tr_variant* first_torrent = tr_variantListChild(torrents, 0);
-
+    EXPECT_TRUE(first_torrent != nullptr);
     EXPECT_TRUE(first_torrent->holds_alternative<tr_variant::Map>());
     int64_t first_torrent_id = 0;
     EXPECT_TRUE(tr_variantDictFindInt(first_torrent, TR_KEY_id, &first_torrent_id));
