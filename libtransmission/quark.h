@@ -67,6 +67,8 @@ enum
     TR_KEY_clientName,
     TR_KEY_comment,
     TR_KEY_comment_utf_8,
+    TR_KEY_compact_columns,
+    TR_KEY_compact_columns_state,
     TR_KEY_compact_view,
     TR_KEY_complete,
     TR_KEY_config_dir,

@@ -9,19 +9,19 @@
 
 #include "TorrentDelegate.h"
 
-class TorrentDelegateMin : public TorrentDelegate
+class ProgressbarDelegate : public TorrentDelegate
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TorrentDelegateMin)
+    TR_DISABLE_COPY_MOVE(ProgressbarDelegate)
 
 public:
-    explicit TorrentDelegateMin(QObject* parent = nullptr)
+    explicit ProgressbarDelegate(QObject* parent = nullptr)
         : TorrentDelegate{ parent }
     {
     }
 
 protected:
     // TorrentDelegate
-    QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const override;
-    void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const override;
+    QSize sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const override;
+    void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const override;
 };

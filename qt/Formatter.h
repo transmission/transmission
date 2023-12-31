@@ -1,4 +1,4 @@
-// This file Copyright © Mnemosyne LLC.
+// This file Copyright © 2012-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -38,6 +38,11 @@ public:
 
     [[nodiscard]] static QString storage_to_string(int64_t bytes);
     [[nodiscard]] static QString storage_to_string(uint64_t bytes);
+
+    [[nodiscard]] static auto bool_to_string(bool value)
+    {
+        return value ? tr("Yes") : tr("No");
+    }
 
     [[nodiscard]] static QString time_to_string(int seconds);
 };

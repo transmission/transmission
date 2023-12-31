@@ -5,31 +5,42 @@
 
 #pragma once
 
-#include <QListView>
+#include <QTableView>
 
 #include <libtransmission/tr-macros.h>
 
-class TorrentView : public QListView
+class TorrentView : public QTableView
 {
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TorrentView)
 
 public:
     explicit TorrentView(QWidget* parent = nullptr);
+    void linkPrefs(Prefs* prefs);
 
 public slots:
     void setHeaderText(QString const& text);
+    void setCompactView(bool active);
+    void setColumns(QString const& columns);
+    void setColumnsState(QByteArray const& columns_state);
+    void sortChanged(int logicalIndex, Qt::SortOrder order);
 
 signals:
     void headerDoubleClicked();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
+private slots:
+    void onPrefChanged(int key);
 
 private:
     class HeaderWidget;
 
     void adjustHeaderPosition();
 
+    Prefs* prefs_;
+    QByteArray column_state_ = {};
     HeaderWidget* const header_widget_ = {};
 };

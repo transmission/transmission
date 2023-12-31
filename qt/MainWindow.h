@@ -39,7 +39,7 @@ class Session;
 class SessionDialog;
 class StatsDialog;
 class TorrentDelegate;
-class TorrentDelegateMin;
+class ProgressbarDelegate;
 class TorrentModel;
 
 extern "C"
@@ -162,7 +162,7 @@ private:
     QSystemTrayIcon tray_icon_;
     TorrentFilter filter_model_;
     TorrentDelegate* torrent_delegate_ = {};
-    TorrentDelegateMin* torrent_delegate_min_ = {};
+    ProgressbarDelegate* torrent_delegate_min_ = {};
     time_t last_send_time_ = {};
     time_t last_read_time_ = {};
     QTimer network_timer_;

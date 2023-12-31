@@ -43,6 +43,8 @@ public:
         ASKQUIT,
         SORT_MODE,
         SORT_REVERSED,
+        COMPACT_COLUMNS,
+        COMPACT_COLUMNS_STATE,
         COMPACT_VIEW,
         FILTERBAR,
         STATUSBAR,

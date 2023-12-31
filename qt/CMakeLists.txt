@@ -66,6 +66,8 @@ target_sources(${TR_NAME}-qt
         Prefs.h
         PrefsDialog.cc
         PrefsDialog.h
+        ProgressbarDelegate.cc
+        ProgressbarDelegate.h
         RelocateDialog.cc
         RelocateDialog.h
         RpcClient.cc
@@ -87,8 +89,6 @@ target_sources(${TR_NAME}-qt
         Torrent.h
         TorrentDelegate.cc
         TorrentDelegate.h
-        TorrentDelegateMin.cc
-        TorrentDelegateMin.h
         TorrentFilter.cc
         TorrentFilter.h
         TorrentModel.cc

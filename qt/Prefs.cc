@@ -73,6 +73,8 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { ASKQUIT, TR_KEY_prompt_before_exit, QMetaType::Bool },
     { SORT_MODE, TR_KEY_sort_mode, CustomVariantType::SortModeType },
     { SORT_REVERSED, TR_KEY_sort_reversed, QMetaType::Bool },
+    { COMPACT_COLUMNS, TR_KEY_compact_columns, QMetaType::QString },
+    { COMPACT_COLUMNS_STATE, TR_KEY_compact_columns_state, QMetaType::QString },
     { COMPACT_VIEW, TR_KEY_compact_view, QMetaType::Bool },
     { FILTERBAR, TR_KEY_show_filterbar, QMetaType::Bool },
     { STATUSBAR, TR_KEY_show_statusbar, QMetaType::Bool },
@@ -430,8 +432,12 @@ tr_variant Prefs::get_default_app_settings()
 
     auto const download_dir = tr_getDefaultDownloadDir();
 
+    auto const compact_columns = std::string_view{ "100000000000000000000" };
+
     auto settings = tr_variant::Map{};
     settings.try_emplace(TR_KEY_blocklist_updates_enabled, true);
+    settings.try_emplace(TR_KEY_compact_columns, compact_columns);
+    settings.try_emplace(TR_KEY_compact_columns_state, std::string_view{});
     settings.try_emplace(TR_KEY_compact_view, false);
     settings.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
     settings.try_emplace(TR_KEY_prompt_before_exit, true);

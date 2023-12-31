@@ -34,6 +34,7 @@
 #include "FreeSpaceLabel.h"
 #include "Prefs.h"
 #include "Session.h"
+#include "TorrentModel.h"
 #include "Utils.h"
 
 // ---
@@ -234,6 +235,25 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     }
 }
 
+void PrefsDialog::linkColumnCheckboxToPref(QWidget* widget, int column)
+{
+    PreferenceWidget pref_widget(widget);
+
+    pref_widget.setPrefKey(Prefs::COMPACT_COLUMNS);
+
+    // update widget value
+    bool const checked = prefs_.getString(Prefs::COMPACT_COLUMNS)[column] == QStringLiteral("1");
+
+    pref_widget.as<QCheckBox>()->setChecked(checked);
+
+    widgets_.try_emplace(Prefs::COMPACT_COLUMNS, widget);
+
+    if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
+    {
+        connect(check_box, &QAbstractButton::toggled, this, [=](bool checked) { columnCheckBoxToggled(checked, column); });
+    }
+}
+
 static bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
 {
     if (ancestor == nullptr)
@@ -282,6 +302,27 @@ void PrefsDialog::checkBoxToggled(bool checked)
     if (pref_widget.is<QCheckBox>())
     {
         setPref(pref_widget.getPrefKey(), checked);
+    }
+}
+
+void PrefsDialog::columnCheckBoxToggled(bool checked, int column)
+{
+    PreferenceWidget const pref_widget(sender());
+
+    if (pref_widget.is<QCheckBox>())
+    {
+        auto str = prefs_.getString(Prefs::COMPACT_COLUMNS);
+
+        if (checked)
+        {
+            str.replace(column, 1, QStringLiteral("1"));
+        }
+        else
+        {
+            str.replace(column, 1, QStringLiteral("0"));
+        }
+
+        setPref(Prefs::COMPACT_COLUMNS, str);
     }
 }
 
@@ -427,6 +468,28 @@ void PrefsDialog::initDesktopTab()
     linkWidgetToPref(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
     linkWidgetToPref(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
     linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
+
+    linkColumnCheckboxToPref(ui_.nameCheckBox, TorrentModel::COL_NAME);
+    linkColumnCheckboxToPref(ui_.privateCheckBox, TorrentModel::COL_PRIVATE);
+    linkColumnCheckboxToPref(ui_.statusCheckBox, TorrentModel::COL_STATUS);
+    linkColumnCheckboxToPref(ui_.sizeCheckBox, TorrentModel::COL_SIZE);
+    linkColumnCheckboxToPref(ui_.seedingTimeCheckBox, TorrentModel::COL_SEEDING_TIME);
+    linkColumnCheckboxToPref(ui_.seedsCheckBox, TorrentModel::COL_SEEDS);
+    linkColumnCheckboxToPref(ui_.peersCheckBox, TorrentModel::COL_PEERS);
+    linkColumnCheckboxToPref(ui_.activityCheckBox, TorrentModel::COL_ACTIVITY);
+    linkColumnCheckboxToPref(ui_.etaCheckBox, TorrentModel::COL_ETA);
+    linkColumnCheckboxToPref(ui_.ratioCheckBox, TorrentModel::COL_RATIO);
+    linkColumnCheckboxToPref(ui_.downloadedCheckBox, TorrentModel::COL_DOWNLOADED);
+    linkColumnCheckboxToPref(ui_.uploadedCheckBox, TorrentModel::COL_UPLOADED);
+    linkColumnCheckboxToPref(ui_.progressCheckBox, TorrentModel::COL_PROGRESS);
+    linkColumnCheckboxToPref(ui_.trackerStatusCheckBox, TorrentModel::COL_TRACKER_STATUS);
+    linkColumnCheckboxToPref(ui_.addedOnCheckBox, TorrentModel::COL_ADDED_ON);
+    linkColumnCheckboxToPref(ui_.lastActiveCheckBox, TorrentModel::COL_LAST_ACTIVE);
+    linkColumnCheckboxToPref(ui_.pathCheckBox, TorrentModel::COL_PATH);
+    linkColumnCheckboxToPref(ui_.priorityCheckBox, TorrentModel::COL_PRIORITY);
+    linkColumnCheckboxToPref(ui_.queuePositionCheckBox, TorrentModel::COL_QUEUE_POSITION);
+    linkColumnCheckboxToPref(ui_.sizeLeftCheckBox, TorrentModel::COL_SIZE_LEFT);
+    linkColumnCheckboxToPref(ui_.idCheckBox, TorrentModel::COL_ID);
 }
 
 /***

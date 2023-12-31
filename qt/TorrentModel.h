@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <QAbstractListModel>
+#include <QAbstractTableModel>
 
 #include <libtransmission/tr-macros.h>
 
@@ -24,12 +24,39 @@ extern "C"
     struct tr_variant;
 }
 
-class TorrentModel : public QAbstractListModel
+class TorrentModel : public QAbstractTableModel
 {
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TorrentModel)
 
 public:
+    enum Columns
+    {
+        COL_NAME,
+        COL_PRIVATE,
+        COL_STATUS,
+        COL_SIZE,
+        COL_SEEDING_TIME,
+        COL_SEEDS,
+        COL_PEERS,
+        COL_ACTIVITY,
+        COL_ETA,
+        COL_RATIO,
+        COL_DOWNLOADED,
+        COL_UPLOADED,
+        COL_PROGRESS,
+        COL_TRACKER_STATUS,
+        COL_ADDED_ON,
+        COL_LAST_ACTIVE,
+        COL_PATH,
+        COL_PRIORITY,
+        COL_QUEUE_POSITION,
+        COL_SIZE_LEFT,
+        COL_ID,
+        //
+        NUM_COLUMNS
+    };
+
     enum Role
     {
         TorrentRole = Qt::UserRole
@@ -51,9 +78,11 @@ public:
         return torrents_;
     }
 
-    // QAbstractItemModel
+    // QAbstractTableModel
     int rowCount(QModelIndex const& parent = QModelIndex{}) const override;
+    int columnCount(QModelIndex const& parent = QModelIndex{}) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
 public slots:
     void updateTorrents(tr_variant* torrent_list, bool is_complete_list);

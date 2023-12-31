@@ -48,8 +48,6 @@ void TorrentFilter::onPrefChanged(int key)
 
     case Prefs::FILTER_MODE:
     case Prefs::FILTER_TRACKERS:
-    case Prefs::SORT_MODE:
-    case Prefs::SORT_REVERSED:
         msec = FastMSec;
         break;
     }
@@ -65,7 +63,6 @@ void TorrentFilter::onPrefChanged(int key)
 void TorrentFilter::refilter()
 {
     invalidate();
-    sort(0, prefs_.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
 /***

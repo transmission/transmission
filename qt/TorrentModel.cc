@@ -17,10 +17,15 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
+#include <QDateTime>
+#include <QTextOption>
+
+#include "Speed.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
 #include "VariantHelpers.h"
+#include "Formatter.h"
 
 using ::trqt::variant_helpers::getValue;
 
@@ -93,22 +98,260 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
     return torrents_.size();
 }
 
+int TorrentModel::columnCount(QModelIndex const& parent) const
+{
+    Q_UNUSED(parent)
+
+    return NUM_COLUMNS;
+}
+
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
-    auto const* const t = (index.isValid() && index.row() < rowCount()) ? torrents_.at(index.row()) : nullptr;
+    auto const* const t = (index.isValid() && index.row() < rowCount() && index.column() < columnCount()) ?
+        torrents_.at(index.row()) :
+        nullptr;
 
     if (t != nullptr)
     {
         switch (role)
         {
         case Qt::DisplayRole:
-            return t->name();
+            switch (index.column())
+            {
+            case COL_NAME:
+                return t->name();
+
+            case COL_PRIVATE:
+                return Formatter::bool_to_string(t->isPrivate());
+
+            case COL_STATUS:
+                return t->activityString();
+
+            case COL_SIZE:
+                return Formatter::storage_to_string(t->sizeWhenDone());
+
+            case COL_SEEDING_TIME:
+                return Formatter::time_to_string(static_cast<int>(std::difftime(std::time(nullptr), t->lastStarted())));
+
+            case COL_SEEDS:
+                return tr("%1 / %2").arg(t->peersWeAreUploadingTo()).arg(t->connectedPeers());
+
+            case COL_PEERS:
+                return tr("%1 / %2")
+                    .arg(t->peersWeAreDownloadingFrom() + t->webseedsWeAreDownloadingFrom())
+                    .arg(t->connectedPeersAndWebseeds());
+
+            case COL_ACTIVITY:
+                return tr("%1 / %2")
+                    .arg(t->downloadSpeed().to_download_qstring())
+                    .arg(t->uploadSpeed().to_upload_qstring());
+
+            case COL_ETA:
+                return Formatter::time_to_string(t->getETA());
+
+            case COL_RATIO:
+                return Formatter::ratio_to_string(t->ratio());
+
+            case COL_DOWNLOADED:
+                return Formatter::storage_to_string(t->downloadedEver());
+
+            case COL_UPLOADED:
+                return Formatter::storage_to_string(t->uploadedEver());
+
+            case COL_PROGRESS:
+                return Formatter::percent_to_string(t->percentDone());
+
+            case COL_TRACKER_STATUS:
+                if (!t->trackerStats().empty())
+                {
+                    switch (t->trackerStats().front().announce_state)
+                    {
+                    case TR_TRACKER_INACTIVE:
+                        return tr("Inactive");
+
+                    case TR_TRACKER_WAITING:
+                        return tr("Waiting");
+
+                    case TR_TRACKER_QUEUED:
+                        return tr("Queued");
+
+                    case TR_TRACKER_ACTIVE:
+                        return tr("Active");
+
+                    default:
+                        break;
+                    }
+                }
+                else
+                {
+                    return tr("None");
+                }
+
+            case COL_ADDED_ON:
+                return QDateTime::fromSecsSinceEpoch(t->dateAdded()).toString();
+
+            case COL_LAST_ACTIVE:
+                return QDateTime::fromSecsSinceEpoch(t->lastActivity()).toString();
+
+            case COL_PATH:
+                return t->getPath();
+
+            case COL_PRIORITY:
+                switch (t->getBandwidthPriority())
+                {
+                case TR_PRI_LOW:
+                    return tr("Low");
+
+                case TR_PRI_NORMAL:
+                    return tr("Normal");
+
+                case TR_PRI_HIGH:
+                    return tr("High");
+
+                default:
+                    break;
+                }
+
+            case COL_QUEUE_POSITION:
+                return t->queuePosition();
+
+            case COL_SIZE_LEFT:
+                return Formatter::storage_to_string(t->totalSize() - t->pieceSize() * t->pieceCount());
+
+            case COL_ID:
+                return t->id();
+
+            default:
+                break;
+            }
 
         case Qt::DecorationRole:
-            return t->getMimeTypeIcon();
+            switch (index.column())
+            {
+            case COL_NAME:
+                return t->getMimeTypeIcon();
+
+            case COL_STATUS:
+                if (t->isDownloading() || t->isWaitingToDownload())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("go-down"));
+                }
+                else if (t->isSeeding() || t->isWaitingToSeed())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("go-up"));
+                }
+                else if (t->isPaused())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("media-playback-pause"));
+                }
+                else if (t->isFinished())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("dialog-ok"));
+                }
+                else if (t->isVerifying() || t->isWaitingToVerify())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("view-refresh"));
+                }
+                else if (t->hasError())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("process-stop"));
+                }
+
+                return QIcon();
+
+            default:
+                return QIcon();
+            }
 
         case TorrentRole:
             return QVariant::fromValue(t);
+
+        case Qt::TextAlignmentRole:
+            if (index.column() == COL_NAME || index.column() == COL_STATUS || index.column() == COL_PATH)
+            {
+                return { Qt::AlignLeading | Qt::AlignVCenter };
+            }
+            else
+            {
+                return { Qt::AlignTrailing | Qt::AlignVCenter };
+            }
+
+        default:
+            break;
+        }
+    }
+
+    return {};
+}
+
+QVariant TorrentModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+        switch (section)
+        {
+        case COL_NAME:
+            return tr("Name");
+
+        case COL_PRIVATE:
+            return tr("Private");
+
+        case COL_STATUS:
+            return tr("Status");
+
+        case COL_SIZE:
+            return tr("Size");
+
+        case COL_SEEDING_TIME:
+            return tr("Seeding Time");
+
+        case COL_SEEDS:
+            return tr("Seeds");
+
+        case COL_PEERS:
+            return tr("Peers");
+
+        case COL_ACTIVITY:
+            return tr("Speeds");
+
+        case COL_ETA:
+            return tr("ETA");
+
+        case COL_RATIO:
+            return tr("Ratio");
+
+        case COL_DOWNLOADED:
+            return tr("Downloaded");
+
+        case COL_UPLOADED:
+            return tr("Uploaded");
+
+        case COL_PROGRESS:
+            return tr("Progress");
+
+        case COL_TRACKER_STATUS:
+            return tr("Tracker Status");
+
+        case COL_ADDED_ON:
+            return tr("Added on");
+
+        case COL_LAST_ACTIVE:
+            return tr("Last active");
+
+        case COL_PATH:
+            return tr("Path");
+
+        case COL_PRIORITY:
+            return tr("Priority");
+
+        case COL_QUEUE_POSITION:
+            return tr("Queue position");
+
+        case COL_SIZE_LEFT:
+            return tr("Size left");
+
+        case COL_ID:
+            return tr("Id");
 
         default:
             break;
@@ -427,7 +670,7 @@ void TorrentModel::rowsEmitChanged(torrent_ids_t const& ids)
 {
     for (auto const& [first, last] : getSpans(ids))
     {
-        emit dataChanged(index(first), index(last));
+        emit dataChanged(index(first, 0), index(last, this->columnCount() - 1));
     }
 }
 

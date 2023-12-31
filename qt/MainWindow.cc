@@ -1,4 +1,4 @@
-// This file Copyright © Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -39,7 +39,7 @@
 #include "Speed.h"
 #include "StatsDialog.h"
 #include "TorrentDelegate.h"
-#include "TorrentDelegateMin.h"
+#include "ProgressbarDelegate.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
@@ -129,7 +129,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     , lvp_style_{ std::make_shared<ListViewProxyStyle>() }
     , filter_model_{ prefs }
     , torrent_delegate_{ new TorrentDelegate{ this } }
-    , torrent_delegate_min_{ new TorrentDelegateMin{ this } }
+    , torrent_delegate_min_{ new ProgressbarDelegate{ this } }
     , network_timer_{ this }
     , refresh_timer_{ this }
 {
@@ -140,8 +140,9 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     ui_.setupUi(this);
 
-    ui_.listView->setStyle(lvp_style_.get());
-    ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
+    ui_.tableView->linkPrefs(&prefs);
+    ui_.tableView->setStyle(lvp_style_.get());
+    ui_.tableView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     auto const& icons = IconCache::get();
 
@@ -216,9 +217,9 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui_.action_SetLocation, &QAction::triggered, this, &MainWindow::setLocation);
     connect(ui_.action_Properties, &QAction::triggered, this, &MainWindow::openProperties);
     connect(ui_.action_SessionDialog, &QAction::triggered, this, &MainWindow::openSession);
-    connect(ui_.listView, &QAbstractItemView::activated, ui_.action_Properties, &QAction::trigger);
-    connect(ui_.action_SelectAll, &QAction::triggered, ui_.listView, &QAbstractItemView::selectAll);
-    connect(ui_.action_DeselectAll, &QAction::triggered, ui_.listView, &QAbstractItemView::clearSelection);
+    connect(ui_.tableView, &QAbstractItemView::activated, ui_.action_Properties, &QAction::trigger);
+    connect(ui_.action_SelectAll, &QAction::triggered, ui_.tableView, &QAbstractItemView::selectAll);
+    connect(ui_.action_DeselectAll, &QAction::triggered, ui_.tableView, &QAbstractItemView::clearSelection);
     connect(ui_.action_Quit, &QAction::triggered, qApp, &QCoreApplication::quit);
 
     auto refresh_action_sensitivity_soon = [this]()
@@ -240,8 +241,8 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&model_, &TorrentModel::rowsInserted, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::torrentsChanged, this, refresh_soon_adapter);
 
-    ui_.listView->setModel(&filter_model_);
-    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
+    ui_.tableView->setModel(&filter_model_);
+    connect(ui_.tableView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
     std::array<std::pair<QAction*, int>, 9> const sort_modes = { {
         { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
@@ -307,10 +308,11 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_header_soon);
     connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_header_soon);
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
-    connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
+    connect(ui_.tableView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
 
-    static std::array<int, 17> constexpr InitKeys = {
+    static std::array<int, 18> constexpr InitKeys = {
         Prefs::ALT_SPEED_LIMIT_ENABLED, //
+        Prefs::COMPACT_COLUMNS, //
         Prefs::COMPACT_VIEW, //
         Prefs::DSPEED, //
         Prefs::DSPEED_ENABLED, //
@@ -868,18 +870,18 @@ void MainWindow::refreshTorrentViewHeader()
 
     if (visible_count == total_count)
     {
-        ui_.listView->setHeaderText(QString{});
+        ui_.tableView->setHeaderText(QString{});
     }
     else
     {
-        ui_.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, total_count).arg(visible_count));
+        ui_.tableView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, total_count).arg(visible_count));
     }
 }
 
 void MainWindow::refreshActionSensitivity()
 {
-    auto const* model = ui_.listView->model();
-    auto const* selection_model = ui_.listView->selectionModel();
+    auto const* model = ui_.tableView->model();
+    auto const* selection_model = ui_.tableView->selectionModel();
     auto const row_count = model->rowCount();
 
     // count how many torrents are selected, paused, etc
@@ -975,7 +977,7 @@ torrent_ids_t MainWindow::getSelectedTorrents(bool with_metadata_only) const
 {
     torrent_ids_t ids;
 
-    for (QModelIndex const& index : ui_.listView->selectionModel()->selectedRows())
+    for (QModelIndex const& index : ui_.tableView->selectionModel()->selectedRows())
     {
         auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
 
@@ -1144,6 +1146,7 @@ void MainWindow::refreshPref(int key)
     auto b = bool{};
     auto i = int{};
     auto str = QString{};
+    auto ba = QByteArray{};
 
     switch (key)
     {
@@ -1224,10 +1227,25 @@ void MainWindow::refreshPref(int key)
         refreshSoon(REFRESH_TRAY_ICON);
         break;
 
+    case Prefs::COMPACT_COLUMNS:
+        str = prefs_.getString(Prefs::COMPACT_COLUMNS);
+        ui_.tableView->setColumns(str);
+        break;
+
+    case Prefs::COMPACT_COLUMNS_STATE:
+        str = prefs_.getString(Prefs::COMPACT_COLUMNS_STATE);
+        ba = QByteArray::fromBase64(str.toUtf8());
+        ui_.tableView->setColumns(str);
+        ui_.tableView->setColumnsState(ba);
+        break;
+
     case Prefs::COMPACT_VIEW:
         b = prefs_.getBool(key);
+        str = prefs_.getString(Prefs::COMPACT_COLUMNS);
         ui_.action_CompactView->setChecked(b);
-        ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
+        ui_.tableView->setItemDelegate(b ? new QStyledItemDelegate{} : torrent_delegate_);
+        ui_.tableView->setCompactView(b);
+        ui_.tableView->setColumns(str);
         break;
 
     case Prefs::MAIN_WINDOW_X:
@@ -1357,7 +1375,7 @@ void MainWindow::removeTorrents(bool const delete_files)
     int incomplete = 0;
     int connected = 0;
 
-    for (QModelIndex const& index : ui_.listView->selectionModel()->selectedRows())
+    for (QModelIndex const& index : ui_.tableView->selectionModel()->selectedRows())
     {
         auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
         ids.insert(tor->id());
@@ -1445,7 +1463,7 @@ void MainWindow::removeTorrents(bool const delete_files)
 
     if (msg_box.exec() == QMessageBox::Ok)
     {
-        ui_.listView->selectionModel()->clear();
+        ui_.tableView->selectionModel()->clear();
         session_.removeTorrents(ids, delete_files);
     }
 }
