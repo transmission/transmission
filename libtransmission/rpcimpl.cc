@@ -828,6 +828,7 @@ char const* torrentGet(
         torrents_vec.emplace_back(make_torrent_info(tor, format, std::data(keys), std::size(keys)));
     }
 
+    args_out.try_emplace(TR_KEY_torrents, std::move(torrents_vec));
     return nullptr; // no error message
 }
 
