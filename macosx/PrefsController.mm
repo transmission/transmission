@@ -791,7 +791,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     return static_cast<int>(components.hour * 60 + components.minute);
 }
 
-+ (NSDate*)timeSumToDate:(int)sum
++ (NSDate*)timeSumToDate:(NSInteger)sum
 {
     NSDateComponents* comps = [[NSDateComponents alloc] init];
     comps.hour = sum / 60;
@@ -1515,7 +1515,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         self.fQueueSeedField.integerValue = seedQueueNum;
 
         //check stalled handled by bindings
-        self.fStalledField.intValue = stalledMinutes;
+        self.fStalledField.integerValue = stalledMinutes;
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];

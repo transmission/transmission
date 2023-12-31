@@ -88,7 +88,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
         NSError* localError;
         if (![Torrent trashFile:@(filename) error:&localError])
         {
-            error->set(localError.code, localError.description.UTF8String);
+            error->set(static_cast<int>(localError.code), localError.description.UTF8String);
             return false;
         }
     }

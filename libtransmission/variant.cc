@@ -40,7 +40,7 @@ namespace
     return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
 }
 
-[[nodiscard]] constexpr int variant_index(tr_variant const* const var)
+[[nodiscard]] constexpr size_t variant_index(tr_variant const* const var)
 {
     if (var != nullptr)
     {

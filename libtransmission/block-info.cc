@@ -19,8 +19,8 @@ void tr_block_info::init_sizes(uint64_t const total_size_in, uint32_t const piec
 
     total_size_ = total_size_in;
     piece_size_ = piece_size_in;
-    n_pieces_ = (total_size_ + piece_size_ - 1) / piece_size_;
-    n_blocks_ = (total_size_ + BlockSize - 1) / BlockSize;
+    n_pieces_ = static_cast<tr_piece_index_t>((total_size_ + piece_size_ - 1) / piece_size_);
+    n_blocks_ = static_cast<tr_block_index_t>((total_size_ + BlockSize - 1) / BlockSize);
 
     uint32_t remainder = total_size_ % piece_size_;
     final_piece_size_ = remainder != 0U ? remainder : piece_size_;

@@ -30,7 +30,7 @@
 struct tr_variant
 {
 public:
-    enum Type
+    enum Type : size_t
     {
         NoneIndex = 0,
         BoolIndex = 1,
