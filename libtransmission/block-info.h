@@ -88,8 +88,8 @@ public:
             }
             else
             {
-                loc.block = byte_idx / BlockSize;
-                loc.piece = byte_idx / piece_size();
+                loc.block = static_cast<tr_block_index_t>(byte_idx / BlockSize);
+                loc.piece = static_cast<tr_piece_index_t>(byte_idx / piece_size());
             }
 
             loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * BlockSize));
