@@ -18,7 +18,7 @@
   </head>
   <body>
     <div id="app"></div>
-    <div class="mainwin">
+    <div id="mainwin">
       <header class="mainwin-toolbar" id="mainwin-toolbar">
         <button
           aria-keyshortcuts="Alt+O"
@@ -189,7 +189,7 @@
         </button>
       </header>
 
-      <header class="mainwin-filterbar" id="statusbar">
+      <header id="mainwin-statusbar">
         <span>Show</span>
         <select id="filter-mode">
           <option value="all">All</option>
@@ -203,7 +203,7 @@
         <input type="search" id="torrent-search" placeholder="Filter" />
         <span id="filter-count">&nbsp;</span>
         <span class="flexible-space"></span>
-        <div class="speed-dn-icon">
+        <div id="speed-dn-icon">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -220,7 +220,7 @@
           </svg>
         </div>
         <div id="speed-dn-label"></div>
-        <div class="speed-up-icon">
+        <div id="speed-up-icon">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -239,9 +239,9 @@
         <div id="speed-up-label"></div>
       </header>
 
-      <main class="mainwin-workarea">
+      <main id="mainwin-workarea">
         <div id="torrent-container">
-          <ul class="torrent-list flex" id="torrent-list"></ul>
+          <ul class="flex" id="torrent-list"></ul>
         </div>
       </main>
 
