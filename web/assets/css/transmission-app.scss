@@ -861,7 +861,6 @@ a {
 
   .alt-speed-label {
     font-size: smaller;
-    font-style: lighter;
     // nudge it up next to the section label
     margin: -10px 0 10px;
   }
@@ -1159,7 +1158,6 @@ a {
   .torrent-row td {
     background: var(--color-bg-odd);
     color: var(--color-fg-primary);
-    font-size: normal;
     font-weight: bolder;
     overflow-x: hidden;
     padding: 10px;
