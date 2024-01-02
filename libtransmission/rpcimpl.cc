@@ -1128,11 +1128,7 @@ void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char const* new
     tr_idle_function_done(data, error != 0 ? tr_strerror(error) : SuccessResult);
 }
 
-char const* torrentRenamePath(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    struct tr_rpc_idle_data* idle_data)
+char const* torrentRenamePath(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
     auto const torrents = getTorrents(session, args_in);
     if (std::size(torrents) != 1U)
@@ -1176,11 +1172,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     tr_idle_function_done(data, SuccessResult);
 }
 
-char const* portTest(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
     auto ip_proto = tr_web::FetchOptions::IPProtocol::ANY;
     if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_ipProtocol); val != nullptr)
@@ -1279,11 +1271,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     tr_idle_function_done(data, SuccessResult);
 }
 
-char const* blocklistUpdate(
-    tr_session* session,
-    tr_variant::Map const& /*args_in*/,
-    tr_variant::Map& /*args_out*/,
-    struct tr_rpc_idle_data* idle_data)
+char const* blocklistUpdate(tr_session* session, tr_variant::Map const& /*args_in*/, struct tr_rpc_idle_data* idle_data)
 {
     session->fetch({ session->blocklistUrl(), onBlocklistFetched, idle_data });
     return nullptr;
@@ -1382,11 +1370,7 @@ bool isCurlURL(std::string_view url)
     return files;
 }
 
-char const* torrentAdd(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* idle_data)
+char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_rpc_idle_data* idle_data)
 {
     TR_ASSERT(idle_data != nullptr);
 
@@ -2089,7 +2073,7 @@ char const* sessionClose(tr_session* session, tr_variant::Map const& /*args_in*/
 
 using SyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&);
 
-auto constexpr SyncHandlers = std::array<std::pair<std::string_view, SyncHandler>, 20>{ {
+auto constexpr SyncHandlers = std::array<std::pair<std::string_view, SyncHandler>, 20U>{ {
     { "free-space"sv, freeSpace },
     { "group-get"sv, groupGet },
     { "group-set"sv, groupSet },
@@ -2112,9 +2096,9 @@ auto constexpr SyncHandlers = std::array<std::pair<std::string_view, SyncHandler
     { "torrent-verify"sv, torrentVerify },
 } };
 
-using AsyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&, struct tr_rpc_idle_data*);
+using AsyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_rpc_idle_data*);
 
-auto constexpr AsyncHandlers = std::array<std::pair<std::string_view, AsyncHandler>, 4>{ {
+auto constexpr AsyncHandlers = std::array<std::pair<std::string_view, AsyncHandler>, 4U>{ {
     { "blocklist-update"sv, blocklistUpdate },
     { "port-test"sv, portTest },
     { "torrent-add"sv, torrentAdd },
@@ -2189,7 +2173,7 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
         data->session = session;
         data->tag = tag;
         data->callback = std::move(callback);
-        if (char const* const errmsg = (*handler->second)(session, *args_in, data->args_out, data); errmsg != nullptr)
+        if (char const* const errmsg = (*handler->second)(session, *args_in, data); errmsg != nullptr)
         {
             // Async operation failed prematurely? Invoke callback to ensure client gets a reply
             tr_idle_function_done(data, errmsg);
