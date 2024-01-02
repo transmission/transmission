@@ -81,14 +81,13 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
     auto response_map = tr_variant::Map{ 3U };
     response_map.try_emplace(TR_KEY_arguments, std::move(data->args_out));
     response_map.try_emplace(TR_KEY_result, result);
-    if (data->tag)
+    if (auto const& tag = data->tag; tag.has_value())
     {
-        response_map.try_emplace(TR_KEY_tag, *data->tag);
+        response_map.try_emplace(TR_KEY_tag, *tag);
     }
 
     // send the response back to the listener
-    auto response = tr_variant{ std::move(response_map) };
-    (data->callback)(data->session, std::move(response));
+    (data->callback)(data->session, tr_variant{ std::move(response_map) });
 
     // cleanup
     delete data;
@@ -116,12 +115,8 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
             if (*val == "recently-active"sv)
             {
                 auto const cutoff = tr_time() - RecentlyActiveSeconds;
-
-                std::copy_if(
-                    std::begin(torrents),
-                    std::end(torrents),
-                    std::back_inserter(torrents_vec),
-                    [cutoff](auto const* walk) { return walk->has_changed_since(cutoff); });
+                auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
+                std::copy(std::begin(recent), std::end(recent), std::back_inserter(torrents_vec));
             }
             else
             {
@@ -154,7 +149,7 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
     }
     else // all of them
     {
-        torrents_vec.assign(std::begin(torrents), std::end(torrents));
+        torrents_vec = torrents.get_all();
     }
 
     return torrents_vec;
