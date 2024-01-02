@@ -165,11 +165,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     session->rpcNotify(TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED);
 }
 
-char const* queueMoveTop(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveTop(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveTop(std::data(torrents), std::size(torrents));
@@ -177,11 +173,7 @@ char const* queueMoveTop(
     return nullptr;
 }
 
-char const* queueMoveUp(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveUp(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveUp(std::data(torrents), std::size(torrents));
@@ -189,11 +181,7 @@ char const* queueMoveUp(
     return nullptr;
 }
 
-char const* queueMoveDown(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveDown(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveDown(std::data(torrents), std::size(torrents));
@@ -201,11 +189,7 @@ char const* queueMoveDown(
     return nullptr;
 }
 
-char const* queueMoveBottom(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveBottom(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveBottom(std::data(torrents), std::size(torrents));
@@ -213,11 +197,7 @@ char const* queueMoveBottom(
     return nullptr;
 }
 
-char const* torrentStart(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentStart(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
@@ -233,11 +213,7 @@ char const* torrentStart(
     return nullptr;
 }
 
-char const* torrentStartNow(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentStartNow(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
@@ -253,11 +229,7 @@ char const* torrentStartNow(
     return nullptr;
 }
 
-char const* torrentStop(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentStop(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -271,11 +243,7 @@ char const* torrentStop(
     return nullptr;
 }
 
-char const* torrentRemove(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentRemove(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const delete_flag = args_in.value_if<bool>(TR_KEY_delete_local_data).value_or(false);
     auto const type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
@@ -291,11 +259,7 @@ char const* torrentRemove(
     return nullptr;
 }
 
-char const* torrentReannounce(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentReannounce(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -309,11 +273,7 @@ char const* torrentReannounce(
     return nullptr;
 }
 
-char const* torrentVerify(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentVerify(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -756,11 +716,7 @@ namespace make_torrent_field_helpers
                                        make_torrent_info_map(tor, fields, field_count);
 }
 
-char const* torrentGet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& args_out,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& args_out)
 {
     auto const torrents = getTorrents(session, args_in);
     auto torrents_vec = tr_variant::Vector{};
@@ -998,11 +954,7 @@ char const* remove_trackers(tr_torrent* tor, tr_variant::Vector const& ids_vec)
     return nullptr;
 }
 
-char const* torrentSet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     char const* errmsg = nullptr;
 
@@ -1140,11 +1092,7 @@ char const* torrentSet(
     return errmsg;
 }
 
-char const* torrentSetLocation(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentSetLocation(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const* const location = args_in.find_if<std::string_view>(TR_KEY_location);
     if (location == nullptr)
@@ -1579,11 +1527,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     }
 }
 
-[[nodiscard]] char const* groupGet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& args_out,
-    struct tr_rpc_idle_data* /*idle_data*/)
+[[nodiscard]] char const* groupGet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& args_out)
 {
     auto names = std::set<std::string_view>{};
     if (auto const iter = args_in.find(TR_KEY_name); iter != std::end(args_in))
@@ -1612,11 +1556,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     return nullptr;
 }
 
-char const* groupSet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    struct tr_rpc_idle_data* /*idle_data*/)
+char const* groupSet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const name = tr_strv_strip(args_in.value_if<std::string_view>(TR_KEY_name).value_or(""sv));
     if (std::empty(name))
@@ -1660,11 +1600,7 @@ char const* groupSet(
 
 // ---
 
-char const* sessionSet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const download_dir = args_in.value_if<std::string_view>(TR_KEY_download_dir);
     if (download_dir && tr_sys_path_is_relative(*download_dir))
@@ -1922,11 +1858,7 @@ char const* sessionSet(
     return nullptr;
 }
 
-char const* sessionStats(
-    tr_session* session,
-    tr_variant::Map const& /*args_in*/,
-    tr_variant::Map& args_out,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/, tr_variant::Map& args_out)
 {
     auto const make_stats_map = [](auto const& stats)
     {
@@ -2103,11 +2035,7 @@ namespace session_get_helpers
 }
 } // namespace session_get_helpers
 
-char const* sessionGet(
-    tr_session* session,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& args_out,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* sessionGet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& args_out)
 {
     using namespace session_get_helpers;
 
@@ -2122,11 +2050,7 @@ char const* sessionGet(
     return nullptr;
 }
 
-char const* freeSpace(
-    tr_session* /*session*/,
-    tr_variant::Map const& args_in,
-    tr_variant::Map& args_out,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* freeSpace(tr_session* /*session*/, tr_variant::Map const& args_in, tr_variant::Map& args_out)
 {
     auto const path = args_in.value_if<std::string_view>(TR_KEY_path);
     if (!path)
@@ -2155,11 +2079,7 @@ char const* freeSpace(
 
 // ---
 
-char const* sessionClose(
-    tr_session* session,
-    tr_variant::Map const& /*args_in*/,
-    tr_variant::Map& /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* sessionClose(tr_session* session, tr_variant::Map const& /*args_in*/, tr_variant::Map& /*args_out*/)
 {
     session->rpcNotify(TR_RPC_SESSION_CLOSE, nullptr);
     return nullptr;
@@ -2167,40 +2087,38 @@ char const* sessionClose(
 
 // ---
 
-using handler = char const* (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&, struct tr_rpc_idle_data*);
+using SyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&);
 
-struct rpc_method
-{
-    std::string_view name;
-    bool immediate;
-    handler func;
-};
+auto constexpr SyncHandlers = std::array<std::pair<std::string_view, SyncHandler>, 20>{ {
+    { "free-space"sv, freeSpace },
+    { "group-get"sv, groupGet },
+    { "group-set"sv, groupSet },
+    { "queue-move-bottom"sv, queueMoveBottom },
+    { "queue-move-down"sv, queueMoveDown },
+    { "queue-move-top"sv, queueMoveTop },
+    { "queue-move-up"sv, queueMoveUp },
+    { "session-close"sv, sessionClose },
+    { "session-get"sv, sessionGet },
+    { "session-set"sv, sessionSet },
+    { "session-stats"sv, sessionStats },
+    { "torrent-get"sv, torrentGet },
+    { "torrent-reannounce"sv, torrentReannounce },
+    { "torrent-remove"sv, torrentRemove },
+    { "torrent-set"sv, torrentSet },
+    { "torrent-set-location"sv, torrentSetLocation },
+    { "torrent-start"sv, torrentStart },
+    { "torrent-start-now"sv, torrentStartNow },
+    { "torrent-stop"sv, torrentStop },
+    { "torrent-verify"sv, torrentVerify },
+} };
 
-auto constexpr Methods = std::array<rpc_method, 24>{ {
-    { "blocklist-update"sv, false, blocklistUpdate },
-    { "free-space"sv, true, freeSpace },
-    { "group-get"sv, true, groupGet },
-    { "group-set"sv, true, groupSet },
-    { "port-test"sv, false, portTest },
-    { "queue-move-bottom"sv, true, queueMoveBottom },
-    { "queue-move-down"sv, true, queueMoveDown },
-    { "queue-move-top"sv, true, queueMoveTop },
-    { "queue-move-up"sv, true, queueMoveUp },
-    { "session-close"sv, true, sessionClose },
-    { "session-get"sv, true, sessionGet },
-    { "session-set"sv, true, sessionSet },
-    { "session-stats"sv, true, sessionStats },
-    { "torrent-add"sv, false, torrentAdd },
-    { "torrent-get"sv, true, torrentGet },
-    { "torrent-reannounce"sv, true, torrentReannounce },
-    { "torrent-remove"sv, true, torrentRemove },
-    { "torrent-rename-path"sv, false, torrentRenamePath },
-    { "torrent-set"sv, true, torrentSet },
-    { "torrent-set-location"sv, true, torrentSetLocation },
-    { "torrent-start"sv, true, torrentStart },
-    { "torrent-start-now"sv, true, torrentStartNow },
-    { "torrent-stop"sv, true, torrentStop },
-    { "torrent-verify"sv, true, torrentVerify },
+using AsyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&, struct tr_rpc_idle_data*);
+
+auto constexpr AsyncHandlers = std::array<std::pair<std::string_view, AsyncHandler>, 4>{ {
+    { "blocklist-update"sv, blocklistUpdate },
+    { "port-test"sv, portTest },
+    { "torrent-add"sv, torrentAdd },
+    { "torrent-rename-path"sv, torrentRenamePath },
 } };
 
 void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
@@ -2234,40 +2152,24 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
     auto const tag = args_in->value_if<int64_t>(TR_KEY_tag);
 
     // find the requested method
-    rpc_method const* method = nullptr;
+    auto method_name = std::string_view{};
     if (request_map != nullptr)
     {
         if (auto const* val = request_map->find_if<std::string_view>(TR_KEY_method); val != nullptr)
         {
-            if (auto const iter = std::find_if(
-                    std::begin(Methods),
-                    std::end(Methods),
-                    [val](auto const& row) { return row.name == *val; });
-                iter != std::end(Methods))
-            {
-                method = &*iter;
-            }
+            method_name = *val;
         }
     }
 
-    if (method == nullptr) // return an error if we couldn't figure out what to do
+    auto const test = [method_name](auto const& handler)
     {
-        auto response = tr_variant::Map{ 3U };
-        response.try_emplace(TR_KEY_arguments, 0);
-        response.try_emplace(TR_KEY_result, "no method name");
-        if (tag.has_value())
-        {
-            response.try_emplace(TR_KEY_tag, *tag);
-        }
+        return handler.first == method_name;
+    };
 
-        (callback)(session, tr_variant{ std::move(response) });
-        return;
-    }
-
-    if (method->immediate) // if it's an immediate action, do it now
+    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
     {
         auto args_out = tr_variant::Map{};
-        char const* const result = (*method->func)(session, *args_in, args_out, nullptr);
+        char const* const result = (*handler->second)(session, *args_in, args_out);
 
         auto response = tr_variant::Map{ 3U };
         response.try_emplace(TR_KEY_arguments, std::move(args_out));
@@ -2281,17 +2183,30 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
         return;
     }
 
-    // async method
-
-    auto* const data = new tr_rpc_idle_data{};
-    data->session = session;
-    data->tag = tag;
-    data->callback = std::move(callback);
-    if (char const* const errmsg = (*method->func)(session, *args_in, data->args_out, data); errmsg != nullptr)
+    if (auto const end = std::end(AsyncHandlers), handler = std::find_if(std::begin(AsyncHandlers), end, test); handler != end)
     {
-        // Async operation failed prematurely? Invoke callback to ensure client gets a reply
-        tr_idle_function_done(data, errmsg);
+        auto* const data = new tr_rpc_idle_data{};
+        data->session = session;
+        data->tag = tag;
+        data->callback = std::move(callback);
+        if (char const* const errmsg = (*handler->second)(session, *args_in, data->args_out, data); errmsg != nullptr)
+        {
+            // Async operation failed prematurely? Invoke callback to ensure client gets a reply
+            tr_idle_function_done(data, errmsg);
+        }
+        return;
     }
+
+    // couldn't find a handler
+    auto response = tr_variant::Map{ 3U };
+    response.try_emplace(TR_KEY_arguments, 0);
+    response.try_emplace(TR_KEY_result, "no method name");
+    if (tag.has_value())
+    {
+        response.try_emplace(TR_KEY_tag, *tag);
+    }
+
+    (callback)(session, tr_variant{ std::move(response) });
 }
 
 /**
