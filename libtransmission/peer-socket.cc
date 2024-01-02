@@ -122,9 +122,15 @@ size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool bu
         return buf.add_socket(handle.tcp, max, error);
     }
 
-    // Unlike conventional BSD-style socket API, libutp pushes incoming data to the
-    // caller via a callback, instead of allowing the caller to pull data from
-    // its buffers. Therefore, reading data from a uTP socket is not handled here.
+#ifdef WITH_UTP
+    // utp_read_drained() notifies libutp that this read buffer is empty.
+    // It opens up the congestion window by sending an ACK (soonish) if
+    // one was not going to be sent.
+    if (is_utp() && buf_is_empty)
+    {
+        utp_read_drained(handle.utp);
+    }
+#endif
 
     return {};
 }

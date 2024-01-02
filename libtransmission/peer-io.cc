@@ -728,14 +728,6 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
                 io->inbuf_.add(args->buf, args->len);
                 io->set_enabled(TR_DOWN, true);
                 io->can_read_wrapper();
-
-                // utp_read_drained() notifies libutp that this read buffer is empty.
-                // It opens up the congestion window by sending an ACK (soonish) if
-                // one was not going to be sent.
-                if (std::empty(io->inbuf_))
-                {
-                    utp_read_drained(io->socket_.handle.utp);
-                }
             }
             return {};
         });
