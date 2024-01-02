@@ -1,15 +1,21 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
+#include <ios>
+#include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
+#include <utility> // std::move
 #include <vector>
 
 #include <fmt/core.h>
@@ -126,7 +132,7 @@ bool tr_torrentUseMetainfoFromFile(
     tr_torrent* tor,
     tr_torrent_metainfo const* metainfo,
     char const* filename_in,
-    tr_error** error)
+    tr_error* error)
 {
     // add .torrent file
     if (!tr_sys_path_copy(filename_in, tor->torrent_file().c_str(), error))
@@ -200,7 +206,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
     return tr_variant{ std::move(top) };
 }
 
-bool use_new_metainfo(tr_torrent* tor, tr_error** error)
+bool use_new_metainfo(tr_torrent* tor, tr_error* error)
 {
     auto const& m = tor->incomplete_metadata;
     TR_ASSERT(m);
@@ -216,12 +222,17 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     auto info_dict_v = serde.parse(m->metadata);
     if (!info_dict_v)
     {
-        tr_error_propagate(error, &serde.error_);
+        if (error != nullptr)
+        {
+            *error = std::move(serde.error_);
+            serde.error_ = {};
+        }
+
         return false;
     }
 
     // yay we have an info dict. Let's make a torrent file
-    auto top_var = build_metainfo_except_info_dict(tor->metainfo_);
+    auto top_var = build_metainfo_except_info_dict(tor->metainfo());
     tr_variantMergeDicts(tr_variantDictAddDict(&top_var, TR_KEY_info, 0), &*info_dict_v);
     auto const benc = serde.to_string(top_var);
 
@@ -249,31 +260,19 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
 
 void on_have_all_metainfo(tr_torrent* tor)
 {
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto& m = tor->incomplete_metadata;
     TR_ASSERT(m);
-    if (use_new_metainfo(tor, &error))
-    {
-        m.reset();
-    }
-    else /* drat. */
-    {
-        auto const n = m->piece_count;
 
-        m->pieces_needed = create_all_needed(n);
-
-        char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
+    if (!use_new_metainfo(tor, &error)) /* drat. */
+    {
+        auto msg = std::string_view{ error && !std::empty(error.message()) ? error.message() : "unknown error" };
         tr_logAddWarnTor(
             tor,
-            fmt::format(
-                tr_ngettext(
-                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece",
-                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces",
-                    n),
-                fmt::arg("error", msg),
-                fmt::arg("piece_count", n)));
-        tr_error_clear(&error);
+            fmt::format("Couldn't parse magnet metainfo: '{error}'. Redownloading metadata", fmt::arg("error", msg)));
     }
+
+    m.reset();
 }
 } // namespace set_metadata_piece_helpers
 } // namespace
@@ -372,7 +371,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
     if (auto const& m = tor->incomplete_metadata; m)
     {
-        if (auto const& n = m->piece_count; n != 0)
+        if (auto const n = m->piece_count; n != 0)
         {
             return (n - std::size(m->pieces_needed)) / static_cast<double>(n);
         }
@@ -383,7 +382,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tor->metainfo_.magnet();
+    return tor->magnet();
 }
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)

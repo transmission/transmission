@@ -127,6 +127,7 @@ target_sources(${TR_NAME}
         timer-ev.h
         timer.h
         torrent-ctor.cc
+        torrent-ctor.h
         torrent-files.cc
         torrent-files.h
         torrent-magnet.cc
@@ -323,6 +324,7 @@ if(INSTALL_LIB)
             tr-strbuf.h
             transmission.h
             utils.h
+            values.h
             variant.h
             watchdir.h
             web-utils.h

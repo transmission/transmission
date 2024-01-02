@@ -1,21 +1,30 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "TorrentCellControlButton.h"
 #import "TorrentTableView.h"
 #import "Torrent.h"
+#import "TorrentCell.h"
 
 @interface TorrentCellControlButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic, copy) NSString* controlImageSuffix;
-@property(nonatomic) TorrentTableView* torrentTableView;
+@property(nonatomic) IBOutlet TorrentCell* torrentCell;
+@property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @end
 
 @implementation TorrentCellControlButton
 
+- (TorrentTableView*)torrentTableView
+{
+    return self.torrentCell.fTorrentTableView;
+}
+
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+
     self.controlImageSuffix = @"Off";
     [self updateImage];
 }
@@ -24,14 +33,6 @@
 {
     self.controlImageSuffix = @"Off";
     [self updateImage];
-}
-
-- (void)setupTorrentTableView
-{
-    if (!self.torrentTableView)
-    {
-        self.torrentTableView = (TorrentTableView*)[[[self superview] superview] superview];
-    }
 }
 
 - (void)mouseEntered:(NSEvent*)event
@@ -66,8 +67,6 @@
 
 - (void)updateImage
 {
-    [self setupTorrentTableView];
-
     NSImage* controlImage;
     Torrent* torrent = [self.torrentTableView itemAtRow:[self.torrentTableView rowForView:self]];
     if (torrent.active)

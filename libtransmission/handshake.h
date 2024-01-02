@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -23,13 +23,19 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/net.h"
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/peer-io.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_peer_id_t
 
 struct tr_error;
+struct tr_socket_address;
+
+namespace libtransmission
+{
+template<typename value_type>
+class BufferWriter;
+}
 
 // short-term class which manages the handshake phase of a tr_peerIo
 class tr_handshake

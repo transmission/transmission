@@ -23,6 +23,7 @@
 #include <libtransmission/file.h> // tr_sys_file_*()
 #include <libtransmission/platform.h> // TR_PATH_DELIMITER
 #include <libtransmission/quark.h>
+#include <libtransmission/torrent-ctor.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -33,7 +34,7 @@ using namespace std::literals;
 
 inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
 {
-    os << err.message << ' ' << err.code;
+    os << err.message() << ' ' << err.code();
     return os;
 }
 
@@ -148,13 +149,8 @@ protected:
             return path;
         }
 
-        tr_error* error = nullptr;
-        auto path = tr_sys_dir_get_current(&error);
-        if (error != nullptr)
-        {
-            tr_error_free(error);
-        }
-        return path;
+        auto error = tr_error{};
+        return tr_sys_dir_get_current(&error);
     }
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
@@ -210,29 +206,30 @@ protected:
         dir.popdir();
         if (auto const info = tr_sys_path_get_info(path); !info)
         {
-            tr_error* error = nullptr;
+            auto error = tr_error{};
             tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-            EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
-            tr_error_clear(&error);
+            EXPECT_FALSE(error) << "path[" << path << "] dir[" << dir << "] " << error;
         }
 
         errno = tmperr;
     }
 
-    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error** error = nullptr)
+    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error* error = nullptr)
     {
+        auto local_error = tr_error{};
+        if (error == nullptr)
+        {
+            error = &local_error;
+        }
+
         uint64_t n_left = data_len;
         auto const* left = static_cast<uint8_t const*>(data);
-
         while (n_left > 0)
         {
             uint64_t n = {};
-            tr_error* local_error = nullptr;
-            if (!tr_sys_file_write(fd, left, n_left, &n, &local_error))
+            if (!tr_sys_file_write(fd, left, n_left, &n, error))
             {
-                fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
-                tr_error_propagate(error, &local_error);
-                tr_error_free(local_error);
+                fmt::print(stderr, "Error writing file: '{:s}'\n", error->message());
                 break;
             }
 
@@ -247,20 +244,19 @@ protected:
 
         buildParentDir(tmpl);
 
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
         blockingFileWrite(fd, payload, n, &error);
         tr_sys_file_flush(fd, &error);
         tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);
-        if (error != nullptr)
+        if (error)
         {
             fmt::print(
                 "Couldn't create '{path}': {error} ({error_code})\n",
                 fmt::arg("path", tmpl),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
         }
         sync();
 
@@ -310,38 +306,6 @@ private:
     Sandbox sandbox_;
 };
 
-inline void ensureFormattersInited()
-{
-    static constexpr int MEM_K = 1024;
-    static char constexpr const* const MEM_K_STR = "KiB";
-    static char constexpr const* const MEM_M_STR = "MiB";
-    static char constexpr const* const MEM_G_STR = "GiB";
-    static char constexpr const* const MEM_T_STR = "TiB";
-
-    static constexpr int DISK_K = 1000;
-    static char constexpr const* const DISK_K_STR = "kB";
-    static char constexpr const* const DISK_M_STR = "MB";
-    static char constexpr const* const DISK_G_STR = "GB";
-    static char constexpr const* const DISK_T_STR = "TB";
-
-    static constexpr int SPEED_K = 1000;
-    static char constexpr const* const SPEED_K_STR = "kB/s";
-    static char constexpr const* const SPEED_M_STR = "MB/s";
-    static char constexpr const* const SPEED_G_STR = "GB/s";
-    static char constexpr const* const SPEED_T_STR = "TB/s";
-
-    static std::once_flag flag;
-
-    std::call_once(
-        flag,
-        []()
-        {
-            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-        });
-}
-
 class SessionTest : public SandboxedTest
 {
 private:
@@ -349,8 +313,6 @@ private:
 
     tr_session* sessionInit(tr_variant& settings)
     {
-        ensureFormattersInited();
-
         auto* const settings_map = settings.get_if<tr_variant::Map>();
         EXPECT_NE(settings_map, nullptr);
 
@@ -397,11 +359,10 @@ protected:
         auto verified_lock = std::unique_lock(verified_mutex_);
         auto const n_previously_verified = std::size(verified_);
 
-        tr_ctorSetVerifyDoneCallback(
-            ctor,
+        ctor->set_verify_done_callback(
             [this](tr_torrent* const tor)
             {
-                auto verified_lock = std::lock_guard{ verified_mutex_ };
+                auto lambda_verified_lock = std::lock_guard{ verified_mutex_ };
                 verified_.emplace_back(tor);
                 verified_cv_.notify_one();
             });
@@ -446,9 +407,9 @@ protected:
         auto const benc = tr_base64_decode(benc_base64);
         EXPECT_LT(0U, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error) << *error;
+        EXPECT_FALSE(error) << error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // maybe create the files

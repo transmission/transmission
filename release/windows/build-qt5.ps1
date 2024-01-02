@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt5Version = '5.15.8'
+$global:Qt5Version = '5.15.11'
 
 $global:Qt5Deps = @(
     'DBus'
@@ -32,7 +32,6 @@ function global:Build-Qt5([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $ConfigOptions = @(
         '-platform'; 'win32-msvc'
         '-mp'
-        # '-ltcg' # error C1002 on VS 2019 16.5.4
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir

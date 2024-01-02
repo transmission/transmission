@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -27,6 +27,7 @@
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
@@ -34,10 +35,13 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
@@ -61,25 +65,7 @@ static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
 
 static auto constexpr Arguments = TR_KEY_arguments;
 
-static auto constexpr MemK = size_t{ 1024 };
-static char constexpr MemKStr[] = "KiB";
-static char constexpr MemMStr[] = MEM_M_STR;
-static char constexpr MemGStr[] = "GiB";
-static char constexpr MemTStr[] = "TiB";
-
-static auto constexpr DiskK = size_t{ 1000 };
-static char constexpr DiskKStr[] = "kB";
-static char constexpr DiskMStr[] = "MB";
-static char constexpr DiskGStr[] = "GB";
-static char constexpr DiskTStr[] = "TB";
-
-static auto constexpr SpeedK = size_t{ 1000 };
-static auto constexpr SpeedKStr = SPEED_K_STR;
-static char constexpr SpeedMStr[] = "MB/s";
-static char constexpr SpeedGStr[] = "GB/s";
-static char constexpr SpeedTStr[] = "TB/s";
-
-struct Config
+struct RemoteConfig
 {
     std::string auth;
     std::string filter;
@@ -195,11 +181,6 @@ static std::string strlratio(int64_t numerator, int64_t denominator)
     return strlratio2(tr_getRatio(numerator, denominator));
 }
 
-static std::string strlmem(int64_t bytes)
-{
-    return bytes == 0 ? "None"s : tr_formatter_mem_B(bytes);
-}
-
 static std::string strlsize(int64_t bytes)
 {
     if (bytes < 0)
@@ -212,7 +193,7 @@ static std::string strlsize(int64_t bytes)
         return "None"s;
     }
 
-    return tr_formatter_size_B(bytes);
+    return Storage{ bytes, Storage::Units::Bytes }.to_string();
 }
 
 enum
@@ -612,7 +593,7 @@ static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view
     }
 }
 
-static void addIdArg(tr_variant* args, Config const& config, std::string_view fallback = "")
+static void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fallback = "")
 {
     return addIdArg(args, config.torrent_ids, fallback);
 }
@@ -698,26 +679,29 @@ static void setGroup(tr_variant* args, std::string_view group)
     tr_variantDictAddStrView(args, TR_KEY_group, group);
 }
 
-static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
+[[nodiscard]] auto make_files_list(char const* const str_in)
 {
-    tr_variant* files = tr_variantDictAddList(args, key, 100);
+    auto str = std::string_view{ str_in != nullptr ? str_in : "" };
 
-    if (tr_str_is_empty(arg))
+    if (std::empty(str))
     {
         fmt::print(stderr, "No files specified!\n");
-        arg = "-1"; /* no file will have this index, so should be a no-op */
+        str = "-1"sv; // no file will have this index, so should be a no-op
     }
 
-    if (strcmp(arg, "all") != 0)
+    auto files = tr_variant::Vector{};
+
+    if (str != "all"sv)
     {
-        for (auto const& idx : tr_num_parse_range(arg))
+        files.reserve(100U);
+        for (auto const& idx : tr_num_parse_range(str))
         {
-            tr_variantListAddInt(files, idx);
+            files.emplace_back(idx);
         }
     }
-}
 
-// clang-format off
+    return files;
+}
 
 static auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_files,
@@ -726,7 +710,7 @@ static auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_wanted,
 };
 
-static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
+static auto constexpr DetailsKeys = std::array<tr_quark, 53>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -768,6 +752,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_secondsSeeding,
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
+    TR_KEY_sequentialDownload,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -778,7 +763,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_uploadLimited,
     TR_KEY_uploadRatio,
     TR_KEY_webseeds,
-    TR_KEY_webseedsSendingToUs
+    TR_KEY_webseedsSendingToUs,
 };
 
 static auto constexpr ListKeys = std::array<tr_quark, 15>{
@@ -796,10 +781,8 @@ static auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_rateUpload,
     TR_KEY_sizeWhenDone,
     TR_KEY_status,
-    TR_KEY_uploadRatio
+    TR_KEY_uploadRatio,
 };
-
-// clang-format on
 
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
@@ -812,7 +795,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 /* look for a session id in the header in case the server gives back a 409 */
 static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
-    auto& config = *static_cast<Config*>(vconfig);
+    auto& config = *static_cast<RemoteConfig*>(vconfig);
     auto const* const line = static_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
@@ -1011,12 +994,12 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
             {
-                fmt::print("  Download Speed: {:s}\n", tr_formatter_speed_KBps(i / (double)tr_speed_K));
+                fmt::print("  Download Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateUpload, &i))
             {
-                fmt::print("  Upload Speed: {:s}\n", tr_formatter_speed_KBps(i / (double)tr_speed_K));
+                fmt::print("  Upload Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
@@ -1174,7 +1157,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceSize, &i))
             {
-                fmt::print("  Piece Size: {:s}\n", strlmem(i));
+                fmt::print("  Piece Size: {:s}\n", Memory{ i, Memory::Units::Bytes }.to_string());
             }
 
             fmt::print("\n");
@@ -1188,7 +1171,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    fmt::print("{:s}\n", tr_formatter_speed_KBps(i));
+                    fmt::print("{:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
                 }
                 else
                 {
@@ -1202,7 +1185,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    fmt::print("{:s}\n", tr_formatter_speed_KBps(i));
+                    fmt::print("{:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
                 }
                 else
                 {
@@ -1351,8 +1334,8 @@ static void printPeersImpl(tr_variant* peers)
                 address,
                 flagstr,
                 progress * 100.0,
-                rateToClient / static_cast<double>(tr_speed_K),
-                rateToPeer / static_cast<double>(tr_speed_K),
+                Speed{ rateToClient, Speed::Units::KByps }.count(Speed::Units::KByps),
+                Speed{ rateToPeer, Speed::Units::KByps }.count(Speed::Units::KByps),
                 client);
         }
     }
@@ -1462,8 +1445,8 @@ static void printTorrentList(tr_variant* top)
         double total_up = 0;
         double total_down = 0;
 
-        printf(
-            "%6s   %-4s  %9s  %-9s  %6s  %6s  %-5s  %-11s  %s\n",
+        fmt::print(
+            "{:>6s}   {:>5s}  {:>9s}  {:<9s}  {:>6s}  {:>6s}  {:<5s}  {:<11s}  {:<s}\n",
             "ID",
             "Done",
             "Have",
@@ -1521,18 +1504,18 @@ static void printTorrentList(tr_variant* top)
                 auto const eta_str = leftUntilDone != 0 || eta != -1 ? etaToString(eta) : "Done";
                 auto const error_mark = tr_variantDictFindInt(d, TR_KEY_error, &error) && error ? '*' : ' ';
                 auto const done_str = sizeWhenDone != 0 ?
-                    fmt::format(FMT_STRING("{:.0f}%"), (100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone)) :
+                    strlpercent(100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone) + '%' :
                     std::string{ "n/a" };
 
                 fmt::print(
-                    FMT_STRING("{:6d}{:c}  {:>4s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:s}\n"),
+                    FMT_STRING("{:>6d}{:c}  {:>5s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:<s}\n"),
                     torId,
                     error_mark,
                     done_str,
                     strlsize(sizeWhenDone - leftUntilDone),
                     eta_str,
-                    up / static_cast<double>(tr_speed_K),
-                    down / static_cast<double>(tr_speed_K),
+                    Speed{ up, Speed::Units::Byps }.count(Speed::Units::KByps),
+                    Speed{ down, Speed::Units::Byps }.count(Speed::Units::KByps),
                     strlratio2(ratio),
                     getStatusString(d),
                     name);
@@ -1544,10 +1527,10 @@ static void printTorrentList(tr_variant* top)
         }
 
         fmt::print(
-            FMT_STRING("Sum:           {:>9s}             {:6.1f}  {:6.1f}\n"),
+            FMT_STRING("Sum:            {:>9s}             {:6.1f}  {:6.1f}\n"),
             strlsize(total_size).c_str(),
-            total_up / static_cast<double>(tr_speed_K),
-            total_down / static_cast<double>(tr_speed_K));
+            Speed{ total_up, Speed::Units::Byps }.count(Speed::Units::KByps),
+            Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
     }
 }
 
@@ -1804,7 +1787,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindInt(args, TR_KEY_cache_size_mb, &i))
         {
-            fmt::print("  Maximum memory cache size: {:s}\n", tr_formatter_mem_MB(i));
+            fmt::print("  Maximum memory cache size: {:s}\n", Memory{ i, Memory::Units::MBytes }.to_string());
         }
 
         fmt::print("\n");
@@ -1849,11 +1832,11 @@ static void printSession(tr_variant* top)
 
                 if (altEnabled)
                 {
-                    effective_up_limit = tr_formatter_speed_KBps(altUp);
+                    effective_up_limit = Speed{ altUp, Speed::Units::KByps }.to_string();
                 }
                 else if (upEnabled)
                 {
-                    effective_up_limit = tr_formatter_speed_KBps(upLimit);
+                    effective_up_limit = Speed{ upLimit, Speed::Units::KByps }.to_string();
                 }
                 else
                 {
@@ -1864,19 +1847,19 @@ static void printSession(tr_variant* top)
                     FMT_STRING("  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
                     effective_up_limit,
                     upEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(upLimit),
+                    Speed{ upLimit, Speed::Units::KByps }.to_string(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(altUp));
+                    Speed{ altUp, Speed::Units::KByps }.to_string());
 
                 std::string effective_down_limit;
 
                 if (altEnabled)
                 {
-                    effective_down_limit = tr_formatter_speed_KBps(altDown);
+                    effective_down_limit = Speed{ altDown, Speed::Units::KByps }.to_string();
                 }
                 else if (downEnabled)
                 {
-                    effective_down_limit = tr_formatter_speed_KBps(downLimit);
+                    effective_down_limit = Speed{ downLimit, Speed::Units::KByps }.to_string();
                 }
                 else
                 {
@@ -1887,9 +1870,9 @@ static void printSession(tr_variant* top)
                     FMT_STRING("  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
                     effective_down_limit,
                     downEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(downLimit),
+                    Speed{ downLimit, Speed::Units::KByps }.to_string(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(altDown));
+                    Speed{ altDown, Speed::Units::KByps }.to_string());
 
                 if (altTimeEnabled)
                 {
@@ -2018,15 +2001,15 @@ static void printGroups(tr_variant* top)
                 fmt::print("{:s}: ", name);
                 fmt::print(
                     FMT_STRING("Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n"),
-                    upEnabled ? tr_formatter_speed_KBps(upLimit).c_str() : "unlimited",
-                    downEnabled ? tr_formatter_speed_KBps(downLimit).c_str() : "unlimited",
+                    upEnabled ? Speed{ upLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
+                    downEnabled ? Speed{ downLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     honors ? "honors" : "does not honor");
             }
         }
     }
 }
 
-static void filterIds(tr_variant* top, Config& config)
+static void filterIds(tr_variant* top, RemoteConfig& config)
 {
     tr_variant* args;
     tr_variant* list;
@@ -2147,7 +2130,7 @@ static void filterIds(tr_variant* top, Config& config)
         }
     }
 }
-static int processResponse(char const* rpcurl, std::string_view response, Config& config)
+static int processResponse(char const* rpcurl, std::string_view response, RemoteConfig& config)
 {
     auto status = int{ EXIT_SUCCESS };
 
@@ -2268,7 +2251,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
     return status;
 }
 
-static CURL* tr_curl_easy_init(struct evbuffer* writebuf, Config& config)
+static CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
@@ -2334,7 +2317,7 @@ static void tr_curl_easy_cleanup(CURL* curl)
     }
 }
 
-static int flush(char const* rpcurl, tr_variant* benc, Config& config)
+static int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
 {
     auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
@@ -2425,7 +2408,7 @@ static tr_variant* ensure_tset(tr_variant& tset)
     return tr_variantDictAddDict(&tset, Arguments, 1);
 }
 
-static int processArgs(char const* rpcurl, int argc, char const* const* argv, Config& config)
+static int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
 {
     int status = EXIT_SUCCESS;
     char const* optarg;
@@ -2954,11 +2937,11 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
             switch (c)
             {
             case 'g':
-                addFiles(args, TR_KEY_files_wanted, optarg);
+                *tr_variantDictAdd(args, TR_KEY_files_wanted) = make_files_list(optarg);
                 break;
 
             case 'G':
-                addFiles(args, TR_KEY_files_unwanted, optarg);
+                *tr_variantDictAdd(args, TR_KEY_files_unwanted) = make_files_list(optarg);
                 break;
 
             case 'L':
@@ -2974,15 +2957,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
                 break;
 
             case 900:
-                addFiles(args, TR_KEY_priority_high, optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_high) = make_files_list(optarg);
                 break;
 
             case 901:
-                addFiles(args, TR_KEY_priority_normal, optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_normal) = make_files_list(optarg);
                 break;
 
             case 902:
-                addFiles(args, TR_KEY_priority_low, optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_low) = make_files_list(optarg);
                 break;
 
             case 700:
@@ -3256,7 +3239,13 @@ static bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl, Config& config)
+static void getHostAndPortAndRpcUrl(
+    int* argc,
+    char** argv,
+    std::string* host,
+    int* port,
+    std::string* rpcurl,
+    RemoteConfig& config)
 {
     if (*argv[1] == '-')
     {
@@ -3318,7 +3307,7 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    auto config = Config{};
+    auto config = RemoteConfig{};
     auto port = DefaultPort;
     auto host = std::string{};
     auto rpcurl = std::string{};
@@ -3328,10 +3317,6 @@ int tr_main(int argc, char* argv[])
         showUsage();
         return EXIT_FAILURE;
     }
-
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl, config);
 

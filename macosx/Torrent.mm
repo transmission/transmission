@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -76,7 +76,7 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
     }
 }
 
-bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
+bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     if (filename == NULL)
     {
@@ -88,7 +88,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         NSError* localError;
         if (![Torrent trashFile:@(filename) error:&localError])
         {
-            tr_error_set(error, localError.code, localError.description.UTF8String);
+            error->set(static_cast<int>(localError.code), localError.description.UTF8String);
             return false;
         }
     }
@@ -168,11 +168,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     };
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (NSString*)description
 {
     return [@"Torrent: " stringByAppendingString:self.name];
@@ -206,12 +201,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     return @(tr_torrentGetCurrentDir(self.fHandle));
 }
 
-- (void)getAvailability:(int8_t*)tab size:(NSInteger)size
+- (void)getAvailability:(int8_t*)tab size:(int)size
 {
     tr_torrentAvailability(self.fHandle, tab, size);
 }
 
-- (void)getAmountFinished:(float*)tab size:(NSInteger)size
+- (void)getAmountFinished:(float*)tab size:(int)size
 {
     tr_torrentAmountFinished(self.fHandle, tab, size);
 }
@@ -612,7 +607,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (uint64_t)size
 {
-    return tr_torrentTotalSize(self.fHandle);
+    return tr_torrentView(self.fHandle).total_size;
 }
 
 - (uint64_t)sizeLeft
@@ -1355,6 +1350,41 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 - (NSUInteger)totalPeersLTEP
 {
     return self.fStat->peersFrom[TR_PEER_FROM_LTEP];
+}
+
+- (NSUInteger)totalKnownPeersTracker
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_TRACKER];
+}
+
+- (NSUInteger)totalKnownPeersIncoming
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_INCOMING];
+}
+
+- (NSUInteger)totalKnownPeersCache
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_RESUME];
+}
+
+- (NSUInteger)totalKnownPeersPex
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_PEX];
+}
+
+- (NSUInteger)totalKnownPeersDHT
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_DHT];
+}
+
+- (NSUInteger)totalKnownPeersLocal
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_LPD];
+}
+
+- (NSUInteger)totalKnownPeersLTEP
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_LTEP];
 }
 
 - (NSUInteger)peersSendingToUs

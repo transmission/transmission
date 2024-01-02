@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -87,10 +87,6 @@ export class ActionManager extends EventTarget {
         enabled: false,
         shortcut: 'V',
         text: 'Verify local data',
-      },
-      'verify-selected-torrents-force': {
-        enabled: false,
-        text: 'Verify local data (force)',
       },
     });
   }
@@ -205,7 +201,6 @@ export class ActionManager extends EventTarget {
       'show-move-dialog',
       'trash-selected-torrents',
       'verify-selected-torrents',
-      'verify-selected-torrents-force',
     ]);
 
     set_enabled(counts.selected === 1, ['show-rename-dialog']);

@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -74,6 +74,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self checkWindowSize];
 
     [self setGlobalLabels];
@@ -82,11 +83,6 @@ static CGFloat const kStackViewSpacing = 8.0;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateOptionsNotification:)
                                                name:@"UpdateOptionsNotification"
                                              object:nil];
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (CGFloat)fHorizLayoutHeight

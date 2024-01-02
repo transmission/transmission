@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,6 +14,7 @@
 #include <cstdint> // uintX_t
 #include <deque>
 #include <memory>
+#include <optional>
 #include <utility> // std::pair
 
 #include <event2/util.h> // for evutil_socket_t
@@ -22,7 +23,6 @@
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h"
-#include "libtransmission/net.h" // tr_address
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/tr-buffer.h"
@@ -32,6 +32,7 @@
 struct struct_utp_context;
 struct tr_error;
 struct tr_session;
+struct tr_socket_address;
 
 namespace libtransmission::test
 {
@@ -170,9 +171,9 @@ public:
         return bandwidth_.clamp(dir, 1024) > 0;
     }
 
-    [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t now, tr_direction dir) const noexcept
+    [[nodiscard]] auto get_piece_speed(uint64_t now, tr_direction dir) const noexcept
     {
-        return bandwidth_.get_piece_speed_bytes_per_second(now, dir);
+        return bandwidth_.get_piece_speed(now, dir);
     }
 
     ///

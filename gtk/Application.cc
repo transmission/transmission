@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,6 +26,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>

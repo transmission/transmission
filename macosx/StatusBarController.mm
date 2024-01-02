@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     //localize menu items
     [self.fStatusButton.menu itemWithTag:StatusTagTotalRatio].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
     [self.fStatusButton.menu itemWithTag:StatusTagSessionRatio].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");
@@ -71,11 +72,6 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
     //update when speed limits are changed
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateSpeedFieldsToolTips) name:@"SpeedLimitUpdate"
                                              object:nil];
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate

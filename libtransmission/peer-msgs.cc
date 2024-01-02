@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,20 +7,24 @@
 #include <array>
 #include <bitset>
 #include <cerrno>
-#include <cstdint>
-#include <cstring>
+#include <cstddef>
+#include <cstdint> // uint8_t, uint32_t, int64_t
 #include <ctime>
 #include <iterator>
 #include <map>
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <queue>
+#include <ratio>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
 #include <fmt/core.h>
+
+#include <small/vector.hpp>
 
 #include "libtransmission/transmission.h"
 
@@ -178,9 +182,6 @@ auto constexpr MetadataReqQ = int{ 64 };
 auto constexpr ReqQ = int{ 512 };
 
 // used in lowering the outMessages queue period
-
-// how many blocks to keep prefetched per peer
-auto constexpr PrefetchMax = size_t{ 18 };
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
@@ -380,16 +381,9 @@ public:
         }
     }
 
-    bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const override
+    [[nodiscard]] Speed get_piece_speed(uint64_t now, tr_direction dir) const override
     {
-        auto const bytes_per_second = io->get_piece_speed_bytes_per_second(now, dir);
-
-        if (setme_bytes_per_second != nullptr)
-        {
-            *setme_bytes_per_second = bytes_per_second;
-        }
-
-        return bytes_per_second > 0;
+        return io->get_piece_speed(now, dir);
     }
 
     [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
@@ -558,19 +552,18 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_bytes_per_second = get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
+        auto rate = get_piece_speed(now, TR_PEER_TO_CLIENT);
         if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
         {
-            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speed_limit_bps(TR_PEER_TO_CLIENT));
+            rate = std::min(rate, torrent->speed_limit(TR_PEER_TO_CLIENT));
         }
 
         // honor the session limits, if enabled
         if (torrent->uses_session_limits())
         {
-            if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
-                irate_bytes_per_second)
+            if (auto const limit = torrent->session->active_speed_limit(TR_PEER_TO_CLIENT); limit)
             {
-                rate_bytes_per_second = std::min(rate_bytes_per_second, *irate_bytes_per_second);
+                rate = std::min(rate, *limit);
             }
         }
 
@@ -578,7 +571,7 @@ private:
         // many requests we should send to this peer
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
+        size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = reqq ? *reqq : 250;
 
         auto max_reqs = estimated_blocks_in_period;
@@ -633,23 +626,11 @@ public:
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
-    int64_t metadata_size_hint = 0;
-
     tr_torrent* const torrent;
 
     std::shared_ptr<tr_peerIo> const io;
 
-    struct QueuedPeerRequest : public peer_request
-    {
-        explicit QueuedPeerRequest(peer_request in) noexcept
-            : peer_request{ in }
-        {
-        }
-
-        bool prefetched = false;
-    };
-
-    std::vector<QueuedPeerRequest> peer_requested_;
+    std::vector<peer_request> peer_requested_;
 
     std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex;
 
@@ -901,15 +882,17 @@ std::optional<int> popNextMetadataRequest(tr_peerMsgsImpl* msgs)
 
 void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
+    auto& queue = msgs->peer_requested_;
+
     if (auto const must_send_rej = msgs->io->supports_fext(); must_send_rej)
     {
-        for (auto const& req : msgs->peer_requested_)
+        for (auto const& req : queue)
         {
             protocolSendReject(msgs, &req);
         }
     }
 
-    msgs->peer_requested_.clear();
+    queue.clear();
 }
 
 // ---
@@ -1075,9 +1058,9 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
+    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i))
     {
-        msgs->metadata_size_hint = i;
+        tr_torrentSetMetadataSizeHint(msgs->torrent, i);
     }
 
     /* look for upload_only (BEP 21) */
@@ -1154,8 +1137,8 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
 
     auto const* const benc_end = serde.end();
 
-    if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
-        msg_end - benc_end <= MetadataPieceSize && piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
+    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= MetadataPieceSize &&
+        piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
@@ -1261,25 +1244,6 @@ void parseLtep(tr_peerMsgsImpl* msgs, MessageReader& payload)
 
 ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
 
-void prefetchPieces(tr_peerMsgsImpl* msgs)
-{
-    if (!msgs->session->allowsPrefetch())
-    {
-        return;
-    }
-
-    // ensure that the first `PrefetchMax` items in `msgs->peer_requested_` are prefetched.
-    auto& requests = msgs->peer_requested_;
-    for (size_t i = 0, n = std::min(PrefetchMax, std::size(requests)); i < n; ++i)
-    {
-        if (auto& req = requests[i]; !req.prefetched)
-        {
-            msgs->session->cache->prefetch_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
-            req.prefetched = true;
-        }
-    }
-}
-
 [[nodiscard]] bool canAddRequestFromPeer(tr_peerMsgsImpl const* const msgs, struct peer_request const& req)
 {
     if (msgs->peer_is_choked())
@@ -1314,7 +1278,6 @@ void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
     if (canAddRequestFromPeer(msgs, *req))
     {
         msgs->peer_requested_.emplace_back(*req);
-        prefetchPieces(msgs);
     }
     else if (msgs->io->supports_fext())
     {
@@ -1712,17 +1675,17 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         }
 
         io->read_uint32(&message_len);
-        current_message_len = message_len;
 
         // The keep-alive message is a message with zero bytes,
         // specified with the length prefix set to zero.
         // There is no message ID and no payload.
-        if (auto const is_keepalive = message_len == uint32_t{}; is_keepalive)
+        if (message_len == 0U)
         {
             logtrace(msgs, "got KeepAlive");
-            current_message_len.reset();
             return READ_NOW;
         }
+
+        current_message_len = message_len;
     }
 
     // read <message ID>
@@ -1741,37 +1704,30 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
     // read <payload>
     auto& current_payload = msgs->incoming.payload;
-    auto const full_payload_len = *current_message_len - sizeof(uint8_t /*message_type*/);
+    auto const full_payload_len = *current_message_len - sizeof(*current_message_type);
     auto n_left = full_payload_len - std::size(current_payload);
-    while (n_left > 0U && io->read_buffer_size() > 0U)
-    {
-        auto buf = std::array<char, tr_block_info::BlockSize>{};
-        auto const n_this_pass = std::min({ n_left, io->read_buffer_size(), std::size(buf) });
-        io->read_bytes(std::data(buf), n_this_pass);
-        current_payload.add(std::data(buf), n_this_pass);
-        n_left -= n_this_pass;
-        logtrace(msgs, fmt::format("read {:d} payload bytes; {:d} left to go", n_this_pass, n_left));
-    }
+    auto const [buf, n_this_pass] = current_payload.reserve_space(std::min(n_left, io->read_buffer_size()));
+    io->read_bytes(buf, n_this_pass);
+    current_payload.commit_space(n_this_pass);
+    n_left -= n_this_pass;
+    logtrace(msgs, fmt::format("read {:d} payload bytes; {:d} left to go", n_this_pass, n_left));
 
     if (n_left > 0U)
     {
         return READ_LATER;
     }
 
-    // The incoming message is now complete. Reset the peerMsgs' incoming
-    // field so it's ready to receive the next message, then process the
-    // current one with `process_peer_message()`.
+    // The incoming message is now complete. After processing the message
+    // with `process_peer_message()`, reset the peerMsgs' incoming
+    // field so it's ready to receive the next message.
+
+    auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, *current_message_type, current_payload);
+    *piece = n_piece_bytes_read;
 
     current_message_len.reset();
-    auto const message_type = *current_message_type;
     current_message_type.reset();
-
-    auto payload = MessageBuffer{};
-    payload.add(current_payload);
     current_payload.clear();
 
-    auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);
-    *piece = n_piece_bytes_read;
     return read_state;
 }
 
@@ -1887,7 +1843,7 @@ namespace peer_pulse_helpers
     if (ok)
     {
         ok = msgs->session->cache
-                 ->read_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+                 ->read_block(*msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
     }
 
     if (ok)
@@ -1904,7 +1860,7 @@ namespace peer_pulse_helpers
     return {};
 }
 
-[[nodiscard]] size_t fill_output_buffer(tr_peerMsgsImpl* msgs, time_t now)
+[[nodiscard]] size_t fill_output_buffer(tr_peerMsgsImpl* msgs, time_t now_sec, uint64_t now_msec)
 {
     auto n_bytes_written = size_t{};
 
@@ -1923,14 +1879,14 @@ namespace peer_pulse_helpers
     for (;;)
     {
         auto const old_len = n_bytes_written;
-        n_bytes_written += add_next_piece(msgs, now);
+        n_bytes_written += add_next_piece(msgs, now_msec);
         if (old_len == n_bytes_written)
         {
             break;
         }
     }
 
-    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
+    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now_sec - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
     {
         n_bytes_written += protocol_send_keepalive(msgs);
     }
@@ -1944,15 +1900,16 @@ void peerPulse(void* vmsgs)
     using namespace peer_pulse_helpers;
 
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-    auto const now = tr_time();
+    auto const now_sec = tr_time();
+    auto const now_msec = tr_time_msec();
 
     updateDesiredRequestCount(msgs);
     updateBlockRequests(msgs);
-    updateMetadataRequests(msgs, now);
+    updateMetadataRequests(msgs, now_sec);
 
     for (;;)
     {
-        if (fill_output_buffer(msgs, now) == 0U)
+        if (fill_output_buffer(msgs, now_sec, now_msec) == 0U)
         {
             break;
         }
@@ -1996,7 +1953,7 @@ void tr_peerMsgsImpl::sendPex()
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
-    auto tmpbuf = std::vector<std::byte>{};
+    auto tmpbuf = small::vector<std::byte, 2048U>{};
 
     for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {

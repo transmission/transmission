@@ -1,4 +1,4 @@
-// This file Copyright 2021-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,7 +13,6 @@
 #include "libtransmission/announce-list.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20, tr_sha1_digest_t
-#include "libtransmission/utils.h" // tr_strv_convert_utf8()
 
 struct tr_error;
 
@@ -22,7 +21,7 @@ class tr_magnet_metainfo
     friend struct MetainfoHandler;
 
 public:
-    bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
+    bool parseMagnet(std::string_view magnet_link, tr_error* error = nullptr);
 
     [[nodiscard]] std::string magnet() const;
 
@@ -66,10 +65,7 @@ public:
         return info_hash2_str_;
     }
 
-    void set_name(std::string_view name)
-    {
-        name_ = tr_strv_convert_utf8(name);
-    }
+    void set_name(std::string_view name);
 
     void add_webseed(std::string_view webseed);
 

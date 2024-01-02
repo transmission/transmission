@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -112,13 +112,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
                                              object:nil];
 }
@@ -352,8 +348,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
 
         // redraw buttons
-        [torrentCell.fControlButton display];
-        [torrentCell.fRevealButton display];
+        torrentCell.fControlButton.needsDisplay = YES;
+        torrentCell.fRevealButton.needsDisplay = YES;
 
         return torrentCell;
     }
@@ -659,8 +655,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
     NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
-    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
-    [pasteBoard setString:links forType:NSStringPboardType];
+    [pasteBoard declareTypes:@[ NSPasteboardTypeString ] owner:nil];
+    [pasteBoard setString:links forType:NSPasteboardTypeString];
 }
 
 - (void)paste:(id)sender
@@ -706,7 +702,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     if (action == @selector(paste:))
     {
-        if ([NSPasteboard.generalPasteboard.types containsObject:NSURLPboardType])
+        if ([NSPasteboard.generalPasteboard.types containsObject:NSPasteboardTypeURL])
         {
             return YES;
         }
@@ -881,7 +877,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     CGFloat width = NSWidth(rect);
 
-    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.frame) - NSMinX(self.window.frame) < 72)
+    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.visibleFrame) - NSMinX(self.window.frame) < 72)
     {
         // Ugly hack to hide NSPopover arrow.
         self.fPositioningView = [[NSView alloc] initWithFrame:rect];

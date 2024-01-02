@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -18,16 +18,6 @@
 
 #include <fmt/core.h>
 
-// RapidJSON SIMD optimisations
-#ifdef __SSE2__
-#define RAPIDJSON_SSE2
-#endif
-#ifdef __SSE4_2__
-#define RAPIDJSON_SSE42
-#endif
-#ifdef __ARM_NEON
-#define RAPIDJSON_NEON
-#endif
 #include <rapidjson/encodedstream.h>
 #include <rapidjson/encodings.h>
 #include <rapidjson/error/en.h>
@@ -60,13 +50,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Null()
     {
-        tr_variantInitStrView(get_leaf(), "");
+        *get_leaf() = tr_variant::unmanaged_string("");
         return true;
     }
 
     bool Bool(bool const val)
     {
-        tr_variantInitBool(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
@@ -82,7 +72,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Int64(int64_t const val)
     {
-        tr_variantInitInt(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
@@ -93,20 +83,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Double(double const val)
     {
-        tr_variantInitReal(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
     bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
     {
-        if (copy)
-        {
-            tr_variantInitStr(get_leaf(), { str, len });
-        }
-        else
-        {
-            tr_variantInitStrView(get_leaf(), { str, len });
-        }
+        *get_leaf() = copy ? tr_variant{ std::string{ str, len } } : tr_variant::unmanaged_string({ str, len });
         return true;
     }
 
@@ -222,10 +205,13 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
     auto* const begin = std::data(input);
     TR_ASSERT(begin != nullptr); // RapidJSON will dereference a nullptr if this is false
+    if (begin == nullptr)
+    {
+        return {};
+    }
+
     auto const size = std::size(input);
-
     auto top = tr_variant{};
-
     auto handler = parse_helpers::json_to_variant_handler{ &top };
     auto ms = rapidjson::MemoryStream{ begin, size };
     auto eis = rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream>{ ms };
@@ -239,13 +225,12 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 
     if (auto err_code = reader.GetParseErrorCode(); err_code == rapidjson::kParseErrorDocumentEmpty)
     {
-        tr_error_set(&error_, EINVAL, "No content");
+        error_.set(EINVAL, "No content");
     }
     else
     {
         auto const err_offset = reader.GetErrorOffset();
-        tr_error_set(
-            &error_,
+        error_.set(
             EILSEQ,
             fmt::format(
                 _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),
@@ -272,7 +257,7 @@ struct string_output_stream
     using Ch = char;
 
     explicit string_output_stream(std::string& str)
-        : str_ref_(str)
+        : str_ref_{ str }
     {
     }
 

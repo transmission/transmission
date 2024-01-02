@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -42,95 +42,43 @@ public:
     };
 
     using file_offset_t = offset_t<tr_file_index_t>;
+    explicit tr_file_piece_map(tr_torrent_metainfo const& tm);
+    tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
-    explicit tr_file_piece_map(tr_torrent_metainfo const& tm)
-    {
-        reset(tm);
-    }
-
-    tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
-    {
-        reset(block_info, file_sizes, n_files);
-    }
-
-    void reset(tr_torrent_metainfo const& tm);
-
-    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span(tr_file_index_t file) const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span_for_file(tr_file_index_t const file) const noexcept
     {
         return file_pieces_[file];
     }
 
-    [[nodiscard]] file_span_t file_span(tr_piece_index_t piece) const;
+    [[nodiscard]] file_span_t file_span_for_piece(tr_piece_index_t piece) const;
 
     [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t size() const
+    [[nodiscard]] TR_CONSTEXPR20 size_t file_count() const
     {
         return std::size(file_pieces_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t const file) const
     {
-        return std::empty(file_pieces_);
-    }
-
-    // TODO(ckerr) minor wart here, two identical span types
-    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span(tr_file_index_t file) const
-    {
-        auto const& span = file_bytes_.at(file);
+        auto const& span = file_bytes_[file];
         return tr_byte_span_t{ span.begin, span.end };
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t piece) const
+    [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t const piece) const
     {
         return std::binary_search(std::begin(edge_pieces_), std::end(edge_pieces_), piece);
     }
 
 private:
+    using byte_span_t = index_span_t<uint64_t>;
+
+    void reset(tr_torrent_metainfo const& tm);
     void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
 
-    using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
-
     std::vector<piece_span_t> file_pieces_;
-
     std::vector<tr_piece_index_t> edge_pieces_;
-
-    template<typename T>
-    struct CompareToSpan
-    {
-        using span_t = index_span_t<T>;
-
-        [[nodiscard]] constexpr int compare(T item, span_t span) const // <=>
-        {
-            if (item < span.begin)
-            {
-                return -1;
-            }
-
-            if (item >= span.end)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        [[nodiscard]] constexpr bool operator()(T item, span_t span) const // <
-        {
-            return compare(item, span) < 0;
-        }
-
-        [[nodiscard]] constexpr int compare(span_t span, T item) const // <=>
-        {
-            return -compare(item, span);
-        }
-
-        [[nodiscard]] constexpr bool operator()(span_t span, T item) const // <
-        {
-            return compare(span, item) < 0;
-        }
-    };
 };
 
 class tr_file_priorities
@@ -141,7 +89,6 @@ public:
     {
     }
 
-    void reset(tr_file_piece_map const*);
     void set(tr_file_index_t file, tr_priority_t priority);
     void set(tr_file_index_t const* files, size_t n, tr_priority_t priority);
 
@@ -156,12 +103,7 @@ private:
 class tr_files_wanted
 {
 public:
-    explicit tr_files_wanted(tr_file_piece_map const* fpm)
-        : wanted_(std::size(*fpm))
-    {
-        reset(fpm);
-    }
-    void reset(tr_file_piece_map const* fpm);
+    explicit tr_files_wanted(tr_file_piece_map const* fpm);
 
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);

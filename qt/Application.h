@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -18,6 +18,7 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/favicon-cache.h>
 
+#include "AddData.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 
@@ -71,8 +72,8 @@ signals:
     void faviconsChanged();
 
 public slots:
-    void addTorrent(AddData const&) const;
-    void addTorrent(QString const&) const;
+    void addTorrent(AddData) const;
+    void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
     void consentGiven(int result) const;
@@ -91,9 +92,12 @@ private slots:
 private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
+    void initUnits();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
     void notifyTorrentAdded(Torrent const*) const;
+
+    std::unordered_set<QString> interned_strings_;
 
     std::unique_ptr<Prefs> prefs_;
     std::unique_ptr<Session> session_;
@@ -111,8 +115,6 @@ private:
 
     QString const config_name_ = QStringLiteral("transmission");
     QString const display_name_ = QStringLiteral("transmission-qt");
-
-    std::unordered_set<QString> interned_strings_;
 
 #ifdef QT_DBUS_LIB
     QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
