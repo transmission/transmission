@@ -124,19 +124,6 @@ private:
     std::vector<tr_torrent*> getTorrents() const;
 
 private:
-    [[nodiscard]] tr_variant build_torrent_ids_variant_list() const
-    {
-        auto ret = tr_variant::Vector{};
-        ret.reserve(std::size(ids_));
-
-        for (auto const id : ids_)
-        {
-            ret.emplace_back(id);
-        }
-
-        return ret;
-    }
-
     DetailsDialog& dialog_;
     Glib::RefPtr<Session> const core_;
 
