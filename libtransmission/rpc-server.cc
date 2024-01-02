@@ -344,7 +344,7 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
 {
     if (auto otop = tr_variant_serde::json().inplace().parse(json); otop)
     {
-        tr_rpc_request_exec_json(
+        tr_rpc_request_exec(
             server->session,
             *otop,
             [req, server](tr_session* /*session*/, tr_variant&& content)

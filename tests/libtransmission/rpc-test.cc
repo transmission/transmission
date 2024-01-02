@@ -78,7 +78,7 @@ TEST_F(RpcTest, sessionGet)
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
     auto response = tr_variant{};
-    tr_rpc_request_exec_json(
+    tr_rpc_request_exec(
         session_,
         request,
         [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
@@ -197,7 +197,7 @@ TEST_F(RpcTest, torrentGet)
     tr_variantListAddStrView(fields, tr_quark_get_string_view(TR_KEY_id));
 
     auto response = tr_variant{};
-    tr_rpc_request_exec_json(
+    tr_rpc_request_exec(
         session_,
         request,
         [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });

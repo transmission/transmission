@@ -1451,7 +1451,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
 
     if (tr_variantListSize(ids) != 0)
     {
-        tr_rpc_request_exec_json(session, top, {});
+        tr_rpc_request_exec(session, top, {});
         invoked = true;
     }
 
@@ -1473,7 +1473,7 @@ void Application::Impl::start_all_torrents()
 
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
-    tr_rpc_request_exec_json(session, request, {});
+    tr_rpc_request_exec(session, request, {});
 }
 
 void Application::Impl::pause_all_torrents()
@@ -1483,7 +1483,7 @@ void Application::Impl::pause_all_torrents()
 
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
-    tr_rpc_request_exec_json(session, request, {});
+    tr_rpc_request_exec(session, request, {});
 }
 
 void Application::Impl::copy_magnet_link_to_clipboard(Glib::RefPtr<Torrent> const& torrent) const

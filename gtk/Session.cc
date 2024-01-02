@@ -1213,7 +1213,7 @@ void Session::Impl::send_rpc_request(
         gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
 #endif
 
-        tr_rpc_request_exec_json(session_, request, core_read_rpc_response);
+        tr_rpc_request_exec(session_, request, core_read_rpc_response);
     }
 }
 

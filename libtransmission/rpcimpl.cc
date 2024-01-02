@@ -2214,7 +2214,7 @@ void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
 
 } // namespace
 
-void tr_rpc_request_exec_json(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback)
+void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback)
 {
     auto const lock = session->unique_lock();
 
