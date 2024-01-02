@@ -661,39 +661,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)paste:(id)sender
 {
-    NSURL* url;
-    if ((url = [NSURL URLFromPasteboard:NSPasteboard.generalPasteboard]))
-    {
-        [self.fController openURL:url.absoluteString];
-    }
-    else
-    {
-        NSArray<NSString*>* items = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
-        if (!items)
-        {
-            return;
-        }
-        NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-        for (NSString* itemString in items)
-        {
-            NSArray<NSString*>* itemLines = [itemString componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet];
-            for (__strong NSString* pbItem in itemLines)
-            {
-                pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-                if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-                {
-                    [self.fController openURL:pbItem];
-                }
-                else
-                {
-#warning only accept full text?
-                    for (NSTextCheckingResult* result in [detector matchesInString:pbItem options:0
-                                                                             range:NSMakeRange(0, pbItem.length)])
-                        [self.fController openURL:result.URL.absoluteString];
-                }
-            }
-        }
-    }
+    [self.fController openPasteboard];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem

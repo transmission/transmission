@@ -1680,6 +1680,47 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
+- (void)openPasteboard
+{
+    // 1. If Pasteboard contains URL objects, we treat those and only those
+    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
+
+    if (arrayOfURLs.count > 0)
+    {
+        for (NSURL* url in arrayOfURLs)
+        {
+            [self openURL:url.absoluteString];
+        }
+        return;
+    }
+
+    // 2. If Pasteboard contains String objects, we'll search for magnet or links
+    NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
+    if (arrayOfStrings.count == 0)
+    {
+        return;
+    }
+    NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    for (NSString* itemString in arrayOfStrings)
+    {
+        NSArray<NSString*>* itemLines = [itemString componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        for (__strong NSString* pbItem in itemLines)
+        {
+            pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+            {
+                [self openURL:pbItem];
+            }
+            else
+            {
+#warning only accept full text?
+                for (NSTextCheckingResult* result in [detector matchesInString:pbItem options:0 range:NSMakeRange(0, pbItem.length)])
+                    [self openURL:result.URL.absoluteString];
+            }
+        }
+    }
+}
+
 - (void)createFile:(id)sender
 {
     [CreatorWindowController createTorrentFile:self.fLib];
