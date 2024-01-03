@@ -53,6 +53,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdlib> // abort()
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <numeric>
@@ -446,7 +447,7 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
         tr_variantListAddInt(ids, id);
     }
 
-    core_->exec(&top);
+    core_->exec(top);
 }
 
 void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
@@ -464,7 +465,7 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
         tr_variantListAddInt(ids, id);
     }
 
-    core_->exec(&top);
+    core_->exec(top);
 }
 
 void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
@@ -482,7 +483,7 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
         tr_variantListAddInt(ids, id);
     }
 
-    core_->exec(&top);
+    core_->exec(top);
 }
 
 void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
@@ -2373,7 +2374,7 @@ void AddTrackerDialog::on_response(int response)
                 auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
                 tr_variantListAddStr(trackers, url.raw());
 
-                core_->exec(&top);
+                core_->exec(top);
                 parent_.refresh();
             }
             else
@@ -2420,7 +2421,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
         tr_variantListAddInt(trackers, tracker_id);
 
-        core_->exec(&top);
+        core_->exec(top);
         refresh();
     }
 }

@@ -71,19 +71,17 @@ TEST_F(RpcTest, list)
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
-    {
-        std::swap(*static_cast<tr_variant*>(setme), *response);
-    };
-
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
-    tr_variant request;
+    auto request = tr_variant{};
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
-    tr_variant response;
-    tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        request,
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
@@ -186,11 +184,6 @@ TEST_F(RpcTest, sessionGet)
 
 TEST_F(RpcTest, torrentGet)
 {
-    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
-    {
-        std::swap(*static_cast<tr_variant*>(setme), *response);
-    };
-
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
@@ -203,8 +196,11 @@ TEST_F(RpcTest, torrentGet)
     tr_variant* fields = tr_variantDictAddList(args_in, TR_KEY_fields, 1);
     tr_variantListAddStrView(fields, tr_quark_get_string_view(TR_KEY_id));
 
-    tr_variant response;
-    tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        request,
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
@@ -215,7 +211,7 @@ TEST_F(RpcTest, torrentGet)
     EXPECT_EQ(1UL, tr_variantListSize(torrents));
 
     tr_variant* first_torrent = tr_variantListChild(torrents, 0);
-
+    EXPECT_TRUE(first_torrent != nullptr);
     EXPECT_TRUE(first_torrent->holds_alternative<tr_variant::Map>());
     int64_t first_torrent_id = 0;
     EXPECT_TRUE(tr_variantDictFindInt(first_torrent, TR_KEY_id, &first_torrent_id));
