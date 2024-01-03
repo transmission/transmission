@@ -291,6 +291,16 @@ public:
         return piece_count_;
     }
 
+    std::vector<int> availability() const noexcept
+    {
+        return availability_;
+    }
+
+    std::vector<bool> pieces() const noexcept
+    {
+        return pieces_;
+    }
+
     [[nodiscard]] constexpr auto downloadedEver() const noexcept
     {
         return downloaded_ever_;
@@ -569,6 +579,7 @@ public:
     {
         ACTIVITY_DATE,
         ADDED_DATE,
+        AVAILABILITY,
         BANDWIDTH_PRIORITY,
         COMMENT,
         CREATOR,
@@ -605,6 +616,7 @@ public:
         PEERS_SENDING_TO_US,
         PEER_LIMIT,
         PERCENT_DONE,
+        PIECES,
         PIECE_COUNT,
         PIECE_SIZE,
         PRIMARY_MIME_TYPE,
@@ -703,6 +715,9 @@ private:
 
     Speed upload_speed_;
     Speed download_speed_;
+
+    std::vector<int> availability_ = {};
+    std::vector<bool> pieces_ = {};
 
     Prefs const& prefs_;
 

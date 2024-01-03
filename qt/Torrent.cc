@@ -182,6 +182,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
             HANDLE_KEY(addedDate, added_date, ADDED_DATE)
+            HANDLE_KEY(availability, availability, AVAILABILITY)
             HANDLE_KEY(bandwidthPriority, bandwidth_priority, BANDWIDTH_PRIORITY)
             HANDLE_KEY(corruptEver, failed_ever, FAILED_EVER)
             HANDLE_KEY(dateCreated, date_created, DATE_CREATED)
@@ -261,6 +262,17 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
         {
             switch (key)
             {
+            case TR_KEY_availability:
+                {
+                    pieces_.clear();
+
+                    for (int i = 0; i < pieceCount(); i++)
+                    {
+                        pieces_.emplace_back(availability_[i] == -1);
+                    }
+                    break;
+                }
+
             case TR_KEY_file_count:
             case TR_KEY_primary_mime_type:
                 icon_ = {};
