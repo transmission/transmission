@@ -148,7 +148,6 @@ struct tr_torrent final : public tr_completion::torrent_view
         uint64_t cur_ = {};
     };
 
-public:
     using labels_t = std::vector<tr_interned_string>;
 
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
@@ -603,6 +602,18 @@ public:
 
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
 
+    /// METAINFO - MAGNET
+
+    void maybe_start_metadata_transfer(int64_t size) noexcept;
+
+    [[nodiscard]] std::optional<tr_metadata_piece> get_metadata_piece(int64_t piece) const;
+
+    void set_metadata_piece(int64_t piece, void const* data, size_t len);
+
+    [[nodiscard]] std::optional<int64_t> get_next_metadata_request(time_t now) noexcept;
+
+    [[nodiscard]] double get_metadata_percent() const noexcept;
+
     ///
 
     [[nodiscard]] tr_stat stats() const;
@@ -949,11 +960,6 @@ public:
     CumulativeCount bytes_downloaded_;
     CumulativeCount bytes_uploaded_;
 
-    /* Used when the torrent has been created with a magnet link
-     * and we're in the process of downloading the metainfo from
-     * other peers */
-    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata;
-
     tr_session* session = nullptr;
 
     tr_torrent_announcer* torrent_announcer = nullptr;
@@ -963,6 +969,7 @@ public:
     time_t lpdAnnounceAt = 0;
 
 private:
+    friend bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename);
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
@@ -1200,6 +1207,8 @@ private:
         return fpm_.byte_span_for_file(file);
     }
 
+    bool use_metainfo_from_file(tr_torrent_metainfo const* metainfo, char const* filename, tr_error* error);
+
     // ---
 
     void set_has_piece(tr_piece_index_t piece, bool has)
@@ -1224,6 +1233,7 @@ private:
 
     void on_metainfo_updated();
     void on_metainfo_completed();
+    void on_have_all_metainfo();
     void on_piece_completed(tr_piece_index_t piece);
     void on_piece_failed(tr_piece_index_t piece);
     void on_file_completed(tr_file_index_t file);
@@ -1231,6 +1241,8 @@ private:
 
     void create_empty_files() const;
     void recheck_completeness();
+
+    [[nodiscard]] bool use_new_metainfo(tr_error* error);
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 
@@ -1260,6 +1272,11 @@ private:
     labels_t labels_;
 
     tr_torrent_metainfo metainfo_;
+
+    /* Used when the torrent has been created with a magnet link
+     * and we're in the process of downloading the metainfo from
+     * other peers */
+    std::unique_ptr<tr_metadata_download> metadata_download_;
 
     tr_bandwidth bandwidth_;
 

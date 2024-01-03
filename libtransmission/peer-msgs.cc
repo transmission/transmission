@@ -1015,12 +1015,11 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     logtrace(msgs, fmt::format(FMT_STRING("here is the base64-encoded handshake: [{:s}]"), tr_base64_encode(handshake_sv)));
 
     /* does the peer prefer encrypted connections? */
-    auto i = int64_t{};
     auto pex = tr_pex{};
     auto& [addr, port] = pex.socket_address;
-    if (tr_variantDictFindInt(&*var, TR_KEY_e, &i))
+    if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
     {
-        msgs->encryption_preference = i != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
+        msgs->encryption_preference = e != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
 
         if (msgs->encryption_preference == EncryptionPreference::Yes)
         {
@@ -1034,21 +1033,21 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 
     if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
     {
-        if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
+        if (auto ut_pex = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_pex, &ut_pex))
         {
-            msgs->peerSupportsPex = i != 0;
-            msgs->ut_pex_id = static_cast<uint8_t>(i);
+            msgs->peerSupportsPex = ut_pex != 0;
+            msgs->ut_pex_id = static_cast<uint8_t>(ut_pex);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_pex is {:d}"), static_cast<int>(msgs->ut_pex_id)));
         }
 
-        if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
+        if (auto ut_metadata = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
         {
-            msgs->peerSupportsMetadataXfer = i != 0;
-            msgs->ut_metadata_id = static_cast<uint8_t>(i);
+            msgs->peerSupportsMetadataXfer = ut_metadata != 0;
+            msgs->ut_metadata_id = static_cast<uint8_t>(ut_metadata);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_metadata_id is {:d}"), static_cast<int>(msgs->ut_metadata_id)));
         }
 
-        if (tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &i))
+        if (auto ut_holepunch = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &ut_holepunch))
         {
             // Transmission doesn't support this extension yet.
             // But its presence does indicate µTP supports,
@@ -1058,13 +1057,20 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i))
+    if (auto metadata_size = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
     {
-        tr_torrentSetMetadataSizeHint(msgs->torrent, i);
+        if (!tr_metadata_download::is_valid_metadata_size(metadata_size))
+        {
+            msgs->peerSupportsMetadataXfer = false;
+        }
+        else
+        {
+            msgs->torrent->maybe_start_metadata_transfer(metadata_size);
+        }
     }
 
     /* look for upload_only (BEP 21) */
-    if (tr_variantDictFindInt(&*var, TR_KEY_upload_only, &i))
+    if (auto upload_only = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_upload_only, &upload_only))
     {
         pex.flags |= ADDED_F_SEED_FLAG;
     }
@@ -1079,11 +1085,11 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* get peer's listening port */
-    if (tr_variantDictFindInt(&*var, TR_KEY_p, &i) && i > 0)
+    if (auto p = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_p, &p) && p > 0)
     {
-        port.set_host(i);
+        port.set_host(p);
         msgs->publish(tr_peer_event::GotPort(port));
-        logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
+        logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), p));
     }
 
     std::byte const* addr_compact = nullptr;
@@ -1103,9 +1109,9 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* get peer's maximum request queue size */
-    if (tr_variantDictFindInt(&*var, TR_KEY_reqq, &i))
+    if (auto reqq = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_reqq, &reqq))
     {
-        msgs->reqq = i;
+        msgs->reqq = reqq;
     }
 }
 
@@ -1135,13 +1141,10 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         /* NOOP */
     }
 
-    auto const* const benc_end = serde.end();
-
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= MetadataPieceSize &&
-        piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
+    if (auto const piece_len = msg_end - serde.end();
+        msg_type == MetadataMsgType::Data && piece * MetadataPieceSize + piece_len <= total_size)
     {
-        size_t const piece_len = msg_end - benc_end;
-        tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
+        msgs->torrent->set_metadata_piece(piece, serde.end(), piece_len);
     }
 
     if (msg_type == MetadataMsgType::Request)
@@ -1745,7 +1748,7 @@ void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         return;
     }
 
-    if (auto const piece = tr_torrentGetNextMetadataRequest(msgs->torrent, now); piece)
+    if (auto const piece = msgs->torrent->get_next_metadata_request(now); piece)
     {
         auto tmp = tr_variant{};
         tr_variantInitDict(&tmp, 3);
@@ -1796,8 +1799,8 @@ namespace peer_pulse_helpers
         return {};
     }
 
-    auto data = tr_metadata_piece{};
-    if (!tr_torrentGetMetadataPiece(msgs->torrent, *piece, data))
+    auto data = msgs->torrent->get_metadata_piece(*piece);
+    if (!data)
     {
         // send a reject
         auto tmp = tr_variant{};
@@ -1813,7 +1816,7 @@ namespace peer_pulse_helpers
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
     tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
     tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->info_dict_size());
-    return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp), data);
+    return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp), *data);
 }
 
 [[nodiscard]] size_t add_next_piece(tr_peerMsgsImpl* msgs, uint64_t now)

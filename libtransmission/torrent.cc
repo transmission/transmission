@@ -131,7 +131,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     }
 
     auto error = tr_error{};
-    tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
+    tor->use_metainfo_from_file(metainfo, filename, &error);
     if (error)
     {
         tor->error().set_local_error(fmt::format(
@@ -890,7 +890,7 @@ void tr_torrent::on_metainfo_completed()
         // Potentially, we are in `tr_torrent::init`,
         // and we don't want any file created before `tr_torrent::start`
         // so we Verify but we don't Create files.
-        tr_torrentVerify(this);
+        session->queue_session_thread(tr_torrentVerify, this);
     }
     else
     {
@@ -904,7 +904,7 @@ void tr_torrent::on_metainfo_completed()
         }
         else if (is_running())
         {
-            tr_torrentStop(this);
+            stop_soon();
         }
     }
 }
@@ -1315,7 +1315,7 @@ tr_stat tr_torrent::stats() const
     stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
     stats.percentComplete = this->completion_.percent_complete();
-    stats.metadataPercentComplete = tr_torrentGetMetadataPercent(this);
+    stats.metadataPercentComplete = get_metadata_percent();
 
     stats.percentDone = this->completion_.percent_done();
     stats.leftUntilDone = this->completion_.left_until_done();
