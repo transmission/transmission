@@ -121,7 +121,7 @@ int64_t RpcClient::getNextTag()
     return next_tag_++;
 }
 
-void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise)
+void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise)
 {
     if (!request_)
     {
@@ -139,9 +139,9 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    auto const json_data = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*json));
+    auto const json_data = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*req));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
-    reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
+    reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(req));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
 
     connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
