@@ -734,7 +734,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
                 // one was not going to be sent.
                 if (std::empty(io->inbuf_))
                 {
-                    utp_read_drained(io->socket_.handle.utp);
+                    utp_read_drained(args->socket);
                 }
             }
             return {};
