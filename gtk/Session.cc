@@ -988,32 +988,30 @@ void Session::Impl::update()
 
 void Session::Impl::update_torrent_list(size_t expected_count)
 {
-    auto raw_torrents = std::vector<tr_torrent*>{};
+    auto torrents = std::vector<tr_torrent*>{};
     do
     {
-        raw_torrents.resize(expected_count);
-        expected_count = tr_sessionGetAllTorrents(session_, std::data(raw_torrents), std::size(raw_torrents));
-    } while (raw_torrents.size() < expected_count);
-    raw_torrents.resize(expected_count);
+        torrents.resize(expected_count);
+        expected_count = tr_sessionGetAllTorrents(session_, std::data(torrents), std::size(torrents));
+    } while (torrents.size() < expected_count);
+    torrents.resize(expected_count);
 
-    auto torrents = std::vector<Glib::RefPtr<Torrent>>();
-    torrents.reserve(raw_torrents.size());
-    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
-    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+    std::sort(torrents.begin(), torrents.end(), [](tr_torrent* a, tr_torrent* b) { return tr_torrentId(a) < tr_torrentId(b); });
 
     // don't rebuild the model, because that would disrupt UI
     // instead, iterate both lists and fix the differences
     for (size_t i = 0; i < torrents.size();)
     {
         auto existing = raw_model_->get_item(i);
-        auto& incoming = torrents[i];
-        if (!existing || existing->get_id() > incoming->get_id())
+
+        auto* incoming = torrents[i];
+        if (!existing || existing->get_id() > tr_torrentId(incoming))
         {
             // new torrent detected
-            raw_model_->insert(i, incoming);
+            raw_model_->insert(i, Torrent::create(incoming));
             ++i;
         }
-        else if (existing->get_id() < incoming->get_id())
+        else if (existing->get_id() < tr_torrentId(incoming))
         {
             // existing torrent was removed
             raw_model_->remove(i);
