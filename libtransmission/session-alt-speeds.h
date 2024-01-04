@@ -20,6 +20,7 @@
 struct tr_variant;
 
 #define ALT_SPEEDS_FIELDS(V) \
+    V(TR_KEY_alt_speed_enabled, is_active_, bool, false, "") \
     V(TR_KEY_alt_speed_up, speed_up_kilobytes_per_second_, size_t, 50U, "") \
     V(TR_KEY_alt_speed_down, speed_down_kilobytes_per_second_, size_t, 50U, "") \
     V(TR_KEY_alt_speed_time_enabled, scheduler_enabled_, bool, false, "whether alt speeds toggle on and off on schedule") \
@@ -140,9 +141,6 @@ private:
     static auto constexpr MinutesPerHour = int{ 60 };
     static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
     static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
-
-    // are alt speeds active right now?
-    bool is_active_ = false;
 
     // bitfield of all the minutes in a week.
     // Each bit's value indicates whether the scheduler wants
