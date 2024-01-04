@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,7 +14,7 @@
 #include <string_view>
 #include <utility> // make_pair
 
-#include "error.h"
+#include "libtransmission/error.h"
 
 namespace transmission::benc
 {
@@ -33,7 +33,7 @@ struct Handler
     class Context
     {
     public:
-        constexpr Context(char const* stream_begin_in, tr_error** error_in)
+        constexpr Context(char const* stream_begin_in, tr_error& error_in)
             : error{ error_in }
             , stream_begin_{ stream_begin_in }
         {
@@ -55,7 +55,7 @@ struct Handler
             token_end_ = token_begin_ + len;
         }
 
-        tr_error** error = nullptr;
+        tr_error& error;
 
     private:
         char const* token_begin_ = nullptr;
@@ -219,17 +219,17 @@ struct ParserStack
         return stack[depth].parent_type;
     }
 
-    std::optional<ParentType> pop(tr_error** error)
+    std::optional<ParentType> pop(tr_error& error)
     {
         if (depth == 0)
         {
-            tr_error_set(error, EILSEQ, "Cannot pop empty stack");
+            error.set(EILSEQ, "Cannot pop empty stack");
             return {};
         }
 
         if (stack[depth].parent_type == ParentType::Dict && ((stack[depth].n_children_walked % 2) != 0))
         {
-            tr_error_set(error, EILSEQ, "Premature end-of-dict found. Malformed benc?");
+            error.set(EILSEQ, "Premature end-of-dict found. Malformed benc?");
             return {};
         }
 
@@ -238,11 +238,11 @@ struct ParserStack
         return ret;
     }
 
-    bool push(ParentType parent_type, tr_error** error)
+    bool push(ParentType parent_type, tr_error& error)
     {
         if (depth + 1 >= std::size(stack))
         {
-            tr_error_set(error, E2BIG, "Max stack depth reached; unable to continue parsing");
+            error.set(E2BIG, "Max stack depth reached; unable to continue parsing");
             return false;
         }
 
@@ -258,11 +258,18 @@ bool parse(
     ParserStack<MaxDepth>& stack,
     Handler& handler,
     char const** setme_end = nullptr,
-    tr_error** error = nullptr)
+    tr_error* error = nullptr)
 {
+    // ensure `error` isn't a nullptr
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
     stack.clear();
     auto const* const stream_begin = std::data(benc);
-    auto context = Handler::Context(stream_begin, error);
+    auto context = Handler::Context{ stream_begin, *error };
 
     int err = 0;
     for (;;)
@@ -283,8 +290,8 @@ bool parse(
         case 'i': // int
             if (auto const value = impl::ParseInt(&benc); !value)
             {
-                tr_error_set(error, err, "Malformed benc? Unable to parse integer");
                 err = EILSEQ;
+                error->set(err, "Malformed benc? Unable to parse integer");
             }
             else
             {
@@ -304,8 +311,8 @@ bool parse(
         case 'l': // list
         case 'd': // dict
             {
-                bool ok = benc.front() == 'l' ? stack.push(ParserStack<MaxDepth>::ParentType::Array, error) :
-                                                stack.push(ParserStack<MaxDepth>::ParentType::Dict, error);
+                bool ok = benc.front() == 'l' ? stack.push(ParserStack<MaxDepth>::ParentType::Array, *error) :
+                                                stack.push(ParserStack<MaxDepth>::ParentType::Dict, *error);
                 if (!ok)
                 {
                     err = EILSEQ;
@@ -326,7 +333,7 @@ bool parse(
         case 'e': // end of list or dict
             benc.remove_prefix(1);
 
-            if (auto const parent_type = stack.pop(error); !parent_type)
+            if (auto const parent_type = stack.pop(*error); !parent_type)
             {
                 err = EILSEQ;
             }
@@ -357,7 +364,7 @@ bool parse(
             if (auto const sv = impl::ParseString(&benc); !sv)
             {
                 err = EILSEQ;
-                tr_error_set(error, err, "Malformed benc? Unable to parse string");
+                error->set(err, "Malformed benc? Unable to parse string");
             }
             else
             {
@@ -398,7 +405,7 @@ bool parse(
     if (stack.depth != 0)
     {
         err = EILSEQ;
-        tr_error_set(error, err, "premature end-of-data reached");
+        error->set(err, "premature end-of-data reached");
         errno = err;
         return false;
     }
@@ -406,7 +413,7 @@ bool parse(
     if (stack.stack[0].n_children_walked == 0)
     {
         err = EILSEQ;
-        tr_error_set(error, err, "no bencoded data to parse");
+        error->set(err, "no bencoded data to parse");
         errno = err;
         return false;
     }

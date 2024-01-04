@@ -54,6 +54,7 @@ target_sources(libtransmission-test
         torrents-test.cc
         tr-peer-info-test.cc
         utils-test.cc
+        values-test.cc
         variant-test.cc
         watchdir-test.cc
         web-utils-test.cc)
@@ -106,10 +107,6 @@ target_sources(subprocess-test
 set_property(
     TARGET subprocess-test
     PROPERTY FOLDER "tests")
-
-target_include_directories(subprocess-test
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/libtransmission)
 
 target_link_libraries(subprocess-test
     PRIVATE

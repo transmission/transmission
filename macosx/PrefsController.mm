@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -11,6 +11,7 @@
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
 #import "Controller.h"
+#import "DefaultAppHelper.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
@@ -58,6 +59,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, copy) NSString* fInitialString;
 
 @property(nonatomic) IBOutlet NSButton* fSystemPreferencesButton;
+@property(nonatomic) IBOutlet NSButton* fSetDefaultForMagnetButton;
+@property(nonatomic) IBOutlet NSButton* fSetDefaultForTorrentButton;
 @property(nonatomic) IBOutlet NSTextField* fCheckForUpdatesLabel;
 @property(nonatomic) IBOutlet NSButton* fCheckForUpdatesButton;
 @property(nonatomic) IBOutlet NSButton* fCheckForUpdatesBetaButton;
@@ -101,6 +104,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
+@property(nonatomic, readonly) DefaultAppHelper* fDefaultAppHelper;
 
 @end
 
@@ -175,6 +179,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         }
 
         [self setAutoUpdateToBeta:nil];
+
+        _fDefaultAppHelper = [[DefaultAppHelper alloc] init];
     }
 
     return self;
@@ -182,8 +188,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     [_fPortStatusTimer invalidate];
     if (_fPortChecker)
     {
@@ -193,6 +197,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fHasLoaded = YES;
 
     self.window.restorationClass = [self class];
@@ -212,6 +217,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.window center];
 
     [self setPrefView:nil];
+
+    [self updateDefaultsStates];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -784,7 +791,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     return static_cast<int>(components.hour * 60 + components.minute);
 }
 
-+ (NSDate*)timeSumToDate:(int)sum
++ (NSDate*)timeSumToDate:(NSInteger)sum
 {
     NSDateComponents* comps = [[NSDateComponents alloc] init];
     comps.hour = sum / 60;
@@ -818,7 +825,24 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)openNotificationSystemPrefs:(NSButton*)sender
 {
-    [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+    NSURL* prefPaneUrl = nil;
+    if (@available(macOS 13, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else if (@available(macOS 12, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.preference.notifications?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else
+    {
+        prefPaneUrl = [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"];
+    }
+    [NSWorkspace.sharedWorkspace openURL:prefPaneUrl];
 }
 
 - (void)resetWarnings:(id)sender
@@ -836,14 +860,29 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     //[fDefaults removeObjectForKey: @"WarningLegal"];
 }
 
-- (void)setDefaultForMagnets:(id)sender
+- (IBAction)setDefaultForMagnets:(id)sender
 {
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-    OSStatus const result = LSSetDefaultHandlerForURLScheme((CFStringRef) @"magnet", (__bridge CFStringRef)bundleID);
-    if (result != noErr)
-    {
-        NSLog(@"Failed setting default magnet link handler");
-    }
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForMagnetURLs:^{
+        [weakSelf updateDefaultsStates];
+    }];
+}
+
+- (IBAction)setDefaultForTorrentFiles:(id)sender
+{
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForTorrentFiles:^{
+        [weakSelf updateDefaultsStates];
+    }];
+}
+
+- (void)updateDefaultsStates
+{
+    BOOL const isDefaultForMagnetURLs = [self.fDefaultAppHelper isDefaultForMagnetURLs];
+    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetURLs;
+
+    BOOL const isDefaultForTorrentFiles = [self.fDefaultAppHelper isDefaultForTorrentFiles];
+    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentFiles;
 }
 
 - (void)setQueue:(id)sender
@@ -1476,7 +1515,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         self.fQueueSeedField.integerValue = seedQueueNum;
 
         //check stalled handled by bindings
-        self.fStalledField.intValue = stalledMinutes;
+        self.fStalledField.integerValue = stalledMinutes;
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];

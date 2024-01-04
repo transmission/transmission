@@ -249,19 +249,31 @@ TEST(Crypto, random)
     }
 }
 
-TEST(Crypto, randBuf)
-{
-    static auto constexpr Width = 32U;
-    static auto constexpr Iterations = 100000U;
-    static auto constexpr Empty = std::array<uint8_t, Width>{};
+using CryptoRandBufferTest = ::testing::TestWithParam<size_t>;
 
-    auto buf = Empty;
+TEST_P(CryptoRandBufferTest, randBuf)
+{
+    static auto constexpr Iterations = 1000U;
+
+    auto const width = GetParam();
+    auto const empty = std::vector<uint8_t>(width, 0);
+
+    auto buf = empty;
 
     for (size_t i = 0; i < Iterations; ++i)
     {
         auto tmp = buf;
         tr_rand_buffer(std::data(tmp), std::size(tmp));
-        EXPECT_NE(tmp, Empty);
+        EXPECT_NE(tmp, empty);
+        EXPECT_NE(tmp, buf);
+        buf = tmp;
+    }
+
+    for (size_t i = 0; i < Iterations; ++i)
+    {
+        auto tmp = buf;
+        EXPECT_TRUE(tr_rand_buffer_crypto(std::data(tmp), std::size(tmp)));
+        EXPECT_NE(tmp, empty);
         EXPECT_NE(tmp, buf);
         buf = tmp;
     }
@@ -270,11 +282,17 @@ TEST(Crypto, randBuf)
     {
         auto tmp = buf;
         tr_rand_buffer_std(std::data(tmp), std::size(tmp));
-        EXPECT_NE(tmp, Empty);
+        EXPECT_NE(tmp, empty);
         EXPECT_NE(tmp, buf);
         buf = tmp;
     }
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    Crypto,
+    CryptoRandBufferTest,
+    ::testing::Values(32, 100, 1024, 3000),
+    ::testing::PrintToStringParamName{});
 
 TEST(Crypto, base64)
 {

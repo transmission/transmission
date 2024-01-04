@@ -143,24 +143,31 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
 
 TEST_F(TorrentFilesTest, isSubpathPortable)
 {
-    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 15>{ {
+    static auto constexpr NotWin32 = TR_IF_WIN32(false, true);
+
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 18>{ {
+        // never portable
+        { ".", false },
+        { "..", false },
+
         // don't end with periods
-        { "foo.", false },
-        { "foo..", false },
+        { "foo.", NotWin32 },
+        { "foo..", NotWin32 },
 
         // don't begin or end with whitespace
-        { " foo ", false },
-        { " foo", false },
-        { "foo ", false },
+        { " foo ", NotWin32 },
+        { " foo", NotWin32 },
+        { "foo ", NotWin32 },
 
         // reserved names
-        { "COM1", false },
-        { "COM1.txt", false },
-        { "Com1", false },
-        { "com1", false },
+        { "COM1", NotWin32 },
+        { "COM1.txt", NotWin32 },
+        { "Com1", NotWin32 },
+        { "com1", NotWin32 },
 
         // reserved characters
-        { "hell:o.txt", false },
+        { "hell:o.txt", NotWin32 },
+        { "hell\to.txt", NotWin32 },
 
         // everything else
         { ".foo", true },

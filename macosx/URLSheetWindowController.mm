@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -24,6 +24,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
     self.fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
     self.fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");

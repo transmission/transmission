@@ -1,0 +1,33 @@
+
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
+"22.title" = "Aletze-mugak";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
+"23.title" = "Transferentzien abiadura";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "KB/s";
+
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
+"43.title" = "Mugatu Igoera:";
+
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
+"44.title" = "Mugatu Deskarga:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
+"98.title" = "minutu";
+
+/* Class = "NSButtonCell"; title = "Status of selected files"; ObjectID = "114"; */
+"114.title" = "Aukeratutako fitxategien egoera";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "116"; */
+"116.title" = "Gelditu emaritza maila honetan:";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "118"; */
+"118.title" = "Geratu igortzea hurrengo tarteaz inaktibo badago:";
+
+/* Class = "NSButtonCell"; title = "Remaining time"; ObjectID = "130"; */
+"130.title" = "Falta den denbora";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "180"; */
+"180.title" = "KB/s";

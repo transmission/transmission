@@ -3,7 +3,7 @@
 "11.title" = "OK";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "12"; */
-"12.title" = "Отменить";
+"12.title" = "Отмена";
 
 /* Class = "NSMenuItem"; title = "begins with"; ObjectID = "40"; */
 "40.title" = "начинается с";

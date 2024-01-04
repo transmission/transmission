@@ -1,4 +1,4 @@
-// This file Copyright © 2023-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include <array>
 #include <chrono>
 #include <cstddef> // size_t
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -155,7 +156,7 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
         {
             auto const type = static_cast<tr_address_type>(i);
             auto const addr = tr_address::from_string(AddrStr[j]);
-            ASSERT_TRUE(addr);
+            ASSERT_TRUE(addr.has_value());
             EXPECT_EQ(global_ip_cache_->set_global_addr(type, *addr), AddrTests[i][j]);
             if (auto const val = global_ip_cache_->global_addr(type); val && AddrTests[i][j])
             {
@@ -231,11 +232,8 @@ TEST_F(GlobalIPCacheTest, onResponseIPQuery)
     {
         void fetch(tr_web::FetchOptions&& options) override
         {
-            auto response = tr_web::FetchResponse{ http_code,
-                                                   std::string{ AddrStr[k_] },
-                                                   true,
-                                                   false,
-                                                   options.done_func_user_data };
+            auto response = tr_web::FetchResponse{ http_code, std::string{ AddrStr[k_] }, std::string{}, true,
+                                                   false,     options.done_func_user_data };
             options.done_func(response);
         }
 

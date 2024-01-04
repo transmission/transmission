@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -80,11 +80,11 @@ public:
     void torrents_added();
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
-    int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
+    void add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
 
-    void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
+    void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
 
     void commit_prefs_change(tr_quark key);
 
@@ -691,12 +691,12 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
     return Torrent::create(tor);
 }
 
-int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
+void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 {
     auto const* metainfo = tr_ctorGetMetainfo(ctor);
     if (metainfo == nullptr)
     {
-        return TR_PARSE_ERR;
+        return;
     }
 
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
@@ -710,18 +710,17 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         }
 
         tr_ctorFree(ctor);
-        return TR_PARSE_DUPLICATE;
+        return;
     }
 
     if (!do_prompt)
     {
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
-        return 0;
+        return;
     }
 
     signal_add_prompt_.emit(ctor);
-    return 0;
 }
 
 namespace
@@ -803,7 +802,7 @@ void Session::Impl::add_file_async_callback(
 
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
-    auto const* const session = get_session();
+    auto* const session = get_session();
     if (session == nullptr)
     {
         return false;
@@ -909,7 +908,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error** error)
+            [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr);
     }
@@ -956,7 +955,7 @@ void Session::start_now(tr_torrent_id_t id)
     auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
-    exec(&top);
+    exec(top);
 }
 
 void Session::Impl::update()
@@ -1226,19 +1225,16 @@ bool core_read_rpc_response_idle(tr_variant& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
+void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 {
-    auto owned_response = std::make_shared<tr_variant>();
-    tr_variantInitBool(owned_response.get(), false);
-    std::swap(*owned_response, *response);
-
+    auto owned_response = std::make_shared<tr_variant>(std::move(response));
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
 }
 
 } // namespace
 
 void Session::Impl::send_rpc_request(
-    tr_variant const* request,
+    tr_variant const& request,
     int64_t tag,
     std::function<void(tr_variant&)> const& response_func)
 {
@@ -1256,7 +1252,7 @@ void Session::Impl::send_rpc_request(
         gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
 #endif
 
-        tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);
+        tr_rpc_request_exec(session_, request, core_read_rpc_response);
     }
 }
 
@@ -1274,7 +1270,7 @@ void Session::port_test()
     tr_variantDictAddStrView(&request, TR_KEY_method, "port-test");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        &request,
+        request,
         tag,
         [this](auto& response)
         {
@@ -1305,7 +1301,7 @@ void Session::blocklist_update()
     tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        &request,
+        request,
         tag,
         [this](auto& response)
         {
@@ -1331,7 +1327,7 @@ void Session::blocklist_update()
 ****
 ***/
 
-void Session::exec(tr_variant const* request)
+void Session::exec(tr_variant const& request)
 {
     auto const tag = nextTag;
     ++nextTag;

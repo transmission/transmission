@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
+#include <cstdint> // uint8_t
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -17,6 +18,7 @@
 #include <fmt/core.h>
 
 #include "libtransmission/clients.h"
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -111,7 +113,7 @@ constexpr std::string_view utSuffix(uint8_t ch)
 void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', strint(&id[3], 2), '.');
-    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:02d}"), strint(&id[5], 2)).out = '\0';
+    *fmt::format_to_n(buf, buflen - 1, "{:02d}", strint(&id[5], 2)).out = '\0';
 }
 
 // Shad0w with his experimental BitTorrent implementation and BitTornado
@@ -232,7 +234,7 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     int const minor = uint8_t(peer_id[5]);
 
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', mod, major, '.');
-    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:02d}"), minor).out = '\0';
+    *fmt::format_to_n(buf, buflen - 1, "{:02d}", minor).out = '\0';
     return true;
 }
 
@@ -294,8 +296,7 @@ constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view na
 void bittorrent_dna_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
-    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:d}.{:d}.{:d}"), strint(&id[3], 2), strint(&id[5], 2), strint(&id[7], 2))
-         .out = '\0';
+    *fmt::format_to_n(buf, buflen - 1, "{:d}.{:d}.{:d}", strint(&id[3], 2), strint(&id[5], 2), strint(&id[7], 2)).out = '\0';
 }
 
 void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
@@ -421,16 +422,15 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_
 
     if (std::equal(&id[3], &id[6], "000")) // very old client style: -TR0006- is 0.6
     {
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("0.{:c}"), id[6]).out = '\0';
+        *fmt::format_to_n(buf, buflen - 1, "0.{:c}", id[6]).out = '\0';
     }
     else if (std::equal(&id[3], &id[5], "00")) // pre-1.0 style: -TR0072- is 0.72
     {
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("0.{:02d}"), strint(&id[5], 2)).out = '\0';
+        *fmt::format_to_n(buf, buflen - 1, "0.{:02d}", strint(&id[5], 2)).out = '\0';
     }
     else if (id[3] <= '3') // style up through 3.00: -TR111Z- is 1.11+
     {
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s}.{:02d}{:s}"), base62str(id[3]), strint(&id[4], 2), utSuffix(id[6]))
-             .out = '\0';
+        *fmt::format_to_n(buf, buflen - 1, "{:s}.{:02d}{:s}", base62str(id[3]), strint(&id[4], 2), utSuffix(id[6])).out = '\0';
     }
     else // -TR400X- is 4.0.0 (Beta)"
     {
@@ -490,7 +490,7 @@ constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name,
 void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', base62str(id[3]), '.', base62str(id[4]), " ("sv);
-    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:d}"), strint(&id[5], 2)).out = '\0';
+    *fmt::format_to_n(buf, buflen - 1, "{:d}", strint(&id[5], 2)).out = '\0';
 }
 
 struct Client
@@ -649,7 +649,7 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 
     if (peer_id[0] == '\0' && peer_id[2] == 'B' && peer_id[3] == 'S')
     {
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("BitSpirit {:d}"), peer_id[1] == '\0' ? 1 : int(peer_id[1])).out = '\0';
+        *fmt::format_to_n(buf, buflen - 1, "BitSpirit {:d}", peer_id[1] == '\0' ? 1 : int(peer_id[1])).out = '\0';
         return;
     }
 
@@ -690,7 +690,7 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
             }
             else
             {
-                walk = fmt::format_to_n(walk, end - walk - 1, FMT_STRING("%{:02X}"), static_cast<unsigned char>(c)).out;
+                walk = fmt::format_to_n(walk, end - walk - 1, "%{:02X}", static_cast<unsigned char>(c)).out;
             }
         }
 

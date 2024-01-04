@@ -1,16 +1,16 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <QSet>
 #include <QTreeView>
 
 #include <libtransmission/tr-macros.h>
 
 #include "Torrent.h" // FileList
+#include "Typedefs.h" // file_indices_t
 
 class QAction;
 class QMenu;
@@ -33,8 +33,8 @@ public:
     void setEditable(bool editable);
 
 signals:
-    void priorityChanged(QSet<int> const& file_indices, int priority);
-    void wantedChanged(QSet<int> const& file_indices, bool wanted);
+    void priorityChanged(file_indices_t const& file_indices, int priority);
+    void wantedChanged(file_indices_t const& file_indices, bool wanted);
     void pathEdited(QString const& old_path, QString const& new_name);
     void openRequested(QString const& path);
 

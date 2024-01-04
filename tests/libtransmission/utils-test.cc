@@ -226,60 +226,6 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-TEST_F(UtilsTest, trStrlcpy)
-{
-    // destination will be initialized with this char
-    char const initial_char = '1';
-    std::array<char, 100> destination = { initial_char };
-
-    std::vector<std::string> const tests{
-        "a",
-        "",
-        "12345678901234567890",
-        "This, very useful string contains a total of 105 characters not counting null. Almost like an easter egg!"
-    };
-
-    for (auto const& test : tests)
-    {
-        auto c_string = test.c_str();
-        auto length = strlen(c_string);
-
-        destination.fill(initial_char);
-
-        auto response = tr_strlcpy(&destination, c_string, 98);
-
-        // Check response length
-        ASSERT_EQ(response, length);
-
-        // Check what was copied
-        for (unsigned i = 0U; i < 97U; ++i)
-        {
-            if (i <= length)
-            {
-                ASSERT_EQ(destination[i], c_string[i]);
-            }
-            else
-            {
-                ASSERT_EQ(destination[i], initial_char);
-            }
-        }
-
-        // tr_strlcpy should only write this far if (length >= 98)
-        if (length >= 98)
-        {
-            ASSERT_EQ(destination[97], '\0');
-        }
-        else
-        {
-            ASSERT_EQ(destination[97], initial_char);
-        }
-
-        // tr_strlcpy should not write this far
-        ASSERT_EQ(destination[98], initial_char);
-        ASSERT_EQ(destination[99], initial_char);
-    }
-}
-
 TEST_F(UtilsTest, env)
 {
     char const* test_key = "TR_TEST_ENV";
@@ -319,27 +265,26 @@ TEST_F(UtilsTest, saveFile)
     // save a file to GoogleTest's temp dir
     filename.assign(::testing::TempDir(), "filename.txt"sv);
     auto contents = "these are the contents"sv;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_TRUE(tr_file_save(filename.sv(), contents, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
     EXPECT_TRUE(tr_file_read(filename.sv(), buf, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);
 
     // remove the tempfile
     EXPECT_TRUE(tr_sys_path_remove(filename, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
     EXPECT_FALSE(tr_file_save(filename.sv(), contents, &error));
-    ASSERT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    tr_error_clear(&error);
+    ASSERT_TRUE(error);
+    EXPECT_NE(0, error.code());
 }
 
 TEST_F(UtilsTest, ratioToString)

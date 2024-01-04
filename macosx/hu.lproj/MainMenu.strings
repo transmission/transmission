@@ -1,0 +1,444 @@
+
+/* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
+"21.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
+"56.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "Transmission"; ObjectID = "57"; */
+"57.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "About Transmission"; ObjectID = "58"; */
+"58.title" = "Névjegy";
+
+/* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "72"; */
+"72.title" = "Torrent fájl megnyitása...";
+
+/* Class = "NSMenuItem"; title = "Close Window"; ObjectID = "73"; */
+"73.title" = "Ablak bezárása";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "Fájl";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "Fájl";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
+"103.title" = "Súgó";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
+"106.title" = "Súgó";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Beállítások...";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "Szolgáltatások";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "Szolgáltatások";
+
+/* Class = "NSMenuItem"; title = "Hide Transmission"; ObjectID = "134"; */
+"134.title" = "Transmission elrejtése";
+
+/* Class = "NSMenuItem"; title = "Quit Transmission"; ObjectID = "136"; */
+"136.title" = "Transmission bezárása";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Többi elrejtése";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Mind mutatása";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "157"; */
+"157.title" = "Másolás";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "160"; */
+"160.title" = "Kivágás";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "163"; */
+"163.title" = "Szerkesztés";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "169"; */
+"169.title" = "Szerkesztés";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "171"; */
+"171.title" = "Beilleszt";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "172"; */
+"172.title" = "Mind kijelölése";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "301"; */
+"301.title" = "Nézet";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "302"; */
+"302.title" = "Nézet";
+
+/* Class = "NSMenuItem"; title = "Forums"; ObjectID = "418"; */
+"418.title" = "Fórum";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "456"; */
+"456.title" = "Menü";
+
+/* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "457"; */
+"457.title" = "Kiválasztottak szüneteltetése";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "459"; */
+"459.title" = "Szemlélő megjelenítése";
+
+/* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "516"; */
+"516.title" = "Megjelenítés Finderben";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "545"; */
+"545.title" = "Eszköztár személyre szabása...";
+
+/* Class = "NSMenuItem"; title = "Hide Status Bar"; ObjectID = "547"; */
+"547.title" = "Állapotsáv elrejtése";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "589"; */
+"589.title" = "Menü";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "598"; */
+"598.title" = "Szemlélő megjelenítése";
+
+/* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "611"; */
+"611.title" = "Torrent fájl megnyitása...";
+
+/* Class = "NSMenuItem"; title = "Check for Update…"; ObjectID = "975"; */
+"975.title" = "Frissítések keresése...";
+
+/* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1028"; */
+"1028.title" = "Kiválasztottak folytatása";
+
+/* Class = "NSMenuItem"; title = "Hide Toolbar"; ObjectID = "1222"; */
+"1222.title" = "Eszköztár elrejtése";
+
+/* Class = "NSMenuItem"; title = "Transfers"; ObjectID = "1399"; */
+"1399.title" = "Átvitelek";
+
+/* Class = "NSMenu"; title = "Transfers"; ObjectID = "1400"; */
+"1400.title" = "Átvitelek";
+
+/* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "1403"; */
+"1403.title" = "Kiválasztottak szüneteltetése";
+
+/* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1404"; */
+"1404.title" = "Kiválasztottak folytatása";
+
+/* Class = "NSMenuItem"; title = "Pause All"; ObjectID = "1413"; */
+"1413.title" = "Összes szüneteltetése";
+
+/* Class = "NSMenuItem"; title = "Resume All"; ObjectID = "1414"; */
+"1414.title" = "Összes folytatása";
+
+/* Class = "NSMenuItem"; title = "Remove and Trash Data File"; ObjectID = "1514"; */
+"1514.title" = "Eltávolítás és adat fájl kukába helyezése";
+
+/* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1516"; */
+"1516.title" = "Eltávolítás listából";
+
+/* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "1533"; */
+"1533.title" = "Torrent fájl mentése másként...";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "1536"; */
+"1536.title" = "Szemlélő megjelenítése";
+
+/* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "1539"; */
+"1539.title" = "Megjelenítés Finderben";
+
+/* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1550"; */
+"1550.title" = "Eltávolítás listából";
+
+/* Class = "NSMenuItem"; title = "Remove and Trash Data File"; ObjectID = "1551"; */
+"1551.title" = "Eltávolítás és adat fájl kukába helyezése";
+
+/* Class = "NSMenuItem"; title = "Transmission Homepage"; ObjectID = "1558"; */
+"1558.title" = "Transmission weblapja";
+
+/* Class = "NSMenuItem"; title = "Transmission Help"; ObjectID = "1561"; */
+"1561.title" = "Transmission súgó";
+
+/* Class = "NSMenuItem"; title = "Speed Limit"; ObjectID = "1566"; */
+"1566.title" = "Sebességkorlát";
+
+/* Class = "NSMenuItem"; title = "Compact View"; ObjectID = "1578"; */
+"1578.title" = "Kompakt nézet";
+
+/* Class = "NSMenuItem"; title = "Hide Filter Bar"; ObjectID = "1620"; */
+"1620.title" = "Szűrősáv elrejtése";
+
+/* Class = "NSMenuItem"; title = "Select None"; ObjectID = "1675"; */
+"1675.title" = "Kiválasztás megszüntetése";
+
+/* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1678"; */
+"1678.title" = "Kiválasztottak folytatása azonnal";
+
+/* Class = "NSMenuItem"; title = "Open With Options Window…"; ObjectID = "1680"; */
+"1680.title" = "Megnyitás beállítások ablakkal...";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "1683"; */
+"1683.title" = "Ablak";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "1684"; */
+"1684.title" = "Ablak";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "1685"; */
+"1685.title" = "Tálcára helyezés";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "1687"; */
+"1687.title" = "Mindet előtérbe helyez";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "1688"; */
+"1688.title" = "Nagyítás";
+
+/* Class = "NSMenuItem"; title = "Next Inspector Tab"; ObjectID = "1693"; */
+"1693.title" = "Következő szemlélő fül";
+
+/* Class = "NSMenuItem"; title = "Previous Inspector Tab"; ObjectID = "1694"; */
+"1694.title" = "Előző szemlélő fül";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "1696"; */
+"1696.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "1766"; */
+"1766.title" = "Törlés";
+
+/* Class = "NSMenuItem"; title = "Message Log"; ObjectID = "1795"; */
+"1795.title" = "Üzenetnapló";
+
+/* Class = "NSMenuItem"; title = "Next Filter Button"; ObjectID = "1797"; */
+"1797.title" = "Következő szűrő gomb";
+
+/* Class = "NSMenuItem"; title = "Previous Filter Button"; ObjectID = "1798"; */
+"1798.title" = "Előző szűrő gomb";
+
+/* Class = "NSMenuItem"; title = "Resume All Waiting"; ObjectID = "1804"; */
+"1804.title" = "Összes várakozó folytatása";
+
+/* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1808"; */
+"1808.title" = "Kiválasztottak folytatása azonnal";
+
+/* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1846"; */
+"1846.title" = "Torrent cím megnyitása...";
+
+/* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1858"; */
+"1858.title" = "Torrent cím megnyitása...";
+
+/* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "1860"; */
+"1860.title" = "Tracker frissítése";
+
+/* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "1877"; */
+"1877.title" = "Helyi adatok ellenőrzése";
+
+/* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "1891"; */
+"1891.title" = "Adat fájl áthelyezése ide...";
+
+/* Class = "NSMenuItem"; title = "Sort Transfers By"; ObjectID = "1894"; */
+"1894.title" = "Átvitelek rendezése";
+
+/* Class = "NSMenu"; title = "Sort Transfers By"; ObjectID = "1895"; */
+"1895.title" = "Átvitelek rendezése";
+
+/* Class = "NSMenuItem"; title = "Progress"; ObjectID = "1896"; */
+"1896.title" = "Folyamat";
+
+/* Class = "NSMenuItem"; title = "State"; ObjectID = "1897"; */
+"1897.title" = "Állapot";
+
+/* Class = "NSMenuItem"; title = "Ascending"; ObjectID = "1899"; */
+"1899.title" = "Növekvő";
+
+/* Class = "NSMenuItem"; title = "Date Added"; ObjectID = "1900"; */
+"1900.title" = "Hozzáadva";
+
+/* Class = "NSMenuItem"; title = "Queue Order"; ObjectID = "1901"; */
+"1901.title" = "Sor rendezése";
+
+/* Class = "NSMenuItem"; title = "Name"; ObjectID = "1902"; */
+"1902.title" = "Név";
+
+/* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1921"; */
+"1921.title" = "Torrent fájl létrehozása...";
+
+/* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1923"; */
+"1923.title" = "Torrent fájl létrehozása...";
+
+/* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
+"1933.title" = "Tracker";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
+"1936.title" = "Menü";
+
+/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
+"1944.title" = "Letöltési sávszélesség korlát";
+
+/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
+"1945.title" = "Letöltési sávszélesség korlát";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
+"1946.title" = "Korlátlan";
+
+/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
+"1950.title" = "Feltöltési sávszélesség korlát";
+
+/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
+"1951.title" = "Feltöltési sávszélesség korlát";
+
+/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
+"1960.title" = "korlát";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
+"1963.title" = "Korlátlan";
+
+/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
+"1964.title" = "korlát";
+
+/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
+"2017.title" = "Megosztás megállítása ekkora aránynál";
+
+/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
+"2018.title" = "Megosztás megállítása ekkora aránynál";
+
+/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
+"2024.title" = "Megosztás folyamatosan";
+
+/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
+"2025.title" = "stop arány";
+
+/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
+"2031.title" = "Globális";
+
+/* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
+"2122.title" = "Tracker frissítése";
+
+/* Class = "NSMenuItem"; title = "Pieces Bar"; ObjectID = "2185"; */
+"2185.title" = "Szeletek sáv";
+
+/* Class = "NSMenuItem"; title = "Availability"; ObjectID = "2279"; */
+"2279.title" = "Elérhetőség";
+
+/* Class = "NSMenuItem"; title = "Statistics"; ObjectID = "2301"; */
+"2301.title" = "Statisztika";
+
+/* Class = "NSMenuItem"; title = "Activity"; ObjectID = "2324"; */
+"2324.title" = "Tevékenység";
+
+/* Class = "NSMenuItem"; title = "Group"; ObjectID = "2839"; */
+"2839.title" = "Csoport";
+
+/* Class = "NSMenu"; title = "Group"; ObjectID = "2840"; */
+"2840.title" = "Csoport";
+
+/* Class = "NSMenuItem"; title = "Group"; ObjectID = "2849"; */
+"2849.title" = "Csoport";
+
+/* Class = "NSMenu"; title = "Group"; ObjectID = "2850"; */
+"2850.title" = "Csoport";
+
+/* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
+"3078.title" = "Csoportok használata";
+
+/* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
+/* "3093.headerCell.title" = ""; */
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
+"3166.title" = "Gyors nézet";
+
+/* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
+"3170.title" = "Támogatás & Fejlesztés";
+
+/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
+"3190.title" = "Maradjon a globális sávszélességi korlátokon belül";
+
+/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
+"3196.title" = "Prioritás";
+
+/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
+"3197.title" = "Prioritás";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
+"3198.title" = "Magas";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
+"3199.title" = "Normál";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
+"3200.title" = "Alacsony";
+
+/* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
+"3207.title" = "Torrent fájl mentése másként...";
+
+/* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "3209"; */
+"3209.title" = "Adat fájl áthelyezése ide...";
+
+/* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "3212"; */
+"3212.title" = "Támogatás...";
+
+/* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3216"; */
+"3216.title" = "Magnet link másolása a vágólapra";
+
+/* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3218"; */
+"3218.title" = "Magnet link másolása a vágólapra";
+
+/* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
+"3221.title" = "Helyi adatok ellenőrzése";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "3321"; */
+"3321.title" = "Visszavon";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "3400"; */
+"3400.title" = "Művelet újbóli elvégzése";
+
+/* Class = "NSMenuItem"; title = "Descending"; ObjectID = "3405"; */
+"3405.title" = "Csökkenő";
+
+/* Class = "NSMenuItem"; title = "Remove All Completed From List"; ObjectID = "3407"; */
+"3407.title" = "Összes befejezett eltávolítása a listából";
+
+/* Class = "NSMenuItem"; title = "Size"; ObjectID = "3430"; */
+"3430.title" = "Méret";
+
+/* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3445"; */
+"3445.title" = "Fájl átnevezése...";
+
+/* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3448"; */
+"3448.title" = "Fájl átnevezése...";
+
+/* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "8t6-wh-5UW"; */
+"8t6-wh-5UW.title" = "Torrent fájl megosztása";
+
+/* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "Cay-iU-bH4"; */
+"Cay-iU-bH4.title" = "Torrent fájl megosztása";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
+/* "HmT-FI-amY.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
+/* "Zmj-A9-NPf.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
+/* "kbX-Av-eP4.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
+/* "lmp-Y3-ZQO.title" = ""; */
+
+/* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
+"lvU-Va-GzM.title" = "Torrent fájl megosztása";
+
+/* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
+"oSz-TE-8jj.title" = "Folyamat";
+
+/* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
+"s5v-VO-G2y.title" = "Torrent fájl megosztása";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
+/* "x8g-Nv-jcD.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
+/* "y9O-gd-sXA.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
+/* "zIM-6D-jsa.title" = ""; */
+
+/* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
+/* "zLF-YR-Oq6.title" = ""; */

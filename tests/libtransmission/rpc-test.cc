@@ -17,6 +17,7 @@
 #include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
+#include "libtransmission/quark.h"
 #include "test-fixtures.h"
 
 struct tr_session;
@@ -32,30 +33,26 @@ TEST_F(RpcTest, list)
 {
     auto i = int64_t{};
     auto sv = std::string_view{};
-    tr_variant top;
 
-    tr_rpc_parse_list_str(&top, "12"sv);
+    auto top = tr_rpc_parse_list_str("12"sv);
     EXPECT_TRUE(top.holds_alternative<int64_t>());
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
-    top.clear();
 
-    tr_rpc_parse_list_str(&top, "6,7"sv);
+    top = tr_rpc_parse_list_str("6,7"sv);
     EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(2U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
     EXPECT_EQ(7, i);
-    top.clear();
 
-    tr_rpc_parse_list_str(&top, "asdf"sv);
+    top = tr_rpc_parse_list_str("asdf"sv);
     EXPECT_TRUE(top.holds_alternative<std::string_view>());
     EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
     EXPECT_EQ("asdf"sv, sv);
-    top.clear();
 
-    tr_rpc_parse_list_str(&top, "1,3-5"sv);
+    top = tr_rpc_parse_list_str("1,3-5"sv);
     EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(4U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
@@ -74,19 +71,17 @@ TEST_F(RpcTest, list)
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
-    {
-        std::swap(*static_cast<tr_variant*>(setme), *response);
-    };
-
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
-    tr_variant request;
+    auto request = tr_variant{};
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
-    tr_variant response;
-    tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        request,
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
@@ -182,6 +177,45 @@ TEST_F(RpcTest, sessionGet)
         std::end(expected_keys),
         std::inserter(unexpected_keys, std::begin(unexpected_keys)));
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
+
+    // cleanup
+    tr_torrentRemove(tor, false, nullptr, nullptr);
+}
+
+TEST_F(RpcTest, torrentGet)
+{
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    EXPECT_NE(nullptr, tor);
+
+    tr_variant request;
+    tr_variantInitDict(&request, 1);
+
+    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-get");
+
+    tr_variant* args_in = tr_variantDictAddDict(&request, TR_KEY_arguments, 1);
+    tr_variant* fields = tr_variantDictAddList(args_in, TR_KEY_fields, 1);
+    tr_variantListAddStrView(fields, tr_quark_get_string_view(TR_KEY_id));
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        request,
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
+    tr_variant* args = nullptr;
+    EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
+
+    tr_variant* torrents = nullptr;
+    EXPECT_TRUE(tr_variantDictFindList(args, TR_KEY_torrents, &torrents));
+    EXPECT_EQ(1UL, tr_variantListSize(torrents));
+
+    tr_variant* first_torrent = tr_variantListChild(torrents, 0);
+    EXPECT_TRUE(first_torrent != nullptr);
+    EXPECT_TRUE(first_torrent->holds_alternative<tr_variant::Map>());
+    int64_t first_torrent_id = 0;
+    EXPECT_TRUE(tr_variantDictFindInt(first_torrent, TR_KEY_id, &first_torrent_id));
+    EXPECT_EQ(1, first_torrent_id);
 
     // cleanup
     tr_torrentRemove(tor, false, nullptr, nullptr);

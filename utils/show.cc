@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -30,14 +30,14 @@
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web.h>
 #include <libtransmission/web-utils.h>
 
-#include "units.h"
-
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -216,8 +216,8 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         }
 
         fmt::print("  Piece Count: {:d}\n", metainfo.piece_count());
-        fmt::print("  Piece Size: {:s}\n", tr_formatter_mem_B(metainfo.piece_size()));
-        fmt::print("  Total Size: {:s}\n", tr_formatter_size_B(metainfo.total_size()));
+        fmt::print("  Piece Size: {:s}\n", Memory{ metainfo.piece_size(), Memory::Units::Bytes }.to_string());
+        fmt::print("  Total Size: {:s}\n", Storage{ metainfo.total_size(), Storage::Units::Bytes }.to_string());
         fmt::print("  Privacy: {:s}\n", metainfo.is_private() ? "Private torrent" : "Public torrent");
     }
 
@@ -283,7 +283,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
                 filename = "  ";
                 filename += metainfo.file_subpath(i);
                 filename += " (";
-                filename += tr_formatter_size_B(metainfo.file_size(i));
+                filename += Storage{ metainfo.file_size(i), Storage::Units::Bytes }.to_string();
                 filename += ')';
             }
             filenames.emplace_back(filename);
@@ -409,9 +409,6 @@ int tr_main(int argc, char* argv[])
 
     tr_logSetQueueEnabled(false);
     tr_logSetLevel(TR_LOG_ERROR);
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     auto opts = app_opts{};
     if (parseCommandLine(opts, argc, (char const* const*)argv) != 0)
@@ -436,12 +433,11 @@ int tr_main(int argc, char* argv[])
 
     /* try to parse the torrent file */
     auto metainfo = tr_torrent_metainfo{};
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const parsed = metainfo.parse_torrent_file(opts.filename, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
-        fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error->message, error->code);
-        tr_error_clear(&error);
+        fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error.message(), error.code());
     }
     if (!parsed)
     {

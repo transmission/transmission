@@ -6,6 +6,7 @@
 #include <array>
 #include <cstdint> // uint64_t
 #include <set>
+#include <string>
 #include <string_view>
 #include <utility>
 

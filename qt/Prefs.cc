@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -211,7 +211,7 @@ bool isValidUtf8(QByteArray const& byteArray)
 ***/
 
 Prefs::Prefs(QString config_dir)
-    : config_dir_(std::move(config_dir))
+    : config_dir_{ std::move(config_dir) }
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -225,7 +225,7 @@ Prefs::Prefs(QString config_dir)
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    temporary_prefs_ << FILTER_TEXT;
+    temporary_prefs_.insert(FILTER_TEXT);
 
     auto top = get_default_app_settings();
     top.merge(tr_sessionLoadSettings(config_dir_.toUtf8().constData(), nullptr));
@@ -326,7 +326,7 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (temporary_prefs_.contains(i))
+        if (temporary_prefs_.count(i) != 0U)
         {
             continue;
         }

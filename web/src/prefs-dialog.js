@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -43,10 +43,13 @@ export class PrefsDialog extends EventTarget {
   }
 
   _checkPort() {
-    const element = this.elements.network.port_status_label;
-    delete element.dataset.open;
-    setTextContent(element, 'Checking...');
-    this.remote.checkPort(this._onPortChecked, this);
+    for (const [key, element] of Object.entries(
+      this.elements.network.port_status_label,
+    )) {
+      delete element.dataset.open;
+      setTextContent(element, 'Checking...');
+      this.remote.checkPort(key, this._onPortChecked, this);
+    }
   }
 
   _onPortChecked(response) {
@@ -54,8 +57,9 @@ export class PrefsDialog extends EventTarget {
       return;
     }
 
-    const element = this.elements.network.port_status_label;
-    const is_open = response.arguments['port-is-open'];
+    const element =
+      this.elements.network.port_status_label[response.arguments['ipProtocol']];
+    const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
     setTextContent(element, is_open ? 'Open' : 'Closed');
   }
@@ -668,12 +672,20 @@ export class PrefsDialog extends EventTarget {
     const port_status_div = document.createElement('div');
     port_status_div.classList.add('port-status');
     label = document.createElement('label');
-    label.textContent = 'Port is';
+    label.textContent = 'IPv4 port is';
     port_status_div.append(label);
-    const port_status_label = document.createElement('label');
-    port_status_label.textContent = '?';
-    port_status_label.classList.add('port-status-label');
-    port_status_div.append(port_status_label);
+    const port_status_label_ipv4 = document.createElement('label');
+    port_status_label_ipv4.textContent = '?';
+    port_status_label_ipv4.classList.add('port-status-label');
+    port_status_div.append(port_status_label_ipv4);
+    port_status_div.append(document.createElement('br'));
+    label = document.createElement('label');
+    label.textContent = 'IPv6 port is';
+    port_status_div.append(label);
+    const port_status_label_ipv6 = document.createElement('label');
+    port_status_label_ipv6.textContent = '?';
+    port_status_label_ipv6.classList.add('port-status-label');
+    port_status_div.append(port_status_label_ipv6);
     root.append(port_status_div);
 
     let cal = PrefsDialog._createCheckAndLabel(
@@ -733,7 +745,10 @@ export class PrefsDialog extends EventTarget {
       default_trackers_textarea,
       port_forwarding_check,
       port_input,
-      port_status_label,
+      port_status_label: {
+        ipv4: port_status_label_ipv4,
+        ipv6: port_status_label_ipv6,
+      },
       random_port_check,
       root,
       utp_check,

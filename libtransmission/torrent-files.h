@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -113,12 +113,11 @@ public:
     bool move(
         std::string_view old_parent_in,
         std::string_view parent_in,
-        double volatile* setme_progress,
         std::string_view parent_name = "",
-        tr_error** error = nullptr) const;
+        tr_error* error = nullptr) const;
 
     using FileFunc = std::function<void(char const* filename)>;
-    void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func, tr_error** error = nullptr)
+    void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func, tr_error* error = nullptr)
         const;
 
     struct FoundFile : public tr_sys_path_info

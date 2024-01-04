@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "Downloaded:"; ObjectID = "30"; */
+"30.title" = "ירדו:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
+"32.title" = "הועלו:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
+"34.title" = "יחס שיתוף:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
+"35.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Have:"; ObjectID = "36"; */
+"36.title" = "קיימים:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "State:"; ObjectID = "38"; */
+"38.title" = "מצב:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "39"; */
+"39.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Error:"; ObjectID = "41"; */
+"41.title" = "שגיאה:";
+
+/* Class = "NSTextFieldCell"; title = "Dates"; ObjectID = "42"; */
+"42.title" = "תאריכים";
+
+/* Class = "NSTextFieldCell"; title = "Added:"; ObjectID = "43"; */
+"43.title" = "נוסף:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
+"44.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Completed:"; ObjectID = "46"; */
+"46.title" = "הושלם:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "47"; */
+"47.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Transfer"; ObjectID = "50"; */
+"50.title" = "העברה";
+
+/* Class = "NSTextFieldCell"; title = "Last Activity:"; ObjectID = "51"; */
+"51.title" = "פעילות אחרונה:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
+"52.placeholderString" = "לא זמין";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
+"54.ibShadowedLabels[0]" = "תהליך";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Available"; ObjectID = "54"; */
+"54.ibShadowedLabels[1]" = "זמין";
+
+/* Class = "NSTextFieldCell"; title = "Progress:"; ObjectID = "55"; */
+"55.title" = "תהליך:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
+"56.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
+"57.title" = "הורדה נכשלה:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
+"58.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Time Elapsed"; ObjectID = "85"; */
+"85.title" = "עבר זמן";
+
+/* Class = "NSTextFieldCell"; title = "Downloading:"; ObjectID = "86"; */
+"86.title" = "הורדה:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "87"; */
+"87.placeholderString" = "לא זמין";
+
+/* Class = "NSTextFieldCell"; title = "Seeding:"; ObjectID = "89"; */
+"89.title" = "בזריעה:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
+"90.placeholderString" = "לא זמין";

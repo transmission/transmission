@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -18,7 +18,7 @@ typedef NSString* FilterSearchType NS_TYPED_EXTENSIBLE_ENUM;
 extern FilterSearchType const FilterSearchTypeName;
 extern FilterSearchType const FilterSearchTypeTracker;
 
-extern const NSInteger kGroupFilterAllTag;
+extern NSInteger const kGroupFilterAllTag;
 
 @interface FilterBarController : NSViewController
 

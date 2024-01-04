@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -80,12 +80,10 @@ private:
     QNetworkAccessManager* networkAccessManager();
     int64_t getNextTag();
 
-    void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
+    void sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise);
+    void sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
     [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
-
-    static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
 
     std::optional<QNetworkRequest> request_;
 
