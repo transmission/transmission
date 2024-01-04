@@ -20,8 +20,10 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
-static char constexpr MyName[] = "transmission-edit";
-static char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file(s)";
+namespace
+{
+char constexpr MyName[] = "transmission-edit";
+char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file(s)";
 
 struct app_options
 {
@@ -33,7 +35,7 @@ struct app_options
     bool show_version = false;
 };
 
-static auto constexpr Options = std::array<tr_option, 6>{
+auto constexpr Options = std::array<tr_option, 6>{
     { { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
       { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
       { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
@@ -42,7 +44,7 @@ static auto constexpr Options = std::array<tr_option, 6>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static int parseCommandLine(app_options& opts, int argc, char const* const* argv)
+int parseCommandLine(app_options& opts, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
@@ -91,7 +93,7 @@ static int parseCommandLine(app_options& opts, int argc, char const* const* argv
     return 0;
 }
 
-static bool removeURL(tr_variant* metainfo, std::string_view url)
+bool removeURL(tr_variant* metainfo, std::string_view url)
 {
     auto sv = std::string_view{};
     tr_variant* announce_list;
@@ -164,7 +166,7 @@ static bool removeURL(tr_variant* metainfo, std::string_view url)
     return changed;
 }
 
-static std::string replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
+[[nodisard]] auto replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
 {
     auto ret = std::string{};
 
@@ -183,7 +185,7 @@ static std::string replaceSubstr(std::string_view str, std::string_view oldval, 
     return ret;
 }
 
-static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view newval)
+bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::string_view newval)
 {
     auto sv = std::string_view{};
     tr_variant* announce_list;
@@ -228,7 +230,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
     return changed;
 }
 
-static bool announce_list_has_url(tr_variant* announce_list, char const* url)
+[[nodiscard]] bool announce_list_has_url(tr_variant* announce_list, char const* url)
 {
     int tierCount = 0;
     tr_variant* tier;
@@ -254,7 +256,7 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
     return false;
 }
 
-static bool addURL(tr_variant* metainfo, char const* url)
+bool addURL(tr_variant* metainfo, char const* url)
 {
     auto announce = std::string_view{};
     tr_variant* announce_list = nullptr;
@@ -298,7 +300,7 @@ static bool addURL(tr_variant* metainfo, char const* url)
     return changed;
 }
 
-static bool setSource(tr_variant* metainfo, char const* source_value)
+bool setSource(tr_variant* metainfo, char const* source_value)
 {
     auto current_source = std::string_view{};
     bool const had_source = tr_variantDictFindStrView(metainfo, TR_KEY_source, &current_source);
@@ -319,6 +321,7 @@ static bool setSource(tr_variant* metainfo, char const* source_value)
 
     return changed;
 }
+} // namespace
 
 int tr_main(int argc, char* argv[])
 {
