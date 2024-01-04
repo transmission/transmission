@@ -30,23 +30,25 @@ using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"
 
-static auto constexpr LineWidth = int{ 80 };
+namespace
+{
+auto constexpr LineWidth = int{ 80 };
 
-static char constexpr MyConfigName[] = "transmission";
-static char constexpr MyReadableName[] = "transmission-cli";
-static char constexpr Usage
+char constexpr MyConfigName[] = "transmission";
+char constexpr MyReadableName[] = "transmission-cli";
+char constexpr Usage
     [] = "A fast and easy BitTorrent client\n"
          "\n"
          "Usage: transmission-cli [options] <file|url|magnet>";
 
-static bool showVersion = false;
-static bool verify = false;
-static sig_atomic_t gotsig = false;
-static sig_atomic_t manualUpdate = false;
+bool showVersion = false;
+bool verify = false;
+sig_atomic_t gotsig = false;
+sig_atomic_t manualUpdate = false;
 
-static char const* torrentPath = nullptr;
+char const* torrentPath = nullptr;
 
-static auto constexpr Options = std::array<tr_option, 20>{
+auto constexpr Options = std::array<tr_option, 20>{
     { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
       { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
@@ -76,11 +78,11 @@ static auto constexpr Options = std::array<tr_option, 20>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static int parseCommandLine(tr_variant*, int argc, char const** argv);
+int parseCommandLine(tr_variant*, int argc, char const** argv);
 
-static void sigHandler(int signal);
+void sigHandler(int signal);
 
-static std::string tr_strlratio(double ratio)
+[[nodiscard]] std::string tr_strlratio(double ratio)
 {
     if (static_cast<int>(ratio) == TR_RATIO_NA)
     {
@@ -105,16 +107,16 @@ static std::string tr_strlratio(double ratio)
     return fmt::format(FMT_STRING("{:.0f}"), ratio);
 }
 
-static bool waitingOnWeb;
+bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
+void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
 {
     auto* ctor = static_cast<tr_ctor*>(response.user_data);
     tr_ctorSetMetainfo(ctor, std::data(response.body), std::size(response.body), nullptr);
     waitingOnWeb = false;
 }
 
-static std::string getStatusStr(tr_stat const* st)
+[[nodiscard]] std::string getStatusStr(tr_stat const* st)
 {
     if (st->activity == TR_STATUS_CHECK_WAIT)
     {
@@ -155,7 +157,7 @@ static std::string getStatusStr(tr_stat const* st)
     return "";
 }
 
-static std::string getConfigDir(int argc, char const** argv)
+[[nodiscard]] auto getConfigDir(int argc, char const** argv)
 {
     int c;
     char const* my_optarg;
@@ -174,6 +176,133 @@ static std::string getConfigDir(int argc, char const** argv)
 
     return tr_getDefaultConfigDir(MyConfigName);
 }
+
+// ---
+
+int parseCommandLine(tr_variant* d, int argc, char const** argv)
+{
+    int c;
+    char const* my_optarg;
+
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
+    {
+        switch (c)
+        {
+        case 'b':
+            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, true);
+            break;
+
+        case 'B':
+            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
+            break;
+
+        case 'd':
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
+            break;
+
+        case 'D':
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
+            break;
+
+        case 'f':
+            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
+            tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
+            break;
+
+        case 'g': /* handled above */
+            break;
+
+        case 'm':
+            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
+            break;
+
+        case 'M':
+            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, false);
+            break;
+
+        case 'p':
+            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
+            break;
+
+        case 't':
+            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
+            break;
+
+        case 'u':
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
+            break;
+
+        case 'U':
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
+            break;
+
+        case 'v':
+            verify = true;
+            break;
+
+        case 'V':
+            showVersion = true;
+            break;
+
+        case 'w':
+            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
+            break;
+
+        case 910:
+            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+            break;
+
+        case 911:
+            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+            break;
+
+        case 912:
+            tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            break;
+
+        case 500:
+            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
+            break;
+
+        case TR_OPT_UNK:
+            if (torrentPath == nullptr)
+            {
+                torrentPath = my_optarg;
+            }
+
+            break;
+
+        default:
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void sigHandler(int signal)
+{
+    switch (signal)
+    {
+    case SIGINT:
+        gotsig = true;
+        break;
+
+#ifndef _WIN32
+
+    case SIGHUP:
+        manualUpdate = true;
+        break;
+
+#endif
+
+    default:
+        break;
+    }
+}
+} // namespace
 
 int tr_main(int argc, char* argv[])
 {
@@ -334,133 +463,4 @@ int tr_main(int argc, char* argv[])
     printf("\n");
     tr_sessionClose(h);
     return EXIT_SUCCESS;
-}
-
-/***
-****
-****
-***/
-
-static int parseCommandLine(tr_variant* d, int argc, char const** argv)
-{
-    int c;
-    char const* my_optarg;
-
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
-    {
-        switch (c)
-        {
-        case 'b':
-            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, true);
-            break;
-
-        case 'B':
-            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
-            break;
-
-        case 'd':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
-            break;
-
-        case 'D':
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
-            break;
-
-        case 'f':
-            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
-            tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
-            break;
-
-        case 'g': /* handled above */
-            break;
-
-        case 'm':
-            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
-            break;
-
-        case 'M':
-            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, false);
-            break;
-
-        case 'p':
-            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
-            break;
-
-        case 't':
-            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
-            break;
-
-        case 'u':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
-            break;
-
-        case 'U':
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
-            break;
-
-        case 'v':
-            verify = true;
-            break;
-
-        case 'V':
-            showVersion = true;
-            break;
-
-        case 'w':
-            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
-            break;
-
-        case 910:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
-            break;
-
-        case 911:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
-            break;
-
-        case 912:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
-            break;
-
-        case 500:
-            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
-            break;
-
-        case TR_OPT_UNK:
-            if (torrentPath == nullptr)
-            {
-                torrentPath = my_optarg;
-            }
-
-            break;
-
-        default:
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-static void sigHandler(int signal)
-{
-    switch (signal)
-    {
-    case SIGINT:
-        gotsig = true;
-        break;
-
-#ifndef _WIN32
-
-    case SIGHUP:
-        manualUpdate = true;
-        break;
-
-#endif
-
-    default:
-        break;
-    }
 }
