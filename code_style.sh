@@ -60,7 +60,7 @@ fi
 
 # format C/C++
 clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
-if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args --verbose '{}' '+'; then
+if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
   [ -n "$fix" ] || echo 'C/C++ code needs formatting'
   exitcode=1
 fi
