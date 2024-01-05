@@ -2133,7 +2133,7 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
         }
     }
 
-    auto const tag = args_in->value_if<int64_t>(TR_KEY_tag);
+    auto const tag = request_map->value_if<int64_t>(TR_KEY_tag);
 
     // find the requested method
     auto method_name = std::string_view{};
