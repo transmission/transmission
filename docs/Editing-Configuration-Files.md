@@ -54,7 +54,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **blocklist-url:** String (default = https://www.example.com/blocklist)
  * **blocklist-enabled:** Boolean (default = false)
 
-#### [Files and Locations](./ConfigFiles.md)
+#### [Files and Locations](./Configuration-Files.md)
 
  * **download-dir:** String (default = [default locations](Configuration-Files.md#Locations))
  * **incomplete-dir:** String (default = [default locations](Configuration-Files.md#Locations)) Directory to keep files in until torrent is complete.
