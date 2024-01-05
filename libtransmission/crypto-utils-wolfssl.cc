@@ -31,9 +31,9 @@ using TR_WC_RNG = RNG;
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-// ---
-
-static void log_wolfssl_error(int error_code, char const* file, int line)
+namespace
+{
+void log_wolfssl_error(int error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -49,7 +49,7 @@ static void log_wolfssl_error(int error_code, char const* file, int line)
     }
 }
 
-static bool check_wolfssl_result(int result, char const* file, int line)
+bool check_wolfssl_result(int result, char const* file, int line)
 {
     bool const ret = result == 0;
 
@@ -65,7 +65,7 @@ static bool check_wolfssl_result(int result, char const* file, int line)
 
 // ---
 
-static TR_WC_RNG* get_rng()
+TR_WC_RNG* get_rng()
 {
     static TR_WC_RNG rng;
     static bool rng_initialized = false;
@@ -83,12 +83,9 @@ static TR_WC_RNG* get_rng()
     return &rng;
 }
 
-static std::mutex rng_mutex_;
+std::mutex rng_mutex_;
 
 // ---
-
-namespace
-{
 
 class Sha1Impl final : public tr_sha1
 {

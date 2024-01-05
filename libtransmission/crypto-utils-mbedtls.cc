@@ -25,9 +25,9 @@
 #define TR_CRYPTO_X509_FALLBACK
 #include "libtransmission/crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-// ---
-
-static void log_mbedtls_error(int error_code, char const* file, int line)
+namespace
+{
+void log_mbedtls_error(int error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -48,7 +48,7 @@ static void log_mbedtls_error(int error_code, char const* file, int line)
 
 #define log_error(error_code) log_mbedtls_error((error_code), __FILE__, __LINE__)
 
-static bool check_mbedtls_result(int result, int expected_result, char const* file, int line)
+bool check_mbedtls_result(int result, int expected_result, char const* file, int line)
 {
     bool const ret = result == expected_result;
 
@@ -65,14 +65,14 @@ static bool check_mbedtls_result(int result, int expected_result, char const* fi
 
 // ---
 
-static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
+int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
     // since we're initializing tr_rand_buffer()'s rng, we can't use tr_rand_buffer() here
     tr_rand_buffer_std(buffer, buffer_size);
     return 0;
 }
 
-static mbedtls_ctr_drbg_context* get_rng()
+mbedtls_ctr_drbg_context* get_rng()
 {
     static mbedtls_ctr_drbg_context rng;
     static bool rng_initialized = false;
@@ -97,12 +97,9 @@ static mbedtls_ctr_drbg_context* get_rng()
     return &rng;
 }
 
-static std::recursive_mutex rng_mutex_;
+std::recursive_mutex rng_mutex_;
 
 // ---
-
-namespace
-{
 
 class Sha1Impl final : public tr_sha1
 {

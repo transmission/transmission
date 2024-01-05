@@ -149,6 +149,25 @@ QString qtDayName(int day)
     }
 }
 
+[[nodiscard]] bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
+{
+    if (ancestor == nullptr)
+    {
+        return false;
+    }
+
+    while (descendant != nullptr)
+    {
+        if (descendant == ancestor)
+        {
+            return true;
+        }
+
+        descendant = descendant->parent();
+    }
+
+    return false;
+}
 } // namespace
 
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
@@ -234,24 +253,6 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     }
 }
 
-static bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
-{
-    if (ancestor == nullptr)
-    {
-        return false;
-    }
-    while (descendant != nullptr)
-    {
-        if (descendant == ancestor)
-        {
-            return true;
-        }
-
-        descendant = descendant->parent();
-    }
-    return false;
-}
-
 void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
 {
     // We don't want to change the preference every time there's a keystroke
@@ -334,9 +335,7 @@ void PrefsDialog::pathChanged(QString const& path)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::initRemoteTab()
 {
@@ -356,9 +355,7 @@ void PrefsDialog::initRemoteTab()
     connect(ui_.openWebClientButton, &QAbstractButton::clicked, &session_, &Session::launchWebInterface);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::altSpeedDaysEdited(int i)
 {
@@ -416,9 +413,7 @@ void PrefsDialog::initSpeedTab()
     connect(ui_.altSpeedLimitDaysCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::altSpeedDaysEdited);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::initDesktopTab()
 {
@@ -429,9 +424,7 @@ void PrefsDialog::initDesktopTab()
     linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onPortTested(bool isOpen)
 {
@@ -473,9 +466,7 @@ void PrefsDialog::initNetworkTab()
     connect(&session_, &Session::portTested, this, &PrefsDialog::onPortTested);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onBlocklistDialogDestroyed(QObject* o)
 {
@@ -540,9 +531,7 @@ void PrefsDialog::initPrivacyTab()
     updateBlocklistLabel();
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onIdleLimitChanged()
 {
@@ -656,9 +645,7 @@ void PrefsDialog::updateSeedingWidgetsLocality()
     ui_.doneSeedingScriptStack->setFixedHeight(ui_.doneSeedingScriptStack->currentWidget()->sizeHint().height());
 }
 
-/***
-****
-***/
+// ---
 
 PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
     : BaseDialog{ parent }
@@ -719,9 +706,7 @@ void PrefsDialog::setPref(int key, QVariant const& v)
     refreshPref(key);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::sessionUpdated()
 {

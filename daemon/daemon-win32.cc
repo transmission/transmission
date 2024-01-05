@@ -23,24 +23,26 @@
 #define SERVICE_CONTROL_PRESHUTDOWN 0x0000000F
 #endif
 
-static LPCWSTR const service_name = L"TransmissionDaemon";
+namespace
+{
+LPCWSTR constexpr service_name = L"TransmissionDaemon";
 
 // If we can get rid of this global variable...
 static tr_daemon* daemon;
 
 // ...these becomes a good candidates for being converted to 'class tr_daemon' members.
-static SERVICE_STATUS_HANDLE status_handle = nullptr;
-static DWORD current_state = SERVICE_STOPPED;
-static HANDLE service_thread = nullptr;
-static HANDLE service_stop_thread = nullptr;
+SERVICE_STATUS_HANDLE status_handle = nullptr;
+DWORD current_state = SERVICE_STOPPED;
+HANDLE service_thread = nullptr;
+HANDLE service_stop_thread = nullptr;
 
-static void set_system_error(tr_error& error, DWORD code, char const* message)
+void set_system_error(tr_error& error, DWORD code, char const* message)
 {
     auto const system_message = tr_win32_format_message(code);
     error.set(code, fmt::format(FMT_STRING("{:s} ({:#08x}): {:s})"), message, code, system_message));
 }
 
-static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
+void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     auto const system_message = tr_win32_format_message(code);
     tr_logAddMessage(file, line, level, fmt::format("{} ({:#x}): {}", message, code, system_message), "tr_daemon");
@@ -57,13 +59,13 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
         } \
     } while (0)
 
-static BOOL WINAPI handle_console_ctrl(DWORD /*control_type*/)
+BOOL WINAPI handle_console_ctrl(DWORD /*control_type*/)
 {
     daemon->stop();
     return TRUE;
 }
 
-static void update_service_status(
+void update_service_status(
     DWORD new_state,
     DWORD win32_exit_code,
     DWORD service_specific_exit_code,
@@ -91,7 +93,7 @@ static void update_service_status(
     }
 }
 
-static unsigned int __stdcall service_stop_thread_main(void* param)
+unsigned int __stdcall service_stop_thread_main(void* param)
 {
     daemon->stop();
 
@@ -107,7 +109,7 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
     return 0;
 }
 
-static void stop_service(void)
+void stop_service(void)
 {
     if (service_stop_thread != nullptr)
     {
@@ -128,7 +130,7 @@ static void stop_service(void)
     }
 }
 
-static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/, LPVOID /*event_data*/, LPVOID /*context*/)
+DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/, LPVOID /*event_data*/, LPVOID /*context*/)
 {
     switch (control_code)
     {
@@ -150,12 +152,12 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/
     return ERROR_CALL_NOT_IMPLEMENTED;
 }
 
-static unsigned int __stdcall service_thread_main(void* /*context*/)
+unsigned int __stdcall service_thread_main(void* /*context*/)
 {
     return daemon->start(false);
 }
 
-static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
+VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
 {
     status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, nullptr);
 
@@ -199,6 +201,7 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
 
     update_service_status(SERVICE_STOPPED, NO_ERROR, exit_code, 0, 0);
 }
+} // namespace
 
 bool tr_daemon::setup_signals([[maybe_unused]] struct event*& sig_ev)
 {
