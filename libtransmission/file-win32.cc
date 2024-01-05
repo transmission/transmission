@@ -35,8 +35,6 @@ using namespace std::literals;
    "i64" suffix for C code, but no warning is issued */
 #define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
 
-namespace
-{
 struct tr_sys_dir_win32
 {
     std::wstring pattern;
@@ -45,6 +43,8 @@ struct tr_sys_dir_win32
     std::string utf8_name;
 };
 
+namespace
+{
 auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
 auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
 
