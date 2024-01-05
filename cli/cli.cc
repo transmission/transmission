@@ -157,7 +157,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     return "";
 }
 
-[[nodiscard]] auto getConfigDir(int argc, char const** argv)
+[[nodiscard]] std::string getConfigDir(int argc, char const** argv)
 {
     int c;
     char const* my_optarg;
