@@ -1,6 +1,10 @@
 **We strongly recommend that you use the [current version](https://github.com/transmission/transmission/releases/latest) of Transmission unless you have a legacy operating system version shown below.**
 
 If you have a legacy operating system version, this table shows the best Transmission version to use:
+ 
+ * **Mac OS X 10.10 (Yosemite), 10.11 (El Capitan)**
+    Latest Version: [Transmission 3.00](https://github.com/transmission/transmission-releases/blob/master/Transmission-3.00.dmg)
+   
  * **Mac OS X 10.7 (Lion), 10.8 (Mountain Lion), 10.9 (Mavericks)**
     Latest version: [Transmission 2.94](https://github.com/transmission/transmission-releases/raw/master/Transmission-2.94.dmg)
     SHA256 hash: [`2cae915ae0e37fc5983406ca7fbd53a054a7153d3bfd7a6cef117a8a28d8a78a`](https://www.virustotal.com/gui/file/2cae915ae0e37fc5983406ca7fbd53a054a7153d3bfd7a6cef117a8a28d8a78a/detection)
