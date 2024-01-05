@@ -384,7 +384,7 @@ enum
     MODE_GROUP_GET = (1 << 15)
 };
 
-[[nodiscard]] auto getOptMode(int val)
+[[nodiscard]] int getOptMode(int val)
 {
     switch (val)
     {
