@@ -166,7 +166,7 @@ bool removeURL(tr_variant* metainfo, std::string_view url)
     return changed;
 }
 
-[[nodisard]] auto replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
+[[nodiscard]] auto replaceSubstr(std::string_view str, std::string_view oldval, std::string_view newval)
 {
     auto ret = std::string{};
 
