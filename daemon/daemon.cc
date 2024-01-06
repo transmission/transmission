@@ -6,7 +6,6 @@
 #include <array>
 #include <cerrno>
 #include <cstdio> /* printf */
-#include <cstdlib> /* atoi */
 #include <iostream>
 #include <iterator> /* std::back_inserter */
 #include <memory>
@@ -402,7 +401,7 @@ bool tr_daemon::reopen_log_file(char const* filename)
     return true;
 }
 
-void tr_daemon::report_status(void)
+void tr_daemon::report_status()
 {
     double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
     double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
@@ -417,7 +416,7 @@ void tr_daemon::report_status(void)
     }
 }
 
-void tr_daemon::periodic_update(void)
+void tr_daemon::periodic_update()
 {
     pumpLogMessages(logfile_, logfile_flush_);
     report_status();
@@ -506,7 +505,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'p':
-            tr_variantDictAddInt(&settings_, TR_KEY_rpc_port, atoi(optstr));
+            if (auto const rpc_port = tr_num_parse<uint16_t>(optstr); rpc_port)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_rpc_port, *rpc_port);
+            }
             break;
 
         case 't':
@@ -530,7 +532,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'P':
-            tr_variantDictAddInt(&settings_, TR_KEY_peer_port, atoi(optstr));
+            if (auto const peer_port = tr_num_parse<uint16_t>(optstr); peer_port)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_peer_port, *peer_port);
+            }
             break;
 
         case 'm':
@@ -542,11 +547,17 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'L':
-            tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_global, atoi(optstr));
+            if (auto const peer_limit_global = tr_num_parse<int64_t>(optstr); peer_limit_global && *peer_limit_global >= 0)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_global, *peer_limit_global);
+            }
             break;
 
         case 'l':
-            tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_per_torrent, atoi(optstr));
+            if (auto const peer_limit_tor = tr_num_parse<int64_t>(optstr); peer_limit_tor && *peer_limit_tor >= 0)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_per_torrent, *peer_limit_tor);
+            }
             break;
 
         case 800:
@@ -578,7 +589,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 953:
-            tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, atof(optstr));
+            if (auto const ratio_limit = tr_num_parse<double>(optstr); optstr)
+            {
+                tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, *ratio_limit);
+            }
             tr_variantDictAddBool(&settings_, TR_KEY_ratio_limit_enabled, true);
             break;
 
@@ -648,7 +662,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
     return true;
 }
 
-void tr_daemon::reconfigure(void)
+void tr_daemon::reconfigure()
 {
     if (my_session_ == nullptr)
     {
@@ -673,26 +687,19 @@ void tr_daemon::reconfigure(void)
     }
 }
 
-void tr_daemon::stop(void)
+void tr_daemon::stop()
 {
     event_base_loopexit(ev_base_, nullptr);
 }
 
 int tr_daemon::start([[maybe_unused]] bool foreground)
 {
-    bool boolVal;
-    bool pidfile_created = false;
-    tr_session* session = nullptr;
-    struct event* status_ev = nullptr;
-    struct event* sig_ev = nullptr;
-    auto watchdir = std::unique_ptr<Watchdir>{};
-    char const* const cdir = this->config_dir_.c_str();
-
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
     /* setup event state */
     ev_base_ = event_base_new();
 
+    event* sig_ev = nullptr;
     if (ev_base_ == nullptr || !setup_signals(sig_ev))
     {
         auto const error_code = errno;
@@ -706,7 +713,8 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    session = tr_sessionInit(cdir, true, settings_);
+    auto const* const cdir = this->config_dir_.c_str();
+    auto* session = tr_sessionInit(cdir, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
     tr_sessionSaveSettings(session, cdir, settings_);
@@ -714,6 +722,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     auto sv = std::string_view{};
     (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
     auto const sz_pid_filename = std::string{ sv };
+    auto pidfile_created = false;
     if (!std::empty(sz_pid_filename))
     {
         auto error = tr_error{};
@@ -741,7 +750,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         }
     }
 
-    if (tr_variantDictFindBool(&settings_, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
+    if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_rpc_authentication_required, &tmp_bool) && tmp_bool)
     {
         tr_logAddInfo(_("Requiring authentication"));
     }
@@ -755,7 +764,8 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* maybe add a watchdir */
-    if (tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
+    auto watchdir = std::unique_ptr<Watchdir>{};
+    if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &tmp_bool) && tmp_bool)
     {
         auto force_generic = bool{ false };
         (void)tr_variantDictFindBool(&settings_, key_watch_dir_force_generic_, &force_generic);
@@ -800,6 +810,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 #endif
 
     /* Create new timer event to report daemon status */
+    event* status_ev;
     {
         constexpr auto one_sec = timeval{ 1, 0 }; // 1 second
         status_ev = event_new(ev_base_, -1, EV_PERSIST, &::periodic_update, this);
@@ -895,7 +906,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     /* overwrite settings from the command line */
     if (!parse_args(argc, argv, &dumpSettings, foreground, ret))
     {
-        goto EXIT_EARLY;
+        return false;
     }
 
     if (*foreground && logfile_ == TR_BAD_SYS_FILE)
@@ -907,13 +918,10 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     if (dumpSettings)
     {
         fmt::print("{:s}\n", tr_variant_serde::json().to_string(settings_));
-        goto EXIT_EARLY;
+        return false;
     }
 
     return true;
-
-EXIT_EARLY:
-    return false;
 }
 
 void tr_daemon::handle_error(tr_error const& error) const
