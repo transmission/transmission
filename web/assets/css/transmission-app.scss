@@ -501,7 +501,7 @@ a {
     }
 
     .torrent-labels {
-      font-size: x-small;
+      font-size: small;
       font-weight: normal;
       margin-bottom: 2px;
       margin-top: 2px;
@@ -512,7 +512,7 @@ a {
 
       &.compact {
         flex: 1;
-        font-size: x-small;
+        font-size: small;
       }
     }
 
@@ -669,7 +669,7 @@ a {
     }
 
     &.compact {
-      min-width: 50px;
+      min-width: 100px;
       width: 10vw;
     }
 
