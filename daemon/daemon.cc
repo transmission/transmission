@@ -360,6 +360,14 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
     }
     return TR_RPC_OK;
 }
+
+tr_variant load_settings(char const* config_dir)
+{
+    auto app_defaults = tr_variant::make_map();
+    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+    return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
+}
+
 } // namespace
 
 bool tr_daemon::reopen_log_file(char const* filename)
@@ -660,11 +668,7 @@ void tr_daemon::reconfigure(void)
         configDir = tr_sessionGetConfigDir(my_session_);
         tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
 
-        auto app_defaults = tr_variant::make_map();
-        tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
-        auto const newsettings = tr_sessionLoadSettings(&app_defaults, configDir, MyName);
-
-        tr_sessionSet(my_session_, newsettings);
+        tr_sessionSet(my_session_, load_settings(configDir));
         tr_sessionReloadBlocklists(my_session_);
     }
 }
@@ -882,9 +886,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    auto app_defaults = tr_variant::make_map();
-    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
-    settings_ = tr_sessionLoadSettings(&app_defaults, config_dir_.c_str(), MyName);
+    settings_ = load_settings(config_dir_.c_str());
 
     bool dumpSettings;
 
