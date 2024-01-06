@@ -53,7 +53,7 @@ void set_system_error(tr_error* error, DWORD code)
     if (error != nullptr)
     {
         auto const message = tr_win32_format_message(code);
-        error->set(code, !std::empty(message) ? message : fmt::format(FMT_STRING("Unknown error: {:#08x}"), code));
+        error->set(code, !std::empty(message) ? message : fmt::format("Unknown error: {:#08x}", code));
     }
 }
 
@@ -838,7 +838,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
+        TR_ASSERT_MSG(false, fmt::format("unknown standard file {:d}", std_file));
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return TR_BAD_SYS_FILE;
     }

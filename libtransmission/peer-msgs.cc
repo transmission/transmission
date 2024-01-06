@@ -295,7 +295,7 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
                 __FILE__, \
                 __LINE__, \
                 (level), \
-                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->user_agent().sv(), text), \
+                fmt::format("{:s} [{:s}]: {:s}", (msgs)->io->display_name(), (msgs)->user_agent().sv(), text), \
                 (msgs)->torrent->name()); \
         } \
     } while (0)
@@ -1012,7 +1012,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         return;
     }
 
-    logtrace(msgs, fmt::format(FMT_STRING("here is the base64-encoded handshake: [{:s}]"), tr_base64_encode(handshake_sv)));
+    logtrace(msgs, fmt::format("here is the base64-encoded handshake: [{:s}]", tr_base64_encode(handshake_sv)));
 
     /* does the peer prefer encrypted connections? */
     auto pex = tr_pex{};
@@ -1037,14 +1037,14 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         {
             msgs->peerSupportsPex = ut_pex != 0;
             msgs->ut_pex_id = static_cast<uint8_t>(ut_pex);
-            logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_pex is {:d}"), static_cast<int>(msgs->ut_pex_id)));
+            logtrace(msgs, fmt::format("msgs->ut_pex is {:d}", static_cast<int>(msgs->ut_pex_id)));
         }
 
         if (auto ut_metadata = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
         {
             msgs->peerSupportsMetadataXfer = ut_metadata != 0;
             msgs->ut_metadata_id = static_cast<uint8_t>(ut_metadata);
-            logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_metadata_id is {:d}"), static_cast<int>(msgs->ut_metadata_id)));
+            logtrace(msgs, fmt::format("msgs->ut_metadata_id is {:d}", static_cast<int>(msgs->ut_metadata_id)));
         }
 
         if (auto ut_holepunch = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &ut_holepunch))
@@ -1089,7 +1089,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     {
         port.set_host(p);
         msgs->publish(tr_peer_event::GotPort(port));
-        logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), p));
+        logtrace(msgs, fmt::format("peer's port is now {:d}", p));
     }
 
     std::byte const* addr_compact = nullptr;
@@ -1132,9 +1132,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         (void)tr_variantDictFindInt(&*var, TR_KEY_total_size, &total_size);
     }
 
-    logtrace(
-        msgs,
-        fmt::format(FMT_STRING("got ut_metadata msg: type {:d}, piece {:d}, total_size {:d}"), msg_type, piece, total_size));
+    logtrace(msgs, fmt::format("got ut_metadata msg: type {:d}, piece {:d}, total_size {:d}", msg_type, piece, total_size));
 
     if (msg_type == MetadataMsgType::Reject)
     {
@@ -1241,7 +1239,7 @@ void parseLtep(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
     else
     {
-        logtrace(msgs, fmt::format(FMT_STRING("skipping unknown ltep message ({:d})"), static_cast<int>(ltep_msgid)));
+        logtrace(msgs, fmt::format("skipping unknown ltep message ({:d})", static_cast<int>(ltep_msgid)));
     }
 }
 
@@ -1407,7 +1405,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
 
     case BtPeerMsgs::Have:
         ui32 = payload.to_uint32();
-        logtrace(msgs, fmt::format(FMT_STRING("got Have: {:d}"), ui32));
+        logtrace(msgs, fmt::format("got Have: {:d}", ui32));
 
         if (msgs->torrent->has_metainfo() && ui32 >= msgs->torrent->piece_count())
         {
@@ -1439,7 +1437,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
             r.index = payload.to_uint32();
             r.offset = payload.to_uint32();
             r.length = payload.to_uint32();
-            logtrace(msgs, fmt::format(FMT_STRING("got Request: {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
+            logtrace(msgs, fmt::format("got Request: {:d}:{:d}->{:d}", r.index, r.offset, r.length));
             peerMadeRequest(msgs, &r);
             break;
         }
@@ -1451,7 +1449,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
             r.offset = payload.to_uint32();
             r.length = payload.to_uint32();
             msgs->cancels_sent_to_client.add(tr_time(), 1);
-            logtrace(msgs, fmt::format(FMT_STRING("got a Cancel {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
+            logtrace(msgs, fmt::format("got a Cancel {:d}:{:d}->{:d}", r.index, r.offset, r.length));
 
             auto& requests = msgs->peer_requested_;
             if (auto iter = std::find(std::begin(requests), std::end(requests), r); iter != std::end(requests))
@@ -1585,7 +1583,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         break;
 
     default:
-        logtrace(msgs, fmt::format(FMT_STRING("peer sent us an UNKNOWN: {:d}"), static_cast<int>(id)));
+        logtrace(msgs, fmt::format("peer sent us an UNKNOWN: {:d}", static_cast<int>(id)));
         break;
     }
 
@@ -1612,7 +1610,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<Cache::BlockData> bloc
         return EMSGSIZE;
     }
 
-    logtrace(msgs, fmt::format(FMT_STRING("got block {:d}"), block));
+    logtrace(msgs, fmt::format("got block {:d}", block));
 
     if (!tr_peerMgrDidPeerRequest(msgs->torrent, msgs, block))
     {
@@ -1838,8 +1836,7 @@ namespace peer_pulse_helpers
 
         if (!ok)
         {
-            msgs->torrent->error().set_local_error(
-                fmt::format(FMT_STRING("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
+            msgs->torrent->error().set_local_error(fmt::format("Please Verify Local Data! Piece #{:d} is corrupt.", req.index));
         }
     }
 
@@ -1993,7 +1990,7 @@ void tr_peerMsgsImpl::sendPex()
         logtrace(
             this,
             fmt::format(
-                FMT_STRING("pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}"),
+                "pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}",
                 tr_ip_protocol_to_sv(ip_type),
                 std::size(old_pex),
                 std::size(new_pex),

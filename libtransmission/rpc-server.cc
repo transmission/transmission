@@ -783,7 +783,7 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 void tr_rpc_server::set_url(std::string_view url)
 {
     url_ = url;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our URL to '{:s}'"), url_));
+    tr_logAddDebug(fmt::format("setting our URL to '{:s}'", url_));
 }
 
 void tr_rpc_server::set_whitelist(std::string_view whitelist)
@@ -797,7 +797,7 @@ void tr_rpc_server::set_whitelist(std::string_view whitelist)
 void tr_rpc_server::set_username(std::string_view username)
 {
     username_ = username;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
+    tr_logAddDebug(fmt::format("setting our username to '{:s}'", username_));
 }
 
 void tr_rpc_server::set_password(std::string_view password) noexcept
@@ -805,7 +805,7 @@ void tr_rpc_server::set_password(std::string_view password) noexcept
     auto const is_salted = tr_ssha1_test(password);
     salted_password_ = is_salted ? password : tr_ssha1(password);
 
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our salted password to '{:s}'"), salted_password_));
+    tr_logAddDebug(fmt::format("setting our salted password to '{:s}'", salted_password_));
 }
 
 void tr_rpc_server::set_password_enabled(bool enabled)
@@ -859,7 +859,7 @@ void tr_rpc_server::load(tr_variant const& src)
 
     if (!tr_strv_ends_with(url_, '/'))
     {
-        url_ = fmt::format(FMT_STRING("{:s}/"), url_);
+        url_ = fmt::format("{:s}/", url_);
     }
 
     this->host_whitelist_ = parse_whitelist(host_whitelist_str_);

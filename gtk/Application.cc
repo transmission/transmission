@@ -1013,7 +1013,7 @@ void Application::Impl::on_app_exit()
     p->attach(*icon, 0, 0, 1, 2);
 
     auto* top_label = Gtk::make_managed<Gtk::Label>();
-    top_label->set_markup(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Closing Connections…")));
+    top_label->set_markup(fmt::format("<b>{:s}</b>", _("Closing Connections…")));
     top_label->set_halign(TR_GTK_ALIGN(START));
     top_label->set_valign(TR_GTK_ALIGN(CENTER));
     p->attach(*top_label, 1, 0, 1, 1);

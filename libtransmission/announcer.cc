@@ -1283,7 +1283,7 @@ void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const&
     if (multiscrape_max != n)
     {
         // don't log the full URL, since that might have a personal announce id
-        tr_logAddDebug(fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n), tr_urlTrackerLogName(url));
+        tr_logAddDebug(fmt::format("Reducing multiscrape max to {:d}", n), tr_urlTrackerLogName(url));
 
         multiscrape_max = n;
     }

@@ -442,7 +442,7 @@ Glib::ustring Torrent::Impl::get_short_status_text() const
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         return fmt::format(
-            FMT_STRING("{:s} {:s}"),
+            "{:s} {:s}",
             get_short_transfer_text(),
             fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(cache_.ratio))));
 
@@ -548,7 +548,7 @@ Glib::ustring Torrent::Impl::get_long_status_text() const
     default:
         if (auto const buf = get_short_transfer_text(); !std::empty(buf))
         {
-            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
+            status_str += fmt::format(" - {:s}", buf);
         }
     }
 
