@@ -2117,55 +2117,35 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
 
     auto const* const request_map = request.get_if<tr_variant::Map>();
 
-    if (callback == nullptr)
+    if (!callback)
     {
         callback = noop_response_callback;
     }
 
-    // find the args
     auto const empty_args = tr_variant::Map{};
     auto const* args_in = &empty_args;
+    auto method_name = std::string_view{};
     if (request_map != nullptr)
     {
+        // find the args
         if (auto const* val = request_map->find_if<tr_variant::Map>(TR_KEY_arguments); val != nullptr)
         {
             args_in = val;
         }
-    }
 
-    auto const tag = args_in->value_if<int64_t>(TR_KEY_tag);
-
-    // find the requested method
-    auto method_name = std::string_view{};
-    if (request_map != nullptr)
-    {
+        // find the requested method
         if (auto const* val = request_map->find_if<std::string_view>(TR_KEY_method); val != nullptr)
         {
             method_name = *val;
         }
     }
 
+    auto const tag = request_map->value_if<int64_t>(TR_KEY_tag);
+
     auto const test = [method_name](auto const& handler)
     {
         return handler.first == method_name;
     };
-
-    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
-    {
-        auto args_out = tr_variant::Map{};
-        char const* const result = (*handler->second)(session, *args_in, args_out);
-
-        auto response = tr_variant::Map{ 3U };
-        response.try_emplace(TR_KEY_arguments, std::move(args_out));
-        response.try_emplace(TR_KEY_result, result != nullptr ? result : "success");
-        if (tag.has_value())
-        {
-            response.try_emplace(TR_KEY_tag, *tag);
-        }
-
-        (callback)(session, tr_variant{ std::move(response) });
-        return;
-    }
 
     if (auto const end = std::end(AsyncHandlers), handler = std::find_if(std::begin(AsyncHandlers), end, test); handler != end)
     {
@@ -2181,16 +2161,28 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
         return;
     }
 
-    // couldn't find a handler
     auto response = tr_variant::Map{ 3U };
-    response.try_emplace(TR_KEY_arguments, 0);
-    response.try_emplace(TR_KEY_result, "no method name");
     if (tag.has_value())
     {
         response.try_emplace(TR_KEY_tag, *tag);
     }
 
-    (callback)(session, tr_variant{ std::move(response) });
+    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
+    {
+        auto args_out = tr_variant::Map{};
+        char const* const result = (handler->second)(session, *args_in, args_out);
+
+        response.try_emplace(TR_KEY_arguments, std::move(args_out));
+        response.try_emplace(TR_KEY_result, result != nullptr ? result : "success");
+    }
+    else
+    {
+        // couldn't find a handler
+        response.try_emplace(TR_KEY_arguments, 0);
+        response.try_emplace(TR_KEY_result, "no method name");
+    }
+
+    callback(session, tr_variant{ std::move(response) });
 }
 
 /**

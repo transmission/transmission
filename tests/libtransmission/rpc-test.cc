@@ -7,6 +7,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <future>
 #include <iterator> // std::inserter
 #include <set>
 #include <string_view>
@@ -63,6 +64,85 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(4, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 3), &i));
     EXPECT_EQ(5, i);
+}
+
+TEST_F(RpcTest, tagSync)
+{
+    auto request_map = tr_variant::Map{ 2U };
+    request_map.try_emplace(TR_KEY_method, "session-stats");
+    request_map.try_emplace(TR_KEY_tag, 12345);
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        tr_variant{ std::move(request_map) },
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    auto const* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto const result = response_map->value_if<std::string_view>(TR_KEY_result);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(*result, "success"sv);
+    auto const tag = response_map->value_if<int64_t>(TR_KEY_tag);
+    ASSERT_TRUE(tag);
+    EXPECT_EQ(*tag, 12345);
+}
+
+TEST_F(RpcTest, tagAsync)
+{
+    auto* tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    EXPECT_NE(nullptr, tor);
+
+    auto request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_method, "torrent-rename-path");
+    request_map.try_emplace(TR_KEY_tag, 12345);
+
+    auto arguments_map = tr_variant::Map{ 2U };
+    arguments_map.try_emplace(TR_KEY_path, "files-filled-with-zeroes/512");
+    arguments_map.try_emplace(TR_KEY_name, "512_test");
+    request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
+
+    auto promise = std::promise<tr_variant>{};
+    auto future = promise.get_future();
+    tr_rpc_request_exec(
+        session_,
+        tr_variant{ std::move(request_map) },
+        [&promise](tr_session* /*session*/, tr_variant&& resp) { promise.set_value(std::move(resp)); });
+    auto const response = future.get();
+
+    auto const* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto const result = response_map->value_if<std::string_view>(TR_KEY_result);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(*result, "success"sv);
+    auto const tag = response_map->value_if<int64_t>(TR_KEY_tag);
+    ASSERT_TRUE(tag);
+    EXPECT_EQ(*tag, 12345);
+
+    // cleanup
+    tr_torrentRemove(tor, false, nullptr, nullptr);
+}
+
+TEST_F(RpcTest, tagNoHandler)
+{
+    auto request_map = tr_variant::Map{ 2U };
+    request_map.try_emplace(TR_KEY_method, "sdgdhsgg");
+    request_map.try_emplace(TR_KEY_tag, 12345);
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        tr_variant{ std::move(request_map) },
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    auto const* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto const result = response_map->value_if<std::string_view>(TR_KEY_result);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(*result, "no method name"sv);
+    auto const tag = response_map->value_if<int64_t>(TR_KEY_tag);
+    ASSERT_TRUE(tag);
+    EXPECT_EQ(*tag, 12345);
 }
 
 /***
