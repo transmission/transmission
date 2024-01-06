@@ -2405,7 +2405,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
         }
         else
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}"sv), newname, subpath.substr(oldpath_len + 1));
+            name = fmt::format("{:s}/{:s}"sv, newname, subpath.substr(oldpath_len + 1));
         }
     }
     else
@@ -2419,11 +2419,11 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 
         if (oldpath_len >= std::size(subpath))
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}"sv), tmp, newname);
+            name = fmt::format("{:s}/{:s}"sv, tmp, newname);
         }
         else
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}/{:s}"sv), tmp, newname, subpath.substr(oldpath_len + 1));
+            name = fmt::format("{:s}/{:s}/{:s}"sv, tmp, newname, subpath.substr(oldpath_len + 1));
         }
     }
 

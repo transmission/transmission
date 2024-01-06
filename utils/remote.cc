@@ -92,32 +92,32 @@ struct RemoteConfig
 
     if (eta < 60)
     {
-        return fmt::format(FMT_STRING("{:d} sec"), eta);
+        return fmt::format("{:d} sec", eta);
     }
 
     if (eta < (60 * 60))
     {
-        return fmt::format(FMT_STRING("{:d} min"), eta / 60);
+        return fmt::format("{:d} min", eta / 60);
     }
 
     if (eta < (60 * 60 * 24))
     {
-        return fmt::format(FMT_STRING("{:d} hrs"), eta / (60 * 60));
+        return fmt::format("{:d} hrs", eta / (60 * 60));
     }
 
     if (eta < (60 * 60 * 24 * 30))
     {
-        return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
+        return fmt::format("{:d} days", eta / (60 * 60 * 24));
     }
 
     if (eta < (60 * 60 * 24 * 30 * 12))
     {
-        return fmt::format(FMT_STRING("{:d} months"), eta / (60 * 60 * 24 * 30));
+        return fmt::format("{:d} months", eta / (60 * 60 * 24 * 30));
     }
 
     if (eta < (60 * 60 * 24 * 365 * 1000LL)) // up to 999 years
     {
-        return fmt::format(FMT_STRING("{:d} years"), eta / (60 * 60 * 24 * 365));
+        return fmt::format("{:d} years", eta / (60 * 60 * 24 * 365));
     }
 
     return "∞";
@@ -138,30 +138,30 @@ struct RemoteConfig
 
     auto tmpstr = std::string{};
 
-    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, tr_ngettext("hour", "hours", hours));
-    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, tr_ngettext("minute", "minutes", minutes));
-    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, tr_ngettext("seconds", "seconds", seconds));
+    auto const hstr = fmt::format("{:d} {:s}", hours, tr_ngettext("hour", "hours", hours));
+    auto const mstr = fmt::format("{:d} {:s}", minutes, tr_ngettext("minute", "minutes", minutes));
+    auto const sstr = fmt::format("{:d} {:s}", seconds, tr_ngettext("seconds", "seconds", seconds));
 
     if (days > 0)
     {
-        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), days, tr_ngettext("day", "days", days));
-        tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format(FMT_STRING("{:s}, {:s}"), dstr, hstr);
+        auto const dstr = fmt::format("{:d} {:s}", days, tr_ngettext("day", "days", days));
+        tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format("{:s}, {:s}", dstr, hstr);
     }
     else if (hours > 0)
     {
-        tmpstr = hours >= 4 || minutes == 0 ? hstr : fmt::format(FMT_STRING("{:s}, {:s}"), hstr, mstr);
+        tmpstr = hours >= 4 || minutes == 0 ? hstr : fmt::format("{:s}, {:s}", hstr, mstr);
     }
     else if (minutes > 0)
     {
-        tmpstr = minutes >= 4 || seconds == 0 ? mstr : fmt::format(FMT_STRING("{:s}, {:s}"), mstr, sstr);
+        tmpstr = minutes >= 4 || seconds == 0 ? mstr : fmt::format("{:s}, {:s}", mstr, sstr);
     }
     else
     {
         tmpstr = sstr;
     }
 
-    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, tr_ngettext("seconds", "seconds", total_seconds));
-    return fmt::format(FMT_STRING("{:s} ({:s})"), tmpstr, totstr);
+    auto const totstr = fmt::format("{:d} {:s}", total_seconds, tr_ngettext("seconds", "seconds", total_seconds));
+    return fmt::format("{:s} ({:s})", tmpstr, totstr);
 }
 
 [[nodiscard]] auto strlpercent(double x)
@@ -356,7 +356,7 @@ void showUsage()
 
     if (*end != '\0')
     {
-        fmt::print(stderr, FMT_STRING("Not a number: '{:s}'\n"), arg);
+        fmt::print(stderr, "Not a number: '{:s}'\n", arg);
         showUsage();
         exit(EXIT_FAILURE);
     }
@@ -530,7 +530,7 @@ enum
         return MODE_GROUP_GET;
 
     default:
-        fmt::print(stderr, FMT_STRING("unrecognized argument {:d}\n"), val);
+        fmt::print(stderr, "unrecognized argument {:d}\n", val);
         assert("unrecognized argument" && 0);
         return 0;
     }
@@ -848,14 +848,14 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     case TR_STATUS_CHECK_WAIT:
         if (auto percent = double{}; tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
         {
-            return fmt::format(FMT_STRING("Will Verify ({:.0f}%)"), floor(percent * 100.0));
+            return fmt::format("Will Verify ({:.0f}%)", floor(percent * 100.0));
         }
         return "Will Verify";
 
     case TR_STATUS_CHECK:
         if (auto percent = double{}; tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
         {
-            return fmt::format(FMT_STRING("Verifying ({:.0f}%)"), floor(percent * 100.0));
+            return fmt::format("Verifying ({:.0f}%)", floor(percent * 100.0));
         }
         return "Verifying";
 
@@ -1288,7 +1288,7 @@ void printFileList(tr_variant* top)
                         }
 
                         fmt::print(
-                            FMT_STRING("{:3d}: {:3.0f}% {:<8s} {:<3s} {:9s}  {:s}\n"),
+                            "{:3d}: {:3.0f}% {:<8s} {:<3s} {:9s}  {:s}\n",
                             j,
                             floor(100.0 * percent),
                             pristr,
@@ -1324,7 +1324,7 @@ void printPeersImpl(tr_variant* peers)
             tr_variantDictFindInt(d, TR_KEY_rateToPeer, &rateToPeer))
         {
             fmt::print(
-                FMT_STRING("{:<40s}  {:<12s}  {:<5.1f} {:6.1f}  {:6.1f}  {:s}\n"),
+                "{:<40s}  {:<12s}  {:<5.1f} {:6.1f}  {:6.1f}  {:s}\n",
                 address,
                 flagstr,
                 progress * 100.0,
@@ -1502,7 +1502,7 @@ void printTorrentList(tr_variant* top)
                     std::string{ "n/a" };
 
                 fmt::print(
-                    FMT_STRING("{:>6d}{:c}  {:>5s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:<s}\n"),
+                    "{:>6d}{:c}  {:>5s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:<s}\n",
                     torId,
                     error_mark,
                     done_str,
@@ -1521,7 +1521,7 @@ void printTorrentList(tr_variant* top)
         }
 
         fmt::print(
-            FMT_STRING("Sum:            {:>9s}             {:6.1f}  {:6.1f}\n"),
+            "Sum:            {:>9s}             {:6.1f}  {:6.1f}\n",
             strlsize(total_size).c_str(),
             Speed{ total_up, Speed::Units::Byps }.count(Speed::Units::KByps),
             Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
@@ -1838,7 +1838,7 @@ void printSession(tr_variant* top)
                 }
 
                 fmt::print(
-                    FMT_STRING("  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
+                    "  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n",
                     effective_up_limit,
                     upEnabled ? "Enabled" : "Disabled",
                     Speed{ upLimit, Speed::Units::KByps }.to_string(),
@@ -1861,7 +1861,7 @@ void printSession(tr_variant* top)
                 }
 
                 fmt::print(
-                    FMT_STRING("  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
+                    "  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n",
                     effective_down_limit,
                     downEnabled ? "Enabled" : "Disabled",
                     Speed{ downLimit, Speed::Units::KByps }.to_string(),
@@ -1994,7 +1994,7 @@ void printGroups(tr_variant* top)
             {
                 fmt::print("{:s}: ", name);
                 fmt::print(
-                    FMT_STRING("Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n"),
+                    "Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n",
                     upEnabled ? Speed{ upLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     downEnabled ? Speed{ downLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     honors ? "honors" : "does not honor");
@@ -2249,7 +2249,7 @@ int processResponse(char const* rpcurl, std::string_view response, RemoteConfig&
 CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
-    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
+    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, LONG_VERSION_STRING).c_str());
     (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     (void)curl_easy_setopt(curl, CURLOPT_HEADERDATA, &config);
@@ -2289,7 +2289,7 @@ CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 
     if (auto const& str = config.session_id; !std::empty(str))
     {
-        auto const h = fmt::format(FMT_STRING("{:s}: {:s}"), TR_RPC_SESSION_ID_HEADER, str);
+        auto const h = fmt::format("{:s}: {:s}", TR_RPC_SESSION_ID_HEADER, str);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         (void)curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
@@ -2316,7 +2316,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
 {
     auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
-    auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), scheme, rpcurl);
+    auto const rpcurl_http = fmt::format("{:s}://{:s}", scheme, rpcurl);
 
     auto* const buf = evbuffer_new();
     auto* curl = tr_curl_easy_init(buf, config);
@@ -3246,12 +3246,12 @@ void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* por
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
-        *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 7);
+        *rpcurl = fmt::format("{:s}/rpc/", s + 7);
     }
     else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
     {
         config.use_ssl = true;
-        *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 8);
+        *rpcurl = fmt::format("{:s}/rpc/", s + 8);
     }
     else if (parsePortString(s, port))
     {
@@ -3279,7 +3279,7 @@ void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* por
         bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != nullptr);
 
         auto const sv = std::string_view{ s, size_t(hend - s) };
-        *host = is_unbracketed_ipv6 ? fmt::format(FMT_STRING("[{:s}]"), sv) : sv;
+        *host = is_unbracketed_ipv6 ? fmt::format("[{:s}]", sv) : sv;
     }
 
     *argc -= 1;

@@ -39,7 +39,7 @@ HANDLE service_stop_thread = nullptr;
 void set_system_error(tr_error& error, DWORD code, char const* message)
 {
     auto const system_message = tr_win32_format_message(code);
-    error.set(code, fmt::format(FMT_STRING("{:s} ({:#08x}): {:s})"), message, code, system_message));
+    error.set(code, fmt::format("{:s} ({:#08x}): {:s})", message, code, system_message));
 }
 
 void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)

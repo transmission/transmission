@@ -96,15 +96,15 @@ void sigHandler(int signal);
 
     if (ratio < 10.0)
     {
-        return fmt::format(FMT_STRING("{:.2f}"), ratio);
+        return fmt::format("{:.2f}", ratio);
     }
 
     if (ratio < 100.0)
     {
-        return fmt::format(FMT_STRING("{:.1f}"), ratio);
+        return fmt::format("{:.1f}", ratio);
     }
 
-    return fmt::format(FMT_STRING("{:.0f}"), ratio);
+    return fmt::format("{:.0f}", ratio);
 }
 
 bool waitingOnWeb;
@@ -126,7 +126,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     if (st->activity == TR_STATUS_CHECK)
     {
         return fmt::format(
-            FMT_STRING("Verifying local files ({:.2f}%, {:.2f}% valid)"),
+            "Verifying local files ({:.2f}%, {:.2f}% valid)",
             tr_truncd(100 * st->recheckProgress, 2),
             tr_truncd(100 * st->percentDone, 2));
     }
@@ -134,7 +134,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     if (st->activity == TR_STATUS_DOWNLOAD)
     {
         return fmt::format(
-            FMT_STRING("Progress: {:.1f}%, dl from {:d} of {:d} peers ({:s}), ul to {:d} ({:s}) [{:s}]"),
+            "Progress: {:.1f}%, dl from {:d} of {:d} peers ({:s}), ul to {:d} ({:s}) [{:s}]",
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
@@ -147,7 +147,7 @@ void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     if (st->activity == TR_STATUS_SEED)
     {
         return fmt::format(
-            FMT_STRING("Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]"),
+            "Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]",
             st->peersGettingFromUs,
             st->peersConnected,
             Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
