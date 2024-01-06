@@ -67,88 +67,92 @@ enum class TrFormat
  * when the task is complete */
 struct tr_rpc_idle_data
 {
-    tr_variant response = {};
+    std::optional<int64_t> tag;
     tr_session* session = nullptr;
-    tr_variant* args_out = nullptr;
-    tr_rpc_response_func callback = nullptr;
-    void* callback_user_data = nullptr;
+    tr_variant::Map args_out = {};
+    tr_rpc_response_func callback = {};
 };
 
 auto constexpr SuccessResult = "success"sv;
 
 void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view result)
 {
-    tr_variantDictAddStr(&data->response, TR_KEY_result, result);
+    // build the response
+    auto response_map = tr_variant::Map{ 3U };
+    response_map.try_emplace(TR_KEY_arguments, std::move(data->args_out));
+    response_map.try_emplace(TR_KEY_result, result);
+    if (auto const& tag = data->tag; tag.has_value())
+    {
+        response_map.try_emplace(TR_KEY_tag, *tag);
+    }
 
-    (*data->callback)(data->session, &data->response, data->callback_user_data);
+    // send the response back to the listener
+    (data->callback)(data->session, tr_variant{ std::move(response_map) });
 
+    // cleanup
     delete data;
 }
 
 // ---
 
-auto getTorrents(tr_session* session, tr_variant* args)
+[[nodiscard]] auto getTorrents(tr_session* session, tr_variant::Map const& args)
 {
-    auto torrents = std::vector<tr_torrent*>{};
+    auto torrents_vec = std::vector<tr_torrent*>{};
 
-    auto id = int64_t{};
-    auto sv = std::string_view{};
-
-    if (tr_variant* ids = nullptr; tr_variantDictFindList(args, TR_KEY_ids, &ids))
+    auto& torrents = session->torrents();
+    torrents_vec.reserve(std::size(torrents));
+    auto const add_torrent_from_var = [&torrents, &torrents_vec](tr_variant const& var)
     {
-        size_t const n = tr_variantListSize(ids);
-        torrents.reserve(n);
+        tr_torrent* tor = nullptr;
 
-        for (size_t i = 0; i < n; ++i)
+        if (auto const* val = var.get_if<int64_t>(); val != nullptr)
         {
-            tr_variant const* const node = tr_variantListChild(ids, i);
-            tr_torrent* tor = nullptr;
+            tor = torrents.get(*val);
+        }
 
-            if (tr_variantGetInt(node, &id))
+        if (auto const* val = var.get_if<std::string_view>(); val != nullptr)
+        {
+            if (*val == "recently-active"sv)
             {
-                tor = tr_torrentFindFromId(session, static_cast<tr_torrent_id_t>(id));
+                auto const cutoff = tr_time() - RecentlyActiveSeconds;
+                auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
+                std::copy(std::begin(recent), std::end(recent), std::back_inserter(torrents_vec));
             }
-            else if (tr_variantGetStrView(node, &sv))
+            else
             {
-                tor = session->torrents().get(sv);
-            }
-
-            if (tor != nullptr)
-            {
-                torrents.push_back(tor);
+                tor = torrents.get(*val);
             }
         }
-    }
-    else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
-    {
-        if (auto* const tor = tr_torrentFindFromId(session, static_cast<tr_torrent_id_t>(id)); tor != nullptr)
+
+        if (tor != nullptr)
         {
-            torrents.push_back(tor);
+            torrents_vec.push_back(tor);
         }
-    }
-    else if (tr_variantDictFindStrView(args, TR_KEY_ids, &sv))
+    };
+
+    if (auto const ids_iter = args.find(TR_KEY_ids); ids_iter != std::end(args))
     {
-        if (sv == "recently-active"sv)
+        auto const& ids_var = ids_iter->second;
+
+        if (auto const* ids_vec = ids_var.get_if<tr_variant::Vector>(); ids_vec != nullptr)
         {
-            auto const cutoff = tr_time() - RecentlyActiveSeconds;
-            torrents = session->torrents().get_matching([cutoff](tr_torrent const* tor)
-                                                        { return tor->has_changed_since(cutoff); });
+            std::for_each(std::begin(*ids_vec), std::end(*ids_vec), add_torrent_from_var);
         }
         else
         {
-            auto* const tor = session->torrents().get(sv);
-            if (tor != nullptr)
-            {
-                torrents.push_back(tor);
-            }
+            add_torrent_from_var(ids_var);
         }
+    }
+    else if (auto const id_iter = args.find(TR_KEY_ids); id_iter != std::end(args))
+    {
+        add_torrent_from_var(id_iter->second);
     }
     else // all of them
     {
-        torrents = session->torrents().get_all();
+        torrents_vec = torrents.get_all();
     }
 
-    return torrents;
+    return torrents_vec;
 }
 
 void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const& torrents)
@@ -161,7 +165,7 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     session->rpcNotify(TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED);
 }
 
-char const* queueMoveTop(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveTop(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveTop(std::data(torrents), std::size(torrents));
@@ -169,7 +173,7 @@ char const* queueMoveTop(tr_session* session, tr_variant* args_in, tr_variant* /
     return nullptr;
 }
 
-char const* queueMoveUp(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveUp(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveUp(std::data(torrents), std::size(torrents));
@@ -177,7 +181,7 @@ char const* queueMoveUp(tr_session* session, tr_variant* args_in, tr_variant* /*
     return nullptr;
 }
 
-char const* queueMoveDown(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveDown(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveDown(std::data(torrents), std::size(torrents));
@@ -185,7 +189,7 @@ char const* queueMoveDown(tr_session* session, tr_variant* args_in, tr_variant* 
     return nullptr;
 }
 
-char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* queueMoveBottom(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto const torrents = getTorrents(session, args_in);
     tr_torrentsQueueMoveBottom(std::data(torrents), std::size(torrents));
@@ -193,7 +197,7 @@ char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_variant
     return nullptr;
 }
 
-char const* torrentStart(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* torrentStart(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
@@ -209,7 +213,7 @@ char const* torrentStart(tr_session* session, tr_variant* args_in, tr_variant* /
     return nullptr;
 }
 
-char const* torrentStartNow(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* torrentStartNow(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     auto torrents = getTorrents(session, args_in);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
@@ -225,7 +229,7 @@ char const* torrentStartNow(tr_session* session, tr_variant* args_in, tr_variant
     return nullptr;
 }
 
-char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* torrentStop(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -239,12 +243,10 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
     return nullptr;
 }
 
-char const* torrentRemove(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* torrentRemove(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
-    auto delete_flag = bool{ false };
-    (void)tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &delete_flag);
-
-    tr_rpc_callback_type const type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
+    auto const delete_flag = args_in.value_if<bool>(TR_KEY_delete_local_data).value_or(false);
+    auto const type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
 
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -257,11 +259,7 @@ char const* torrentRemove(tr_session* session, tr_variant* args_in, tr_variant* 
     return nullptr;
 }
 
-char const* torrentReannounce(
-    tr_session* session,
-    tr_variant* args_in,
-    tr_variant* /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentReannounce(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -275,7 +273,7 @@ char const* torrentReannounce(
     return nullptr;
 }
 
-char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* torrentVerify(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
@@ -469,15 +467,15 @@ namespace make_torrent_field_helpers
 [[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
 {
     auto const& from = st.peersFrom;
-    auto from_map = tr_variant::Map{ 7U };
-    from_map.try_emplace(TR_KEY_fromCache, from[TR_PEER_FROM_RESUME]);
-    from_map.try_emplace(TR_KEY_fromDht, from[TR_PEER_FROM_DHT]);
-    from_map.try_emplace(TR_KEY_fromIncoming, from[TR_PEER_FROM_INCOMING]);
-    from_map.try_emplace(TR_KEY_fromLpd, from[TR_PEER_FROM_LPD]);
-    from_map.try_emplace(TR_KEY_fromLtep, from[TR_PEER_FROM_LTEP]);
-    from_map.try_emplace(TR_KEY_fromPex, from[TR_PEER_FROM_PEX]);
-    from_map.try_emplace(TR_KEY_fromTracker, from[TR_PEER_FROM_TRACKER]);
-    return tr_variant{ std::move(from_map) };
+    auto peer_counts_map = tr_variant::Map{ 7U };
+    peer_counts_map.try_emplace(TR_KEY_fromCache, from[TR_PEER_FROM_RESUME]);
+    peer_counts_map.try_emplace(TR_KEY_fromDht, from[TR_PEER_FROM_DHT]);
+    peer_counts_map.try_emplace(TR_KEY_fromIncoming, from[TR_PEER_FROM_INCOMING]);
+    peer_counts_map.try_emplace(TR_KEY_fromLpd, from[TR_PEER_FROM_LPD]);
+    peer_counts_map.try_emplace(TR_KEY_fromLtep, from[TR_PEER_FROM_LTEP]);
+    peer_counts_map.try_emplace(TR_KEY_fromPex, from[TR_PEER_FROM_PEX]);
+    peer_counts_map.try_emplace(TR_KEY_fromTracker, from[TR_PEER_FROM_TRACKER]);
+    return tr_variant{ std::move(peer_counts_map) };
 }
 
 [[nodiscard]] auto make_piece_availability_vec(tr_torrent const& tor)
@@ -685,131 +683,140 @@ namespace make_torrent_field_helpers
     // clang-format on
 }
 
-void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quark const* fields, size_t field_count)
+[[nodiscard]] auto make_torrent_info_map(tr_torrent* const tor, tr_quark const* const fields, size_t const field_count)
 {
-    if (format == TrFormat::Table)
+    auto const* const st = tr_torrentStat(tor);
+    auto info_map = tr_variant::Map{ field_count };
+    for (size_t i = 0; i < field_count; ++i)
     {
-        tr_variantInitList(entry, field_count);
+        info_map.try_emplace(fields[i], make_torrent_field(*tor, *st, fields[i]));
     }
-    else
-    {
-        tr_variantInitDict(entry, field_count);
-    }
-
-    if (field_count > 0)
-    {
-        tr_stat const* const st = tr_torrentStat(tor);
-
-        for (size_t i = 0; i < field_count; ++i)
-        {
-            tr_variant* child = format == TrFormat::Table ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
-
-            *child = make_torrent_field(*tor, *st, fields[i]);
-        }
-    }
+    return tr_variant{ std::move(info_map) };
 }
 
-char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
+[[nodiscard]] auto make_torrent_info_vec(tr_torrent* const tor, tr_quark const* const fields, size_t const field_count)
+{
+    auto const* const st = tr_torrentStat(tor);
+    auto info_vec = tr_variant::Vector{};
+    info_vec.reserve(field_count);
+    for (size_t i = 0; i < field_count; ++i)
+    {
+        info_vec.emplace_back(make_torrent_field(*tor, *st, fields[i]));
+    }
+    return tr_variant{ std::move(info_vec) };
+}
+
+[[nodiscard]] auto make_torrent_info(
+    tr_torrent* const tor,
+    TrFormat const format,
+    tr_quark const* const fields,
+    size_t const field_count)
+{
+    return format == TrFormat::Table ? make_torrent_info_vec(tor, fields, field_count) :
+                                       make_torrent_info_map(tor, fields, field_count);
+}
+
+char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& args_out)
 {
     auto const torrents = getTorrents(session, args_in);
+    auto torrents_vec = tr_variant::Vector{};
 
-    auto sv = std::string_view{};
-    auto const format = tr_variantDictFindStrView(args_in, TR_KEY_format, &sv) && sv == "table"sv ? TrFormat::Table :
-                                                                                                    TrFormat::Object;
+    auto const format = args_in.value_if<std::string_view>(TR_KEY_format).value_or("object"sv) == "table"sv ? TrFormat::Table :
+                                                                                                              TrFormat::Object;
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
+    if (args_in.value_if<std::string_view>(TR_KEY_ids).value_or(""sv) == "recently-active"sv)
     {
         auto const cutoff = tr_time() - RecentlyActiveSeconds;
         auto const ids = session->torrents().removedSince(cutoff);
-        auto* const out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(ids));
+
+        auto removed_vec = tr_variant::Vector{};
+        removed_vec.reserve(std::size(ids));
         for (auto const& id : ids)
         {
-            tr_variantListAddInt(out, id);
+            removed_vec.emplace_back(id);
         }
+        args_out.try_emplace(TR_KEY_removed, std::move(removed_vec));
     }
 
-    tr_variant* fields = nullptr;
-    char const* errmsg = nullptr;
-    if (!tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
+    auto keys = std::vector<tr_quark>{};
+    auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields);
+    if (fields_vec != nullptr)
     {
-        errmsg = "no fields specified";
+        auto const n_fields = std::size(*fields_vec);
+        keys.reserve(n_fields);
+        for (auto const& field : *fields_vec)
+        {
+            if (auto const* field_sv = field.get_if<std::string_view>(); field_sv != nullptr)
+            {
+                if (auto const key = tr_quark_lookup(*field_sv); key && isSupportedTorrentGetField(*key))
+                {
+                    keys.emplace_back(*key);
+                }
+            }
+        }
     }
-    else
+
+    if (std::empty(keys))
     {
-        auto const n = tr_variantListSize(fields);
-        auto keys = std::vector<tr_quark>{};
-        keys.reserve(n);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            if (!tr_variantGetStrView(tr_variantListChild(fields, i), &sv))
-            {
-                continue;
-            }
-
-            if (auto const key = tr_quark_lookup(sv); key && isSupportedTorrentGetField(*key))
-            {
-                keys.emplace_back(*key);
-            }
-        }
-
-        auto* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1U);
-
-        if (format == TrFormat::Table)
-        {
-            /* first entry is an array of property names */
-            tr_variant* names = tr_variantListAddList(list, std::size(keys));
-            for (auto const& key : keys)
-            {
-                tr_variantListAddStrView(names, tr_quark_get_string_view(key));
-            }
-        }
-
-        for (auto* tor : torrents)
-        {
-            addTorrentInfo(tor, format, tr_variantListAdd(list), std::data(keys), std::size(keys));
-        }
+        return "no fields specified";
     }
 
-    return errmsg;
+    if (format == TrFormat::Table)
+    {
+        /* first entry is an array of property names */
+        auto names = tr_variant::Vector{};
+        names.reserve(std::size(keys));
+        std::transform(
+            std::begin(keys),
+            std::end(keys),
+            std::back_inserter(names),
+            [](tr_quark key) { return tr_quark_get_string_view(key); });
+        torrents_vec.emplace_back(std::move(names));
+    }
+
+    for (auto* const tor : torrents)
+    {
+        torrents_vec.emplace_back(make_torrent_info(tor, format, std::data(keys), std::size(keys)));
+    }
+
+    args_out.try_emplace(TR_KEY_torrents, std::move(torrents_vec));
+    return nullptr; // no error message
 }
 
 // ---
 
-[[nodiscard]] std::pair<tr_torrent::labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
+[[nodiscard]] std::pair<tr_torrent::labels_t, char const* /*errmsg*/> make_labels(tr_variant::Vector const& labels_vec)
 {
+    auto const n_labels = std::size(labels_vec);
+
     auto labels = tr_torrent::labels_t{};
-    size_t const n = tr_variantListSize(list);
-    labels.reserve(n);
-
-    for (size_t i = 0; i < n; ++i)
+    labels.reserve(n_labels);
+    for (auto const& label_var : labels_vec)
     {
-        auto label = std::string_view{};
-        if (!tr_variantGetStrView(tr_variantListChild(list, i), &label))
+        if (auto const* value = label_var.get_if<std::string_view>(); value != nullptr)
         {
-            continue;
-        }
+            auto const label = tr_strv_strip(*value);
 
-        label = tr_strv_strip(label);
-        if (std::empty(label))
-        {
-            return { {}, "labels cannot be empty" };
-        }
+            if (std::empty(label))
+            {
+                return { {}, "labels cannot be empty" };
+            }
 
-        if (tr_strv_contains(label, ','))
-        {
-            return { {}, "labels cannot contain comma (,) character" };
-        }
+            if (tr_strv_contains(label, ','))
+            {
+                return { {}, "labels cannot contain comma (,) character" };
+            }
 
-        labels.emplace_back(label);
+            labels.emplace_back(tr_quark_new(label));
+        }
     }
 
     return { labels, nullptr };
 }
 
-char const* setLabels(tr_torrent* tor, tr_variant* list)
+char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
 {
-    auto [labels, errmsg] = makeLabels(list);
+    auto [labels, errmsg] = make_labels(list);
 
     if (errmsg != nullptr)
     {
@@ -820,120 +827,74 @@ char const* setLabels(tr_torrent* tor, tr_variant* list)
     return nullptr;
 }
 
-char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr_variant* list)
+[[nodiscard]] std::pair<char const*, std::vector<tr_file_index_t>> get_file_indices(
+    tr_torrent const* tor,
+    tr_variant::Vector const& files_vec)
 {
-    char const* errmsg = nullptr;
     auto const n_files = tor->file_count();
 
     auto files = std::vector<tr_file_index_t>{};
     files.reserve(n_files);
 
-    if (size_t const n = tr_variantListSize(list); n != 0)
-    {
-        for (size_t i = 0; i < n; ++i)
-        {
-            if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
-            {
-                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
-                {
-                    files.push_back(file_index);
-                }
-                else
-                {
-                    errmsg = "file index out of range";
-                }
-            }
-        }
-    }
-    else // if empty set, apply to all
+    if (std::empty(files_vec)) // if empty set, apply to all
     {
         files.resize(n_files);
         std::iota(std::begin(files), std::end(files), 0);
     }
-
-    tor->set_file_priorities(std::data(files), std::size(files), priority);
-
-    return errmsg;
-}
-
-char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
-{
-    char const* errmsg = nullptr;
-
-    auto const n_files = tor->file_count();
-    auto const n_items = tr_variantListSize(list);
-
-    auto files = std::vector<tr_file_index_t>{};
-    files.reserve(n_files);
-
-    if (n_items != 0) // if argument list, process them
+    else
     {
-        for (size_t i = 0; i < n_items; ++i)
+        for (auto const& file_var : files_vec)
         {
-            if (auto val = int64_t{}; tr_variantGetInt(tr_variantListChild(list, i), &val))
+            if (auto const* val = file_var.get_if<int64_t>(); val != nullptr)
             {
-                if (auto const file_index = static_cast<tr_file_index_t>(val); file_index < n_files)
+                if (auto const idx = static_cast<tr_file_index_t>(*val); idx < n_files)
                 {
-                    files.push_back(file_index);
+                    files.push_back(idx);
                 }
                 else
                 {
-                    errmsg = "file index out of range";
+                    return { "file index out of range", {} };
                 }
             }
         }
     }
-    else // if empty set, apply to all
-    {
-        files.resize(n_files);
-        std::iota(std::begin(files), std::end(files), 0);
-    }
 
-    tor->set_files_wanted(std::data(files), std::size(files), wanted);
-
-    return errmsg;
+    return { nullptr, std::move(files) };
 }
 
-char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
+char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_variant::Vector const& files_vec)
+{
+    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    if (errmsg != nullptr)
+    {
+        return errmsg;
+    }
+
+    tor->set_file_priorities(std::data(indices), std::size(indices), priority);
+    return nullptr; // no error
+}
+
+[[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
+{
+    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    if (errmsg != nullptr)
+    {
+        return errmsg;
+    }
+    tor->set_files_wanted(std::data(indices), std::size(indices), wanted);
+    return nullptr; // no error
+}
+
+char const* add_tracker_urls(tr_torrent* tor, tr_variant::Vector const& urls_vec)
 {
     auto ann = tor->announce_list();
     auto const baseline = ann;
 
-    for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
+    for (auto const& url_var : urls_vec)
     {
-        auto announce = std::string_view();
-
-        if (auto const* const val = tr_variantListChild(urls, i); val == nullptr || !tr_variantGetStrView(val, &announce))
+        if (auto const* val = url_var.get_if<std::string_view>(); val != nullptr)
         {
-            continue;
-        }
-
-        ann.add(announce);
-    }
-
-    if (ann == baseline) // unchanged
-    {
-        return "error setting announce list";
-    }
-
-    tor->set_announce_list(std::move(ann));
-    return nullptr;
-}
-
-char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
-{
-    auto ann = tor->announce_list();
-    auto const baseline = ann;
-
-    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
-    {
-        auto id = int64_t{};
-        auto newval = std::string_view{};
-
-        if (tr_variantGetInt(tr_variantListChild(urls, i), &id) &&
-            tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval))
-        {
-            ann.replace(static_cast<tr_tracker_id_t>(id), newval);
+            ann.add(*val);
         }
     }
 
@@ -946,21 +907,20 @@ char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     return nullptr;
 }
 
-char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
+char const* replace_trackers(tr_torrent* tor, tr_variant::Vector const& urls_vec)
 {
     auto ann = tor->announce_list();
     auto const baseline = ann;
 
-    for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
+    for (size_t i = 0, vec_size = std::size(urls_vec); i + 1 < vec_size; i += 2U)
     {
-        auto id = int64_t{};
+        auto const* id = urls_vec[i].get_if<int64_t>();
+        auto const* url = urls_vec[i + 1U].get_if<std::string_view>();
 
-        if (auto const* const val = tr_variantListChild(ids, i); val == nullptr || !tr_variantGetInt(val, &id))
+        if (id != nullptr && url != nullptr)
         {
-            continue;
+            ann.replace(static_cast<tr_tracker_id_t>(*id), *url);
         }
-
-        ann.remove(static_cast<tr_tracker_id_t>(id));
     }
 
     if (ann == baseline) // unchanged
@@ -972,139 +932,155 @@ char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     return nullptr;
 }
 
-char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* remove_trackers(tr_torrent* tor, tr_variant::Vector const& ids_vec)
+{
+    auto ann = tor->announce_list();
+    auto const baseline = ann;
+
+    for (auto const& id_var : ids_vec)
+    {
+        if (auto const* val = id_var.get_if<int64_t>(); val != nullptr)
+        {
+            ann.remove(static_cast<tr_tracker_id_t>(*val));
+        }
+    }
+
+    if (ann == baseline) // unchanged
+    {
+        return "error setting announce list";
+    }
+
+    tor->set_announce_list(std::move(ann));
+    return nullptr;
+}
+
+char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
     char const* errmsg = nullptr;
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        auto tmp = int64_t{};
-        auto d = double{};
-        tr_variant* tmp_variant = nullptr;
-
-        if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_bandwidthPriority); val != nullptr)
         {
-            auto const priority = tr_priority_t(tmp);
-
-            if (tr_isPriority(priority))
+            if (auto const priority = static_cast<tr_priority_t>(*val); tr_isPriority(priority))
             {
                 tr_torrentSetPriority(tor, priority);
             }
         }
 
-        if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
+        if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_group); val != nullptr)
         {
-            tor->set_bandwidth_group(group);
+            tor->set_bandwidth_group(*val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_labels); val != nullptr && errmsg == nullptr)
         {
-            errmsg = setLabels(tor, tmp_variant);
+            errmsg = set_labels(tor, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_unwanted); val != nullptr && errmsg == nullptr)
         {
-            errmsg = setFileDLs(tor, false, tmp_variant);
+            errmsg = set_file_dls(tor, false, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_files_wanted, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted); val != nullptr && errmsg == nullptr)
         {
-            errmsg = setFileDLs(tor, true, tmp_variant);
+            errmsg = set_file_dls(tor, false, *val);
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
         {
-            tr_torrentSetPeerLimit(tor, tmp);
+            tr_torrentSetPeerLimit(tor, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_priority_high, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_high); val != nullptr && errmsg == nullptr)
         {
-            errmsg = setFilePriorities(tor, TR_PRI_HIGH, tmp_variant);
+            errmsg = set_file_priorities(tor, TR_PRI_HIGH, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_priority_low, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_low); val != nullptr && errmsg == nullptr)
         {
-            errmsg = setFilePriorities(tor, TR_PRI_LOW, tmp_variant);
+            errmsg = set_file_priorities(tor, TR_PRI_LOW, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_priority_normal, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_normal); val != nullptr && errmsg == nullptr)
         {
-            errmsg = setFilePriorities(tor, TR_PRI_NORMAL, tmp_variant);
+            errmsg = set_file_priorities(tor, TR_PRI_NORMAL, *val);
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_downloadLimit, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
         {
-            tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, tmp);
+            tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_sequentialDownload, &val))
+        if (auto const* val = args_in.find_if<bool>(TR_KEY_sequentialDownload); val != nullptr)
         {
-            tor->set_sequential_download(val);
+            tor->set_sequential_download(*val);
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))
+        if (auto const* val = args_in.find_if<bool>(TR_KEY_downloadLimited); val != nullptr)
         {
-            tor->use_speed_limit(TR_DOWN, val);
+            tor->use_speed_limit(TR_DOWN, *val);
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &val))
+        if (auto const* val = args_in.find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
         {
-            tr_torrentUseSessionLimits(tor, val);
+            tr_torrentUseSessionLimits(tor, *val);
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_uploadLimit, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
         {
-            tr_torrentSetSpeedLimit_KBps(tor, TR_UP, tmp);
+            tr_torrentSetSpeedLimit_KBps(tor, TR_UP, *val);
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_uploadLimited, &val))
+        if (auto const* val = args_in.find_if<bool>(TR_KEY_uploadLimited); val != nullptr)
         {
-            tor->use_speed_limit(TR_UP, val);
+            tor->use_speed_limit(TR_UP, *val);
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seedIdleLimit); val != nullptr)
         {
-            tor->set_idle_limit_minutes(static_cast<uint16_t>(tmp));
+            tor->set_idle_limit_minutes(static_cast<uint16_t>(*val));
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seedIdleMode); val != nullptr)
         {
-            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(tmp));
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*val));
         }
 
-        if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))
+        if (auto const* val = args_in.find_if<double>(TR_KEY_seedRatioLimit); val != nullptr)
         {
-            tor->set_seed_ratio(d);
+            tor->set_seed_ratio(*val);
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seedRatioMode); val != nullptr)
         {
-            tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(tmp));
+            tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*val));
         }
 
-        if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
+        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_queuePosition); val != nullptr)
         {
-            tr_torrentSetQueuePosition(tor, static_cast<size_t>(tmp));
+            tr_torrentSetQueuePosition(tor, static_cast<size_t>(*val));
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerAdd); val != nullptr)
         {
-            errmsg = addTrackerUrls(tor, tmp_variant);
+            errmsg = add_tracker_urls(tor, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerRemove, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerRemove); val != nullptr)
         {
-            errmsg = removeTrackers(tor, tmp_variant);
+            errmsg = remove_trackers(tor, *val);
         }
 
-        if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerReplace, &tmp_variant))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerReplace); val != nullptr)
         {
-            errmsg = replaceTrackers(tor, tmp_variant);
+            errmsg = replace_trackers(tor, *val);
         }
 
-        if (std::string_view txt; errmsg == nullptr && tr_variantDictFindStrView(args_in, TR_KEY_trackerList, &txt))
+        if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_trackerList); val != nullptr)
         {
-            if (!tor->set_announce_list(txt))
+            if (!tor->set_announce_list(*val))
             {
                 errmsg = "Invalid tracker list";
             }
@@ -1116,30 +1092,23 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
     return errmsg;
 }
 
-char const* torrentSetLocation(
-    tr_session* session,
-    tr_variant* args_in,
-    tr_variant* /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* torrentSetLocation(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
-    auto location = std::string_view{};
-
-    if (!tr_variantDictFindStrView(args_in, TR_KEY_location, &location))
+    auto const* const location = args_in.find_if<std::string_view>(TR_KEY_location);
+    if (location == nullptr)
     {
         return "no location";
     }
 
-    if (tr_sys_path_is_relative(location))
+    if (tr_sys_path_is_relative(*location))
     {
         return "new location path is not absolute";
     }
 
-    auto move = bool{};
-    (void)tr_variantDictFindBool(args_in, TR_KEY_move, &move);
-
+    auto const move_flag = args_in.value_if<bool>(TR_KEY_move).value_or(false);
     for (auto* tor : getTorrents(session, args_in))
     {
-        tor->set_location(location, move, nullptr);
+        tor->set_location(*location, move_flag, nullptr);
         session->rpcNotify(TR_RPC_TORRENT_MOVED, tor);
     }
 
@@ -1150,39 +1119,27 @@ char const* torrentSetLocation(
 
 void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char const* newname, int error, void* user_data)
 {
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* const data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
-    tr_variantDictAddInt(data->args_out, TR_KEY_id, tr_torrentId(tor));
-    tr_variantDictAddStr(data->args_out, TR_KEY_path, oldpath);
-    tr_variantDictAddStr(data->args_out, TR_KEY_name, newname);
+    data->args_out.try_emplace(TR_KEY_id, tor->id());
+    data->args_out.try_emplace(TR_KEY_path, oldpath);
+    data->args_out.try_emplace(TR_KEY_name, newname);
 
     tr_idle_function_done(data, error != 0 ? tr_strerror(error) : SuccessResult);
 }
 
-char const* torrentRenamePath(
-    tr_session* session,
-    tr_variant* args_in,
-    tr_variant* /*args_out*/,
-    struct tr_rpc_idle_data* idle_data)
+char const* torrentRenamePath(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
-    char const* errmsg = nullptr;
-
-    auto oldpath = std::string_view{};
-    (void)tr_variantDictFindStrView(args_in, TR_KEY_path, &oldpath);
-    auto newname = std::string_view{};
-    (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &newname);
-
-    if (auto const torrents = getTorrents(session, args_in); std::size(torrents) == 1)
+    auto const torrents = getTorrents(session, args_in);
+    if (std::size(torrents) != 1U)
     {
-        torrents[0]->rename_path(oldpath, newname, torrentRenamePathDone, idle_data);
-    }
-    else
-    {
-        errmsg = "torrent-rename-path requires 1 torrent";
+        return "torrent-rename-path requires 1 torrent";
     }
 
-    /* cleanup */
-    return errmsg;
+    auto const oldpath = args_in.value_if<std::string_view>(TR_KEY_path).value_or(""sv);
+    auto const newname = args_in.value_if<std::string_view>(TR_KEY_name).value_or(""sv);
+    torrents[0]->rename_path(oldpath, newname, torrentRenamePathDone, idle_data);
+    return nullptr; // no error
 }
 
 // ---
@@ -1210,37 +1167,34 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    bool const is_open = tr_strv_starts_with(body, '1');
-    tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
-    if (tr_variantDictFind(data->args_out, TR_KEY_ipProtocol) == nullptr) // `ipProtocol` was not specified in the request
-    {
-        tr_variantDictAddStrView(data->args_out, TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
-    }
+    data->args_out.try_emplace(TR_KEY_port_is_open, tr_strv_starts_with(body, '1'));
+    data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     tr_idle_function_done(data, SuccessResult);
 }
 
-char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
-    auto const port = session->advertisedPeerPort();
-    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
-
-    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
-    if (std::string_view arg; tr_variantDictFindStrView(args_in, TR_KEY_ipProtocol, &arg))
+    auto ip_proto = tr_web::FetchOptions::IPProtocol::ANY;
+    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_ipProtocol); val != nullptr)
     {
-        tr_variantDictAddStr(args_out, TR_KEY_ipProtocol, arg);
-        if (arg == "ipv4"sv)
+        if (*val == "ipv4"sv)
         {
-            options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            ip_proto = tr_web::FetchOptions::IPProtocol::V4;
         }
-        else if (arg == "ipv6"sv)
+        else if (*val == "ipv6"sv)
         {
-            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            ip_proto = tr_web::FetchOptions::IPProtocol::V6;
         }
         else
         {
             return "invalid ip protocol string";
         }
     }
+
+    auto const port = session->advertisedPeerPort();
+    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
+    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
+    options.ip_proto = ip_proto;
     session->fetch(std::move(options));
     return nullptr;
 }
@@ -1312,17 +1266,12 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     }
 
     // feed it to the session and give the client a response
-    size_t const rule_count = tr_blocklistSetContent(session, filename);
-    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, static_cast<int64_t>(rule_count));
+    data->args_out.try_emplace(TR_KEY_blocklist_size, tr_blocklistSetContent(session, filename));
     tr_sys_path_remove(filename);
     tr_idle_function_done(data, SuccessResult);
 }
 
-char const* blocklistUpdate(
-    tr_session* session,
-    tr_variant* /*args_in*/,
-    tr_variant* /*args_out*/,
-    struct tr_rpc_idle_data* idle_data)
+char const* blocklistUpdate(tr_session* session, tr_variant::Map const& /*args_in*/, struct tr_rpc_idle_data* idle_data)
 {
     session->fetch({ session->blocklistUrl(), onBlocklistFetched, idle_data });
     return nullptr;
@@ -1344,23 +1293,17 @@ void add_torrent_impl(struct tr_rpc_idle_data* data, tr_ctor& ctor)
     static auto constexpr Fields = std::array<tr_quark, 3>{ TR_KEY_id, TR_KEY_name, TR_KEY_hashString };
     if (duplicate_of != nullptr)
     {
-        addTorrentInfo(
-            duplicate_of,
-            TrFormat::Object,
-            tr_variantDictAdd(data->args_out, TR_KEY_torrent_duplicate),
-            std::data(Fields),
-            std::size(Fields));
+        data->args_out.try_emplace(
+            TR_KEY_torrent_duplicate,
+            make_torrent_info(duplicate_of, TrFormat::Object, std::data(Fields), std::size(Fields)));
         tr_idle_function_done(data, SuccessResult);
         return;
     }
 
     data->session->rpcNotify(TR_RPC_TORRENT_ADDED, tor);
-    addTorrentInfo(
-        tor,
-        TrFormat::Object,
-        tr_variantDictAdd(data->args_out, TR_KEY_torrent_added),
-        std::data(Fields),
-        std::size(Fields));
+    data->args_out.try_emplace(
+        TR_KEY_torrent_added,
+        make_torrent_info(tor, TrFormat::Object, std::data(Fields), std::size(Fields)));
     tr_idle_function_done(data, SuccessResult);
 }
 
@@ -1412,108 +1355,97 @@ bool isCurlURL(std::string_view url)
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
 }
 
-auto fileListFromList(tr_variant* list)
+[[nodiscard]] auto file_list_from_list(tr_variant::Vector const& idx_vec)
 {
-    size_t const n = tr_variantListSize(list);
-
+    auto const n_files = std::size(idx_vec);
     auto files = std::vector<tr_file_index_t>{};
-    files.reserve(n);
-
-    auto file_index = int64_t{};
-    for (size_t i = 0; i < n; ++i)
+    files.reserve(n_files);
+    for (auto const& idx_var : idx_vec)
     {
-        if (tr_variantGetInt(tr_variantListChild(list, i), &file_index))
+        if (auto const* val = idx_var.get_if<int64_t>(); val != nullptr)
         {
-            files.push_back(static_cast<tr_file_index_t>(file_index));
+            files.emplace_back(static_cast<tr_file_index_t>(*val));
         }
     }
-
     return files;
 }
 
-char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* idle_data)
+char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_rpc_idle_data* idle_data)
 {
     TR_ASSERT(idle_data != nullptr);
 
-    auto filename = std::string_view{};
-    (void)tr_variantDictFindStrView(args_in, TR_KEY_filename, &filename);
-
-    auto metainfo_base64 = std::string_view{};
-    (void)tr_variantDictFindStrView(args_in, TR_KEY_metainfo, &metainfo_base64);
-
+    auto const filename = args_in.value_if<std::string_view>(TR_KEY_filename).value_or(""sv);
+    auto const metainfo_base64 = args_in.value_if<std::string_view>(TR_KEY_metainfo).value_or(""sv);
     if (std::empty(filename) && std::empty(metainfo_base64))
     {
         return "no filename or metainfo specified";
     }
 
-    auto download_dir = std::string_view{};
-    if (tr_variantDictFindStrView(args_in, TR_KEY_download_dir, &download_dir) && tr_sys_path_is_relative(download_dir))
+    auto const download_dir = args_in.value_if<std::string_view>(TR_KEY_download_dir);
+    if (download_dir && tr_sys_path_is_relative(*download_dir))
     {
         return "download directory path is not absolute";
     }
 
-    auto i = int64_t{};
-    tr_variant* l = nullptr;
     auto ctor = tr_ctor{ session };
 
-    /* set the optional arguments */
+    // set the optional arguments
 
-    auto cookies = std::string_view{};
-    (void)tr_variantDictFindStrView(args_in, TR_KEY_cookies, &cookies);
+    auto const cookies = args_in.value_if<std::string_view>(TR_KEY_cookies).value_or(""sv);
 
-    if (!std::empty(download_dir))
+    if (download_dir && !std::empty(*download_dir))
     {
-        ctor.set_download_dir(TR_FORCE, download_dir);
+        ctor.set_download_dir(TR_FORCE, *download_dir);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_paused, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_paused); val != nullptr)
     {
-        ctor.set_paused(TR_FORCE, val);
+        ctor.set_paused(TR_FORCE, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
     {
-        ctor.set_peer_limit(TR_FORCE, static_cast<uint16_t>(i));
+        ctor.set_peer_limit(TR_FORCE, static_cast<uint16_t>(*val));
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_bandwidthPriority); val != nullptr)
     {
-        ctor.set_bandwidth_priority(static_cast<tr_priority_t>(i));
+        ctor.set_bandwidth_priority(static_cast<tr_priority_t>(*val));
     }
 
-    if (tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &l))
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_unwanted); val != nullptr)
     {
-        auto const files = fileListFromList(l);
+        auto const files = file_list_from_list(*val);
         ctor.set_files_wanted(std::data(files), std::size(files), false);
     }
 
-    if (tr_variantDictFindList(args_in, TR_KEY_files_wanted, &l))
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted); val != nullptr)
     {
-        auto const files = fileListFromList(l);
+        auto const files = file_list_from_list(*val);
         ctor.set_files_wanted(std::data(files), std::size(files), true);
     }
 
-    if (tr_variantDictFindList(args_in, TR_KEY_priority_low, &l))
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_low); val != nullptr)
     {
-        auto const files = fileListFromList(l);
+        auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_LOW);
     }
 
-    if (tr_variantDictFindList(args_in, TR_KEY_priority_normal, &l))
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_normal); val != nullptr)
     {
-        auto const files = fileListFromList(l);
+        auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_NORMAL);
     }
 
-    if (tr_variantDictFindList(args_in, TR_KEY_priority_high, &l))
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_high); val != nullptr)
     {
-        auto const files = fileListFromList(l);
+        auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_HIGH);
     }
 
-    if (tr_variantDictFindList(args_in, TR_KEY_labels, &l))
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_labels); val != nullptr)
     {
-        auto [labels, errmsg] = makeLabels(l);
+        auto [labels, errmsg] = make_labels(*val);
 
         if (errmsg != nullptr)
         {
@@ -1562,52 +1494,55 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
 // ---
 
-char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* /*idle_data*/)
+void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const& var)
 {
-    std::set<std::string_view> names;
-
-    if (std::string_view one_name; tr_variantDictFindStrView(args_in, TR_KEY_name, &one_name))
+    if (auto const* val = var.get_if<std::string_view>(); val != nullptr)
     {
-        names.insert(one_name);
+        strings.insert(*val);
+        return;
     }
-    else if (tr_variant* names_list = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &names_list))
-    {
-        auto const names_count = tr_variantListSize(names_list);
 
-        for (size_t i = 0; i < names_count; ++i)
+    if (auto const* val = var.get_if<tr_variant::Vector>(); val != nullptr)
+    {
+        for (auto const& vecvar : *val)
         {
-            auto const* const v = tr_variantListChild(names_list, i);
-            if (std::string_view l; v != nullptr && tr_variantGetStrView(v, &l))
-            {
-                names.insert(l);
-            }
+            add_strings_from_var(strings, vecvar);
         }
     }
+}
 
-    auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
-    for (auto const& [name, group] : s->bandwidthGroups())
+[[nodiscard]] char const* groupGet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& args_out)
+{
+    auto names = std::set<std::string_view>{};
+    if (auto const iter = args_in.find(TR_KEY_name); iter != std::end(args_in))
     {
-        if (names.empty() || names.count(name.sv()) > 0)
+        add_strings_from_var(names, iter->second);
+    }
+
+    auto groups_vec = tr_variant::Vector{};
+    for (auto const& [name, group] : session->bandwidthGroups())
+    {
+        if (names.empty() || names.count(name.sv()) > 0U)
         {
-            tr_variant* dict = tr_variantListAddDict(list, 5);
-            auto limits = group->get_limits();
-            tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
-            tr_variantDictAddStr(dict, TR_KEY_name, name);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
-            tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
-            tr_variantDictAddBool(dict, TR_KEY_speed_limit_up_enabled, limits.up_limited);
+            auto const limits = group->get_limits();
+            auto group_map = tr_variant::Map{ 6U };
+            group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+            group_map.try_emplace(TR_KEY_name, name.sv());
+            group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
+            group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
+            group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
+            group_map.try_emplace(TR_KEY_speed_limit_up_enabled, limits.up_limited);
+            groups_vec.emplace_back(std::move(group_map));
         }
     }
+    args_out.try_emplace(TR_KEY_group, std::move(groups_vec));
 
     return nullptr;
 }
 
-char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, struct tr_rpc_idle_data* /*idle_data*/)
+char const* groupSet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
-    auto name = std::string_view{};
-    (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
-    name = tr_strv_strip(name);
+    auto const name = tr_strv_strip(args_in.value_if<std::string_view>(TR_KEY_name).value_or(""sv));
     if (std::empty(name))
     {
         return "No group name given";
@@ -1616,25 +1551,32 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
     auto& group = session->getBandwidthGroup(name);
     auto limits = group.get_limits();
 
-    (void)tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
-    (void)tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
-
-    if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
+    if (auto const* const val = args_in.find_if<bool>(TR_KEY_speed_limit_down_enabled); val != nullptr)
     {
-        limits.down_limit = Speed{ limit, Speed::Units::KByps };
+        limits.down_limited = *val;
     }
 
-    if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
+    if (auto const* const val = args_in.find_if<bool>(TR_KEY_speed_limit_up_enabled); val != nullptr)
     {
-        limits.up_limit = Speed{ limit, Speed::Units::KByps };
+        limits.up_limited = *val;
+    }
+
+    if (auto const* const val = args_in.find_if<int64_t>(TR_KEY_speed_limit_down); val != nullptr)
+    {
+        limits.down_limit = Speed{ *val, Speed::Units::KByps };
+    }
+
+    if (auto const* const val = args_in.find_if<int64_t>(TR_KEY_speed_limit_up); val != nullptr)
+    {
+        limits.up_limit = Speed{ *val, Speed::Units::KByps };
     }
 
     group.set_limits(limits);
 
-    if (auto honors = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
+    if (auto const* const val = args_in.find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
     {
-        group.honor_parent_limits(TR_UP, honors);
-        group.honor_parent_limits(TR_DOWN, honors);
+        group.honor_parent_limits(TR_UP, *val);
+        group.honor_parent_limits(TR_DOWN, *val);
     }
 
     return nullptr;
@@ -1642,245 +1584,240 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 
 // ---
 
-char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
-    auto download_dir = std::string_view{};
-    auto incomplete_dir = std::string_view{};
-
-    if (tr_variantDictFindStrView(args_in, TR_KEY_download_dir, &download_dir) && tr_sys_path_is_relative(download_dir))
+    auto const download_dir = args_in.value_if<std::string_view>(TR_KEY_download_dir);
+    if (download_dir && tr_sys_path_is_relative(*download_dir))
     {
         return "download directory path is not absolute";
     }
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_incomplete_dir, &incomplete_dir) && tr_sys_path_is_relative(incomplete_dir))
+    auto const incomplete_dir = args_in.value_if<std::string_view>(TR_KEY_incomplete_dir);
+    if (incomplete_dir && tr_sys_path_is_relative(*incomplete_dir))
     {
         return "incomplete torrents directory path is not absolute";
     }
 
-    auto d = double{};
-    auto i = int64_t{};
-    auto sv = std::string_view{};
-
-    if (tr_variantDictFindInt(args_in, TR_KEY_cache_size_mb, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_cache_size_mb); val != nullptr)
     {
-        tr_sessionSetCacheLimit_MB(session, i);
+        tr_sessionSetCacheLimit_MB(session, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_up, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_up); val != nullptr)
     {
-        tr_sessionSetAltSpeed_KBps(session, TR_UP, i);
+        tr_sessionSetAltSpeed_KBps(session, TR_UP, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_down, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_down); val != nullptr)
     {
-        tr_sessionSetAltSpeed_KBps(session, TR_DOWN, i);
+        tr_sessionSetAltSpeed_KBps(session, TR_DOWN, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_alt_speed_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_alt_speed_enabled); val != nullptr)
     {
-        tr_sessionUseAltSpeed(session, val);
+        tr_sessionUseAltSpeed(session, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_begin, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_time_begin); val != nullptr)
     {
-        tr_sessionSetAltSpeedBegin(session, static_cast<size_t>(i));
+        tr_sessionSetAltSpeedBegin(session, static_cast<size_t>(*val));
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_end, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_time_end); val != nullptr)
     {
-        tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(i));
+        tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(*val));
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_alt_speed_time_day, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_time_day); val != nullptr)
     {
-        tr_sessionSetAltSpeedDay(session, tr_sched_day(i));
+        tr_sessionSetAltSpeedDay(session, static_cast<tr_sched_day>(*val));
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_alt_speed_time_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_alt_speed_time_enabled); val != nullptr)
     {
-        tr_sessionUseAltSpeedTime(session, val);
+        tr_sessionUseAltSpeedTime(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_blocklist_enabled); val != nullptr)
     {
-        session->set_blocklist_enabled(val);
+        session->set_blocklist_enabled(*val);
     }
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_blocklist_url, &sv))
+    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_blocklist_url); val != nullptr)
     {
-        session->setBlocklistUrl(sv);
+        session->setBlocklistUrl(*val);
     }
 
-    if (!std::empty(download_dir))
+    if (download_dir && !std::empty(*download_dir))
     {
-        session->setDownloadDir(download_dir);
+        session->setDownloadDir(*download_dir);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_queue_stalled_minutes, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_queue_stalled_minutes); val != nullptr)
     {
-        tr_sessionSetQueueStalledMinutes(session, static_cast<int>(i));
+        tr_sessionSetQueueStalledMinutes(session, static_cast<int>(*val));
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_queue_stalled_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_queue_stalled_enabled); val != nullptr)
     {
-        tr_sessionSetQueueStalledEnabled(session, val);
+        tr_sessionSetQueueStalledEnabled(session, *val);
     }
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_default_trackers, &sv))
+    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_default_trackers); val != nullptr)
     {
-        session->setDefaultTrackers(sv);
+        session->setDefaultTrackers(*val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_download_queue_size, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_download_queue_size); val != nullptr)
     {
-        tr_sessionSetQueueSize(session, TR_DOWN, i);
+        tr_sessionSetQueueSize(session, TR_DOWN, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_download_queue_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_download_queue_enabled); val != nullptr)
     {
-        tr_sessionSetQueueEnabled(session, TR_DOWN, val);
+        tr_sessionSetQueueEnabled(session, TR_DOWN, *val);
     }
 
-    if (!std::empty(incomplete_dir))
+    if (incomplete_dir && !std::empty(*incomplete_dir))
     {
-        session->setIncompleteDir(incomplete_dir);
+        session->setIncompleteDir(*incomplete_dir);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_incomplete_dir_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_incomplete_dir_enabled); val != nullptr)
     {
-        session->useIncompleteDir(val);
+        session->useIncompleteDir(*val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit_global, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit_global); val != nullptr)
     {
-        tr_sessionSetPeerLimit(session, i);
+        tr_sessionSetPeerLimit(session, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit_per_torrent, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit_per_torrent); val != nullptr)
     {
-        tr_sessionSetPeerLimitPerTorrent(session, i);
+        tr_sessionSetPeerLimitPerTorrent(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_pex_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_pex_enabled); val != nullptr)
     {
-        tr_sessionSetPexEnabled(session, val);
+        tr_sessionSetPexEnabled(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_dht_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_dht_enabled); val != nullptr)
     {
-        tr_sessionSetDHTEnabled(session, val);
+        tr_sessionSetDHTEnabled(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_utp_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_utp_enabled); val != nullptr)
     {
-        tr_sessionSetUTPEnabled(session, val);
+        tr_sessionSetUTPEnabled(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_lpd_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_lpd_enabled); val != nullptr)
     {
-        tr_sessionSetLPDEnabled(session, val);
+        tr_sessionSetLPDEnabled(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_peer_port_random_on_start, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_peer_port_random_on_start); val != nullptr)
     {
-        tr_sessionSetPeerPortRandomOnStart(session, val);
+        tr_sessionSetPeerPortRandomOnStart(session, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_peer_port, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_port); val != nullptr)
     {
-        tr_sessionSetPeerPort(session, i);
+        tr_sessionSetPeerPort(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_port_forwarding_enabled); val != nullptr)
     {
-        tr_sessionSetPortForwardingEnabled(session, val);
+        tr_sessionSetPortForwardingEnabled(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_rename_partial_files, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_rename_partial_files); val != nullptr)
     {
-        tr_sessionSetIncompleteFileNamingEnabled(session, val);
+        tr_sessionSetIncompleteFileNamingEnabled(session, *val);
     }
 
-    if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))
+    if (auto const* val = args_in.find_if<double>(TR_KEY_seedRatioLimit); val != nullptr)
     {
-        tr_sessionSetRatioLimit(session, d);
+        tr_sessionSetRatioLimit(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_seedRatioLimited, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_seedRatioLimited); val != nullptr)
     {
-        tr_sessionSetRatioLimited(session, val);
+        tr_sessionSetRatioLimited(session, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_idle_seeding_limit, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_idle_seeding_limit); val != nullptr)
     {
-        tr_sessionSetIdleLimit(session, i);
+        tr_sessionSetIdleLimit(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_idle_seeding_limit_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_idle_seeding_limit_enabled); val != nullptr)
     {
-        tr_sessionSetIdleLimited(session, val);
+        tr_sessionSetIdleLimited(session, *val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_start_added_torrents, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_start_added_torrents); val != nullptr)
     {
-        tr_sessionSetPaused(session, !val);
+        tr_sessionSetPaused(session, !*val);
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_seed_queue_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_seed_queue_enabled); val != nullptr)
     {
-        tr_sessionSetQueueEnabled(session, TR_UP, val);
+        tr_sessionSetQueueEnabled(session, TR_UP, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_seed_queue_size, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seed_queue_size); val != nullptr)
     {
-        tr_sessionSetQueueSize(session, TR_UP, i);
+        tr_sessionSetQueueSize(session, TR_UP, *val);
     }
 
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        if (auto enabled = bool{}; tr_variantDictFindBool(args_in, enabled_key, &enabled))
+        if (auto const* val = args_in.find_if<bool>(enabled_key); val != nullptr)
         {
-            session->useScript(script, enabled);
+            session->useScript(script, *val);
         }
 
-        if (auto file = std::string_view{}; tr_variantDictFindStrView(args_in, script_key, &file))
+        if (auto const* val = args_in.find_if<std::string_view>(script_key); val != nullptr)
         {
-            session->setScript(script, file);
+            session->setScript(script, *val);
         }
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_trash_original_torrent_files); val != nullptr)
     {
-        tr_sessionSetDeleteSource(session, val);
+        tr_sessionSetDeleteSource(session, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_speed_limit_down); val != nullptr)
     {
-        session->set_speed_limit(TR_DOWN, Speed{ i, Speed::Units::KByps });
+        session->set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_speed_limit_down_enabled); val != nullptr)
     {
-        tr_sessionLimitSpeed(session, TR_DOWN, val);
+        tr_sessionLimitSpeed(session, TR_DOWN, *val);
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_speed_limit_up); val != nullptr)
     {
-        session->set_speed_limit(TR_UP, Speed{ i, Speed::Units::KByps });
+        session->set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_speed_limit_up_enabled); val != nullptr)
     {
-        tr_sessionLimitSpeed(session, TR_UP, val);
+        tr_sessionLimitSpeed(session, TR_UP, *val);
     }
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_encryption, &sv))
+    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_encryption); val != nullptr)
     {
-        if (sv == "required"sv)
+        if (*val == "required"sv)
         {
             tr_sessionSetEncryption(session, TR_ENCRYPTION_REQUIRED);
         }
-        else if (sv == "tolerated"sv)
+        else if (*val == "tolerated"sv)
         {
             tr_sessionSetEncryption(session, TR_CLEAR_PREFERRED);
         }
@@ -1890,14 +1827,14 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
         }
     }
 
-    if (tr_variantDictFindInt(args_in, TR_KEY_anti_brute_force_threshold, &i))
+    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_anti_brute_force_threshold); val != nullptr)
     {
-        tr_sessionSetAntiBruteForceThreshold(session, static_cast<int>(i));
+        tr_sessionSetAntiBruteForceThreshold(session, static_cast<int>(*val));
     }
 
-    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &val))
+    if (auto const* val = args_in.find_if<bool>(TR_KEY_anti_brute_force_enabled); val != nullptr)
     {
-        tr_sessionSetAntiBruteForceEnabled(session, val);
+        tr_sessionSetAntiBruteForceEnabled(session, *val);
     }
 
     session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
@@ -1905,41 +1842,39 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
     return nullptr;
 }
 
-char const* sessionStats(tr_session* session, tr_variant* /*args_in*/, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
+char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/, tr_variant::Map& args_out)
 {
+    auto const make_stats_map = [](auto const& stats)
+    {
+        auto stats_map = tr_variant::Map{ 5U };
+        stats_map.try_emplace(TR_KEY_downloadedBytes, stats.downloadedBytes);
+        stats_map.try_emplace(TR_KEY_filesAdded, stats.filesAdded);
+        stats_map.try_emplace(TR_KEY_secondsActive, stats.secondsActive);
+        stats_map.try_emplace(TR_KEY_sessionCount, stats.sessionCount);
+        stats_map.try_emplace(TR_KEY_uploadedBytes, stats.uploadedBytes);
+        return stats_map;
+    };
+
     auto const& torrents = session->torrents();
     auto const total = std::size(torrents);
-    auto const running = std::count_if(
+    auto const n_running = std::count_if(
         std::begin(torrents),
         std::end(torrents),
         [](auto const* tor) { return tor->is_running(); });
 
-    tr_variantDictAddInt(args_out, TR_KEY_activeTorrentCount, running);
-    tr_variantDictAddInt(args_out, TR_KEY_downloadSpeed, session->piece_speed(TR_DOWN).base_quantity());
-    tr_variantDictAddInt(args_out, TR_KEY_pausedTorrentCount, total - running);
-    tr_variantDictAddInt(args_out, TR_KEY_torrentCount, total);
-    tr_variantDictAddInt(args_out, TR_KEY_uploadSpeed, session->piece_speed(TR_UP).base_quantity());
-
-    auto stats = session->stats().cumulative();
-    tr_variant* d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
-    tr_variantDictAddInt(d, TR_KEY_downloadedBytes, stats.downloadedBytes);
-    tr_variantDictAddInt(d, TR_KEY_filesAdded, stats.filesAdded);
-    tr_variantDictAddInt(d, TR_KEY_secondsActive, stats.secondsActive);
-    tr_variantDictAddInt(d, TR_KEY_sessionCount, stats.sessionCount);
-    tr_variantDictAddInt(d, TR_KEY_uploadedBytes, stats.uploadedBytes);
-
-    stats = session->stats().current();
-    d = tr_variantDictAddDict(args_out, TR_KEY_current_stats, 5);
-    tr_variantDictAddInt(d, TR_KEY_downloadedBytes, stats.downloadedBytes);
-    tr_variantDictAddInt(d, TR_KEY_filesAdded, stats.filesAdded);
-    tr_variantDictAddInt(d, TR_KEY_secondsActive, stats.secondsActive);
-    tr_variantDictAddInt(d, TR_KEY_sessionCount, stats.sessionCount);
-    tr_variantDictAddInt(d, TR_KEY_uploadedBytes, stats.uploadedBytes);
+    args_out.reserve(std::size(args_out) + 7U);
+    args_out.try_emplace(TR_KEY_activeTorrentCount, n_running);
+    args_out.try_emplace(TR_KEY_cumulative_stats, make_stats_map(session->stats().cumulative()));
+    args_out.try_emplace(TR_KEY_current_stats, make_stats_map(session->stats().current()));
+    args_out.try_emplace(TR_KEY_downloadSpeed, session->piece_speed(TR_DOWN).base_quantity());
+    args_out.try_emplace(TR_KEY_pausedTorrentCount, total - n_running);
+    args_out.try_emplace(TR_KEY_torrentCount, total);
+    args_out.try_emplace(TR_KEY_uploadSpeed, session->piece_speed(TR_UP).base_quantity());
 
     return nullptr;
 }
 
-constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
+[[nodiscard]] constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
 {
     switch (mode)
     {
@@ -1983,324 +1918,152 @@ constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
     return tr_variant{ std::move(units_map) };
 }
 
-void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
+[[nodiscard]] tr_variant make_session_field(tr_session const& session, tr_quark const key)
 {
+    // clang-format off
     switch (key)
     {
-    case TR_KEY_alt_speed_up:
-        tr_variantDictAddInt(d, key, tr_sessionGetAltSpeed_KBps(s, TR_UP));
-        break;
-
-    case TR_KEY_alt_speed_down:
-        tr_variantDictAddInt(d, key, tr_sessionGetAltSpeed_KBps(s, TR_DOWN));
-        break;
-
-    case TR_KEY_alt_speed_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionUsesAltSpeed(s));
-        break;
-
-    case TR_KEY_alt_speed_time_begin:
-        tr_variantDictAddInt(d, key, tr_sessionGetAltSpeedBegin(s));
-        break;
-
-    case TR_KEY_alt_speed_time_end:
-        tr_variantDictAddInt(d, key, tr_sessionGetAltSpeedEnd(s));
-        break;
-
-    case TR_KEY_alt_speed_time_day:
-        tr_variantDictAddInt(d, key, tr_sessionGetAltSpeedDay(s));
-        break;
-
-    case TR_KEY_alt_speed_time_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionUsesAltSpeedTime(s));
-        break;
-
-    case TR_KEY_blocklist_enabled:
-        tr_variantDictAddBool(d, key, s->blocklist_enabled());
-        break;
-
-    case TR_KEY_blocklist_url:
-        tr_variantDictAddStr(d, key, s->blocklistUrl());
-        break;
-
-    case TR_KEY_cache_size_mb:
-        tr_variantDictAddInt(d, key, tr_sessionGetCacheLimit_MB(s));
-        break;
-
-    case TR_KEY_blocklist_size:
-        tr_variantDictAddInt(d, key, tr_blocklistGetRuleCount(s));
-        break;
-
-    case TR_KEY_config_dir:
-        tr_variantDictAddStr(d, key, s->configDir());
-        break;
-
-    case TR_KEY_default_trackers:
-        tr_variantDictAddStr(d, key, s->defaultTrackersStr());
-        break;
-
-    case TR_KEY_download_dir:
-        tr_variantDictAddStr(d, key, s->downloadDir());
-        break;
-
-    case TR_KEY_download_dir_free_space:
-        if (auto const capacity = tr_sys_path_get_capacity(s->downloadDir()); capacity)
-        {
-            tr_variantDictAddInt(d, key, capacity->free);
-        }
-        else
-        {
-            tr_variantDictAddInt(d, key, -1);
-        }
-        break;
-
-    case TR_KEY_download_queue_enabled:
-        tr_variantDictAddBool(d, key, s->queueEnabled(TR_DOWN));
-        break;
-
-    case TR_KEY_download_queue_size:
-        tr_variantDictAddInt(d, key, s->queueSize(TR_DOWN));
-        break;
-
-    case TR_KEY_peer_limit_global:
-        tr_variantDictAddInt(d, key, s->peerLimit());
-        break;
-
-    case TR_KEY_peer_limit_per_torrent:
-        tr_variantDictAddInt(d, key, s->peerLimitPerTorrent());
-        break;
-
-    case TR_KEY_incomplete_dir:
-        tr_variantDictAddStr(d, key, s->incompleteDir());
-        break;
-
-    case TR_KEY_incomplete_dir_enabled:
-        tr_variantDictAddBool(d, key, s->useIncompleteDir());
-        break;
-
-    case TR_KEY_pex_enabled:
-        tr_variantDictAddBool(d, key, s->allows_pex());
-        break;
-
-    case TR_KEY_tcp_enabled:
-        tr_variantDictAddBool(d, key, s->allowsTCP());
-        break;
-
-    case TR_KEY_utp_enabled:
-        tr_variantDictAddBool(d, key, s->allowsUTP());
-        break;
-
-    case TR_KEY_dht_enabled:
-        tr_variantDictAddBool(d, key, s->allowsDHT());
-        break;
-
-    case TR_KEY_lpd_enabled:
-        tr_variantDictAddBool(d, key, s->allowsLPD());
-        break;
-
-    case TR_KEY_peer_port:
-        tr_variantDictAddInt(d, key, s->advertisedPeerPort().host());
-        break;
-
-    case TR_KEY_peer_port_random_on_start:
-        tr_variantDictAddBool(d, key, s->isPortRandom());
-        break;
-
-    case TR_KEY_port_forwarding_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsPortForwardingEnabled(s));
-        break;
-
-    case TR_KEY_rename_partial_files:
-        tr_variantDictAddBool(d, key, s->isIncompleteFileNamingEnabled());
-        break;
-
-    case TR_KEY_rpc_version:
-        tr_variantDictAddInt(d, key, RpcVersion);
-        break;
-
-    case TR_KEY_rpc_version_semver:
-        tr_variantDictAddStrView(d, key, RpcVersionSemver);
-        break;
-
-    case TR_KEY_rpc_version_minimum:
-        tr_variantDictAddInt(d, key, RpcVersionMin);
-        break;
-
-    case TR_KEY_seedRatioLimit:
-        tr_variantDictAddReal(d, key, s->desiredRatio());
-        break;
-
-    case TR_KEY_seedRatioLimited:
-        tr_variantDictAddBool(d, key, s->isRatioLimited());
-        break;
-
-    case TR_KEY_idle_seeding_limit:
-        tr_variantDictAddInt(d, key, s->idleLimitMinutes());
-        break;
-
-    case TR_KEY_idle_seeding_limit_enabled:
-        tr_variantDictAddBool(d, key, s->isIdleLimited());
-        break;
-
-    case TR_KEY_seed_queue_enabled:
-        tr_variantDictAddBool(d, key, s->queueEnabled(TR_UP));
-        break;
-
-    case TR_KEY_seed_queue_size:
-        tr_variantDictAddInt(d, key, s->queueSize(TR_UP));
-        break;
-
-    case TR_KEY_start_added_torrents:
-        tr_variantDictAddBool(d, key, !s->shouldPauseAddedTorrents());
-        break;
-
-    case TR_KEY_trash_original_torrent_files:
-        tr_variantDictAddBool(d, key, s->shouldDeleteSource());
-        break;
-
-    case TR_KEY_speed_limit_up:
-        tr_variantDictAddInt(d, key, s->speed_limit(TR_UP).count(Speed::Units::KByps));
-        break;
-
-    case TR_KEY_speed_limit_up_enabled:
-        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_UP));
-        break;
-
-    case TR_KEY_speed_limit_down:
-        tr_variantDictAddInt(d, key, s->speed_limit(TR_DOWN).count(Speed::Units::KByps));
-        break;
-
-    case TR_KEY_speed_limit_down_enabled:
-        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_DOWN));
-        break;
-
-    case TR_KEY_script_torrent_added_filename:
-        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_ADDED));
-        break;
-
-    case TR_KEY_script_torrent_added_enabled:
-        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_ADDED));
-        break;
-
-    case TR_KEY_script_torrent_done_filename:
-        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_DONE));
-        break;
-
-    case TR_KEY_script_torrent_done_enabled:
-        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_DONE));
-        break;
-
-    case TR_KEY_script_torrent_done_seeding_filename:
-        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
-        break;
-
-    case TR_KEY_script_torrent_done_seeding_enabled:
-        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
-        break;
-
-    case TR_KEY_queue_stalled_enabled:
-        tr_variantDictAddBool(d, key, s->queueStalledEnabled());
-        break;
-
-    case TR_KEY_queue_stalled_minutes:
-        tr_variantDictAddInt(d, key, s->queueStalledMinutes());
-        break;
-
-    case TR_KEY_anti_brute_force_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionGetAntiBruteForceEnabled(s));
-        break;
-
-    case TR_KEY_anti_brute_force_threshold:
-        tr_variantDictAddInt(d, key, tr_sessionGetAntiBruteForceThreshold(s));
-        break;
-
-    case TR_KEY_units:
-        *tr_variantDictAdd(d, key) = values_get_units();
-        break;
-
-    case TR_KEY_version:
-        tr_variantDictAddStrView(d, key, LONG_VERSION_STRING);
-        break;
-
-    case TR_KEY_encryption:
-        tr_variantDictAddStr(d, key, getEncryptionModeString(tr_sessionGetEncryption(s)));
-        break;
-
-    case TR_KEY_session_id:
-        tr_variantDictAddStr(d, key, s->sessionId());
-        break;
-
-    default:
-        break;
+    case TR_KEY_alt_speed_down: return tr_sessionGetAltSpeed_KBps(&session, TR_DOWN);
+    case TR_KEY_alt_speed_enabled: return tr_sessionUsesAltSpeed(&session);
+    case TR_KEY_alt_speed_time_begin: return tr_sessionGetAltSpeedBegin(&session);
+    case TR_KEY_alt_speed_time_day: return tr_sessionGetAltSpeedDay(&session);
+    case TR_KEY_alt_speed_time_enabled: return tr_sessionUsesAltSpeedTime(&session);
+    case TR_KEY_alt_speed_time_end: return tr_sessionGetAltSpeedEnd(&session);
+    case TR_KEY_alt_speed_up: return tr_sessionGetAltSpeed_KBps(&session, TR_UP);
+    case TR_KEY_anti_brute_force_enabled: return tr_sessionGetAntiBruteForceEnabled(&session);
+    case TR_KEY_anti_brute_force_threshold: return tr_sessionGetAntiBruteForceThreshold(&session);
+    case TR_KEY_blocklist_enabled: return session.blocklist_enabled();
+    case TR_KEY_blocklist_size: return tr_blocklistGetRuleCount(&session);
+    case TR_KEY_blocklist_url: return session.blocklistUrl();
+    case TR_KEY_cache_size_mb: return tr_sessionGetCacheLimit_MB(&session);
+    case TR_KEY_config_dir: return session.configDir();
+    case TR_KEY_default_trackers: return session.defaultTrackersStr();
+    case TR_KEY_dht_enabled: return session.allowsDHT();
+    case TR_KEY_download_dir: return session.downloadDir();
+    case TR_KEY_download_dir_free_space: return tr_sys_path_get_capacity(session.downloadDir()).value_or(tr_sys_path_capacity{}).free;
+    case TR_KEY_download_queue_enabled: return session.queueEnabled(TR_DOWN);
+    case TR_KEY_download_queue_size: return session.queueSize(TR_DOWN);
+    case TR_KEY_encryption: return getEncryptionModeString(tr_sessionGetEncryption(&session));
+    case TR_KEY_idle_seeding_limit: return session.idleLimitMinutes();
+    case TR_KEY_idle_seeding_limit_enabled: return session.isIdleLimited();
+    case TR_KEY_incomplete_dir: return session.incompleteDir();
+    case TR_KEY_incomplete_dir_enabled: return session.useIncompleteDir();
+    case TR_KEY_lpd_enabled: return session.allowsLPD();
+    case TR_KEY_peer_limit_global: return session.peerLimit();
+    case TR_KEY_peer_limit_per_torrent: return session.peerLimitPerTorrent();
+    case TR_KEY_peer_port: return session.advertisedPeerPort().host();
+    case TR_KEY_peer_port_random_on_start: return session.isPortRandom();
+    case TR_KEY_pex_enabled: return session.allows_pex();
+    case TR_KEY_port_forwarding_enabled: return tr_sessionIsPortForwardingEnabled(&session);
+    case TR_KEY_queue_stalled_enabled: return session.queueStalledEnabled();
+    case TR_KEY_queue_stalled_minutes: return session.queueStalledMinutes();
+    case TR_KEY_rename_partial_files: return session.isIncompleteFileNamingEnabled();
+    case TR_KEY_rpc_version: return RpcVersion;
+    case TR_KEY_rpc_version_minimum: return RpcVersionMin;
+    case TR_KEY_rpc_version_semver: return RpcVersionSemver;
+    case TR_KEY_script_torrent_added_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);
+    case TR_KEY_script_torrent_added_filename: return session.script(TR_SCRIPT_ON_TORRENT_ADDED);
+    case TR_KEY_script_torrent_done_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_DONE);
+    case TR_KEY_script_torrent_done_filename: return session.script(TR_SCRIPT_ON_TORRENT_DONE);
+    case TR_KEY_script_torrent_done_seeding_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
+    case TR_KEY_script_torrent_done_seeding_filename: return session.script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
+    case TR_KEY_seedRatioLimit: return session.desiredRatio();
+    case TR_KEY_seedRatioLimited: return session.isRatioLimited();
+    case TR_KEY_seed_queue_enabled: return session.queueEnabled(TR_UP);
+    case TR_KEY_seed_queue_size: return session.queueSize(TR_UP);
+    case TR_KEY_session_id: return session.sessionId();
+    case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
+    case TR_KEY_speed_limit_down_enabled: return session.is_speed_limited(TR_DOWN);
+    case TR_KEY_speed_limit_up: return session.speed_limit(TR_UP).count(Speed::Units::KByps);
+    case TR_KEY_speed_limit_up_enabled: return session.is_speed_limited(TR_UP);
+    case TR_KEY_start_added_torrents: return !session.shouldPauseAddedTorrents();
+    case TR_KEY_tcp_enabled: return session.allowsTCP();
+    case TR_KEY_trash_original_torrent_files: return session.shouldDeleteSource();
+    case TR_KEY_units: return values_get_units();
+    case TR_KEY_utp_enabled: return session.allowsUTP();
+    case TR_KEY_version: return LONG_VERSION_STRING;
+    default: return tr_variant{};
     }
+    // clang-format on
 }
 
-char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
+namespace session_get_helpers
 {
-    if (tr_variant* fields = nullptr; tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
+[[nodiscard]] auto get_session_fields(tr_variant::Vector const* fields_vec)
+{
+    auto fields = std::set<tr_quark>{};
+
+    if (fields_vec != nullptr)
     {
-        size_t const field_count = tr_variantListSize(fields);
-
-        for (size_t i = 0; i < field_count; ++i)
+        for (auto const& field_var : *fields_vec)
         {
-            auto field_name = std::string_view{};
-            if (!tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
+            if (auto const* field_name = field_var.get_if<std::string_view>(); field_name != nullptr)
             {
-                continue;
-            }
-
-            if (auto const field_id = tr_quark_lookup(field_name); field_id)
-            {
-                addSessionField(s, args_out, *field_id);
+                if (auto const field_id = tr_quark_lookup(*field_name); field_id)
+                {
+                    fields.insert(*field_id);
+                }
             }
         }
     }
-    else
+
+    if (std::empty(fields)) // no fields specified; get them all
     {
         for (tr_quark field_id = TR_KEY_NONE + 1; field_id < TR_N_KEYS; ++field_id)
         {
-            addSessionField(s, args_out, field_id);
+            fields.insert(field_id);
+        }
+    }
+
+    return fields;
+}
+} // namespace session_get_helpers
+
+char const* sessionGet(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& args_out)
+{
+    using namespace session_get_helpers;
+
+    for (auto const key : get_session_fields(args_in.find_if<tr_variant::Vector>(TR_KEY_fields)))
+    {
+        if (auto var = make_session_field(*session, key); var.has_value())
+        {
+            args_out.try_emplace(key, std::move(var));
         }
     }
 
     return nullptr;
 }
 
-char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
+char const* freeSpace(tr_session* /*session*/, tr_variant::Map const& args_in, tr_variant::Map& args_out)
 {
-    auto path = std::string_view{};
-
-    if (!tr_variantDictFindStrView(args_in, TR_KEY_path, &path))
+    auto const path = args_in.value_if<std::string_view>(TR_KEY_path);
+    if (!path)
     {
         return "directory path argument is missing";
     }
 
-    if (tr_sys_path_is_relative(path))
+    if (tr_sys_path_is_relative(*path))
     {
         return "directory path is not absolute";
     }
 
-    /* get the free space */
+    // get the free space
     auto const old_errno = errno;
     auto error = tr_error{};
-    auto const capacity = tr_sys_path_get_capacity(path, &error);
+    auto const capacity = tr_sys_path_get_capacity(*path, &error);
     char const* const err = error ? tr_strerror(error.code()) : nullptr;
     errno = old_errno;
 
-    /* response */
-    tr_variantDictAddStr(args_out, TR_KEY_path, path);
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, capacity ? capacity->free : -1);
-    tr_variantDictAddInt(args_out, TR_KEY_total_size, capacity ? capacity->total : -1);
+    // response
+    args_out.try_emplace(TR_KEY_path, *path);
+    args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->free : -1);
+    args_out.try_emplace(TR_KEY_total_size, capacity ? capacity->total : -1);
     return err;
 }
 
 // ---
 
-char const* sessionClose(
-    tr_session* session,
-    tr_variant* /*args_in*/,
-    tr_variant* /*args_out*/,
-    tr_rpc_idle_data* /*idle_data*/)
+char const* sessionClose(tr_session* session, tr_variant::Map const& /*args_in*/, tr_variant::Map& /*args_out*/)
 {
     session->rpcNotify(TR_RPC_SESSION_CLOSE, nullptr);
     return nullptr;
@@ -2308,143 +2071,118 @@ char const* sessionClose(
 
 // ---
 
-using handler = char const* (*)(tr_session*, tr_variant*, tr_variant*, struct tr_rpc_idle_data*);
+using SyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&);
 
-struct rpc_method
-{
-    std::string_view name;
-    bool immediate;
-    handler func;
-};
-
-auto constexpr Methods = std::array<rpc_method, 24>{ {
-    { "blocklist-update"sv, false, blocklistUpdate },
-    { "free-space"sv, true, freeSpace },
-    { "group-get"sv, true, groupGet },
-    { "group-set"sv, true, groupSet },
-    { "port-test"sv, false, portTest },
-    { "queue-move-bottom"sv, true, queueMoveBottom },
-    { "queue-move-down"sv, true, queueMoveDown },
-    { "queue-move-top"sv, true, queueMoveTop },
-    { "queue-move-up"sv, true, queueMoveUp },
-    { "session-close"sv, true, sessionClose },
-    { "session-get"sv, true, sessionGet },
-    { "session-set"sv, true, sessionSet },
-    { "session-stats"sv, true, sessionStats },
-    { "torrent-add"sv, false, torrentAdd },
-    { "torrent-get"sv, true, torrentGet },
-    { "torrent-reannounce"sv, true, torrentReannounce },
-    { "torrent-remove"sv, true, torrentRemove },
-    { "torrent-rename-path"sv, false, torrentRenamePath },
-    { "torrent-set"sv, true, torrentSet },
-    { "torrent-set-location"sv, true, torrentSetLocation },
-    { "torrent-start"sv, true, torrentStart },
-    { "torrent-start-now"sv, true, torrentStartNow },
-    { "torrent-stop"sv, true, torrentStop },
-    { "torrent-verify"sv, true, torrentVerify },
+auto constexpr SyncHandlers = std::array<std::pair<std::string_view, SyncHandler>, 20U>{ {
+    { "free-space"sv, freeSpace },
+    { "group-get"sv, groupGet },
+    { "group-set"sv, groupSet },
+    { "queue-move-bottom"sv, queueMoveBottom },
+    { "queue-move-down"sv, queueMoveDown },
+    { "queue-move-top"sv, queueMoveTop },
+    { "queue-move-up"sv, queueMoveUp },
+    { "session-close"sv, sessionClose },
+    { "session-get"sv, sessionGet },
+    { "session-set"sv, sessionSet },
+    { "session-stats"sv, sessionStats },
+    { "torrent-get"sv, torrentGet },
+    { "torrent-reannounce"sv, torrentReannounce },
+    { "torrent-remove"sv, torrentRemove },
+    { "torrent-set"sv, torrentSet },
+    { "torrent-set-location"sv, torrentSetLocation },
+    { "torrent-start"sv, torrentStart },
+    { "torrent-start-now"sv, torrentStartNow },
+    { "torrent-stop"sv, torrentStop },
+    { "torrent-verify"sv, torrentVerify },
 } };
 
-void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/, void* /*user_data*/)
+using AsyncHandler = char const* (*)(tr_session*, tr_variant::Map const&, tr_rpc_idle_data*);
+
+auto constexpr AsyncHandlers = std::array<std::pair<std::string_view, AsyncHandler>, 4U>{ {
+    { "blocklist-update"sv, blocklistUpdate },
+    { "port-test"sv, portTest },
+    { "torrent-add"sv, torrentAdd },
+    { "torrent-rename-path"sv, torrentRenamePath },
+} };
+
+void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
 {
 }
 
 } // namespace
 
-void tr_rpc_request_exec_json(
-    tr_session* session,
-    tr_variant const* request,
-    tr_rpc_response_func callback,
-    void* callback_user_data)
+void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback)
 {
     auto const lock = session->unique_lock();
 
-    auto* const mutable_request = const_cast<tr_variant*>(request);
-    tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
-    char const* result = nullptr;
+    auto const* const request_map = request.get_if<tr_variant::Map>();
 
-    if (callback == nullptr)
+    if (!callback)
     {
         callback = noop_response_callback;
     }
 
-    // parse the request's method name
-    auto sv = std::string_view{};
-    rpc_method const* method = nullptr;
-    if (!tr_variantDictFindStrView(mutable_request, TR_KEY_method, &sv))
+    auto const empty_args = tr_variant::Map{};
+    auto const* args_in = &empty_args;
+    auto method_name = std::string_view{};
+    if (request_map != nullptr)
     {
-        result = "no method name";
-    }
-    else
-    {
-        auto const it = std::find_if(std::begin(Methods), std::end(Methods), [&sv](auto const& row) { return row.name == sv; });
-        if (it == std::end(Methods))
+        // find the args
+        if (auto const* val = request_map->find_if<tr_variant::Map>(TR_KEY_arguments); val != nullptr)
         {
-            result = "method name not recognized";
+            args_in = val;
         }
-        else
+
+        // find the requested method
+        if (auto const* val = request_map->find_if<std::string_view>(TR_KEY_method); val != nullptr)
         {
-            method = &*it;
+            method_name = *val;
         }
     }
 
-    /* if we couldn't figure out which method to use, return an error */
-    if (result != nullptr)
+    auto const tag = request_map->value_if<int64_t>(TR_KEY_tag);
+
+    auto const test = [method_name](auto const& handler)
     {
-        auto response = tr_variant{};
-        tr_variantInitDict(&response, 3);
-        tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
-        tr_variantDictAddStr(&response, TR_KEY_result, result);
+        return handler.first == method_name;
+    };
 
-        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
-        {
-            tr_variantDictAddInt(&response, TR_KEY_tag, tag);
-        }
-
-        (*callback)(session, &response, callback_user_data);
-    }
-    else if (method->immediate)
-    {
-        auto response = tr_variant{};
-        tr_variantInitDict(&response, 3);
-        tr_variant* const args_out = tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
-        result = (*method->func)(session, args_in, args_out, nullptr);
-
-        if (result == nullptr)
-        {
-            result = "success";
-        }
-
-        tr_variantDictAddStr(&response, TR_KEY_result, result);
-
-        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
-        {
-            tr_variantDictAddInt(&response, TR_KEY_tag, tag);
-        }
-
-        (*callback)(session, &response, callback_user_data);
-    }
-    else
+    if (auto const end = std::end(AsyncHandlers), handler = std::find_if(std::begin(AsyncHandlers), end, test); handler != end)
     {
         auto* const data = new tr_rpc_idle_data{};
         data->session = session;
-        tr_variantInitDict(&data->response, 3);
-
-        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        data->tag = tag;
+        data->callback = std::move(callback);
+        if (char const* const errmsg = (*handler->second)(session, *args_in, data); errmsg != nullptr)
         {
-            tr_variantDictAddInt(&data->response, TR_KEY_tag, tag);
+            // Async operation failed prematurely? Invoke callback to ensure client gets a reply
+            tr_idle_function_done(data, errmsg);
         }
-
-        data->args_out = tr_variantDictAddDict(&data->response, TR_KEY_arguments, 0);
-        data->callback = callback;
-        data->callback_user_data = callback_user_data;
-        result = (*method->func)(session, args_in, data->args_out, data);
-
-        /* Async operation failed prematurely? Invoke callback or else client will not get a reply */
-        if (result != nullptr)
-        {
-            tr_idle_function_done(data, result);
-        }
+        return;
     }
+
+    auto response = tr_variant::Map{ 3U };
+    if (tag.has_value())
+    {
+        response.try_emplace(TR_KEY_tag, *tag);
+    }
+
+    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
+    {
+        auto args_out = tr_variant::Map{};
+        char const* const result = (handler->second)(session, *args_in, args_out);
+
+        response.try_emplace(TR_KEY_arguments, std::move(args_out));
+        response.try_emplace(TR_KEY_result, result != nullptr ? result : "success");
+    }
+    else
+    {
+        // couldn't find a handler
+        response.try_emplace(TR_KEY_arguments, 0);
+        response.try_emplace(TR_KEY_result, "no method name");
+    }
+
+    callback(session, tr_variant{ std::move(response) });
 }
 
 /**

@@ -340,29 +340,21 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
     }
 }
 
-struct rpc_response_data
-{
-    struct evhttp_request* req;
-    tr_rpc_server* server;
-};
-
-void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data)
-{
-    auto* data = static_cast<struct rpc_response_data*>(user_data);
-
-    auto* const response = make_response(data->req, data->server, tr_variant_serde::json().compact().to_string(*content));
-    evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
-    evhttp_send_reply(data->req, HTTP_OK, "OK", response);
-    evbuffer_free(response);
-
-    delete data;
-}
-
 void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
-    auto otop = tr_variant_serde::json().inplace().parse(json);
-
-    tr_rpc_request_exec_json(server->session, otop ? &*otop : nullptr, rpc_response_func, new rpc_response_data{ req, server });
+    if (auto otop = tr_variant_serde::json().inplace().parse(json); otop)
+    {
+        tr_rpc_request_exec(
+            server->session,
+            *otop,
+            [req, server](tr_session* /*session*/, tr_variant&& content)
+            {
+                auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(content));
+                evhttp_add_header(req->output_headers, "Content-Type", "application/json; charset=UTF-8");
+                evhttp_send_reply(req, HTTP_OK, "OK", response);
+                evbuffer_free(response);
+            });
+    }
 }
 
 void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
@@ -791,7 +783,7 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 void tr_rpc_server::set_url(std::string_view url)
 {
     url_ = url;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our URL to '{:s}'"), url_));
+    tr_logAddDebug(fmt::format("setting our URL to '{:s}'", url_));
 }
 
 void tr_rpc_server::set_whitelist(std::string_view whitelist)
@@ -805,7 +797,7 @@ void tr_rpc_server::set_whitelist(std::string_view whitelist)
 void tr_rpc_server::set_username(std::string_view username)
 {
     username_ = username;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
+    tr_logAddDebug(fmt::format("setting our username to '{:s}'", username_));
 }
 
 void tr_rpc_server::set_password(std::string_view password) noexcept
@@ -813,7 +805,7 @@ void tr_rpc_server::set_password(std::string_view password) noexcept
     auto const is_salted = tr_ssha1_test(password);
     salted_password_ = is_salted ? password : tr_ssha1(password);
 
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our salted password to '{:s}'"), salted_password_));
+    tr_logAddDebug(fmt::format("setting our salted password to '{:s}'", salted_password_));
 }
 
 void tr_rpc_server::set_password_enabled(bool enabled)
@@ -867,7 +859,7 @@ void tr_rpc_server::load(tr_variant const& src)
 
     if (!tr_strv_ends_with(url_, '/'))
     {
-        url_ = fmt::format(FMT_STRING("{:s}/"), url_);
+        url_ = fmt::format("{:s}/", url_);
     }
 
     this->host_whitelist_ = parse_whitelist(host_whitelist_str_);

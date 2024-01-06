@@ -131,7 +131,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     }
 
     auto error = tr_error{};
-    tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
+    tor->use_metainfo_from_file(metainfo, filename, &error);
     if (error)
     {
         tor->error().set_local_error(fmt::format(
@@ -890,7 +890,7 @@ void tr_torrent::on_metainfo_completed()
         // Potentially, we are in `tr_torrent::init`,
         // and we don't want any file created before `tr_torrent::start`
         // so we Verify but we don't Create files.
-        tr_torrentVerify(this);
+        session->queue_session_thread(tr_torrentVerify, this);
     }
     else
     {
@@ -904,7 +904,7 @@ void tr_torrent::on_metainfo_completed()
         }
         else if (is_running())
         {
-            tr_torrentStop(this);
+            stop_soon();
         }
     }
 }
@@ -1315,7 +1315,7 @@ tr_stat tr_torrent::stats() const
     stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
     stats.percentComplete = this->completion_.percent_complete();
-    stats.metadataPercentComplete = tr_torrentGetMetadataPercent(this);
+    stats.metadataPercentComplete = get_metadata_percent();
 
     stats.percentDone = this->completion_.percent_done();
     stats.leftUntilDone = this->completion_.left_until_done();
@@ -2174,8 +2174,7 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
     set_needs_completeness_check();
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const [file_begin, file_end] = fpm_.file_span_for_piece(piece);
-    for (auto file = file_begin; file < file_end; ++file)
+    for (auto [file, file_end] = fpm_.file_span_for_piece(piece); file < file_end; ++file)
     {
         if (completion_.has_blocks(block_span_for_file(file)))
         {
@@ -2406,7 +2405,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
         }
         else
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}"sv), newname, subpath.substr(oldpath_len + 1));
+            name = fmt::format("{:s}/{:s}"sv, newname, subpath.substr(oldpath_len + 1));
         }
     }
     else
@@ -2420,11 +2419,11 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 
         if (oldpath_len >= std::size(subpath))
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}"sv), tmp, newname);
+            name = fmt::format("{:s}/{:s}"sv, tmp, newname);
         }
         else
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}/{:s}"sv), tmp, newname, subpath.substr(oldpath_len + 1));
+            name = fmt::format("{:s}/{:s}/{:s}"sv, tmp, newname, subpath.substr(oldpath_len + 1));
         }
     }
 

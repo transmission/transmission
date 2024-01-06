@@ -564,7 +564,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), static_cast<int>(std_file)));
+        TR_ASSERT_MSG(false, fmt::format("unknown standard file {:d}", static_cast<int>(std_file)));
 
         if (error != nullptr)
         {
@@ -1098,7 +1098,7 @@ namespace
         {
             if (error != nullptr)
             {
-                error->set(ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
+                error->set(ENOTDIR, fmt::format("File is in the way: {:s}", path));
             }
 
             return false;

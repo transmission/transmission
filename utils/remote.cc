@@ -46,24 +46,26 @@ using namespace libtransmission::Values;
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
 
-static auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
-static char constexpr DefaultHost[] = "localhost";
-static char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
+namespace
+{
+auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
+char constexpr DefaultHost[] = "localhost";
+char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
-static char constexpr MyName[] = "transmission-remote";
-static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
-                                "\n"
-                                "A fast and easy BitTorrent client\n"
-                                "https://transmissionbt.com/\n"
-                                "\n"
-                                "Usage: transmission-remote [host] [options]\n"
-                                "       transmission-remote [port] [options]\n"
-                                "       transmission-remote [host:port] [options]\n"
-                                "       transmission-remote [http(s?)://host:port/transmission/] [options]\n"
-                                "\n"
-                                "See the man page for detailed explanations and many examples.";
+char constexpr MyName[] = "transmission-remote";
+char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
+                         "\n"
+                         "A fast and easy BitTorrent client\n"
+                         "https://transmissionbt.com/\n"
+                         "\n"
+                         "Usage: transmission-remote [host] [options]\n"
+                         "       transmission-remote [port] [options]\n"
+                         "       transmission-remote [host:port] [options]\n"
+                         "       transmission-remote [http(s?)://host:port/transmission/] [options]\n"
+                         "\n"
+                         "See the man page for detailed explanations and many examples.";
 
-static auto constexpr Arguments = TR_KEY_arguments;
+auto constexpr Arguments = TR_KEY_arguments;
 
 struct RemoteConfig
 {
@@ -79,13 +81,9 @@ struct RemoteConfig
     bool use_ssl = false;
 };
 
-/***
-****
-****  Display Utilities
-****
-***/
+// --- Display Utilities
 
-static std::string etaToString(int64_t eta)
+[[nodiscard]] std::string etaToString(int64_t eta)
 {
     if (eta < 0)
     {
@@ -94,38 +92,38 @@ static std::string etaToString(int64_t eta)
 
     if (eta < 60)
     {
-        return fmt::format(FMT_STRING("{:d} sec"), eta);
+        return fmt::format("{:d} sec", eta);
     }
 
     if (eta < (60 * 60))
     {
-        return fmt::format(FMT_STRING("{:d} min"), eta / 60);
+        return fmt::format("{:d} min", eta / 60);
     }
 
     if (eta < (60 * 60 * 24))
     {
-        return fmt::format(FMT_STRING("{:d} hrs"), eta / (60 * 60));
+        return fmt::format("{:d} hrs", eta / (60 * 60));
     }
 
     if (eta < (60 * 60 * 24 * 30))
     {
-        return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
+        return fmt::format("{:d} days", eta / (60 * 60 * 24));
     }
 
     if (eta < (60 * 60 * 24 * 30 * 12))
     {
-        return fmt::format(FMT_STRING("{:d} months"), eta / (60 * 60 * 24 * 30));
+        return fmt::format("{:d} months", eta / (60 * 60 * 24 * 30));
     }
 
     if (eta < (60 * 60 * 24 * 365 * 1000LL)) // up to 999 years
     {
-        return fmt::format(FMT_STRING("{:d} years"), eta / (60 * 60 * 24 * 365));
+        return fmt::format("{:d} years", eta / (60 * 60 * 24 * 365));
     }
 
     return "∞";
 }
 
-static std::string tr_strltime(time_t seconds)
+[[nodiscard]] auto tr_strltime(time_t seconds)
 {
     if (seconds < 0)
     {
@@ -140,48 +138,48 @@ static std::string tr_strltime(time_t seconds)
 
     auto tmpstr = std::string{};
 
-    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, tr_ngettext("hour", "hours", hours));
-    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, tr_ngettext("minute", "minutes", minutes));
-    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, tr_ngettext("seconds", "seconds", seconds));
+    auto const hstr = fmt::format("{:d} {:s}", hours, tr_ngettext("hour", "hours", hours));
+    auto const mstr = fmt::format("{:d} {:s}", minutes, tr_ngettext("minute", "minutes", minutes));
+    auto const sstr = fmt::format("{:d} {:s}", seconds, tr_ngettext("seconds", "seconds", seconds));
 
     if (days > 0)
     {
-        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), days, tr_ngettext("day", "days", days));
-        tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format(FMT_STRING("{:s}, {:s}"), dstr, hstr);
+        auto const dstr = fmt::format("{:d} {:s}", days, tr_ngettext("day", "days", days));
+        tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format("{:s}, {:s}", dstr, hstr);
     }
     else if (hours > 0)
     {
-        tmpstr = hours >= 4 || minutes == 0 ? hstr : fmt::format(FMT_STRING("{:s}, {:s}"), hstr, mstr);
+        tmpstr = hours >= 4 || minutes == 0 ? hstr : fmt::format("{:s}, {:s}", hstr, mstr);
     }
     else if (minutes > 0)
     {
-        tmpstr = minutes >= 4 || seconds == 0 ? mstr : fmt::format(FMT_STRING("{:s}, {:s}"), mstr, sstr);
+        tmpstr = minutes >= 4 || seconds == 0 ? mstr : fmt::format("{:s}, {:s}", mstr, sstr);
     }
     else
     {
         tmpstr = sstr;
     }
 
-    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, tr_ngettext("seconds", "seconds", total_seconds));
-    return fmt::format(FMT_STRING("{:s} ({:s})"), tmpstr, totstr);
+    auto const totstr = fmt::format("{:d} {:s}", total_seconds, tr_ngettext("seconds", "seconds", total_seconds));
+    return fmt::format("{:s} ({:s})", tmpstr, totstr);
 }
 
-static std::string strlpercent(double x)
+[[nodiscard]] auto strlpercent(double x)
 {
     return tr_strpercent(x);
 }
 
-static std::string strlratio2(double ratio)
+[[nodiscard]] auto strlratio2(double ratio)
 {
     return tr_strratio(ratio, "Inf");
 }
 
-static std::string strlratio(int64_t numerator, int64_t denominator)
+[[nodiscard]] auto strlratio(int64_t numerator, int64_t denominator)
 {
     return strlratio2(tr_getRatio(numerator, denominator));
 }
 
-static std::string strlsize(int64_t bytes)
+[[nodiscard]] auto strlsize(int64_t bytes)
 {
     if (bytes < 0)
     {
@@ -212,13 +210,9 @@ enum
     TAG_TRACKERS
 };
 
-/***
-****
-****  Command-Line Arguments
-****
-***/
+// --- Command-Line Arguments
 
-static auto constexpr Options = std::array<tr_option, 98>{
+auto constexpr Options = std::array<tr_option, 98>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -350,19 +344,19 @@ static auto constexpr Options = std::array<tr_option, 98>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static void showUsage(void)
+void showUsage()
 {
     tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
-static long numarg(char const* arg)
+[[nodiscard]] auto numarg(char const* arg)
 {
     char* end = nullptr;
     long const num = strtol(arg, &end, 10);
 
     if (*end != '\0')
     {
-        fmt::print(stderr, FMT_STRING("Not a number: '{:s}'\n"), arg);
+        fmt::print(stderr, "Not a number: '{:s}'\n", arg);
         showUsage();
         exit(EXIT_FAILURE);
     }
@@ -390,7 +384,7 @@ enum
     MODE_GROUP_GET = (1 << 15)
 };
 
-static int getOptMode(int val)
+[[nodiscard]] int getOptMode(int val)
 {
     switch (val)
     {
@@ -536,13 +530,13 @@ static int getOptMode(int val)
         return MODE_GROUP_GET;
 
     default:
-        fmt::print(stderr, FMT_STRING("unrecognized argument {:d}\n"), val);
+        fmt::print(stderr, "unrecognized argument {:d}\n", val);
         assert("unrecognized argument" && 0);
         return 0;
     }
 }
 
-static std::string getEncodedMetainfo(char const* filename)
+[[nodiscard]] std::string getEncodedMetainfo(char const* filename)
 {
     if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
@@ -552,7 +546,7 @@ static std::string getEncodedMetainfo(char const* filename)
     return {};
 }
 
-static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view fallback = "")
+void addIdArg(tr_variant* args, std::string_view id_str, std::string_view fallback = "")
 {
     if (std::empty(id_str))
     {
@@ -593,12 +587,12 @@ static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view
     }
 }
 
-static void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fallback = "")
+void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fallback = "")
 {
     return addIdArg(args, config.torrent_ids, fallback);
 }
 
-static void addTime(tr_variant* args, tr_quark const key, char const* arg)
+void addTime(tr_variant* args, tr_quark const key, char const* arg)
 {
     int time = 0;
     bool success = false;
@@ -627,7 +621,7 @@ static void addTime(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-static void addDays(tr_variant* args, tr_quark const key, char const* arg)
+void addDays(tr_variant* args, tr_quark const key, char const* arg)
 {
     int days = 0;
 
@@ -659,7 +653,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
+void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
 {
     tr_variant* labels;
     if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
@@ -674,7 +668,7 @@ static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
     }
 }
 
-static void setGroup(tr_variant* args, std::string_view group)
+void setGroup(tr_variant* args, std::string_view group)
 {
     tr_variantDictAddStrView(args, TR_KEY_group, group);
 }
@@ -703,14 +697,14 @@ static void setGroup(tr_variant* args, std::string_view group)
     return files;
 }
 
-static auto constexpr FilesKeys = std::array<tr_quark, 4>{
+auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_files,
     TR_KEY_name,
     TR_KEY_priorities,
     TR_KEY_wanted,
 };
 
-static auto constexpr DetailsKeys = std::array<tr_quark, 53>{
+auto constexpr DetailsKeys = std::array<tr_quark, 53>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -766,7 +760,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 53>{
     TR_KEY_webseedsSendingToUs,
 };
 
-static auto constexpr ListKeys = std::array<tr_quark, 15>{
+auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_addedDate,
     TR_KEY_error,
     TR_KEY_errorString,
@@ -784,7 +778,7 @@ static auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_uploadRatio,
 };
 
-static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
+[[nodiscard]] size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
     auto* const buf = static_cast<evbuffer*>(vbuf);
     size_t const byteCount = size * nmemb;
@@ -793,7 +787,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
-static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
+[[nodiscard]] size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
     auto& config = *static_cast<RemoteConfig*>(vconfig);
     auto const* const line = static_cast<char const*>(ptr);
@@ -817,7 +811,7 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vc
     return line_len;
 }
 
-static long getTimeoutSecs(std::string_view req)
+[[nodiscard]] long getTimeoutSecs(std::string_view req)
 {
     if (req.find("\"method\":\"blocklist-update\""sv) != std::string_view::npos)
     {
@@ -827,7 +821,7 @@ static long getTimeoutSecs(std::string_view req)
     return 60L; /* default value */
 }
 
-static std::string getStatusString(tr_variant* t)
+[[nodiscard]] std::string getStatusString(tr_variant* t)
 {
     auto from_us = int64_t{};
     auto status = int64_t{};
@@ -854,14 +848,14 @@ static std::string getStatusString(tr_variant* t)
     case TR_STATUS_CHECK_WAIT:
         if (auto percent = double{}; tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
         {
-            return fmt::format(FMT_STRING("Will Verify ({:.0f}%)"), floor(percent * 100.0));
+            return fmt::format("Will Verify ({:.0f}%)", floor(percent * 100.0));
         }
         return "Will Verify";
 
     case TR_STATUS_CHECK:
         if (auto percent = double{}; tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
         {
-            return fmt::format(FMT_STRING("Verifying ({:.0f}%)"), floor(percent * 100.0));
+            return fmt::format("Verifying ({:.0f}%)", floor(percent * 100.0));
         }
         return "Verifying";
 
@@ -893,20 +887,20 @@ static std::string getStatusString(tr_variant* t)
     }
 }
 
-static auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
+auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
     "Low"sv,
     "Normal"sv,
     "High"sv,
     "Invalid"sv,
 };
 
-static char* format_date(char* buf, size_t buflen, time_t now)
+char* format_date(char* buf, size_t buflen, time_t now)
 {
     *fmt::format_to_n(buf, buflen - 1, "{:%a %b %d %T %Y}", fmt::localtime(now)).out = '\0';
     return buf;
 }
 
-static void printDetails(tr_variant* top)
+void printDetails(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* torrents;
@@ -1238,7 +1232,7 @@ static void printDetails(tr_variant* top)
     }
 }
 
-static void printFileList(tr_variant* top)
+void printFileList(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* torrents;
@@ -1294,7 +1288,7 @@ static void printFileList(tr_variant* top)
                         }
 
                         fmt::print(
-                            FMT_STRING("{:3d}: {:3.0f}% {:<8s} {:<3s} {:9s}  {:s}\n"),
+                            "{:3d}: {:3.0f}% {:<8s} {:<3s} {:9s}  {:s}\n",
                             j,
                             floor(100.0 * percent),
                             pristr,
@@ -1308,7 +1302,7 @@ static void printFileList(tr_variant* top)
     }
 }
 
-static void printPeersImpl(tr_variant* peers)
+void printPeersImpl(tr_variant* peers)
 {
     printf("%-40s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
@@ -1330,7 +1324,7 @@ static void printPeersImpl(tr_variant* peers)
             tr_variantDictFindInt(d, TR_KEY_rateToPeer, &rateToPeer))
         {
             fmt::print(
-                FMT_STRING("{:<40s}  {:<12s}  {:<5.1f} {:6.1f}  {:6.1f}  {:s}\n"),
+                "{:<40s}  {:<12s}  {:<5.1f} {:6.1f}  {:6.1f}  {:s}\n",
                 address,
                 flagstr,
                 progress * 100.0,
@@ -1341,7 +1335,7 @@ static void printPeersImpl(tr_variant* peers)
     }
 }
 
-static void printPeers(tr_variant* top)
+void printPeers(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* torrents;
@@ -1366,7 +1360,7 @@ static void printPeers(tr_variant* top)
     }
 }
 
-static void printPiecesImpl(std::string_view raw, size_t piece_count)
+void printPiecesImpl(std::string_view raw, size_t piece_count)
 {
     auto const str = tr_base64_decode(raw);
     fmt::print("  ");
@@ -1391,7 +1385,7 @@ static void printPiecesImpl(std::string_view raw, size_t piece_count)
     fmt::print("\n");
 }
 
-static void printPieces(tr_variant* top)
+void printPieces(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* torrents;
@@ -1419,7 +1413,7 @@ static void printPieces(tr_variant* top)
     }
 }
 
-static void printPortTest(tr_variant* top)
+void printPortTest(tr_variant* top)
 {
     tr_variant* args;
 
@@ -1434,7 +1428,7 @@ static void printPortTest(tr_variant* top)
     }
 }
 
-static void printTorrentList(tr_variant* top)
+void printTorrentList(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* list;
@@ -1508,7 +1502,7 @@ static void printTorrentList(tr_variant* top)
                     std::string{ "n/a" };
 
                 fmt::print(
-                    FMT_STRING("{:>6d}{:c}  {:>5s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:<s}\n"),
+                    "{:>6d}{:c}  {:>5s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:<s}\n",
                     torId,
                     error_mark,
                     done_str,
@@ -1527,14 +1521,14 @@ static void printTorrentList(tr_variant* top)
         }
 
         fmt::print(
-            FMT_STRING("Sum:            {:>9s}             {:6.1f}  {:6.1f}\n"),
+            "Sum:            {:>9s}             {:6.1f}  {:6.1f}\n",
             strlsize(total_size).c_str(),
             Speed{ total_up, Speed::Units::Byps }.count(Speed::Units::KByps),
             Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
     }
 }
 
-static void printTrackersImpl(tr_variant* trackerStats)
+void printTrackersImpl(tr_variant* trackerStats)
 {
     for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
@@ -1684,7 +1678,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
     }
 }
 
-static void printTrackers(tr_variant* top)
+void printTrackers(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* torrents;
@@ -1709,7 +1703,7 @@ static void printTrackers(tr_variant* top)
     }
 }
 
-static void printSession(tr_variant* top)
+void printSession(tr_variant* top)
 {
     tr_variant* args;
 
@@ -1844,7 +1838,7 @@ static void printSession(tr_variant* top)
                 }
 
                 fmt::print(
-                    FMT_STRING("  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
+                    "  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n",
                     effective_up_limit,
                     upEnabled ? "Enabled" : "Disabled",
                     Speed{ upLimit, Speed::Units::KByps }.to_string(),
@@ -1867,7 +1861,7 @@ static void printSession(tr_variant* top)
                 }
 
                 fmt::print(
-                    FMT_STRING("  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
+                    "  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n",
                     effective_down_limit,
                     downEnabled ? "Enabled" : "Disabled",
                     Speed{ downLimit, Speed::Units::KByps }.to_string(),
@@ -1939,7 +1933,7 @@ static void printSession(tr_variant* top)
     }
 }
 
-static void printSessionStats(tr_variant* top)
+void printSessionStats(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* d;
@@ -1975,7 +1969,7 @@ static void printSessionStats(tr_variant* top)
     }
 }
 
-static void printGroups(tr_variant* top)
+void printGroups(tr_variant* top)
 {
     tr_variant* args;
     tr_variant* groups;
@@ -2000,7 +1994,7 @@ static void printGroups(tr_variant* top)
             {
                 fmt::print("{:s}: ", name);
                 fmt::print(
-                    FMT_STRING("Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n"),
+                    "Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n",
                     upEnabled ? Speed{ upLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     downEnabled ? Speed{ downLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     honors ? "honors" : "does not honor");
@@ -2009,7 +2003,7 @@ static void printGroups(tr_variant* top)
     }
 }
 
-static void filterIds(tr_variant* top, RemoteConfig& config)
+void filterIds(tr_variant* top, RemoteConfig& config)
 {
     tr_variant* args;
     tr_variant* list;
@@ -2130,7 +2124,8 @@ static void filterIds(tr_variant* top, RemoteConfig& config)
         }
     }
 }
-static int processResponse(char const* rpcurl, std::string_view response, RemoteConfig& config)
+
+int processResponse(char const* rpcurl, std::string_view response, RemoteConfig& config)
 {
     auto status = int{ EXIT_SUCCESS };
 
@@ -2251,10 +2246,10 @@ static int processResponse(char const* rpcurl, std::string_view response, Remote
     return status;
 }
 
-static CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
+CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
-    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
+    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, LONG_VERSION_STRING).c_str());
     (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     (void)curl_easy_setopt(curl, CURLOPT_HEADERDATA, &config);
@@ -2294,7 +2289,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 
     if (auto const& str = config.session_id; !std::empty(str))
     {
-        auto const h = fmt::format(FMT_STRING("{:s}: {:s}"), TR_RPC_SESSION_ID_HEADER, str);
+        auto const h = fmt::format("{:s}: {:s}", TR_RPC_SESSION_ID_HEADER, str);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         (void)curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
@@ -2304,7 +2299,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
     return curl;
 }
 
-static void tr_curl_easy_cleanup(CURL* curl)
+void tr_curl_easy_cleanup(CURL* curl)
 {
     struct curl_slist* custom_headers = nullptr;
     curl_easy_getinfo(curl, CURLINFO_PRIVATE, &custom_headers);
@@ -2317,11 +2312,11 @@ static void tr_curl_easy_cleanup(CURL* curl)
     }
 }
 
-static int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
+int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
 {
     auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
-    auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), scheme, rpcurl);
+    auto const rpcurl_http = fmt::format("{:s}://{:s}", scheme, rpcurl);
 
     auto* const buf = evbuffer_new();
     auto* curl = tr_curl_easy_init(buf, config);
@@ -2384,7 +2379,7 @@ static int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
     return status;
 }
 
-static tr_variant* ensure_sset(tr_variant& sset)
+tr_variant* ensure_sset(tr_variant& sset)
 {
     if (sset.has_value())
     {
@@ -2396,7 +2391,7 @@ static tr_variant* ensure_sset(tr_variant& sset)
     return tr_variantDictAddDict(&sset, Arguments, 0);
 }
 
-static tr_variant* ensure_tset(tr_variant& tset)
+tr_variant* ensure_tset(tr_variant& tset)
 {
     if (tset.has_value())
     {
@@ -2408,7 +2403,7 @@ static tr_variant* ensure_tset(tr_variant& tset)
     return tr_variantDictAddDict(&tset, Arguments, 1);
 }
 
-static int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
+int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
 {
     int status = EXIT_SUCCESS;
     char const* optarg;
@@ -3221,7 +3216,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Re
     return status;
 }
 
-static bool parsePortString(char const* s, int* port)
+bool parsePortString(char const* s, int* port)
 {
     int const errno_stack = errno;
     errno = 0;
@@ -3239,13 +3234,7 @@ static bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-static void getHostAndPortAndRpcUrl(
-    int* argc,
-    char** argv,
-    std::string* host,
-    int* port,
-    std::string* rpcurl,
-    RemoteConfig& config)
+void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl, RemoteConfig& config)
 {
     if (*argv[1] == '-')
     {
@@ -3257,12 +3246,12 @@ static void getHostAndPortAndRpcUrl(
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
-        *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 7);
+        *rpcurl = fmt::format("{:s}/rpc/", s + 7);
     }
     else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
     {
         config.use_ssl = true;
-        *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 8);
+        *rpcurl = fmt::format("{:s}/rpc/", s + 8);
     }
     else if (parsePortString(s, port))
     {
@@ -3290,7 +3279,7 @@ static void getHostAndPortAndRpcUrl(
         bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != nullptr);
 
         auto const sv = std::string_view{ s, size_t(hend - s) };
-        *host = is_unbracketed_ipv6 ? fmt::format(FMT_STRING("[{:s}]"), sv) : sv;
+        *host = is_unbracketed_ipv6 ? fmt::format("[{:s}]", sv) : sv;
     }
 
     *argc -= 1;
@@ -3300,6 +3289,7 @@ static void getHostAndPortAndRpcUrl(
         argv[i] = argv[i + 1];
     }
 }
+} // namespace
 
 int tr_main(int argc, char* argv[])
 {
@@ -3327,7 +3317,7 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(rpcurl))
     {
-        rpcurl = fmt::format(FMT_STRING("{:s}:{:d}{:s}"), host, port, DefaultUrl);
+        rpcurl = fmt::format("{:s}:{:d}{:s}", host, port, DefaultUrl);
     }
 
     return processArgs(rpcurl.c_str(), argc, (char const* const*)argv, config);

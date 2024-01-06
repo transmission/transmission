@@ -44,11 +44,11 @@ void set_system_error(tr_error* error, DWORD code, std::string_view what)
 
     if (auto const message = tr_win32_format_message(code); !std::empty(message))
     {
-        error->set(code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message));
+        error->set(code, fmt::format("{:s} failed: {:s}", what, message));
     }
     else
     {
-        error->set(code, fmt::format(FMT_STRING("{:s} failed: Unknown error: {:#08x}"), what, code));
+        error->set(code, fmt::format("{:s} failed: Unknown error: {:#08x}", what, code));
     }
 }
 
@@ -89,7 +89,7 @@ auto to_env_string(SortedWideEnv const& wide_env)
 
     for (auto const& [key, val] : wide_env)
     {
-        fmt::format_to(std::back_inserter(ret), FMT_STRING(L"{:s}={:s}"), key, val);
+        fmt::format_to(std::back_inserter(ret), L"{:s}={:s}", key, val);
         ret.insert(std::end(ret), L'\0');
     }
 

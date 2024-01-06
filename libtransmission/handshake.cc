@@ -613,9 +613,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
             break;
 
         default:
-            TR_ASSERT_MSG(
-                false,
-                fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state())));
+            TR_ASSERT_MSG(false, fmt::format("unhandled handshake state {:d}", static_cast<int>(handshake->state())));
             ret = READ_ERR;
             break;
         }

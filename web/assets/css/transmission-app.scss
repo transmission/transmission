@@ -253,6 +253,10 @@ a {
     margin: 0;
     padding: 0;
   }
+
+  .flexible-space {
+    margin-right: auto;
+  }
 }
 
 #mainwin-workarea {
@@ -396,10 +400,6 @@ a {
 }
 
 /// TORRENT CONTAINER
-
-.flexible-space {
-  margin-right: auto;
-}
 
 #torrent-container {
   flex-grow: 1;
@@ -1685,28 +1685,6 @@ dialog {
   font-style: italic;
 }
 
-.ui-menu {
-  width: 200px;
-}
-
 .upload-div {
   display: none;
-}
-
-.dropzone {
-  background: var(--color-bg-primary);
-  border: 2px dashed var(--color-border-stark);
-  border-radius: 5px;
-  color: var(--color-fg-primary);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  font-size: 1.2em;
-  font-weight: bold;
-  height: 100%;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  width: 100%;
 }

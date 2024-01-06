@@ -420,7 +420,7 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->render(context, widget, icon_area, icon_area, flags);
 
     progress_renderer_->property_value() = percent_done;
-    progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
+    progress_renderer_->property_text() = fmt::format("{:d}%", percent_done);
     progress_renderer_->property_sensitive() = sensitive;
     render_progress_bar(context, widget, prog_area, flags, progress_color);
 

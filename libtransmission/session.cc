@@ -476,9 +476,15 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     return settings;
 }
 
-tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name)
+tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name)
 {
     auto settings = tr_sessionGetDefaultSettings();
+
+    // if app defaults are provided, override libtransmission defaults
+    if (app_defaults != nullptr && app_defaults->holds_alternative<tr_variant::Map>())
+    {
+        settings.merge(*app_defaults);
+    }
 
     // if a settings file exists, use it to override the defaults
     if (auto const filename = fmt::format(
@@ -554,11 +560,11 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     // - client settings
     // - previous session's values in settings.json
     // - hardcoded defaults
-    auto settings = tr_sessionLoadSettings(config_dir, nullptr);
+    auto settings = tr_sessionLoadSettings(nullptr, config_dir, nullptr);
     settings.merge(client_settings);
 
     // if logging is desired, start it now before doing more work
-    if (auto const* settings_map = client_settings.get_if<tr_variant::Map>(); settings_map != nullptr)
+    if (auto const* settings_map = settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
         if (auto const* val = settings_map->find_if<bool>(TR_KEY_message_level); val != nullptr)
         {

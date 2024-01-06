@@ -80,12 +80,10 @@ private:
     QNetworkAccessManager* networkAccessManager();
     int64_t getNextTag();
 
-    void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
+    void sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise);
+    void sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
     [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
-
-    static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
 
     std::optional<QNetworkRequest> request_;
 
