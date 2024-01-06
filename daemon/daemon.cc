@@ -360,13 +360,6 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
     return TR_RPC_OK;
 }
 
-tr_variant load_settings(char const* config_dir)
-{
-    auto app_defaults = tr_variant::make_map();
-    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
-    return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
-}
-
 } // namespace
 
 bool tr_daemon::reopen_log_file(char const* filename)
@@ -420,6 +413,16 @@ void tr_daemon::periodic_update()
 {
     pumpLogMessages(logfile_, logfile_flush_);
     report_status();
+}
+
+tr_variant tr_daemon::load_settings(char const* config_dir)
+{
+    auto app_defaults = tr_variant::make_map();
+    tr_variantDictAddStr(&app_defaults, TR_KEY_watch_dir, ""sv);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
+    tr_variantDictAddBool(&app_defaults, key_watch_dir_force_generic, false);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+    return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
 }
 
 bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
@@ -601,7 +604,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'x':
-            tr_variantDictAddStr(&settings_, key_pidfile_, optstr);
+            tr_variantDictAddStr(&settings_, key_pidfile, optstr);
             break;
 
         case 'y':
@@ -720,7 +723,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     tr_sessionSaveSettings(session, cdir, settings_);
 
     auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
+    (void)tr_variantDictFindStrView(&settings_, key_pidfile, &sv);
     auto const sz_pid_filename = std::string{ sv };
     auto pidfile_created = false;
     if (!std::empty(sz_pid_filename))
@@ -768,7 +771,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &tmp_bool) && tmp_bool)
     {
         auto force_generic = bool{ false };
-        (void)tr_variantDictFindBool(&settings_, key_watch_dir_force_generic_, &force_generic);
+        (void)tr_variantDictFindBool(&settings_, key_watch_dir_force_generic, &force_generic);
 
         auto dir = std::string_view{};
         (void)tr_variantDictFindStrView(&settings_, TR_KEY_watch_dir, &dir);
