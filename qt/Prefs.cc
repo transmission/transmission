@@ -227,13 +227,13 @@ Prefs::Prefs(QString config_dir)
     // when the application exits.
     temporary_prefs_.insert(FILTER_TEXT);
 
-    auto top = get_default_app_settings();
-    top.merge(tr_sessionLoadSettings(config_dir_.toUtf8().constData(), nullptr));
-    ensureSoundCommandIsAList(&top);
+    auto const app_defaults = get_default_app_settings();
+    auto settings = tr_sessionLoadSettings(&app_defaults, config_dir_.toUtf8().constData(), nullptr);
+    ensureSoundCommandIsAList(&settings);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
+        tr_variant const* b = tr_variantDictFind(&settings, Items[i].key);
 
         switch (Items[i].type)
         {

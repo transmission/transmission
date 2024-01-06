@@ -108,8 +108,8 @@ tr_variant& getPrefs()
 
     if (!settings.has_value())
     {
-        settings = get_default_app_settings();
-        settings.merge(tr_sessionLoadSettings(gl_confdir.c_str(), nullptr));
+        auto const app_defaults = get_default_app_settings();
+        settings.merge(tr_sessionLoadSettings(&app_defaults, gl_confdir.c_str(), nullptr));
         ensure_sound_cmd_is_a_list(&settings);
     }
 

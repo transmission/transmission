@@ -321,7 +321,7 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     auto const config_dir = getConfigDir(argc, (char const**)argv);
-    auto settings = tr_sessionLoadSettings(config_dir.c_str(), MyConfigName);
+    auto settings = tr_sessionLoadSettings(nullptr, config_dir.c_str(), MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)

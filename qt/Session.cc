@@ -357,7 +357,7 @@ void Session::start()
     }
     else
     {
-        auto const settings = tr_sessionLoadSettings(config_dir_.toUtf8().constData(), "qt");
+        auto const settings = tr_sessionLoadSettings(nullptr, config_dir_.toUtf8().constData(), "qt");
         session_ = tr_sessionInit(config_dir_.toUtf8().constData(), true, settings);
 
         rpc_.start(session_);
