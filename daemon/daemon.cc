@@ -660,9 +660,9 @@ void tr_daemon::reconfigure(void)
         configDir = tr_sessionGetConfigDir(my_session_);
         tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
 
-        auto newsettings = tr_variant::make_map();
-        tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
-        newsettings.merge(tr_sessionLoadSettings(configDir, MyName));
+        auto app_defaults = tr_variant::make_map();
+        tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+        auto const newsettings = tr_sessionLoadSettings(&app_defaults, configDir, MyName);
 
         tr_sessionSet(my_session_, newsettings);
         tr_sessionReloadBlocklists(my_session_);
@@ -882,9 +882,9 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    settings_ = tr_variant::make_map();
-    tr_variantDictAddBool(&settings_, TR_KEY_rpc_enabled, true);
-    settings_.merge(tr_sessionLoadSettings(config_dir_.c_str(), MyName));
+    auto app_defaults = tr_variant::make_map();
+    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+    settings_ = tr_sessionLoadSettings(&app_defaults, config_dir_.c_str(), MyName);
 
     bool dumpSettings;
 
