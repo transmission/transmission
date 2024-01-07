@@ -23,6 +23,8 @@
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <giomm/liststore.h>
+#include <giomm/menuattributeiter.h>
+#include <giomm/menulinkiter.h>
 #include <gtkmm/shortcut.h>
 #include <gtkmm/shortcutaction.h>
 #include <gtkmm/shortcuttrigger.h>
