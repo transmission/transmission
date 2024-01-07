@@ -12,6 +12,7 @@ Checks: >
   -cppcoreguidelines-narrowing-conversions,
   hicpp-*,
   misc-*,
+  -misc-include-cleaner,
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
