@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,10 @@
 #include <algorithm>
 #include <array>
 #include <cerrno> // ECONNREFUSED, ETIMEDOUT
+#include <cstddef>
+#include <cstdint>
 #include <string_view>
+#include <tuple>
 #include <utility>
 
 #include <fmt/core.h>
@@ -24,6 +27,7 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 
 #define tr_logAddTraceHand(handshake, msg) \
     tr_logAddTrace(msg, fmt::format("handshake {}", (handshake)->peer_io_->display_name()))
@@ -609,9 +613,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
             break;
 
         default:
-            TR_ASSERT_MSG(
-                false,
-                fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state())));
+            TR_ASSERT_MSG(false, fmt::format("unhandled handshake state {:d}", static_cast<int>(handshake->state())));
             ret = READ_ERR;
             break;
         }
@@ -632,7 +634,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         auto const info = handshake->mediator_->torrent(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
-        if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
+        if ((error.code() == ETIMEDOUT || error.code() == ECONNREFUSED) && info)
         {
             handshake->mediator_->set_utp_failed(info_hash, io->socket_address());
         }
@@ -657,7 +659,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         return;
     }
 
-    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message(), error.code()));
     handshake->done(false);
 }
 

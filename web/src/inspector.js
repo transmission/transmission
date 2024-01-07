@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -539,7 +539,17 @@ export class Inspector extends EventTarget {
       const get = (t) => t.getDateAdded();
       const first = get(torrents[0]);
       string = torrents.every((t) => get(t) === first)
-        ? new Date(first * 1000).toDateString()
+        ? new Date(first * 1000).toLocaleString(navigator.language, {
+            day: '2-digit',
+            hour: '2-digit',
+            hour12: false,
+            minute: '2-digit',
+            month: 'short',
+            second: '2-digit',
+            timeZoneName: 'short',
+            weekday: 'short',
+            year: 'numeric',
+          })
         : mixed;
     }
     setTextContent(e.info.dateAdded, string);
@@ -603,8 +613,14 @@ export class Inspector extends EventTarget {
         setTextContent(td, peer.flagStr);
         td.setAttribute('title', Inspector._peerStatusTitle(peer.flagStr));
       },
-      (peer, td) => setTextContent(td, peer.address),
-      (peer, td) => setTextContent(td, peer.clientName),
+      (peer, td) => {
+        setTextContent(td, peer.address);
+        td.setAttribute('title', peer.address);
+      },
+      (peer, td) => {
+        setTextContent(td, peer.clientName);
+        td.setAttribute('title', peer.clientName);
+      },
     ];
 
     const rows = [];
@@ -735,10 +751,6 @@ export class Inspector extends EventTarget {
 
     const rows = [];
     for (const tor of torrents) {
-      const group = document.createElement('div');
-      group.classList.add('inspector-group');
-      rows.push(group);
-
       // if >1 torrent to be shown, give a title
       if (torrents.length > 1) {
         const title = document.createElement('div');

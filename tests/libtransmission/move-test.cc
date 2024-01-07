@@ -38,9 +38,9 @@ protected:
     void SetUp() override
     {
         auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.c_str());
+        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir);
         auto const incomplete_dir = GetParam().first;
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.c_str());
+        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir);
         tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
 
         SessionTest::SetUp();
@@ -88,7 +88,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
         data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf));
-        tr_torrentGotBlock(data->tor, data->block);
+        data->tor->on_block_received(data->block);
         data->done = true;
     };
 
@@ -106,7 +106,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
             std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
-            session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);
+            session_->run_in_session_thread(test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()
             {
@@ -166,7 +166,7 @@ TEST_F(MoveTest, setLocation)
 
     // now move it
     auto state = int{ -1 };
-    tr_torrentSetLocation(tor, target_dir, true, nullptr, &state);
+    tr_torrentSetLocation(tor, target_dir, true, &state);
     auto test = [&state]()
     {
         return state == TR_LOC_DONE;

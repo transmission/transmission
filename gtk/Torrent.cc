@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,6 +12,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 
 #include <glibmm/i18n.h>
 #include <glibmm/value.h>
@@ -23,6 +24,8 @@
 #include <utility>
 
 using namespace std::string_view_literals;
+
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -137,12 +140,15 @@ public:
 
         std::string_view mime_type;
 
-        uint64_t have_unchecked = {};
-        uint64_t have_valid = {};
-        uint64_t left_until_done = {};
-        uint64_t size_when_done = {};
-        uint64_t total_size = {};
-        uint64_t uploaded_ever = {};
+        Storage have_unchecked = {};
+        Storage have_valid = {};
+        Storage left_until_done = {};
+        Storage size_when_done = {};
+        Storage total_size = {};
+        Storage uploaded_ever = {};
+
+        Speed speed_down = {};
+        Speed speed_up = {};
 
         size_t queue_position = {};
 
@@ -171,8 +177,6 @@ public:
 
         float ratio = {};
         float seed_ratio = {};
-        float speed_down = {};
-        float speed_up = {};
 
         tr_priority_t priority = {};
 
@@ -241,10 +245,19 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     auto seed_ratio = 0.0;
     auto const has_seed_ratio = tr_torrentGetSeedRatio(raw_torrent_, &seed_ratio);
+    auto const view = tr_torrentView(raw_torrent_);
 
-    update_cache_value(cache_.name, tr_torrentName(raw_torrent_), result, ChangeFlag::NAME);
-    update_cache_value(cache_.speed_up, stats->pieceUploadSpeed_KBps, 0.01F, result, ChangeFlag::SPEED_UP);
-    update_cache_value(cache_.speed_down, stats->pieceDownloadSpeed_KBps, 0.01F, result, ChangeFlag::SPEED_DOWN);
+    update_cache_value(cache_.name, view.name, result, ChangeFlag::NAME);
+    update_cache_value(
+        cache_.speed_up,
+        Speed{ stats->pieceUploadSpeed_KBps, Speed::Units::KByps },
+        result,
+        ChangeFlag::SPEED_UP);
+    update_cache_value(
+        cache_.speed_down,
+        Speed{ stats->pieceDownloadSpeed_KBps, Speed::Units::KByps },
+        result,
+        ChangeFlag::SPEED_DOWN);
     update_cache_value(cache_.active_peers_up, stats->peersGettingFromUs, result, ChangeFlag::ACTIVE_PEERS_UP);
     update_cache_value(
         cache_.active_peers_down,
@@ -290,16 +303,36 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
         Percents(stats->seedRatioPercentDone),
         result,
         ChangeFlag::SEED_RATIO_PERCENT_DONE);
-    update_cache_value(cache_.total_size, tr_torrentTotalSize(raw_torrent_), result, ChangeFlag::TOTAL_SIZE);
+    update_cache_value(cache_.total_size, Storage{ view.total_size, Storage::Units::Bytes }, result, ChangeFlag::TOTAL_SIZE);
 
     update_cache_value(cache_.has_seed_ratio, has_seed_ratio, result, ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.have_unchecked, stats->haveUnchecked, result, ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.have_valid, stats->haveValid, result, ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.left_until_done, stats->leftUntilDone, result, ChangeFlag::LONG_PROGRESS);
+    update_cache_value(
+        cache_.have_unchecked,
+        Storage{ stats->haveUnchecked, Storage::Units::Bytes },
+        result,
+        ChangeFlag::LONG_PROGRESS);
+    update_cache_value(
+        cache_.have_valid,
+        Storage{ stats->haveValid, Storage::Units::Bytes },
+        result,
+        ChangeFlag::LONG_PROGRESS);
+    update_cache_value(
+        cache_.left_until_done,
+        Storage{ stats->leftUntilDone, Storage::Units::Bytes },
+        result,
+        ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.percent_done, Percents(stats->percentDone), result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.seed_ratio, static_cast<float>(seed_ratio), 0.01F, result, ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.size_when_done, stats->sizeWhenDone, result, ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.uploaded_ever, stats->uploadedEver, result, ChangeFlag::LONG_PROGRESS);
+    update_cache_value(
+        cache_.size_when_done,
+        Storage{ stats->sizeWhenDone, Storage::Units::Bytes },
+        result,
+        ChangeFlag::LONG_PROGRESS);
+    update_cache_value(
+        cache_.uploaded_ever,
+        Storage{ stats->uploadedEver, Storage::Units::Bytes },
+        result,
+        ChangeFlag::LONG_PROGRESS);
 
     update_cache_value(
         cache_.metadata_percent_complete,
@@ -313,7 +346,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     if (result.test(ChangeFlag::NAME))
     {
-        cache_.name_collated = fmt::format("{}\t{}", cache_.name.lowercase(), tr_torrentView(raw_torrent_).hash_string);
+        cache_.name_collated = fmt::format("{}\t{}", cache_.name.lowercase(), view.hash_string);
     }
 
     return result;
@@ -409,7 +442,7 @@ Glib::ustring Torrent::Impl::get_short_status_text() const
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         return fmt::format(
-            FMT_STRING("{:s} {:s}"),
+            "{:s} {:s}",
             get_short_transfer_text(),
             fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(cache_.ratio))));
 
@@ -422,7 +455,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
 {
     Glib::ustring gstr;
 
-    bool const isDone = cache_.left_until_done == 0;
+    bool const isDone = cache_.left_until_done.is_zero();
     auto const haveTotal = cache_.have_unchecked + cache_.have_valid;
     bool const isSeed = cache_.have_valid >= cache_.total_size;
 
@@ -515,7 +548,7 @@ Glib::ustring Torrent::Impl::get_long_status_text() const
     default:
         if (auto const buf = get_short_transfer_text(); !std::empty(buf))
         {
-            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
+            status_str += fmt::format(" - {:s}", buf);
         }
     }
 
@@ -581,14 +614,14 @@ Glib::ustring Torrent::Impl::get_short_transfer_text() const
     if (cache_.has_metadata && cache_.active_peers_down > 0)
     {
         return fmt::format(
-            _("{download_speed} ▼  {upload_speed} ▲"),
-            fmt::arg("upload_speed", tr_formatter_speed_KBps(cache_.speed_up)),
-            fmt::arg("download_speed", tr_formatter_speed_KBps(cache_.speed_down)));
+            fmt::runtime(_("{download_speed} ▼  {upload_speed} ▲")),
+            fmt::arg("upload_speed", cache_.speed_up.to_string()),
+            fmt::arg("download_speed", cache_.speed_down.to_string()));
     }
 
     if (cache_.has_metadata && cache_.active_peers_up > 0)
     {
-        return fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(cache_.speed_up)));
+        return fmt::format(fmt::runtime(_("{upload_speed} ▲")), fmt::arg("upload_speed", cache_.speed_up.to_string()));
     }
 
     if (cache_.stalled)
@@ -714,12 +747,12 @@ tr_torrent& Torrent::get_underlying() const
     return *impl_->get_raw_torrent();
 }
 
-float Torrent::get_speed_up() const
+Speed Torrent::get_speed_up() const
 {
     return impl_->get_cache().speed_up;
 }
 
-float Torrent::get_speed_down() const
+Speed Torrent::get_speed_down() const
 {
     return impl_->get_cache().speed_down;
 }
@@ -784,7 +817,7 @@ int Torrent::get_active_peer_count() const
     return impl_->get_cache().active_peer_count;
 }
 
-uint64_t Torrent::get_total_size() const
+Storage Torrent::get_total_size() const
 {
     return impl_->get_cache().total_size;
 }

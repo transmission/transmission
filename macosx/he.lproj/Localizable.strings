@@ -1,0 +1,1152 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@ מתוך %2$@";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "%@ מנתוני העל של הטורנט התקבלו";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "%@ נבחרו";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ סך הכול";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@אומת";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld ק״ב/שנ׳";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld דקות";
+
+/* stats window -> times opened */
+"%llu times" = "%llu פעמים";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu במטמון";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu מחוברים";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu מורידים";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu קבצים";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu נכנסים";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu כללי כתובות IP ברשימה";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Known:" = "%lu ידועים:";
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu איתור מקומי";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu העברות ממוגנטות";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu זורעים";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu קובצי טורנט";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu טורנטים נבחרו";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "עוקב אחד";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu העברות";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu זורעי רשת";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u חלקים, כל אחד %2$@";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "אחד מחובר";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "קובץ אחד";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "העברה ממוגנטת";
+
+/* Info options -> global setting */
+"1 minute" = "דקה אחת";
+
+/* Create torrent -> info */
+"1 piece, %@" = "חלק אחד, %@";
+
+/* stats window -> times opened */
+"1 time" = "פעם אחת";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "העברה אחת";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "„%@” אינו קובץ טורנט תקני.";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = " יש להוריד רשימת חסימה תחילה";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "קובץ בשם \"%1$@\" קיים כבר בתיקייה \"%2$@\". נא לבחור שם או תיקיה אחרת לשמירת קובץ הטורנט.";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "לא ניתן להעביר תיקיה לתוך עצמה.";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "לא ניתן ליצור קובץ טורנט ללא גודל.";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "לא ניתן ליצור קובץ טורנט בשם ובתיקייה הללו.";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "העברה המסומנת כפרטית ללא כתובות עוקב לא תוכל להתחבר לעמיתים. קובץ הטורנט יהיה בר שימוש רק אם הכוונה היא להעלות את הקובץ לאתר מעקב שיוסיף את הכתובות.";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "כבר קיימת העברה של \"%@\"";
+
+/* Filter Bar -> filter button */
+"Active" = "פעילים";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "פעילות";
+
+/* Add torrent -> same name -> button */
+"Add" = "הוספה";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "הוספת עוקב";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "הוספת העברה ממוגנטת כשלה.";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "הכול";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "כל הקבוצות";
+
+/* Tracker last announce */
+"Announce error" = "שגיאת הכרזה";
+
+/* Tracker next announce */
+"Announce in progress" = "התקדמות הכרזה";
+
+/* Tracker next announce */
+"Announce is queued" = "הכרזה נוספה לתור";
+
+/* Tracker next announce */
+"Announce not scheduled" = "הכרזה לא תוזמנה";
+
+/* Tracker last announce */
+"Announce timed out" = "פג זמן הכרזה";
+
+/* All toolbar item -> label */
+"Apply All" = "החלת הכל";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "החלת פריטים שנבחרו";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "לצאת?";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "להסיר %lu העברות שהושלמו מרשימת ההעברות?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "להסיר %lu עוקבים?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "להסיר %lu העברות מרשימת ההעברות ולהעביר את קובצי הנתונים לאשפה?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "להסיר את %lu ההעברות מרשימת ההעברות?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "האם להסיר \"%@\" מרשימת ההעברות ולהעביר לסל המחזור את קובץ הנתונים?";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "האם  להסיר \"%@\" העברות מרשימת ההעברות?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "להסיר עוקב זה?";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "לאפס את סטטיסטיקת השימוש?";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "זמין";
+
+/* Transfer speed (bytes per second) */
+"B/s" = "ב׳/שנ׳";
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "רוחב פס";
+
+/* notification description */
+"Bandwidth settings changed" = "הגדרות רוחב הפס השתנו";
+
+/* Groups -> Name */
+"Blue" = "כחול";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "ביטול";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "שינוי הגדרות העברה";
+
+/* File Outline -> Menu */
+"Check Selected" = "סימון הפריטים שנבחרו";
+
+/* Torrent -> status string */
+"Checking existing data" = "בדיקת הנתונים הקיימים";
+
+/* Message window -> save button */
+"Clear" = "ניקוי";
+
+/* inspector -> peer table -> header */
+"Client" = "לקוח";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "סגירת מבט חטוף";
+
+/* Blocklist -> message */
+"Connecting to site" = "התחברות לאתר";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "לא ניתן ליצור עותק של „%@”";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "יצירה";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "יצירת קובץ טורנט";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "יצירת קובץ טורנט";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "יצירת קובץ טורנט";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "היצירה של „%@” נכשלה.";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "מתבצעת הורדה (מעוניינים ולא נבלמנו)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "מתבצעת העלאה (מעוניינים ולא נבלמנו)";
+
+/* Message window -> table column */
+"Date" = "תאריך";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "ניפוי שגיאות";
+
+/* Info options -> global setting */
+"disabled" = "מושבת";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "הורדה";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "הורדה מ־%lu";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "לא לבדוק שוב את הנפח בכונן הקשיח";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "לא להציק על זה שוב.";
+
+/* files tab -> tooltip */
+"Don't Download" = "לא להוריד";
+
+/* Donation beg -> button */
+"Donate" = "תרומה";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "בחירתך לתרום או לא לתרום לא תשפיע על חוויית העברת הטורנטים שלך.";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "הורדה";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "להוריד בכל מקרה";
+
+/* notification title */
+"Download Complete" = "ההורדה הושלמה";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "הורדת רשימת חסימה כשלה.";
+
+/* files tab -> tooltip */
+"Download Some" = "הורדת כמה";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "מהירות הורדה";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "ירדו";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "בהליכי הורדה";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "הורדת רשימת חסימה";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "מתבצעת הורדה מ־%1$lu מתוך %2$lu עמיתים";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = "מתבצעת הורדה מ־%lu מתוך עמית אחד";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "הורדה העמית";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "הורדה מזורעי רשת";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "מוצפן";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "חיבור מוצפן";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "שגיאה";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "קבצים";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "סינון";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "מתוך: מטמון";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "מתוך: טבלת גיבוב מבוזרת";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "מתוך: חיבורים נכנסים";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "מתוך: נוהל 'לחיצת יד' של הרחבת ליבטורנט";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "מתוך: תגלית עמיתים מקומית";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "מתוך: חילופי עמיתים";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "מתוך: עוקב";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "ג״ב/שנייה";
+
+/* Preferences -> toolbar item title */
+"General" = "כללי";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "מידע כללי";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "מגבלת הורדה כללית";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "מגבלת העלאה כללית";
+
+/* Tracker last announce */
+"got %lu peers" = "התקבלו %lu עמיתים";
+
+/* Tracker last announce */
+"got 1 peer" = "נמצא עמית 1";
+
+/* Groups -> Name */
+"Gray" = "אפור";
+
+/* Groups -> Name */
+"Green" = "ירוק";
+
+/* Groups -> Button */
+"Group" = "קבוצה";
+
+/* Preferences -> toolbar item title */
+"Groups" = "קבוצות";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "הסתרת סרגל סינון";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "הסתרת מנתח";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "הסתרת סרגל מצב";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "הסתרת סרגל כלים";
+
+/* File Outline -> Priority Menu */
+"High" = "גבוהה";
+
+/* files tab -> tooltip */
+"High Priority" = "עדיפות גבוהה";
+
+/* Legal alert -> button */
+"I Accept" = "מוסכם עלי";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "אם אתם מנסים להשתמש בנתונים שכבר קיימים, מחיצת נתוני השורש צריכה להיות בתוך מחיצת היעד.";
+
+/* Torrent -> eta string */
+"inactive" = "לא פיעל";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "מידע";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "מנתח";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "כתובת מרשתת של קובץ הטורנט:";
+
+/* inspector -> peer table -> header */
+"IP Address" = "כתובת IP";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "נראה שקובץ \"%1$@\" מ %2$@אינו קובץ טורנט.";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "ק״ב/שנייה";
+
+/* Inspector -> Peers tab -> peers */
+"Known:" = "ידועים:";
+
+/* Tracker last announce */
+"Last Announce" = "הכרזה אחרונה";
+
+/* Tracker last scrape */
+"Last Scrape" = "בידוק אחרון";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "עודכנו לאחרונה";
+
+/* tracker peer stat */
+"Leechers" = "יונקים";
+
+/* About window -> license button */
+"License" = "רישיון";
+
+/* torrent action menu -> upload/download limit */
+"Limit (%ld KB/s)" = "הגבלה (%ld ק״ב לשנ׳)";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "לא ניתן לשמור יומן";
+
+/* File Outline -> Priority Menu */
+"Low" = "נמוכה";
+
+/* files tab -> tooltip */
+"Low Priority" = "עדיפות נמוכה";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "קישור המגנט הוא כפילות של העברה קיימת.";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "העברה ממוגנטת";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "מ״ב/שנייה";
+
+/* Message window -> table column */
+"Message" = "הודעה";
+
+/* Message window -> title */
+"Message Log" = "יומן הודעות";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "עדיפויות מרובות";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "לא זמין";
+
+/* Filter Bar -> filter menu */
+"Name" = "שם";
+
+/* Preferences -> toolbar item title */
+"Network" = "רשת";
+
+/* Prefs -> blocklist -> message */
+"Never" = "לעולם לא";
+
+/* Inspector -> tracker table */
+"New Tier" = "שכבה חדשה";
+
+/* Tracker next announce */
+"Next announce in %@" = "ההכרזה הבאה בעוד %@";
+
+/* Group table row */
+"No Group" = "ללא קבוצה";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "לא נבחרו טורנטים";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "ללא";
+
+/* Donation beg -> button */
+"Nope" = "לא";
+
+/* File Outline -> Priority Menu */
+"Normal" = "רגילה";
+
+/* files tab -> tooltip */
+"Normal Priority" = "עדיפות רגילה";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "לא נותר מספיק מקום בקונן להורדת \"%@\" במלאו.";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "אישור";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "לאחר ההסרה, בחירה להמשיך בהעברה תדרוש את קובץ הטורנט או את קישור המגנט.";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "לאחר ההסרה, המשך ההעברה תדרוש את קובץ הטורנט או את קישור המגנט.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "לאחר ההסרה, ‏Transmission לא ינסה להתחבר אליה. פעולה זו לא ניתנת להסגה.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "לאחר ההסרה, ‏Transmission לא ינסה להתחבר אליהם. פעולה זו לא ניתנת להסגה.";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "בדיקת הפריטים שנבחרו בלבד";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "פתיחה";
+
+/* Open address toolbar item -> label */
+"Open Address" = "פתיחת כתובת";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "פתיחת כתובת טורנט";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "פתיחת קובצי טורנט";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "פתיחת קובצי טורנט";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "פתיחת כתובת רשת טורנט";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "אפשרויות";
+
+/* Groups -> Name */
+"Orange" = "כתום";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "זריעה חלקית";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "השהית / המשך הכל";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "השהית / המשך פריטים שנבחרו";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "השהיית הכול";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "השהית כל ההעברות";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "השהית הפריטים שנבחרו";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "השהית ההעברות שנבחרו";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "השהית ההעברה";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "מושהה";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "העמית שחרר את הבלימה, אבל אין לנו עניין";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "העמית רוצה שנעלה, אך אין לנו עניין (מעוניינים אך נבלמו)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "עמיתים";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "אתר בדיקות פיתחה אינו זמין";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "הפתחה סגורה";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "הפתחה פתוחה";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "פתחה: %@";
+
+/* No comment provided by engineer. */
+"PrefWindowSize" = "גודל חלון העדפות";
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "עדיפות";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "העדיפות אינה זמינה";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "טורנט פרטי, גילוי עמיתים מחוץ לעוקב מושבת";
+
+/* Message window -> table column */
+"Process" = "תהליך";
+
+/* Blocklist -> message */
+"Processing blocklist" = "רשימת החסימה מעובדת";
+
+/* Stats window -> label */
+"Program Started" = "התכנית החלה";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "תהליך: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "פרוטוקול: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "טורנט ציבורי";
+
+/* Groups -> Name */
+"Purple" = "סגול";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "מבט מהיר";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "יציאה";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "יחס";
+
+/* Groups -> Name */
+"Red" = "אדום";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "הזמן שנותר לא ידוע";
+
+/* Preferences -> toolbar item title */
+"Remote" = "מרוחק";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "הסרה";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "הסרת כל ההעברות שזריעתן הסתיימה.";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "הסרת הנבחרים";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "הסרת העוקבים הנבחרים";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "הסרת ההעברות הנבחרות";
+
+/* rename sheet button */
+"Rename" = "שינוי שם ";
+
+/* File Outline -> Menu */
+"Rename File" = "שינוי שם קובץ";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "לשנות את שם הקובץ „%@”:";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "איפוס";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "להמשיך הכול";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "להמשיך את כל ההעברות";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "להמשיך את הנבחרות";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "להמשיך את ההעברות הנבחרות";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "להמשיך את ההעברה";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "להמשיך את ההעברה מיידית";
+
+/* Stats window -> label */
+"Running Time" = "זמן פעילות";
+
+/* Message window -> save button */
+"Save" = "שמירה";
+
+/* Tracker last scrape */
+"Scrape error" = "שגיאת בידוק";
+
+/* Tracker last scrape */
+"Scrape timed out" = "פג זמן בידוק";
+
+/* tracker peer stat */
+"Seeders" = "זורעים";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "זריעה";
+
+/* Torrent -> status string */
+"Seeding complete" = "הזריעה הושלמה";
+
+/* notification title */
+"Seeding Complete" = "הזריעה הושלמה";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "זריעה ל־%1$lu מתוך %2$lu עמיתים";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = "זריעה ל־%u מתוך עמית אחד";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "בחירה";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "נא לבחור קובץ או תיקייה עבור קובץ הטורנט.";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "בחירת תיקיית ההורדות עבור \"%@\"";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "בחירת שם ומיקום לקובץ הטורנט.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "בחירת תיקייה חדשה עבור %lu קובצי נתונים.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "בחירת תיקייה חדשה עבור \"%@\".";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "יחס מופע";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "העברות מופע";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "שיתוף";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "שיתוף קובץ טורנט";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "קיצורים לשינוי הגדרות כלליות.";
+
+/* notification button */
+"Show" = "הצגה";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "הצגת סרגל סינון";
+
+/* File Outline -> Menu */
+"Show in Finder" = "הצגה ב־„מאתר”";
+
+/* View menu -> Inspector */
+"Show Inspector" = "הצגת המפקח";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "הצגת סרגל מצב";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "הצגת קובץ הנתונים ב־„מאתר”";
+
+/* View menu -> Toolbar */
+"Show Toolbar" = "הצגת סרגל כלים";
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "מגבלת מהירות";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "הגבלת מהירות מושבתת אוטומטית";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "הגבלת מהירות מאופשרת אוטומטית";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "מגבלת המהירות עוקפת את הסך הכולל של מגבלות רוחב הפס במגבלות שלה.";
+
+/* Torrent -> status string */
+"Stalled" = "מעוכב";
+
+/* Stats window -> title */
+"Statistics" = "סטטיסטיקה";
+
+/* torrent action menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "עצירה ביחס (%.2f)";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "הפסקת המתנה להתחלה";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "תמיכה בתוכנת חברה עצמאית בקוד פתוח";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "ט״ב/ש";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "מיקום קובץ הטורנט שנבחר אינו קיים.";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "למחיצת היעד ולמחיצת נתוני השורש שם זהה.";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "התיקייה \"%@\" אינה קיימת כרגע. נא ליצור תיקיה זו או לבחור תיקיה אחרת ליצירת קובץ הטורנט.";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "לא ניתן להוסיף את קישור המגנט \"%@\" מכיוון שהוא כפיל של העברה קיימת.";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "לא ניתן לבצע העברה של \"%@\".";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "רשימת חסימה שצויינה לא כללה כללים תקינים.";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "לא ניתן להורחד את הטורנט מ %1$@: %2$@";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "קובץ טורנט (%@) לא נמצא.";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "לא ניתן לפתוח את קובץ הטורנט  מאחר והוא מכיל נתונים לא תקינים.";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "הגודל הכללי של הקובץ  הוא אפס בייטים.";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "לא ניתן להוסיף את ההעברה מכיוון שמדובר בכפילות של העברה קיימת.";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "ההעברה תושהה. נא לפנות מקום ב %@ או לבטל בחירת בקבצים במנתח הטורנט בכדי להמשיך.";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "ההעברה לא תתקשר לעוקבים עבור עמיתים, תצטרכו להסתמך אך ורק על שיטות גילוי עמיתים ללא עוקב כמו PEX ו־DHT כדי להוריד ולזרוע.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "יש %1$lu העברות (%2$lu פעילות).";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "יש %lu העברות פעילות שיושהו ביציאה. ההעברות יתחדשו אוטומטית בהפעלה הבאה.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "יש %lu העברות פעילות.";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "אין כתובות עוקבים.";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "כבר קיים עותק ‏Transmission פועל. לא ניתן לפתוח עותק זה עד לסגירת המופע הפעיל.";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "קיימת העברה פעילה שתושהה ביציאה. ההעברה תתחדש אוטומטית באתחול הבאה.";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "צריך להיות לפחות קובץ אחד בתיקייה על מנת לייצור קובץ טורנט.";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "בעיה בעת יצירת הקובץ \"%@\".";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "אירעה שגיאה בהעברת קובץ הנתונים.";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "שגיאה בעת הוספת קישור המגנט \"%@\". ההעברה לא תתבצע.";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "תיקייה זו אינה מכילה קבצים.";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+"This option is not available if Default location is set to Same as torrent file." = "האפשרות הזאת לא זמינה אם מקום ברירת המחדל מוגדר לאותו מקום כמו קובץ הטורנט.";
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "ההעברה הזו פעילה. לאחר ההסרה, בחירה להמשיך בהעברה תדרוש את קובץ הטורנט או את קישור המגנט.";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "פעולה זו תנקה את הסטטיסטיקה הכללית המוצגת על ידי ‏Transmission. סטטיסטיקות העברה יחידניות לא יושפעו.";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "שכבה %ld";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "החלפת מצב מסנן";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "החלפת מצב מנתח";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "החלפת מצב סרגל מסנן";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "החלפת מצב מנתח טורנט";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "הורדת טורנט כשלה";
+
+/* notification title */
+"Torrent File Auto Added" = "קובץ טורנט התווסף אוטומטית";
+
+/* Inspector -> title */
+"Torrent Inspector" = "מפקח טורנטים";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "נדרשים מטא-נתוני הטורנט ";
+
+/* stats total */
+"Total N/A" = "סך הכול N/A";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "יחס שיתוף כולל";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "סך הכול הועבר";
+
+/* Message window -> level */
+"Trace" = "מעקב";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "עוקב";
+
+/* Torrent -> status string */
+"Tracker returned error" = "העוקב החזיר שגיאה";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "העוקב החזיר אזהרה";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "העוקב ישמש כגיבוי";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "עוקבים";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "העברה בלתי פעילה";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "העברות";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "העברות בלתי פעילות";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "‏Transmission היא תכנה לשיתוף קבצים. כאשר טורנט מופעל, הנתונים בו יהיו נגישים לאחרים דרך מנגנון ההעלאה. האחריות הבלעדית להפעלת שיקול דעת נכון ולציית לחוקים המקומיים חלים עליכם בלבד.";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "‏Transmission היא בעלת תכונות מלאות להעברת טורנטים. זמן ומאמץ רב הושקעו בפיתוח, קידוד ועידון. אם אתם נהנים מהשימוש בה, נא שקלו להפגין את אהבתכם בתרומה.";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "‏Transmission כבר פעיל.";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "העלאה";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "העלאה אל %lu";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "ביטול סימון הפריטים שנבחרו";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "ללא הגבלה";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "שגיאה בלתי ניתנת לקריאה";
+
+/* Save log panel -> default file name */
+"untitled" = "ללא שם";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "מהירות העלאה";
+
+/* Stats window -> label */
+"Uploaded" = "הועלו";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "הועלו %1$@ (יחס: %2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "מתבצעת העלאה לעמית";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "בהמתנה לבדיקת הנתונים הקיימים";
+
+/* Torrent -> status string */
+"Waiting to download" = "בהמתנה להורדה";
+
+/* Torrent -> status string */
+"Waiting to seed" = "בהמתנה לזריעה";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "אזהרה";
+
+/* Drag overlay -> url */
+"Web Address" = "כתובת אינטרנט";
+
+/* Torrent -> status string */
+"web seed" = "זורע רשת";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "זורעי רשת";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "ברוך בואך אל ‏Transmission";
+
+/* Groups -> Name */
+"Yellow" = "צהוב";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "בלימת העמית שוחררה, אך העמית אינו מעוניין";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "אנחנו מעוניינים להוריד, אך העמית לא מעוניין לשלוח (מעוניינים אך נבלמנו)";
+

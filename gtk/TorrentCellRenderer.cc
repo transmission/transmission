@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -420,7 +420,7 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->render(context, widget, icon_area, icon_area, flags);
 
     progress_renderer_->property_value() = percent_done;
-    progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
+    progress_renderer_->property_text() = fmt::format("{:d}%", percent_done);
     progress_renderer_->property_sensitive() = sensitive;
     render_progress_bar(context, widget, prog_area, flags, progress_color);
 

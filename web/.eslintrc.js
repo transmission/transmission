@@ -9,10 +9,6 @@ module.exports = {
     "plugin:sonarjs/recommended",
     "plugin:unicorn/recommended"
   ],
-  "parser": "@babel/eslint-parser",
-  "parserOptions": {
-    "sourceType": "module"
-  },
   "plugins": [
     "sonarjs",
     "unicorn"

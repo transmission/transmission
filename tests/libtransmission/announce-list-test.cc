@@ -17,7 +17,6 @@
 
 #include <libtransmission/announce-list.h>
 #include <libtransmission/error.h>
-#include <libtransmission/quark.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
@@ -39,7 +38,9 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ(Announce, tracker.announce.sv());
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.sv());
     EXPECT_EQ(Tier, tracker.tier);
-    EXPECT_EQ("example.org:443"sv, tracker.host_and_port.sv());
+    EXPECT_EQ("example.org", tracker.announce_parsed.host);
+    EXPECT_EQ("example.org"sv, tracker.announce_parsed.authority);
+    EXPECT_EQ(443, tracker.announce_parsed.port);
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
@@ -63,9 +64,15 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     EXPECT_EQ(Announce1, announce_list.at(0).announce.sv());
     EXPECT_EQ(Announce2, announce_list.at(1).announce.sv());
     EXPECT_EQ(Announce3, announce_list.at(2).announce.sv());
-    EXPECT_EQ("example.org:443"sv, announce_list.at(0).host_and_port.sv());
-    EXPECT_EQ("example.org:80"sv, announce_list.at(1).host_and_port.sv());
-    EXPECT_EQ("example.org:999"sv, announce_list.at(2).host_and_port.sv());
+    EXPECT_EQ("example.org"sv, announce_list.at(0).announce_parsed.host);
+    EXPECT_EQ("example.org"sv, announce_list.at(1).announce_parsed.host);
+    EXPECT_EQ("example.org"sv, announce_list.at(2).announce_parsed.host);
+    EXPECT_EQ(443, announce_list.at(0).announce_parsed.port);
+    EXPECT_EQ(80, announce_list.at(1).announce_parsed.port);
+    EXPECT_EQ(999, announce_list.at(2).announce_parsed.port);
+    EXPECT_EQ("example.org"sv, announce_list.at(0).announce_parsed.authority);
+    EXPECT_EQ("example.org"sv, announce_list.at(1).announce_parsed.authority);
+    EXPECT_EQ("example.org:999"sv, announce_list.at(2).announce_parsed.authority);
 }
 
 TEST_F(AnnounceListTest, canAddWithoutScrape)
@@ -339,8 +346,8 @@ TEST_F(AnnounceListTest, announceToScrape)
 
     for (auto const& test : Tests)
     {
-        auto const scrape = tr_announce_list::announce_to_scrape(tr_quark_new(test.announce));
-        EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
+        auto const scrape = tr_announce_list::announce_to_scrape(test.announce);
+        EXPECT_EQ(test.expected_scrape, scrape.value_or(""));
     }
 }
 
@@ -357,11 +364,11 @@ TEST_F(AnnounceListTest, save)
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
     auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
     EXPECT_TRUE(tr_file_save(test_file.sv(), original_content, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // make an announce_list for it
     auto announce_list = tr_announce_list();
@@ -371,13 +378,13 @@ TEST_F(AnnounceListTest, save)
 
     // try saving to a nonexistent torrent file
     EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
-    EXPECT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    tr_error_clear(&error);
+    EXPECT_TRUE(error);
+    EXPECT_NE(0, error.code());
+    error = {};
 
     // now save to a real torrent file
     EXPECT_TRUE(announce_list.save(std::string{ test_file.sv() }, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // load the original
     auto original_tm = tr_torrent_metainfo{};

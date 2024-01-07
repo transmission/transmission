@@ -1,0 +1,33 @@
+
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
+"22.title" = "מגבלות זריעה";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
+"23.title" = "רוחב־פס תעבורה";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "ק״ב/שנייה";
+
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
+"43.title" = "מגבלת העלאה:";
+
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
+"44.title" = "מגבלת הורדה:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
+"98.title" = "דקות";
+
+/* Class = "NSButtonCell"; title = "Status of selected files"; ObjectID = "114"; */
+"114.title" = "מצב הקבצים הנבחרים";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "116"; */
+"116.title" = "הפסקת הזריעה ביחס:";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "118"; */
+"118.title" = "לעצור את הזריעה לאחר חוסר פעילות של:";
+
+/* Class = "NSButtonCell"; title = "Remaining time"; ObjectID = "130"; */
+"130.title" = "זמן שנותר";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "180"; */
+"180.title" = "ק״ב/שנייה";

@@ -51,7 +51,7 @@
 "50.title" = "Aktarım";
 
 /* Class = "NSTextFieldCell"; title = "Last Activity:"; ObjectID = "51"; */
-"51.title" = "Son Etkinlik:";
+"51.title" = "Son etkinlik:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
 "52.placeholderString" = "Erişilemiyor";
@@ -69,7 +69,7 @@
 "56.placeholderString" = "Erişilemiyor";
 
 /* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
-"57.title" = "Hatalı İnd.:";
+"57.title" = "Hatalı ind.:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
 "58.placeholderString" = "Erişilemiyor";

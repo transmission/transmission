@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,7 +9,6 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <optional>
-#include <numeric>
 #include <string>
 #include <string_view>
 #include <type_traits> // std::is_same_v
@@ -17,10 +16,9 @@
 #include <variant>
 #include <vector>
 
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-
-struct tr_error;
 
 /**
  * A variant that holds typical benc/json types: bool, int,
@@ -32,7 +30,7 @@ struct tr_error;
 struct tr_variant
 {
 public:
-    enum Type
+    enum Type : size_t
     {
         NoneIndex = 0,
         BoolIndex = 1,
@@ -85,12 +83,20 @@ public:
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) noexcept
         {
-            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(std::begin(vec_), std::end(vec_), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
         {
-            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(std::cbegin(vec_), std::cend(vec_), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
@@ -137,7 +143,7 @@ public:
                 return { iter->second, false };
             }
 
-            return { vec_.emplace_back(key, tr_variant{ std::move(val) }).second, true };
+            return { vec_.emplace_back(key, tr_variant{ std::forward<Val>(val) }).second, true };
         }
 
         // --- custom functions
@@ -267,8 +273,8 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<StringHolder>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringHolder>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -287,8 +293,8 @@ public:
     {
         if constexpr (Index == StringIndex)
         {
-            auto const* const str = std::get_if<StringIndex>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringIndex>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -367,11 +373,6 @@ private:
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
-void tr_variantInitStr(tr_variant* initme, std::string_view value);
-void tr_variantInitQuark(tr_variant* initme, tr_quark value);
-void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
-void tr_variantInitStrView(tr_variant* initme, std::string_view val);
-
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
@@ -379,19 +380,13 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
-void tr_variantInitReal(tr_variant* initme, double value);
-
 // --- Booleans
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
-void tr_variantInitBool(tr_variant* initme, bool value);
-
 // --- Ints
 
 bool tr_variantGetInt(tr_variant const* var, int64_t* setme);
-
-void tr_variantInitInt(tr_variant* initme, int64_t value);
 
 // --- Lists
 
@@ -404,7 +399,6 @@ tr_variant* tr_variantListAddInt(tr_variant* var, int64_t value);
 tr_variant* tr_variantListAddReal(tr_variant* var, double value);
 tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
 tr_variant* tr_variantListAddStrView(tr_variant* var, std::string_view value);
-tr_variant* tr_variantListAddQuark(tr_variant* var, tr_quark value);
 tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t n_bytes);
 tr_variant* tr_variantListAddList(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListAddDict(tr_variant* var, size_t n_reserve);
@@ -437,7 +431,6 @@ tr_variant* tr_variantDictAddInt(tr_variant* var, tr_quark key, int64_t value);
 tr_variant* tr_variantDictAddBool(tr_variant* var, tr_quark key, bool value);
 tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view value);
 tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_view value);
-tr_variant* tr_variantDictAddQuark(tr_variant* var, tr_quark key, tr_quark val);
 tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t n_bytes);
@@ -464,8 +457,6 @@ void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
 class tr_variant_serde
 {
 public:
-    ~tr_variant_serde();
-
     [[nodiscard]] static tr_variant_serde benc() noexcept
     {
         return tr_variant_serde{ Type::Benc };
@@ -519,7 +510,7 @@ public:
     // ---
 
     // Tracks errors when parsing / saving
-    tr_error* error_ = nullptr;
+    tr_error error_ = {};
 
 private:
     friend tr_variant;

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -119,7 +119,7 @@ class tr_rpc_address
 {
 public:
     tr_rpc_address()
-        : inet_addr_(tr_address::any(TR_AF_INET))
+        : inet_addr_{ tr_address::any(TR_AF_INET) }
     {
     }
 
@@ -278,10 +278,9 @@ void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::st
 
     auto content = std::vector<char>{};
 
-    if (tr_error* error = nullptr; !tr_file_read(filename, content, &error))
+    if (auto error = tr_error{}; !tr_file_read(filename, content, &error))
     {
-        send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
-        tr_error_free(error);
+        send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error.message()).c_str());
         return;
     }
 
@@ -341,29 +340,21 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
     }
 }
 
-struct rpc_response_data
-{
-    struct evhttp_request* req;
-    tr_rpc_server* server;
-};
-
-void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_data)
-{
-    auto* data = static_cast<struct rpc_response_data*>(user_data);
-
-    auto* const response = make_response(data->req, data->server, tr_variant_serde::json().compact().to_string(*content));
-    evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
-    evhttp_send_reply(data->req, HTTP_OK, "OK", response);
-    evbuffer_free(response);
-
-    delete data;
-}
-
 void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
-    auto otop = tr_variant_serde::json().inplace().parse(json);
-
-    tr_rpc_request_exec_json(server->session, otop ? &*otop : nullptr, rpc_response_func, new rpc_response_data{ req, server });
+    if (auto otop = tr_variant_serde::json().inplace().parse(json); otop)
+    {
+        tr_rpc_request_exec(
+            server->session,
+            *otop,
+            [req, server](tr_session* /*session*/, tr_variant&& content)
+            {
+                auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(content));
+                evhttp_add_header(req->output_headers, "Content-Type", "application/json; charset=UTF-8");
+                evhttp_send_reply(req, HTTP_OK, "OK", response);
+                evbuffer_free(response);
+            });
+    }
 }
 
 void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
@@ -528,7 +519,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (std::empty(location) || location == "web"sv)
         {
-            auto const new_location = fmt::format(FMT_STRING("{:s}web/"), server->url());
+            auto const new_location = fmt::format("{:s}web/", server->url());
             evhttp_add_header(req->output_headers, "Location", new_location.c_str());
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
         }
@@ -556,16 +547,16 @@ void handle_request(struct evhttp_request* req, void* arg)
         {
             auto const session_id = std::string{ server->session->sessionId() };
             auto const tmp = fmt::format(
-                FMT_STRING("<p>Your request had an invalid session-id header.</p>"
-                           "<p>To fix this, follow these steps:"
-                           "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
-                           "<li> Add the updated header to your outgoing requests"
-                           "<li> When you get this 409 error message, resend your request with the updated header"
-                           "</ol></p>"
-                           "<p>This requirement has been added to help prevent "
-                           "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
-                           "attacks.</p>"
-                           "<p><code>{:s}: {:s}</code></p>"),
+                "<p>Your request had an invalid session-id header.</p>"
+                "<p>To fix this, follow these steps:"
+                "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
+                "<li> Add the updated header to your outgoing requests"
+                "<li> When you get this 409 error message, resend your request with the updated header"
+                "</ol></p>"
+                "<p>This requirement has been added to help prevent "
+                "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
+                "attacks.</p>"
+                "<p><code>{:s}: {:s}</code></p>",
                 TR_RPC_SESSION_ID_HEADER,
                 session_id);
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
@@ -602,7 +593,7 @@ bool bindUnixSocket(
 #else
     auto addr = sockaddr_un{};
     addr.sun_family = AF_UNIX;
-    tr_strlcpy(addr.sun_path, path + std::size(TrUnixSocketPrefix), sizeof(addr.sun_path));
+    *fmt::format_to_n(addr.sun_path, sizeof(addr.sun_path) - 1, "{:s}", path + std::size(TrUnixSocketPrefix)).out = '\0';
 
     unlink(addr.sun_path);
 
@@ -760,7 +751,7 @@ void tr_rpc_server::set_enabled(bool is_enabled)
 {
     is_enabled_ = is_enabled;
 
-    session->runInSessionThread(
+    session->run_in_session_thread(
         [this]()
         {
             if (!is_enabled_)
@@ -785,14 +776,14 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 
     if (is_enabled())
     {
-        session->runInSessionThread(&restart_server, this);
+        session->run_in_session_thread(&restart_server, this);
     }
 }
 
 void tr_rpc_server::set_url(std::string_view url)
 {
     url_ = url;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our URL to '{:s}'"), url_));
+    tr_logAddDebug(fmt::format("setting our URL to '{:s}'", url_));
 }
 
 void tr_rpc_server::set_whitelist(std::string_view whitelist)
@@ -806,7 +797,7 @@ void tr_rpc_server::set_whitelist(std::string_view whitelist)
 void tr_rpc_server::set_username(std::string_view username)
 {
     username_ = username;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
+    tr_logAddDebug(fmt::format("setting our username to '{:s}'", username_));
 }
 
 void tr_rpc_server::set_password(std::string_view password) noexcept
@@ -814,7 +805,7 @@ void tr_rpc_server::set_password(std::string_view password) noexcept
     auto const is_salted = tr_ssha1_test(password);
     salted_password_ = is_salted ? password : tr_ssha1(password);
 
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our salted password to '{:s}'"), salted_password_));
+    tr_logAddDebug(fmt::format("setting our salted password to '{:s}'", salted_password_));
 }
 
 void tr_rpc_server::set_password_enabled(bool enabled)
@@ -843,7 +834,7 @@ void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant const& settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
-    , bind_address_(std::make_unique<class tr_rpc_address>())
+    , bind_address_{ std::make_unique<class tr_rpc_address>() }
     , session{ session_in }
 {
     load(settings);
@@ -868,7 +859,7 @@ void tr_rpc_server::load(tr_variant const& src)
 
     if (!tr_strv_ends_with(url_, '/'))
     {
-        url_ = fmt::format(FMT_STRING("{:s}/"), url_);
+        url_ = fmt::format("{:s}/", url_);
     }
 
     this->host_whitelist_ = parse_whitelist(host_whitelist_str_);
@@ -882,8 +873,8 @@ void tr_rpc_server::load(tr_variant const& src)
         // NOTE: bind_address_ is default initialized to INADDR_ANY
         tr_logAddWarn(fmt::format(
             _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
-            fmt::format("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
-            fmt::format("value", bind_address_str_)));
+            fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
+            fmt::arg("value", bind_address_str_)));
     }
 
     if (bind_address_->is_unix_addr())
@@ -895,7 +886,7 @@ void tr_rpc_server::load(tr_variant const& src)
     {
         auto const rpc_uri = bind_address_->to_string(this->port()) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        session->runInSessionThread(start_server, this);
+        session->run_in_session_thread(start_server, this);
 
         if (this->is_whitelist_enabled())
         {

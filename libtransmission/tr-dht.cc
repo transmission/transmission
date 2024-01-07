@@ -1,10 +1,11 @@
-// This file Copyright © 2009-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <cstdint> // uint16_t
 #include <cstring> // memcpy()
 #include <ctime>
@@ -17,6 +18,7 @@
 #include <string_view>
 #include <tuple> // std::tie()
 #include <utility>
+#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -386,7 +388,7 @@ private:
         };
 
         pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
-        return pex;
+        return std::move(pex);
     }
 
     static void callback(void* vself, int event, unsigned char const* info_hash, void const* data, size_t data_len)
@@ -555,7 +557,7 @@ private:
         hints.ai_flags = 0;
 
         auto port_str = std::array<char, 16>{};
-        *fmt::format_to(std::data(port_str), FMT_STRING("{:d}"), port_in.host()) = '\0';
+        *fmt::format_to(std::data(port_str), "{:d}", port_in.host()) = '\0';
 
         addrinfo* info = nullptr;
         if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)

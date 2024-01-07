@@ -21,13 +21,13 @@
 "78.title" = "Создать";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
-"79.title" = "Отменить";
+"79.title" = "Отмена";
 
 /* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
 "81.title" = "Открыть после создания";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
-"82.title" = "Отменить";
+"82.title" = "Отмена";
 
 /* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
 "83.title" = "Создание торрент-файла…";

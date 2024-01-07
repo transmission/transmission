@@ -1,4 +1,4 @@
-// This file Copyright © 2023-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -128,8 +128,6 @@ private:
         ABORT
     };
     array_ip_t<is_updating_t> is_updating_ = {};
-    array_ip_t<std::mutex> is_updating_mutex_;
-    array_ip_t<std::condition_variable> is_updating_cv_;
 
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead

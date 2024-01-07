@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -135,7 +135,7 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
     auto int_client = std::array<char, 16>{};
     auto int_port = std::array<char, 16>{};
 
-    auto const port_str = fmt::format(FMT_STRING("{:d}"), handle->port.host());
+    auto const port_str = std::to_string(handle->port.host());
 
 #if (MINIUPNPC_API_VERSION >= 10) /* adds remoteHost arg */
     int const err = UPNP_GetSpecificPortMappingEntry(
@@ -178,7 +178,7 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
     int const old_errno = errno;
     errno = 0;
 
-    auto const port_str = fmt::format(FMT_STRING("{:d}"), port.host());
+    auto const port_str = std::to_string(port.host());
 
 #if (MINIUPNPC_API_VERSION >= 8)
     int const err = UPNP_AddPortMapping(
@@ -214,7 +214,7 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
 
 void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, tr_port port)
 {
-    auto const port_str = fmt::format(FMT_STRING("{:d}"), port.host());
+    auto const port_str = std::to_string(port.host());
 
     UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, port_str.c_str(), proto, nullptr);
 }
@@ -337,7 +337,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         }
         else
         {
-            auto const desc = fmt::format(FMT_STRING("Transmission at {:d}"), port.host());
+            auto const desc = fmt::format("Transmission at {:d}", port.host());
             int const err_tcp = upnp_add_port_mapping(handle, "TCP", port, desc.c_str());
             int const err_udp = upnp_add_port_mapping(handle, "UDP", port, desc.c_str());
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -219,11 +219,11 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 ***/
 
 FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
-    : QWidget(parent)
-    , prefs_(prefs)
-    , torrents_(torrents)
-    , filter_(filter)
-    , is_bootstrapping_(true)
+    : QWidget{ parent }
+    , prefs_{ prefs }
+    , torrents_{ torrents }
+    , filter_{ filter }
+    , is_bootstrapping_{ true }
 {
     auto* h = new QHBoxLayout{ this };
     h->setContentsMargins(3, 3, 3, 3);

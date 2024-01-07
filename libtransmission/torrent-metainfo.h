@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,11 +11,12 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
-#include "magnet-metainfo.h"
-#include "torrent-files.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 
@@ -27,13 +28,13 @@ public:
         return std::empty(files_);
     }
 
-    bool parse_benc(std::string_view benc, tr_error** error = nullptr);
+    bool parse_benc(std::string_view benc, tr_error* error = nullptr);
 
     // Helper function wrapper around parseBenc().
     // If you're looping through several files, passing in a non-nullptr
     // `contents` can reduce the number of memory allocations needed to
     // load multiple files.
-    bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
+    bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error* error = nullptr);
 
     // FILES
 
@@ -195,7 +196,7 @@ public:
 
 private:
     friend struct MetainfoHandler;
-    static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error** error);
+    static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);
     static std::string fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url);
 
     enum class BasenameFormat

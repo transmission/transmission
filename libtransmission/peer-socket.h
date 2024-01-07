@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,15 +12,10 @@
 #include <atomic>
 #include <cstddef> // size_t
 #include <string>
-#include <string_view>
 #include <utility> // for std::make_pair()
 
-#include "transmission.h"
-
-#include "error.h"
-#include "net.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
+#include "libtransmission/net.h"
+#include "libtransmission/tr-buffer.h"
 
 struct UTPSocket;
 struct tr_session;
@@ -57,8 +52,8 @@ public:
     }
     void close();
 
-    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
-    size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
+    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error* error) const;
+    size_t try_write(OutBuf& buf, size_t max, tr_error* error) const;
 
     [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
@@ -131,7 +126,7 @@ public:
         struct UTPSocket* utp;
     } handle = {};
 
-    [[nodiscard]] static bool limit_reached(tr_session* session) noexcept;
+    [[nodiscard]] static bool limit_reached(tr_session const* session) noexcept;
 
 private:
     enum class Type

@@ -3,16 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cerrno>
 #include <cmath> // lrint()
-#include <cctype> // isspace()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
+#include <vector>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -26,17 +25,7 @@
 
 using namespace std::literals;
 
-class VariantTest : public ::testing::Test
-{
-protected:
-    static std::string stripWhitespace(std::string const& in)
-    {
-        auto s = in;
-        s.erase(s.begin(), std::find_if_not(s.begin(), s.end(), ::isspace));
-        s.erase(std::find_if_not(s.rbegin(), s.rend(), ::isspace).base(), s.end());
-        return s;
-    }
-};
+using VariantTest = ::testing::Test;
 
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
@@ -52,7 +41,7 @@ TEST_F(VariantTest, getType)
     auto sv = std::string_view{};
     auto v = tr_variant{};
 
-    tr_variantInitInt(&v, 30);
+    v = 30;
     EXPECT_TRUE(tr_variantGetInt(&v, &i));
     EXPECT_EQ(30, i);
     EXPECT_TRUE(tr_variantGetReal(&v, &d));
@@ -61,28 +50,28 @@ TEST_F(VariantTest, getType)
     EXPECT_FALSE(tr_variantGetStrView(&v, &sv));
 
     auto strkey = "foo"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_FALSE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_NE(std::data(strkey), std::data(sv));
 
     strkey = "anything"sv;
-    tr_variantInitStrView(&v, strkey);
+    v = tr_variant::unmanaged_string(strkey);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_EQ(std::data(strkey), std::data(sv)); // literally the same memory
     EXPECT_EQ(std::size(strkey), std::size(sv));
 
     strkey = "true"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
 
     strkey = "false"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
@@ -363,7 +352,7 @@ TEST_F(VariantTest, bencToJson)
     for (auto const& test : Tests)
     {
         auto top = benc_serde.parse(test.benc).value_or(tr_variant{});
-        EXPECT_EQ(test.expected, stripWhitespace(json_serde.to_string(top)));
+        EXPECT_EQ(test.expected, json_serde.to_string(top));
     }
 }
 
@@ -430,8 +419,8 @@ TEST_F(VariantTest, stackSmash)
     auto serde = tr_variant_serde::benc();
     auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
-    EXPECT_NE(nullptr, serde.error_);
-    EXPECT_EQ(E2BIG, serde.error_ != nullptr ? serde.error_->code : 0);
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
 }
 
 TEST_F(VariantTest, boolAndIntRecast)

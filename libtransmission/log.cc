@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,6 +10,7 @@
 #include <iterator> // back_insert_iterator, empty
 #include <map>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -228,7 +229,7 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     auto name_fallback = std::string{};
     if (std::empty(name))
     {
-        name_fallback = fmt::format(FMT_STRING("{}:{}"), filename, line);
+        name_fallback = fmt::format("{:s}:{:d}", filename, line);
         name = name_fallback;
     }
 

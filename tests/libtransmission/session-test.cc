@@ -168,12 +168,12 @@ TEST_F(SessionTest, propertiesApi)
 
     for (auto const value : { true, false })
     {
-        session->useBlocklist(value);
-        EXPECT_EQ(value, session->useBlocklist());
+        session->set_blocklist_enabled(value);
+        EXPECT_EQ(value, session->blocklist_enabled());
         EXPECT_EQ(value, tr_blocklistIsEnabled(session));
 
         tr_sessionSetIncompleteDirEnabled(session, value);
-        EXPECT_EQ(value, session->useBlocklist());
+        EXPECT_EQ(value, session->blocklist_enabled());
         EXPECT_EQ(value, tr_blocklistIsEnabled(session));
     }
 }

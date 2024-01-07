@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,6 +11,7 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 
 #include <giomm/liststore.h>
 #include <giomm/menuattributeiter.h>
@@ -19,17 +20,21 @@
 #include <glibmm/i18n.h>
 #include <glibmm/variant.h>
 
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-#include <gtkmm/shortcut.h>
-#include <gtkmm/shortcutaction.h>
-#include <gtkmm/shortcuttrigger.h>
-#endif
-
 #include <array>
 #include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <giomm/liststore.h>
+#include <gtkmm/shortcut.h>
+#include <gtkmm/shortcutaction.h>
+#include <gtkmm/shortcuttrigger.h>
+
+#include <stack>
+#include <utility>
+#endif
 
 using namespace std::string_view_literals;
 
