@@ -8,14 +8,16 @@
 #include "Utils.h"
 
 #include <giomm/file.h>
-#include <glibmm/error.h>
 #include <glibmm/i18n.h>
-#include <glibmm/property.h>
 #include <gtkmm/box.h>
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+#include <glibmm/error.h>
+#include <glibmm/property.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/image.h>
 #include <gtkmm/label.h>
 #include <gtkmm/separator.h>
+#endif
 
 #include <vector>
 

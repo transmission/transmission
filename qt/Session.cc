@@ -37,7 +37,6 @@
 #include "RpcQueue.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
-#include "Utils.h"
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictAdd;

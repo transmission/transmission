@@ -14,7 +14,6 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 
 #include <glibmm/date.h>

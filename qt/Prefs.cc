@@ -19,7 +19,6 @@
 #endif
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
@@ -30,9 +29,7 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -513,9 +510,7 @@ QDateTime Prefs::getDateTime(int key) const
     return values_[key].toDateTime();
 }
 
-/***
-****
-***/
+// ---
 
 void Prefs::toggleBool(int key)
 {

@@ -36,16 +36,10 @@
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
-#include <string>
-#include <string_view>
 
 /* #define TEST_RTL */
 
-using namespace std::string_literals;
-
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -240,7 +234,7 @@ void set_error_color(
     Gtk::Widget& widget,
     Gtk::CellRendererState flags)
 {
-    static auto const error_color_name = Glib::ustring("tr_error_color"s);
+    static auto const error_color_name = Glib::ustring{ "tr_error_color" };
 
     auto color = Gdk::RGBA();
     if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{} &&
@@ -256,9 +250,9 @@ void set_error_color(
 
 std::optional<Gdk::RGBA> get_progress_bar_color(Torrent const& torrent, Gtk::Widget const& widget)
 {
-    static auto const down_color_name = Glib::ustring("tr_transfer_down_color"s);
-    static auto const up_color_name = Glib::ustring("tr_transfer_up_color"s);
-    static auto const idle_color_name = Glib::ustring("tr_transfer_idle_color"s);
+    static auto const down_color_name = Glib::ustring{ "tr_transfer_down_color" };
+    static auto const up_color_name = Glib::ustring{ "tr_transfer_up_color" };
+    static auto const idle_color_name = Glib::ustring{ "tr_transfer_idle_color" };
 
     auto const* color_name = &idle_color_name;
     switch (torrent.get_activity())

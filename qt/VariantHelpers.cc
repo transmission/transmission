@@ -13,7 +13,6 @@
 #include <QUrl>
 
 #include "Application.h" // qApp
-#include "Filters.h"
 #include "Speed.h"
 #include "Torrent.h"
 

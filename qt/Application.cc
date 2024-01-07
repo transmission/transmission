@@ -33,7 +33,6 @@
 #include <libtransmission/version.h>
 
 #include "AddData.h"
-#include "Formatter.h"
 #include "InteropHelper.h"
 #include "MainWindow.h"
 #include "OptionsDialog.h"
