@@ -52,7 +52,7 @@ export class StatisticsDialog extends EventTarget {
     let ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
     setTextContent(this.elements.session.up, fmt.size(s.uploadedBytes));
     setTextContent(this.elements.session.down, fmt.size(s.downloadedBytes));
-    setTextContent(this.elements.session.ratio, fmt.ratioString(ratio));
+    this.elements.session.ratio.innerHTML = fmt.ratioString(ratio);
     setTextContent(
       this.elements.session.time,
       fmt.timeInterval(s.secondsActive)
@@ -62,7 +62,7 @@ export class StatisticsDialog extends EventTarget {
     ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
     setTextContent(this.elements.total.up, fmt.size(s.uploadedBytes));
     setTextContent(this.elements.total.down, fmt.size(s.downloadedBytes));
-    setTextContent(this.elements.total.ratio, fmt.ratioString(ratio));
+    this.elements.total.ratio.innerHTML = fmt.ratioString(ratio);
     setTextContent(this.elements.total.time, fmt.timeInterval(s.secondsActive));
   }
 

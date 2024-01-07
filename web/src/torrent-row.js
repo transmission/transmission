@@ -237,7 +237,7 @@ export class TorrentRendererFull {
 
     // progress details
     e = root._progress_details_container;
-    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
+    e.innerHTML = TorrentRendererFull.getProgressDetails(controller, t);
 
     // pause/resume button
     e = root._toggle_running_button;
