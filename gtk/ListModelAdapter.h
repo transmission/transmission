@@ -14,6 +14,7 @@
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelcolumn.h>
 
+#include <cstdint>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -25,7 +26,7 @@ class ListModelAdapter
     using IdGetter = std::function<int(Glib::RefPtr<Glib::ObjectBase const> const&)>;
     using ValueGetter = std::function<void(Glib::RefPtr<Glib::ObjectBase const> const&, int, Glib::ValueBase&)>;
 
-    enum class PositionAdjustment
+    enum class PositionAdjustment : uint8_t
     {
         DECREMENT = -1,
         INCREMENT = 1,

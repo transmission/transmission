@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <cstring> /* for strcspn() */
 #include <ctime>
 #include <memory>
@@ -77,7 +78,7 @@ auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(((struct sockaddr_un*)nu
                                                  std::size(TrUnixSocketPrefix) };
 #endif
 
-enum tr_rpc_address_type
+enum tr_rpc_address_type : uint8_t
 {
     TR_RPC_INET_ADDR,
     TR_RPC_UNIX_ADDR

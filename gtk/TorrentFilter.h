@@ -11,10 +11,12 @@
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 
+#include <cstdint>
+
 class TorrentFilter : public FilterBase<Torrent>
 {
 public:
-    enum class Activity
+    enum class Activity : uint8_t
     {
         ALL,
         DOWNLOADING,
@@ -26,7 +28,7 @@ public:
         ERROR,
     };
 
-    enum class Tracker
+    enum class Tracker : uint8_t
     {
         ALL,
         HOST,

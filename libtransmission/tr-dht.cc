@@ -117,7 +117,7 @@ private:
     using Nodes = std::deque<Node>;
     using Id = std::array<unsigned char, 20>;
 
-    enum class SwarmStatus
+    enum class SwarmStatus : uint8_t
     {
         Stopped,
         Broken,

@@ -150,7 +150,7 @@ auto constexpr Handshake = uint8_t{ 0 };
 // Client-defined extension message IDs that we tell peers about
 // in the LTEP handshake and will respond to when sent in an LTEP
 // message.
-enum LtepMessageIds
+enum LtepMessageIds : uint8_t
 {
     // we support peer exchange (bep 11)
     // https://www.bittorrent.org/beps/bep_0011.html
@@ -194,7 +194,7 @@ auto constexpr MaxPexPeerCount = size_t{ 50 };
 
 // ---
 
-enum class EncryptionPreference
+enum class EncryptionPreference : uint8_t
 {
     Unknown,
     Yes,
