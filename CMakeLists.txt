@@ -95,10 +95,18 @@ else()
     set(TR_STABLE_RELEASE 1)
 endif()
 
-# derived from above: lib version
-math(EXPR TR_LIB_VERSION_MAJOR "${TR_VERSION_MAJOR} + 14714")
-math(EXPR TR_LIB_VERSION_MINOR "${TR_VERSION_MINOR}")
-math(EXPR TR_LIB_VERSION_PATCH "${TR_VERSION_PATCH} * 100 + 0${TR_STABLE_RELEASE} * 99 + 0${TR_VERSION_BETA_NUMBER}")
+# derived from above: CFBundleVersion
+# note: CFBundleVersion only honors 3 numbers, so third number has to hold both patch and beta info.
+# 5.0.1-dev     -> 14719.0.100
+# 5.0.1-beta.1  -> 14719.0.101
+# 5.0.1         -> 14719.0.199
+math(EXPR CFBUNDLE_1 "${TR_VERSION_MAJOR} + 14714")
+math(EXPR CFBUNDLE_2 "${TR_VERSION_MINOR}")
+math(EXPR CFBUNDLE_3 "${TR_VERSION_PATCH} * 100 + 0${TR_STABLE_RELEASE} * 99 + 0${TR_VERSION_BETA_NUMBER}")
+set(CFBUNDLE_VERSION "${CFBUNDLE_1}.${CFBUNDLE_2}.${CFBUNDLE_3}")
+unset(CFBUNDLE_1)
+unset(CFBUNDLE_2)
+unset(CFBUNDLE_3)
 
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
