@@ -1,15 +1,20 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <set>
 
 #include <libtransmission/transmission.h> // priorities
+
+#include <QAbstractItemModel>
+#include <QMutableListIterator>
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
@@ -20,7 +25,7 @@ namespace
 class PathIteratorBase
 {
 protected:
-    PathIteratorBase(QString const& path, int slash_index)
+    PathIteratorBase(QString const& path, int const slash_index)
         : path_{ path }
         , slash_index_{ slash_index }
     {
@@ -371,8 +376,8 @@ void FileTreeModel::addFile(
             if (child == nullptr)
             {
                 added = true;
-                QModelIndex const parent_index(indexOf(item, 0));
-                int const n(item->childCount());
+                auto const parent_index = indexOf(item, 0);
+                auto const n = item->childCount();
 
                 beginInsertRows(parent_index, n, n);
 

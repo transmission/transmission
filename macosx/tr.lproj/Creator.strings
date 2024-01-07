@@ -12,7 +12,7 @@
 "73.title" = "Değiştir...";
 
 /* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
-"74.title" = "Torrent Dosyası:";
+"74.title" = "Torrent dosyası:";
 
 /* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
 "77.title" = "Özel";

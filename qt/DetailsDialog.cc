@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -25,6 +25,7 @@
 #include <QResizeEvent>
 #include <QRegularExpression>
 #include <QStringList>
+#include <QString>
 #include <QStyle>
 #include <QTreeWidgetItem>
 
@@ -52,9 +53,7 @@
 class Prefs;
 class Session;
 
-/****
-*****
-****/
+// ---
 
 namespace
 {
@@ -91,10 +90,20 @@ private:
     QTimer timer_;
 };
 
-} // namespace
-
-namespace
+constexpr tr_quark priorityKey(int priority)
 {
+    switch (priority)
+    {
+    case TR_PRI_LOW:
+        return TR_KEY_priority_low;
+
+    case TR_PRI_HIGH:
+        return TR_KEY_priority_high;
+
+    default:
+        return TR_KEY_priority_normal;
+    }
+}
 
 int constexpr DebounceIntervalMSec = 100;
 int constexpr RefreshIntervalMSec = 4000;
@@ -123,44 +132,9 @@ int measureViewItem(QTreeWidget const* view, int column, QString const& text)
     return std::max(item_width, header_width);
 }
 
-QString collateAddress(QString const& address)
-{
-    auto collated = QString{};
-
-    if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
-    {
-        if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
-        {
-            quint32 const ipv4_address = ip_address.toIPv4Address();
-            collated = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
-        }
-        else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
-        {
-            Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
-            QByteArray tmp(16, '\0');
-
-            for (int i = 0; i < 16; ++i)
-            {
-                tmp[i] = ipv6_address[i];
-            }
-
-            collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
-        }
-    }
-
-    if (collated.isEmpty())
-    {
-        collated = QStringLiteral("3-") + address.toLower();
-    }
-
-    return collated;
-}
-
 } // namespace
 
-/***
-****
-***/
+// ---
 
 class PeerItem : public QTreeWidgetItem
 {
@@ -170,7 +144,7 @@ class PeerItem : public QTreeWidgetItem
 
 public:
     explicit PeerItem(Peer p)
-        : peer_(std::move(p))
+        : peer_{ std::move(p) }
     {
     }
 
@@ -232,11 +206,43 @@ private:
 
         return collated_address_;
     }
+
+    [[nodiscard]] static QString collateAddress(QString const& address)
+    {
+        auto collated = QString{};
+
+        if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
+        {
+            if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                quint32 const ipv4_address = ip_address.toIPv4Address();
+                collated = QStringLiteral("1-") +
+                    QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
+            }
+            else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
+                QByteArray tmp(16, '\0');
+
+                for (int i = 0; i < 16; ++i)
+                {
+                    tmp[i] = ipv6_address[i];
+                }
+
+                collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
+            }
+        }
+
+        if (collated.isEmpty())
+        {
+            collated = QStringLiteral("3-") + address.toLower();
+        }
+
+        return collated;
+    }
 };
 
-/***
-****
-***/
+// ---
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 int DetailsDialog::prev_tab_index_ = 0;
@@ -282,6 +288,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     // set up the debounce timer
     connect(&ui_debounce_timer_, &QTimer::timeout, this, &DetailsDialog::refreshUI);
     ui_debounce_timer_.setSingleShot(true);
+
+    // set labels
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &DetailsDialog::onButtonBoxClicked);
 }
 
 DetailsDialog::~DetailsDialog()
@@ -299,6 +308,8 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
         ids_ = ids;
         session_.refreshDetailInfo(ids_);
         tracker_model_->refresh(model_, ids_);
+
+        labels_need_refresh_ = true;
 
         refreshModel();
         refreshUI();
@@ -322,9 +333,7 @@ void DetailsDialog::refreshPref(int key)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::refreshModel()
 {
@@ -386,6 +395,40 @@ void DetailsDialog::onSessionCalled(Session::Tag tag)
     }
 }
 
+void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
+{
+    if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
+    {
+        if (ui_.labelsTextEdit->isReadOnly()) // no edits could have been made
+        {
+            return;
+        }
+
+        QString const labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+
+        if (labels_text == labels_baseline_) // no edits have been made
+        {
+            return;
+        }
+
+        QString const re = QStringLiteral("((,|;)\\s*)");
+
+//see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
+#else
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
+#endif
+
+        torrentSet(TR_KEY_labels, labels_list);
+
+        if (!ids_.empty())
+        {
+            session_.refreshDetailInfo(ids_);
+        }
+    }
+}
+
 namespace
 {
 
@@ -430,7 +473,6 @@ void DetailsDialog::refreshUI()
     auto const mixed = tr("Mixed");
     auto const unknown = tr("Unknown");
     auto const now = time(nullptr);
-    auto const& fmt = Formatter::get();
 
     // build a list of torrents
     auto torrents = QList<Torrent const*>{};
@@ -500,7 +542,7 @@ void DetailsDialog::refreshUI()
     }
 
     ui_.stateValueLabel->setText(string);
-    QString const state_string = string;
+    auto const state_string = string;
 
     // myHaveLabel
     uint64_t size_when_done = 0;
@@ -532,14 +574,14 @@ void DetailsDialog::refreshUI()
         double const d = size_when_done == 0 ?
             100.0 :
             100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
-        auto const pct = fmt.percentToString(d);
-        auto const size_when_done_str = fmt.sizeToString(size_when_done);
+        auto const pct = Formatter::percent_to_string(d);
+        auto const size_when_done_str = Formatter::storage_to_string(size_when_done);
 
         if (have_unverified == 0 && left_until_done == 0)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data
-            string = tr("%1 (100%)").arg(fmt.sizeToString(have_verified));
+            string = tr("%1 (100%)").arg(Formatter::storage_to_string(have_verified));
         }
         else if (have_unverified == 0)
         {
@@ -547,7 +589,7 @@ void DetailsDialog::refreshUI()
             //: %1 is amount of downloaded and verified data,
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100)
-            string = tr("%1 of %2 (%3%)").arg(fmt.sizeToString(have_verified)).arg(size_when_done_str).arg(pct);
+            string = tr("%1 of %2 (%3%)").arg(Formatter::storage_to_string(have_verified)).arg(size_when_done_str).arg(pct);
         }
         else
         {
@@ -557,10 +599,10 @@ void DetailsDialog::refreshUI()
             //: %3 is percentage (%1/%2*100),
             //: %4 is amount of downloaded but not yet verified data
             string = tr("%1 of %2 (%3%), %4 Unverified")
-                         .arg(fmt.sizeToString(have_verified + have_unverified))
+                         .arg(Formatter::storage_to_string(have_verified + have_unverified))
                          .arg(size_when_done_str)
                          .arg(pct)
-                         .arg(fmt.sizeToString(have_unverified));
+                         .arg(Formatter::storage_to_string(have_unverified));
         }
     }
 
@@ -574,7 +616,7 @@ void DetailsDialog::refreshUI()
     else
     {
         auto const percent = 100.0 * static_cast<double>(available) / static_cast<double>(size_when_done);
-        string = QStringLiteral("%1%").arg(fmt.percentToString(percent));
+        string = QStringLiteral("%1%").arg(Formatter::percent_to_string(percent));
     }
 
     ui_.availabilityValueLabel->setText(string);
@@ -595,8 +637,8 @@ void DetailsDialog::refreshUI()
             f += t->failedEver();
         }
 
-        QString const dstr = fmt.sizeToString(d);
-        QString const fstr = fmt.sizeToString(f);
+        auto const dstr = Formatter::storage_to_string(d);
+        auto const fstr = Formatter::storage_to_string(f);
 
         if (f != 0)
         {
@@ -627,8 +669,8 @@ void DetailsDialog::refreshUI()
         }
 
         string = tr("%1 (Ratio: %2)")
-                     .arg(fmt.sizeToString(uploaded))
-                     .arg(fmt.ratioToString(tr_getRatio(uploaded, denominator)));
+                     .arg(Formatter::storage_to_string(uploaded))
+                     .arg(Formatter::ratio_to_string(tr_getRatio(uploaded, denominator)));
     }
 
     ui_.uploadedValueLabel->setText(string);
@@ -667,7 +709,7 @@ void DetailsDialog::refreshUI()
         else
         {
             auto const seconds = static_cast<int>(std::difftime(now, baseline));
-            string = fmt.timeToString(seconds);
+            string = Formatter::time_to_string(seconds);
         }
     }
 
@@ -701,7 +743,7 @@ void DetailsDialog::refreshUI()
             }
             else
             {
-                string = fmt.timeToString(baseline);
+                string = Formatter::time_to_string(baseline);
             }
         }
     }
@@ -739,7 +781,7 @@ void DetailsDialog::refreshUI()
         }
         else
         {
-            string = tr("%1 ago").arg(fmt.timeToString(seconds));
+            string = tr("%1 ago").arg(Formatter::time_to_string(seconds));
         }
     }
 
@@ -802,11 +844,13 @@ void DetailsDialog::refreshUI()
         }
         else if (piece_size > 0)
         {
-            string = tr("%1 (%Ln pieces @ %2)", "", pieces).arg(fmt.sizeToString(size)).arg(fmt.memToString(piece_size));
+            string = tr("%1 (%Ln pieces @ %2)", "", pieces)
+                         .arg(Formatter::storage_to_string(size))
+                         .arg(Formatter::memory_to_string(piece_size));
         }
         else
         {
-            string = tr("%1 (%Ln pieces)", "", pieces).arg(fmt.sizeToString(size));
+            string = tr("%1 (%Ln pieces)", "", pieces).arg(Formatter::storage_to_string(size));
         }
     }
 
@@ -848,6 +892,39 @@ void DetailsDialog::refreshUI()
 
     ui_.privacyValueLabel->setText(string);
 
+    // myLabelsTextEdit
+    if (labels_need_refresh_)
+    {
+        labels_need_refresh_ = false;
+
+        if (torrents.empty())
+        {
+            labels_baseline_.clear();
+            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(true);
+            ui_.labelsTextEdit->setEnabled(true);
+        }
+        else if (auto const& baseline = torrents[0]->labels(); std::all_of(
+                     std::begin(torrents),
+                     std::end(torrents),
+                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+        {
+            labels_baseline_ = baseline.join(QStringLiteral(", "));
+            ui_.labelsTextEdit->setText(labels_baseline_);
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(false);
+            ui_.labelsTextEdit->setEnabled(true);
+        }
+        else // mixed
+        {
+            labels_baseline_.clear();
+            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlaceholderText(mixed);
+            ui_.labelsTextEdit->setEnabled(false);
+        }
+    }
+
     // myCommentBrowser
     string = none;
     bool is_comment_mixed = false;
@@ -881,7 +958,7 @@ void DetailsDialog::refreshUI()
     {
         bool mixed_creator = false;
         bool mixed_date = false;
-        QString const creator = torrents[0]->creator();
+        auto const creator = torrents[0]->creator();
         auto const date = torrents[0]->dateCreated();
 
         for (Torrent const* const t : torrents)
@@ -1039,8 +1116,8 @@ void DetailsDialog::refreshUI()
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
-        setIfIdle(ui_.singleDownSpin, static_cast<int>(baseline.downloadLimit().getKBps()));
-        setIfIdle(ui_.singleUpSpin, static_cast<int>(baseline.uploadLimit().getKBps()));
+        setIfIdle(ui_.singleDownSpin, static_cast<int>(baseline.downloadLimit().count(Speed::Units::KByps)));
+        setIfIdle(ui_.singleUpSpin, static_cast<int>(baseline.uploadLimit().count(Speed::Units::KByps)));
         setIfIdle(ui_.peerLimitSpin, baseline.peerLimit());
     }
 
@@ -1102,11 +1179,11 @@ void DetailsDialog::refreshUI()
 
     for (Torrent const* const t : torrents)
     {
-        QString const id_str(QString::number(t->id()));
+        auto const id_str = QString::number(t->id());
 
         for (Peer const& peer : t->peers())
         {
-            QString const key = id_str + QLatin1Char(':') + peer.address;
+            auto const key = id_str + QLatin1Char(':') + peer.address;
 
             PeerItem* item = nullptr;
             if (auto iter = peers_.find(key); iter != std::end(peers_))
@@ -1201,8 +1278,8 @@ void DetailsDialog::refreshUI()
                 code_tip.resize(code_tip.size() - 1); // eat the trailing linefeed
             }
 
-            item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString{} : fmt.speedToString(peer.rate_to_peer));
-            item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString{} : fmt.speedToString(peer.rate_to_client));
+            item->setText(COL_UP, peer.rate_to_peer.is_zero() ? QString{} : peer.rate_to_peer.to_qstring());
+            item->setText(COL_DOWN, peer.rate_to_client.is_zero() ? QString{} : peer.rate_to_client.to_qstring());
             item->setText(
                 COL_PERCENT,
                 peer.progress > 0 ? QStringLiteral("%1%").arg(static_cast<int>(peer.progress * 100.0)) : QString{});
@@ -1243,14 +1320,16 @@ void DetailsDialog::setEnabled(bool enabled)
     ui_.tabs->setEnabled(enabled);
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initInfoTab()
 {
-    int const h = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
-    ui_.commentBrowser->setFixedHeight(h);
+    int const cbh = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
+    ui_.commentBrowser->setFixedHeight(cbh);
+
+    int const lteh = QFontMetrics{ ui_.labelsTextEdit->font() }.lineSpacing() * 2;
+    ui_.labelsTextEdit->setFixedHeight(lteh);
+    ui_.labelsTextEdit->setText(QStringLiteral("Initializing..."));
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);
@@ -1258,9 +1337,7 @@ void DetailsDialog::initInfoTab()
     cr->update();
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::onShowTrackerScrapesToggled(bool val)
 {
@@ -1449,10 +1526,9 @@ void DetailsDialog::onRemoveTrackerClicked()
 
 void DetailsDialog::initOptionsTab()
 {
-    auto const speed_unit_str = Formatter::get().unitStr(Formatter::SPEED, Formatter::KB);
-
-    ui_.singleDownSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
-    ui_.singleUpSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
+    auto const speed_unit_suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+    ui_.singleDownSpin->setSuffix(speed_unit_suffix);
+    ui_.singleUpSpin->setSuffix(speed_unit_suffix);
 
     ui_.singleDownSpin->setProperty(PrefKey, TR_KEY_downloadLimit);
     ui_.singleUpSpin->setProperty(PrefKey, TR_KEY_uploadLimit);
@@ -1495,9 +1571,7 @@ void DetailsDialog::initOptionsTab()
     connect(ui_.singleUpSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initTrackerTab()
 {
@@ -1539,26 +1613,24 @@ void DetailsDialog::initTrackerTab()
     onTrackerSelectionChanged();
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initPeersTab()
 {
+    auto const speed_width_str = Speed{ 1024U, Speed::Units::MByps }.to_qstring();
+
     ui_.peersView->setHeaderLabels({ QString{}, tr("Up"), tr("Down"), tr("%"), tr("Status"), tr("Address"), tr("Client") });
     ui_.peersView->sortByColumn(COL_ADDRESS, Qt::AscendingOrder);
 
     ui_.peersView->setColumnWidth(COL_LOCK, 20);
-    ui_.peersView->setColumnWidth(COL_UP, measureViewItem(ui_.peersView, COL_UP, QStringLiteral("1024 MiB/s")));
-    ui_.peersView->setColumnWidth(COL_DOWN, measureViewItem(ui_.peersView, COL_DOWN, QStringLiteral("1024 MiB/s")));
+    ui_.peersView->setColumnWidth(COL_UP, measureViewItem(ui_.peersView, COL_UP, speed_width_str));
+    ui_.peersView->setColumnWidth(COL_DOWN, measureViewItem(ui_.peersView, COL_DOWN, speed_width_str));
     ui_.peersView->setColumnWidth(COL_PERCENT, measureViewItem(ui_.peersView, COL_PERCENT, QStringLiteral("100%")));
     ui_.peersView->setColumnWidth(COL_STATUS, measureViewItem(ui_.peersView, COL_STATUS, QStringLiteral("ODUK?EXI")));
     ui_.peersView->setColumnWidth(COL_ADDRESS, measureViewItem(ui_.peersView, COL_ADDRESS, QStringLiteral("888.888.888.888")));
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initFilesTab() const
 {
@@ -1566,21 +1638,6 @@ void DetailsDialog::initFilesTab() const
     connect(ui_.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
     connect(ui_.filesView, &FileTreeView::priorityChanged, this, &DetailsDialog::onFilePriorityChanged);
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
-}
-
-static constexpr tr_quark priorityKey(int priority)
-{
-    switch (priority)
-    {
-    case TR_PRI_LOW:
-        return TR_KEY_priority_low;
-
-    case TR_PRI_HIGH:
-        return TR_KEY_priority_high;
-
-    default:
-        return TR_KEY_priority_normal;
-    }
 }
 
 void DetailsDialog::onFilePriorityChanged(file_indices_t const& indices, int priority)
@@ -1615,7 +1672,7 @@ void DetailsDialog::onOpenRequested(QString const& path) const
             continue;
         }
 
-        QString const local_file_path = tor->getPath() + QLatin1Char('/') + path;
+        auto const local_file_path = tor->getPath() + QLatin1Char('/') + path;
 
         if (!QFile::exists(local_file_path))
         {

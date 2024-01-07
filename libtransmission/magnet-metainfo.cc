@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,14 +9,16 @@
 #include <cstring>
 #include <iterator> // back_inserter
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include <fmt/core.h>
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/tr-macros.h" // for tr_sha1_digest_t
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
@@ -191,6 +193,11 @@ std::string tr_magnet_metainfo::magnet() const
     return std::string{ buf.sv() };
 }
 
+void tr_magnet_metainfo::set_name(std::string_view name)
+{
+    name_ = tr_strv_convert_utf8(name);
+}
+
 void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 {
     if (!tr_urlIsValid(webseed))
@@ -208,18 +215,22 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
     urls.emplace_back(webseed);
 }
 
-bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
+bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* error)
 {
     magnet_link = tr_strv_strip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
     {
-        return parseMagnet(fmt::format(FMT_STRING("magnet:?xt=urn:btih:{:s}"), tr_sha1_to_string(*hash)));
+        return parseMagnet(fmt::format("magnet:?xt=urn:btih:{:s}", tr_sha1_to_string(*hash)));
     }
 
     auto const parsed = tr_urlParse(magnet_link);
     if (!parsed || parsed->scheme != "magnet"sv)
     {
-        tr_error_set(error, TR_ERROR_EINVAL, "Error parsing URL"sv);
+        if (error != nullptr)
+        {
+            error->set(TR_ERROR_EINVAL, "Error parsing URL"sv);
+        }
+
         return false;
     }
 

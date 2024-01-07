@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,7 +8,6 @@
 #include <cmath>
 #include <ctime> // time()
 #include <iterator>
-#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -73,16 +72,15 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
 
     auto path = tr_pathbuf{ top, '/', subpath };
     tr_sys_path_native_separators(std::data(path));
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const info = tr_sys_path_get_info(path, 0, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Skipping '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
     if (!info)
     {
@@ -150,14 +148,18 @@ bool tr_metainfo_builder::set_piece_size(uint32_t piece_size) noexcept
     return true;
 }
 
-bool tr_metainfo_builder::blocking_make_checksums(tr_error** error)
+bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
 {
     checksum_piece_ = 0;
     cancel_ = false;
 
     if (total_size() == 0U)
     {
-        tr_error_set_from_errno(error, ENOENT);
+        if (error != nullptr)
+        {
+            error->set(ENOENT, "zero-length torrents are not allowed"sv);
+        }
+
         return false;
     }
 
@@ -246,7 +248,11 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error** error)
 
     if (cancel_)
     {
-        tr_error_set_from_errno(error, ECANCELED);
+        if (error != nullptr)
+        {
+            error->set_from_errno(ECANCELED);
+        }
+
         return false;
     }
 
@@ -254,7 +260,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error** error)
     return true;
 }
 
-std::string tr_metainfo_builder::benc(tr_error** error) const
+std::string tr_metainfo_builder::benc(tr_error* error) const
 {
     TR_ASSERT_MSG(!std::empty(piece_hashes_), "did you forget to call makeChecksums() first?");
 
@@ -265,7 +271,11 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
     if (total_size() == 0)
     {
-        tr_error_set_from_errno(error, ENOENT);
+        if (error != nullptr)
+        {
+            error->set_from_errno(ENOENT);
+        }
+
         return {};
     }
 
@@ -361,14 +371,17 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     return tr_variant_serde::benc().to_string(tr_variant{ std::move(top) });
 }
 
+bool tr_metainfo_builder::save(std::string_view filename, tr_error* error) const
+{
+    return tr_file_save(filename, benc(error), error);
+}
+
 uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
 {
-    TR_ASSERT(total_size != 0);
-
     // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
     // So we subtract 10 from the log2 of total size.
     // The ideal number of pieces is up for debate.
-    auto exp = std::log2(total_size) - 10;
+    auto exp = (total_size > 0U ? std::log2(total_size) : 0) - 10;
 
     // We want a piece size between 16KiB (2^14 bytes) and 16MiB (2^24 bytes) for maximum compatibility
     exp = std::clamp(exp, 14., 24.);

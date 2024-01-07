@@ -57,7 +57,7 @@ jobs:
           get_changes any-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
           get_changes our-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
           get_changes daemon   CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
-          get_changes dist     dist
+          get_changes dist     dist release
           get_changes docs     docs
           get_changes gtk      CMakeLists.txt cmake third-party libtransmission gtk
           get_changes mac      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
@@ -227,8 +227,8 @@ jobs:
         run: |
           if grep 'warning:' makelog; then exit 1; fi
 
-  macos-11:
-    runs-on: macos-11
+  macos-12:
+    runs-on: macos-12
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
@@ -245,7 +245,7 @@ jobs:
         run: brew install gtkmm3
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install qt@5
+        run: brew install qt
       - name: Get Source
         uses: actions/checkout@v3
         with:
@@ -260,7 +260,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
-            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
@@ -336,7 +336,6 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
@@ -500,10 +499,10 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-11-from-tarball:
+  macos-12-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
       - name: Show Configuration
         run: |
@@ -518,7 +517,7 @@ jobs:
         run: brew install gtkmm3
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install qt@5
+        run: brew install qt
       - name: Get Source
         uses: actions/download-artifact@v3
         with:
@@ -534,7 +533,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
-            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
@@ -771,7 +770,6 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \

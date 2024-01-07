@@ -7,6 +7,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <future>
 #include <iterator> // std::inserter
 #include <set>
 #include <string_view>
@@ -17,6 +18,7 @@
 #include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
+#include "libtransmission/quark.h"
 #include "test-fixtures.h"
 
 struct tr_session;
@@ -64,25 +66,102 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(5, i);
 }
 
+TEST_F(RpcTest, tagSync)
+{
+    auto request_map = tr_variant::Map{ 2U };
+    request_map.try_emplace(TR_KEY_method, "session-stats");
+    request_map.try_emplace(TR_KEY_tag, 12345);
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        tr_variant{ std::move(request_map) },
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    auto const* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto const result = response_map->value_if<std::string_view>(TR_KEY_result);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(*result, "success"sv);
+    auto const tag = response_map->value_if<int64_t>(TR_KEY_tag);
+    ASSERT_TRUE(tag);
+    EXPECT_EQ(*tag, 12345);
+}
+
+TEST_F(RpcTest, tagAsync)
+{
+    auto* tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    EXPECT_NE(nullptr, tor);
+
+    auto request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_method, "torrent-rename-path");
+    request_map.try_emplace(TR_KEY_tag, 12345);
+
+    auto arguments_map = tr_variant::Map{ 2U };
+    arguments_map.try_emplace(TR_KEY_path, "files-filled-with-zeroes/512");
+    arguments_map.try_emplace(TR_KEY_name, "512_test");
+    request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
+
+    auto promise = std::promise<tr_variant>{};
+    auto future = promise.get_future();
+    tr_rpc_request_exec(
+        session_,
+        tr_variant{ std::move(request_map) },
+        [&promise](tr_session* /*session*/, tr_variant&& resp) { promise.set_value(std::move(resp)); });
+    auto const response = future.get();
+
+    auto const* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto const result = response_map->value_if<std::string_view>(TR_KEY_result);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(*result, "success"sv);
+    auto const tag = response_map->value_if<int64_t>(TR_KEY_tag);
+    ASSERT_TRUE(tag);
+    EXPECT_EQ(*tag, 12345);
+
+    // cleanup
+    tr_torrentRemove(tor, false, nullptr, nullptr);
+}
+
+TEST_F(RpcTest, tagNoHandler)
+{
+    auto request_map = tr_variant::Map{ 2U };
+    request_map.try_emplace(TR_KEY_method, "sdgdhsgg");
+    request_map.try_emplace(TR_KEY_tag, 12345);
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        tr_variant{ std::move(request_map) },
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    auto const* const response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto const result = response_map->value_if<std::string_view>(TR_KEY_result);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(*result, "no method name"sv);
+    auto const tag = response_map->value_if<int64_t>(TR_KEY_tag);
+    ASSERT_TRUE(tag);
+    EXPECT_EQ(*tag, 12345);
+}
+
 /***
 ****
 ***/
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
-    {
-        std::swap(*static_cast<tr_variant*>(setme), *response);
-    };
-
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
-    tr_variant request;
+    auto request = tr_variant{};
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
-    tr_variant response;
-    tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        request,
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
     EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
@@ -178,6 +257,45 @@ TEST_F(RpcTest, sessionGet)
         std::end(expected_keys),
         std::inserter(unexpected_keys, std::begin(unexpected_keys)));
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
+
+    // cleanup
+    tr_torrentRemove(tor, false, nullptr, nullptr);
+}
+
+TEST_F(RpcTest, torrentGet)
+{
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    EXPECT_NE(nullptr, tor);
+
+    tr_variant request;
+    tr_variantInitDict(&request, 1);
+
+    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-get");
+
+    tr_variant* args_in = tr_variantDictAddDict(&request, TR_KEY_arguments, 1);
+    tr_variant* fields = tr_variantDictAddList(args_in, TR_KEY_fields, 1);
+    tr_variantListAddStrView(fields, tr_quark_get_string_view(TR_KEY_id));
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        request,
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
+    tr_variant* args = nullptr;
+    EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
+
+    tr_variant* torrents = nullptr;
+    EXPECT_TRUE(tr_variantDictFindList(args, TR_KEY_torrents, &torrents));
+    EXPECT_EQ(1UL, tr_variantListSize(torrents));
+
+    tr_variant* first_torrent = tr_variantListChild(torrents, 0);
+    EXPECT_TRUE(first_torrent != nullptr);
+    EXPECT_TRUE(first_torrent->holds_alternative<tr_variant::Map>());
+    int64_t first_torrent_id = 0;
+    EXPECT_TRUE(tr_variantDictFindInt(first_torrent, TR_KEY_id, &first_torrent_id));
+    EXPECT_EQ(1, first_torrent_id);
 
     // cleanup
     tr_torrentRemove(tor, false, nullptr, nullptr);

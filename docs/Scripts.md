@@ -39,8 +39,6 @@ Functionality of these scripts has been implemented in libtransmission and is th
 ## contrib/scripts
 Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [GitHub repository](https://github.com/wereHamster/transmission/tree/master/contrib/scripts/ ).
 
-Falk Husemann (aka hxgn) is maintaining scripts in his [blog](https://falkhusemann.de/category/tcp_ip/transmission-tcp_ip/).
-
 Oguz wrote [on his blog](https://oguzarduc.blogspot.com/2012/05/transmission-quit-script-in-php.html) a PHP script to stop Transmission after it finishes downloading and seeding.
 Scripts which have not yet been ported and may not work with the latest version:
  * https://pastebin.com/QzVxQDtM: Bash - (cron)script to keep a maximum number of torrents running; starting and pausing torrents as necessary

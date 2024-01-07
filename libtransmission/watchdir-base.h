@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,8 +20,8 @@
 #include <string_view>
 #include <utility>
 
-#include "timer.h"
-#include "watchdir.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/watchdir.h"
 
 namespace libtransmission::impl
 {

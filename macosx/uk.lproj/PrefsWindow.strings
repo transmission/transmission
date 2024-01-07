@@ -1,0 +1,399 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
+"23.title" = "Налаштування";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
+"53.title" = "Інші…";
+
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
+"55.title" = "Ту саму теку, де торент-файл";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
+"219.title" = "Інші…";
+
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
+"253.label" = "Додавання";
+
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
+"254.label" = "Керування";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
+"542.title" = "Інші…";
+
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
+"1201.title" = "Завершити програму під час роздачі";
+
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
+"1202.title" = "Видалення активних завантажень";
+
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
+"1203.title" = "Попереджати при:";
+
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
+"1204.title" = "показувати у Dock:";
+
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
+"1205.title" = "Загальну швидкість завантажування";
+
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
+"1206.title" = "Загальну швидкість роздачі";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
+"1207.title" = "Тільки під час завантаження";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
+"1208.title" = "Тільки під час завантаження";
+
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
+"1209.title" = "Автоматична зміна розміру:";
+
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
+"1210.title" = "Тільки під час завантаження";
+
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
+"1211.title" = "Скинути";
+
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
+"1212.title" = "Скинути всі попередження:";
+
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
+"1213.title" = "Перевіряти оновлення кожен день";
+
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
+"1214.title" = "Перевірити оновлення:";
+
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
+"1216.title" = "Завантажувати у:";
+
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
+"1217.title" = "Налаштування:";
+
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
+"1218.title" = "Видаляти торент-файли";
+
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
+"1219.title" = "Шукати торент-файли у:";
+
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
+"1226.title" = "Автододавання:";
+
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
+"1227.title" = "Зберігати недозавантажені файли у:";
+
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
+"1230.title" = "Черги:";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
+"1231.title" = "активні роздачі";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
+"1232.title" = "Припинити поширення при співвідношенні:";
+
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
+"1234.title" = "Обмеження:";
+
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
+"1235.title" = "Рейтинг — відношення розданого до завантаженого";
+
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
+"1236.title" = "Завантажувати одночасно не більше";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
+"1239.title" = "активні роздачі";
+
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
+"1240.title" = "Роздавати одночасно не більше";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
+"1242.title" = "хвилини";
+
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
+"1243.title" = "В кінець у разі неактивності протягом";
+
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
+"1247.title" = "Відкривати порт автоматично";
+
+/* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
+"1248.title" = "Використовуючи NAT-T з NAT-PMP чи UPnP";
+
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
+"1250.title" = "Порт відкритий";
+
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
+"1253.title" = "Звʼязок:";
+
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
+"1254.title" = "Запобігати переходу комп’ютера в режим сну поки є активні роздачі";
+
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
+"1255.title" = "Сплячий режим:";
+
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
+"1265.title" = "Роздачі:";
+
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
+"1267.title" = "Завантаження:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
+"1268.title" = "КБ/с";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
+"1269.title" = "КБ/с";
+
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
+"1270.title" = "Ширина каналу:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
+"1273.title" = "КБ/с";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
+"1274.title" = "КБ/с";
+
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
+"1275.title" = "Режим обмеження:";
+
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
+"1276.title" = "Роздачі:";
+
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
+"1277.title" = "Завантаження:";
+
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
+"1278.title" = "У режимі обмеження швидкості налаштування загальної ширини каналу не враховується";
+
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
+"1280.title" = "Вмикати за розкладом:";
+
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
+"1281.title" = "до";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
+"1294.title" = "Показувати діалогове вікно під час відкриття торент-файлу";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
+"1302.title" = "Коли завантаження завершені:";
+
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
+"1306.title" = "Після завершення завантаження:";
+
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
+"1310.title" = "Програвати звук:";
+
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
+"1335.title" = "Розпочати завантаження після додавання";
+
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
+"1338.title" = "Додати вікно:";
+
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
+"1340.title" = "Тільки за наявності декількох файлів";
+
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
+"1437.title" = "Оновити";
+
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
+"1438.title" = "чорний список завантажений / не завантажений";
+
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
+"1439.title" = "Список блокування:";
+
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
+"1440.title" = "Не підключатися до учасників з чорного списку";
+
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
+"1441.title" = "Деякі роутери будуть \"гальмувати\" якщо підключень дуже багато";
+
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
+"1442.title" = "Використовувати одноранговий обмін (PEX) для публічних торентів";
+
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
+"1443.title" = "Максимум підключень для нових роздач:";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
+"1446.title" = "вузли";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
+"1447.title" = "вузли";
+
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
+"1450.title" = "Глобальний максимум підключень:";
+
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
+"1451.title" = "Підключення:";
+
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
+"1452.title" = "Надавати перевагу зашифрованим користувачам";
+
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
+"1453.title" = "Шифрування:";
+
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
+"1454.title" = "Ігнорувати незашифрованих користувачів";
+
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
+"1477.title" = "Тільки при додаванні вручну";
+
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
+"1493.title" = "Порт очікування:";
+
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
+"1502.title" = "Включити віддалений доступ";
+
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
+"1505.title" = "Необхідна автентифікація";
+
+/* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
+"1523.headerCell.title" = "IP Адреси";
+
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
+"1542.title" = "IP-адреси можуть містити символ *";
+
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
+"1555.title" = "Пароль:";
+
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
+"1557.title" = "Користувач:";
+
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
+"1645.title" = "Керування програмою буде доступне через веб-інтерфейс";
+
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
+"1718.title" = "Відкрити веб-інтерфейс";
+
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
+"1739.title" = "Останнє оновлення: немає даних";
+
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
+"1742.title" = "Оновлювати список щотижня";
+
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
+"1748.title" = "Дозволяти підключатися тільки наступним IP:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
+"1777.headerCell.title" = "Колір";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
+"1779.headerCell.title" = "Назва";
+
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
+"1796.title" = "Назва групи:";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
+"1813.title" = "Інші…";
+
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
+"1815.title" = "Місце розташування:";
+
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
+"1824.title" = "Буде вибрано під час додавання нових роздач";
+
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
+"1826.title" = "Анонсувати веб-інтерфейс через Bonjour";
+
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
+"1831.title" = "Автоматично додавати роздачі до групи";
+
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
+"1833.title" = "Редагування…";
+
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
+"1835.title" = "Роздачі будуть додані в першу \n групу що задовольняє  всім правилам";
+
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
+"1890.title" = "Випадковий порт під час запуску";
+
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
+"1892.title" = "Випадковий порт";
+
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
+"1896.title" = "Оновлюватися до бета-версій";
+
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
+"1910.title" = "Щодня";
+
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
+"1911.title" = "У робочі дні";
+
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
+"1912.title" = "У вихідні";
+
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
+"1914.title" = "Понеділок";
+
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
+"1915.title" = "Вівторок";
+
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
+"1916.title" = "Середа";
+
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
+"1917.title" = "Четвер";
+
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
+"1918.title" = "П’ятниця";
+
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
+"1919.title" = "Субота";
+
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
+"1920.title" = "Неділя";
+
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
+"1926.title" = "Використовувати розподілену геш-таблицю (DHT) для публічних торентів";
+
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
+"1931.title" = "Приймати магнет-посилання:";
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
+"1933.title" = "Зробити програмою за замовчуванням";
+
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
+"1940.title" = "Додавати .part до незавершених файлів";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
+"1948.title" = "Показувати діалогове вікно під час відкриття магнет-посилання";
+
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
+"1952.title" = "Використовувати локальне виявлення учасників для публічних торентів";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
+"1962.title" = "Припинити висів коли неактивний протягом:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
+"1970.title" = "хвилини";
+
+/* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
+"1988.title" = "URL:";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
+"2044.title" = "Коли завантаження завершені:";
+
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
+"2047.title" = "Сценарій виклику:";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
+"2053.title" = "Інші…";
+
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+"2078.title" = "Використовувати Micro Transport Protocol (µTP)";
+
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
+"2082.title" = "Порт прослуховування:";
+
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
+"2087.title" = "Сповіщення:";
+
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
+"2114.title" = "Налаштуйте в параметрах системи";
+
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
+"2119.title" = "Видалити з переліку передач коли висів закінчиться";
+
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
+"2123.title" = "Застосовується до нових роздач";
+
+/* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
+/* "A9E-F4-a3c.title" = ""; */
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
+"pgY-W3-HdI.title" = "Зробити програмою за замовчуванням";

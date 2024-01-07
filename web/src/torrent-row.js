@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -16,7 +16,7 @@ const TorrentRendererHelper = {
     if (eta < 0 || eta >= 999 * 60 * 60) {
       return '';
     }
-    return `ETA: ${Formatter.timeInterval(eta)}`;
+    return `ETA: ${Formatter.timeInterval(eta, 1)}`;
   },
   formatLabels: (t, label) => {
     const labels = t.getLabels();
@@ -209,7 +209,7 @@ export class TorrentRendererFull {
       if (eta < 0 || eta >= 999 * 60 * 60 /* arbitrary */) {
         c.push('remaining time unknown');
       } else {
-        c.push(Formatter.timeInterval(t.getETA()), ' remaining');
+        c.push(Formatter.timeInterval(t.getETA(), 1), ' remaining');
       }
     }
 
@@ -220,17 +220,18 @@ export class TorrentRendererFull {
   render(controller, t, root) {
     const is_stopped = t.isStopped();
 
+    root.classList.toggle('paused', is_stopped);
+
     // name
     let e = root._name_container;
     setTextContent(e, t.getName());
-    e.classList.toggle('paused', is_stopped);
 
     // labels
     TorrentRendererHelper.formatLabels(t, root._labels_container);
 
     // progress details
     e = root._progress_details_container;
-    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
+    e.innerHTML = TorrentRendererFull.getProgressDetails(controller, t);
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
@@ -332,9 +333,10 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
+    root.classList.toggle('paused', t.isStopped());
+
     // name
     let e = root._name_container;
-    e.classList.toggle('paused', t.isStopped());
     setTextContent(e, t.getName());
 
     // labels

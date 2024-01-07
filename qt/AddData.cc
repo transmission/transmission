@@ -1,10 +1,11 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 
 #include <libtransmission/transmission.h>
 
@@ -56,7 +57,7 @@ int AddData::set(QString const& key)
         this->url = key;
         type = URL;
     }
-    else if (QFile(key).exists())
+    else if (QFile{ key }.exists())
     {
         this->filename = QDir::fromNativeSeparators(key);
         type = FILENAME;
@@ -115,12 +116,37 @@ QString AddData::readableShortName() const
     switch (type)
     {
     case FILENAME:
-        return QFileInfo(filename).baseName();
+        return QFileInfo{ filename }.baseName();
 
     case URL:
         return url.path().split(QLatin1Char('/')).last();
 
     default:
         return readableName();
+    }
+}
+
+void AddData::disposeSourceFile() const
+{
+    auto file = QFile{ filename };
+    if (!disposal_ || !file.exists())
+    {
+        return;
+    }
+
+    switch (*disposal_)
+    {
+    case FilenameDisposal::Delete:
+        file.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
+        file.remove();
+        break;
+
+    case FilenameDisposal::Rename:
+        file.rename(QStringLiteral("%1.added").arg(filename));
+        break;
+
+    default:
+        // no action
+        break;
     }
 }

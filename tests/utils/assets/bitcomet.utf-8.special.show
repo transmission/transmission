@@ -10,8 +10,8 @@ GENERAL
 
   Source: 私たちの世界
   Piece Count: 1
-  Piece Size: 1.00 MiB
-  Total Size: 0.01 kB
+  Piece Size: 1 MiB
+  Total Size: 13 B
   Privacy: Public torrent
 
 TRACKERS
@@ -21,6 +21,6 @@ TRACKERS
 
 FILES
 
-  modified test-utf8/別の世界f1.txt (0.01 kB)
-  modified test-utf8/別の世界f2.txt (0.01 kB)
+  modified test-utf8/別の世界f1.txt (6 B)
+  modified test-utf8/別の世界f2.txt (7 B)
 

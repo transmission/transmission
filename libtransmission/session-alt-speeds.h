@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,12 +17,14 @@
 #include "libtransmission/transmission.h" // for TR_SCHED_ALL
 
 #include "libtransmission/quark.h"
+#include "libtransmission/values.h"
 
 struct tr_variant;
 
 #define ALT_SPEEDS_FIELDS(V) \
-    V(TR_KEY_alt_speed_up, speed_up_kilobytes_per_second_, size_t, 50U, "") \
-    V(TR_KEY_alt_speed_down, speed_down_kilobytes_per_second_, size_t, 50U, "") \
+    V(TR_KEY_alt_speed_enabled, is_active_, bool, false, "") \
+    V(TR_KEY_alt_speed_up, speed_up_kbyps_, size_t, 50U, "") \
+    V(TR_KEY_alt_speed_down, speed_down_kbyps_, size_t, 50U, "") \
     V(TR_KEY_alt_speed_time_enabled, scheduler_enabled_, bool, false, "whether alt speeds toggle on and off on schedule") \
     V(TR_KEY_alt_speed_time_day, use_on_these_weekdays_, size_t, TR_SCHED_ALL, "days of the week") \
     V(TR_KEY_alt_speed_time_begin, minute_begin_, size_t, 540U, "minutes past midnight; 9AM") \
@@ -31,6 +33,8 @@ struct tr_variant;
 /** Manages alternate speed limits and a scheduler to auto-toggle them. */
 class tr_session_alt_speeds
 {
+    using Speed = libtransmission::Values::Speed;
+
 public:
     enum class ChangeReason
     {
@@ -110,20 +114,21 @@ public:
         return static_cast<tr_sched_day>(use_on_these_weekdays_);
     }
 
-    [[nodiscard]] constexpr auto limit_kbps(tr_direction dir) const noexcept
+    [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        return dir == TR_DOWN ? speed_down_kilobytes_per_second_ : speed_up_kilobytes_per_second_;
+        auto const kbyps = dir == TR_DOWN ? speed_down_kbyps_ : speed_up_kbyps_;
+        return Speed{ kbyps, Speed::Units::KByps };
     }
 
-    constexpr void set_limit_kbps(tr_direction dir, size_t limit) noexcept
+    constexpr void set_speed_limit(tr_direction dir, Speed const limit) noexcept
     {
         if (dir == TR_DOWN)
         {
-            speed_down_kilobytes_per_second_ = limit;
+            speed_down_kbyps_ = limit.count(Speed::Units::KByps);
         }
         else
         {
-            speed_up_kilobytes_per_second_ = limit;
+            speed_up_kbyps_ = limit.count(Speed::Units::KByps);
         }
     }
 
@@ -141,9 +146,6 @@ private:
     static auto constexpr MinutesPerHour = int{ 60 };
     static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
     static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
-
-    // are alt speeds active right now?
-    bool is_active_ = false;
 
     // bitfield of all the minutes in a week.
     // Each bit's value indicates whether the scheduler wants

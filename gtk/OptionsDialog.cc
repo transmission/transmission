@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -118,7 +118,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
     {
         if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
         {
-            tr_torrentSetPriority(tor_, gtr_combo_box_get_active_enum(*priority_combo_));
+            tr_torrentSetPriority(tor_, static_cast<tr_priority_t>(gtr_combo_box_get_active_enum(*priority_combo_)));
 
             if (run_check_->get_active())
             {

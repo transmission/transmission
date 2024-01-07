@@ -1,14 +1,14 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <algorithm>
+#include <algorithm> // for std::for_each()
 #include <cctype>
-#include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <ctime> // time_t
 #include <locale>
 #include <memory>
@@ -17,8 +17,6 @@
 #include <string_view>
 #include <type_traits>
 #include <vector>
-
-#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 
@@ -63,14 +61,14 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error = nullptr);
 
-bool tr_file_move(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, tr_error* error = nullptr);
 
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error = nullptr);
 
 template<typename ContiguousRange>
-constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
+constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error* error = nullptr)
 {
     return tr_file_save(filename, std::string_view{ std::data(x), std::size(x) }, error);
 }
@@ -101,14 +99,6 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 #endif
 
 // ---
-
-[[nodiscard]] constexpr bool tr_str_is_empty(char const* value)
-{
-    return value == nullptr || *value == '\0';
-}
-
-/** @brief Portability wrapper for `strlcpy()` that uses the system implementation if available */
-size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
 /** @brief Convenience wrapper around `strerorr()` guaranteed to not return nullptr
     @param errnum the error number to describe */
@@ -221,10 +211,10 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
 
 // ---
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
 
-template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr);
 
 /**
@@ -299,59 +289,6 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 
 // ---
 
-/* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
-
-void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-extern size_t tr_speed_K;
-extern size_t tr_mem_K;
-extern uint64_t tr_size_K; /* unused? */
-
-/** @brief Format a speed from KBps into a user-readable string of at most 4 significant digits. */
-[[nodiscard]] std::string tr_formatter_speed_KBps(double kilo_per_second);
-/** @brief Format a speed from KBps into a user-readable string of at most 3 significant digits. */
-[[nodiscard]] std::string tr_formatter_speed_compact_KBps(double kilo_per_second);
-
-/** @brief Format a memory size from bytes into a user-readable string. */
-[[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
-
-/** @brief Format a memory size from MB into a user-readable string. */
-[[nodiscard]] static inline std::string tr_formatter_mem_MB(double MBps)
-{
-    return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
-}
-
-/** @brief Format a file size from bytes into a user-readable string. */
-[[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
-
-struct tr_variant tr_formatter_get_units();
-
-[[nodiscard]] static inline size_t tr_toSpeedBytes(size_t KBps)
-{
-    return KBps * tr_speed_K;
-}
-
-[[nodiscard]] static inline auto tr_toSpeedKBps(size_t Bps)
-{
-    return Bps / double(tr_speed_K);
-}
-
-[[nodiscard]] static inline auto tr_toMemBytes(size_t MB)
-{
-    return uint64_t(tr_mem_K) * tr_mem_K * MB;
-}
-
-[[nodiscard]] static inline auto tr_toMemMB(uint64_t B)
-{
-    return size_t(B / (tr_mem_K * tr_mem_K));
-}
-
-// ---
-
 /** @brief Check if environment variable exists. */
 [[nodiscard]] bool tr_env_key_exists(char const* key);
 
@@ -362,15 +299,17 @@ struct tr_variant tr_formatter_get_units();
 
 class tr_net_init_mgr
 {
-private:
-    tr_net_init_mgr();
-    TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
-
 public:
     ~tr_net_init_mgr();
     static std::unique_ptr<tr_net_init_mgr> create();
 
 private:
+    tr_net_init_mgr();
+    tr_net_init_mgr(tr_net_init_mgr&&) = delete;
+    tr_net_init_mgr(tr_net_init_mgr const&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr&&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr const&) = delete;
+
     static bool initialised;
 };
 

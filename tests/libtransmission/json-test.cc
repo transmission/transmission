@@ -8,7 +8,6 @@
 #include <cstdint> // int64_t
 #include <locale>
 #include <optional>
-#include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 

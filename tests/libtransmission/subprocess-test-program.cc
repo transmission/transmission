@@ -3,8 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "file.h" // tr_sys_file_write_line(), tr_sys_file_close(), tr_sy...
-#include "utils.h" // tr_env_get_string()
+#include <libtransmission/file.h> // tr_sys_file_write_line(), tr_sys_file_close(), tr_sy...
+#include <libtransmission/utils.h> // tr_env_get_string()
 
 #include <string>
 

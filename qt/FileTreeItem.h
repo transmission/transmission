@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <QCoreApplication>
@@ -29,9 +30,9 @@ public:
     static auto constexpr High = int{ 1 << 2 };
 
     FileTreeItem(QString const& name = QString{}, int file_index = -1, uint64_t size = 0)
-        : name_(name)
-        , total_size_(size)
-        , file_index_(file_index)
+        : name_{ name }
+        , total_size_{ size }
+        , file_index_{ file_index }
     {
     }
 
@@ -94,7 +95,7 @@ public:
 private:
     QString priorityString() const;
     QString sizeString() const;
-    void getSubtreeWantedSize(uint64_t& have, uint64_t& total) const;
+    std::pair<uint64_t, uint64_t> get_subtree_wanted_size() const;
     double progress() const;
     uint64_t size() const;
     std::unordered_map<QString, int> const& getMyChildRows() const;

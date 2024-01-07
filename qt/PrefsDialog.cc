@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -36,9 +36,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -151,6 +149,25 @@ QString qtDayName(int day)
     }
 }
 
+[[nodiscard]] bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
+{
+    if (ancestor == nullptr)
+    {
+        return false;
+    }
+
+    while (descendant != nullptr)
+    {
+        if (descendant == ancestor)
+        {
+            return true;
+        }
+
+        descendant = descendant->parent();
+    }
+
+    return false;
+}
 } // namespace
 
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
@@ -171,7 +188,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QTimeEdit>())
     {
-        pref_widget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(prefs_.getInt(pref_key) * 60));
+        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
     }
     else if (pref_widget.is<QLineEdit>())
     {
@@ -236,24 +253,6 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     }
 }
 
-static bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
-{
-    if (ancestor == nullptr)
-    {
-        return false;
-    }
-    while (descendant != nullptr)
-    {
-        if (descendant == ancestor)
-        {
-            return true;
-        }
-
-        descendant = descendant->parent();
-    }
-    return false;
-}
-
 void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
 {
     // We don't want to change the preference every time there's a keystroke
@@ -307,7 +306,7 @@ void PrefsDialog::timeEditingFinished()
 
     if (pref_widget.is<QTimeEdit>())
     {
-        setPref(pref_widget.getPrefKey(), QTime(0, 0).secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
+        setPref(pref_widget.getPrefKey(), QTime{ 0, 0 }.secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
     }
 }
 
@@ -336,9 +335,7 @@ void PrefsDialog::pathChanged(QString const& path)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::initRemoteTab()
 {
@@ -358,9 +355,7 @@ void PrefsDialog::initRemoteTab()
     connect(ui_.openWebClientButton, &QAbstractButton::clicked, &session_, &Session::launchWebInterface);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::altSpeedDaysEdited(int i)
 {
@@ -370,18 +365,18 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_unit_str = Formatter::get().unitStr(Formatter::get().SPEED, Formatter::get().KB);
-    auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
-    QLocale const locale;
+    auto const suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+
+    auto const locale = QLocale{};
 
     ui_.uploadSpeedLimitSpin->setSuffix(suffix);
     ui_.downloadSpeedLimitSpin->setSuffix(suffix);
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant(TR_SCHED_ALL));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant(TR_SCHED_WEEKDAY));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant(TR_SCHED_WEEKEND));
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant{ TR_SCHED_ALL });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant{ TR_SCHED_WEEKDAY });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant{ TR_SCHED_WEEKEND });
     ui_.altSpeedLimitDaysCombo->insertSeparator(ui_.altSpeedLimitDaysCombo->count());
 
     for (int i = locale.firstDayOfWeek(); i <= Qt::Sunday; ++i)
@@ -418,9 +413,7 @@ void PrefsDialog::initSpeedTab()
     connect(ui_.altSpeedLimitDaysCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::altSpeedDaysEdited);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::initDesktopTab()
 {
@@ -431,9 +424,7 @@ void PrefsDialog::initDesktopTab()
     linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onPortTested(bool isOpen)
 {
@@ -475,9 +466,7 @@ void PrefsDialog::initNetworkTab()
     connect(&session_, &Session::portTested, this, &PrefsDialog::onPortTested);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onBlocklistDialogDestroyed(QObject* o)
 {
@@ -542,9 +531,7 @@ void PrefsDialog::initPrivacyTab()
     updateBlocklistLabel();
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onIdleLimitChanged()
 {
@@ -658,16 +645,14 @@ void PrefsDialog::updateSeedingWidgetsLocality()
     ui_.doneSeedingScriptStack->setFixedHeight(ui_.doneSeedingScriptStack->currentWidget()->sizeHint().height());
 }
 
-/***
-****
-***/
+// ---
 
 PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , prefs_(prefs)
-    , is_server_(session.isServer())
-    , is_local_(session_.isLocal())
+    : BaseDialog{ parent }
+    , session_{ session }
+    , prefs_{ prefs }
+    , is_server_{ session.isServer() }
+    , is_local_{ session_.isLocal() }
 {
     ui_.setupUi(this);
 
@@ -721,9 +706,7 @@ void PrefsDialog::setPref(int key, QVariant const& v)
     refreshPref(key);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::sessionUpdated()
 {

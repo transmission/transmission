@@ -457,6 +457,23 @@
           </widget>
          </item>
          <item row="6" column="0">
+          <widget class="QLabel" name="labelsLabel">
+           <property name="text">
+            <string>Labels:</string>
+           </property>
+           <property name="buddy">
+            <cstring>labelsTextEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QTextEdit" name="labelsTextEdit">
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
           <widget class="QLabel" name="commentLabel">
            <property name="text">
             <string>Comment:</string>
@@ -466,7 +483,7 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <widget class="QTextBrowser" name="commentBrowser">
            <property name="textInteractionFlags">
             <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>

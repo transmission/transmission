@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -95,7 +95,6 @@ export class ContextMenu extends EventTarget {
     add_item('trash-selected-torrents', true);
     add_separator();
     add_item('verify-selected-torrents');
-    add_item('verify-selected-torrents-force');
     add_item('show-move-dialog');
     add_item('show-rename-dialog');
     add_item('show-labels-dialog');

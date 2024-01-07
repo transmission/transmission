@@ -9,8 +9,6 @@
 
 #include "gtest/gtest.h"
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer()
 #include <libtransmission/magnet-metainfo.h>
 #include <libtransmission/tr-macros.h>

@@ -12,6 +12,8 @@
 
 #include <libtransmission/log.h>
 #include <libtransmission/net.h>
+#include <libtransmission/open-files.h>
+#include <libtransmission/peer-io.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session-settings.h>
 #include <libtransmission/variant.h>
@@ -245,12 +247,12 @@ TEST_F(SettingsTest, canLoadPreallocation)
 
     auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->preallocation_mode;
-    auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
+    auto constexpr ExpectedValue = tr_open_files::Preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
-    tr_variantDictAddInt(&var, Key, ExpectedValue);
+    tr_variantDictAddInt(&var, Key, static_cast<int64_t>(ExpectedValue));
     settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->preallocation_mode);
     var.clear();
@@ -268,14 +270,14 @@ TEST_F(SettingsTest, canSavePreallocation)
 
     auto settings = tr_session_settings{};
     auto const default_value = settings.preallocation_mode;
-    auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
+    auto constexpr ExpectedValue = tr_open_files::Preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.preallocation_mode = ExpectedValue;
     auto var = settings.settings();
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
-    EXPECT_EQ(ExpectedValue, val);
+    EXPECT_EQ(static_cast<int64_t>(ExpectedValue), val);
 }
 
 TEST_F(SettingsTest, canLoadSizeT)

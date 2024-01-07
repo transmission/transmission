@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -254,7 +254,6 @@ enum
     TR_KEY_port_is_open,
     TR_KEY_preallocation,
     TR_KEY_preferred_transport,
-    TR_KEY_prefetch_enabled,
     TR_KEY_primary_mime_type,
     TR_KEY_priorities,
     TR_KEY_priority,

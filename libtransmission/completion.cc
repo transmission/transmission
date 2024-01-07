@@ -1,8 +1,11 @@
-// This file Copyright 2021-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -184,6 +187,7 @@ uint64_t tr_completion::count_has_bytes_in_span(tr_byte_span_t span) const
     span.begin = std::clamp(span.begin, uint64_t{ 0 }, block_info_->total_size());
     span.end = std::clamp(span.end, uint64_t{ 0 }, block_info_->total_size());
     auto const [begin_byte, end_byte] = span;
+    TR_ASSERT(end_byte >= begin_byte);
     if (begin_byte >= end_byte)
     {
         return 0;
