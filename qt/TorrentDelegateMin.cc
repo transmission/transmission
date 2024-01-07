@@ -17,8 +17,6 @@
 #include <QPixmapCache>
 #include <QStyleOptionProgressBar>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/utils.h>
 
 #include "StyleHelper.h"

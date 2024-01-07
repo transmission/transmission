@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
 
 #include <libutp/utp.h>
 

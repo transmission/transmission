@@ -10,18 +10,13 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
-#include <giomm/liststore.h>
-#include <giomm/menuattributeiter.h>
-#include <giomm/menulinkiter.h>
 #include <giomm/simpleaction.h>
 #include <glibmm/i18n.h>
 #include <glibmm/variant.h>
 
 #include <array>
-#include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>

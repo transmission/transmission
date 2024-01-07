@@ -12,7 +12,6 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 
 #include <giomm/simpleaction.h>
