@@ -21,6 +21,7 @@
 #include <gtkmm/treemodel.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -29,7 +30,7 @@
 class Session : public Glib::Object
 {
 public:
-    enum ErrorCode
+    enum ErrorCode : uint16_t
     {
         ERR_ADD_TORRENT_ERR = 1,
         ERR_ADD_TORRENT_DUP = 2,

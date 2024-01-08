@@ -71,7 +71,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     std::string_view pieces_root_;
     int64_t file_length_ = 0;
 
-    enum class State
+    enum class State : uint8_t
     {
         UsePath,
         FileTree,

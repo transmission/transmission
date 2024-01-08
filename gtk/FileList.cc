@@ -49,7 +49,7 @@ using namespace std::literals;
 namespace
 {
 
-enum
+enum : uint16_t
 {
     /* these two fields could be any number at all so long as they're not
      * TR_PRI_LOW, TR_PRI_NORMAL, TR_PRI_HIGH, true, or false */

@@ -54,7 +54,7 @@ auto constexpr RpcVersion = int64_t{ 18 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
 auto constexpr RpcVersionSemver = "5.4.0"sv;
 
-enum class TrFormat
+enum class TrFormat : uint8_t
 {
     Object,
     Table

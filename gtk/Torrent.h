@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <bitset>
+#include <cstdint>
 #include <initializer_list>
 #include <memory>
 
@@ -38,7 +39,7 @@ public:
         Gtk::TreeModelColumn<Glib::ustring> name_collated;
     };
 
-    enum class ChangeFlag
+    enum class ChangeFlag : uint8_t
     {
         ACTIVE_PEER_COUNT,
         ACTIVE_PEERS_DOWN,
