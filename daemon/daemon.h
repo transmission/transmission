@@ -15,6 +15,7 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/file.h>
 
+struct event_base;
 struct tr_error;
 struct tr_session;
 
