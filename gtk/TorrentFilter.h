@@ -16,7 +16,7 @@
 class TorrentFilter : public FilterBase<Torrent>
 {
 public:
-    enum class Activity : uint8_t
+    enum class Activity : int8_t
     {
         ALL,
         DOWNLOADING,
@@ -28,7 +28,7 @@ public:
         ERROR,
     };
 
-    enum class Tracker : uint8_t
+    enum class Tracker : int8_t
     {
         ALL,
         HOST,
