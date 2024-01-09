@@ -181,7 +181,7 @@ void timer_callback(void* vsession)
 }
 } // namespace
 
-void tr_utpInit(tr_session* session)
+void tr_utp_init(tr_session* session)
 {
     if (session->utp_context != nullptr)
     {
@@ -212,7 +212,7 @@ void tr_utpInit(tr_session* session)
     restart_timer(session);
 }
 
-bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+bool tr_utp_packet(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
 
@@ -222,7 +222,7 @@ bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const
     return ret != 0;
 }
 
-void tr_utpClose(tr_session* session)
+void tr_utp_close(tr_session* session)
 {
     session->utp_timer.reset();
 

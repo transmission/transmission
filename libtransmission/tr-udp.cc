@@ -131,7 +131,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
     }
     else if (session->allowsUTP() && (session->utp_context != nullptr))
     {
-        if (!tr_utpPacket(std::data(buf), rc, from_sa, fromlen, session))
+        if (!tr_utp_packet(std::data(buf), rc, from_sa, fromlen, session))
         {
             tr_logAddTrace("Unexpected UDP packet");
         }

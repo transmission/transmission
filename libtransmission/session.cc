@@ -737,7 +737,7 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(settings, true);
 
-    tr_utpInit(this);
+    tr_utp_init(this);
 
     /* cleanup */
     data.done_cv.notify_one();
@@ -1401,7 +1401,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     stats().save();
     peer_mgr_.reset();
     openFiles().close_all();
-    tr_utpClose(this);
+    tr_utp_close(this);
     this->udp_core_.reset();
 
     // tada we are done!
