@@ -129,7 +129,7 @@ ItemLayout::ItemLayout(
     status_rect = name_rect.adjusted(0, name_rect.height() + 1, 0, status_size.height() + 1);
     bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, PROGRESS_BAR_HEIGHT + PIECE_BAR_HEIGHT + 1);
     progress_bar_rect = bar_rect.adjusted(0, 0, 0, -PIECE_BAR_HEIGHT);
-    piece_bar_rect = bar_rect.adjusted(0, PROGRESS_BAR_HEIGHT + 1, 0, -PROGRESS_BAR_HEIGHT);
+    piece_bar_rect = bar_rect.adjusted(0, PROGRESS_BAR_HEIGHT + 1, 0, 0);
     progress_rect = bar_rect.adjusted(0, bar_rect.height() + 1, 0, progress_size.height());
     icon_rect = QStyle::alignedRect(
         direction,
@@ -610,21 +610,34 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
-    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
+    // style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
+
+    auto const cr = is_item_selected ? QPalette::HighlightedText : QPalette::Base;
+    float progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+
+    QRect progress_bar_fill_rect = layout.progress_bar_rect;
+    progress_bar_fill_rect.setWidth(progress*layout.progress_bar_rect.width());
+    painter->fillRect(progress_bar_fill_rect, progress_bar_style_.palette.brush(cr));
 
     std::vector<int> const availability = tor.availability();
-    float const piece_width = (float) (layout.piece_bar_rect.width() - 2) / tor.pieceCount();
+    float const piece_width = static_cast<float>(layout.piece_bar_rect.width() - 3) / tor.pieceCount();
 
-    for (int i = 0; i < tor.pieceCount(); i++)
+    if (progress == 1.0)
     {
-        if (availability[i] == -1)
+        painter->fillRect(layout.piece_bar_rect, progress_bar_style_.palette.brush(cr));
+    }
+    else
+    {
+        for (int i = 0; i < tor.pieceCount(); i++)
         {
-            int const offset = i*piece_width;
-            QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 1, layout.piece_bar_rect.top(),
-                                       (int) std::ceil(piece_width), PIECE_BAR_HEIGHT - 2 };
+            if (availability[i] == -1)
+            {
+                int const offset = i*piece_width;
+                QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2, layout.piece_bar_rect.top(),
+                                           static_cast<int>(std::ceil(piece_width)), PIECE_BAR_HEIGHT - 2 };
 
-            auto const cr = is_item_selected ? QPalette::HighlightedText : QPalette::Base;
-            painter->fillRect(piece_rect, progress_bar_style_.palette.brush(cr));
+                painter->fillRect(piece_rect, progress_bar_style_.palette.brush(cr));
+            }
         }
     }
 
