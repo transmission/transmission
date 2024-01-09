@@ -610,10 +610,9 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
-    // style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
 
-    auto const cr = is_item_selected ? QPalette::HighlightedText : QPalette::Base;
-    float progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+    auto const cr = is_item_selected ? QPalette::Highlight : QPalette::Base;
+    float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
 
     QRect progress_bar_fill_rect = layout.progress_bar_rect;
     progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
@@ -633,8 +632,10 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
             if (availability[i] == -1)
             {
                 int const offset = i * piece_width;
-                QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2, layout.piece_bar_rect.top(),
-                                           static_cast<int>(std::ceil(piece_width)), PIECE_BAR_HEIGHT - 2 };
+                QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2,
+                                           layout.piece_bar_rect.top() + 1,
+                                           static_cast<int>(std::ceil(piece_width)),
+                                           PIECE_BAR_HEIGHT - 3 };
 
                 painter->fillRect(piece_rect, progress_bar_style_.palette.brush(cr));
             }
