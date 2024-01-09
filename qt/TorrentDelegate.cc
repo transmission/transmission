@@ -616,7 +616,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     float progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
 
     QRect progress_bar_fill_rect = layout.progress_bar_rect;
-    progress_bar_fill_rect.setWidth(progress*layout.progress_bar_rect.width());
+    progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
     painter->fillRect(progress_bar_fill_rect, progress_bar_style_.palette.brush(cr));
 
     std::vector<int> const availability = tor.availability();
@@ -632,7 +632,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         {
             if (availability[i] == -1)
             {
-                int const offset = i*piece_width;
+                int const offset = i * piece_width;
                 QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2, layout.piece_bar_rect.top(),
                                            static_cast<int>(std::ceil(piece_width)), PIECE_BAR_HEIGHT - 2 };
 
