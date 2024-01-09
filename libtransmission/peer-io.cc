@@ -729,6 +729,9 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
                 io->set_enabled(TR_DOWN, true);
                 io->can_read_wrapper();
 
+                // utp_read_drained() notifies libutp that we read a packet from them.
+                // It opens up the congestion window by sending an ACK (soonish) if
+                // one was not going to be sent.
                 utp_read_drained(args->socket);
             }
             return {};
