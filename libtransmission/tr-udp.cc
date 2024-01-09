@@ -27,6 +27,7 @@
 
 namespace
 {
+
 /* Since we use a single UDP socket in order to implement multiple
    µTP sockets, try to set up huge buffers. */
 void set_socket_buffers(tr_socket_t fd, bool large)
@@ -99,41 +100,55 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
     auto from = sockaddr_storage{};
     auto fromlen = socklen_t{ sizeof(from) };
     auto* const from_sa = reinterpret_cast<sockaddr*>(&from);
-
-    auto const rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, from_sa, &fromlen);
-    if (rc <= 0)
-    {
-        return;
-    }
-
-    /* Since most packets we receive here are µTP, make quick inline
-       checks for the other protocols. The logic is as follows:
-       - all DHT packets start with 'd'
-       - all UDP tracker packets start with a 32-bit (!) "action", which
-         is between 0 and 3
-       - the above cannot be µTP packets, since these start with a 4-bit
-         version number (1). */
     auto* const session = static_cast<tr_session*>(vsession);
-    if (buf[0] == 'd')
+    auto got_utp_packet = false;
+
+    for (;;)
     {
-        if (session->dht_)
+        auto const n_read = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, from_sa, &fromlen);
+        if (n_read <= 0)
         {
-            buf[rc] = '\0'; // libdht requires zero-terminated messages
-            session->dht_->handle_message(std::data(buf), rc, from_sa, fromlen);
+            if (got_utp_packet)
+            {
+                // To reduce protocol overhead, we wait until we've read all UDP packets
+                // we can, then send one ACK for each µTP socket that received packet(s).
+                tr_utp_issue_deferred_acks(session);
+            }
+            return;
         }
-    }
-    else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
-    {
-        if (!session->announcer_udp_->handle_message(std::data(buf), rc))
+
+        // Since most packets we receive here are µTP, make quick inline
+        // checks for the other protocols. The logic is as follows:
+        // - all DHT packets start with 'd'
+        // - all UDP tracker packets start with a 32-bit (!) "action", which
+        //   is between 0 and 3
+        // - the above cannot be µTP packets, since these start with a 4-bit
+        //   version number (1).
+        if (buf[0] == 'd')
         {
-            tr_logAddTrace("Couldn't parse UDP tracker packet.");
+            if (session->dht_)
+            {
+                buf[n_read] = '\0'; // libdht requires zero-terminated messages
+                session->dht_->handle_message(std::data(buf), n_read, from_sa, fromlen);
+            }
         }
-    }
-    else if (session->allowsUTP() && (session->utp_context != nullptr))
-    {
-        if (!tr_utp_packet(std::data(buf), rc, from_sa, fromlen, session))
+        else if (n_read >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            tr_logAddTrace("Unexpected UDP packet");
+            if (!session->announcer_udp_->handle_message(std::data(buf), n_read))
+            {
+                tr_logAddTrace("Couldn't parse UDP tracker packet.");
+            }
+        }
+        else if (session->allowsUTP() && session->utp_context != nullptr)
+        {
+            if (tr_utp_packet(std::data(buf), n_read, from_sa, fromlen, session))
+            {
+                got_utp_packet = true;
+            }
+            else
+            {
+                tr_logAddTrace("Unexpected UDP packet");
+            }
         }
     }
 }

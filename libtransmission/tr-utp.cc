@@ -173,9 +173,6 @@ void timer_callback(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(session->utp_context);
-
     utp_check_timeouts(session->utp_context);
     restart_timer(session);
 }
@@ -216,10 +213,12 @@ bool tr_utp_packet(unsigned char const* buf, size_t buflen, struct sockaddr cons
 {
     auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
 
-    /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(ss->utp_context);
-
     return ret != 0;
+}
+
+void tr_utp_issue_deferred_acks(tr_session* ss)
+{
+    utp_issue_deferred_acks(ss->utp_context);
 }
 
 void tr_utp_close(tr_session* session)
