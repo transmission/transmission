@@ -811,7 +811,7 @@ void tr_rpc_server::set_password(std::string_view password) noexcept
 
 void tr_rpc_server::set_password_enabled(bool enabled)
 {
-    is_password_enabled_ = enabled;
+    authentication_required_ = enabled;
     tr_logAddDebug(fmt::format("setting password-enabled to '{}'", enabled));
 }
 
