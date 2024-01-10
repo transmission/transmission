@@ -224,266 +224,210 @@
       </attribute>
       <layout class="QVBoxLayout" name="downloadingTabLayout">
        <item>
-        <widget class="QLabel" name="addingSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="addingSection">
+         <property name="title">
           <string>Adding</string>
          </property>
+         <layout class="QGridLayout" name="addingSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="watchDirCheck">
+            <property name="text">
+             <string>Automatically add .torrent files &amp;from:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QStackedWidget" name="watchDirStack">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <widget class="PathButton" name="watchDirButton"/>
+            <widget class="QLineEdit" name="watchDirEdit"/>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
+            <property name="text">
+             <string>Show the Torrent Options &amp;dialog</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QCheckBox" name="startAddedTorrentsCheck">
+            <property name="text">
+             <string>&amp;Start added torrents</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QCheckBox" name="detectTorrentFromClipboard">
+            <property name="toolTip">
+             <string>Reads user clipboard content for torrents</string>
+            </property>
+            <property name="text">
+             <string>Detect new torrents from clipboard</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QCheckBox" name="trashTorrentFileCheck">
+            <property name="text">
+             <string>Mo&amp;ve the .torrent file to the trash</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="downloadDirLabel">
+            <property name="text">
+             <string>Save to &amp;Location:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QStackedWidget" name="downloadDirStack">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <widget class="PathButton" name="downloadDirButton"/>
+            <widget class="QLineEdit" name="downloadDirEdit"/>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
+           <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
+            <property name="text">
+             <string notr="true">...</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="addingSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="5" column="0">
-          <widget class="QLabel" name="downloadDirLabel">
-           <property name="text">
-            <string>Save to &amp;Location:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="watchDirCheck">
-           <property name="text">
-            <string>Automatically add .torrent files &amp;from:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="startAddedTorrentsCheck">
-           <property name="text">
-            <string>&amp;Start added torrents</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
-           <property name="text">
-            <string notr="true">...</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
-           <property name="text">
-            <string>Show the Torrent Options &amp;dialog</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2">
-          <widget class="QCheckBox" name="trashTorrentFileCheck">
-           <property name="text">
-            <string>Mo&amp;ve the .torrent file to the trash</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QStackedWidget" name="watchDirStack">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <widget class="PathButton" name="watchDirButton"/>
-           <widget class="QLineEdit" name="watchDirEdit"/>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QStackedWidget" name="downloadDirStack">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <widget class="PathButton" name="downloadDirButton"/>
-           <widget class="QLineEdit" name="downloadDirEdit"/>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QCheckBox" name="detectTorrentFromClipboard">
-           <property name="toolTip">
-            <string>Reads user clipboard content for torrents</string>
-           </property>
-           <property name="text">
-            <string>Detect new torrents from clipboard</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="downloadQueueSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="downloadQueueSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="downloadQueueSection">
+         <property name="title">
           <string>Download Queue</string>
          </property>
+         <layout class="QGridLayout" name="downloadQueueSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QLabel" name="downloadQueueSizeLabel">
+            <property name="text">
+             <string>Ma&amp;ximum active downloads:</string>
+            </property>
+            <property name="buddy">
+             <cstring>downloadQueueSizeSpin</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="downloadQueueSizeSpin">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="queueStalledMinutesLabel">
+            <property name="text">
+             <string extracomment="Please keep this phrase as short as possible, it's currently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
+            </property>
+            <property name="buddy">
+             <cstring>queueStalledMinutesSpin</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="queueStalledMinutesSpin">
+            <property name="suffix">
+             <string notr="true"> minute(s) ago</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>9999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="downloadQueueSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="downloadQueueSizeLabel">
-           <property name="text">
-            <string>Ma&amp;ximum active downloads:</string>
-           </property>
-           <property name="buddy">
-            <cstring>downloadQueueSizeSpin</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="downloadQueueSizeSpin">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="queueStalledMinutesLabel">
-           <property name="text">
-            <string extracomment="Please keep this phrase as short as possible, it's currently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
-           </property>
-           <property name="buddy">
-            <cstring>queueStalledMinutesSpin</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="queueStalledMinutesSpin">
-           <property name="suffix">
-            <string notr="true"> minute(s) ago</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>9999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="incompleteSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="incompleteSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="incompleteSection">
+         <property name="title">
           <string>Incomplete</string>
          </property>
+         <layout class="QGridLayout" name="incompleteSectionLayout" columnstretch="0,1">
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="renamePartialFilesCheck">
+            <property name="text">
+             <string>Append &quot;.&amp;part&quot; to incomplete files' names</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="incompleteDirCheck">
+            <property name="text">
+             <string>Keep &amp;incomplete files in:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QStackedWidget" name="incompleteDirStack">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <widget class="PathButton" name="incompleteDirButton"/>
+            <widget class="QLineEdit" name="incompleteDirEdit"/>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="doneDownloadingScriptCheck">
+            <property name="text">
+             <string>Call scrip&amp;t when downloading is completed:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QStackedWidget" name="doneDownloadingScriptStack">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <widget class="PathButton" name="doneDownloadingScriptButton"/>
+            <widget class="QLineEdit" name="doneDownloadingScriptEdit"/>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="incompleteSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="renamePartialFilesCheck">
-           <property name="text">
-            <string>Append &quot;.&amp;part&quot; to incomplete files' names</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="incompleteDirCheck">
-           <property name="text">
-            <string>Keep &amp;incomplete files in:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QStackedWidget" name="incompleteDirStack">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <widget class="PathButton" name="incompleteDirButton"/>
-           <widget class="QLineEdit" name="incompleteDirEdit"/>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="doneDownloadingScriptCheck">
-           <property name="text">
-            <string>Call scrip&amp;t when downloading is completed:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QStackedWidget" name="doneDownloadingScriptStack">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <widget class="PathButton" name="doneDownloadingScriptButton"/>
-           <widget class="QLineEdit" name="doneDownloadingScriptEdit"/>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <spacer name="downloadingTabBottomSpacer">
