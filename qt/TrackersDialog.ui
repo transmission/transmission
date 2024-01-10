@@ -18,49 +18,41 @@
   </property>
   <layout class="QVBoxLayout" name="dialogLayout">
    <item>
-    <widget class="QLabel" name="filesSectionLabel">
-     <property name="styleSheet">
-      <string notr="true">font-weight:bold</string>
-     </property>
-     <property name="text">
+    <widget class="QGroupBox" name="filesSection">
+     <property name="title">
       <string>Tracker Announce URLs</string>
      </property>
+     <layout class="QGridLayout" name="filesSectionLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="backupLabel">
+        <property name="text">
+         <string>To add a backup URL, add it on the next line after a primary URL.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="primaryLabel">
+        <property name="text">
+         <string>To add a new primary URL, add it after a blank line.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPlainTextEdit" name="trackerList">
+        <property name="tabChangesFocus">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="defaultsLabel">
+        <property name="text">
+         <string>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="filesSectionLayout" columnstretch="0">
-     <property name="leftMargin">
-      <number>18</number>
-     </property>
-     <item row="1" column="0">
-      <widget class="QLabel" name="primaryLabel">
-       <property name="text">
-        <string>To add a new primary URL, add it after a blank line.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QPlainTextEdit" name="trackerList">
-       <property name="tabChangesFocus">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="backupLabel">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="defaultsLabel">
-       <property name="text">
-        <string>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="dialogButtons">
