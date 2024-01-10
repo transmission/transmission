@@ -31,212 +31,177 @@
       </attribute>
       <layout class="QVBoxLayout" name="speedTabLayout">
        <item>
-        <widget class="QLabel" name="speedLimitsSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="speedLimitsSection">
+         <property name="title">
           <string>Speed Limits</string>
          </property>
+         <layout class="QGridLayout" name="speedLimitsSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="uploadSpeedLimitCheck">
+            <property name="text">
+             <string>&amp;Upload:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="uploadSpeedLimitSpin">
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="downloadSpeedLimitCheck">
+            <property name="text">
+             <string>&amp;Download:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="downloadSpeedLimitSpin">
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="speedLimitsSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
+        <widget class="QGroupBox" name="altSpeedLimitsSection">
+         <property name="title">
+          <string>Alternative Speed Limits</string>
          </property>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="uploadSpeedLimitCheck">
-           <property name="text">
-            <string>&amp;Upload:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="uploadSpeedLimitSpin">
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="downloadSpeedLimitCheck">
-           <property name="text">
-            <string>&amp;Download:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="downloadSpeedLimitSpin">
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="altSpeedLimitsSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="altSpeedLimitsSectionTitleLayout" stretch="0,1">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="altSpeedLimitsSectionLabel">
-           <property name="styleSheet">
-            <string notr="true">font-weight:bold</string>
-           </property>
-           <property name="text">
-            <string>Alternative Speed Limits</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
-           <property name="pixmap">
-            <pixmap resource="application.qrc">:/icons/alt-limit-off.svg</pixmap>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="altSpeedLimitsSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="altSpeedLimitsSectionDescriptionLabel">
-           <property name="text">
-            <string>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="altUploadSpeedLimitLabel">
-           <property name="text">
-            <string>U&amp;pload:</string>
-           </property>
-           <property name="buddy">
-            <cstring>altUploadSpeedLimitSpin</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="altUploadSpeedLimitSpin">
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="altDownloadSpeedLimitLabel">
-           <property name="text">
-            <string>Do&amp;wnload:</string>
-           </property>
-           <property name="buddy">
-            <cstring>altDownloadSpeedLimitSpin</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QSpinBox" name="altDownloadSpeedLimitSpin">
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QCheckBox" name="altSpeedLimitScheduleCheck">
-           <property name="text">
-            <string>&amp;Scheduled times:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <layout class="QHBoxLayout" name="altSpeedLimitScheduleLayout">
-           <item>
-            <widget class="QTimeEdit" name="altSpeedLimitStartTimeEdit">
-             <property name="displayFormat">
-              <string notr="true">hh:mm</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="altSpeedLimitToLabel">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>&amp;to</string>
-             </property>
-             <property name="buddy">
-              <cstring>altSpeedLimitEndTimeEdit</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTimeEdit" name="altSpeedLimitEndTimeEdit">
-             <property name="displayFormat">
-              <string notr="true">hh:mm</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="altSpeedLimitDaysLabel">
-           <property name="text">
-            <string>&amp;On days:</string>
-           </property>
-           <property name="buddy">
-            <cstring>altSpeedLimitDaysCombo</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QComboBox" name="altSpeedLimitDaysCombo"/>
-         </item>
-        </layout>
+         <layout class="QGridLayout" name="altSpeedLimitsSectionLayout" columnstretch="0,1">
+          <item row="0" column="0" colspan="2">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
+              <property name="pixmap">
+               <pixmap resource="application.qrc">:/icons/alt-limit-off.svg</pixmap>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="altSpeedLimitsSectionDescriptionLabel">
+              <property name="text">
+               <string>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="altUploadSpeedLimitLabel">
+            <property name="text">
+             <string>U&amp;pload:</string>
+            </property>
+            <property name="buddy">
+             <cstring>altUploadSpeedLimitSpin</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="altUploadSpeedLimitSpin">
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="altDownloadSpeedLimitLabel">
+            <property name="text">
+             <string>Do&amp;wnload:</string>
+            </property>
+            <property name="buddy">
+             <cstring>altDownloadSpeedLimitSpin</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSpinBox" name="altDownloadSpeedLimitSpin">
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="altSpeedLimitScheduleCheck">
+            <property name="text">
+             <string>&amp;Scheduled times:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="altSpeedLimitScheduleLayout">
+            <item>
+             <widget class="QTimeEdit" name="altSpeedLimitStartTimeEdit">
+              <property name="displayFormat">
+               <string notr="true">hh:mm</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="altSpeedLimitToLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>&amp;to</string>
+              </property>
+              <property name="buddy">
+               <cstring>altSpeedLimitEndTimeEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTimeEdit" name="altSpeedLimitEndTimeEdit">
+              <property name="displayFormat">
+               <string notr="true">hh:mm</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="altSpeedLimitDaysLabel">
+            <property name="text">
+             <string>&amp;On days:</string>
+            </property>
+            <property name="buddy">
+             <cstring>altSpeedLimitDaysCombo</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="altSpeedLimitDaysCombo"/>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
         <spacer name="speedTabBottomSpacer">
