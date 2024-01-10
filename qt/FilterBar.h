@@ -56,13 +56,15 @@ private:
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
 
-    std::map<QString, int> sitename_counts_;
-    FilterBarComboBox* const activity_combo_ = createActivityCombo();
-    FilterBarComboBox* tracker_combo_ = {};
-    QLabel* count_label_ = {};
     QStandardItemModel* const tracker_model_ = new QStandardItemModel{ this };
-    QTimer recount_timer_;
+
+    QLabel* const count_label_ = {};
+    FilterBarComboBox* const activity_combo_ = createActivityCombo();
+    FilterBarComboBox* const tracker_combo_ = createTrackerCombo(tracker_model_);
     QLineEdit* const line_edit_ = new QLineEdit{ this };
+
+    std::map<QString, int> sitename_counts_;
+    QTimer recount_timer_;
     Pending pending_ = {};
     bool is_bootstrapping_ = {};
 
