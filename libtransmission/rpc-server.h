@@ -100,7 +100,7 @@ public:
 
     [[nodiscard]] constexpr auto isPasswordEnabled() const noexcept
     {
-        return is_password_enabled_;
+        return authentication_required_;
     }
 
     void setPasswordEnabled(bool enabled);
@@ -161,6 +161,4 @@ public:
 
     size_t login_attempts_ = 0U;
     int start_retry_counter = 0;
-
-    bool is_password_enabled_ = false;
 };
