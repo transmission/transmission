@@ -450,89 +450,81 @@
       </attribute>
       <layout class="QVBoxLayout" name="seedingTabLayout">
        <item>
-        <widget class="QLabel" name="limitsSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="limitsSection">
+         <property name="title">
           <string>Limits</string>
          </property>
+         <layout class="QGridLayout" name="limitsSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="ratioLimitCheck">
+            <property name="text">
+             <string>Stop seeding at &amp;ratio:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="ratioLimitSpin">
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="idleLimitCheck">
+            <property name="text">
+             <string>Stop seedi&amp;ng if idle for:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="idleLimitSpin">
+            <property name="suffix">
+             <string notr="true"> minute(s)</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>40320</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="doneSeedingScriptCheck">
+            <property name="text">
+             <string>Call scrip&amp;t when seeding is completed:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QStackedWidget" name="doneSeedingScriptStack">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <widget class="PathButton" name="doneSeedingScriptButton"/>
+            <widget class="QLineEdit" name="doneSeedingScriptEdit"/>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="limitsSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="ratioLimitCheck">
-           <property name="text">
-            <string>Stop seeding at &amp;ratio:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="ratioLimitSpin">
-           <property name="maximum">
-            <double>999999999.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.500000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="idleLimitCheck">
-           <property name="text">
-            <string>Stop seedi&amp;ng if idle for:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="idleLimitSpin">
-           <property name="suffix">
-            <string notr="true"> minute(s)</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>40320</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="doneSeedingScriptCheck">
-           <property name="text">
-            <string>Call scrip&amp;t when seeding is completed:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QStackedWidget" name="doneSeedingScriptStack">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <widget class="PathButton" name="doneSeedingScriptButton"/>
-           <widget class="QLineEdit" name="doneSeedingScriptEdit"/>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <spacer name="seedingTabBottomSpacer">
