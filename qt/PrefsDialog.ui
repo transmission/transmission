@@ -847,89 +847,57 @@ To add a new primary URL, add it after a blank line.</string>
       </attribute>
       <layout class="QVBoxLayout" name="desktopTabLayout">
        <item>
-        <widget class="QLabel" name="desktopSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="desktopSection">
+         <property name="title">
           <string>Desktop</string>
          </property>
+         <layout class="QVBoxLayout" name="desktopSectionLayout">
+          <item>
+           <widget class="QCheckBox" name="showTrayIconCheck">
+            <property name="text">
+             <string>Show Transmission icon in the &amp;notification area</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="startMinimizedCheck">
+            <property name="text">
+             <string>Start &amp;minimized in notification area</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="desktopSectionLayout">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item>
-          <widget class="QCheckBox" name="showTrayIconCheck">
-           <property name="text">
-            <string>Show Transmission icon in the &amp;notification area</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="startMinimizedCheck">
-           <property name="text">
-            <string>Start &amp;minimized in notification area</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="notificationSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="notificationSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="notificationSection">
+         <property name="title">
           <string>Notification</string>
          </property>
+         <layout class="QVBoxLayout" name="notificationSectionLayout">
+          <item>
+           <widget class="QCheckBox" name="notifyOnTorrentAddedCheck">
+            <property name="text">
+             <string>Show a notification when torrents are a&amp;dded</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="notifyOnTorrentCompletedCheck">
+            <property name="text">
+             <string>Show a notification when torrents &amp;finish</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="playSoundOnTorrentCompletedCheck">
+            <property name="text">
+             <string>Play a &amp;sound when torrents finish</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="notificationSectionLayout">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item>
-          <widget class="QCheckBox" name="notifyOnTorrentAddedCheck">
-           <property name="text">
-            <string>Show a notification when torrents are a&amp;dded</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="notifyOnTorrentCompletedCheck">
-           <property name="text">
-            <string>Show a notification when torrents &amp;finish</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="playSoundOnTorrentCompletedCheck">
-           <property name="text">
-            <string>Play a &amp;sound when torrents finish</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <spacer name="desktopTabBottomSpacer">
