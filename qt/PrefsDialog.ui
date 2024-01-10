@@ -547,104 +547,72 @@
       </attribute>
       <layout class="QVBoxLayout" name="privacyTabLayout">
        <item>
-        <widget class="QLabel" name="encryptionSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="encryptionSection">
+         <property name="title">
           <string>Encryption</string>
          </property>
+         <layout class="QGridLayout" name="encryptionSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QLabel" name="encryptionModeLabel">
+            <property name="text">
+             <string>&amp;Encryption mode:</string>
+            </property>
+            <property name="buddy">
+             <cstring>encryptionModeCombo</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="encryptionModeCombo"/>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="encryptionSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="encryptionModeLabel">
-           <property name="text">
-            <string>&amp;Encryption mode:</string>
-           </property>
-           <property name="buddy">
-            <cstring>encryptionModeCombo</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="encryptionModeCombo"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="blocklistSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="blocklistSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="blocklistSection">
+         <property name="title">
           <string>Blocklist</string>
          </property>
+         <layout class="QGridLayout" name="blocklistSectionLayout" columnstretch="0,1,0">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="blocklistCheck">
+            <property name="text">
+             <string>Enable &amp;blocklist:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2">
+           <widget class="QLineEdit" name="blocklistEdit"/>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="blocklistStatusLabel">
+            <property name="text">
+             <string notr="true">...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="updateBlocklistButton">
+            <property name="text">
+             <string>&amp;Update</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3">
+           <widget class="QCheckBox" name="autoUpdateBlocklistCheck">
+            <property name="text">
+             <string>Enable &amp;automatic updates</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="blocklistSectionLayout" columnstretch="0,1,0">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="blocklistCheck">
-           <property name="text">
-            <string>Enable &amp;blocklist:</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" colspan="2">
-          <widget class="QLineEdit" name="blocklistEdit"/>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QLabel" name="blocklistStatusLabel">
-           <property name="text">
-            <string notr="true">...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QPushButton" name="updateBlocklistButton">
-           <property name="text">
-            <string>&amp;Update</string>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QCheckBox" name="autoUpdateBlocklistCheck">
-           <property name="text">
-            <string>Enable &amp;automatic updates</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <spacer name="privacyTabBottomSpacer">
