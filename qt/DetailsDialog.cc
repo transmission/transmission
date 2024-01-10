@@ -1550,8 +1550,7 @@ void DetailsDialog::initOptionsTab()
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedSectionLayout);
-    cr->addLayout(ui_.seedingLimitsSectionRatioLayout);
-    cr->addLayout(ui_.seedingLimitsSectionIdleLayout);
+    cr->addLayout(ui_.seedingLimitsSectionLayout);
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 

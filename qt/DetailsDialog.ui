@@ -714,229 +714,174 @@
       </attribute>
       <layout class="QVBoxLayout" name="optionsTabLayout">
        <item>
-        <widget class="QLabel" name="speedSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="speedSection">
+         <property name="title">
           <string>Speed</string>
          </property>
+         <layout class="QGridLayout" name="speedSectionLayout" columnstretch="0,1">
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="sessionLimitCheck">
+            <property name="text">
+             <string>Honor global &amp;limits</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="singleUpCheck">
+            <property name="text">
+             <string>Limit &amp;upload speed:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="singleUpSpin">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="singleDownCheck">
+            <property name="text">
+             <string>Limit &amp;download speed:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSpinBox" name="singleDownSpin">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="bandwidthPriorityLabel">
+            <property name="text">
+             <string>Torrent &amp;priority:</string>
+            </property>
+            <property name="buddy">
+             <cstring>bandwidthPriorityCombo</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="bandwidthPriorityCombo"/>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="speedSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="sessionLimitCheck">
-           <property name="text">
-            <string>Honor global &amp;limits</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="singleUpCheck">
-           <property name="text">
-            <string>Limit &amp;upload speed:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="singleUpSpin">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="singleDownCheck">
-           <property name="text">
-            <string>Limit &amp;download speed:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QSpinBox" name="singleDownSpin">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="bandwidthPriorityLabel">
-           <property name="text">
-            <string>Torrent &amp;priority:</string>
-           </property>
-           <property name="buddy">
-            <cstring>bandwidthPriorityCombo</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="bandwidthPriorityCombo"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="seedingLimitsSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="seedingLimitsSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="seedingLimitsSection">
+         <property name="title">
           <string>Seeding Limits</string>
          </property>
+         <layout class="QGridLayout" name="seedingLimitsSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QLabel" name="ratioLabel">
+            <property name="text">
+             <string>&amp;Ratio:</string>
+            </property>
+            <property name="buddy">
+             <cstring>ratioCombo</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="seedingLimitsSectionRatioLayout" stretch="1,0">
+            <item>
+             <widget class="QComboBox" name="ratioCombo"/>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="ratioSpin">
+              <property name="maximum">
+               <double>999999999.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.500000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="idleLabel">
+            <property name="text">
+             <string>&amp;Idle:</string>
+            </property>
+            <property name="buddy">
+             <cstring>idleCombo</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="seedingLimitsSectionIdleLayout" stretch="1,0">
+            <item>
+             <widget class="QComboBox" name="idleCombo"/>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="idleSpin">
+              <property name="suffix">
+               <string notr="true"> minute(s)</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>40320</number>
+              </property>
+              <property name="singleStep">
+               <number>5</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="seedingLimitsSectionRatioLayout" columnstretch="0,1,0">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="ratioLabel">
-           <property name="text">
-            <string>&amp;Ratio:</string>
-           </property>
-           <property name="buddy">
-            <cstring>ratioCombo</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="ratioCombo"/>
-         </item>
-         <item row="0" column="2">
-          <widget class="QDoubleSpinBox" name="ratioSpin">
-           <property name="maximum">
-            <double>999999999.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.500000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="seedingLimitsSectionIdleLayout" columnstretch="0,1,0">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="idleLabel">
-           <property name="text">
-            <string>&amp;Idle:</string>
-           </property>
-           <property name="buddy">
-            <cstring>idleCombo</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="idleCombo"/>
-         </item>
-         <item row="0" column="2">
-          <widget class="QSpinBox" name="idleSpin">
-           <property name="suffix">
-            <string notr="true"> minute(s)</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>40320</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="peerConnectionsSectionSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>1</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="peerConnectionsSectionLabel">
-         <property name="styleSheet">
-          <string notr="true">font-weight:bold</string>
-         </property>
-         <property name="text">
+        <widget class="QGroupBox" name="peerConnectionsSection">
+         <property name="title">
           <string>Peer Connections</string>
          </property>
+         <layout class="QGridLayout" name="peerConnectionsSectionLayout" columnstretch="0,1">
+          <item row="0" column="0">
+           <widget class="QLabel" name="peerLimitLabel">
+            <property name="text">
+             <string>&amp;Maximum peers:</string>
+            </property>
+            <property name="buddy">
+             <cstring>peerLimitSpin</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="peerLimitSpin">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>300</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="peerConnectionsSectionLayout" columnstretch="0,1">
-         <property name="leftMargin">
-          <number>18</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="peerLimitLabel">
-           <property name="text">
-            <string>&amp;Maximum peers:</string>
-           </property>
-           <property name="buddy">
-            <cstring>peerLimitSpin</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="peerLimitSpin">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>300</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <spacer name="optionsTabBottomSpacer">
@@ -988,8 +933,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>26</x>
-     <y>563</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1004,8 +949,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>26</x>
-     <y>563</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1020,12 +965,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>35</x>
-     <y>99</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
     <hint type="destinationlabel">
-     <x>247</x>
-     <y>93</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>
@@ -1036,12 +981,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>35</x>
-     <y>131</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
     <hint type="destinationlabel">
-     <x>247</x>
-     <y>125</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>
