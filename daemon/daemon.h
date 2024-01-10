@@ -53,11 +53,11 @@ private:
     bool logfile_flush_ = false;
     tr_session* my_session_ = nullptr;
     char const* log_file_name_ = nullptr;
-    event_base* ev_base_ = nullptr;
+    struct event_base* ev_base_ = nullptr;
     tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
 
-    tr_quark const key_pidfile_ = tr_quark_new("pidfile");
-    tr_quark const key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic");
+    static inline const tr_quark key_pidfile = tr_quark_new("pidfile");
+    static inline const tr_quark key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic");
 
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);
@@ -65,5 +65,5 @@ private:
     void cleanup_signals(struct event* sig_ev) const;
     void report_status();
 
-    tr_variant load_settings(char const* config_dir) const;
+    static tr_variant load_settings(char const* config_dir);
 };
