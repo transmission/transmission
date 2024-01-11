@@ -56,14 +56,9 @@ private:
     struct event_base* ev_base_ = nullptr;
     tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
 
-    static inline const tr_quark key_pidfile = tr_quark_new("pidfile");
-    static inline const tr_quark key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic");
-
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);
     bool setup_signals(struct event*& sig_ev);
     void cleanup_signals(struct event* sig_ev) const;
     void report_status();
-
-    static tr_variant load_settings(char const* config_dir);
 };
