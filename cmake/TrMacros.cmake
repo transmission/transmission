@@ -181,7 +181,9 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DANDROID_ABI=${ANDROID_ABI}"
                 "-DANDROID_STL=${ANDROID_STL}"
                 "-DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}"
-                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}")
+                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
+                "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+                "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
         endif()
 
         ExternalProject_Add(
