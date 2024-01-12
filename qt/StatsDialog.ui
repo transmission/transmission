@@ -34,7 +34,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="currentUploadedValueLabel">
+       <widget class="SqueezeLabel" name="currentUploadedValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -60,7 +60,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="currentDownloadedValueLabel">
+       <widget class="SqueezeLabel" name="currentDownloadedValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -86,7 +86,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="currentRatioValueLabel">
+       <widget class="SqueezeLabel" name="currentRatioValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -112,7 +112,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="currentDurationValueLabel">
+       <widget class="SqueezeLabel" name="currentDurationValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -137,7 +137,7 @@
      </property>
      <layout class="QGridLayout" name="totalSectionLayout" columnstretch="0,1">
       <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="startCountLabel">
+       <widget class="SqueezeLabel" name="startCountLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -163,7 +163,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="totalUploadedValueLabel">
+       <widget class="SqueezeLabel" name="totalUploadedValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -189,7 +189,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="totalDownloadedValueLabel">
+       <widget class="SqueezeLabel" name="totalDownloadedValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -215,7 +215,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="totalRatioValueLabel">
+       <widget class="SqueezeLabel" name="totalRatioValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -241,7 +241,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="totalDurationValueLabel">
+       <widget class="SqueezeLabel" name="totalDurationValueLabel">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -271,6 +271,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SqueezeLabel</class>
+   <extends>QLabel</extends>
+   <header>SqueezeLabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

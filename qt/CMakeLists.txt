@@ -9,6 +9,8 @@ target_sources(${TR_NAME}-qt
     PRIVATE
         AboutDialog.cc
         AboutDialog.h
+        AccessibleSqueezeLabel.cc
+        AccessibleSqueezeLabel.h
         AddData.cc
         AddData.h
         Application.cc
