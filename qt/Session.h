@@ -130,7 +130,7 @@ public slots:
 
 signals:
     void sourceChanged();
-    void portTested(bool is_open);
+    void portTested(std::string_view ip_protocol, bool is_open);
     void statsUpdated();
     void sessionUpdated();
     void blocklistUpdated(int);

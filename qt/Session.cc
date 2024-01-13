@@ -83,28 +83,37 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
 
 void Session::portTest()
 {
-    auto* q = new RpcQueue{};
+    auto const response_func = [this](RpcResponse const& r)
+    {
+        bool is_open = false;
+        std::string_view ip_protocol;
 
-    q->add([this]() { return exec("port-test", nullptr); });
-
-    q->add(
-        [this](RpcResponse const& r)
+        if (auto const value = dictFind<std::string_view>(r.args.get(), TR_KEY_ipProtocol); value)
         {
-            bool is_open = false;
+            ip_protocol = *value;
+        }
 
-            if (r.success)
-            {
-                auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open);
-                if (value)
-                {
-                    is_open = *value;
-                }
-            }
+        if (auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open); value)
+        {
+            is_open = *value;
+        }
 
-            emit portTested(is_open);
-        });
+        emit portTested(ip_protocol, is_open);
+    };
 
-    q->run();
+    for (auto const* ip_protocol : { "ipv4", "ipv6" })
+    {
+        auto args = tr_variant::make_map(1U);
+        tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, ip_protocol);
+
+        auto* q = new RpcQueue{};
+
+        q->add([this, &args]() { return exec("port-test", &args); }, response_func);
+
+        q->add(response_func);
+
+        q->run();
+    }
 }
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)

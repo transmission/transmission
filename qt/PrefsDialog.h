@@ -39,7 +39,7 @@ private slots:
     void encryptionEdited(int);
     void altSpeedDaysEdited(int);
     void sessionUpdated();
-    void onPortTested(bool);
+    void onPortTested(std::string_view, bool);
     void onPortTest();
     void onIdleLimitChanged();
     void onQueueStalledMinutesChanged();

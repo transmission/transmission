@@ -426,16 +426,35 @@ void PrefsDialog::initDesktopTab()
 
 // ---
 
-void PrefsDialog::onPortTested(bool isOpen)
+void PrefsDialog::onPortTested(std::string_view ip_protocol, bool is_open)
 {
-    ui_.testPeerPortButton->setEnabled(true);
-    widgets_[Prefs::PEER_PORT]->setEnabled(true);
-    ui_.peerPortStatusLabel->setText(isOpen ? tr("Port is <b>open</b>") : tr("Port is <b>closed</b>"));
+    static bool ipv4_complete = false;
+    static bool ipv6_complete = false;
+
+    if (ip_protocol == "ipv4")
+    {
+        ui_.peerPortStatusIPv4Label->setText(is_open ? tr("IPv4 port is <b>open</b>") : tr("IPv4 port is <b>closed</b>"));
+        ipv4_complete = true;
+    }
+    else if (ip_protocol == "ipv6")
+    {
+        ui_.peerPortStatusIPv6Label->setText(is_open ? tr("IPv6 port is <b>open</b>") : tr("IPv6 port is <b>closed</b>"));
+        ipv6_complete = true;
+    }
+
+    if (ipv4_complete && ipv6_complete)
+    {
+        ui_.testPeerPortButton->setEnabled(true);
+        widgets_[Prefs::PEER_PORT]->setEnabled(true);
+        ipv4_complete = false;
+        ipv6_complete = false;
+    }
 }
 
 void PrefsDialog::onPortTest()
 {
-    ui_.peerPortStatusLabel->setText(tr("Testing TCP Port…"));
+    ui_.peerPortStatusIPv4Label->setText(tr("Testing IPv4 TCP Port…"));
+    ui_.peerPortStatusIPv6Label->setText(tr("Testing IPv6 TCP Port…"));
     ui_.testPeerPortButton->setEnabled(false);
     widgets_[Prefs::PEER_PORT]->setEnabled(false);
     session_.portTest();
@@ -781,7 +800,8 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        ui_.peerPortStatusLabel->setText(tr("Status unknown"));
+        ui_.peerPortStatusIPv4Label->setText(tr("Status unknown"));
+        ui_.peerPortStatusIPv6Label->setText(tr("Status unknown"));
         ui_.testPeerPortButton->setEnabled(true);
         break;
 
