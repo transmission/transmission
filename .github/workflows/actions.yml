@@ -1,7 +1,11 @@
 name: Sanity
 on:
   push:
+    branches:
+      - 'main'
   pull_request:
+    branches:
+      - 'main'
 env:
   GTEST_OUTPUT: xml:./
 jobs:
