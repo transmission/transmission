@@ -32,7 +32,7 @@ android {
     externalNativeBuild {
       cmake {
         abiFilters "x86_64"
-        arguments "-DVCPKG_TARGET_ANDROID=ON", "-DWITH_CRYPTO=openssl", "-DANDROID_NDK=$System.env.ANDROID_NDK_HOME"
+        arguments "-DVCPKG_TARGET_ANDROID=ON", "-DWITH_CRYPTO=openssl"
       }
     }
   }

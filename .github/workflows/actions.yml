@@ -826,6 +826,5 @@ jobs:
     - name: Build Transmission
       working-directory: ./android
       run: |
-        export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/26.1.10909125
         vcpkg install openssl curl --triplet x64-android
         gradle build
