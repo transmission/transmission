@@ -1172,6 +1172,8 @@ void onPortTested(tr_web::FetchResponse const& web_response)
 
 char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
+    static auto constexpr TimeoutSecs = 20s;
+
     auto ip_proto = tr_web::FetchOptions::IPProtocol::ANY;
     if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_ipProtocol); val != nullptr)
     {
@@ -1195,6 +1197,7 @@ char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct
     auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     options.ip_proto = ip_proto;
+    options.timeout_secs = TimeoutSecs;
     session->fetch(std::move(options));
     return nullptr;
 }
