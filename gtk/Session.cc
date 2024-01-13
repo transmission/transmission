@@ -169,7 +169,7 @@ private:
     sigc::signal<void(bool)> signal_blocklist_updated_;
     sigc::signal<void(bool)> signal_busy_;
     sigc::signal<void(tr_quark)> signal_prefs_changed_;
-    sigc::signal<void(bool)> signal_port_tested_;
+    sigc::signal<void(std::string_view, bool)> signal_port_tested_;
     sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)> signal_torrents_changed_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
@@ -1222,29 +1222,35 @@ void Session::Impl::send_rpc_request(
 
 void Session::port_test()
 {
-    auto const tag = nextTag;
-    ++nextTag;
+    auto const response_func = [this](tr_variant& response)
+    {
+        tr_variant* args = nullptr;
+        auto is_open = false;
+        auto ip_protocol = std::string_view{};
 
-    tr_variant request;
-    tr_variantInitDict(&request, 2);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "port-test");
-    tr_variantDictAddInt(&request, TR_KEY_tag, tag);
-    impl_->send_rpc_request(
-        request,
-        tag,
-        [this](auto& response)
+        if (tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
         {
-            tr_variant* args = nullptr;
-            bool is_open = false;
+            tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open);
+            tr_variantDictFindStrView(args, TR_KEY_ipProtocol, &ip_protocol);
+        }
 
-            if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
-                !tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open))
-            {
-                is_open = false;
-            }
+        impl_->signal_port_tested().emit(ip_protocol, is_open);
+    };
 
-            impl_->signal_port_tested().emit(is_open);
-        });
+    for (auto const* ip_protocol : { "ipv4", "ipv6" })
+    {
+        auto const tag = nextTag++;
+
+        auto arguments_map = tr_variant::Map{ 1U };
+        arguments_map.try_emplace(TR_KEY_ipProtocol, tr_variant::unmanaged_string(ip_protocol));
+
+        auto request_map = tr_variant::Map{ 3U };
+        request_map.try_emplace(TR_KEY_method, "port-test");
+        request_map.try_emplace(TR_KEY_tag, tag);
+        request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
+
+        impl_->send_rpc_request(tr_variant{ std::move(request_map) }, tag, response_func);
+    }
 }
 
 /***
@@ -1386,7 +1392,7 @@ sigc::signal<void(tr_quark)>& Session::signal_prefs_changed()
     return impl_->signal_prefs_changed();
 }
 
-sigc::signal<void(bool)>& Session::signal_port_tested()
+sigc::signal<void(std::string_view, bool)>& Session::signal_port_tested()
 {
     return impl_->signal_port_tested();
 }

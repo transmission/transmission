@@ -879,13 +879,14 @@ public:
 
 private:
     void onCorePrefsChanged(tr_quark key);
-    void onPortTested(bool isOpen);
+    void onPortTested(std::string_view ip_protocol, bool is_open);
     void onPortTest();
 
 private:
     Glib::RefPtr<Session> core_;
 
-    Gtk::Label* portLabel_ = nullptr;
+    Gtk::Label* portIPv4Label_ = nullptr;
+    Gtk::Label* portIPv6Label_ = nullptr;
     Gtk::Button* portButton_ = nullptr;
     Gtk::SpinButton* portSpin_ = nullptr;
 
@@ -897,7 +898,8 @@ void NetworkPage::onCorePrefsChanged(tr_quark const key)
 {
     if (key == TR_KEY_peer_port)
     {
-        gtr_label_set_text(*portLabel_, _("Status unknown"));
+        gtr_label_set_text(*portIPv4Label_, _("Status unknown"));
+        gtr_label_set_text(*portIPv6Label_, _("Status unknown"));
         portButton_->set_sensitive(true);
         portSpin_->set_sensitive(true);
     }
@@ -909,25 +911,48 @@ NetworkPage::~NetworkPage()
     portTag_.disconnect();
 }
 
-void NetworkPage::onPortTested(bool isOpen)
+void NetworkPage::onPortTested(std::string_view ip_protocol, bool is_open)
 {
-    portLabel_->set_markup(fmt::format(
-        isOpen ? _("Port is {markup_begin}open{markup_end}") : _("Port is {markup_begin}closed{markup_end}"),
-        fmt::arg("markup_begin", "<b>"),
-        fmt::arg("markup_end", "</b>")));
-    portButton_->set_sensitive(true);
-    portSpin_->set_sensitive(true);
+    static bool ipv4_complete = false;
+    static bool ipv6_complete = false;
+
+    if (ip_protocol == "ipv4")
+    {
+        portIPv4Label_->set_markup(fmt::format(
+            is_open ? _("IPv4 port is {markup_begin}open{markup_end}") : _("IPv4 port is {markup_begin}closed{markup_end}"),
+            fmt::arg("markup_begin", "<b>"),
+            fmt::arg("markup_end", "</b>")));
+        ipv4_complete = true;
+    }
+    else if (ip_protocol == "ipv6")
+    {
+        portIPv6Label_->set_markup(fmt::format(
+            is_open ? _("IPv6 port is {markup_begin}open{markup_end}") : _("IPv6 port is {markup_begin}closed{markup_end}"),
+            fmt::arg("markup_begin", "<b>"),
+            fmt::arg("markup_end", "</b>")));
+        ipv6_complete = true;
+    }
+
+    if (ipv4_complete && ipv6_complete)
+    {
+        portButton_->set_sensitive(true);
+        portSpin_->set_sensitive(true);
+        ipv4_complete = false;
+        ipv6_complete = false;
+    }
 }
 
 void NetworkPage::onPortTest()
 {
     portButton_->set_sensitive(false);
     portSpin_->set_sensitive(false);
-    portLabel_->set_text(_("Testing TCP port…"));
+    portIPv4Label_->set_text(_("Testing IPv4 TCP port…"));
+    portIPv6Label_->set_text(_("Testing IPv6 TCP port…"));
 
     if (!portTag_.connected())
     {
-        portTag_ = core_->signal_port_tested().connect([this](bool is_open) { onPortTested(is_open); });
+        portTag_ = core_->signal_port_tested().connect([this](std::string_view ip_protocol, bool is_open)
+                                                       { onPortTested(ip_protocol, is_open); });
     }
 
     core_->port_test();
@@ -939,7 +964,8 @@ NetworkPage::NetworkPage(
     Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, builder, core)
     , core_(core)
-    , portLabel_(get_widget<Gtk::Label>("listening_port_status_label"))
+    , portIPv4Label_(get_widget<Gtk::Label>("listening_port_status_ipv4_label"))
+    , portIPv6Label_(get_widget<Gtk::Label>("listening_port_status_ipv6_label"))
     , portButton_(get_widget<Gtk::Button>("test_listening_port_button"))
     , portSpin_(init_spin_button("listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
 {
