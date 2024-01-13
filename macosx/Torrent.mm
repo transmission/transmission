@@ -98,6 +98,14 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 
 @implementation Torrent
 
++ (void)initialize
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_CONCURRENT);
+    });
+}
+
 - (instancetype)initWithPath:(NSString*)path
                     location:(NSString*)location
            deleteTorrentFile:(BOOL)torrentDelete
@@ -1826,10 +1834,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_CONCURRENT);
-    });
     [self update];
     [self updateTimeMachineExclude];
 
