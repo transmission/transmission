@@ -220,11 +220,9 @@ void MakeDialog::onSourceChanged()
         builder_.emplace(filename.toStdString());
     }
 
-    if (!builder_)
-    {
-        updatePiecesLabel();
-    }
-    else
+    updatePiecesLabel();
+
+    if (builder_)
     {
         ui_.pieceSizeSlider->setValue(log2(builder_->pieceSize()));
     }
