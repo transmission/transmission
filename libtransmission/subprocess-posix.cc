@@ -98,7 +98,7 @@ void set_system_error(tr_error* error, int code, std::string_view what)
         if (n_read > 0)
         {
             // child errno was set
-            TR_ASSERT(static_cast<size_t>(count) == sizeof(child_errno));
+            TR_ASSERT(static_cast<size_t>(n_read) == sizeof(child_errno));
             set_system_error(error, child_errno, "Child process setup");
             return false;
         }
