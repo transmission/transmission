@@ -676,7 +676,7 @@ std::optional<std::string> get_filename_to_open(tr_torrent const* tor, Gtk::Tree
 {
     auto file = Gio::File::create_for_path(build_filename(tor, iter));
 
-    // if the specified file is complete, open it
+    // if the selected file is complete, use it
     if (iter->get_value(file_cols.prog) == 100 && file->query_exists())
     {
         return file->get_path();
@@ -708,7 +708,7 @@ void FileList::Impl::onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeV
         return;
     }
 
-    auto iter = store_->get_iter(path);
+    auto const iter = store_->get_iter(path);
     if (!iter)
     {
         return;
