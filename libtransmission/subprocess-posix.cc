@@ -82,35 +82,31 @@ void set_system_error(tr_error* error, int code, std::string_view what)
 
 [[nodiscard]] bool tr_spawn_async_in_parent(int pipe_fd, tr_error* error)
 {
-    int child_errno = 0;
-    ssize_t count = 0;
-
-    static_assert(sizeof(child_errno) == sizeof(errno));
-
-    do
+    for (;;)
     {
-        count = read(pipe_fd, &child_errno, sizeof(child_errno));
-    } while (count == -1 && errno == EINTR);
+        int child_errno = 0;
+        auto const n_read = read(pipe_fd, &child_errno, sizeof(child_errno));
 
-    close(pipe_fd);
+        if (n_read == 0) // child successfully exec'ed
+        {
+            return true;
+        }
 
-    if (count == -1)
-    {
-        /* Read failed (what to do?) */
+        if (n_read > 0)
+        {
+            // child errno was set
+            TR_ASSERT(static_cast<size_t>(count) == sizeof(child_errno));
+            set_system_error(error, child_errno, "Child process setup");
+            return false;
+        }
+
+        if (errno != EINTR) // read failed (what to do?)
+        {
+            return true;
+        }
+
+        // got EINTR; try again
     }
-    else if (count == 0)
-    {
-        /* Child successfully exec-ed */
-    }
-    else
-    {
-        TR_ASSERT((size_t)count == sizeof(child_errno));
-
-        set_system_error(error, child_errno, "Child process setup");
-        return false;
-    }
-
-    return true;
 }
 } // namespace
 
