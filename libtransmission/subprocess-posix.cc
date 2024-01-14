@@ -29,15 +29,18 @@ namespace
 {
 void handle_sigchld(int /*i*/)
 {
-    int rc = 0;
-
-    do
+    for (;;)
     {
-        /* FIXME: Only check for our own PIDs */
-        rc = waitpid(-1, nullptr, WNOHANG);
-    } while (rc > 0 || (rc == -1 && errno == EINTR));
+        // FIXME: only check for our own PIDs
+        auto const res = waitpid(-1, nullptr, WNOHANG);
 
-    /* FIXME: Call old handler, if any */
+        if ((res == 0) || (res == -1 && errno != EINTR))
+        {
+            break;
+        }
+    }
+
+    // FIXME: Call old handler, if any
 }
 
 void set_system_error(tr_error* error, int code, std::string_view what)
