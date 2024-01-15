@@ -56,7 +56,7 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
 
 @end
 
-NSMutableSet* creatorWindowControllerSet = nil;
+static NSMutableSet* creatorWindowControllerSet;
 
 @implementation CreatorWindowController
 
