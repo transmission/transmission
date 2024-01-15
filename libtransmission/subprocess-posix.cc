@@ -90,25 +90,27 @@ void set_system_error(tr_error* error, int code, std::string_view what)
         int child_errno = 0;
         auto const n_read = read(pipe_fd, &child_errno, sizeof(child_errno));
 
+        if (n_read == -1 && errno == EINTR) // try again
+        {
+            continue;
+        }
+
+        close(pipe_fd);
+
         if (n_read == 0) // child successfully exec'ed
         {
             return true;
         }
 
-        if (n_read > 0)
+        if (n_read > 0) // child errno was set
         {
-            // child errno was set
             TR_ASSERT(static_cast<size_t>(n_read) == sizeof(child_errno));
             set_system_error(error, child_errno, "Child process setup");
             return false;
         }
 
-        if (errno != EINTR) // read failed (what to do?)
-        {
-            return true;
-        }
-
-        // got EINTR; try again
+        // read failed (what to do?)
+        return true;
     }
 }
 } // namespace
