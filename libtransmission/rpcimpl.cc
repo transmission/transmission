@@ -735,8 +735,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
     }
 
     auto keys = std::vector<tr_quark>{};
-    auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields);
-    if (fields_vec != nullptr)
+    if (auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields); fields_vec != nullptr)
     {
         auto const n_fields = std::size(*fields_vec);
         keys.reserve(n_fields);
@@ -807,7 +806,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
         }
     }
 
-    return { labels, nullptr };
+    return { std::move(labels), nullptr };
 }
 
 char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
