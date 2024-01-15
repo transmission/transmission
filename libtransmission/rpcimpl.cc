@@ -143,10 +143,6 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
             add_torrent_from_var(ids_var);
         }
     }
-    else if (auto const id_iter = args.find(TR_KEY_ids); id_iter != std::end(args))
-    {
-        add_torrent_from_var(id_iter->second);
-    }
     else // all of them
     {
         torrents_vec = torrents.get_all();
