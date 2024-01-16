@@ -386,11 +386,6 @@ void Session::start()
     emit sourceChanged();
 }
 
-bool Session::isServer() const
-{
-    return session_ != nullptr;
-}
-
 // ---
 
 void Session::addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const

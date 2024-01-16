@@ -86,7 +86,10 @@ public:
     bool portTestPending(PortTestIpProtocol ip_protocol) const noexcept;
 
     /** returns true if the transmission session is being run inside this client */
-    bool isServer() const;
+    [[nodiscard]] constexpr auto isServer() const noexcept
+    {
+        return session_ != nullptr;
+    }
 
     /** returns true if isServer() is true or if the remote address is the localhost */
     [[nodiscard]] constexpr auto isLocal() const noexcept
