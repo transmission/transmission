@@ -46,7 +46,7 @@ public:
     void stop();
     void restart();
 
-    QUrl const& getRemoteUrl() const
+    [[nodiscard]] constexpr auto const& getRemoteUrl() const noexcept
     {
         return rpc_.url();
     }
