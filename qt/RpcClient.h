@@ -55,13 +55,16 @@ class RpcClient : public QObject
 public:
     explicit RpcClient(QObject* parent = nullptr);
 
+    [[nodiscard]] constexpr auto const& url() const noexcept
+    {
+        return url_;
+    }
+
     void stop();
     void start(tr_session* session);
     void start(QUrl const& url);
 
     bool isLocal() const;
-    QUrl const& url() const;
-
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
 

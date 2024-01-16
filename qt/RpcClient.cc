@@ -85,11 +85,6 @@ bool RpcClient::isLocal() const
     return false;
 }
 
-QUrl const& RpcClient::url() const
-{
-    return url_;
-}
-
 RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
 {
     return exec(tr_quark_get_string_view(method), args);
