@@ -89,7 +89,10 @@ public:
     bool isServer() const;
 
     /** returns true if isServer() is true or if the remote address is the localhost */
-    bool isLocal() const;
+    [[nodiscard]] constexpr auto isLocal() const noexcept
+    {
+        return !session_id_.isEmpty() ? is_definitely_local_session_ : rpc_.isLocal();
+    }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
