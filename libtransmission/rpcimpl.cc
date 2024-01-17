@@ -980,7 +980,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
 
         if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted); val != nullptr && errmsg == nullptr)
         {
-            errmsg = set_file_dls(tor, false, *val);
+            errmsg = set_file_dls(tor, true, *val);
         }
 
         if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
