@@ -822,7 +822,7 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
     return nullptr;
 }
 
-[[nodiscard]] std::pair<char const*, std::vector<tr_file_index_t>> get_file_indices(
+[[nodiscard]] std::pair<std::vector<tr_file_index_t>, char const*> get_file_indices(
     tr_torrent const* tor,
     tr_variant::Vector const& files_vec)
 {
@@ -848,18 +848,18 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
                 }
                 else
                 {
-                    return { "file index out of range", {} };
+                    return { {}, "file index out of range" };
                 }
             }
         }
     }
 
-    return { nullptr, std::move(files) };
+    return { std::move(files), nullptr };
 }
 
 char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_variant::Vector const& files_vec)
 {
-    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    auto const [indices, errmsg] = get_file_indices(tor, files_vec);
     if (errmsg != nullptr)
     {
         return errmsg;
@@ -871,7 +871,7 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
 
 [[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
 {
-    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    auto const [indices, errmsg] = get_file_indices(tor, files_vec);
     if (errmsg != nullptr)
     {
         return errmsg;
