@@ -1145,13 +1145,8 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (auto const addr = tr_address::from_string(primary_ip);
-        data->args_out.find_if<std::string_view>(TR_KEY_ipProtocol) == nullptr)
+        data->args_out.find_if<std::string_view>(TR_KEY_ipProtocol) == nullptr && addr && addr->is_valid())
     {
-        if (!addr || !addr->is_valid())
-        {
-            tr_idle_function_done(data, fmt::format(_("Couldn't determine IP protocol: {ip}"), fmt::arg("ip", primary_ip)));
-            return;
-        }
         data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     }
 
