@@ -661,16 +661,9 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="peerPortStatusIPv4Label">
+           <widget class="QLabel" name="peerPortStatusLabel">
             <property name="text">
-             <string>Status unknown</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="peerPortStatusIPv6Label">
-            <property name="text">
-             <string>Status unknown</string>
+             <string>Status: &lt;b&gt;unknown&lt;/b&gt;</string>
             </property>
            </widget>
           </item>
@@ -684,14 +677,14 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="3">
+          <item row="2" column="0" colspan="3">
            <widget class="QCheckBox" name="randomPeerPortCheck">
             <property name="text">
              <string>Pick a &amp;random port every time Transmission is started</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="3">
+          <item row="3" column="0" colspan="3">
            <widget class="QCheckBox" name="enablePortForwardingCheck">
             <property name="text">
              <string>Use UPnP or NAT-PMP port &amp;forwarding from my router</string>

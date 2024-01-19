@@ -7,6 +7,7 @@
 
 #include <cstdint> // int64_t
 #include <map>
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -130,7 +131,7 @@ public slots:
 
 signals:
     void sourceChanged();
-    void portTested(std::string_view ip_protocol, bool is_open);
+    void portTested(std::optional<bool> is_open_ipv4, std::optional<bool> is_open_ipv6);
     void statsUpdated();
     void sessionUpdated();
     void blocklistUpdated(int);

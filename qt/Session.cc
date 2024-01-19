@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -38,6 +39,8 @@
 #include "SessionDialog.h"
 #include "Torrent.h"
 #include "VariantHelpers.h"
+
+using namespace std::literals;
 
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
@@ -83,30 +86,48 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
 
 void Session::portTest()
 {
-    auto const response_func = [this](RpcResponse const& r)
+    enum : uint8_t
     {
-        bool is_open = false;
-        std::string_view ip_protocol;
-
-        if (auto const value = dictFind<std::string_view>(r.args.get(), TR_KEY_ipProtocol); value)
-        {
-            ip_protocol = *value;
-        }
-
-        if (auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open); value)
-        {
-            is_open = *value;
-        }
-
-        emit portTested(ip_protocol, is_open);
+        // These numbers are used as array indices
+        PORT_TEST_IPV4,
+        PORT_TEST_IPV6,
+        NUM_PORT_TEST_IP_PROTOCOL
     };
 
-    for (auto const* ip_protocol : { "ipv4", "ipv6" })
+    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
+    static auto tags = std::array<std::optional<RpcQueue::Tag>, NUM_PORT_TEST_IP_PROTOCOL>{};
+    static auto results = std::array<std::optional<bool>, NUM_PORT_TEST_IP_PROTOCOL>{};
+
+    for (uint8_t ip_protocol = 0U; ip_protocol < NUM_PORT_TEST_IP_PROTOCOL; ++ip_protocol)
     {
         auto args = tr_variant::make_map(1U);
-        tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, ip_protocol);
+        tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, IpStr[ip_protocol]);
 
         auto* q = new RpcQueue{};
+        tags[ip_protocol] = q->tag();
+        results[ip_protocol].reset();
+
+        auto const response_func = [this, &tag_req = tags[ip_protocol], ip_protocol](RpcResponse const& r)
+        {
+            if (tag_req != r.tag)
+            {
+                return;
+            }
+
+            if (auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open); value)
+            {
+                results[ip_protocol] = value;
+            }
+
+            tag_req.reset();
+            if (!tags[PORT_TEST_IPV4] && !tags[PORT_TEST_IPV6])
+            {
+                // If for whatever reason the results optional is empty here,
+                // then something must have gone wrong with the port test,
+                // so the UI should show the "error" state
+                emit portTested(results[PORT_TEST_IPV4], results[PORT_TEST_IPV6]);
+            }
+        };
 
         q->add([this, &args]() { return exec("port-test", &args); }, response_func);
 

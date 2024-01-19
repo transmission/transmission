@@ -6,6 +6,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 
 #include <libtransmission/tr-macros.h>
 
@@ -39,7 +40,7 @@ private slots:
     void encryptionEdited(int);
     void altSpeedDaysEdited(int);
     void sessionUpdated();
-    void onPortTested(std::string_view, bool);
+    void onPortTested(std::optional<bool>, std::optional<bool>);
     void onPortTest();
     void onIdleLimitChanged();
     void onQueueStalledMinutesChanged();

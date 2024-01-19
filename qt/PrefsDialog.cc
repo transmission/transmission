@@ -6,6 +6,7 @@
 #include "PrefsDialog.h"
 
 #include <cassert>
+#include <optional>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -426,35 +427,23 @@ void PrefsDialog::initDesktopTab()
 
 // ---
 
-void PrefsDialog::onPortTested(std::string_view ip_protocol, bool is_open)
+void PrefsDialog::onPortTested(std::optional<bool> is_open_ipv4, std::optional<bool> is_open_ipv6)
 {
-    static bool ipv4_complete = false;
-    static bool ipv6_complete = false;
+    static auto constexpr ToStr = [](std::optional<bool> is_open)
+    {
+        return is_open ? (*is_open ? tr("open") : tr("closed")) : tr("error");
+    };
 
-    if (ip_protocol == "ipv4")
-    {
-        ui_.peerPortStatusIPv4Label->setText(is_open ? tr("IPv4 port is <b>open</b>") : tr("IPv4 port is <b>closed</b>"));
-        ipv4_complete = true;
-    }
-    else if (ip_protocol == "ipv6")
-    {
-        ui_.peerPortStatusIPv6Label->setText(is_open ? tr("IPv6 port is <b>open</b>") : tr("IPv6 port is <b>closed</b>"));
-        ipv6_complete = true;
-    }
-
-    if (ipv4_complete && ipv6_complete)
-    {
-        ui_.testPeerPortButton->setEnabled(true);
-        widgets_[Prefs::PEER_PORT]->setEnabled(true);
-        ipv4_complete = false;
-        ipv6_complete = false;
-    }
+    ui_.testPeerPortButton->setEnabled(true);
+    widgets_[Prefs::PEER_PORT]->setEnabled(true);
+    ui_.peerPortStatusLabel->setText(
+        tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(ToStr(is_open_ipv4)).arg(ToStr(is_open_ipv6)));
 }
 
 void PrefsDialog::onPortTest()
 {
-    ui_.peerPortStatusIPv4Label->setText(tr("Testing IPv4 TCP Port…"));
-    ui_.peerPortStatusIPv6Label->setText(tr("Testing IPv6 TCP Port…"));
+    ui_.peerPortStatusLabel->setText(
+        tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(tr("checking...")).arg(tr("checking...")));
     ui_.testPeerPortButton->setEnabled(false);
     widgets_[Prefs::PEER_PORT]->setEnabled(false);
     session_.portTest();
@@ -800,8 +789,7 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        ui_.peerPortStatusIPv4Label->setText(tr("Status unknown"));
-        ui_.peerPortStatusIPv6Label->setText(tr("Status unknown"));
+        ui_.peerPortStatusLabel->setText(tr("Status: <b>unknown</b>"));
         ui_.testPeerPortButton->setEnabled(true);
         break;
 
