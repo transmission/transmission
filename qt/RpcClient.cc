@@ -319,5 +319,10 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
         variantInit(args, false);
     }
 
+    if (auto const tag = dictFind<int64_t>(&response, TR_KEY_tag); tag)
+    {
+        ret.tag = *tag;
+    }
+
     return ret;
 }

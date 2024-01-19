@@ -38,6 +38,7 @@ struct RpcResponse
 {
     QString result;
     TrVariantPtr args;
+    int64_t tag;
     bool success = false;
     QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
 };
