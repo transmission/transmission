@@ -931,8 +931,8 @@ void NetworkPage::onPortTest()
     portSpin_->set_sensitive(false);
     portLabel_->set_markup(fmt::format(
         _("Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"),
-        fmt::arg("status_ipv4", _("checking...")),
-        fmt::arg("status_ipv6", _("checking..."))));
+        fmt::arg("status_ipv4", _("checking…")),
+        fmt::arg("status_ipv6", _("checking…"))));
 
     if (!portTag_.connected())
     {
