@@ -44,12 +44,14 @@
 #include <fmt/core.h>
 
 #include <algorithm>
+#include <array>
 #include <cinttypes> // PRId64
 #include <cstring> // strstr
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -169,7 +171,7 @@ private:
     sigc::signal<void(bool)> signal_blocklist_updated_;
     sigc::signal<void(bool)> signal_busy_;
     sigc::signal<void(tr_quark)> signal_prefs_changed_;
-    sigc::signal<void(std::string_view, bool)> signal_port_tested_;
+    sigc::signal<void(std::optional<bool>, std::optional<bool>)> signal_port_tested_;
     sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)> signal_torrents_changed_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
@@ -1222,34 +1224,59 @@ void Session::Impl::send_rpc_request(
 
 void Session::port_test()
 {
-    auto const response_func = [this](tr_variant& response)
+    enum : uint8_t
     {
-        tr_variant* args = nullptr;
-        auto is_open = false;
-        auto ip_protocol = std::string_view{};
-
-        if (tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
-        {
-            tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open);
-            tr_variantDictFindStrView(args, TR_KEY_ipProtocol, &ip_protocol);
-        }
-
-        impl_->signal_port_tested().emit(ip_protocol, is_open);
+        // These numbers are used as array indices
+        PORT_TEST_IPV4,
+        PORT_TEST_IPV6,
+        NUM_PORT_TEST_IP_PROTOCOL
     };
 
-    for (auto const* ip_protocol : { "ipv4", "ipv6" })
+    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
+    static auto tags = std::array<std::optional<int64_t>, NUM_PORT_TEST_IP_PROTOCOL>{};
+    static auto results = std::array<std::optional<bool>, NUM_PORT_TEST_IP_PROTOCOL>{};
+
+    for (uint8_t ip_protocol = 0U; ip_protocol < NUM_PORT_TEST_IP_PROTOCOL; ++ip_protocol)
     {
         auto const tag = nextTag++;
+        tags[ip_protocol] = tag;
+        results[ip_protocol].reset();
 
         auto arguments_map = tr_variant::Map{ 1U };
-        arguments_map.try_emplace(TR_KEY_ipProtocol, tr_variant::unmanaged_string(ip_protocol));
+        arguments_map.try_emplace(TR_KEY_ipProtocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
 
         auto request_map = tr_variant::Map{ 3U };
-        request_map.try_emplace(TR_KEY_method, "port-test");
+        request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));
         request_map.try_emplace(TR_KEY_tag, tag);
         request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
 
-        impl_->send_rpc_request(tr_variant{ std::move(request_map) }, tag, response_func);
+        impl_->send_rpc_request(
+            tr_variant{ std::move(request_map) },
+            tag,
+            [this, &tag_req = tags[ip_protocol], ip_protocol](tr_variant& response)
+            {
+                if (auto tag_resp = int64_t{}; tr_variantDictFindInt(&response, TR_KEY_tag, &tag_resp) && tag_req != tag_resp)
+                {
+                    return;
+                }
+
+                if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
+                {
+                    if (auto result = bool{}; tr_variantDictFindBool(args, TR_KEY_port_is_open, &result))
+                    {
+                        results[ip_protocol] = result;
+                    }
+                }
+
+                tag_req.reset();
+                if (!tags[PORT_TEST_IPV4] && !tags[PORT_TEST_IPV6])
+                {
+                    // If for whatever reason the results optional is empty here,
+                    // then something must have gone wrong with the port test,
+                    // so the UI should show the "error" state
+                    impl_->signal_port_tested().emit(results[PORT_TEST_IPV4], results[PORT_TEST_IPV6]);
+                }
+            });
     }
 }
 
@@ -1392,7 +1419,7 @@ sigc::signal<void(tr_quark)>& Session::signal_prefs_changed()
     return impl_->signal_prefs_changed();
 }
 
-sigc::signal<void(std::string_view, bool)>& Session::signal_port_tested()
+sigc::signal<void(std::optional<bool>, std::optional<bool>)>& Session::signal_port_tested()
 {
     return impl_->signal_port_tested();
 }
