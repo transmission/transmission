@@ -443,7 +443,7 @@ void PrefsDialog::onPortTested(std::optional<bool> is_open_ipv4, std::optional<b
 void PrefsDialog::onPortTest()
 {
     ui_.peerPortStatusLabel->setText(
-        tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(tr("checking...")).arg(tr("checking...")));
+        tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(tr("checking…")).arg(tr("checking…")));
     ui_.testPeerPortButton->setEnabled(false);
     widgets_[Prefs::PEER_PORT]->setEnabled(false);
     session_.portTest();
