@@ -650,7 +650,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2">
+          <item row="0" column="1">
            <widget class="QSpinBox" name="peerPortSpin">
             <property name="minimum">
              <number>1</number>
@@ -660,20 +660,20 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="peerPortStatusLabel">
-            <property name="text">
-             <string>Status: &lt;b&gt;unknown&lt;/b&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
+          <item row="0" column="2">
            <widget class="QPushButton" name="testPeerPortButton">
             <property name="text">
              <string>Te&amp;st Port</string>
             </property>
             <property name="autoDefault">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2">
+           <widget class="QLabel" name="peerPortStatusLabel">
+            <property name="text">
+             <string>Status: &lt;b&gt;unknown&lt;/b&gt;</string>
             </property>
            </widget>
           </item>

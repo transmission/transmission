@@ -1245,14 +1245,19 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="listening_port_spin">
+                      <object class="GtkLabel" id="listening_port_status_label">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="hexpand">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="use-markup">True</property>
+                        <property name="label" translatable="yes">Status: &lt;b&gt;unknown&lt;/b&gt;</property>
+                        <property name="xalign">0</property>
+                        <attributes>
+                          <attribute name="style" value="italic"/>
+                        </attributes>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
-                        <property name="top-attach">0</property>
+                        <property name="top-attach">1</property>
                       </packing>
                     </child>
                     <child>
@@ -1262,15 +1267,10 @@
                         <property name="hexpand">True</property>
                         <property name="spacing">12</property>
                         <child>
-                          <object class="GtkLabel" id="listening_port_status_label">
+                          <object class="GtkSpinButton" id="listening_port_spin">
                             <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="use-markup">True</property>
-                            <property name="label" translatable="yes">Status: &lt;b&gt;unknown&lt;/b&gt;</property>
-                            <property name="xalign">0</property>
-                            <attributes>
-                              <attribute name="style" value="italic"/>
-                            </attributes>
+                            <property name="can-focus">True</property>
+                            <property name="hexpand">True</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -1296,7 +1296,7 @@
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
-                        <property name="top-attach">1</property>
+                        <property name="top-attach">0</property>
                       </packing>
                     </child>
                   </object>

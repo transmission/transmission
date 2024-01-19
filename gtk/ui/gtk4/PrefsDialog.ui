@@ -868,12 +868,17 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="listening_port_spin">
-                            <property name="focusable">1</property>
+                          <object class="GtkLabel" id="listening_port_status_label">
                             <property name="hexpand">1</property>
+                            <property name="use-markup">1</property>
+                            <property name="label" translatable="1">Status: &lt;b&gt;unknown&lt;/b&gt;</property>
+                            <property name="xalign">0</property>
+                            <attributes>
+                              <attribute name="style" value="italic"/>
+                            </attributes>
                             <layout>
                               <property name="column">1</property>
-                              <property name="row">0</property>
+                              <property name="row">1</property>
                             </layout>
                           </object>
                         </child>
@@ -882,14 +887,13 @@
                             <property name="hexpand">1</property>
                             <property name="spacing">12</property>
                             <child>
-                              <object class="GtkLabel" id="listening_port_status_label">
+                              <object class="GtkSpinButton" id="listening_port_spin">
+                                <property name="focusable">1</property>
                                 <property name="hexpand">1</property>
-                                <property name="use-markup">1</property>
-                                <property name="label" translatable="1">Status: &lt;b&gt;unknown&lt;/b&gt;</property>
-                                <property name="xalign">0</property>
-                                <attributes>
-                                  <attribute name="style" value="italic"/>
-                                </attributes>
+                                <layout>
+                                  <property name="column">1</property>
+                                  <property name="row">0</property>
+                                </layout>
                               </object>
                             </child>
                             <child>
@@ -902,7 +906,7 @@
                             </child>
                             <layout>
                               <property name="column">1</property>
-                              <property name="row">1</property>
+                              <property name="row">0</property>
                             </layout>
                           </object>
                         </child>
