@@ -652,6 +652,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         }
     }
 
+    painter->setPen(option.palette.color(color_group, color_role));
     painter->drawRect(layout.progress_bar_rect);
     painter->drawRect(layout.bar_rect);
 
