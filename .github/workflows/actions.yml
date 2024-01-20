@@ -827,8 +827,11 @@ jobs:
       with:
         vcpkgGitCommitId: 2024.01.12
 
+    - name: Install vcpkg packages
+      run: |
+        vcpkg install openssl curl
+
     - name: Build Transmission
       working-directory: ./android
       run: |
-        vcpkg install openssl curl --triplet x64-android
         gradle build
