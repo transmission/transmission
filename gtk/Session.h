@@ -20,6 +20,7 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/treemodel.h>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -36,6 +37,13 @@ public:
         ERR_ADD_TORRENT_ERR = 1,
         ERR_ADD_TORRENT_DUP = 2,
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
+    };
+
+    enum PortTestIpProtocol : uint8_t
+    {
+        PORT_TEST_IPV4,
+        PORT_TEST_IPV6,
+        NUM_PORT_TEST_IP_PROTOCOL // Must always be the last value
     };
 
     using Model = IF_GTKMM4(Gio::ListModel, Gtk::TreeModel);
@@ -129,7 +137,8 @@ public:
     ***
     **/
 
-    void port_test();
+    void port_test(PortTestIpProtocol ip_protocol);
+    bool port_test_pending(PortTestIpProtocol ip_protocol) const noexcept;
 
     void blocklist_update();
 
@@ -142,7 +151,7 @@ public:
     sigc::signal<void(bool)>& signal_blocklist_updated();
     sigc::signal<void(bool)>& signal_busy();
     sigc::signal<void(tr_quark)>& signal_prefs_changed();
-    sigc::signal<void(std::optional<bool>, std::optional<bool>)>& signal_port_tested();
+    sigc::signal<void(std::optional<bool>, PortTestIpProtocol)>& signal_port_tested();
     sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)>& signal_torrents_changed();
 
 protected:
@@ -151,4 +160,6 @@ protected:
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
+
+    std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};
 };
