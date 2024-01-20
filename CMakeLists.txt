@@ -19,7 +19,7 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
 endif()
 
 if(VCPKG_TARGET_ANDROID)
-    include("cmake/VcpkgAndroid.cmake")
+    include(cmake/VcpkgAndroid.cmake)
 endif()
 
 project(transmission)
