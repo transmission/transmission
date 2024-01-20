@@ -825,7 +825,7 @@ jobs:
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: c8696863d371ab7f46e213d8f5ca923c4aef2a00
+        vcpkgGitCommitId: 2024.01.12
 
     - name: Build Transmission
       working-directory: ./android
