@@ -279,11 +279,14 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
                     auto const ba = QByteArray::fromBase64(pieces_b64_.toLocal8Bit());
                     pieces_.clear();
 
-                    for(int i = 0; i < ba.count(); ++i)
+                    for (int i = 0; i < ba.count(); ++i)
                     {
                         for (int b = 0; b < 8; b++)
                         {
-                            if (i * 8 + b >= piece_count_) break;
+                            if (i * 8 + b >= piece_count_)
+                            {
+                                break;
+                            }
                             pieces_.emplace_back(ba.at(i) & (1 << (7 - b)));
                         }
                     }

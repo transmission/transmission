@@ -634,7 +634,8 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         {
             if (pieces[i])
             {
-                if (section_width == 0) {
+                if (section_width == 0)
+                {
                     offset = i * piece_width;
                 }
                 section_width++;
