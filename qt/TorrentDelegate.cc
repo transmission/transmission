@@ -624,7 +624,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     }
     else
     {
-        std::vector<int> const availability = tor.availability();
+        std::vector<bool> const pieces = tor.pieces();
         float const piece_width = static_cast<float>(layout.piece_bar_rect.width() - 3) / tor.pieceCount();
 
         int offset = 0;
@@ -632,7 +632,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
         for (int i = 0; i < tor.pieceCount(); i++)
         {
-            if (availability[i] == -1)
+            if (pieces[i])
             {
                 if (section_width == 0) {
                     offset = i * piece_width;

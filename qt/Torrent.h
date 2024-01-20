@@ -291,12 +291,7 @@ public:
         return piece_count_;
     }
 
-    std::vector<int> availability() const noexcept
-    {
-        return availability_;
-    }
-
-    std::vector<bool> pieces() const noexcept
+    std::vector<bool> const& pieces() const noexcept
     {
         return pieces_;
     }
@@ -579,7 +574,6 @@ public:
     {
         ACTIVITY_DATE,
         ADDED_DATE,
-        AVAILABILITY,
         BANDWIDTH_PRIORITY,
         COMMENT,
         CREATOR,
@@ -716,8 +710,8 @@ private:
     Speed upload_speed_;
     Speed download_speed_;
 
-    std::vector<int> availability_ = {};
     std::vector<bool> pieces_ = {};
+    QString pieces_b64_;
 
     Prefs const& prefs_;
 
