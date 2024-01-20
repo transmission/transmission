@@ -611,7 +611,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    auto const cr = is_item_selected ? QPalette::Highlight : QPalette::Base;
+    auto const cr = is_item_selected ? QPalette::Base : QPalette::Highlight;
     float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
 
     QRect progress_bar_fill_rect = layout.progress_bar_rect;
