@@ -160,12 +160,6 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
 
         set(${ID}_EXT_PROJ_CMAKE_ARGS)
 
-        list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
-            "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
-            "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}"
-            "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-            "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}")
-
         if(APPLE)
             string(REPLACE ";" "$<SEMICOLON>" ${ID}_CMAKE_OSX_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
             list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
@@ -181,8 +175,11 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DANDROID_ABI=${ANDROID_ABI}"
                 "-DANDROID_STL=${ANDROID_STL}"
                 "-DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}"
-                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
-                "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}")
+        endif()
+
+        if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
                 "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
         endif()
 
