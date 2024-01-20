@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <list>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <stack>
 #include <string>
@@ -658,7 +659,7 @@ void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator 
 }
 
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
-std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const& iter)
+std::string build_filename(tr_torrent const* tor, Gtk::TreeModel::iterator const& iter)
 {
     std::vector<std::string> tokens;
     for (auto child = iter; child; child = child->parent())
@@ -671,37 +672,52 @@ std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const&
     return Glib::build_filename(tokens);
 }
 
+std::optional<std::string> get_filename_to_open(tr_torrent const* tor, Gtk::TreeModel::iterator const& iter)
+{
+    auto file = Gio::File::create_for_path(build_filename(tor, iter));
+
+    // if the selected file is complete, use it
+    if (iter->get_value(file_cols.prog) == 100 && file->query_exists())
+    {
+        return file->get_path();
+    }
+
+    // use nearest existing ancestor instead
+    for (;;)
+    {
+        file = file->get_parent();
+
+        if (!file)
+        {
+            return {};
+        }
+
+        if (file->query_exists())
+        {
+            return file->get_path();
+        }
+    }
+}
 } // namespace
 
 void FileList::Impl::onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeViewColumn* /*col*/)
 {
-    bool handled = false;
-
-    if (auto const* tor = core_->find_torrent(torrent_id_); tor != nullptr)
+    auto const* const tor = core_->find_torrent(torrent_id_);
+    if (tor == nullptr)
     {
-        if (auto const iter = store_->get_iter(path); iter)
-        {
-            auto filename = buildFilename(tor, iter);
-            auto const prog = iter->get_value(file_cols.prog);
-
-            /* if the file's not done, walk up the directory tree until we find
-             * an ancestor that exists, and open that instead */
-            if (!filename.empty() && (prog < 100 || !Glib::file_test(filename, TR_GLIB_FILE_TEST(EXISTS))))
-            {
-                do
-                {
-                    filename = Glib::path_get_dirname(filename);
-                } while (!filename.empty() && !Glib::file_test(filename, TR_GLIB_FILE_TEST(EXISTS)));
-            }
-
-            if (handled = !filename.empty(); handled)
-            {
-                gtr_open_file(filename);
-            }
-        }
+        return;
     }
 
-    // return handled;
+    auto const iter = store_->get_iter(path);
+    if (!iter)
+    {
+        return;
+    }
+
+    if (auto const filename = get_filename_to_open(tor, iter); filename)
+    {
+        gtr_open_file(*filename);
+    }
 }
 
 bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel::Path const& path)

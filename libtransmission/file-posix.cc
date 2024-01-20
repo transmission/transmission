@@ -977,8 +977,6 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     TR_ASSERT(
         !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
-    bool ret = false;
-
 #if defined(F_OFD_SETLK)
 
     struct flock fl = {};
@@ -1000,58 +998,60 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
 
     fl.l_whence = SEEK_SET;
 
-    do
-    {
-        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
-    } while (!ret && errno == EINTR);
+    int const native_operation = (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW;
 
-    if (!ret && errno == EAGAIN)
+    auto result = std::optional<bool>{};
+    while (!result)
     {
-        errno = EWOULDBLOCK;
+        if (fcntl(handle, native_operation, &fl) != -1)
+        {
+            result = true;
+        }
+        else if (errno != EINTR)
+        {
+            result = false;
+        }
     }
 
 #elif defined(HAVE_FLOCK)
 
-    int native_operation = 0;
+    int const native_operation = //
+        (((operation & TR_SYS_FILE_LOCK_SH) != 0) ? LOCK_SH : 0) | //
+        (((operation & TR_SYS_FILE_LOCK_EX) != 0) ? LOCK_EX : 0) | //
+        (((operation & TR_SYS_FILE_LOCK_NB) != 0) ? LOCK_NB : 0) | //
+        (((operation & TR_SYS_FILE_LOCK_UN) != 0) ? LOCK_UN : 0);
 
-    if ((operation & TR_SYS_FILE_LOCK_SH) != 0)
+    auto result = std::optional<bool>{};
+    while (!result)
     {
-        native_operation |= LOCK_SH;
+        if (flock(handle, native_operation) != -1)
+        {
+            result = true;
+        }
+        else if (errno != EINTR)
+        {
+            result = false;
+        }
     }
-
-    if ((operation & TR_SYS_FILE_LOCK_EX) != 0)
-    {
-        native_operation |= LOCK_EX;
-    }
-
-    if ((operation & TR_SYS_FILE_LOCK_NB) != 0)
-    {
-        native_operation |= LOCK_NB;
-    }
-
-    if ((operation & TR_SYS_FILE_LOCK_UN) != 0)
-    {
-        native_operation |= LOCK_UN;
-    }
-
-    do
-    {
-        ret = flock(handle, native_operation) != -1;
-    } while (!ret && errno == EINTR);
 
 #else
 
     errno = ENOSYS;
-    ret = false;
+    auto const result = std::optional<bool>{ false };
 
 #endif
 
-    if (error != nullptr && !ret)
+    if (!*result && errno == EAGAIN)
+    {
+        errno = EWOULDBLOCK;
+    }
+
+    if (error != nullptr && !*result)
     {
         error->set_from_errno(errno);
     }
 
-    return ret;
+    return *result;
 }
 
 std::string tr_sys_dir_get_current(tr_error* error)

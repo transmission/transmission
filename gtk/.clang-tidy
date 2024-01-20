@@ -23,5 +23,6 @@ Checks: >
   -readability-redundant-access-specifiers
 
 CheckOptions:
-  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
-  modernize-pass-by-value.ValuesOnly: true
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros, value: true }
+  - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
+  - { key: modernize-pass-by-value.ValuesOnly, value: true }
