@@ -12,6 +12,7 @@ jobs:
   what-to-make:
     runs-on: ubuntu-22.04
     outputs:
+      make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' }}
       make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' }}
       make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' }}
       make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' }}
@@ -53,6 +54,7 @@ jobs:
             git diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
+          get_changes android  CMakeLists.txt cmake third-party libtransmission android
           get_changes cli      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
           get_changes any-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
           get_changes our-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
@@ -796,6 +798,7 @@ jobs:
 
   android:
     needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-android == 'true' }}
     runs-on: ubuntu-22.04
     env:
       VCPKG_DEFAULT_TRIPLET: arm64-android
