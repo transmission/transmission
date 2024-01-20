@@ -803,6 +803,13 @@ jobs:
     env:
       VCPKG_DEFAULT_TRIPLET: arm64-android
     steps:
+    - name: Get Dependencies
+      run: |
+        set -ex
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          ninja-build
+
     - name: Get Source
       uses: actions/checkout@v3
       with:
