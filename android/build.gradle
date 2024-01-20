@@ -31,7 +31,7 @@ android {
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     externalNativeBuild {
       cmake {
-        abiFilters "x86_64"
+        abiFilters "arm64-v8a"
         arguments "-DVCPKG_TARGET_ANDROID=ON", "-DWITH_CRYPTO=openssl"
       }
     }

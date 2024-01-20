@@ -798,7 +798,7 @@ jobs:
     needs: [ what-to-make ]
     runs-on: ubuntu-22.04
     env:
-      VCPKG_DEFAULT_TRIPLET: x64-android
+      VCPKG_DEFAULT_TRIPLET: arm64-android
     steps:
     - name: Get Source
       uses: actions/checkout@v3
