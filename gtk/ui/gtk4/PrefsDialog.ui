@@ -870,8 +870,7 @@
                         <child>
                           <object class="GtkLabel" id="listening_port_status_label">
                             <property name="hexpand">1</property>
-                            <property name="use-markup">1</property>
-                            <property name="label" translatable="1">Status: &lt;b&gt;unknown&lt;/b&gt;</property>
+                            <property name="label">...</property>
                             <property name="xalign">0</property>
                             <attributes>
                               <attribute name="style" value="italic"/>

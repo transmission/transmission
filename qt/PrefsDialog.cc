@@ -427,6 +427,11 @@ void PrefsDialog::initDesktopTab()
 
 // ---
 
+void PrefsDialog::resetPortStatusLabel()
+{
+    ui_.peerPortStatusLabel->setText(tr("Status: <b>%1</b>").arg(tr("unknown")));
+}
+
 void PrefsDialog::onPortTested(std::optional<bool> is_open_ipv4, std::optional<bool> is_open_ipv6)
 {
     static auto constexpr ToStr = [](std::optional<bool> is_open)
@@ -472,6 +477,8 @@ void PrefsDialog::initNetworkTab()
 
     connect(ui_.testPeerPortButton, &QAbstractButton::clicked, this, &PrefsDialog::onPortTest);
     connect(&session_, &Session::portTested, this, &PrefsDialog::onPortTested);
+
+    resetPortStatusLabel();
 }
 
 // ---
@@ -789,7 +796,7 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        ui_.peerPortStatusLabel->setText(tr("Status: <b>unknown</b>"));
+        resetPortStatusLabel();
         ui_.testPeerPortButton->setEnabled(true);
         break;
 

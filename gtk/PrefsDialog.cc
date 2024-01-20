@@ -879,6 +879,7 @@ public:
     TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
+    void resetPortStatusLabel();
     void onCorePrefsChanged(tr_quark key);
     void onPortTested(std::optional<bool> is_open_ipv4, std::optional<bool> is_open_ipv6);
     void onPortTest();
@@ -898,7 +899,7 @@ void NetworkPage::onCorePrefsChanged(tr_quark const key)
 {
     if (key == TR_KEY_peer_port)
     {
-        portLabel_->set_markup(_("Status: <b>unknown</b>"));
+        resetPortStatusLabel();
         portButton_->set_sensitive(true);
         portSpin_->set_sensitive(true);
     }
@@ -908,6 +909,11 @@ NetworkPage::~NetworkPage()
 {
     prefsTag_.disconnect();
     portTag_.disconnect();
+}
+
+void NetworkPage::resetPortStatusLabel()
+{
+    portLabel_->set_markup(fmt::format(_("Status: <b>{status}</b>"), fmt::arg("status", _("unknown"))));
 }
 
 void NetworkPage::onPortTested(std::optional<bool> is_open_ipv4, std::optional<bool> is_open_ipv6)
@@ -955,6 +961,7 @@ NetworkPage::NetworkPage(
     , portSpin_(init_spin_button("listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
 {
     portButton_->signal_clicked().connect([this]() { onPortTest(); });
+    resetPortStatusLabel();
 
     prefsTag_ = core_->signal_prefs_changed().connect([this](auto key) { onCorePrefsChanged(key); });
 

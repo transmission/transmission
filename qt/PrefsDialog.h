@@ -58,6 +58,7 @@ private:
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
     void updateSeedingWidgetsLocality();
+    void resetPortStatusLabel();
 
     void setPref(int key, QVariant const& v);
 

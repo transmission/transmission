@@ -673,7 +673,7 @@
           <item row="1" column="1" colspan="2">
            <widget class="QLabel" name="peerPortStatusLabel">
             <property name="text">
-             <string>Status: &lt;b&gt;unknown&lt;/b&gt;</string>
+             <string notr="true">...</string>
             </property>
            </widget>
           </item>
