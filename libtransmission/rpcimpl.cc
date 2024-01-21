@@ -143,10 +143,6 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
             add_torrent_from_var(ids_var);
         }
     }
-    else if (auto const id_iter = args.find(TR_KEY_ids); id_iter != std::end(args))
-    {
-        add_torrent_from_var(id_iter->second);
-    }
     else // all of them
     {
         torrents_vec = torrents.get_all();
@@ -739,8 +735,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
     }
 
     auto keys = std::vector<tr_quark>{};
-    auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields);
-    if (fields_vec != nullptr)
+    if (auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields); fields_vec != nullptr)
     {
         auto const n_fields = std::size(*fields_vec);
         keys.reserve(n_fields);
@@ -811,7 +806,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
         }
     }
 
-    return { labels, nullptr };
+    return { std::move(labels), nullptr };
 }
 
 char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
@@ -827,7 +822,7 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
     return nullptr;
 }
 
-[[nodiscard]] std::pair<char const*, std::vector<tr_file_index_t>> get_file_indices(
+[[nodiscard]] std::pair<std::vector<tr_file_index_t>, char const*> get_file_indices(
     tr_torrent const* tor,
     tr_variant::Vector const& files_vec)
 {
@@ -853,18 +848,18 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
                 }
                 else
                 {
-                    return { "file index out of range", {} };
+                    return { {}, "file index out of range" };
                 }
             }
         }
     }
 
-    return { nullptr, std::move(files) };
+    return { std::move(files), nullptr };
 }
 
 char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_variant::Vector const& files_vec)
 {
-    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    auto const [indices, errmsg] = get_file_indices(tor, files_vec);
     if (errmsg != nullptr)
     {
         return errmsg;
@@ -876,7 +871,7 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
 
 [[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
 {
-    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    auto const [indices, errmsg] = get_file_indices(tor, files_vec);
     if (errmsg != nullptr)
     {
         return errmsg;
@@ -985,7 +980,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
 
         if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted); val != nullptr && errmsg == nullptr)
         {
-            errmsg = set_file_dls(tor, false, *val);
+            errmsg = set_file_dls(tor, true, *val);
         }
 
         if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
