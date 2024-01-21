@@ -448,9 +448,13 @@ QString PrefsDialog::getPortStatusText(PrefsDialog::PortTestStatus status) noexc
 
 void PrefsDialog::updatePortStatusLabel()
 {
-    ui_.peerPortStatusLabel->setText(tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)")
-                                         .arg(getPortStatusText(port_test_status_[Session::PORT_TEST_IPV4]))
-                                         .arg(getPortStatusText(port_test_status_[Session::PORT_TEST_IPV6])));
+    auto const status_ipv4 = getPortStatusText(port_test_status_[Session::PORT_TEST_IPV4]);
+    auto const status_ipv6 = getPortStatusText(port_test_status_[Session::PORT_TEST_IPV6]);
+
+    ui_.peerPortStatusLabel->setText(
+        port_test_status_[Session::PORT_TEST_IPV4] == port_test_status_[Session::PORT_TEST_IPV6] ?
+            tr("Status: <b>%1</b>").arg(status_ipv4) :
+            tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(status_ipv4).arg(status_ipv6));
 }
 
 void PrefsDialog::portTestSetEnabled()

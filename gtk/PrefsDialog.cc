@@ -49,6 +49,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 using namespace libtransmission::Values;
 
@@ -895,7 +896,7 @@ private:
     void onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
     void onPortTest();
 
-    static char const* getPortStatusText(PortTestStatus status) noexcept;
+    static std::string_view getPortStatusText(PortTestStatus status) noexcept;
 
 private:
     Glib::RefPtr<Session> core_;
@@ -927,7 +928,7 @@ NetworkPage::~NetworkPage()
     portTag_.disconnect();
 }
 
-char const* NetworkPage::getPortStatusText(PortTestStatus const status) noexcept
+std::string_view NetworkPage::getPortStatusText(PortTestStatus const status) noexcept
 {
     switch (status)
     {
@@ -942,16 +943,22 @@ char const* NetworkPage::getPortStatusText(PortTestStatus const status) noexcept
     case PORT_TEST_ERROR:
         return _("error");
     default:
-        return nullptr;
+        return {};
     }
 }
 
 void NetworkPage::updatePortStatusText()
 {
-    portLabel_->set_markup(fmt::format(
-        _("Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"),
-        fmt::arg("status_ipv4", getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV4])),
-        fmt::arg("status_ipv6", getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV6]))));
+    auto const status_ipv4 = getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV4]);
+    auto const status_ipv6 = getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV6]);
+
+    portLabel_->set_markup(
+        portTestStatus_[Session::PORT_TEST_IPV4] == portTestStatus_[Session::PORT_TEST_IPV6] ?
+            fmt::format(_("Status: <b>{status}</b>"), fmt::arg("status", status_ipv4)) :
+            fmt::format(
+                _("Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"),
+                fmt::arg("status_ipv4", status_ipv4),
+                fmt::arg("status_ipv6", status_ipv6)));
 }
 
 void NetworkPage::portTestSetSensitive()
