@@ -20,7 +20,6 @@
 #include <glibmm/ustring.h>
 #include <gtkmm/treemodel.h>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
