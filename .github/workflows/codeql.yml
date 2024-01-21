@@ -77,14 +77,14 @@ jobs:
 
     - name: Initialize CodeQL
       if: ${{ matrix.language == 'javascript' }}
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         config-file: ./.github/codeql/codeql-config-js.yml
 
     - name: Initialize CodeQL
       if: ${{ matrix.language == 'cpp' }}
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
 
@@ -94,6 +94,6 @@ jobs:
         ninja -C _build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"

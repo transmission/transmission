@@ -23,6 +23,7 @@
 #include <libtransmission/file.h> // tr_sys_file_*()
 #include <libtransmission/platform.h> // TR_PATH_DELIMITER
 #include <libtransmission/quark.h>
+#include <libtransmission/torrent-ctor.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -305,38 +306,6 @@ private:
     Sandbox sandbox_;
 };
 
-inline void ensureFormattersInited()
-{
-    static constexpr int MEM_K = 1024;
-    static char constexpr const* const MEM_K_STR = "KiB";
-    static char constexpr const* const MEM_M_STR = "MiB";
-    static char constexpr const* const MEM_G_STR = "GiB";
-    static char constexpr const* const MEM_T_STR = "TiB";
-
-    static constexpr int DISK_K = 1000;
-    static char constexpr const* const DISK_K_STR = "kB";
-    static char constexpr const* const DISK_M_STR = "MB";
-    static char constexpr const* const DISK_G_STR = "GB";
-    static char constexpr const* const DISK_T_STR = "TB";
-
-    static constexpr int SPEED_K = 1000;
-    static char constexpr const* const SPEED_K_STR = "kB/s";
-    static char constexpr const* const SPEED_M_STR = "MB/s";
-    static char constexpr const* const SPEED_G_STR = "GB/s";
-    static char constexpr const* const SPEED_T_STR = "TB/s";
-
-    static std::once_flag flag;
-
-    std::call_once(
-        flag,
-        []()
-        {
-            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-        });
-}
-
 class SessionTest : public SandboxedTest
 {
 private:
@@ -344,8 +313,6 @@ private:
 
     tr_session* sessionInit(tr_variant& settings)
     {
-        ensureFormattersInited();
-
         auto* const settings_map = settings.get_if<tr_variant::Map>();
         EXPECT_NE(settings_map, nullptr);
 
@@ -392,8 +359,7 @@ protected:
         auto verified_lock = std::unique_lock(verified_mutex_);
         auto const n_previously_verified = std::size(verified_);
 
-        tr_ctorSetVerifyDoneCallback(
-            ctor,
+        ctor->set_verify_done_callback(
             [this](tr_torrent* const tor)
             {
                 auto lambda_verified_lock = std::lock_guard{ verified_mutex_ };
@@ -417,7 +383,7 @@ protected:
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
         //     512 files-filled-with-zeroes/512
-        char const* benc_base64 =
+        static auto constexpr BencBase64 =
             "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
             "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
             "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
@@ -438,7 +404,7 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto const benc = tr_base64_decode(benc_base64);
+        auto const benc = tr_base64_decode(BencBase64);
         EXPECT_LT(0U, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
         auto error = tr_error{};
@@ -478,6 +444,20 @@ protected:
         }
 
         auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
+        tr_ctorFree(ctor);
+        return tor;
+    }
+
+    [[nodiscard]] tr_torrent* zeroTorrentMagnetInit()
+    {
+        static auto constexpr V1Hash = "fa5794674a18241bec985ddc3390e3cb171345e4";
+
+        auto ctor = tr_ctorNew(session_);
+        ctor->set_metainfo_from_magnet_link(V1Hash);
+        tr_ctorSetPaused(ctor, TR_FORCE, true);
+
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+        EXPECT_NE(nullptr, tor);
         tr_ctorFree(ctor);
         return tor;
     }

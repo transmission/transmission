@@ -1,0 +1,46 @@
+name: Update copyright year(s)
+
+on:
+  schedule:
+    - cron: '0 3 1 1 *' # 03:00 AM on January 1
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  update-copyright-years:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          prTitle: 'chore: update copyright years'
+          commitTitle: 'chore: update copyright year in COPYING'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: COPYING
+          transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})?   
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in user-facing files (1)'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: |
+            gtk/Application.cc
+            qt/LicenseDialog.ui
+          transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in user-facing files (2)'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: |
+            macosx/Info.plist
+            macosx/Info.plist.in
+            macosx/*/InfoPlist.strings
+            macosx/QuickLookPlugin/Info.plist.in
+            macosx/QuickLookPlugin/QuickLookPlugin-Info.plist
+          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in cmake/transmission.rc.in'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: cmake/Transmission.rc.in
+          transform: (?<from>\d{4})?-?(\d{4})(?= Transmission Project)

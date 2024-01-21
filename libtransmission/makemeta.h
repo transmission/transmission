@@ -21,7 +21,6 @@
 #include "libtransmission/file.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-#include "libtransmission/utils.h" // for tr_file_save()
 
 class tr_metainfo_builder
 {
@@ -67,10 +66,7 @@ public:
     [[nodiscard]] std::string benc(tr_error* error = nullptr) const;
 
     // generate the metainfo and save it to a torrent file
-    bool save(std::string_view filename, tr_error* error = nullptr) const
-    {
-        return tr_file_save(filename, benc(error), error);
-    }
+    bool save(std::string_view filename, tr_error* error = nullptr) const;
 
     /// setters
 

@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cerrno>
@@ -42,7 +41,7 @@ TEST_F(VariantTest, getType)
     auto sv = std::string_view{};
     auto v = tr_variant{};
 
-    tr_variantInitInt(&v, 30);
+    v = 30;
     EXPECT_TRUE(tr_variantGetInt(&v, &i));
     EXPECT_EQ(30, i);
     EXPECT_TRUE(tr_variantGetReal(&v, &d));
@@ -51,28 +50,28 @@ TEST_F(VariantTest, getType)
     EXPECT_FALSE(tr_variantGetStrView(&v, &sv));
 
     auto strkey = "foo"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_FALSE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_NE(std::data(strkey), std::data(sv));
 
     strkey = "anything"sv;
-    tr_variantInitStrView(&v, strkey);
+    v = tr_variant::unmanaged_string(strkey);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_EQ(std::data(strkey), std::data(sv)); // literally the same memory
     EXPECT_EQ(std::size(strkey), std::size(sv));
 
     strkey = "true"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
 
     strkey = "false"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));

@@ -88,7 +88,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
         NSError* localError;
         if (![Torrent trashFile:@(filename) error:&localError])
         {
-            error->set(localError.code, localError.description.UTF8String);
+            error->set(static_cast<int>(localError.code), localError.description.UTF8String);
             return false;
         }
     }
@@ -1350,6 +1350,41 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 - (NSUInteger)totalPeersLTEP
 {
     return self.fStat->peersFrom[TR_PEER_FROM_LTEP];
+}
+
+- (NSUInteger)totalKnownPeersTracker
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_TRACKER];
+}
+
+- (NSUInteger)totalKnownPeersIncoming
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_INCOMING];
+}
+
+- (NSUInteger)totalKnownPeersCache
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_RESUME];
+}
+
+- (NSUInteger)totalKnownPeersPex
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_PEX];
+}
+
+- (NSUInteger)totalKnownPeersDHT
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_DHT];
+}
+
+- (NSUInteger)totalKnownPeersLocal
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_LPD];
+}
+
+- (NSUInteger)totalKnownPeersLTEP
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_LTEP];
 }
 
 - (NSUInteger)peersSendingToUs

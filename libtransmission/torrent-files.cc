@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::find()
 #include <array>
+#include <cstddef>
 #include <cctype>
 #include <functional>
 #include <iterator>
@@ -163,7 +164,7 @@ bool tr_torrent_files::move(
 {
     auto const old_parent = tr_pathbuf{ old_parent_in };
     auto const parent = tr_pathbuf{ parent_in };
-    tr_logAddTrace(fmt::format(FMT_STRING("Moving files from '{:s}' to '{:s}'"), old_parent, parent), parent_name);
+    tr_logAddTrace(fmt::format("Moving files from '{:s}' to '{:s}'", old_parent, parent), parent_name);
 
     if (tr_sys_path_is_same(old_parent, parent))
     {
@@ -189,14 +190,14 @@ bool tr_torrent_files::move(
 
         auto const& old_path = found->filename();
         auto const path = tr_pathbuf{ parent, '/', found->subpath() };
-        tr_logAddTrace(fmt::format(FMT_STRING("Found file #{:d} '{:s}'"), i, old_path), parent_name);
+        tr_logAddTrace(fmt::format("Found file #{:d} '{:s}'", i, old_path), parent_name);
 
         if (tr_sys_path_is_same(old_path, path))
         {
             continue;
         }
 
-        tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), parent_name);
+        tr_logAddTrace(fmt::format("Moving file #{:d} to '{:s}'", i, old_path, path), parent_name);
         if (!tr_file_move(old_path, path, error))
         {
             err = true;

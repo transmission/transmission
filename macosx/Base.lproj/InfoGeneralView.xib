@@ -117,7 +117,7 @@
                         <constraint firstAttribute="height" constant="14" id="50q-rm-IPl"/>
                         <constraint firstAttribute="width" constant="14" id="Zd6-df-Ynq"/>
                     </constraints>
-                    <buttonCell key="cell" type="square" title="RevealDataFile" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" alternateImage="RevealOn" imageScaling="proportionallyDown" inset="2" id="29">
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" alternateImage="RevealOn" imageScaling="proportionallyDown" inset="2" id="29">
                         <behavior key="behavior" lightByContents="YES"/>
                         <font key="font" metaFont="label"/>
                     </buttonCell>

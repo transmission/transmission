@@ -188,51 +188,36 @@ QVariant FileTreeItem::data(int column, int role) const
     return value;
 }
 
-void FileTreeItem::getSubtreeWantedSize(uint64_t& have, uint64_t& total) const
+std::pair<uint64_t, uint64_t> FileTreeItem::get_subtree_wanted_size() const
 {
-    if (is_wanted_)
+    auto have = uint64_t{ is_wanted_ ? have_size_ : 0U };
+    auto total = uint64_t{ is_wanted_ ? total_size_ : 0U };
+
+    for (auto const* const child : children_)
     {
-        have += have_size_;
-        total += total_size_;
+        auto const [child_have, child_total] = child->get_subtree_wanted_size();
+        have += child_have;
+        total += child_total;
     }
 
-    for (FileTreeItem const* const i : children_)
-    {
-        i->getSubtreeWantedSize(have, total);
-    }
+    return { have, total };
 }
 
 double FileTreeItem::progress() const
 {
-    double d(0);
-    uint64_t have(0);
-    uint64_t total(0);
+    auto const [have, total] = get_subtree_wanted_size();
 
-    getSubtreeWantedSize(have, total);
-
-    if (total != 0)
-    {
-        d = static_cast<double>(have) / static_cast<double>(total);
-    }
-
-    return d;
+    return have >= total ? 1.0 : static_cast<double>(have) / static_cast<double>(total);
 }
 
 QString FileTreeItem::sizeString() const
 {
-    return Formatter::get().sizeToString(size());
+    return Formatter::storage_to_string(size());
 }
 
 uint64_t FileTreeItem::size() const
 {
-    if (std::empty(children_))
-    {
-        return total_size_;
-    }
-
-    uint64_t have = 0;
-    uint64_t total = 0;
-    getSubtreeWantedSize(have, total);
+    auto const [have, total] = get_subtree_wanted_size();
     return total;
 }
 

@@ -19,7 +19,6 @@
 #endif
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
@@ -30,9 +29,7 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -211,7 +208,7 @@ bool isValidUtf8(QByteArray const& byteArray)
 ***/
 
 Prefs::Prefs(QString config_dir)
-    : config_dir_(std::move(config_dir))
+    : config_dir_{ std::move(config_dir) }
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -227,13 +224,13 @@ Prefs::Prefs(QString config_dir)
     // when the application exits.
     temporary_prefs_.insert(FILTER_TEXT);
 
-    auto top = get_default_app_settings();
-    top.merge(tr_sessionLoadSettings(config_dir_.toUtf8().constData(), nullptr));
-    ensureSoundCommandIsAList(&top);
+    auto const app_defaults = get_default_app_settings();
+    auto settings = tr_sessionLoadSettings(&app_defaults, config_dir_.toUtf8().constData(), nullptr);
+    ensureSoundCommandIsAList(&settings);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
+        tr_variant const* b = tr_variantDictFind(&settings, Items[i].key);
 
         switch (Items[i].type)
         {
@@ -513,9 +510,7 @@ QDateTime Prefs::getDateTime(int key) const
     return values_[key].toDateTime();
 }
 
-/***
-****
-***/
+// ---
 
 void Prefs::toggleBool(int key)
 {

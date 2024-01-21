@@ -32,7 +32,7 @@ namespace
 
 bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    if (length == 0)
+    if (length == 0U)
     {
         return true;
     }
@@ -48,12 +48,12 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     if (!TR_ERROR_IS_ENOSPC(local_error.code()))
     {
-        char const zero = '\0';
+        static char constexpr Zero = '\0';
 
         local_error = {};
 
         /* fallback: the old-style seek-and-write */
-        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, nullptr, &local_error) &&
+        if (tr_sys_file_write_at(fd, &Zero, 1, length - 1, nullptr, &local_error) &&
             tr_sys_file_truncate(fd, length, &local_error))
         {
             return true;
@@ -72,7 +72,7 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
 bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    if (length == 0)
+    if (length == 0U)
     {
         return true;
     }
@@ -142,7 +142,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     tr_file_index_t file_num,
     bool writable,
     std::string_view filename_in,
-    tr_preallocation_mode allocation,
+    Preallocation allocation,
     uint64_t file_size)
 {
     // is there already an entry
@@ -196,17 +196,17 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         return {};
     }
 
-    if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
+    if (writable && !already_existed && allocation != Preallocation::None)
     {
         bool success = false;
         char const* type = nullptr;
 
-        if (allocation == TR_PREALLOCATE_FULL)
+        if (allocation == Preallocation::Full)
         {
             success = preallocate_file_full(fd, file_size, &error);
             type = "full";
         }
-        else if (allocation == TR_PREALLOCATE_SPARSE)
+        else if (allocation == Preallocation::Sparse)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
             type = "sparse";

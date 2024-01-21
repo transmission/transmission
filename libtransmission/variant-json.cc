@@ -18,16 +18,6 @@
 
 #include <fmt/core.h>
 
-// RapidJSON SIMD optimisations
-#ifdef __SSE2__
-#define RAPIDJSON_SSE2
-#endif
-#ifdef __SSE4_2__
-#define RAPIDJSON_SSE42
-#endif
-#ifdef __ARM_NEON
-#define RAPIDJSON_NEON
-#endif
 #include <rapidjson/encodedstream.h>
 #include <rapidjson/encodings.h>
 #include <rapidjson/error/en.h>
@@ -60,13 +50,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Null()
     {
-        tr_variantInitStrView(get_leaf(), "");
+        *get_leaf() = tr_variant::unmanaged_string("");
         return true;
     }
 
     bool Bool(bool const val)
     {
-        tr_variantInitBool(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
@@ -82,7 +72,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Int64(int64_t const val)
     {
-        tr_variantInitInt(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
@@ -93,20 +83,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Double(double const val)
     {
-        tr_variantInitReal(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
     bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
     {
-        if (copy)
-        {
-            tr_variantInitStr(get_leaf(), { str, len });
-        }
-        else
-        {
-            tr_variantInitStrView(get_leaf(), { str, len });
-        }
+        *get_leaf() = copy ? tr_variant{ std::string{ str, len } } : tr_variant::unmanaged_string({ str, len });
         return true;
     }
 
@@ -222,10 +205,13 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
     auto* const begin = std::data(input);
     TR_ASSERT(begin != nullptr); // RapidJSON will dereference a nullptr if this is false
+    if (begin == nullptr)
+    {
+        return {};
+    }
+
     auto const size = std::size(input);
-
     auto top = tr_variant{};
-
     auto handler = parse_helpers::json_to_variant_handler{ &top };
     auto ms = rapidjson::MemoryStream{ begin, size };
     auto eis = rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream>{ ms };
@@ -271,7 +257,7 @@ struct string_output_stream
     using Ch = char;
 
     explicit string_output_stream(std::string& str)
-        : str_ref_(str)
+        : str_ref_{ str }
     {
     }
 

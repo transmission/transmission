@@ -32,7 +32,6 @@
 
 namespace
 {
-
 auto const* const AppConfigDirName = "transmission";
 auto const* const AppTranslationDomainName = "transmission-gtk";
 auto const* const AppName = "transmission-gtk";
@@ -45,7 +44,6 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
     entry.set_description(description);
     return entry;
 }
-
 } // namespace
 
 int main(int argc, char** argv)
@@ -117,10 +115,11 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    /* init the unit formatters */
-    tr_formatter_mem_init(mem_K, _(mem_K_str), _(mem_M_str), _(mem_G_str), _(mem_T_str));
-    tr_formatter_size_init(disk_K, _(disk_K_str), _(disk_M_str), _(disk_G_str), _(disk_T_str));
-    tr_formatter_speed_init(speed_K, _(speed_K_str), _(speed_M_str), _(speed_G_str), _(speed_T_str));
+    // init the unit formatters
+    using Config = libtransmission::Values::Config;
+    Config::Speed = { Config::Base::Kilo, _("B/s"), _("kB/s"), _("MB/s"), _("GB/s"), _("TB/s") };
+    Config::Memory = { Config::Base::Kibi, _("B"), _("KiB"), _("MiB"), _("GiB"), _("TiB") };
+    Config::Storage = { Config::Base::Kilo, _("B"), _("kB"), _("MB"), _("GB"), _("TB") };
 
     /* set up the config dir */
     if (std::empty(config_dir))

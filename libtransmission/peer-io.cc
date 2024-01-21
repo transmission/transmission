@@ -37,17 +37,6 @@
 
 struct sockaddr;
 
-#ifdef _WIN32
-#undef EAGAIN
-#define EAGAIN WSAEWOULDBLOCK
-#undef EINTR
-#define EINTR WSAEINTR
-#undef EINPROGRESS
-#define EINPROGRESS WSAEINPROGRESS
-#undef EPIPE
-#define EPIPE WSAECONNRESET
-#endif
-
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
@@ -57,9 +46,14 @@ namespace
 {
 // Helps us to ignore errors that say "try again later"
 // since that's what peer-io does by default anyway.
-[[nodiscard]] auto constexpr canRetryFromError(int error_code) noexcept
+[[nodiscard]] constexpr auto can_retry_from_error(int error_code) noexcept
 {
-    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
+#ifdef _WIN32
+    return error_code == 0 || error_code == WSAEWOULDBLOCK || error_code == WSAEINTR || error_code == WSAEINPROGRESS;
+#else
+    return error_code == 0 || error_code == EAGAIN || error_code == EWOULDBLOCK || error_code == EINTR ||
+        error_code == EINPROGRESS;
+#endif
 }
 
 size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
@@ -67,14 +61,14 @@ size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
     // this is all kind of arbitrary, but what seems to work well is
     // being large enough to hold the next 20 seconds' worth of input,
     // or a few blocks, whichever is bigger. OK to tweak this as needed.
-    static auto constexpr PeriodSecs = 15U;
+    static auto constexpr PeriodSecs = uint64_t{ 15U };
 
     // the 3 is an arbitrary number of blocks;
     // the .5 is to leave room for protocol messages
-    static auto constexpr Floor = static_cast<size_t>(tr_block_info::BlockSize * 3.5);
+    static auto constexpr Floor = static_cast<uint64_t>(tr_block_info::BlockSize * 3.5);
 
-    auto const current_speed_bytes_per_second = io->get_piece_speed_bytes_per_second(now, TR_UP);
-    return std::max(Floor, current_speed_bytes_per_second * PeriodSecs);
+    auto const current_speed = io->get_piece_speed(now, TR_UP);
+    return std::max(Floor, current_speed.base_quantity() * PeriodSecs);
 }
 } // namespace
 
@@ -277,7 +271,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 {
     auto const keep_alive = shared_from_this();
 
-    while (bytes_transferred != 0 && !std::empty(outbuf_info_))
+    while (bytes_transferred != 0U && !std::empty(outbuf_info_))
     {
         auto& [n_bytes_left, is_piece_data] = outbuf_info_.front();
 
@@ -288,7 +282,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 
         bandwidth().notify_bandwidth_consumed(TR_UP, payload, is_piece_data, now);
 
-        if (overhead > 0)
+        if (overhead > 0U)
         {
             bandwidth().notify_bandwidth_consumed(TR_UP, overhead, false, now);
         }
@@ -300,7 +294,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 
         bytes_transferred -= payload;
         n_bytes_left -= payload;
-        if (n_bytes_left == 0)
+        if (n_bytes_left == 0U)
         {
             outbuf_info_.pop_front();
         }
@@ -311,7 +305,7 @@ size_t tr_peerIo::try_write(size_t max)
 {
     static auto constexpr Dir = TR_UP;
 
-    if (max == 0)
+    if (max == 0U)
     {
         return {};
     }
@@ -319,7 +313,7 @@ size_t tr_peerIo::try_write(size_t max)
     auto& buf = outbuf_;
     max = std::min(max, std::size(buf));
     max = bandwidth().clamp(Dir, max);
-    if (max == 0)
+    if (max == 0U)
     {
         set_enabled(Dir, false);
         return {};
@@ -328,11 +322,11 @@ size_t tr_peerIo::try_write(size_t max)
     auto error = tr_error{};
     auto const n_written = socket_.try_write(buf, max, &error);
     // enable further writes if there's more data to write
-    set_enabled(Dir, !std::empty(buf) && (!error || canRetryFromError(error.code())));
+    set_enabled(Dir, !std::empty(buf) && (!error || can_retry_from_error(error.code())));
 
     if (error)
     {
-        if (!canRetryFromError(error.code()))
+        if (!can_retry_from_error(error.code()))
         {
             tr_logAddTraceIo(
                 this,
@@ -381,28 +375,31 @@ void tr_peerIo::can_read_wrapper()
     auto done = bool{ false };
     auto err = bool{ false };
 
-    while (!done && !err)
+    // In normal conditions, only continue processing if we still have bandwidth
+    // quota for it.
+    //
+    // The read buffer will grow indefinitely if libutp or the TCP stack keeps buffering
+    // data faster than the bandwidth limit allows. To safeguard against that, we keep
+    // processing if the read buffer is more than twice as large as the target size.
+    while (!done && !err && (read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
     {
-        size_t piece = 0;
+        size_t piece = 0U;
         auto const old_len = read_buffer_size();
         auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : READ_ERR;
         auto const used = old_len - read_buffer_size();
         auto const overhead = socket_.guess_packet_overhead(used);
 
-        if (piece != 0 || piece != used)
+        if (piece != 0U)
         {
-            if (piece != 0)
-            {
-                bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
-            }
-
-            if (used != piece)
-            {
-                bandwidth().notify_bandwidth_consumed(TR_DOWN, used - piece, false, now);
-            }
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
         }
 
-        if (overhead > 0)
+        if (used != piece)
+        {
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, used - piece, false, now);
+        }
+
+        if (overhead > 0U)
         {
             bandwidth().notify_bandwidth_consumed(TR_DOWN, overhead, false, now);
         }
@@ -433,7 +430,7 @@ size_t tr_peerIo::try_read(size_t max)
 {
     static auto constexpr Dir = TR_DOWN;
 
-    if (max == 0)
+    if (max == 0U)
     {
         return {};
     }
@@ -441,7 +438,7 @@ size_t tr_peerIo::try_read(size_t max)
     // Do not write more than the bandwidth allows.
     // If there is no bandwidth left available, disable writes.
     max = bandwidth().clamp(Dir, max);
-    if (max == 0)
+    if (max == 0U)
     {
         set_enabled(Dir, false);
         return {};
@@ -450,11 +447,11 @@ size_t tr_peerIo::try_read(size_t max)
     auto& buf = inbuf_;
     auto error = tr_error{};
     auto const n_read = socket_.try_read(buf, max, std::empty(buf), &error);
-    set_enabled(Dir, !error || canRetryFromError(error.code()));
+    set_enabled(Dir, !error || can_retry_from_error(error.code()));
 
     if (error)
     {
-        if (!canRetryFromError(error.code()))
+        if (!can_retry_from_error(error.code()))
         {
             tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error.code(), error.message()));
             call_error_callback(error);
@@ -482,7 +479,7 @@ void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event
 
     // if we don't have any bandwidth left, stop reading
     auto const n_used = std::size(io->inbuf_);
-    auto const n_left = n_used >= MaxLen ? 0 : MaxLen - n_used;
+    auto const n_left = n_used >= MaxLen ? 0U : MaxLen - n_used;
     io->try_read(n_left);
 }
 
@@ -577,7 +574,7 @@ size_t tr_peerIo::flush(tr_direction dir, size_t limit)
 
 size_t tr_peerIo::flush_outgoing_protocol_msgs()
 {
-    size_t byte_count = 0;
+    size_t byte_count = 0U;
 
     /* count up how many bytes are used by non-piece-data messages
        at the front of our outbound queue */
@@ -728,9 +725,19 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
+                // The peer io object can destruct inside can_read_wrapper(), so keep
+                // it alive for the duration of this code block. This can happen when
+                // a BT handshake did not complete successfully for example.
+                auto const keep_alive = io->shared_from_this();
+
                 io->inbuf_.add(args->buf, args->len);
                 io->set_enabled(TR_DOWN, true);
                 io->can_read_wrapper();
+
+                // utp_read_drained() notifies libutp that we read a packet from them.
+                // It opens up the congestion window by sending an ACK (soonish) if
+                // one was not going to be sent.
+                utp_read_drained(args->socket);
             }
             return {};
         });
@@ -742,16 +749,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto const* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                // We use this callback to enforce speed limits by telling
-                // libutp to read no more than `target_dl_bytes` bytes.
-                auto const target_dl_bytes = io->bandwidth_.clamp(TR_DOWN, RcvBuf);
-
-                // libutp's private function get_rcv_window() allows libutp
-                // to read up to (UTP_RCVBUF - READ_BUFFER_SIZE) bytes and
-                // UTP_RCVBUF is set to `RcvBuf` by tr_peerIo::utp_init().
-                // So to limit dl to `target_dl_bytes`, we need to return
-                // N where (`target_dl_bytes` == RcvBuf - N).
-                return RcvBuf - target_dl_bytes;
+                return io->read_buffer_size();
             }
             return {};
         });

@@ -47,7 +47,7 @@ static CGFloat const kImageOverlap = 1.0;
     [super setSelected:flag forSegment:segment];
 
     //only for when clicking manually
-    NSInteger priority;
+    tr_priority_t priority;
     switch (segment)
     {
     case 0:

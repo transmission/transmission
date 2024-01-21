@@ -46,6 +46,8 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)openURL:(NSString*)urlString;
 - (IBAction)openURLShowSheet:(id)sender;
 
+- (void)openPasteboard;
+
 @property(nonatomic, readonly) tr_session* sessionHandle;
 
 - (IBAction)createFile:(id)sender;

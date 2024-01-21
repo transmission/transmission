@@ -13,7 +13,6 @@
 #include "libtransmission/announce-list.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20, tr_sha1_digest_t
-#include "libtransmission/utils.h" // tr_strv_convert_utf8()
 
 struct tr_error;
 
@@ -66,10 +65,7 @@ public:
         return info_hash2_str_;
     }
 
-    void set_name(std::string_view name)
-    {
-        name_ = tr_strv_convert_utf8(name);
-    }
+    void set_name(std::string_view name);
 
     void add_webseed(std::string_view webseed);
 

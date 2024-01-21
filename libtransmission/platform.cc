@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <list>
 #include <string>
 #include <string_view>
@@ -119,7 +120,7 @@ std::string getXdgEntryFromUserDirs(std::string_view key)
     }
 
     // search for key="val" and extract val
-    auto const search = fmt::format(FMT_STRING("{:s}=\""), key);
+    auto const search = fmt::format("{:s}=\"", key);
     auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
     if (begin == std::end(content))
     {
@@ -147,7 +148,7 @@ std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto const filename = tr_pathbuf{ path, '/', "index.html"sv };
     bool const found = tr_sys_path_exists(filename);
-    tr_logAddTrace(fmt::format(FMT_STRING("Searching for web interface file '{:s}'"), filename));
+    tr_logAddTrace(fmt::format("Searching for web interface file '{:s}'", filename));
     return found;
 }
 } // namespace
@@ -307,7 +308,7 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     {
         char const* const pkg = PACKAGE_DATA_DIR;
         auto const xdg = tr_env_get_string("XDG_DATA_DIRS"sv);
-        auto const buf = fmt::format(FMT_STRING("{:s}:{:s}:/usr/local/share:/usr/share"), pkg, xdg);
+        auto const buf = fmt::format("{:s}:{:s}:/usr/local/share:/usr/share", pkg, xdg);
 
         auto sv = std::string_view{ buf };
         auto token = std::string_view{};

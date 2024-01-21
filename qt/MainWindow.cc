@@ -110,7 +110,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
             layoutDirection(),
             Qt::AlignBottom | Qt::AlignRight,
             emblem_size,
-            QRect(QPoint(0, 0), size));
+            QRect{ QPoint{ 0, 0 }, size });
 
         auto pixmap = base_icon.pixmap(size);
         auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
@@ -151,7 +151,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     QIcon const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
     ui_.action_OpenFile->setIcon(icon_open);
     ui_.action_AddURL->setIcon(
-        addEmblem(icon_open, QStringList() << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
+        addEmblem(icon_open, QStringList{} << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
     ui_.action_New->setIcon(icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
     ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
@@ -391,7 +391,7 @@ void MainWindow::initStatusBar()
     ui_.optionsButton->setMenu(createOptionsMenu());
 
     int const minimum_speed_width = ui_.downloadSpeedLabel->fontMetrics()
-                                        .size(0, Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99)))
+                                        .size(0, Speed{ 999.99, Speed::Units::KByps }.to_qstring())
                                         .width();
     ui_.downloadSpeedLabel->setMinimumWidth(minimum_speed_width);
     ui_.uploadSpeedLabel->setMinimumWidth(minimum_speed_width);
@@ -416,7 +416,7 @@ QMenu* MainWindow::createOptionsMenu()
         action_group->addAction(off_action);
         connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
-        on_action = menu->addAction(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
+        on_action = menu->addAction(tr("Limited at %1").arg(Speed{ current_value, Speed::Units::KByps }.to_qstring()));
         on_action->setCheckable(true);
         on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
@@ -424,10 +424,10 @@ QMenu* MainWindow::createOptionsMenu()
 
         menu->addSeparator();
 
-        for (auto const kps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
+        for (auto const kbyps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
         {
-            auto* const action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(kps)));
-            action->setProperty(PrefVariantsKey, QVariantList{ pref, kps, enabled_pref, true });
+            auto* const action = menu->addAction(Speed{ kbyps, Speed::Units::KByps }.to_qstring());
+            action->setProperty(PrefVariantsKey, QVariantList{ pref, kbyps, enabled_pref, true });
             connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
         }
     };
@@ -446,7 +446,7 @@ QMenu* MainWindow::createOptionsMenu()
         action_group->addAction(off_action);
         connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
-        on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(current_value)));
+        on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(current_value)));
         on_action->setCheckable(true);
         on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
@@ -456,7 +456,7 @@ QMenu* MainWindow::createOptionsMenu()
 
         for (double const i : StockRatios)
         {
-            QAction* action = menu->addAction(Formatter::get().ratioToString(i));
+            QAction* action = menu->addAction(Formatter::ratio_to_string(i));
             action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
             connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
         }
@@ -590,13 +590,13 @@ void openSelect(QString const& path)
     auto const explorer = QStringLiteral("explorer");
     QString param;
 
-    if (!QFileInfo(path).isDir())
+    if (!QFileInfo{ path }.isDir())
     {
         param = QStringLiteral("/select,");
     }
 
     param += QDir::toNativeSeparators(path);
-    QProcess::startDetached(explorer, QStringList(param));
+    QProcess::startDetached(explorer, QStringList{ param });
 }
 #elif defined(Q_OS_MAC)
 void openSelect(QString const& path)
@@ -703,7 +703,7 @@ void MainWindow::openStats()
 
 void MainWindow::openDonate() const
 {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate/")));
+    QDesktopServices::openUrl(QUrl{ QStringLiteral("https://transmissionbt.com/donate/") });
 }
 
 void MainWindow::openAbout()
@@ -714,7 +714,7 @@ void MainWindow::openAbout()
 void MainWindow::openHelp() const
 {
     QDesktopServices::openUrl(
-        QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10)));
+        QUrl{ QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10) });
 }
 
 /****
@@ -788,7 +788,7 @@ void MainWindow::refreshTitle()
 {
     QString title(QStringLiteral("Transmission"));
 
-    if (auto const url = QUrl(session_.getRemoteUrl()); !url.isEmpty())
+    if (auto const url = QUrl{ session_.getRemoteUrl() }; !url.isEmpty())
     {
         //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
@@ -812,12 +812,11 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peers_sending != 0)
     {
-        tip = Formatter::get().downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") +
-            Formatter::get().uploadSpeedToString(stats.speed_up);
+        tip = stats.speed_down.to_download_qstring() + QStringLiteral("   ") + stats.speed_up.to_upload_qstring();
     }
     else if (stats.peers_receiving != 0)
     {
-        tip = Formatter::get().uploadSpeedToString(stats.speed_up);
+        tip = stats.speed_up.to_upload_qstring();
     }
 
     tray_icon_.setToolTip(tip);
@@ -825,10 +824,9 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
 
 void MainWindow::refreshStatusBar(TransferStats const& stats)
 {
-    auto const& fmt = Formatter::get();
-    ui_.uploadSpeedLabel->setText(fmt.uploadSpeedToString(stats.speed_up));
+    ui_.uploadSpeedLabel->setText(stats.speed_up.to_upload_qstring());
     ui_.uploadSpeedLabel->setVisible(stats.peers_sending || stats.peers_receiving);
-    ui_.downloadSpeedLabel->setText(fmt.downloadSpeedToString(stats.speed_down));
+    ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
     ui_.networkLabel->setVisible(!session_.isServer());
@@ -838,22 +836,26 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
 
     if (mode == session_ratio_stats_mode_name_)
     {
-        str = tr("Ratio: %1").arg(fmt.ratioToString(session_.getStats().ratio));
+        str = tr("Ratio: %1").arg(Formatter::ratio_to_string(session_.getStats().ratio));
     }
     else if (mode == session_transfer_stats_mode_name_)
     {
         auto const& st = session_.getStats();
-        str = tr("Down: %1, Up: %2").arg(fmt.sizeToString(st.downloadedBytes)).arg(fmt.sizeToString(st.uploadedBytes));
+        str = tr("Down: %1, Up: %2")
+                  .arg(Formatter::storage_to_string(st.downloadedBytes))
+                  .arg(Formatter::storage_to_string(st.uploadedBytes));
     }
     else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
-        str = tr("Down: %1, Up: %2").arg(fmt.sizeToString(st.downloadedBytes)).arg(fmt.sizeToString(st.uploadedBytes));
+        str = tr("Down: %1, Up: %2")
+                  .arg(Formatter::storage_to_string(st.downloadedBytes))
+                  .arg(Formatter::storage_to_string(st.uploadedBytes));
     }
     else // default is "total-ratio"
     {
         assert(mode == total_ratio_stats_mode_name_);
-        str = tr("Ratio: %1").arg(fmt.ratioToString(session_.getCumulativeStats().ratio));
+        str = tr("Ratio: %1").arg(Formatter::ratio_to_string(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);
@@ -889,7 +891,11 @@ void MainWindow::refreshActionSensitivity()
     auto const now = time(nullptr);
     for (auto const& row : selection_model->selectedRows())
     {
-        auto const& tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
+        auto const* const tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
+        if (tor == nullptr)
+        {
+            continue;
+        }
 
         ++selected;
 
@@ -1172,7 +1178,7 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::DSPEED:
         dlimit_on_action_->setText(
-            tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
+            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(key), Speed::Units::KByps }.to_qstring()));
         break;
 
     case Prefs::USPEED_ENABLED:
@@ -1181,7 +1187,7 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::USPEED:
         ulimit_on_action_->setText(
-            tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
+            tr("Limited at %1").arg(Speed{ prefs_.get<unsigned int>(key), Speed::Units::KByps }.to_qstring()));
         break;
 
     case Prefs::RATIO_ENABLED:
@@ -1189,7 +1195,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::RATIO:
-        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(prefs_.get<double>(key))));
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(key))));
         break;
 
     case Prefs::FILTERBAR:
@@ -1242,11 +1248,11 @@ void MainWindow::refreshPref(int key)
             b = prefs_.getBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
             alt_speed_action_->setChecked(b);
             ui_.altSpeedButton->setChecked(b);
-            QString const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
-                                    tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
-            Speed const d = Speed::fromKBps(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
-            Speed const u = Speed::fromKBps(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_UP));
-            ui_.altSpeedButton->setToolTip(fmt.arg(Formatter::get().speedToString(d)).arg(Formatter::get().speedToString(u)));
+            auto const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
+                                 tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
+            auto const d = Speed{ prefs_.get<unsigned int>(Prefs::ALT_SPEED_LIMIT_DOWN), Speed::Units::KByps };
+            auto const u = Speed{ prefs_.get<unsigned int>(Prefs::ALT_SPEED_LIMIT_UP), Speed::Units::KByps };
+            ui_.altSpeedButton->setToolTip(fmt.arg(d.to_qstring()).arg(u.to_qstring()));
             break;
         }
 
@@ -1496,7 +1502,7 @@ void MainWindow::updateNetworkIcon()
     }
     else if (seconds_since_last_read < 120)
     {
-        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::get().timeToString(seconds_since_last_read));
+        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::time_to_string(seconds_since_last_read));
     }
     else
     {
@@ -1587,7 +1593,7 @@ void MainWindow::dropEvent(QDropEvent* event)
 
         if (!key.isEmpty())
         {
-            if (auto const url = QUrl(key); url.isLocalFile())
+            if (auto const url = QUrl{ key }; url.isLocalFile())
             {
                 key = url.toLocalFile();
             }

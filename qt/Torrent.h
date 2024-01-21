@@ -16,6 +16,7 @@
 #include <QMetaType>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 
 #include <libtransmission/transmission.h>
 
@@ -415,19 +416,24 @@ public:
 
     bool includesTracker(QString const& sitename) const;
 
+    [[nodiscard]] constexpr auto const& labels() const noexcept
+    {
+        return labels_;
+    }
+
     [[nodiscard]] constexpr auto const& sitenames() const noexcept
     {
         return sitenames_;
     }
 
-    [[nodiscard]] Speed uploadLimit() const
+    [[nodiscard]] constexpr auto uploadLimit() const
     {
-        return Speed::fromKBps(upload_limit_);
+        return Speed{ upload_limit_, Speed::Units::KByps };
     }
 
-    [[nodiscard]] Speed downloadLimit() const
+    [[nodiscard]] constexpr auto downloadLimit() const
     {
-        return Speed::fromKBps(download_limit_);
+        return Speed{ download_limit_, Speed::Units::KByps };
     }
 
     [[nodiscard]] constexpr auto uploadIsLimited() const noexcept
@@ -588,6 +594,7 @@ public:
         IS_FINISHED,
         IS_PRIVATE,
         IS_STALLED,
+        LABELS,
         LEFT_UNTIL_DONE,
         MANUAL_ANNOUNCE_TIME,
         METADATA_PERCENT_COMPLETE,
@@ -643,7 +650,6 @@ private:
     time_t start_date_ = {};
 
     int bandwidth_priority_ = {};
-    int download_limit_ = {};
     int error_ = {};
     int eta_ = {};
     int peer_limit_ = {};
@@ -656,10 +662,10 @@ private:
     int seed_idle_mode_ = {};
     int seed_ratio_mode_ = {};
     int status_ = {};
-    int upload_limit_ = {};
     int webseeds_sending_to_us_ = {};
 
     uint64_t desired_available_ = {};
+    uint64_t download_limit_ = {};
     uint64_t downloaded_ever_ = {};
     uint64_t failed_ever_ = {};
     uint64_t file_count_ = {};
@@ -669,6 +675,7 @@ private:
     uint64_t piece_size_ = {};
     uint64_t size_when_done_ = {};
     uint64_t total_size_ = {};
+    uint64_t upload_limit_ = {};
     uint64_t uploaded_ever_ = {};
 
     double metadata_percent_complete_ = {};
@@ -690,6 +697,7 @@ private:
     PeerList peers_;
     FileList files_;
 
+    QStringList labels_;
     std::vector<QString> sitenames_;
     TrackerStatsList tracker_stats_;
 

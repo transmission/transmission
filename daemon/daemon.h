@@ -15,6 +15,7 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/file.h>
 
+struct event_base;
 struct tr_error;
 struct tr_session;
 
@@ -54,8 +55,6 @@ private:
     char const* log_file_name_ = nullptr;
     struct event_base* ev_base_ = nullptr;
     tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
-    tr_quark key_pidfile_ = tr_quark_new("pidfile");
-    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic");
 
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);

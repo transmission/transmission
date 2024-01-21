@@ -21,8 +21,7 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     static auto constexpr PieceCount = uint64_t{ 4U };
     static auto constexpr TotalSize = PieceSize * PieceCount;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto info = tr_block_info{ TotalSize, PieceSize };
 
     EXPECT_EQ(ExpectedBlockSize, info.block_size(info.block_count() - 1));
     EXPECT_EQ(PieceCount, info.piece_count());
@@ -30,7 +29,7 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     EXPECT_EQ(PieceSize, info.piece_size());
     EXPECT_EQ(TotalSize, info.total_size());
 
-    info.init_sizes(0, 0);
+    info = tr_block_info{ 0U, 0U };
     EXPECT_EQ(0U, info.block_size(info.block_count() - 1));
     EXPECT_EQ(0U, info.piece_count());
     EXPECT_EQ(0U, info.piece_size(info.piece_count() - 1));
@@ -46,8 +45,7 @@ TEST_F(BlockInfoTest, handlesOddSize)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto const info = tr_block_info{ TotalSize, PieceSize };
 
     EXPECT_EQ(1U, info.block_size(info.block_count() - 1));
     EXPECT_EQ(1U, info.piece_size(info.piece_count() - 1));
@@ -64,8 +62,7 @@ TEST_F(BlockInfoTest, pieceSize)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto const info = tr_block_info{ TotalSize, PieceSize };
 
     EXPECT_EQ(PieceSize, info.piece_size(info.piece_count() - 2));
     EXPECT_EQ(1U, info.piece_size(info.piece_count() - 1));
@@ -79,8 +76,7 @@ TEST_F(BlockInfoTest, blockSize)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto const info = tr_block_info{ TotalSize, PieceSize };
 
     EXPECT_EQ(ExpectedBlockSize, info.block_size(info.block_count() - 2));
     EXPECT_EQ(1U, info.block_size(info.block_count() - 1));
@@ -94,8 +90,7 @@ TEST_F(BlockInfoTest, blockSpanForPiece)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto info = tr_block_info{ TotalSize, PieceSize };
 
     EXPECT_EQ(0U, info.block_span_for_piece(0).begin);
     EXPECT_EQ(4U, info.block_span_for_piece(0).end);
@@ -118,8 +113,7 @@ TEST_F(BlockInfoTest, blockLoc)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto const info = tr_block_info{ TotalSize, PieceSize };
 
     // begin
     auto loc = info.block_loc(0);
@@ -150,8 +144,7 @@ TEST_F(BlockInfoTest, pieceLoc)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto const info = tr_block_info{ TotalSize, PieceSize };
 
     // begin
     auto loc = info.piece_loc(0);
@@ -198,8 +191,7 @@ TEST_F(BlockInfoTest, byteLoc)
     static auto constexpr PieceCount = uint64_t{ 5U };
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
-    auto info = tr_block_info{};
-    info.init_sizes(TotalSize, PieceSize);
+    auto const info = tr_block_info{ TotalSize, PieceSize };
 
     auto loc = info.byte_loc(0);
     EXPECT_EQ(tr_block_info::Location{}, loc);

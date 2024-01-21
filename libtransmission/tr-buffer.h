@@ -6,9 +6,9 @@
 #pragma once
 
 #include <algorithm> // for std::copy_n
-#include <cstddef>
-#include <iterator>
-#include <limits>
+#include <cstddef> // size_t
+#include <memory> // std::allocator
+#include <ratio>
 #include <string>
 #include <string_view>
 
@@ -16,6 +16,8 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR
 #include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
@@ -217,7 +219,9 @@ public:
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
-        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
+        n_bytes = std::min(n_bytes, buflen);
+        TR_ASSERT(n_bytes > 0U);
+        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0);
         auto const err = sockerrno;
 
         if (n_read > 0)

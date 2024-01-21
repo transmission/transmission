@@ -19,6 +19,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/values.h"
 
 class tr_peerIo;
 
@@ -29,8 +30,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    tr_kilobytes_per_second_t up_limit_KBps = 0U;
-    tr_kilobytes_per_second_t down_limit_KBps = 0U;
+    libtransmission::Values::Speed up_limit = {};
+    libtransmission::Values::Speed down_limit = {};
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -77,15 +78,17 @@ struct tr_bandwidth_limits
 struct tr_bandwidth
 {
 private:
-    static constexpr size_t HistoryMSec = 2000U;
-    static constexpr size_t GranularityMSec = 250U;
-    static constexpr size_t HistorySize = HistoryMSec / GranularityMSec;
+    using Speed = libtransmission::Values::Speed;
+
+    static constexpr auto HistoryMSec = 2000U;
+    static constexpr auto GranularityMSec = 250U;
+    static constexpr auto HistorySize = HistoryMSec / GranularityMSec;
 
 public:
-    explicit tr_bandwidth(tr_bandwidth* new_parent);
+    explicit tr_bandwidth(tr_bandwidth* parent, bool is_group = false);
 
-    tr_bandwidth()
-        : tr_bandwidth(nullptr)
+    explicit tr_bandwidth(bool is_group = false)
+        : tr_bandwidth{ nullptr, is_group }
     {
     }
 
@@ -104,7 +107,7 @@ public:
      */
     void set_peer(std::weak_ptr<tr_peerIo> peer) noexcept
     {
-        this->peer_ = std::move(peer);
+        peer_ = std::move(peer);
     }
 
     /**
@@ -120,14 +123,14 @@ public:
 
     void set_parent(tr_bandwidth* new_parent);
 
-    [[nodiscard]] constexpr tr_priority_t get_priority() const noexcept
+    [[nodiscard]] constexpr auto get_priority() const noexcept
     {
-        return this->priority_;
+        return priority_;
     }
 
     constexpr void set_priority(tr_priority_t prio) noexcept
     {
-        this->priority_ = prio;
+        priority_ = prio;
     }
 
     /**
@@ -136,19 +139,19 @@ public:
     [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept;
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] auto get_raw_speed_bytes_per_second(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto get_raw_speed(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed_bytes_per_second(this->band_[dir].raw_, HistoryMSec, now);
+        return get_speed(band_[dir].raw_, HistoryMSec, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto get_piece_speed(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed_bytes_per_second(this->band_[dir].piece_, HistoryMSec, now);
+        return get_speed(band_[dir].piece_, HistoryMSec, now);
     }
 
     /**
@@ -156,10 +159,10 @@ public:
      * @see `tr_bandwidth::allocate`
      * @see `tr_bandwidth::getDesiredSpeed`
      */
-    constexpr bool set_desired_speed_bytes_per_second(tr_direction dir, tr_bytes_per_second_t desired_speed)
+    constexpr bool set_desired_speed(tr_direction dir, Speed desired_speed)
     {
-        auto& value = this->band_[dir].desired_speed_bps_;
-        bool const did_change = desired_speed != value;
+        auto& value = band_[dir].desired_speed_;
+        auto const did_change = desired_speed != value;
         value = desired_speed;
         return did_change;
     }
@@ -168,9 +171,9 @@ public:
      * @brief Get the desired speed for the bandwidth subtree.
      * @see `tr_bandwidth::setDesiredSpeed`
      */
-    [[nodiscard]] constexpr auto get_desired_speed_bytes_per_second(tr_direction dir) const
+    [[nodiscard]] constexpr auto get_desired_speed(tr_direction dir) const
     {
-        return this->band_[dir].desired_speed_bps_;
+        return band_[dir].desired_speed_;
     }
 
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
@@ -180,8 +183,8 @@ public:
             return false;
         }
 
-        auto const got = get_piece_speed_bytes_per_second(now_msec, dir);
-        auto const want = get_desired_speed_bytes_per_second(dir);
+        auto const got = get_piece_speed(now_msec, dir);
+        auto const want = get_desired_speed(dir);
         return got >= want;
     }
 
@@ -190,8 +193,8 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        bool& value = this->band_[dir].is_limited_;
-        bool const did_change = is_limited != value;
+        auto& value = band_[dir].is_limited_;
+        auto const did_change = is_limited != value;
         value = is_limited;
         return did_change;
     }
@@ -201,7 +204,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_limited(tr_direction dir) const noexcept
     {
-        return this->band_[dir].is_limited_;
+        return band_[dir].is_limited_;
     }
 
     /**
@@ -212,17 +215,15 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        bool& value = this->band_[direction].honor_parent_limits_;
-        bool const did_change = is_enabled != value;
+        auto& value = band_[direction].honor_parent_limits_;
+        auto const did_change = is_enabled != value;
         value = is_enabled;
         return did_change;
     }
 
     [[nodiscard]] constexpr bool are_parent_limits_honored(tr_direction direction) const
     {
-        TR_ASSERT(tr_isDirection(direction));
-
-        return this->band_[direction].honor_parent_limits_;
+        return band_[direction].honor_parent_limits_;
     }
 
     [[nodiscard]] tr_bandwidth_limits get_limits() const;
@@ -235,7 +236,7 @@ private:
         std::array<uint64_t, HistorySize> date_;
         std::array<size_t, HistorySize> size_;
         uint64_t cache_time_;
-        tr_bytes_per_second_t cache_val_;
+        Speed cache_val_;
         int newest_;
     };
 
@@ -244,12 +245,12 @@ private:
         RateControl raw_;
         RateControl piece_;
         size_t bytes_left_;
-        tr_bytes_per_second_t desired_speed_bps_;
+        Speed desired_speed_;
         bool is_limited_ = false;
         bool honor_parent_limits_ = true;
     };
 
-    static tr_bytes_per_second_t get_speed_bytes_per_second(RateControl& r, unsigned int interval_msec, uint64_t now);
+    static Speed get_speed(RateControl& r, unsigned int interval_msec, uint64_t now);
 
     [[nodiscard]] constexpr auto* parent() noexcept
     {
@@ -271,7 +272,12 @@ private:
     std::vector<tr_bandwidth*> children_;
     tr_bandwidth* parent_ = nullptr;
     std::weak_ptr<tr_peerIo> peer_;
-    tr_priority_t priority_ = 0;
+    tr_priority_t priority_;
 };
 
 /* @} */
+
+constexpr auto tr_isPriority(tr_priority_t p)
+{
+    return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
+}

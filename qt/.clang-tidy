@@ -23,6 +23,7 @@ Checks: >
   -hicpp-multiway-paths-covered,
   -hicpp-signed-bitwise,
   misc-*,
+  -misc-include-cleaner,
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
@@ -37,6 +38,7 @@ Checks: >
   -readability-redundant-access-specifiers, # keep: 'private' vs 'private slots'
 
 CheckOptions:
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,          value: true       }
   - { key: readability-identifier-naming.ClassCase,                value: CamelCase  }
   - { key: readability-identifier-naming.ClassMethodCase,          value: camelBack  }
   - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }

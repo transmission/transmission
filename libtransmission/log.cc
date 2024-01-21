@@ -10,6 +10,7 @@
 #include <iterator> // back_insert_iterator, empty
 #include <map>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -228,7 +229,7 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     auto name_fallback = std::string{};
     if (std::empty(name))
     {
-        name_fallback = fmt::format(FMT_STRING("{}:{}"), filename, line);
+        name_fallback = fmt::format("{:s}:{:d}", filename, line);
         name = name_fallback;
     }
 

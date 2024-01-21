@@ -21,7 +21,7 @@
 #include <fmt/core.h>
 
 #include <libtransmission/file.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/utils.h> // for tr_file_save()
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h>
 

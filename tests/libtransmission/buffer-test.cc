@@ -98,39 +98,3 @@ TEST_F(BufferTest, Numbers)
         EXPECT_EQ(expected_u8, buf.to_uint8());
     }
 }
-
-#if 0
-TEST_F(BufferTest, NonBufferWriter)
-{
-    auto constexpr Hello = "Hello, "sv;
-    auto constexpr World = "World"sv;
-    auto constexpr Bang = "!"sv;
-
-    auto out1 = Buffer{};
-
-    auto out2_vec = std::vector<std::byte>{};
-    auto out2 = libtransmission::BufferWriter<std::vector<std::byte>, std::byte>{ &out2_vec };
-
-    out1.add_uint8(1);
-    out2.add_uint8(1);
-
-    out1.add_uint16(1);
-    out2.add_uint16(1);
-
-    out1.add_uint32(1);
-    out2.add_uint32(1);
-
-    out1.add(Hello);
-    out2.add(Hello);
-
-    out1.add(World);
-    out2.add(World);
-
-    out1.add(Bang);
-    out2.add(Bang);
-
-    auto const result1 = out1.to_string_view();
-    auto const result2 = std::string_view{ reinterpret_cast<char const*>(std::data(out2_vec)), std::size(out2_vec) };
-    EXPECT_EQ(result1, result2);
-}
-#endif

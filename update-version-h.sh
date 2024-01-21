@@ -47,7 +47,7 @@ fi
 # '-TR400B-' (4.0.0 Beta)
 # '-TR400Z-' (4.0.0 Dev)
 # '-TR4000-' (4.0.0)
-BASE62=($(echo {0..9} {A..A} {a..z}))
+BASE62=($(echo {0..9} {A..Z} {a..z}))
 peer_id_prefix="-TR${BASE62[$(( 10#$major_version ))]}${BASE62[$(( 10#$minor_version ))]}${BASE62[$(( 10#$patch_version ))]}"
 if [ "$is_dev" = true ]; then
   peer_id_prefix="${peer_id_prefix}Z"

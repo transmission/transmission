@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
@@ -224,60 +223,6 @@ TEST_F(UtilsTest, truncd)
     auto const nanstr = fmt::format("{:.2f}", tr_truncd(nan, 2));
     EXPECT_TRUE(strstr(nanstr.c_str(), "nan") != nullptr || strstr(nanstr.c_str(), "NaN") != nullptr);
 #endif
-}
-
-TEST_F(UtilsTest, trStrlcpy)
-{
-    // destination will be initialized with this char
-    char const initial_char = '1';
-    std::array<char, 100> destination = { initial_char };
-
-    std::vector<std::string> const tests{
-        "a",
-        "",
-        "12345678901234567890",
-        "This, very useful string contains a total of 105 characters not counting null. Almost like an easter egg!"
-    };
-
-    for (auto const& test : tests)
-    {
-        auto c_string = test.c_str();
-        auto length = strlen(c_string);
-
-        destination.fill(initial_char);
-
-        auto response = tr_strlcpy(&destination, c_string, 98);
-
-        // Check response length
-        ASSERT_EQ(response, length);
-
-        // Check what was copied
-        for (unsigned i = 0U; i < 97U; ++i)
-        {
-            if (i <= length)
-            {
-                ASSERT_EQ(destination[i], c_string[i]);
-            }
-            else
-            {
-                ASSERT_EQ(destination[i], initial_char);
-            }
-        }
-
-        // tr_strlcpy should only write this far if (length >= 98)
-        if (length >= 98)
-        {
-            ASSERT_EQ(destination[97], '\0');
-        }
-        else
-        {
-            ASSERT_EQ(destination[97], initial_char);
-        }
-
-        // tr_strlcpy should not write this far
-        ASSERT_EQ(destination[98], initial_char);
-        ASSERT_EQ(destination[99], initial_char);
-    }
 }
 
 TEST_F(UtilsTest, env)

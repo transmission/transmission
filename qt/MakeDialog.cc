@@ -6,14 +6,17 @@
 #include "MakeDialog.h"
 
 #include <chrono>
+#include <cmath>
 #include <future>
 #include <utility>
 #include <vector>
 
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QPushButton>
+#include <QString>
 #include <QTimer>
 
 #include <libtransmission/error.h>
@@ -84,7 +87,7 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
     switch (ui_.dialogButtons->standardButton(button))
     {
     case QDialogButtonBox::Open:
-        session_.addNewlyCreatedTorrent(outfile_, QFileInfo(QString::fromStdString(builder_.top())).dir().path());
+        session_.addNewlyCreatedTorrent(outfile_, QFileInfo{ QString::fromStdString(builder_.top()) }.dir().path());
         break;
 
     case QDialogButtonBox::Abort:
@@ -118,7 +121,7 @@ void MakeProgressDialog::onProgress()
 
     // progress label
     auto const top = QString::fromStdString(builder_.top());
-    auto const base = QFileInfo(top).completeBaseName();
+    auto const base = QFileInfo{ top }.completeBaseName();
     QString str;
 
     auto success = false;
@@ -175,8 +178,8 @@ void MakeDialog::makeTorrent()
 
     // the file to create
     auto const path = QString::fromStdString(builder_->top());
-    auto const torrent_name = QFileInfo(path).completeBaseName() + QStringLiteral(".torrent");
-    auto const outfile = QDir(ui_.destinationButton->path()).filePath(torrent_name);
+    auto const torrent_name = QFileInfo{ path }.completeBaseName() + QStringLiteral(".torrent");
+    auto const outfile = QDir{ ui_.destinationButton->path() }.filePath(torrent_name);
 
     // comment
     if (ui_.commentCheck->isChecked())
@@ -220,19 +223,17 @@ void MakeDialog::onSourceChanged()
         builder_.emplace(filename.toStdString());
     }
 
-    if (!builder_)
-    {
-        updatePiecesLabel();
-    }
-    else
+    updatePiecesLabel();
+
+    if (builder_)
     {
         ui_.pieceSizeSlider->setValue(log2(builder_->piece_size()));
     }
 }
 
 MakeDialog::MakeDialog(Session& session, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
+    : BaseDialog{ parent }
+    , session_{ session }
 {
     ui_.setupUi(this);
 
@@ -269,7 +270,7 @@ void MakeDialog::dragEnterEvent(QDragEnterEvent* event)
 {
     QMimeData const* mime = event->mimeData();
 
-    if (!mime->urls().isEmpty() && QFileInfo(mime->urls().front().path()).exists())
+    if (!mime->urls().isEmpty() && QFileInfo{ mime->urls().front().path() }.exists())
     {
         event->acceptProposedAction();
     }
@@ -309,10 +310,10 @@ void MakeDialog::updatePiecesLabel()
         auto const files = tr("%Ln File(s)", nullptr, builder_->file_count());
         auto const pieces = tr("%Ln Piece(s)", nullptr, builder_->piece_count());
         text = tr("%1 in %2; %3 @ %4")
-                   .arg(Formatter::get().sizeToString(builder_->total_size()))
+                   .arg(Formatter::storage_to_string(builder_->total_size()))
                    .arg(files)
                    .arg(pieces)
-                   .arg(Formatter::get().memToString(static_cast<uint64_t>(builder_->piece_size())));
+                   .arg(Formatter::memory_to_string(static_cast<uint64_t>(builder_->piece_size())));
         ui_.pieceSizeSlider->setEnabled(true);
     }
 

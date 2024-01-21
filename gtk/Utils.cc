@@ -13,6 +13,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
+#include <libtransmission/values.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
 
@@ -25,8 +26,6 @@
 #include <glibmm/quark.h>
 #include <glibmm/spawn.h>
 #include <gtkmm/cellrenderertext.h>
-#include <gtkmm/eventcontroller.h>
-#include <gtkmm/gesture.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/treemodel.h>
@@ -34,6 +33,8 @@
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gdkmm/clipboard.h>
+#include <gtkmm/eventcontroller.h>
+#include <gtkmm/gesture.h>
 #include <gtkmm/gestureclick.h>
 #else
 #include <gdkmm/window.h>
@@ -44,7 +45,6 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
 #include <stack>
 #include <stdexcept>
 #include <utility>
@@ -53,32 +53,14 @@
 #include <gtk/gtk.h>
 
 #if GTK_CHECK_VERSION(4, 0, 0) && defined(GDK_WINDOWING_X11)
+#include <optional>
+
 #include <gdk/x11/gdkx.h>
 #endif
 
 using namespace std::literals;
 
-/***
-****  UNITS
-***/
-
-int const mem_K = 1024;
-char const* const mem_K_str = N_("KiB");
-char const* const mem_M_str = N_("MiB");
-char const* const mem_G_str = N_("GiB");
-char const* const mem_T_str = N_("TiB");
-
-int const disk_K = 1000;
-char const* const disk_K_str = N_("kB");
-char const* const disk_M_str = N_("MB");
-char const* const disk_G_str = N_("GB");
-char const* const disk_T_str = N_("TB");
-
-int const speed_K = 1000;
-char const* const speed_K_str = N_("kB/s");
-char const* const speed_M_str = N_("MB/s");
-char const* const speed_G_str = N_("GB/s");
-char const* const speed_T_str = N_("TB/s");
+using namespace libtransmission::Values;
 
 /***
 ****
@@ -132,9 +114,14 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlsize(guint64 size_in_bytes)
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
 {
-    return size_in_bytes == 0 ? Q_("None") : tr_formatter_size_B(size_in_bytes);
+    return storage.is_zero() ? Q_("None") : storage.to_string();
+}
+
+Glib::ustring tr_strlsize(guint64 n_bytes)
+{
+    return tr_strlsize(Storage{ n_bytes, Storage::Units::Bytes });
 }
 
 namespace
@@ -659,9 +646,7 @@ void gtr_open_uri(Glib::ustring const& uri)
     }
 }
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -749,9 +734,7 @@ void gtr_priority_combo_init(Gtk::ComboBox& combo)
         });
 }
 
-/***
-****
-***/
+// ---
 
 void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 {
@@ -861,9 +844,7 @@ void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
 #endif
 }
 
-/***
-****
-***/
+// ---
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {

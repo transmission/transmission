@@ -421,15 +421,9 @@
                                             </tableColumns>
                                             <connections>
                                                 <outlet property="dataSource" destination="206" id="3097"/>
-                                                <outlet property="fActionMenu" destination="1936" id="3098"/>
                                                 <outlet property="fContextNoRow" destination="589" id="3101"/>
                                                 <outlet property="fContextRow" destination="456" id="3100"/>
                                                 <outlet property="fController" destination="206" id="3102"/>
-                                                <outlet property="fDownloadMenu" destination="1945" id="3103"/>
-                                                <outlet property="fGlobalLimitItem" destination="3190" id="3193"/>
-                                                <outlet property="fPriorityMenu" destination="3197" id="3201"/>
-                                                <outlet property="fRatioMenu" destination="2018" id="3105"/>
-                                                <outlet property="fUploadMenu" destination="1951" id="3104"/>
                                             </connections>
                                         </outlineView>
                                     </subviews>
@@ -1216,123 +1210,6 @@ CA
         </menu>
         <customObject id="1812" userLabel="SUUpdater" customClass="SUUpdater"/>
         <userDefaultsController representsSharedInstance="YES" id="1815" userLabel="Shared Defaults"/>
-        <menu title="Menu" autoenablesItems="NO" id="1936" userLabel="TorrentActionMenu">
-            <items>
-                <menuItem title="Priority" id="3196">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Priority" id="3197">
-                        <items>
-                            <menuItem title="High" image="PriorityHighTemplate" tag="101" id="3198">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="setPriority:" target="3091" id="3202"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Normal" image="PriorityNormalTemplate" tag="102" id="3199">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="setPriority:" target="3091" id="3203"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Low" image="PriorityLowTemplate" tag="103" id="3200">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="setPriority:" target="3091" id="3204"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="3091" id="3205"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="3195">
-                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                </menuItem>
-                <menuItem title="Download Bandwidth Limit" id="1944">
-                    <menu key="submenu" title="Download Bandwidth Limit" id="1945">
-                        <items>
-                            <menuItem title="Unlimited" tag="102" id="1946">
-                                <connections>
-                                    <action selector="setQuickLimitMode:" target="3091" id="3110"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="limit" tag="103" id="1960">
-                                <connections>
-                                    <action selector="setQuickLimitMode:" target="3091" id="3111"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="1971">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="3091" id="3121"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-                <menuItem title="Upload Bandwidth Limit" id="1950">
-                    <menu key="submenu" title="Upload Bandwidth Limit" id="1951">
-                        <items>
-                            <menuItem title="Unlimited" tag="102" id="1963">
-                                <connections>
-                                    <action selector="setQuickLimitMode:" target="3091" id="3113"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="limit" tag="103" id="1964">
-                                <connections>
-                                    <action selector="setQuickLimitMode:" target="3091" id="3114"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="2005">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="3091" id="3122"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-                <menuItem title="Stay Within Global Bandwidth Limits" id="3190">
-                    <connections>
-                        <action selector="setGlobalLimit:" target="3091" id="3191"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="2029">
-                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                </menuItem>
-                <menuItem title="Stop Seeding at Ratio" id="2017">
-                    <menu key="submenu" title="Stop Seeding at Ratio" id="2018">
-                        <items>
-                            <menuItem title="Global" tag="101" id="2031">
-                                <connections>
-                                    <action selector="setQuickRatioMode:" target="3091" id="3115"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Seed Forever" tag="102" id="2024">
-                                <connections>
-                                    <action selector="setQuickRatioMode:" target="3091" id="3116"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="stop ratio" tag="103" id="2025">
-                                <connections>
-                                    <action selector="setQuickRatioMode:" target="3091" id="3117"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="2026">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="3091" id="3123"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-            </items>
-            <connections>
-                <outlet property="delegate" destination="3091" id="3120"/>
-            </connections>
-        </menu>
     </objects>
     <resources>
         <image name="ActionHover" width="16" height="16"/>
@@ -1342,8 +1219,6 @@ CA
         <image name="NSFolder" width="32" height="32"/>
         <image name="NSStatusAvailable" width="16" height="16"/>
         <image name="PriorityHighTemplate" width="12" height="12"/>
-        <image name="PriorityLowTemplate" width="12" height="12"/>
-        <image name="PriorityNormalTemplate" width="12" height="12"/>
         <image name="ResumeOff" width="14" height="14"/>
         <image name="RevealOff" width="14" height="14"/>
         <image name="TortoiseTemplate" width="18" height="18"/>

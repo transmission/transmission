@@ -25,14 +25,19 @@
 #include <QDBusReply>
 #endif
 
+#if QT_CONFIG(accessibility)
+#include <QAccessible>
+#endif
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/version.h>
 
+#include "AccessibleSqueezeLabel.h"
 #include "AddData.h"
-#include "Formatter.h"
 #include "InteropHelper.h"
 #include "MainWindow.h"
 #include "OptionsDialog.h"
@@ -90,6 +95,25 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return QIcon{ QStringLiteral(":/icons/transmission.svg") };
 }
 
+#if QT_CONFIG(accessibility)
+
+QAccessibleInterface* accessibleFactory(QString const& className, QObject* object)
+{
+    auto* widget = qobject_cast<QWidget*>(object);
+
+    if (widget != nullptr)
+    {
+        if (className == QStringLiteral("SqueezeLabel"))
+        {
+            return new AccessibleSqueezeLabel(widget);
+        }
+    }
+
+    return nullptr;
+}
+
+#endif // QT_CONFIG(accessibility)
+
 } // namespace
 
 Application::Application(int& argc, char** argv)
@@ -99,6 +123,7 @@ Application::Application(int& argc, char** argv)
 {
     setApplicationName(config_name_);
     loadTranslations();
+    initUnits();
 
 #if defined(_WIN32) || defined(__APPLE__)
 
@@ -272,6 +297,10 @@ Application::Application(int& argc, char** argv)
         minimized = false;
     }
 
+#if QT_CONFIG(accessibility)
+    QAccessible::installFactory(&accessibleFactory);
+#endif
+
     session_ = std::make_unique<Session>(config_dir, *prefs_);
     model_ = std::make_unique<TorrentModel>(*prefs_);
     window_ = std::make_unique<MainWindow>(*session_, *prefs_, *model_, minimized);
@@ -401,6 +430,20 @@ void Application::loadTranslations()
     {
         installTranslator(&app_translator_);
     }
+}
+
+void Application::initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    Config::Speed = { Config::Base::Kilo,       tr("B/s").toStdString(),  tr("kB/s").toStdString(),
+                      tr("MB/s").toStdString(), tr("GB/s").toStdString(), tr("TB/s").toStdString() };
+
+    Config::Memory = { Config::Base::Kibi,      tr("B").toStdString(),   tr("KiB").toStdString(),
+                       tr("MiB").toStdString(), tr("GiB").toStdString(), tr("TiB").toStdString() };
+
+    Config::Storage = { Config::Base::Kilo,     tr("B").toStdString(),  tr("kB").toStdString(),
+                        tr("MB").toStdString(), tr("GB").toStdString(), tr("TB").toStdString() };
 }
 
 void Application::quitLater() const
@@ -634,9 +677,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(QVariantMap({
-            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
-        })); // hints
+        args.append(QVariantMap{ {
+            std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
+        } }); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);

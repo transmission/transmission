@@ -1,0 +1,399 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
+"23.title" = "偏好设置";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
+"53.title" = "其他…";
+
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
+"55.title" = "与 Torrent 文件相同";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
+"219.title" = "其他…";
+
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
+"253.label" = "正在添加";
+
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
+"254.label" = "管理";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
+"542.title" = "其他…";
+
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
+"1201.title" = "退出时仍有正在传输的任务";
+
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
+"1202.title" = "移除正在传输的任务";
+
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
+"1203.title" = "提示用户进行：";
+
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
+"1204.title" = "在 Dock 图标上显示角标：";
+
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
+"1205.title" = "总下载速率";
+
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
+"1206.title" = "总上传速率";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
+"1207.title" = "仅在传输正在下载时";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
+"1208.title" = "仅在传输正在下载时";
+
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
+"1209.title" = "自动调整大小：";
+
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
+"1210.title" = "自动调整窗口大小以适应全部传输";
+
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
+"1211.title" = "重设";
+
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
+"1212.title" = "重置所有警告";
+
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
+"1213.title" = "每天自动检查";
+
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
+"1214.title" = "检查更新：";
+
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
+"1216.title" = "默认位置：";
+
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
+"1217.title" = "设置：";
+
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
+"1218.title" = "将原始 Torrent 文件移到废纸篓。";
+
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
+"1219.title" = "监听以下位置的 Torrent 文件：";
+
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
+"1226.title" = "自动添加：";
+
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
+"1227.title" = "将未完成的文件保存在以下位置：";
+
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
+"1230.title" = "队列：";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
+"1231.title" = "正在传输的任务";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
+"1232.title" = "达到以下分享率停止做种：";
+
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
+"1234.title" = "限制：";
+
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
+"1235.title" = "分享率是上传量与下载量的比值";
+
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
+"1236.title" = "下载最大速度限制为：";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
+"1239.title" = "正在传输的任务";
+
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
+"1240.title" = "做种最大速度限制为：";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
+"1242.title" = "分钟";
+
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
+"1243.title" = "传输在闲置时间达到以下时间时停滞：";
+
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
+"1247.title" = "自动映射端口";
+
+/* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
+"1248.title" = "NAT 穿透使用 NAT-PMP 或 UPnP";
+
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
+"1250.title" = "端口是打开的";
+
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
+"1253.title" = "节点通信：";
+
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
+"1254.title" = "有活动传输时防止计算机进入睡眠状态";
+
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
+"1255.title" = "系统睡眠：";
+
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
+"1265.title" = "上传速度：";
+
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
+"1267.title" = "下载速度：";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
+"1268.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
+"1269.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
+"1270.title" = "全局带宽限制：";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
+"1273.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
+"1274.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
+"1275.title" = "限速模式：";
+
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
+"1276.title" = "上传速度：";
+
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
+"1277.title" = "下载速度：";
+
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
+"1278.title" = "启用限速时将覆盖全局带宽限制";
+
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
+"1280.title" = "计划限速：";
+
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
+"1281.title" = "到";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
+"1294.title" = "打开 Torrent 文件时显示窗口";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
+"1302.title" = "下载完成时：";
+
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
+"1306.title" = "做种完成时：";
+
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
+"1310.title" = "播放声音：";
+
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
+"1335.title" = "添加后开始传输";
+
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
+"1338.title" = "添加窗口：";
+
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
+"1340.title" = "仅当有多个文件时";
+
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
+"1437.title" = "更新";
+
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
+"1438.title" = "屏蔽列表已加载/未加载";
+
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
+"1439.title" = "屏蔽列表：";
+
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
+"1440.title" = "阻止来自屏蔽列表中的节点连接";
+
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
+"1441.title" = "高连接限制可能会显著影响系统性能";
+
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
+"1442.title" = "对公共 Torrent 文件使用节点交换（PEX）";
+
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
+"1443.title" = "新传输的最大连接数：";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
+"1446.title" = "节点";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
+"1447.title" = "节点";
+
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
+"1450.title" = "全局最大连接数：";
+
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
+"1451.title" = "连接数：";
+
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
+"1452.title" = "优先选择加密的节点";
+
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
+"1453.title" = "加密：";
+
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
+"1454.title" = "忽略未加密的节点";
+
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
+"1477.title" = "仅在手动添加时";
+
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
+"1493.title" = "监听端口：";
+
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
+"1502.title" = "启用远程访问";
+
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
+"1505.title" = "需要身份验证";
+
+/* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
+"1523.headerCell.title" = "IP地址";
+
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
+"1542.title" = "IP 地址可以包含 * 通配符";
+
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
+"1555.title" = "密码：";
+
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
+"1557.title" = "用户名：";
+
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
+"1645.title" = "这将启用 Web 界面并允许远程请求";
+
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
+"1718.title" = "启动 Web 界面";
+
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
+"1739.title" = "最后更新时间：N/A";
+
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
+"1742.title" = "每周自动更新";
+
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
+"1748.title" = "仅允许以下 IP 地址进行连接：";
+
+/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
+"1777.headerCell.title" = "颜色";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
+"1779.headerCell.title" = "名称";
+
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
+"1796.title" = "群组名称：";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
+"1813.title" = "其他…";
+
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
+"1815.title" = "自定义位置：";
+
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
+"1824.title" = "位置只有在添加传输时才会被设置";
+
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
+"1826.title" = "使用 Bonjour 显示 Web 界面";
+
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
+"1831.title" = "基于条件将新传输任务分配到群组";
+
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
+"1833.title" = "编辑…";
+
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
+"1835.title" = "传输将分配到第一个符合所有标准的群组";
+
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
+"1890.title" = "启动时随机更换端口";
+
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
+"1892.title" = "随机";
+
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
+"1896.title" = "包括 beta 版本发布";
+
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
+"1910.title" = "每天";
+
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
+"1911.title" = "工作日";
+
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
+"1912.title" = "周末";
+
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
+"1914.title" = "星期一";
+
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
+"1915.title" = "星期二";
+
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
+"1916.title" = "星期三";
+
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
+"1917.title" = "星期四";
+
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
+"1918.title" = "星期五";
+
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
+"1919.title" = "星期六";
+
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
+"1920.title" = "星期日";
+
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
+"1926.title" = "对于公共 Torrent 文件，使用分布式哈希表（DHT）";
+
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
+"1931.title" = "接受磁力链接：";
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
+"1933.title" = "设置默认应用程序";
+
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
+"1940.title" = "为未完成的文件附加 \".part\" 扩展名";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
+"1948.title" = "打开磁力链接时显示窗口";
+
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
+"1952.title" = "对公共 Torrent 文件使用本地节点发现";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
+"1962.title" = "当闲置时间达到以下时间时停止做种：";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
+"1970.title" = "分钟";
+
+/* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
+"1988.title" = "网址：";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
+"2044.title" = "下载完成时：";
+
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
+"2047.title" = "调用脚本：";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
+"2053.title" = "其他…";
+
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+"2078.title" = "启用微型传输协议（µTP）";
+
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
+"2082.title" = "节点监听端口：";
+
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
+"2087.title" = "通知：";
+
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
+"2114.title" = "配置系统偏好";
+
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
+"2119.title" = "做种完成时从传输列表中移除";
+
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
+"2123.title" = "适用于新添加的传输";
+
+/* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
+/* "A9E-F4-a3c.title" = ""; */
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
+"pgY-W3-HdI.title" = "设置默认应用程序";

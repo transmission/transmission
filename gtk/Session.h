@@ -21,6 +21,7 @@
 #include <gtkmm/treemodel.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -29,10 +30,10 @@
 class Session : public Glib::Object
 {
 public:
-    enum ErrorCode
+    enum ErrorCode : uint16_t
     {
-        ERR_ADD_TORRENT_ERR = TR_PARSE_ERR,
-        ERR_ADD_TORRENT_DUP = TR_PARSE_DUPLICATE,
+        ERR_ADD_TORRENT_ERR = 1,
+        ERR_ADD_TORRENT_DUP = 2,
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
     };
 
@@ -131,7 +132,7 @@ public:
 
     void blocklist_update();
 
-    void exec(tr_variant const* request);
+    void exec(tr_variant const& request);
 
     void open_folder(tr_torrent_id_t torrent_id) const;
 

@@ -11,6 +11,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/torrent-metainfo.h>
 

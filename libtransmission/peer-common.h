@@ -181,10 +181,12 @@ using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& ev
 class tr_peer
 {
 public:
+    using Speed = libtransmission::Values::Speed;
+
     tr_peer(tr_torrent const* tor);
     virtual ~tr_peer();
 
-    virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
+    [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
     [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept
     {
@@ -207,13 +209,6 @@ public:
 
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
-
-    [[nodiscard]] tr_bytes_per_second_t get_piece_speed_bytes_per_second(uint64_t now, tr_direction direction) const
-    {
-        auto bytes_per_second = tr_bytes_per_second_t{};
-        isTransferringPieces(now, direction, &bytes_per_second);
-        return bytes_per_second;
-    }
 
     virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
@@ -263,8 +258,12 @@ struct tr_swarm_stats
 {
     std::array<uint16_t, 2> active_peer_count;
     uint16_t active_webseed_count;
+    // connected peers
     uint16_t peer_count;
+    // connected peers by peer source
     std::array<uint16_t, TR_PEER_FROM__MAX> peer_from_count;
+    // known peers by peer source
+    std::array<uint16_t, TR_PEER_FROM__MAX> known_peer_from_count;
 };
 
 tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);

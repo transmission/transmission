@@ -17,8 +17,6 @@
 #include <QPixmapCache>
 #include <QStyleOptionProgressBar>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/utils.h>
 
 #include "StyleHelper.h"
@@ -240,7 +238,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     // render
     if (tor.hasError() && !is_item_selected)
     {
-        painter->setPen(QColor("red"));
+        painter->setPen(QColor{ "red" });
     }
     else
     {

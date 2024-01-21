@@ -1,0 +1,48 @@
+
+/* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
+"21.title" = "區塊：";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
+"22.placeholderString" = "不明";
+
+/* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
+"24.title" = "安全：";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
+"25.placeholderString" = "不明";
+
+/* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
+"26.title" = "資料檔案：";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
+"27.placeholderString" = "不明";
+
+/* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
+"28.title" = "位置";
+
+/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
+"29.title" = "顯示資料檔案";
+
+/* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
+"30.title" = "建立者：";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "不明";
+
+/* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
+"32.title" = "建立於：";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "不明";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
+"35.title" = "備註：";
+
+/* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
+"36.title" = "雜湊：";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "不明";
+
+/* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
+"41.title" = "Torrent 資訊";

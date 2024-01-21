@@ -27,5 +27,11 @@ node_modules/
 /android/.gradle
 /android/build
 
+# clangd compile commands
+compile_commands.json
+
 # CLion IDE build directory
 /cmake-build-*/
+
+# CMake user presets
+CMakeUserPresets.json

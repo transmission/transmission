@@ -24,6 +24,13 @@
 class tr_open_files
 {
 public:
+    enum class Preallocation
+    {
+        None,
+        Sparse,
+        Full
+    };
+
     [[nodiscard]] std::optional<tr_sys_file_t> get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable);
 
     [[nodiscard]] std::optional<tr_sys_file_t> get(
@@ -31,7 +38,7 @@ public:
         tr_file_index_t file_num,
         bool writable,
         std::string_view filename,
-        tr_preallocation_mode allocation,
+        Preallocation allocation,
         uint64_t file_size);
 
     void close_all();
@@ -67,6 +74,6 @@ private:
         bool writable_ = false;
     };
 
-    static constexpr size_t MaxOpenFiles = 32;
+    static constexpr size_t MaxOpenFiles = 32U;
     tr_lru_cache<Key, Val, MaxOpenFiles> pool_;
 };

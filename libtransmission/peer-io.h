@@ -14,6 +14,7 @@
 #include <cstdint> // uintX_t
 #include <deque>
 #include <memory>
+#include <optional>
 #include <utility> // std::pair
 
 #include <event2/util.h> // for evutil_socket_t
@@ -170,9 +171,9 @@ public:
         return bandwidth_.clamp(dir, 1024) > 0;
     }
 
-    [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t now, tr_direction dir) const noexcept
+    [[nodiscard]] auto get_piece_speed(uint64_t now, tr_direction dir) const noexcept
     {
-        return bandwidth_.get_piece_speed_bytes_per_second(now, dir);
+        return bandwidth_.get_piece_speed(now, dir);
     }
 
     ///
@@ -340,8 +341,10 @@ private:
         }
     }
 
+#ifdef WITH_UTP
     void on_utp_state_change(int new_state);
     void on_utp_error(int errcode);
+#endif
 
     void close();
 
