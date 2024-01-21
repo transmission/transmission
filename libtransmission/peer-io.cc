@@ -722,6 +722,11 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
+                // The peer io object can destruct inside can_read_wrapper(), so keep
+                // it alive for the duration of this code block. This can happen when
+                // a BT handshake did not complete successfully for example.
+                auto const keep_alive = io->shared_from_this();
+
                 io->inbuf_.add(args->buf, args->len);
                 io->set_enabled(TR_DOWN, true);
                 io->can_read_wrapper();
