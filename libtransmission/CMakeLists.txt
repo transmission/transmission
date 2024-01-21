@@ -271,6 +271,10 @@ target_include_directories(${TR_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}/..)
 
+if(ANDROID)
+    find_library(log-lib log)
+endif()
+
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
@@ -295,6 +299,7 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
+        "$<$<BOOL:${ANDROID}>:${log-lib}>"
     PUBLIC
         fmt::fmt-header-only
         small::small
