@@ -160,6 +160,4 @@ protected:
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
-
-    std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};
 };

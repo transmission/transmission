@@ -76,6 +76,9 @@ public:
 
     size_t get_active_torrent_count() const;
 
+    bool get_port_test_pending(PortTestIpProtocol ip_protocol);
+    void set_port_test_pending(bool pending, PortTestIpProtocol ip_protocol);
+
     void update();
     void torrents_added();
 
@@ -184,6 +187,7 @@ private:
     bool inhibit_allowed_ = false;
     bool have_inhibit_cookie_ = false;
     bool dbus_error_ = false;
+    std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};
     guint inhibit_cookie_ = 0;
     gint busy_count_ = 0;
     Glib::RefPtr<Gio::ListStore<Torrent>> raw_model_;
@@ -1230,7 +1234,7 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
     {
         return;
     }
-    port_test_pending_[ip_protocol] = true;
+    impl_->set_port_test_pending(true, ip_protocol);
 
     auto const tag = nextTag++;
 
@@ -1247,7 +1251,7 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
         tag,
         [this, ip_protocol](tr_variant& response)
         {
-            port_test_pending_[ip_protocol] = false;
+            impl_->set_port_test_pending(false, ip_protocol);
 
             auto status = std::optional<bool>{};
             if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
@@ -1267,7 +1271,20 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
 
 bool Session::port_test_pending(Session::PortTestIpProtocol ip_protocol) const noexcept
 {
+    return impl_->get_port_test_pending(ip_protocol);
+}
+
+bool Session::Impl::get_port_test_pending(Session::PortTestIpProtocol ip_protocol)
+{
     return ip_protocol < NUM_PORT_TEST_IP_PROTOCOL && port_test_pending_[ip_protocol];
+}
+
+void Session::Impl::set_port_test_pending(bool pending, Session::PortTestIpProtocol ip_protocol)
+{
+    if (ip_protocol < NUM_PORT_TEST_IP_PROTOCOL)
+    {
+        port_test_pending_[ip_protocol] = pending;
+    }
 }
 
 /***
