@@ -427,31 +427,66 @@ void PrefsDialog::initDesktopTab()
 
 // ---
 
-void PrefsDialog::resetPortStatusLabel()
+QString PrefsDialog::getPortStatusText(PrefsDialog::PortTestStatus status) noexcept
 {
-    ui_.peerPortStatusLabel->setText(tr("Status: <b>%1</b>").arg(tr("unknown")));
+    switch (status)
+    {
+    case PORT_TEST_UNKNOWN:
+        return tr("unknown");
+    case PORT_TEST_CHECKING:
+        return tr("checking…");
+    case PORT_TEST_OPEN:
+        return tr("open");
+    case PORT_TEST_CLOSED:
+        return tr("closed");
+    case PORT_TEST_ERROR:
+        return tr("error");
+    default:
+        return {};
+    }
 }
 
-void PrefsDialog::onPortTested(std::optional<bool> is_open_ipv4, std::optional<bool> is_open_ipv6)
+void PrefsDialog::updatePortStatusLabel()
 {
-    static auto constexpr ToStr = [](std::optional<bool> is_open)
-    {
-        return is_open ? (*is_open ? tr("open") : tr("closed")) : tr("error");
-    };
+    ui_.peerPortStatusLabel->setText(tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)")
+                                         .arg(getPortStatusText(port_test_status_[Session::PORT_TEST_IPV4]))
+                                         .arg(getPortStatusText(port_test_status_[Session::PORT_TEST_IPV6])));
+}
 
-    ui_.testPeerPortButton->setEnabled(true);
-    widgets_[Prefs::PEER_PORT]->setEnabled(true);
-    ui_.peerPortStatusLabel->setText(
-        tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(ToStr(is_open_ipv4)).arg(ToStr(is_open_ipv6)));
+void PrefsDialog::portTestSetEnabled()
+{
+    // Depend on the RPC call status instead of the UI status, so that the widgets
+    // won't be enabled even if the port peer port changed while we have port-test
+    // RPC call(s) in-flight.
+    auto const sensitive = !session_.portTestPending(Session::PORT_TEST_IPV4) &&
+        !session_.portTestPending(Session::PORT_TEST_IPV6);
+    ui_.testPeerPortButton->setEnabled(sensitive);
+    widgets_[Prefs::PEER_PORT]->setEnabled(sensitive);
+}
+
+void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol)
+{
+    // Only update the UI if the current status is "checking", so that
+    // we won't show the port test results for the old peer port if it
+    // changed while we have port-test RPC call(s) in-flight.
+    if (port_test_status_[ip_protocol] == PORT_TEST_CHECKING)
+    {
+        port_test_status_[ip_protocol] = result ? (*result ? PORT_TEST_OPEN : PORT_TEST_CLOSED) : PORT_TEST_ERROR;
+        updatePortStatusLabel();
+    }
+    portTestSetEnabled();
 }
 
 void PrefsDialog::onPortTest()
 {
-    ui_.peerPortStatusLabel->setText(
-        tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(tr("checking…")).arg(tr("checking…")));
-    ui_.testPeerPortButton->setEnabled(false);
-    widgets_[Prefs::PEER_PORT]->setEnabled(false);
-    session_.portTest();
+    port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_CHECKING;
+    port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_CHECKING;
+    updatePortStatusLabel();
+
+    session_.portTest(Session::PORT_TEST_IPV4);
+    session_.portTest(Session::PORT_TEST_IPV6);
+
+    portTestSetEnabled();
 }
 
 void PrefsDialog::initNetworkTab()
@@ -478,7 +513,7 @@ void PrefsDialog::initNetworkTab()
     connect(ui_.testPeerPortButton, &QAbstractButton::clicked, this, &PrefsDialog::onPortTest);
     connect(&session_, &Session::portTested, this, &PrefsDialog::onPortTested);
 
-    resetPortStatusLabel();
+    updatePortStatusLabel();
 }
 
 // ---
@@ -796,8 +831,10 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        resetPortStatusLabel();
-        ui_.testPeerPortButton->setEnabled(true);
+        port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_UNKNOWN;
+        port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_UNKNOWN;
+        updatePortStatusLabel();
+        portTestSetEnabled();
         break;
 
     default:

@@ -84,57 +84,41 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
     exec("session-set", &args);
 }
 
-void Session::portTest()
+void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
 {
-    enum : uint8_t
+    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
+
+    if (portTestPending(ip_protocol))
     {
-        // These numbers are used as array indices
-        PORT_TEST_IPV4,
-        PORT_TEST_IPV6,
-        NUM_PORT_TEST_IP_PROTOCOL
+        return;
+    }
+    port_test_pending_[ip_protocol] = true;
+
+    auto args = tr_variant::make_map(1U);
+    tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, IpStr[ip_protocol]);
+
+    auto const response_func = [this, ip_protocol](RpcResponse const& r)
+    {
+        port_test_pending_[ip_protocol] = false;
+
+        // If for whatever reason the status optional is empty here,
+        // then something must have gone wrong with the port test,
+        // so the UI should show the "error" state
+        emit portTested(dictFind<bool>(r.args.get(), TR_KEY_port_is_open), ip_protocol);
     };
 
-    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
-    static auto tags = std::array<std::optional<RpcQueue::Tag>, NUM_PORT_TEST_IP_PROTOCOL>{};
-    static auto results = std::array<std::optional<bool>, NUM_PORT_TEST_IP_PROTOCOL>{};
+    auto* q = new RpcQueue{};
 
-    for (uint8_t ip_protocol = 0U; ip_protocol < NUM_PORT_TEST_IP_PROTOCOL; ++ip_protocol)
-    {
-        auto args = tr_variant::make_map(1U);
-        tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, IpStr[ip_protocol]);
+    q->add([this, &args]() { return exec("port-test", &args); }, response_func);
 
-        auto* q = new RpcQueue{};
-        tags[ip_protocol] = q->tag();
-        results[ip_protocol].reset();
+    q->add(response_func);
 
-        auto const response_func = [this, &tag_req = tags[ip_protocol], ip_protocol](RpcResponse const& r)
-        {
-            if (tag_req != r.tag)
-            {
-                return;
-            }
+    q->run();
+}
 
-            if (auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open); value)
-            {
-                results[ip_protocol] = value;
-            }
-
-            tag_req.reset();
-            if (!tags[PORT_TEST_IPV4] && !tags[PORT_TEST_IPV6])
-            {
-                // If for whatever reason the results optional is empty here,
-                // then something must have gone wrong with the port test,
-                // so the UI should show the "error" state
-                emit portTested(results[PORT_TEST_IPV4], results[PORT_TEST_IPV6]);
-            }
-        };
-
-        q->add([this, &args]() { return exec("port-test", &args); }, response_func);
-
-        q->add(response_func);
-
-        q->run();
-    }
+bool Session::portTestPending(Session::PortTestIpProtocol const ip_protocol) const noexcept
+{
+    return ip_protocol >= NUM_PORT_TEST_IP_PROTOCOL || port_test_pending_[ip_protocol];
 }
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)

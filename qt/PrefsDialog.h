@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <map>
 #include <optional>
 
@@ -12,14 +13,12 @@
 
 #include "BaseDialog.h"
 #include "Prefs.h"
+#include "Session.h"
 #include "ui_PrefsDialog.h"
 
 class QHttp;
 class QMessageBox;
 class QString;
-
-class Prefs;
-class Session;
 
 class PrefsDialog : public BaseDialog
 {
@@ -40,7 +39,7 @@ private slots:
     void encryptionEdited(int);
     void altSpeedDaysEdited(int);
     void sessionUpdated();
-    void onPortTested(std::optional<bool>, std::optional<bool>);
+    void onPortTested(std::optional<bool>, Session::PortTestIpProtocol);
     void onPortTest();
     void onIdleLimitChanged();
     void onQueueStalledMinutesChanged();
@@ -53,12 +52,23 @@ private slots:
 private:
     using key2widget_t = std::map<int, QWidget*>;
 
+    enum PortTestStatus : uint8_t
+    {
+        PORT_TEST_UNKNOWN = 0U,
+        PORT_TEST_CHECKING,
+        PORT_TEST_OPEN,
+        PORT_TEST_CLOSED,
+        PORT_TEST_ERROR
+    };
+
     bool updateWidgetValue(QWidget* widget, int pref_key) const;
+    void portTestSetEnabled();
     void linkWidgetToPref(QWidget* widget, int pref_key);
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
+    void updatePortStatusLabel();
     void updateSeedingWidgetsLocality();
-    void resetPortStatusLabel();
+    static QString getPortStatusText(PortTestStatus status) noexcept;
 
     void setPref(int key, QVariant const& v);
 
@@ -77,6 +87,7 @@ private:
 
     bool const is_server_;
     bool is_local_ = {};
+    std::array<PortTestStatus, Session::NUM_PORT_TEST_IP_PROTOCOL> port_test_status_ = {};
 
     key2widget_t widgets_;
     QWidgetList web_widgets_;
