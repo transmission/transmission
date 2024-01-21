@@ -1144,6 +1144,12 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
+    if (auto const addr = tr_address::from_string(primary_ip);
+        data->args_out.find_if<std::string_view>(TR_KEY_ipProtocol) == nullptr && addr && addr->is_valid())
+    {
+        data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+    }
+
     if (status != 200)
     {
         tr_idle_function_done(
@@ -1155,30 +1161,30 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    auto const addr = tr_address::from_string(primary_ip);
-    if (!addr || !addr->is_valid())
-    {
-        tr_idle_function_done(data, "Unknown error, please file a bug report to us");
-        return;
-    }
-
     data->args_out.try_emplace(TR_KEY_port_is_open, tr_strv_starts_with(body, '1'));
-    data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     tr_idle_function_done(data, SuccessResult);
 }
 
 char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
-    auto ip_proto = tr_web::FetchOptions::IPProtocol::ANY;
+    static auto constexpr TimeoutSecs = 20s;
+
+    auto const port = session->advertisedPeerPort();
+    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
+    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
+    options.timeout_secs = TimeoutSecs;
+
     if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_ipProtocol); val != nullptr)
     {
         if (*val == "ipv4"sv)
         {
-            ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv4"sv);
         }
         else if (*val == "ipv6"sv)
         {
-            ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv6"sv);
         }
         else
         {
@@ -1186,10 +1192,6 @@ char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct
         }
     }
 
-    auto const port = session->advertisedPeerPort();
-    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
-    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
-    options.ip_proto = ip_proto;
     session->fetch(std::move(options));
     return nullptr;
 }
