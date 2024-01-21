@@ -933,15 +933,15 @@ std::string_view NetworkPage::getPortStatusText(PortTestStatus const status) noe
     switch (status)
     {
     case PORT_TEST_UNKNOWN:
-        return _("unknown");
+        return C_("Port test status", "unknown");
     case PORT_TEST_CHECKING:
-        return _("checking…");
+        return C_("Port test status", "checking…");
     case PORT_TEST_OPEN:
-        return _("open");
+        return C_("Port test status", "open");
     case PORT_TEST_CLOSED:
-        return _("closed");
+        return C_("Port test status", "closed");
     case PORT_TEST_ERROR:
-        return _("error");
+        return C_("Port test status", "error");
     default:
         return {};
     }
