@@ -1267,7 +1267,7 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
 
 bool Session::port_test_pending(Session::PortTestIpProtocol ip_protocol) const noexcept
 {
-    return ip_protocol >= NUM_PORT_TEST_IP_PROTOCOL || port_test_pending_[ip_protocol];
+    return ip_protocol < NUM_PORT_TEST_IP_PROTOCOL && port_test_pending_[ip_protocol];
 }
 
 /***
