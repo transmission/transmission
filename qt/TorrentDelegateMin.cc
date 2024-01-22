@@ -248,15 +248,15 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     if (tor.isDownloading())
     {
-        progress_bar_style_.palette.setBrush(QPalette::Highlight, BlueBrush);
-        progress_bar_style_.palette.setColor(QPalette::Base, BlueBack);
-        progress_bar_style_.palette.setColor(QPalette::Window, BlueBack);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, FrostedBlueBerries);
+        progress_bar_style_.palette.setColor(QPalette::Base, BlueTriumph);
+        progress_bar_style_.palette.setColor(QPalette::Window, BlueTriumph);
     }
     else if (tor.isSeeding())
     {
-        progress_bar_style_.palette.setBrush(QPalette::Highlight, GreenBrush);
-        progress_bar_style_.palette.setColor(QPalette::Base, GreenBack);
-        progress_bar_style_.palette.setColor(QPalette::Window, GreenBack);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, GolfCourse);
+        progress_bar_style_.palette.setColor(QPalette::Base, Verde);
+        progress_bar_style_.palette.setColor(QPalette::Window, GolfCourse);
     }
     else
     {
@@ -274,7 +274,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     auto const brush = progress_bar_style_.palette.brush(QPalette::Highlight);
     float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
 
-    painter->fillRect(layout.progress_bar_rect, progress_bar_style_.palette.color(QPalette::Light));
+    painter->fillRect(layout.progress_bar_rect, option.palette.color(QPalette::Base));
 
     QRect progress_bar_fill_rect = layout.progress_bar_rect;
     progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());

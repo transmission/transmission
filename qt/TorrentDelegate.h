@@ -42,10 +42,10 @@ protected:
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-    QColor const BlueBack{ "lightgrey" };
-    QColor const BlueBrush{ "steelblue" };
-    QColor const GreenBack{ "darkseagreen" };
-    QColor const GreenBrush{ "forestgreen" };
+    QColor const FrostedBlueBerries{ "#1847d4" };
+    QColor const BlueTriumph{ "#5379a9" };
+    QColor const Verde{ "#62be79" };
+    QColor const GolfCourse{ "#26a955" };
     QColor const SilverBack{ "grey" };
     QColor const SilverBrush{ "silver" };
 
