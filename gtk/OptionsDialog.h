@@ -11,7 +11,7 @@
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/filechoosernative.h>
 #include <gtkmm/window.h>
 
 #include <memory>
@@ -38,7 +38,7 @@ private:
     void onOpenURLResponse(int response, Gtk::Entry const& entry, Glib::RefPtr<Session> const& core);
 };
 
-class TorrentFileChooserDialog : public Gtk::FileChooserDialog
+class TorrentFileChooserDialog : public Gtk::FileChooserNative
 {
 public:
     ~TorrentFileChooserDialog() override = default;

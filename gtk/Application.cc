@@ -1516,7 +1516,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
-        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
+        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "show-stats")
