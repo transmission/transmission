@@ -285,6 +285,49 @@ public:
     using Peers = std::vector<tr_peerMsgs*>;
     using Pool = std::unordered_map<tr_socket_address, tr_peer_info>;
 
+    class WishlistMediator final : public Wishlist::Mediator
+    {
+    public:
+        explicit WishlistMediator(tr_swarm& swarm)
+            : tor_{ *swarm.tor }
+            , swarm_{ swarm }
+        {
+        }
+
+        [[nodiscard]] bool client_has_block(tr_block_index_t block) const override;
+        [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override;
+        [[nodiscard]] bool is_endgame() const override;
+        [[nodiscard]] bool is_sequential_download() const override;
+        [[nodiscard]] size_t count_active_requests(tr_block_index_t block) const override;
+        [[nodiscard]] size_t count_missing_blocks(tr_piece_index_t piece) const override;
+        [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override;
+        [[nodiscard]] tr_block_span_t block_span(tr_piece_index_t piece) const override;
+        [[nodiscard]] tr_piece_index_t piece_count() const override;
+        [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override;
+
+        [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_block(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_have(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_have_all(
+            libtransmission::SimpleObservable<tr_torrent*>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_piece_completed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_priority_changed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer
+                observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
+            libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
+
+    private:
+        tr_torrent& tor_;
+        tr_swarm& swarm_;
+    };
+
     [[nodiscard]] auto unique_lock() const
     {
         return tor->unique_lock();
@@ -371,6 +414,8 @@ public:
     void remove_peer(tr_peerMsgs* peer)
     {
         auto const lock = unique_lock();
+
+        peer_disconnect.emit(tor, peer->has());
 
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
@@ -504,11 +549,19 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotHave:
+            s->got_have.emit(s->tor, event.pieceIndex);
+            break;
+
         case tr_peer_event::Type::ClientGotHaveAll:
+            s->got_have_all.emit(s->tor);
+            break;
+
         case tr_peer_event::Type::ClientGotHaveNone:
+            // no-op
+            break;
+
         case tr_peer_event::Type::ClientGotBitfield:
-            /* TODO: if we don't need these, should these events be removed? */
-            /* noop */
+            s->got_bitfield.emit(s->tor, msgs->has());
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
@@ -544,6 +597,12 @@ public:
         }
     }
 
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> peer_disconnect;
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t> got_block;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have;
+    libtransmission::SimpleObservable<tr_torrent*> got_have_all;
+
     mutable tr_swarm_stats stats = {};
 
     uint8_t optimistic_unchoke_time_scaler = 0;
@@ -561,6 +620,8 @@ public:
 
     // depends-on: active_requests
     Peers peers;
+
+    std::unique_ptr<Wishlist> wishlist;
 
     // tr_peerMsgs hold pointers to the items in these containers,
     // therefore references to elements within cannot invalidate
@@ -652,6 +713,7 @@ private:
     void on_torrent_done()
     {
         std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
+        wishlist.reset();
     }
 
     void on_swarm_is_all_seeds()
@@ -765,6 +827,7 @@ private:
                 s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 tor->on_block_received(loc.block);
+                s->got_block.emit(tor, event.pieceIndex, loc.block);
             }
 
             break;
@@ -906,6 +969,111 @@ private:
 
     bool is_endgame_ = false;
 };
+
+bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
+{
+    return tor_.has_block(block);
+}
+
+bool tr_swarm::WishlistMediator::client_wants_piece(tr_piece_index_t piece) const
+{
+    return tor_.piece_is_wanted(piece);
+}
+
+bool tr_swarm::WishlistMediator::is_endgame() const
+{
+    return swarm_.is_endgame();
+}
+
+bool tr_swarm::WishlistMediator::is_sequential_download() const
+{
+    return tor_.is_sequential_download();
+}
+
+size_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block) const
+{
+    return swarm_.active_requests.count(block);
+}
+
+size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) const
+{
+    return tor_.count_missing_blocks_in_piece(piece);
+}
+
+size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piece) const
+{
+    auto const& peers = swarm_.peers;
+    return std::accumulate(
+        std::begin(peers),
+        std::end(peers),
+        size_t{},
+        [piece](size_t acc, tr_peer* peer) { return acc + (peer->hasPiece(piece) ? 1U : 0U); });
+}
+
+tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
+{
+    return tor_.block_span_for_piece(piece);
+}
+
+tr_piece_index_t tr_swarm::WishlistMediator::piece_count() const
+{
+    return tor_.piece_count();
+}
+
+tr_priority_t tr_swarm::WishlistMediator::priority(tr_piece_index_t piece) const
+{
+    return tor_.piece_priority(piece);
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_peer_disconnect(
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
+{
+    return swarm_.peer_disconnect.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
+{
+    return swarm_.got_bitfield.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_block(
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer)
+{
+    return swarm_.got_block.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have(
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+{
+    return swarm_.got_have.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have_all(
+    libtransmission::SimpleObservable<tr_torrent*>::Observer observer)
+{
+    return swarm_.got_have_all.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_piece_completed(
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+{
+    return tor_.piece_completed_.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_priority_changed(
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer observer)
+{
+    return tor_.priority_changed_.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_changed(
+    libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer)
+{
+    return tor_.sequential_download_changed_.observe(std::move(observer));
+}
+
+// ---
 
 struct tr_peerMgr
 {
@@ -1087,77 +1255,16 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
-    class MediatorImpl final : public Wishlist::Mediator
+    TR_ASSERT(!torrent->is_done());
+    tr_swarm& swarm = *torrent->swarm;
+    if (!swarm.wishlist)
     {
-    public:
-        MediatorImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
-            : torrent_{ torrent_in }
-            , swarm_{ torrent_in->swarm }
-            , peer_{ peer_in }
-        {
-        }
-
-        MediatorImpl(MediatorImpl&&) = delete;
-        MediatorImpl(MediatorImpl const&) = delete;
-        MediatorImpl& operator=(MediatorImpl&&) = delete;
-        MediatorImpl& operator=(MediatorImpl const&) = delete;
-
-        ~MediatorImpl() override = default;
-
-        [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
-        {
-            return !torrent_->has_block(block) && !swarm_->active_requests.has(block, peer_);
-        }
-
-        [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
-        {
-            return torrent_->piece_is_wanted(piece) && peer_->hasPiece(piece);
-        }
-
-        [[nodiscard]] bool isEndgame() const override
-        {
-            return swarm_->is_endgame();
-        }
-
-        [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const override
-        {
-            return swarm_->active_requests.count(block);
-        }
-
-        [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const override
-        {
-            return torrent_->count_missing_blocks_in_piece(piece);
-        }
-
-        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
-        {
-            return torrent_->block_span_for_piece(piece);
-        }
-
-        [[nodiscard]] tr_piece_index_t countAllPieces() const override
-        {
-            return torrent_->piece_count();
-        }
-
-        [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
-        {
-            return torrent_->piece_priority(piece);
-        }
-
-        [[nodiscard]] bool isSequentialDownload() const override
-        {
-            return torrent_->is_sequential_download();
-        }
-
-    private:
-        tr_torrent const* const torrent_;
-        tr_swarm const* const swarm_;
-        tr_peer const* const peer_;
-    };
-
-    torrent->swarm->update_endgame();
-    auto const mediator = MediatorImpl{ torrent, peer };
-    return Wishlist{ mediator }.next(numwant);
+        swarm.wishlist = std::make_unique<Wishlist>(std::make_unique<tr_swarm::WishlistMediator>(swarm));
+    }
+    return swarm.wishlist->next(
+        numwant,
+        [peer](tr_piece_index_t p) { return peer->hasPiece(p); },
+        [peer, &swarm](tr_block_index_t b) { return swarm.active_requests.has(b, peer); });
 }
 
 // --- Piece List Manipulation / Accessors
