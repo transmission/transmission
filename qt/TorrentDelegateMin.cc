@@ -284,7 +284,21 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+
+    auto const brush = progress_bar_style_.palette.brush(QPalette::Highlight);
+    float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+
+    painter->fillRect(layout.progress_bar_rect, progress_bar_style_.palette.color(QPalette::Light));
+
+    QRect progress_bar_fill_rect = layout.progress_bar_rect;
+    progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
+    painter->fillRect(progress_bar_fill_rect, brush);
+
+    painter->setPen(progress_bar_style_.palette.color(QPalette::Base));
+    painter->drawRect(layout.progress_bar_rect);
+
+    painter->setPen(progress_bar_style_.palette.color(QPalette::Text));
+    painter->drawText(layout.progress_bar_rect, progress_bar_style_.text, QTextOption{ Qt::AlignCenter });
 
     painter->restore();
 }
