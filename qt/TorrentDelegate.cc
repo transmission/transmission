@@ -611,16 +611,21 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    auto const cr = is_item_selected ? QPalette::Base : QPalette::Highlight;
+    auto const brush = progress_bar_style_.palette.brush(QPalette::Highlight);
     float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+
+    painter->fillRect(layout.bar_rect, progress_bar_style_.palette.color(QPalette::Light));
 
     QRect progress_bar_fill_rect = layout.progress_bar_rect;
     progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
-    painter->fillRect(progress_bar_fill_rect, progress_bar_style_.palette.brush(cr));
+    painter->fillRect(progress_bar_fill_rect, brush);
+
+    painter->setPen(progress_bar_style_.palette.color(QPalette::Base));
+    painter->drawRect(layout.progress_bar_rect);
 
     if (progress == 1.0)
     {
-        painter->fillRect(layout.piece_bar_rect, progress_bar_style_.palette.brush(cr));
+        painter->fillRect(layout.bar_rect, brush);
     }
     else
     {
@@ -646,14 +651,12 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
                                            static_cast<int>(section_width * piece_width + 1),
                                            PIECE_BAR_HEIGHT - 3 };
 
-                painter->fillRect(piece_rect, progress_bar_style_.palette.brush(cr));
+                painter->fillRect(piece_rect, brush);
                 section_width = 0;
             }
         }
     }
 
-    painter->setPen(option.palette.color(color_group, color_role));
-    painter->drawRect(layout.progress_bar_rect);
     painter->drawRect(layout.bar_rect);
 
     painter->restore();
