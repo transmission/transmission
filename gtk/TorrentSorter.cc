@@ -13,6 +13,8 @@
 #include <libtransmission/utils.h>
 
 #include <algorithm>
+#include <array>
+#include <utility>
 
 using namespace std::string_view_literals;
 
@@ -178,7 +180,8 @@ TorrentSorter::TorrentSorter()
 
 void TorrentSorter::set_mode(std::string_view mode)
 {
-    static auto const compare_funcs = std::map<std::string_view, CompareFunc>({
+    static auto constexpr DefaultCompareFunc = &compare_by_name;
+    static auto constexpr CompareFuncs = std::array<std::pair<std::string_view, CompareFunc>, 9U>{ {
         { "sort-by-activity"sv, &compare_by_activity },
         { "sort-by-age"sv, &compare_by_age },
         { "sort-by-name"sv, &compare_by_name },
@@ -188,14 +191,13 @@ void TorrentSorter::set_mode(std::string_view mode)
         { "sort-by-size"sv, &compare_by_size },
         { "sort-by-state"sv, &compare_by_state },
         { "sort-by-time-left"sv, &compare_by_eta },
-    });
+    } };
 
-    auto compare_func = &compare_by_name;
-    if (auto const compare_func_it = compare_funcs.find(mode); compare_func_it != compare_funcs.end())
-    {
-        compare_func = compare_func_it->second;
-    }
-
+    auto const iter = std::find_if(
+        std::begin(CompareFuncs),
+        std::end(CompareFuncs),
+        [key = mode](auto const& row) { return row.first == key; });
+    auto const compare_func = iter != std::end(CompareFuncs) ? iter->second : DefaultCompareFunc;
     if (compare_func_ == compare_func)
     {
         return;
