@@ -113,6 +113,7 @@
                         <property name="receives-default">False</property>
                         <property name="valign">center</property>
                         <property name="use-underline">True</property>
+                        <property name="active">True</property>
                         <property name="draw-indicator">True</property>
                       </object>
                       <packing>
@@ -142,7 +143,6 @@
                         <property name="receives-default">False</property>
                         <property name="valign">center</property>
                         <property name="use-underline">True</property>
-                        <property name="active">True</property>
                         <property name="draw-indicator">True</property>
                         <property name="group">source_folder_radio</property>
                       </object>

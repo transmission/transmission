@@ -1451,6 +1451,7 @@
                               <object class="GtkTextView" id="default_trackers_view">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
+                                <property name="accepts-tab">False</property>
                                 <property name="tooltip-text" translatable="yes"><![CDATA[Trackers to use on all public torrents.
 
 To add a backup URL, add it on the next line after a primary URL.

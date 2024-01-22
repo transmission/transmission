@@ -54,6 +54,7 @@
                         <property name="label" translatable="1">Source F_older:</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
+                        <property name="active">1</property>
                         <layout>
                           <property name="column">0</property>
                           <property name="row">1</property>
@@ -76,7 +77,6 @@
                         <property name="label" translatable="1">Source _File:</property>
                         <property name="valign">center</property>
                         <property name="use-underline">1</property>
-                        <property name="active">1</property>
                         <property name="group">source_folder_radio</property>
                         <layout>
                           <property name="column">0</property>
