@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
 <interface domain="transmission-gtk">
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkDialog" id="MakeDialog">
@@ -77,7 +76,6 @@
               </packing>
             </child>
             <child>
-              <!-- n-columns=2 n-rows=5 -->
               <object class="GtkGrid" id="files_section_layout">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -254,7 +252,6 @@
               </packing>
             </child>
             <child>
-              <!-- n-columns=2 n-rows=4 -->
               <object class="GtkGrid" id="properties_section_layout">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -312,8 +309,8 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">To add a backup URL, add it on the next line after a primary URL.
-To add a new primary URL, add it after a blank line.</property>
+                        <property name="label" translatable="yes"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
+To add a new primary URL, add it after a blank line.]]></property>
                         <property name="xalign">0</property>
                       </object>
                       <packing>

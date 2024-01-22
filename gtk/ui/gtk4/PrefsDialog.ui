@@ -27,7 +27,7 @@
                         <property name="label" translatable="1">Speed Limits</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -97,7 +97,7 @@
                             <property name="label" translatable="1">Alternative Speed Limits</property>
                             <property name="xalign">0</property>
                             <attributes>
-                              <attribute name="weight" value="bold"></attribute>
+                              <attribute name="weight" value="bold"/>
                             </attributes>
                           </object>
                         </child>
@@ -261,7 +261,7 @@
                         <property name="label" translatable="1" context="Gerund">Adding</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -341,7 +341,6 @@
                             <property name="sensitive" bind-source="watch_dir_check" bind-property="active" bind-flags="sync-create">0</property>
                             <property name="hexpand">1</property>
                             <property name="action">select-folder</property>
-                            <property name="title" translatable="1"></property>
                             <layout>
                               <property name="column">1</property>
                               <property name="row">0</property>
@@ -351,7 +350,6 @@
                         <child>
                           <object class="gtkmm__CustomObject_10PathButton" id="download_dir_chooser">
                             <property name="action">select-folder</property>
-                            <property name="title" translatable="1"></property>
                             <layout>
                               <property name="column">1</property>
                               <property name="row">4</property>
@@ -363,7 +361,7 @@
                             <property name="label">...</property>
                             <property name="xalign">0</property>
                             <attributes>
-                              <attribute name="style" value="italic"></attribute>
+                              <attribute name="style" value="italic"/>
                             </attributes>
                             <layout>
                               <property name="column">1</property>
@@ -393,7 +391,7 @@
                         <property name="label" translatable="1">Download Queue</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -458,7 +456,7 @@
                         <property name="label" translatable="1">Incomplete</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -510,7 +508,6 @@
                             <property name="sensitive" bind-source="incomplete_dir_check" bind-property="active" bind-flags="sync-create">0</property>
                             <property name="hexpand">1</property>
                             <property name="action">select-folder</property>
-                            <property name="title" translatable="1"></property>
                             <layout>
                               <property name="column">1</property>
                               <property name="row">1</property>
@@ -521,7 +518,6 @@
                           <object class="gtkmm__CustomObject_10PathButton" id="download_done_script_chooser">
                             <property name="sensitive" bind-source="download_done_script_check" bind-property="active" bind-flags="sync-create">0</property>
                             <property name="hexpand">1</property>
-                            <property name="title" translatable="1"></property>
                             <layout>
                               <property name="column">1</property>
                               <property name="row">2</property>
@@ -552,7 +548,7 @@
                         <property name="label" translatable="1">Limits</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -623,7 +619,6 @@
                           <object class="gtkmm__CustomObject_10PathButton" id="seeding_done_script_chooser">
                             <property name="sensitive" bind-source="seeding_done_script_check" bind-property="active" bind-flags="sync-create">0</property>
                             <property name="hexpand">1</property>
-                            <property name="title" translatable="1"></property>
                             <layout>
                               <property name="column">1</property>
                               <property name="row">2</property>
@@ -654,7 +649,7 @@
                         <property name="label" translatable="1">Privacy</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -696,7 +691,7 @@
                         <property name="label" translatable="1">Blocklist</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -755,7 +750,7 @@
                                 <property name="label">...</property>
                                 <property name="xalign">0</property>
                                 <attributes>
-                                  <attribute name="style" value="italic"></attribute>
+                                  <attribute name="style" value="italic"/>
                                 </attributes>
                               </object>
                             </child>
@@ -808,7 +803,7 @@
                         <property name="label" translatable="1">Listening Port</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -921,7 +916,7 @@
                         <property name="label" translatable="1">Peer Limits</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -986,7 +981,7 @@
                         <property name="label" translatable="1">Options</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -1067,7 +1062,7 @@
                         <property name="label" translatable="1">Default Public Trackers</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -1088,10 +1083,10 @@
                               <object class="GtkTextView" id="default_trackers_view">
                                 <property name="focusable">1</property>
                                 <property name="accepts-tab">0</property>
-                                <property name="tooltip-text" translatable="1">Trackers to use on all public torrents.
+                                <property name="tooltip-text" translatable="1"><![CDATA[Trackers to use on all public torrents.
 
 To add a backup URL, add it on the next line after a primary URL.
-To add a new primary URL, add it after a blank line.</property>
+To add a new primary URL, add it after a blank line.]]></property>
                                 <property name="vexpand">True</property>
                               </object>
                             </property>
@@ -1126,7 +1121,7 @@ To add a new primary URL, add it after a blank line.</property>
                         <property name="label" translatable="1">Desktop</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -1175,7 +1170,7 @@ To add a new primary URL, add it after a blank line.</property>
                         <property name="label" translatable="1">Notification</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -1250,7 +1245,7 @@ To add a new primary URL, add it after a blank line.</property>
                         <property name="label" translatable="1">Remote Control</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>

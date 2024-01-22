@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
 <interface domain="transmission-gtk">
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkDialog" id="PrefsDialog">
@@ -83,7 +82,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=2 -->
                   <object class="GtkGrid" id="speed_limits_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -205,7 +203,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=5 -->
                   <object class="GtkGrid" id="alt_speed_limits_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -418,7 +415,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=6 -->
                   <object class="GtkGrid" id="adding_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -594,7 +590,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=2 -->
                   <object class="GtkGrid" id="download_queue_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -687,7 +682,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=3 -->
                   <object class="GtkGrid" id="incomplete_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -815,7 +809,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=3 -->
                   <object class="GtkGrid" id="limits_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -951,7 +944,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=1 -->
                   <object class="GtkGrid" id="privacy_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1019,7 +1011,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=3 -->
                   <object class="GtkGrid" id="blocklist_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1177,7 +1168,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=4 -->
                   <object class="GtkGrid" id="listening_port_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1334,7 +1324,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=2 -->
                   <object class="GtkGrid" id="peer_limits_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1427,7 +1416,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=4 -->
                   <object class="GtkGrid" id="network_options_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1542,7 +1530,6 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=1 -->
                   <object class="GtkGrid" id="default_trackers_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1562,10 +1549,10 @@
                           <object class="GtkTextView" id="default_trackers_view">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
-                            <property name="tooltip-text" translatable="yes">Trackers to use on all public torrents.
+                            <property name="tooltip-text" translatable="yes"><![CDATA[Trackers to use on all public torrents.
 
 To add a backup URL, add it on the next line after a primary URL.
-To add a new primary URL, add it after a blank line.</property>
+To add a new primary URL, add it after a blank line.]]></property>
                             <property name="vexpand">True</property>
                           </object>
                         </child>
@@ -1623,7 +1610,6 @@ To add a new primary URL, add it after a blank line.</property>
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=2 -->
                   <object class="GtkGrid" id="desktop_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1700,7 +1686,6 @@ To add a new primary URL, add it after a blank line.</property>
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=3 -->
                   <object class="GtkGrid" id="notification_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1805,7 +1790,6 @@ To add a new primary URL, add it after a blank line.</property>
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=8 -->
                   <object class="GtkGrid" id="remote_control_section_layout">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>

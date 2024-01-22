@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
 <interface domain="transmission-gtk">
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkDialog" id="EditTrackersDialog">
@@ -74,7 +73,6 @@
               </packing>
             </child>
             <child>
-              <!-- n-columns=2 n-rows=3 -->
               <object class="GtkGrid" id="urls_section_layout">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -85,8 +83,8 @@
                   <object class="GtkLabel" id="urls_section_top_comment_label">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">To add a backup URL, add it on the next line after a primary URL.
-To add a new primary URL, add it after a blank line.</property>
+                    <property name="label" translatable="yes"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
+To add a new primary URL, add it after a blank line.]]></property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>

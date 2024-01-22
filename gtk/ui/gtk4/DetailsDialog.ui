@@ -25,7 +25,7 @@
                         <property name="label" translatable="1">Activity</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -242,7 +242,7 @@
                         <property name="label" translatable="1">Details</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -599,7 +599,7 @@
                         <property name="label" translatable="1">Speed</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -701,7 +701,7 @@
                         <property name="label" translatable="1">Seeding Limits</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>
@@ -787,7 +787,7 @@
                         <property name="label" translatable="1">Peer Connections</property>
                         <property name="xalign">0</property>
                         <attributes>
-                          <attribute name="weight" value="bold"></attribute>
+                          <attribute name="weight" value="bold"/>
                         </attributes>
                       </object>
                     </child>

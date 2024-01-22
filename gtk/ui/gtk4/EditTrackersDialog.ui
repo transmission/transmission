@@ -18,7 +18,7 @@
                 <property name="label" translatable="1">Tracker Announce URLs</property>
                 <property name="xalign">0</property>
                 <attributes>
-                  <attribute name="weight" value="bold"></attribute>
+                  <attribute name="weight" value="bold"/>
                 </attributes>
               </object>
             </child>
@@ -29,8 +29,8 @@
                 <property name="column-spacing">12</property>
                 <child>
                   <object class="GtkLabel" id="urls_section_top_comment_label">
-                    <property name="label" translatable="1">To add a backup URL, add it on the next line after a primary URL.
-To add a new primary URL, add it after a blank line.</property>
+                    <property name="label" translatable="1"><![CDATA[To add a backup URL, add it on the next line after a primary URL.
+To add a new primary URL, add it after a blank line.]]></property>
                     <property name="xalign">0</property>
                     <layout>
                       <property name="column">0</property>

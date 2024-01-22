@@ -18,7 +18,7 @@
                 <property name="label" translatable="1">Tracker</property>
                 <property name="xalign">0</property>
                 <attributes>
-                  <attribute name="weight" value="bold"></attribute>
+                  <attribute name="weight" value="bold"/>
                 </attributes>
               </object>
             </child>
