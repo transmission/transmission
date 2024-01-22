@@ -636,15 +636,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
         for (int i = 0; i < tor.pieceCount(); i++)
         {
-            if (tor.pieces()[i])
-            {
-                if (section_width == 0)
-                {
-                    offset = i * piece_width;
-                }
-                section_width++;
-            }
-            else
+            if (!tor.pieces()[i] || i == tor.pieceCount() - 1)
             {
                 QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2,
                                            layout.piece_bar_rect.top() + 1,
@@ -653,6 +645,14 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
                 painter->fillRect(piece_rect, brush);
                 section_width = 0;
+            }
+            else
+            {
+                if (section_width == 0)
+                {
+                    offset = i * piece_width;
+                }
+                section_width++;
             }
         }
     }
