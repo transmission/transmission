@@ -24,7 +24,7 @@
 #include <glibmm/variant.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/combobox.h>
-#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/filechoosernative.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/treemodel.h>
@@ -71,8 +71,8 @@ private:
     bool onRefresh();
 
     void onSaveRequest();
-    void onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response);
-    void doSave(Gtk::Window& parent, Glib::ustring const& filename);
+    void onSaveDialogResponse(Glib::RefPtr<Gtk::FileChooserNative>& d, int response);
+    void doSave(std::string const& filename);
 
     void onClearRequest();
     void onPauseToggled(Gio::SimpleAction& action);
@@ -200,13 +200,13 @@ Glib::ustring gtr_asctime(time_t t)
 
 } // namespace
 
-void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& filename)
+void MessageLogWindow::Impl::doSave(std::string const& filename)
 {
     try
     {
         auto stream = std::ofstream();
         stream.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-        stream.open(Glib::locale_from_utf8(filename), std::ios_base::trunc);
+        stream.open(filename, std::ios_base::trunc);
 
         for (auto const& row : store_->children())
         {
@@ -222,10 +222,10 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     catch (std::ios_base::failure const& e)
     {
         auto w = std::make_shared<Gtk::MessageDialog>(
-            parent,
+            window_,
             fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
+                fmt::arg("path", Glib::filename_to_utf8(filename)),
                 fmt::arg("error", e.code().message()),
                 fmt::arg("error_code", e.code().value())),
             false,
@@ -237,22 +237,21 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     }
 }
 
-void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response)
+void MessageLogWindow::Impl::onSaveDialogResponse(Glib::RefPtr<Gtk::FileChooserNative>& d, int response)
 {
-    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
-    {
-        doSave(*d, d->get_file()->get_path());
-    }
+    auto const filename = response == TR_GTK_RESPONSE_TYPE(ACCEPT) ? d->get_file()->get_path() : std::string();
 
     d.reset();
+
+    if (!filename.empty())
+    {
+        doSave(filename);
+    }
 }
 
 void MessageLogWindow::Impl::onSaveRequest()
 {
-    auto d = std::make_shared<Gtk::FileChooserDialog>(window_, _("Save Log"), TR_GTK_FILE_CHOOSER_ACTION(SAVE));
-    d->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
-    d->add_button(_("_Save"), TR_GTK_RESPONSE_TYPE(ACCEPT));
-
+    auto d = Gtk::FileChooserNative::create(_("Save Log"), window_, TR_GTK_FILE_CHOOSER_ACTION(SAVE), _("_Save"), _("_Cancel"));
     d->signal_response().connect([this, d](int response) mutable { onSaveDialogResponse(d, response); });
     d->show();
 }

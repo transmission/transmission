@@ -5,6 +5,7 @@
 
 #include "PathButton.h"
 
+#include "GtkCompat.h"
 #include "Utils.h"
 
 #include <giomm/file.h>
@@ -13,7 +14,8 @@
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <glibmm/error.h>
 #include <glibmm/property.h>
-#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/filechoosernative.h>
 #include <gtkmm/image.h>
 #include <gtkmm/label.h>
 #include <gtkmm/separator.h>
@@ -144,10 +146,12 @@ void PathButton::Impl::show_dialog()
 {
     auto const title = title_.get_value();
 
-    auto dialog = std::make_shared<Gtk::FileChooserDialog>(!title.empty() ? title : _("Select a File"), action_.get_value());
+    auto dialog = Gtk::FileChooserNative::create(
+        !title.empty() ? title : _("Select a File"),
+        action_.get_value(),
+        _("_Open"),
+        _("_Cancel"));
     dialog->set_transient_for(gtr_widget_get_window(widget_));
-    dialog->add_button(_("_Cancel"), Gtk::ResponseType::CANCEL);
-    dialog->add_button(_("_Open"), Gtk::ResponseType::ACCEPT);
     dialog->set_modal(true);
 
     if (!current_file_.empty())
@@ -169,7 +173,7 @@ void PathButton::Impl::show_dialog()
     dialog->signal_response().connect(
         [this, dialog](int response) mutable
         {
-            if (response == Gtk::ResponseType::ACCEPT)
+            if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
             {
                 set_filename(dialog->get_file()->get_path());
                 selection_changed_.emit();
