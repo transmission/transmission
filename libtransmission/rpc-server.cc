@@ -714,7 +714,7 @@ void start_server(tr_rpc_server* server)
     //     (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
 
     bool success = false;
-    if (server->bind_address_->type == TR_RPC_AF_UNIX)
+    if (server->bind_address_->is_unix_addr())
     {
         success = bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_);
     }
