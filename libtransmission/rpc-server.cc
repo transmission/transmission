@@ -643,6 +643,57 @@ void rpc_server_start_retry_cancel(tr_rpc_server* server)
     server->start_retry_counter = 0;
 }
 
+#ifdef _WIN32
+int evhttp_bind_socket_win(struct evhttp* httpd, char* address, ev_uint16_t port)
+{
+    WORD wVersionRequested;
+    WSADATA wsaData;
+    wVersionRequested = MAKEWORD(2, 2);
+    int iResult = WSAStartup(wVersionRequested, &wsaData);
+    if (iResult != 0)
+    {
+        tr_logAddInfo(fmt::format(FMT_STRING("WSAStartup failed")));
+        return -1;
+    }
+    struct addrinfo* result = NULL;
+    struct addrinfo hints;
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
+
+    int ret = getaddrinfo(address, std::to_string(port).c_str(), &hints, &result);
+    if (ret != 0)
+    {
+        tr_logAddInfo(fmt::format(FMT_STRING("getaddrinfo failed")));
+        return -1;
+    }
+
+    int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (fd == INVALID_SOCKET)
+    {
+        return -1;
+        // printf("socket failed with error: %ld\n", WSAGetLastError());
+    }
+    evutil_make_socket_nonblocking(fd);
+    evutil_make_listen_socket_reuseable(fd);
+    int off = 0;
+    // Making dual stack
+    if (result->ai_family == AF_INET6)
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&off, (ev_socklen_t)sizeof(off));
+    int on = 1;
+    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&on, sizeof(on));
+    int res = bind(fd, result->ai_addr, result->ai_addrlen);
+    if (res != 0)
+        return -1;
+    if (listen(fd, 128) == -1)
+        return -1;
+    if (evhttp_accept_socket(httpd, fd) == -1)
+        return evhttp_bind_socket(httpd, address, port);
+}
+#endif
+
 void start_server(tr_rpc_server* server)
 {
     if (server->httpd)
@@ -658,9 +709,23 @@ void start_server(tr_rpc_server* server)
     auto const address = server->get_bind_address();
     auto const port = server->port();
 
-    bool const success = server->bind_address_->is_unix_addr() ?
-        bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_) :
-        (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
+    // bool const success = server->bind_address_->is_unix_addr() ?
+    //     bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_) :
+    //     (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
+
+    bool success = false;
+    if (server->bind_address_->type == TR_RPC_AF_UNIX)
+    {
+        success = bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_);
+    }
+    else
+    {
+#ifdef _WIN32
+        success = (evhttp_bind_socket_win(httpd, (char*)address.c_str(), port.host()) != -1);
+#else
+        success = (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
+#endif
+    }
 
     auto const addr_port_str = server->bind_address_->to_string(port);
 
