@@ -5,6 +5,7 @@
 
 #include <cstddef> // size_t
 #include <map>
+#include <memory>
 #include <set>
 
 #define LIBTRANSMISSION_PEER_MODULE
@@ -19,54 +20,67 @@
 class PeerMgrWishlistTest : public ::testing::Test
 {
 protected:
-    struct MockMediator : public Wishlist::Mediator
+    struct MockMediator final : public Wishlist::Mediator
     {
         mutable std::map<tr_block_index_t, size_t> active_request_count_;
         mutable std::map<tr_piece_index_t, size_t> missing_block_count_;
         mutable std::map<tr_piece_index_t, tr_block_span_t> block_span_;
         mutable std::map<tr_piece_index_t, tr_priority_t> piece_priority_;
-        mutable std::set<tr_block_index_t> can_request_block_;
-        mutable std::set<tr_piece_index_t> can_request_piece_;
+        mutable std::map<tr_piece_index_t, size_t> piece_replication_;
+        mutable std::set<tr_block_index_t> client_has_block_;
+        mutable std::set<tr_piece_index_t> client_wants_piece_;
         tr_piece_index_t piece_count_ = 0;
         bool is_endgame_ = false;
         bool is_sequential_download_ = false;
 
-        [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const final
+        PeerMgrWishlistTest& parent_;
+
+        explicit MockMediator(PeerMgrWishlistTest& parent)
+            : parent_{ parent }
         {
-            return can_request_block_.count(block) != 0;
         }
 
-        [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const final
+        [[nodiscard]] bool client_has_block(tr_block_index_t block) const override
         {
-            return can_request_piece_.count(piece) != 0;
+            return client_has_block_.count(block) != 0;
         }
 
-        [[nodiscard]] bool isEndgame() const final
+        [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override
+        {
+            return client_wants_piece_.count(piece) != 0;
+        }
+
+        [[nodiscard]] bool is_endgame() const override
         {
             return is_endgame_;
         }
 
-        [[nodiscard]] bool isSequentialDownload() const final
+        [[nodiscard]] bool is_sequential_download() const override
         {
             return is_sequential_download_;
         }
 
-        [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const final
+        [[nodiscard]] size_t count_active_requests(tr_block_index_t block) const override
         {
             return active_request_count_[block];
         }
 
-        [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const final
+        [[nodiscard]] size_t count_missing_blocks(tr_piece_index_t piece) const override
         {
             return missing_block_count_[piece];
         }
 
-        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const final
+        [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override
+        {
+            return piece_replication_[piece];
+        }
+
+        [[nodiscard]] tr_block_span_t block_span(tr_piece_index_t piece) const override
         {
             return block_span_[piece];
         }
 
-        [[nodiscard]] tr_piece_index_t countAllPieces() const final
+        [[nodiscard]] tr_piece_index_t piece_count() const override
         {
             return piece_count_;
         }
@@ -75,12 +89,80 @@ protected:
         {
             return piece_priority_[piece];
         }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
+        {
+            return parent_.peer_disconnect_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
+        {
+            return parent_.got_bitfield_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_block(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer) override
+        {
+            return parent_.got_block_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_have(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override
+        {
+            return parent_.got_have_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_have_all(
+            libtransmission::SimpleObservable<tr_torrent*>::Observer observer) override
+        {
+            return parent_.got_have_all_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_piece_completed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override
+        {
+            return parent_.piece_completed_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_priority_changed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer
+                observer) override
+        {
+            return parent_.priority_changed_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
+            libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override
+        {
+            return parent_.sequential_download_changed_.observe(std::move(observer));
+        }
+    };
+
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> peer_disconnect_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t> got_block_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have_;
+    libtransmission::SimpleObservable<tr_torrent*> got_have_all_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
+    libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
+
+    static auto constexpr PeerHasAllPieces = [](tr_piece_index_t)
+    {
+        return true;
+    };
+    static auto constexpr ClientHasNoActiveRequests = [](tr_block_index_t)
+    {
+        return false;
     };
 };
 
-TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
+TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
 {
-    auto mediator = MockMediator{};
+    auto mediator_ptr = std::make_unique<MockMediator>(*this);
+    auto& mediator = *mediator_ptr;
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
@@ -92,22 +174,19 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
     mediator.block_span_[2] = { 200, 251 };
 
     // but we only want the first piece
-    mediator.can_request_piece_.insert(0);
-    for (tr_block_index_t i = mediator.block_span_[0].begin; i < mediator.block_span_[0].end; ++i)
-    {
-        mediator.can_request_block_.insert(i);
-    }
+    mediator.client_wants_piece_.insert(0);
 
     // we should only get the first piece back
-    auto spans = Wishlist{ mediator }.next(1000);
+    auto const spans = Wishlist{ std::move(mediator_ptr) }.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
     ASSERT_EQ(1U, std::size(spans));
     EXPECT_EQ(mediator.block_span_[0].begin, spans[0].begin);
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
 }
 
-TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
+TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 {
-    auto mediator = MockMediator{};
+    auto mediator_ptr = std::make_unique<MockMediator>(*this);
+    auto& mediator = *mediator_ptr;
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
@@ -119,21 +198,61 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
     mediator.block_span_[2] = { 200, 251 };
 
     // and we want all three pieces
-    mediator.can_request_piece_.insert(0);
-    mediator.can_request_piece_.insert(1);
-    mediator.can_request_piece_.insert(2);
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
 
-    // but we've already requested blocks [0..10) from someone else,
-    // so we don't want to send repeat requests
-    for (tr_block_index_t i = 10; i < 250; ++i)
+    // but the peer only has the second piece, we don't want to
+    // request blocks other than these
+    static auto constexpr IsPieceOne = [](tr_piece_index_t p)
     {
-        mediator.can_request_block_.insert(i);
-    }
+        return p == 1U;
+    };
 
     // even if we ask wishlist for more blocks than exist,
-    // it should omit blocks 1-10 from the return set
-    auto spans = Wishlist{ mediator }.next(1000);
-    auto requested = tr_bitfield(250);
+    // it should only return blocks [100..200)
+    auto const spans = Wishlist{ std::move(mediator_ptr) }.next(1000, IsPieceOne, ClientHasNoActiveRequests);
+    auto requested = tr_bitfield{ 250 };
+    for (auto const& span : spans)
+    {
+        requested.set_span(span.begin, span.end);
+    }
+    EXPECT_EQ(100U, requested.count());
+    EXPECT_EQ(0U, requested.count(0, 100));
+    EXPECT_EQ(100U, requested.count(100, 200));
+    EXPECT_EQ(0U, requested.count(200, 250));
+}
+
+TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
+{
+    auto mediator_ptr = std::make_unique<MockMediator>(*this);
+    auto& mediator = *mediator_ptr;
+
+    // setup: three pieces, all missing
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 251 };
+
+    // and we want all three pieces
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
+
+    // but we've already requested blocks [0..10) from this peer,
+    // so we don't want to send repeated requests
+    static auto constexpr IsBetweenZeroToTen = [](tr_block_index_t b)
+    {
+        return b < 10U;
+    };
+
+    // even if we ask wishlist for more blocks than exist,
+    // it should omit blocks [0..10) from the return set
+    auto const spans = Wishlist{ std::move(mediator_ptr) }.next(1000, PeerHasAllPieces, IsBetweenZeroToTen);
+    auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
         requested.set_span(span.begin, span.end);
@@ -143,9 +262,95 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
     EXPECT_EQ(240U, requested.count(10, 250));
 }
 
+TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
+{
+    auto mediator_ptr = std::make_unique<MockMediator>(*this);
+    auto& mediator = *mediator_ptr;
+
+    // setup: three pieces, all missing
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 251 };
+
+    // and we want all three pieces
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
+
+    // but we've already requested blocks [0..10) from someone else,
+    // and it is not endgame, so we don't want to send repeated requests
+    for (tr_block_index_t block = 0; block < 10; ++block)
+    {
+        mediator.active_request_count_[block] = 1;
+    }
+
+    // even if we ask wishlist for more blocks than exist,
+    // it should omit blocks [0..10) from the return set
+    auto const spans = Wishlist{ std::move(mediator_ptr) }.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
+    auto requested = tr_bitfield{ 250 };
+    for (auto const& span : spans)
+    {
+        requested.set_span(span.begin, span.end);
+    }
+    EXPECT_EQ(240U, requested.count());
+    EXPECT_EQ(0U, requested.count(0, 10));
+    EXPECT_EQ(240U, requested.count(10, 250));
+}
+
+TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
+{
+    auto mediator_ptr = std::make_unique<MockMediator>(*this);
+    auto& mediator = *mediator_ptr;
+
+    // setup: three pieces, all missing
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 251 };
+
+    // and we want all three pieces
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
+
+    // we've already requested blocks [0..10) from someone else,
+    // but it is endgame, so we can request each block twice.
+    // blocks [5..10) are already requested twice
+    mediator.is_endgame_ = true;
+    for (tr_block_index_t block = 0; block < 5; ++block)
+    {
+        mediator.active_request_count_[block] = 1;
+    }
+    for (tr_block_index_t block = 5; block < 10; ++block)
+    {
+        mediator.active_request_count_[block] = 2;
+    }
+
+    // if we ask wishlist for more blocks than exist,
+    // it should omit blocks [5..10) from the return set
+    auto const spans = Wishlist{ std::move(mediator_ptr) }.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
+    auto requested = tr_bitfield{ 250 };
+    for (auto const& span : spans)
+    {
+        requested.set_span(span.begin, span.end);
+    }
+    EXPECT_EQ(245U, requested.count());
+    EXPECT_EQ(5U, requested.count(0, 5));
+    EXPECT_EQ(0U, requested.count(5, 10));
+    EXPECT_EQ(240U, requested.count(10, 250));
+}
+
 TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 {
-    auto mediator = MockMediator{};
+    auto mediator_ptr = std::make_unique<MockMediator>(*this);
+    auto& mediator = *mediator_ptr;
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
@@ -159,17 +364,13 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
     {
-        mediator.can_request_piece_.insert(i);
-    }
-    for (tr_block_index_t i = 0; i < 250; ++i)
-    {
-        mediator.can_request_block_.insert(i);
+        mediator.client_wants_piece_.insert(i);
     }
 
     // but we only ask for 10 blocks,
     // so that's how many we should get back
     auto const n_wanted = 10U;
-    auto const spans = Wishlist{ mediator }.next(n_wanted);
+    auto const spans = Wishlist{ std::move(mediator_ptr) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     auto n_got = size_t{};
     for (auto const& span : spans)
     {
@@ -180,150 +381,100 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 
 TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 {
-    auto mediator = MockMediator{};
-
-    // setup: three pieces, all missing
-    mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 100;
-    mediator.block_span_[0] = { 0, 100 };
-    mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 300 };
-
-    // and we want everything
-    for (tr_piece_index_t i = 0; i < 3; ++i)
+    auto const get_ranges = [this](size_t n_wanted)
     {
-        mediator.can_request_piece_.insert(i);
-    }
-    for (tr_block_index_t i = 0; i < 299; ++i)
-    {
-        mediator.can_request_block_.insert(i);
-    }
+        auto mediator_ptr = std::make_unique<MockMediator>(*this);
+        auto& mediator = *mediator_ptr;
 
-    // and the second piece is high priority
-    mediator.piece_priority_[1] = TR_PRI_HIGH;
+        // setup: three pieces, all missing
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 100;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // and the second piece is high priority
+        mediator.piece_priority_[1] = TR_PRI_HIGH;
+
+        return Wishlist{ std::move(mediator_ptr) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    };
 
     // wishlist should pick the high priority piece's blocks first.
     //
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
-    auto const num_runs = 1000;
-    for (int run = 0; run < num_runs; ++run)
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
     {
-        auto const n_wanted = 10U;
-        auto spans = Wishlist{ mediator }.next(n_wanted);
-        auto n_got = size_t{};
+        auto const spans = get_ranges(10);
+        auto requested = tr_bitfield{ 300 };
         for (auto const& span : spans)
         {
-            for (auto block = span.begin; block < span.end; ++block)
-            {
-                EXPECT_LE(mediator.block_span_[1].begin, block);
-                EXPECT_LT(block, mediator.block_span_[1].end);
-            }
-            n_got += span.end - span.begin;
+            requested.set_span(span.begin, span.end);
         }
-        EXPECT_EQ(n_wanted, n_got);
+        EXPECT_EQ(10U, requested.count());
+        EXPECT_EQ(0U, requested.count(0, 100));
+        EXPECT_EQ(10U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(200, 300));
     }
-}
-
-TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
-{
-    auto mediator = MockMediator{};
-
-    // setup: three pieces, all missing
-    mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 100;
-    mediator.block_span_[0] = { 0, 100 };
-    mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 300 };
-
-    // and we want everything
-    for (tr_piece_index_t i = 0; i < 3; ++i)
-    {
-        mediator.can_request_piece_.insert(i);
-    }
-    for (tr_block_index_t i = 0; i < 300; ++i)
-    {
-        mediator.can_request_block_.insert(i);
-    }
-
-    // and we've already requested blocks [0-150)
-    for (tr_block_index_t i = 0; i < 150; ++i)
-    {
-        mediator.active_request_count_[i] = 1;
-    }
-
-    // even if we ask wishlist to list more blocks than exist,
-    // those first 150 should be omitted from the return list
-    auto spans = Wishlist{ mediator }.next(1000);
-    auto requested = tr_bitfield(300);
-    for (auto const& span : spans)
-    {
-        requested.set_span(span.begin, span.end);
-    }
-    EXPECT_EQ(150U, requested.count());
-    EXPECT_EQ(0U, requested.count(0, 150));
-    EXPECT_EQ(150U, requested.count(150, 300));
-
-    // BUT during endgame it's OK to request dupes,
-    // so then we _should_ see the first 150 in the list
-    mediator.is_endgame_ = true;
-    spans = Wishlist{ mediator }.next(1000);
-    requested = tr_bitfield(300);
-    for (auto const& span : spans)
-    {
-        requested.set_span(span.begin, span.end);
-    }
-    EXPECT_EQ(300U, requested.count());
-    EXPECT_EQ(150U, requested.count(0, 150));
-    EXPECT_EQ(150U, requested.count(150, 300));
 }
 
 TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
 {
-    auto mediator = MockMediator{};
-
-    // setup: three pieces, same size
-    mediator.piece_count_ = 3;
-    mediator.block_span_[0] = { 0, 100 };
-    mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 300 };
-
-    // and we want everything
-    for (tr_piece_index_t i = 0; i < 3; ++i)
+    auto const get_ranges = [this](size_t n_wanted)
     {
-        mediator.can_request_piece_.insert(i);
-    }
+        auto mediator_ptr = std::make_unique<MockMediator>(*this);
+        auto& mediator = *mediator_ptr;
 
-    // but some pieces are closer to completion than others
-    mediator.missing_block_count_[0] = 10;
-    mediator.missing_block_count_[1] = 20;
-    mediator.missing_block_count_[2] = 100;
-    for (tr_piece_index_t piece = 0; piece < 3; ++piece)
-    {
-        auto const& span = mediator.block_span_[piece];
-        auto const& n_missing = mediator.missing_block_count_[piece];
+        // setup: three pieces, same size
+        mediator.piece_count_ = 3;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
 
-        for (size_t i = 0; i < n_missing; ++i)
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
         {
-            mediator.can_request_block_.insert(span.begin + i);
+            mediator.client_wants_piece_.insert(i);
         }
-    }
+
+        // but some pieces are closer to completion than others
+        mediator.missing_block_count_[0] = 10;
+        mediator.missing_block_count_[1] = 20;
+        mediator.missing_block_count_[2] = 100;
+        for (tr_piece_index_t piece = 0; piece < 3; ++piece)
+        {
+            auto const& span = mediator.block_span_[piece];
+            auto const have_end = span.end - mediator.missing_block_count_[piece];
+
+            for (tr_piece_index_t i = span.begin; i < have_end; ++i)
+            {
+                mediator.client_has_block_.insert(i);
+            }
+        }
+
+        return Wishlist{ std::move(mediator_ptr) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    };
 
     // wishlist prefers to get pieces completed ASAP, so it
     // should pick the ones with the fewest missing blocks first.
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
-    auto const num_runs = 1000;
-    for (int run = 0; run < num_runs; ++run)
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
     {
-        auto const ranges = Wishlist{ mediator }.next(10);
-        auto requested = tr_bitfield(300);
+        auto const ranges = get_ranges(10);
+        auto requested = tr_bitfield{ 300 };
         for (auto const& range : ranges)
         {
             requested.set_span(range.begin, range.end);
@@ -336,10 +487,10 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     // Same premise as previous test, but ask for more blocks.
     // Since the second piece is also the second-closest to completion,
     // those blocks should be next in line.
-    for (int run = 0; run < num_runs; ++run)
+    for (int run = 0; run < NumRuns; ++run)
     {
-        auto const ranges = Wishlist{ mediator }.next(20);
-        auto requested = tr_bitfield(300);
+        auto const ranges = get_ranges(20);
+        auto requested = tr_bitfield{ 300 };
         for (auto const& range : ranges)
         {
             requested.set_span(range.begin, range.end);
