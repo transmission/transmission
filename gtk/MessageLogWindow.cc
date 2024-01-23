@@ -225,7 +225,7 @@ void MessageLogWindow::Impl::doSave(std::string const& filename)
             auto const iter = std::find_if(
                 std::begin(level_names_),
                 std::end(level_names_),
-                [key = node->level](auto const& row) { return row.first == key; });
+                [key = node->level](auto const& item) { return item.first == key; });
             auto const* const level_str = iter != std::end(level_names_) ? iter->second : "???";
 
             fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
