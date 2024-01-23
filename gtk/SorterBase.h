@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,7 +20,7 @@ class SorterBase : public IF_GTKMM4(Gtk::Sorter, Glib::Object)
 {
 public:
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    enum class Change{
+    enum class Change : uint8_t{
         DIFFERENT,
         INVERTED,
         LESS_STRICT,

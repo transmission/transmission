@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -219,29 +219,25 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 ***/
 
 FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
-    : QWidget(parent)
-    , prefs_(prefs)
-    , torrents_(torrents)
-    , filter_(filter)
-    , is_bootstrapping_(true)
+    : QWidget{ parent }
+    , prefs_{ prefs }
+    , torrents_{ torrents }
+    , filter_{ filter }
+    , count_label_{ new QLabel{ tr("Show:"), this } }
+    , is_bootstrapping_{ true }
 {
     auto* h = new QHBoxLayout{ this };
     h->setContentsMargins(3, 3, 3, 3);
 
-    count_label_ = new QLabel{ tr("Show:"), this };
     h->addWidget(count_label_);
-
     h->addWidget(activity_combo_);
-
-    tracker_combo_ = createTrackerCombo(tracker_model_);
     h->addWidget(tracker_combo_);
-
     h->addStretch();
+    h->addWidget(line_edit_, 1);
 
     line_edit_->setClearButtonEnabled(true);
     line_edit_->setPlaceholderText(tr("Search…"));
     line_edit_->setMaximumWidth(250);
-    h->addWidget(line_edit_, 1);
     connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
     // listen for changes from the other players

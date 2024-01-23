@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -18,6 +18,7 @@
 #include <QMimeDatabase>
 #include <QObject>
 #include <QPainter>
+#include <QPixmap>
 #include <QStyle>
 
 #ifdef _WIN32
@@ -29,7 +30,8 @@
 #endif
 #endif
 
-#include <libtransmission/transmission.h>
+#include <optional>
+#include <utility>
 
 /***
 ****
@@ -104,16 +106,16 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
     {
         // upper left corner
         auto const folder_size = size / 2;
-        auto const folder_rect = QRect(QPoint(), folder_size);
+        auto const folder_rect = QRect{ QPoint{}, folder_size };
 
         // fullsize
         auto const mime_size = size;
-        auto const mime_rect = QRect(QPoint(), mime_size);
+        auto const mime_rect = QRect{ QPoint{}, mime_size };
 
         // build the icon
-        auto pixmap = QPixmap(size);
+        auto pixmap = QPixmap{ size };
         pixmap.fill(Qt::transparent);
-        QPainter painter(&pixmap);
+        auto painter = QPainter{ &pixmap };
         painter.setRenderHints(QPainter::SmoothPixmapTransform);
         painter.drawPixmap(folder_rect, folder_icon_.pixmap(folder_size));
         painter.drawPixmap(mime_rect, mime_icon.pixmap(mime_size));
@@ -180,14 +182,14 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
 {
     if (suffixes_.empty())
     {
-        for (auto const& type : QMimeDatabase().allMimeTypes())
+        for (auto const& type : QMimeDatabase{}.allMimeTypes())
         {
             auto const tmp = type.suffixes();
             suffixes_.insert(tmp.begin(), tmp.end());
         }
     }
 
-    auto const ext = QFileInfo(filename).suffix();
+    auto const ext = QFileInfo{ filename }.suffix();
     if (suffixes_.count(ext) == 0)
     {
         return {};

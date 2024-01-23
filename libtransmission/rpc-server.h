@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -50,7 +50,7 @@ class Timer;
 class tr_rpc_server
 {
 public:
-    tr_rpc_server(tr_session* session, tr_variant* settings);
+    tr_rpc_server(tr_session* session, tr_variant const& settings);
     ~tr_rpc_server();
 
     tr_rpc_server(tr_rpc_server&) = delete;
@@ -58,9 +58,9 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
-    static void default_settings(tr_variant* tgt);
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
     [[nodiscard]] constexpr tr_port port() const noexcept
     {
@@ -102,7 +102,7 @@ public:
 
     [[nodiscard]] constexpr auto is_password_enabled() const noexcept
     {
-        return is_password_enabled_;
+        return authentication_required_;
     }
 
     void set_password_enabled(bool enabled);
@@ -163,6 +163,4 @@ public:
 
     size_t login_attempts_ = 0U;
     int start_retry_counter = 0;
-
-    bool is_password_enabled_ = false;
 };

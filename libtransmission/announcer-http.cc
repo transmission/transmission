@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,7 +7,6 @@
 #include <cctype>
 #include <cstddef> // std::byte, size_t
 #include <cstdint> // int64_t, uint8_t, uint...
-#include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -34,7 +33,6 @@
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"
-#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf
@@ -56,7 +54,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
     }
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
-    out << description << std::endl << "[raw]"sv << direction_sv;
+    out << description << '\n' << "[raw]"sv << direction_sv;
     for (unsigned char const ch : message)
     {
         if (isprint(ch) != 0)
@@ -69,7 +67,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
                 << std::setfill(' ');
         }
     }
-    out << std::endl << "[b64]"sv << direction_sv << tr_base64_encode(message) << std::endl;
+    out << '\n' << "[b64]"sv << direction_sv << tr_base64_encode(message) << '\n';
 }
 
 auto constexpr MaxBencDepth = 8;
@@ -99,7 +97,6 @@ struct http_announce_data
     std::optional<tr_announce_response> previous_response;
 
     tr_announce_response_func on_response;
-    bool http_success = false;
 
     uint8_t requests_sent_count = {};
     uint8_t requests_answered_count = {};
@@ -107,33 +104,33 @@ struct http_announce_data
     std::string log_name;
 };
 
-bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
+bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response& response)
 {
-    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
     auto const& log_name = static_cast<http_announce_data const*>(vdata)->log_name;
 
-    response->did_connect = did_connect;
-    response->did_timeout = did_timeout;
+    response.did_connect = did_connect;
+    response.did_timeout = did_timeout;
     tr_logAddTrace("Got announce response", log_name);
 
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
+        response.errmsg = fmt::format("Tracker HTTP response {:d} ({:s})", status, response_str);
 
         return false;
     }
 
-    tr_announcerParseHttpAnnounceResponse(*response, body, log_name);
+    tr_announcerParseHttpAnnounceResponse(response, body, log_name);
 
-    if (!std::empty(response->pex6))
+    if (!std::empty(response.pex6))
     {
-        tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response->pex6)), log_name);
+        tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response.pex6)), log_name);
     }
 
-    if (!std::empty(response->pex))
+    if (!std::empty(response.pex))
     {
-        tr_logAddTrace(fmt::format("got a peers length of {}", std::size(response->pex)), log_name);
+        tr_logAddTrace(fmt::format("got a peers length of {}", std::size(response.pex)), log_name);
     }
 
     return true;
@@ -141,25 +138,22 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
 
 void onAnnounceDone(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
-    auto* data = static_cast<struct http_announce_data*>(vdata);
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
+    auto* data = static_cast<http_announce_data*>(vdata);
 
-    ++data->requests_answered_count;
+    auto const got_all_responses = ++data->requests_answered_count == data->requests_sent_count;
 
-    // If another request already succeeded (or we don't have a registered callback),
-    // skip processing this response:
-    if (!data->http_success && data->on_response)
+    TR_ASSERT(data->on_response);
+    if (data->on_response)
     {
         tr_announce_response response;
         response.info_hash = data->info_hash;
 
-        data->http_success = handleAnnounceResponse(web_response, &response);
-
-        if (data->http_success)
+        if (handleAnnounceResponse(web_response, response))
         {
             data->on_response(response);
         }
-        else if (data->requests_answered_count == data->requests_sent_count)
+        else if (got_all_responses)
         {
             auto const* response_used = &response;
 
@@ -181,13 +175,9 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
             data->previous_response = std::move(response);
         }
     }
-    else
-    {
-        tr_logAddTrace("Ignoring redundant announce response", data->log_name);
-    }
 
-    // Free data if no more responses are expected:
-    if (data->requests_answered_count == data->requests_sent_count)
+    // Free data if no more responses are expected
+    if (got_all_responses)
     {
         delete data;
     }
@@ -290,7 +280,7 @@ void tr_tracker_http_announce(
      * Before Curl 7.77.0, if we explicitly choose the IP version we want
      * to use, it is still possible that the wrong one is used. The workaround
      * is expensive (disabling DNS cache), so instead we have to make do with
-     * a request that we don't know if will go through IPv6 or IPv4.
+     * a request that we don't know whether it will go through IPv6 or IPv4.
      */
     static auto const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < 0x074D00 /* 7.77.0 */;
     if (use_curl_workaround || session->useAnnounceIP())
@@ -307,12 +297,12 @@ void tr_tracker_http_announce(
     {
         d->requests_sent_count = 2;
 
-        // First try to send the announce via IPv4:
+        // First try to send the announce via IPv4
         auto ipv4_options = options;
         ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
         do_make_request("IPv4"sv, std::move(ipv4_options));
 
-        // Then try to send via IPv6:
+        // Then try to send via IPv6
         options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
         do_make_request("IPv6"sv, std::move(options));
     }
@@ -442,17 +432,16 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = AnnounceHandler{ response, log_name };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse announce response: {error} ({error_code})"),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())),
             log_name);
-        tr_error_clear(&error);
     }
 }
 
@@ -497,7 +486,7 @@ private:
 
 void onScrapeDone(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vdata] = web_response;
     auto* const data = static_cast<scrape_data*>(vdata);
 
     auto& response = data->response();
@@ -510,7 +499,7 @@ void onScrapeDone(tr_web::FetchResponse const& web_response)
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response.errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
+        response.errmsg = fmt::format("Tracker HTTP response {:d} ({:s})", status, response_str);
     }
     else if (!std::empty(body))
     {
@@ -650,16 +639,15 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = ScrapeHandler{ response, log_name };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse scrape response: {error} ({error_code})"),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())),
             log_name);
-        tr_error_clear(&error);
     }
 }

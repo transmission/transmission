@@ -1,0 +1,1152 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@ %2$@-etik";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "%@ torrent metadatu berreskuratuta";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "%@ aukeratuta";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ guztira";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ baieztatuta";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/s";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld minutu";
+
+/* stats window -> times opened */
+"%llu times" = "%llu aldiz";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu cachea";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu Konektatuta";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu Deskargatzen";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu fitxategiak";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu sartzen";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu IP helbide-arau zerrendan";
+
+/* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu aurkikuntza lokala";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu magnetizatutako transferentzia";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu Igortzen";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu Torrent Fitxategi";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu Torrent Aukeratuta";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "%lu aztarnari";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu transferentzia";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu web igortze";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u zati, %2$@ bakoitzak";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "1 Konektatuta";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "Fitxategi 1";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "Magnetizatutako transferentzia 1";
+
+/* Info options -> global setting */
+"1 minute" = "Minutu 1";
+
+/* Create torrent -> info */
+"1 piece, %@" = "1 zati, %@";
+
+/* stats window -> times opened */
+"1 time" = "1 denbora";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "Transmisio 1";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "\"%@\" ezin da torrent artxibo mota hau erabili.";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "Aurretik blokeo-zerrenda bat deskargatu behar da";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "\"%1$@\" izena duen fitxategia dagoeneko existitzen da \"%2$@\" direktorioan. Aukeratu ezazu izen ala direktorio berri bat torrent fitxategia sortzeko.";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "Karpeta bat ezin da bere barrura mugitu.";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "Ezin da tamainarik gabeko fitxategientzako torrent fitxategia sortu.";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "Ezin da sortu izen eta direktorio hau dituen torrent fitxategia.";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Aztarnaririk gabeko eta pribatu gisa markatuta dagoen transferentzia bat ezingo da kideekin konektatu. Torrent fitxategia soilik izango da erabilgarria fitxategia helbideak zuretzako gehituko dituen aztarnarien webgune batera igotzeko asmoa baduzu.";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "\"%@\"(e)ko transferentzia bat existitzen da dagoeneko.";
+
+/* Filter Bar -> filter button */
+"Active" = "Aktibo";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "Aktibitatea";
+
+/* Add torrent -> same name -> button */
+"Add" = "Gehitu";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "Gehitu aztarnari bat";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "Magnetizatutako transferentzia gehitzeak huts egin du.";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "Denak";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "Talde guztiak";
+
+/* Tracker last announce */
+"Announce error" = "Errorea iragarri";
+
+/* Tracker next announce */
+"Announce in progress" = "Iragarritakoa prozesuan dago";
+
+/* Tracker next announce */
+"Announce is queued" = "Iragarria ilaratuta dago";
+
+/* Tracker next announce */
+"Announce not scheduled" = "Iragarria ez programatu";
+
+/* Tracker last announce */
+"Announce timed out" = "Iragarria huts egin du";
+
+/* All toolbar item -> label */
+"Apply All" = "Denei ezarri";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "Aukeratutakoei ezarri";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "Irten nahi duzula ziur zaude?";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Ziur zaude %lu osatutako transferentziak transferentzia zerrendatik guztiz kendu nahi dituzula?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "Ziur zaude %lu aztarnari kendu nahi dituzula?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Ziur zaude %lu transferentziak transferentzia zerrendatik guztiz kendu eta datu-fitxategiak zakarrontzira bota nahi dituzula?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "Ziur zaude %lu transferentziak transferentzia zerrendatik guztiz kendu nahi dituzula?";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Ziur zaude \"%@\" zure transferentzien zerrendatik kendu eta bere fitxategiak zakarrontzira eraman nahi dituzula?";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Ziur zaude \"%@\" zure transferentzien zerrendatik kendu nahi duzula?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "Ziur zaude aztarnari hau ezabatu duzula?";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "Ziur zaude erabilera-estatistikak berrabiarazi nahi dituzula?";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "Erabilgarria";
+
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "Transferentzien abiadura";
+
+/* notification description */
+"Bandwidth settings changed" = "Transferentzien abiaduraren hobespenak aldatuta";
+
+/* Groups -> Name */
+"Blue" = "Urdina";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "Ezeztatu";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "Transmisioaren hobespenak aldatu";
+
+/* File Outline -> Menu */
+"Check Selected" = "Aukeratu Hautatua";
+
+/* Torrent -> status string */
+"Checking existing data" = "Dauden datuak egiaztatzen";
+
+/* Message window -> save button */
+"Clear" = "Garbitu";
+
+/* inspector -> peer table -> header */
+"Client" = "Bezeroa";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "Itxi Begirada Azkarra";
+
+/* Blocklist -> message */
+"Connecting to site" = "Leku honetara konektatzen";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "Ezin da \"%@\"(r)en kopia sortu";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "Sortu";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "Torrent Fitxategia sortu";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Torrent Fitxategia sortu";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "Torrent artxibo mota sortu";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "\"%@\"(r)en sorrerak huts egin du.";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "Une honetan deskargatzen (interesatua eta buxatu gabea)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "Une honetan igotzen (interesatua eta buxatu gabea)";
+
+/* Message window -> table column */
+"Date" = "Data";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "Araztu";
+
+/* Info options -> global setting */
+"disabled" = "Desgaituta";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "Deskarga";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "Deskarga %lu (e)tik";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "Ez egiaztatu berriro diskoko espazioa";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "Ez jakinarazi berriro horrelakoen inguruan.";
+
+/* files tab -> tooltip */
+"Don't Download" = "Ez deskargatu";
+
+/* Donation beg -> button */
+"Donate" = "Donatu";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "Donatu ala ez, ez da ezberdintasunik egongo zure \"torrentatze\" esperientzian";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "Deskargatu";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "Edozein deskargatu";
+
+/* notification title */
+"Download Complete" = "Deskarga osatu da";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "Blokeo-zerrendaren deskargak huts egin du.";
+
+/* files tab -> tooltip */
+"Download Some" = "Deskargatu Batzuk";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "Deskargaren abiadura";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "Deskargatuta";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "Deskargatzen";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "Blokeo-zerrenda deskargatzen";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "%1$lu %2$lu kideetatik deskargatzen";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = " %lu kide batetik deskargatzen";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "Kidetik Deskargatzen";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "Web-aztarnaritik Deskargatzen";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "zifratuta";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "Zifratutako Konexioa";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "Errorea";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "Fitxategiak";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "Iragazkia";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "Jatorria: cachea";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "Jatorria: banatutako hash-taula";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "Jatorria: sarrerako konexioa";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "Jatorria: libtorrent protokolo-luzapenaren handshake-a";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "Jatorria: kideen aurkikuntza lokala";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "Jatorria: kideen partekatzea";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "Jatorria: aztarnaria";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "GB/s";
+
+/* Preferences -> toolbar item title */
+"General" = "Orokorra";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "Informazio orokorra";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "Deskargen muga orokorra";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "Igoeren muga orokorra";
+
+/* Tracker last announce */
+"got %lu peers" = "%lu kide aurkitu dira";
+
+/* Tracker last announce */
+"got 1 peer" = "kide 1 aurkitu da";
+
+/* Groups -> Name */
+"Gray" = "Grisa";
+
+/* Groups -> Name */
+"Green" = "Berdea";
+
+/* Groups -> Button */
+"Group" = "Taldea";
+
+/* Preferences -> toolbar item title */
+"Groups" = "Taldeak";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "Ezkutatu Iragazki-barra";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "Ezkutatu Ikuskatzailea";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "Ezkutatu Egoera-barra";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Ezkutatu Tresna-barra";
+
+/* File Outline -> Priority Menu */
+"High" = "Altua";
+
+/* files tab -> tooltip */
+"High Priority" = "Lehentasun Altua";
+
+/* Legal alert -> button */
+"I Accept" = "Onartzen dut";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Dagoeneko existitzen diren datuak erabiltzen saiatzen ari bazara, datuen jatorrizko direktorioa helburuko direktorioaren barruan egon behar da.";
+
+/* Torrent -> eta string */
+"inactive" = "inaktiboa";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "Info";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "Ikuskatzailea";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "Internet-helbidea ala torrent-fitxategia";
+
+/* inspector -> peer table -> header */
+"IP Address" = "IP Helbidea";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Dirudienez %2$@ direktorioko \"%1$@\" fitxategia ez da torrent fitxategia.";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "KB/s";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
+
+/* Tracker last announce */
+"Last Announce" = "Azken Abisua";
+
+/* Tracker last scrape */
+"Last Scrape" = "Azken zuriketa";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "Azkenengoz eguneratuta";
+
+/* tracker peer stat */
+"Leechers" = "Izainak";
+
+/* About window -> license button */
+"License" = "Baimena";
+
+/* torrent action menu -> upload/download limit */
+"Limit (%ld KB/s)" = "Mugatu (%ld KB/s)";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "Ezin izan da Erregistroa gorde";
+
+/* File Outline -> Priority Menu */
+"Low" = "Baxua";
+
+/* files tab -> tooltip */
+"Low Priority" = "Lehentasun Baxua";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "Magnet esteka existitzen den transferentzia baten kopia da.";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "Magnetizatutako transferentzia";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "MB/s";
+
+/* Message window -> table column */
+"Message" = "Mezua";
+
+/* Message window -> title */
+"Message Log" = "Mezuen egunkaria";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "Lehentasun anitz";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "E/E";
+
+/* Filter Bar -> filter menu */
+"Name" = "Izena";
+
+/* Preferences -> toolbar item title */
+"Network" = "Sarea";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Inoiz ez";
+
+/* Inspector -> tracker table */
+"New Tier" = "New Tier";
+
+/* Tracker next announce */
+"Next announce in %@" = "Hurrengo abisua %@ barru";
+
+/* Group table row */
+"No Group" = "Talderik ez";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "Ez da torrent-ik hautatu";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "Ezer ez";
+
+/* Donation beg -> button */
+"Nope" = "Ez";
+
+/* File Outline -> Priority Menu */
+"Normal" = "Arrunta";
+
+/* files tab -> tooltip */
+"Normal Priority" = "Lehentasun Normala";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "Diskoan ez dago \"%@\" osorik deskargatzeko behar beste espazio.";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "Ados";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "Behin kenduta, transferentziarekin jarraitzeko torrent fitxategia ala magnet esteka beharko da.";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "Kendu ondoren, transferentziekin jarraitu nahi bada torrent fitxategiak edo magnet estekak beharko dira.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Behin kenduta, Transmission-ek ez du berriz kontaktatuko. Ekintza honek ez du atzera bueltarik.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Behin kenduta, Transmission-ek ez ditu berriz kontaktatuko. Ekintza honek ez du atzera bueltarik.";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "Soilik Egiaztatu Aukeratutakoak";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "Ireki";
+
+/* Open address toolbar item -> label */
+"Open Address" = "Helbidea zabaldu";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "Ireki Torrent Helbidea";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Ireki torrent fitxategiak";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Ireki Torrent Fitxategiak";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "Ireki torrent web-helbidea";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "Aukerak";
+
+/* Groups -> Name */
+"Orange" = "Laranja";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "Aztarnari partziala";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "Pausatu / Jarraitu Guztiak";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "Pausatu / Jarraitu Aukeratutakoak";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "Pausatu Guztiak";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "Pausatu transferentzia guztiak";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "Pausatu Aukeratutakoak";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "Pausatu aukeratutako transferentziak";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "Pausatu transferentzia";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "Pausatua";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "Kideak buxadura kentzen ari zaigu, baina ez gaude interesatuta";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Kideak zuk igortzea nahi du, baina zuk ez duzu nahi (interesatua eta buxatuta)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "Kideak ";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "Ataka-egiaztatzeko gunea erorita dago";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "Ataka itxita dago";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "Ataka zabalik dago";
+
+/* Inspector -> Peers tab -> table row tooltip */
+/* "Port: %@" = ""; */
+
+/* No comment provided by engineer. */
+"PrefWindowSize" = "HobetsitakoLeihoTamaina";
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "Lehentasuna";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "Lehentasuna ez-eskuragarri";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "Torrent Pribatua, aztarnariarenak ez diren kideek aurkikuntza desgaituta";
+
+/* Message window -> table column */
+"Process" = "Prozesatu";
+
+/* Blocklist -> message */
+"Processing blocklist" = "Blokeo-zerrenda prozesatzen";
+
+/* Stats window -> label */
+"Program Started" = "Programa Hasita";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "Aurrerapena: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "Protokoloa: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "Torrent Publikoa";
+
+/* Groups -> Name */
+"Purple" = "Morea";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "Begirada Azkarra";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "Irten";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "Maila";
+
+/* Groups -> Name */
+"Red" = "Gorria";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "geratzen den denbora ezezaguna";
+
+/* Preferences -> toolbar item title */
+"Remote" = "Urrutikoa";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "Kendu";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "Kendu igortzea amaitu duten transferentzia guztiak.";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "Kendu Aukeratutakoak";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "Kendu aukeratutako aztarnariak";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "Kendu aukeratutako transferentziak";
+
+/* rename sheet button */
+"Rename" = "Berrizendatu";
+
+/* File Outline -> Menu */
+"Rename File" = "Aldatu fitxategiaren izena";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "Aldatu \"%@\" fitxategiaren izena:";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "Berrabiarazi";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "Jarraitu Guztiekin";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "Jarraitu transferentzia guztiekin";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "Jarraitu Aukeratutakoekin";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "Jarraitu aukeratutako transferentziekin";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "Jarraitu transferentziarekin";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "Jarraitu transferentziarekin oraintxe bertan";
+
+/* Stats window -> label */
+"Running Time" = "Exekuzio-denbora";
+
+/* Message window -> save button */
+"Save" = "Gorde";
+
+/* Tracker last scrape */
+"Scrape error" = "Zuriketa-errorea";
+
+/* Tracker last scrape */
+"Scrape timed out" = "Zuriketaren denbora agortu da.";
+
+/* tracker peer stat */
+"Seeders" = "Igorleak";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "Igortzen";
+
+/* Torrent -> status string */
+"Seeding complete" = "Igortzea amaituta";
+
+/* notification title */
+"Seeding Complete" = "Igortzea Amaituta";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "%1$lu %2$lu kideetara igortzen";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = " %u Igortzen kide batetara";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "Aukeratu";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "Hautatu fitxategi bat edo karpeta bat torrent fitxategiarentzat.";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "Hautatu \"%@\"  honetarako deskarga karpeta";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "Hautatu izena eta kokapen bat torrent fitxategiarentzat";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "Aukeratu karpeta berria %lu datu-fitxategientzako.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "Aukeratu karpeta berria \"%@\"(e)rako.";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "Saioaren tasa";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "Saioaren transferentzia";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "Elkarbanatu";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "Partekatu torrent fitxategia";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "Ezarpen orokorretarako laster-markak.";
+
+/* notification button */
+"Show" = "Erakutzi";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "Erakutsi Iragazki-barra";
+
+/* File Outline -> Menu */
+"Show in Finder" = "Erakutsi Finder-en";
+
+/* View menu -> Inspector */
+"Show Inspector" = "Erakutsi Ikuskatzailea";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "Erakutsi Egoera-barra";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "Erakutsi datu-fitxategia Finder-en";
+
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "Abiadura-muga";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "Abiadura-muga Automatikoa Desgaituta";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "Abiadura-muga Automatikoa Gaituta";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Abiadura-mugak transferentzia muga orokorrak baliogabetu eta bere mugak zehazten ditu.";
+
+/* Torrent -> status string */
+"Stalled" = "Trabatuta";
+
+/* Stats window -> title */
+"Statistics" = "Estatistikak";
+
+/* torrent action menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "Geratu Maila iristean (%.2f)";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "Geratu abiarazteko itxarotea";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "Eman sostengua iturburu irekiko software independentea";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "TB/s";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "Aukeratutako torrent fitxategiaren kokapena ez da existitzen.";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "Helburuko direktorioa eta datuen jatorrizko direktorioak izen berdina dute.";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "\"%@\" ez da existitzen une honetan. Direktorio hau sortu ezazu edo aukeratu beste bat torrent fitxategia sortzeko.";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Ezin da  \"%@\" magnet esteka gehitu dagoeneko existitzen den transferentzia baten kopia delako.";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "Ezin izan da \"%@\" mugitzeko eragiketa egin.";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "Zehaztutako blokeo-zerrenda fitxategiak ez dauka baliozko araurik.";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "Torrent-a ezin da %1$@(e)tik deskagatu: %2$@.";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "Ezin izan da (%@) torrent fitxategia aurkitu.";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "Torrent fitxategia ezin izan da ireki datu baliogabeak dituelako.";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "Fitxategiaren tamaina zero byte dira.";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "Transferentzia ezin izan da gehitu dagoeneko existitzen den transferentzia baten kopia delako.";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Transferentzia pausatuko da. Jarraitzeko espazioa garbitu ezazu %@ unitatean edo desmarkatu fitxategiak torrent-ikuskatzailean.";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Transferentziak ez du aztarnaririk kontaktatuko kideen bila, eta deskargatu eta igortzeko aztarnariarenak ez diren kideen aurkikuntza metodoak baino ez ditu erabiliko, hala nola PEX eta DHT.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "%1$lu transferentzia daude (%2$lu aktibo).";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Ixterakoan pausatuko diren %lu transferentzia aktibo daude. Transferentziak automatikoki martxan jarriko dira berriz abiarazten denean.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "%lu transferentzia aktibo daude.";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "Ez dago aztarnari-helbiderik.";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Transmission-eko instantzia bat dagoeneko martxan dago. Instantzia hau ezin da ireki beste instantzia hori itxi arte.";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Ixterakoan pausatuko den transferentzia bat aktibo dago. Transferentzia automatikoki martxan jarriko da berriz abiarazten denean.";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "Torrent-fitxategia sortzeko karpetan gutxienez fitxategi bat egon behar da.";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "Arazo bat egon da \"%@\" fitxategia sortzerakoan.";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "Errore bat gertatu da datu-fitxategiak mugitzerakoan.";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Errorea gertatu da \"%@\" esteka gehitzerakoan. Transferentzia ez da egingo.";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "Karpeta honek ez dauka fitxategirik.";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Transferentzia hau aktibo dago. Behin kenduta, transferentziarekin jarraitzeko torrent fitxategia ala magnet esteka bat beharko da.";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Honek Transmission-ek erakutsitako estatistika orokorrak garbituko ditu. Banakako transferentzien estatistikak ez dira aldatuko.";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "%ld Maila";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "Erakutsi/Ezkutatu Iragazkia";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "Erakutsi/ezkutatu ikuskatzailea";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "Erakutsi/Ezkutatu Iragazki-barra";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "Erakutsi ala ezkutatu torrent-ikuskatzailea";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "Torrent-aren deskargak huts egin du";
+
+/* notification title */
+"Torrent File Auto Added" = "Torrent Fitxategia Automatikoki Gehituta";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Torrent-ikuskatzailea";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "torrent metadatuak behar dira";
+
+/* stats total */
+"Total N/A" = "Guztira E/A";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "Tasa guztira";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "Transferentzia guztira";
+
+/* Message window -> level */
+"Trace" = "Jarraitu";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "Aztarnaria";
+
+/* Torrent -> status string */
+"Tracker returned error" = "Aztarnariak errorea itzuli du";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "Aztarnariak oharra itzuli du";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "Aztarnaria segurtasun-kopia gisa erabiliko da";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "Aztarnariak";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "Transferentzia Ez Aktiboa";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "Transferentziak";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "Transferentzia Ez Aktiboak";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission fitxategiak partekatzeko programa bat da. Torrent bat exekutatzen duzunean, bere datuak eskuragarri jarriko dira igorriak izan daitezen. Zu eta soilik zu zara arduraduna zure lekuko legeak betetzeko erabaki zentzudunak egiteko.";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission funtzio askoz hornitutako torrent aplikazio bat da. Garapenak, kodea idazteak eta hobekuntzak denbora eta esfortzu handia behar izan du. Transmission erabiltzea gustuko baduzu, zure maitasuna erakusteko donazio bat egitea hausnartu ezazu.";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Transmission dagoeneko martxan dago.";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "Igoera";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "Igoera %lu (e)ra";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "Desmarkatu Aukeratutakoak";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "mugagabea";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "Irakurri ezin den errorea";
+
+/* Save log panel -> default file name */
+"untitled" = "izenbururik gabe";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "Igoera-abiadura";
+
+/* Stats window -> label */
+"Uploaded" = "Igotakoa";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = " %1$@ igota (Maila: %2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "Kideei Igotzen";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "Existitzen diren datuak egiaztatzeko itxaroten";
+
+/* Torrent -> status string */
+"Waiting to download" = "Deskargatzeko itxaroten";
+
+/* Torrent -> status string */
+"Waiting to seed" = "Igortzeko itxaroten";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "Oharra";
+
+/* Drag overlay -> url */
+"Web Address" = "Web Helbidea";
+
+/* Torrent -> status string */
+"web seed" = "web igortzea";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "Web emaritzak";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "Ongi Etorri Transmission-era";
+
+/* Groups -> Name */
+"Yellow" = "Horia";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "Zuk kideari buxadura kendu diozu, baina bera ez dago interesatuta.";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "Zuk deskargatu nahi duzu, baina kideak ez du igorri nahi (interesatua eta buxatuta)";
+

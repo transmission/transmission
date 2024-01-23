@@ -4,10 +4,8 @@
   "repository": "https://github.com/transmission/transmission",
   "license": "MIT",
   "scripts": {
-    "dev": "WEBPACK_MODE=development webpack serve --config webpack.config.js",
-    "build": "webpack --config webpack.config.js",
-    "css": "sass --no-source-map assets/css/",
-    "css:map": "sass assets/css/",
+    "build": "node esbuild.mjs",
+    "dev": "DEV=true node esbuild.mjs",
     "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
     "lint:fix": "run-s lint:eslint:fix lint:stylelint:fix lint:prettier:fix",
     "lint:eslint": "eslint src/*.js",
@@ -18,30 +16,19 @@
     "lint:stylelint:fix": "stylelint --fix assets/css/*scss"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
-    "@babel/eslint-parser": "^7.22.9",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@primer/stylelint-config": "^12.7.2",
-    "css-loader": "^6.8.1",
-    "css-minimizer-webpack-plugin": "^5.0.1",
+    "esbuild": "^0.19.7",
+    "esbuild-sass-plugin": "^2.16.0",
+    "@primer/stylelint-config": "^12.8.0",
     "eslint": "^8.45.0",
     "eslint-plugin-sonarjs": "^0.19.0",
     "eslint-plugin-unicorn": "^47.0.0",
-    "file-loader": "^6.2.0",
-    "mini-css-extract-plugin": "^2.7.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.0",
     "sass": "^1.63.6",
-    "sass-loader": "^13.2.2",
     "style-loader": "^3.3.3",
     "stylelint": "^15.10.1",
     "stylelint-config-sass-guidelines": "^10.0.0",
-    "stylelint-config-standard": "^34.0.0",
-    "terser-webpack-plugin": "^5.3.9",
-    "webpack": "^5.88.1",
-    "webpack-bundle-analyzer": "^4.9.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "stylelint-config-standard": "^34.0.0"
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0"

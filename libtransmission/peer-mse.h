@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -33,7 +33,7 @@ public:
     // MSE spec: "Minimum length [for the private key] is 128 bit.
     // Anything beyond 180 bit is not believed to add any further
     // security and only increases the necessary calculation time.
-    // You should use a length of 160bits whenever possible[.]
+    // You should use a length of 160bits whenever possible[.]"
     static auto constexpr PrivateKeySize = size_t{ 20 };
 
     // MSE spec: "P, S [the shared secret], Ya and Yb
@@ -77,6 +77,10 @@ class Filter
 {
 public:
     void decrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    constexpr void decrypt_disable() noexcept
+    {
+        dec_active_ = false;
+    }
 
     template<typename T>
     constexpr void decrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
@@ -85,6 +89,10 @@ public:
     }
 
     void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    constexpr void encrypt_disable() noexcept
+    {
+        enc_active_ = false;
+    }
 
     template<typename T>
     constexpr void encrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
@@ -101,13 +109,25 @@ private:
     template<typename T>
     static constexpr void process(T const* buf_in, size_t buf_len, T* buf_out, bool active, tr_arc4& arc4) noexcept
     {
-        if (active)
+        if (buf_in == nullptr || buf_out == nullptr)
+        {
+            skip(buf_len, active, arc4);
+        }
+        else if (active)
         {
             arc4.process(reinterpret_cast<uint8_t const*>(buf_in), buf_len, reinterpret_cast<uint8_t*>(buf_out));
         }
-        else
+        else if (buf_in != buf_out)
         {
             std::copy_n(buf_in, buf_len, buf_out);
+        }
+    }
+
+    static constexpr void skip(size_t len, bool active, tr_arc4& arc4)
+    {
+        if (active)
+        {
+            arc4.discard(len);
         }
     }
 

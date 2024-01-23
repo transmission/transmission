@@ -3,11 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstring>
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/peer-msgs.h>
-
 #include "gtest/gtest.h"
 
 TEST(PeerMsgs, placeholder)

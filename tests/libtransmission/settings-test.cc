@@ -12,6 +12,8 @@
 
 #include <libtransmission/log.h>
 #include <libtransmission/net.h>
+#include <libtransmission/open-files.h>
+#include <libtransmission/peer-io.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session-settings.h>
 #include <libtransmission/variant.h>
@@ -30,9 +32,8 @@ TEST_F(SettingsTest, canInstantiate)
 {
     auto settings = tr_session_settings{};
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
-    settings.save(&var);
+    auto var = settings.settings();
+    EXPECT_TRUE(var.has_value());
 }
 
 TEST_F(SettingsTest, canLoadBools)
@@ -45,7 +46,7 @@ TEST_F(SettingsTest, canLoadBools)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddBool(&var, Key, expected_value);
-    settings.load(&var);
+    settings.load(var);
 
     EXPECT_EQ(expected_value, settings.seed_queue_enabled);
 }
@@ -58,9 +59,7 @@ TEST_F(SettingsTest, canSaveBools)
     auto const expected_value = !settings.seed_queue_enabled;
     settings.seed_queue_enabled = expected_value;
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = bool{};
     EXPECT_TRUE(tr_variantDictFindBool(&var, Key, &val));
     EXPECT_EQ(expected_value, val);
@@ -76,7 +75,7 @@ TEST_F(SettingsTest, canLoadDoubles)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddReal(&var, Key, expected_value);
-    settings.load(&var);
+    settings.load(var);
     EXPECT_NEAR(expected_value, settings.ratio_limit, 0.001);
 }
 
@@ -89,9 +88,7 @@ TEST_F(SettingsTest, canSaveDoubles)
     auto const expected_value = !default_value;
     settings.seed_queue_enabled = expected_value;
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = bool{};
     EXPECT_TRUE(tr_variantDictFindBool(&var, Key, &val));
     EXPECT_EQ(expected_value, val);
@@ -108,14 +105,14 @@ TEST_F(SettingsTest, canLoadEncryptionMode)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, ExpectedValue);
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->encryption_mode);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "required");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->encryption_mode);
 }
 
@@ -128,9 +125,7 @@ TEST_F(SettingsTest, canSaveEncryptionMode)
     EXPECT_NE(ExpectedValue, settings.seed_queue_enabled);
     settings.encryption_mode = ExpectedValue;
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
     EXPECT_EQ(ExpectedValue, val);
@@ -148,14 +143,14 @@ TEST_F(SettingsTest, canLoadLogLevel)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, ExpectedValue);
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->log_level);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "debug");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->log_level);
 }
 
@@ -168,10 +163,8 @@ TEST_F(SettingsTest, canSaveLogLevel)
     auto constexpr ExpectedValue = TR_LOG_DEBUG;
     ASSERT_NE(ExpectedValue, default_value);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.log_level = ExpectedValue;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
     EXPECT_EQ(ExpectedValue, val);
@@ -189,14 +182,14 @@ TEST_F(SettingsTest, canLoadMode)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, ExpectedValue);
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->umask);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "0777");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->umask);
 }
 
@@ -209,10 +202,8 @@ TEST_F(SettingsTest, canSaveMode)
     auto constexpr ExpectedValue = tr_mode_t{ 0777 };
     ASSERT_NE(ExpectedValue, default_value);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.umask = ExpectedValue;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ("0777", val);
@@ -230,7 +221,7 @@ TEST_F(SettingsTest, canLoadPort)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, ExpectedValue.host());
-    settings.load(&var);
+    settings.load(var);
     EXPECT_EQ(ExpectedValue, settings.peer_port);
 }
 
@@ -243,10 +234,8 @@ TEST_F(SettingsTest, canSavePort)
     auto constexpr ExpectedValue = tr_port::from_host(8080);
     ASSERT_NE(ExpectedValue, default_value);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.peer_port = ExpectedValue;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
     EXPECT_EQ(ExpectedValue.host(), val);
@@ -258,20 +247,20 @@ TEST_F(SettingsTest, canLoadPreallocation)
 
     auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->preallocation_mode;
-    auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
+    auto constexpr ExpectedValue = tr_open_files::Preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
-    tr_variantDictAddInt(&var, Key, ExpectedValue);
-    settings->load(&var);
+    tr_variantDictAddInt(&var, Key, static_cast<int64_t>(ExpectedValue));
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->preallocation_mode);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "full");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->preallocation_mode);
 }
 
@@ -281,16 +270,14 @@ TEST_F(SettingsTest, canSavePreallocation)
 
     auto settings = tr_session_settings{};
     auto const default_value = settings.preallocation_mode;
-    auto constexpr ExpectedValue = TR_PREALLOCATE_FULL;
+    auto constexpr ExpectedValue = tr_open_files::Preallocation::Full;
     ASSERT_NE(ExpectedValue, default_value);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.preallocation_mode = ExpectedValue;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
-    EXPECT_EQ(ExpectedValue, val);
+    EXPECT_EQ(static_cast<int64_t>(ExpectedValue), val);
 }
 
 TEST_F(SettingsTest, canLoadSizeT)
@@ -303,7 +290,7 @@ TEST_F(SettingsTest, canLoadSizeT)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, expected_value);
-    settings.load(&var);
+    settings.load(var);
     EXPECT_EQ(expected_value, settings.queue_stalled_minutes);
 }
 
@@ -314,10 +301,8 @@ TEST_F(SettingsTest, canSaveSizeT)
     auto settings = tr_session_settings{};
     auto const expected_value = settings.queue_stalled_minutes + 5U;
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.queue_stalled_minutes = expected_value;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
     EXPECT_EQ(expected_value, static_cast<size_t>(val));
@@ -334,7 +319,7 @@ TEST_F(SettingsTest, canLoadString)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, ChangedValue);
-    settings.load(&var);
+    settings.load(var);
     EXPECT_EQ(ChangedValue, settings.bind_address_ipv4);
 }
 
@@ -346,10 +331,8 @@ TEST_F(SettingsTest, canSaveString)
     auto settings = tr_session_settings{};
     EXPECT_NE(ChangedValue, tr_session_settings{}.bind_address_ipv4);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.bind_address_ipv4 = ChangedValue;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ(ChangedValue, val);
@@ -367,14 +350,14 @@ TEST_F(SettingsTest, canLoadTos)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, 0x20);
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ChangedValue, settings->peer_socket_tos);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "cs1");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ChangedValue, settings->peer_socket_tos);
 }
 
@@ -386,10 +369,8 @@ TEST_F(SettingsTest, canSaveTos)
     auto settings = tr_session_settings{};
     ASSERT_NE(ChangedValue, settings.peer_socket_tos);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.peer_socket_tos = tr_tos_t(0x20);
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ(ChangedValue.toString(), val);
@@ -407,14 +388,14 @@ TEST_F(SettingsTest, canLoadVerify)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "full");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ChangedValue, settings->torrent_added_verify_mode);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, ChangedValue);
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ChangedValue, settings->torrent_added_verify_mode);
 }
 
@@ -426,11 +407,50 @@ TEST_F(SettingsTest, canSaveVerify)
     auto settings = tr_session_settings{};
     ASSERT_NE(ChangedValue, settings.torrent_added_verify_mode);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
     settings.torrent_added_verify_mode = ChangedValue;
-    settings.save(&var);
+    auto var = settings.settings();
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ("full", val);
+}
+
+TEST_F(SettingsTest, canLoadPreferredTransport)
+{
+    static auto constexpr Key = TR_KEY_preferred_transport;
+    auto constexpr ExpectedValue = TR_PREFER_TCP;
+
+    auto settings = std::make_unique<tr_session_settings>();
+    auto const default_value = settings->preferred_transport;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 1);
+    tr_variantDictAddInt(&var, Key, ExpectedValue);
+    settings->load(var);
+    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    var.clear();
+
+    settings = std::make_unique<tr_session_settings>();
+    tr_variantInitDict(&var, 1);
+    tr_variantDictAddStrView(&var, Key, "tcp");
+    settings->load(var);
+    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+}
+
+TEST_F(SettingsTest, canSavePreferredTransport)
+{
+    static auto constexpr Key = TR_KEY_preferred_transport;
+    static auto constexpr ExpectedValue = TR_PREFER_TCP;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.preferred_transport;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 100);
+    settings.preferred_transport = ExpectedValue;
+    var = settings.settings();
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
+    EXPECT_EQ("tcp", val);
 }

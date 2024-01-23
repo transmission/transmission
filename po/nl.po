@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-14 01:08+0100\n"
+"POT-Creation-Date: 2023-12-28 23:43+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Dutch (https://app.transifex.com/transmissionbt/teams/33778/nl/)\n"
@@ -25,134 +25,134 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:527
+#: ../cli/cli.cc:87 ../gtk/Utils.cc:118 ../libtransmission/utils.cc:545
 msgid "None"
 msgstr "Geen"
 
-#: ../cli/cli.cc:112
+#: ../cli/cli.cc:92
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:168 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
+#: ../daemon/daemon.cc:229 ../gtk/Session.cc:793 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:238 ../libtransmission/blocklist.cc:336 ../libtransmission/blocklist.cc:351 ../libtransmission/inout.cc:160 ../libtransmission/utils.cc:125 ../libtransmission/utils.cc:144 ../libtransmission/utils.cc:155 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet lezen: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:260 ../gtk/Session.cc:863 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:95
+#: ../daemon/daemon.cc:254 ../gtk/Session.cc:844 ../gtk/Utils.cc:271 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
 msgstr "Kan torrent-bestand '{path}' niet toevoegen"
 
-#: ../daemon/daemon.cc:271
+#: ../daemon/daemon.cc:263
 msgid "Removing torrent file '{path}'"
 msgstr "Torrent-bestand aan het verwijderen '{path}'"
 
-#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:585
+#: ../daemon/daemon.cc:268 ../gtk/Utils.cc:554 ../libtransmission/utils.cc:607
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Kan '{path}' niet verwijderen: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:604
+#: ../daemon/daemon.cc:603
 msgid "Couldn't parse log level '{level}'"
 msgstr "Kan logboekniveau niet parseren '{level}'"
 
-#: ../daemon/daemon.cc:651
+#: ../daemon/daemon.cc:650
 msgid "Deferring reload until session is fully started."
 msgstr "Herladen uitstellen totdat de sessie volledig is gestart."
 
-#: ../daemon/daemon.cc:666
+#: ../daemon/daemon.cc:664
 msgid "Reloading settings from '{path}'"
 msgstr "Instellingen opnieuw laden vanaf '{path}'"
 
-#: ../daemon/daemon.cc:702
+#: ../daemon/daemon.cc:699
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "Kon daemon niet initialiseren: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:715
+#: ../daemon/daemon.cc:710
 msgid "Loading settings from '{path}'"
 msgstr "Instellingen laden vanaf '{path}'"
 
-#: ../daemon/daemon.cc:735
+#: ../daemon/daemon.cc:730
 msgid "Saved pidfile '{path}'"
 msgstr "Opgeslagen pid-bestand '{path}'"
 
-#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:183 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1141 ../libtransmission/torrent.cc:2130 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:736 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:471 ../libtransmission/inout.cc:155 ../libtransmission/rpcimpl.cc:1306 ../libtransmission/torrent.cc:1029 ../libtransmission/torrent.cc:1990 ../libtransmission/variant.cc:855
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Kon  '{path}' niet opslaan: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:751
+#: ../daemon/daemon.cc:745
 msgid "Requiring authentication"
 msgstr "Verificatie vereisen"
 
-#: ../daemon/daemon.cc:772
+#: ../daemon/daemon.cc:766
 msgid "Watching '{path}' for new torrent files"
 msgstr "'{path}' in de gaten houden voor nieuwe torrent bestanden"
 
-#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:181
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr "Kon geen event maken: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "Kon geen event toevoegen: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:840
+#: ../daemon/daemon.cc:834
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "Kon daemon event loop niet starten: {error} ({error_code})"
 
-#: ../gtk/Application.cc:395
+#: ../gtk/Application.cc:398
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr "Kan Transmission niet registreren als een {content_type} handler: {error} ({error_code})"
 
-#: ../gtk/Application.cc:552
+#: ../gtk/Application.cc:554
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr "Kreeg beëindigingssignaal, proberen om netjes af te sluiten. Doe het opnieuw als het vastloopt."
 
-#: ../gtk/Application.cc:778
+#: ../gtk/Application.cc:780
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr "Transmission is een programma om bestanden te delen. Wanneer er een torrent wordt binnengehaald, worden de gegevens ook beschikbaar gesteld  aan anderen via uploaden. Het delen van bestanden is geheel uw eigen verantwoordelijkheid."
 
-#: ../gtk/Application.cc:784 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+#: ../gtk/Application.cc:786 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:372 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
 msgstr "_Annuleren"
 
-#: ../gtk/Application.cc:785
+#: ../gtk/Application.cc:787
 msgid "I _Agree"
 msgstr "Ik ga _akkoord"
 
-#: ../gtk/Application.cc:1014
+#: ../gtk/Application.cc:1016
 msgid "Closing Connections…"
 msgstr "Verbindingen sluiten…"
 
-#: ../gtk/Application.cc:1019
+#: ../gtk/Application.cc:1021
 msgid "Sending upload/download totals to tracker…"
 msgstr "Upload/download-totalen versturen naar tracker…"
 
-#: ../gtk/Application.cc:1024
+#: ../gtk/Application.cc:1026
 msgid "_Quit Now"
 msgstr "_Direct afsluiten"
 
-#: ../gtk/Application.cc:1086
+#: ../gtk/Application.cc:1088
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Kon corrupte torrent niet toevoegen"
 msgstr[1] "Kon corrupte torrents niet toevoegen"
 
-#: ../gtk/Application.cc:1093
+#: ../gtk/Application.cc:1095
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Kon dubbele torrent niet toevoegen"
 msgstr[1] "Kon dubbele torrents niet toevoegen"
 
-#: ../gtk/Application.cc:1414
+#: ../gtk/Application.cc:1416
 msgid "A fast and easy BitTorrent client"
 msgstr "Een eenvoudige en snelle BitTorrent-client"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1417
 msgid "Copyright © The Transmission Project"
 msgstr "Copyright © Het Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1421
+#: ../gtk/Application.cc:1423
 msgid "translator-credits"
 msgstr ""
 "Jan Geboers\n"
@@ -189,335 +189,335 @@ msgstr ""
 "  korst https://launchpad.net/~jasperkorst\n"
 "  rob https://launchpad.net/~rvdb"
 
-#: ../gtk/DetailsDialog.cc:518 ../gtk/DetailsDialog.cc:536
+#: ../gtk/DetailsDialog.cc:520 ../gtk/DetailsDialog.cc:538
 msgid "Use global settings"
 msgstr "Algemene instellingen gebruiken"
 
-#: ../gtk/DetailsDialog.cc:519
+#: ../gtk/DetailsDialog.cc:521
 msgid "Seed regardless of ratio"
 msgstr "Seeden ongeacht verhouding"
 
-#: ../gtk/DetailsDialog.cc:520
+#: ../gtk/DetailsDialog.cc:522
 msgid "Stop seeding at ratio:"
 msgstr "Stoppen met seeden bij een verhouding van:"
 
-#: ../gtk/DetailsDialog.cc:537
+#: ../gtk/DetailsDialog.cc:539
 msgid "Seed regardless of activity"
 msgstr "Seeden ongeacht activiteit"
 
-#: ../gtk/DetailsDialog.cc:538
+#: ../gtk/DetailsDialog.cc:540
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Stoppen met seeden indien langer dan N minuten inactief:"
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
+#: ../gtk/DetailsDialog.cc:571 ../gtk/Torrent.cc:428
 msgid "Queued for verification"
 msgstr "In de wachtrij gezet voor verificatie"
 
-#: ../gtk/DetailsDialog.cc:572
+#: ../gtk/DetailsDialog.cc:574
 msgid "Verifying local data"
 msgstr "Lokale gegevens aan het verifiëren"
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
+#: ../gtk/DetailsDialog.cc:577 ../gtk/Torrent.cc:431
 msgid "Queued for download"
 msgstr "In de wachtrij gezet voor download"
 
-#: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
+#: ../gtk/DetailsDialog.cc:580 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Downloaden"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
+#: ../gtk/DetailsDialog.cc:583 ../gtk/Torrent.cc:434
 msgid "Queued for seeding"
 msgstr "In de wachtrij gezet voor seeden"
 
-#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:474
+#: ../gtk/DetailsDialog.cc:586 ../gtk/FilterBar.cc:474
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Seeden"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
+#: ../gtk/DetailsDialog.cc:589 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:425
 msgid "Finished"
 msgstr "Voltooid"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
+#: ../gtk/DetailsDialog.cc:589 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:425
 msgid "Paused"
 msgstr "Gepauzeerd"
 
-#: ../gtk/DetailsDialog.cc:608 ../gtk/DetailsDialog.cc:613 ../gtk/DetailsDialog.cc:727
+#: ../gtk/DetailsDialog.cc:610 ../gtk/DetailsDialog.cc:615 ../gtk/DetailsDialog.cc:729
 msgid "N/A"
 msgstr "n.v.t."
 
-#: ../gtk/DetailsDialog.cc:622 ../gtk/FileList.cc:654
+#: ../gtk/DetailsDialog.cc:624 ../gtk/FileList.cc:654
 msgid "Mixed"
 msgstr "Gemengd"
 
-#: ../gtk/DetailsDialog.cc:623
+#: ../gtk/DetailsDialog.cc:625
 msgid "No Torrents Selected"
 msgstr "Geen torrents geselecteerd"
 
-#: ../gtk/DetailsDialog.cc:652
+#: ../gtk/DetailsDialog.cc:654
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "Exclusief voor deze tracker — DHT en PEX uitgeschakeld"
 
-#: ../gtk/DetailsDialog.cc:652
+#: ../gtk/DetailsDialog.cc:654
 msgid "Public torrent"
 msgstr "Publieke torrent"
 
-#: ../gtk/DetailsDialog.cc:715
+#: ../gtk/DetailsDialog.cc:717
 msgid "Created by {creator} on {date}"
 msgstr "Gemaakt door {creator} op {date}"
 
-#: ../gtk/DetailsDialog.cc:719
+#: ../gtk/DetailsDialog.cc:721
 msgid "Created by {creator}"
 msgstr "Gemaakt door {creator}"
 
-#: ../gtk/DetailsDialog.cc:723
+#: ../gtk/DetailsDialog.cc:725
 msgid "Created on {date}"
 msgstr "Gemaakt op {date}"
 
-#: ../gtk/DetailsDialog.cc:837
+#: ../gtk/DetailsDialog.cc:839
 msgid "Unknown"
 msgstr "Onbekend"
 
-#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:388
+#: ../gtk/DetailsDialog.cc:876 ../gtk/MakeDialog.cc:388
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] "{total_size} in {file_count:L} bestand"
 msgstr[1] "{total_size} in {file_count:L} bestanden"
 
-#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:394
+#: ../gtk/DetailsDialog.cc:891 ../gtk/MakeDialog.cc:394
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] "({piece_count} BitTorrent stukje @ {piece_size})"
 msgstr[1] "({piece_count} BitTorrent fragmenten @ {piece_size})"
 
-#: ../gtk/DetailsDialog.cc:933
+#: ../gtk/DetailsDialog.cc:935
 msgid "{current_size} ({percent_done}%)"
 msgstr "{current_size} ({percent_done}%)"
 
-#: ../gtk/DetailsDialog.cc:941
+#: ../gtk/DetailsDialog.cc:943
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} ({percent_done}% van {percent_available}% beschikbaar)"
 
-#: ../gtk/DetailsDialog.cc:950
+#: ../gtk/DetailsDialog.cc:952
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} ({percent_done}% van {percent_available}% beschikbaar; {unverified_size} niet geverifieerd)"
 
-#: ../gtk/DetailsDialog.cc:983
+#: ../gtk/DetailsDialog.cc:985
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
 msgstr "{downloaded_size} (+{discarded_size} weggegooid na mislukte checksum)"
 
-#: ../gtk/DetailsDialog.cc:1013
+#: ../gtk/DetailsDialog.cc:1015
 msgid "{uploaded_size} (Ratio: {ratio})"
 msgstr "{uploaded_size} (Ratio: {ratio})"
 
-#: ../gtk/DetailsDialog.cc:1054
+#: ../gtk/DetailsDialog.cc:1056
 msgid "No errors"
 msgstr "Geen fouten"
 
-#: ../gtk/DetailsDialog.cc:1074
+#: ../gtk/DetailsDialog.cc:1076
 msgid "Never"
 msgstr "Nooit"
 
-#: ../gtk/DetailsDialog.cc:1078
+#: ../gtk/DetailsDialog.cc:1080
 msgid "Active now"
 msgstr "Nu actief"
 
-#: ../gtk/DetailsDialog.cc:1489
+#: ../gtk/DetailsDialog.cc:1494
 msgid "Optimistic unchoke"
 msgstr "Betere verbindingen met peers zoeken"
 
-#: ../gtk/DetailsDialog.cc:1493
+#: ../gtk/DetailsDialog.cc:1498
 msgid "Downloading from this peer"
 msgstr "Aan het downloaden van deze peer"
 
-#: ../gtk/DetailsDialog.cc:1497
+#: ../gtk/DetailsDialog.cc:1502
 msgid "We would download from this peer if they would let us"
 msgstr "We zouden van deze peer downloaden als deze dat toeliet"
 
-#: ../gtk/DetailsDialog.cc:1501
+#: ../gtk/DetailsDialog.cc:1506
 msgid "Uploading to peer"
 msgstr "Uploaden naar peer"
 
-#: ../gtk/DetailsDialog.cc:1505
+#: ../gtk/DetailsDialog.cc:1510
 msgid "We would upload to this peer if they asked"
 msgstr "We zouden naar deze peer uploaden als deze daarom zouden vragen."
 
-#: ../gtk/DetailsDialog.cc:1509
+#: ../gtk/DetailsDialog.cc:1514
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "We zouden van deze peer kunnen downloaden, maar willen dat niet"
 
-#: ../gtk/DetailsDialog.cc:1513
+#: ../gtk/DetailsDialog.cc:1518
 msgid "We unchoked this peer, but they're not interested"
 msgstr "Deze peer zou van ons kunnen downloaden, maar wil dat niet"
 
-#: ../gtk/DetailsDialog.cc:1517
+#: ../gtk/DetailsDialog.cc:1522
 msgid "Encrypted connection"
 msgstr "Versleutelde verbinding"
 
-#: ../gtk/DetailsDialog.cc:1521
+#: ../gtk/DetailsDialog.cc:1526
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "Peer is gevonden via peeruitwisseling (PEX)"
 
-#: ../gtk/DetailsDialog.cc:1525
+#: ../gtk/DetailsDialog.cc:1530
 msgid "Peer was found through DHT"
 msgstr "Peer is gevonden via DHT"
 
-#: ../gtk/DetailsDialog.cc:1529
+#: ../gtk/DetailsDialog.cc:1534
 msgid "Peer is an incoming connection"
 msgstr "Peer is een inkomende verbinding"
 
-#: ../gtk/DetailsDialog.cc:1533
+#: ../gtk/DetailsDialog.cc:1538
 msgid "Peer is connected over µTP"
 msgstr "Peer is verbonden via µTP"
 
-#: ../gtk/DetailsDialog.cc:1619
+#: ../gtk/DetailsDialog.cc:1608
 msgid "Address"
 msgstr "Adres"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1627
+#: ../gtk/DetailsDialog.cc:1616
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1643
+#: ../gtk/DetailsDialog.cc:1632
 msgid "Dn Reqs"
 msgstr "Downl.-verz."
 
-#: ../gtk/DetailsDialog.cc:1650
+#: ../gtk/DetailsDialog.cc:1639
 msgid "Up Reqs"
 msgstr "Upl.-verz."
 
-#: ../gtk/DetailsDialog.cc:1657
+#: ../gtk/DetailsDialog.cc:1646
 msgid "Dn Blocks"
 msgstr "Downl.-blokken"
 
-#: ../gtk/DetailsDialog.cc:1664
+#: ../gtk/DetailsDialog.cc:1653
 msgid "Up Blocks"
 msgstr "Upl.-blokken"
 
-#: ../gtk/DetailsDialog.cc:1671
+#: ../gtk/DetailsDialog.cc:1660
 msgid "We Cancelled"
 msgstr "Afgebroken door ons"
 
-#: ../gtk/DetailsDialog.cc:1678
+#: ../gtk/DetailsDialog.cc:1667
 msgid "They Cancelled"
 msgstr "Afgebroken door hen"
 
-#: ../gtk/DetailsDialog.cc:1686 ../gtk/DetailsDialog.cc:1764
+#: ../gtk/DetailsDialog.cc:1675 ../gtk/DetailsDialog.cc:1753
 msgid "Down"
 msgstr "Downl."
 
-#: ../gtk/DetailsDialog.cc:1694
+#: ../gtk/DetailsDialog.cc:1683
 msgid "Up"
 msgstr "Upl."
 
-#: ../gtk/DetailsDialog.cc:1701
+#: ../gtk/DetailsDialog.cc:1690
 msgid "Client"
 msgstr "Cliënt"
 
-#: ../gtk/DetailsDialog.cc:1707
+#: ../gtk/DetailsDialog.cc:1696
 msgid "Flags"
 msgstr "Vlaggen"
 
-#: ../gtk/DetailsDialog.cc:1755
+#: ../gtk/DetailsDialog.cc:1744
 msgid "Web Seeds"
 msgstr "Webseeds"
 
-#: ../gtk/DetailsDialog.cc:1823
+#: ../gtk/DetailsDialog.cc:1812
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] "Kreeg een lijst van {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgstr[1] "Kreeg een lijst van {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1835
+#: ../gtk/DetailsDialog.cc:1824
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr "Peer list verzoek {markup_begin}time-out {time_span_ago}{markup_end} geleden; zal het opnieuw proberen"
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1844
+#: ../gtk/DetailsDialog.cc:1833
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr "Kreeg een foutmelding '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
-#: ../gtk/DetailsDialog.cc:1857
+#: ../gtk/DetailsDialog.cc:1846
 msgid "No updates scheduled"
 msgstr "Geen updates gepland"
 
-#: ../gtk/DetailsDialog.cc:1864
+#: ../gtk/DetailsDialog.cc:1853
 msgid "Asking for more peers {time_span_from_now}"
 msgstr "Er worden meer peers gevraagd {time_span_from_now}"
 
-#: ../gtk/DetailsDialog.cc:1871
+#: ../gtk/DetailsDialog.cc:1860
 msgid "Queued to ask for more peers"
 msgstr "In de wachtrij om naar meer peers te vragen"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
-#: ../gtk/DetailsDialog.cc:1879
+#: ../gtk/DetailsDialog.cc:1868
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr "Meer peers gevraagd {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
-#: ../gtk/DetailsDialog.cc:1904
+#: ../gtk/DetailsDialog.cc:1893
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} en {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
-#: ../gtk/DetailsDialog.cc:1906
+#: ../gtk/DetailsDialog.cc:1895
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] "seeder"
 msgstr[1] "seeders"
 
-#: ../gtk/DetailsDialog.cc:1908
+#: ../gtk/DetailsDialog.cc:1897
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] "leecher"
 msgstr[1] "leechers"
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:1917
+#: ../gtk/DetailsDialog.cc:1906
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr "Kreeg een scrape fout '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
-#: ../gtk/DetailsDialog.cc:1934
+#: ../gtk/DetailsDialog.cc:1923
 msgid "Asking for peer counts in {time_span_from_now}"
 msgstr "Er wordt een peer telling gevraagd over {time_span_from_now}"
 
-#: ../gtk/DetailsDialog.cc:1941
+#: ../gtk/DetailsDialog.cc:1930
 msgid "Queued to ask for peer counts"
 msgstr "In de wachtrij om het aantal peers op te vragen"
 
-#: ../gtk/DetailsDialog.cc:1948
+#: ../gtk/DetailsDialog.cc:1937
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr "Er is een peer telling gevraagd {markup_begin}{time_span_ago}{markup_end}"
 
-#: ../gtk/DetailsDialog.cc:2231
+#: ../gtk/DetailsDialog.cc:2220
 msgid "{torrent_name} - Edit Trackers"
 msgstr "{torrent_name} - Bewerk Trackers"
 
-#: ../gtk/DetailsDialog.cc:2265
+#: ../gtk/DetailsDialog.cc:2254
 msgid "List contains invalid URLs"
 msgstr "De lijst bevat ongeldige URL’s"
 
-#: ../gtk/DetailsDialog.cc:2270 ../gtk/FileList.cc:849
+#: ../gtk/DetailsDialog.cc:2259 ../gtk/FileList.cc:850
 msgid "Please correct the errors and try again."
 msgstr "Verhelp de fouten en probeer het opnieuw."
 
-#: ../gtk/DetailsDialog.cc:2350
+#: ../gtk/DetailsDialog.cc:2339
 msgid "{torrent_name} - Add Tracker"
 msgstr "{torrent_name} - Tracker teovoegen"
 
-#: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
+#: ../gtk/DetailsDialog.cc:2448 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
 msgid "Trackers"
 msgstr "Trackers"
 
-#: ../gtk/DetailsDialog.cc:2642
+#: ../gtk/DetailsDialog.cc:2627
 msgid "{torrent_name} Properties"
 msgstr "{torrent_name} Eigenschappen"
 
-#: ../gtk/DetailsDialog.cc:2647
+#: ../gtk/DetailsDialog.cc:2632
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] "Eigenschappen - {torrent_count:L} Torrent"
@@ -573,42 +573,42 @@ msgstr "_Verwijderen"
 msgid "_Remove"
 msgstr "Ve_rwijderen"
 
-#: ../gtk/FileList.cc:642 ../gtk/Utils.cc:626
+#: ../gtk/FileList.cc:642 ../gtk/Utils.cc:732
 msgid "High"
 msgstr "Hoog"
 
-#: ../gtk/FileList.cc:646 ../gtk/Utils.cc:627
+#: ../gtk/FileList.cc:646 ../gtk/Utils.cc:733
 msgid "Normal"
 msgstr "Normaal"
 
-#: ../gtk/FileList.cc:650 ../gtk/Utils.cc:628
+#: ../gtk/FileList.cc:650 ../gtk/Utils.cc:734
 msgid "Low"
 msgstr "Laag"
 
-#: ../gtk/FileList.cc:840 ../gtk/Session.cc:329
+#: ../gtk/FileList.cc:841 ../gtk/Session.cc:311
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "'{old_path}' niet hernoemen als '{path}': {error} ({error_code})"
 
-#: ../gtk/FileList.cc:953 ../gtk/MessageLogWindow.cc:327
+#: ../gtk/FileList.cc:954 ../gtk/MessageLogWindow.cc:327
 msgid "Name"
 msgstr "Naam"
 
-#: ../gtk/FileList.cc:983
+#: ../gtk/FileList.cc:984
 msgid "Size"
 msgstr "Grootte"
 
 #. add "progress" column
-#: ../gtk/FileList.cc:992
+#: ../gtk/FileList.cc:993
 msgid "Have"
 msgstr "In bezit"
 
 #. add "enabled" column
-#: ../gtk/FileList.cc:1009
+#: ../gtk/FileList.cc:1010
 msgid "Download"
 msgstr "Downloaden"
 
 #. add priority column
-#: ../gtk/FileList.cc:1025
+#: ../gtk/FileList.cc:1026
 msgid "Priority"
 msgstr "Prioriteit"
 
@@ -625,7 +625,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Aan het verifiëren"
 
-#: ../gtk/FilterBar.cc:478 ../gtk/FreeSpaceLabel.cc:54
+#: ../gtk/FilterBar.cc:478 ../gtk/FreeSpaceLabel.cc:55
 msgid "Error"
 msgstr "Foutmelding"
 
@@ -641,7 +641,7 @@ msgstr "_Toon {count:L} van:"
 msgid "{disk_space} free"
 msgstr "{disk_space} vrij"
 
-#: ../gtk/MainWindow.cc:304
+#: ../gtk/MainWindow.cc:381
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -649,7 +649,7 @@ msgstr ""
 "Klik om alternatieve snelheidslimieten uit te schakelen\n"
 " ({download_speed} down, {upload_speed} up)"
 
-#: ../gtk/MainWindow.cc:305
+#: ../gtk/MainWindow.cc:382
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -657,77 +657,77 @@ msgstr ""
 "Klik om alternatieve snelheidslimieten in te schakelen\n"
 " ({download_speed} down, {upload_speed} up)"
 
-#: ../gtk/MainWindow.cc:357
+#: ../gtk/MainWindow.cc:434
 msgid "Unlimited"
 msgstr "Onbeperkt"
 
-#: ../gtk/MainWindow.cc:420
+#: ../gtk/MainWindow.cc:497
 msgid "Seed Forever"
 msgstr "Altijd seeden"
 
-#: ../gtk/MainWindow.cc:459
+#: ../gtk/MainWindow.cc:536
 msgid "Limit Download Speed"
 msgstr "Downloadsnelheid begrenzen"
 
-#: ../gtk/MainWindow.cc:460
+#: ../gtk/MainWindow.cc:537
 msgid "Limit Upload Speed"
 msgstr "Uploadsnelheid begrenzen"
 
-#: ../gtk/MainWindow.cc:464
+#: ../gtk/MainWindow.cc:541
 msgid "Stop Seeding at Ratio"
 msgstr "Stoppen met seeden bij verhouding"
 
-#: ../gtk/MainWindow.cc:503
+#: ../gtk/MainWindow.cc:580
 msgid "Stop at Ratio ({ratio})"
 msgstr "Stop bij Ratio ({ratio})"
 
-#: ../gtk/MainWindow.cc:516
+#: ../gtk/MainWindow.cc:593
 msgid "Total Ratio"
 msgstr "Totale verhouding"
 
-#: ../gtk/MainWindow.cc:517
+#: ../gtk/MainWindow.cc:594
 msgid "Session Ratio"
 msgstr "Verhouding per sessie"
 
-#: ../gtk/MainWindow.cc:518
+#: ../gtk/MainWindow.cc:595
 msgid "Total Transfer"
 msgstr "Totale overdracht"
 
-#: ../gtk/MainWindow.cc:519
+#: ../gtk/MainWindow.cc:596
 msgid "Session Transfer"
 msgstr "Overdracht per sessie"
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
+#: ../gtk/MainWindow.cc:761 ../gtk/MainWindow.cc:782 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
 msgstr "Ratio: {ratio}"
 
-#: ../gtk/MainWindow.cc:690
+#: ../gtk/MainWindow.cc:767
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "Down: {downloaded_size}, Up: {uploaded_size}"
 
-#: ../gtk/MainWindow.cc:698
+#: ../gtk/MainWindow.cc:775
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "Down: {downloaded_size}, Up: {uploaded_size}"
 
-#: ../gtk/MainWindow.cc:732
+#: ../gtk/MainWindow.cc:809
 msgid "{download_speed} ▼"
 msgstr "{download_speed} ▼"
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
+#: ../gtk/MainWindow.cc:812 ../gtk/Torrent.cc:624
 msgid "{upload_speed} ▲"
 msgstr "{upload_speed} ▲"
 
-#: ../gtk/MakeDialog.cc:189
+#: ../gtk/MakeDialog.cc:190
 msgid "Creating '{path}'"
 msgstr "Maken van '{path}'"
 
-#: ../gtk/MakeDialog.cc:202
+#: ../gtk/MakeDialog.cc:203
 msgid "Created '{path}'"
 msgstr "'{path}' gemaakt"
 
-#: ../gtk/MakeDialog.cc:208 ../libtransmission/open-files.cc:161 ../libtransmission/session-id.cc:71
+#: ../gtk/MakeDialog.cc:209 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet aanmaken: {error} ({error_code})"
 
@@ -812,15 +812,15 @@ msgstr "Torrentbestanden"
 msgid "All files"
 msgstr "Alle bestanden"
 
-#: ../gtk/OptionsDialog.cc:369
+#: ../gtk/OptionsDialog.cc:368
 msgid "Open a Torrent"
 msgstr "Een torrent openen"
 
-#: ../gtk/OptionsDialog.cc:374 ../gtk/PathButton.cc:148 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
+#: ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:148 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
 msgid "_Open"
 msgstr "_Open"
 
-#: ../gtk/OptionsDialog.cc:385
+#: ../gtk/OptionsDialog.cc:384
 msgid "Show options dialog"
 msgstr "Dialoogvenster Opties weergeven"
 
@@ -832,61 +832,61 @@ msgstr "Selecteer een bestand"
 msgid "(None)"
 msgstr "(Geen)"
 
-#: ../gtk/PrefsDialog.cc:306
+#: ../gtk/PrefsDialog.cc:308
 msgid "Allow encryption"
 msgstr "Versleuteling toestaan"
 
-#: ../gtk/PrefsDialog.cc:307
+#: ../gtk/PrefsDialog.cc:309
 msgid "Prefer encryption"
 msgstr "Voorkeur geven aan versleuteling"
 
-#: ../gtk/PrefsDialog.cc:308
+#: ../gtk/PrefsDialog.cc:310
 msgid "Require encryption"
 msgstr "Versleuteling vereisen"
 
-#: ../gtk/PrefsDialog.cc:374
+#: ../gtk/PrefsDialog.cc:376
 msgid "Every Day"
 msgstr "Elke dag"
 
-#: ../gtk/PrefsDialog.cc:375
+#: ../gtk/PrefsDialog.cc:377
 msgid "Weekdays"
 msgstr "Weekdagen"
 
-#: ../gtk/PrefsDialog.cc:376
+#: ../gtk/PrefsDialog.cc:378
 msgid "Weekends"
 msgstr "Weekends"
 
-#: ../gtk/PrefsDialog.cc:551
+#: ../gtk/PrefsDialog.cc:553
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] "zwarte lijst heeft {count:L} regels"
 msgstr[1] "Zwarte lijst heeft {count:L} regel"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:569
 msgid "Blocklist updated!"
 msgstr "Zwarte lijst bijgewerkt!"
 
-#: ../gtk/PrefsDialog.cc:567
+#: ../gtk/PrefsDialog.cc:569
 msgid "Couldn't update blocklist"
 msgstr "Kon zwarte lijst niet bijwerken"
 
-#: ../gtk/PrefsDialog.cc:579
+#: ../gtk/PrefsDialog.cc:581
 msgid "Getting new blocklist…"
 msgstr "Nieuwe blokkadelijst wordt opgehaald…"
 
-#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
+#: ../gtk/PrefsDialog.cc:901 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
 msgstr "Status onbekend"
 
-#: ../gtk/PrefsDialog.cc:912
+#: ../gtk/PrefsDialog.cc:916
 msgid "Port is {markup_begin}closed{markup_end}"
 msgstr "Poort is {markup_begin}gesloten{markup_end}"
 
-#: ../gtk/PrefsDialog.cc:912
+#: ../gtk/PrefsDialog.cc:916
 msgid "Port is {markup_begin}open{markup_end}"
 msgstr "Poort is {markup_begin}open{markup_end}"
 
-#: ../gtk/PrefsDialog.cc:923
+#: ../gtk/PrefsDialog.cc:927
 msgid "Testing TCP port…"
 msgstr "Testen van TCP poort…"
 
@@ -902,25 +902,25 @@ msgstr "Kon de torrent niet verplaatsen"
 msgid "This may take a moment…"
 msgstr "Dit kan even duren…"
 
-#: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
+#: ../gtk/Session.cc:779 ../libtransmission/watchdir-win32.cc:154 ../libtransmission/watchdir-win32.cc:162
 msgid "Couldn't read '{path}'"
 msgstr "Kon '{path}' niet lezen"
 
 #. logging
-#: ../gtk/Session.cc:1057
+#: ../gtk/Session.cc:1037
 msgid "Inhibiting desktop hibernation"
 msgstr "Verhinderen dat de computer in slaapstand wordt gezet"
 
-#: ../gtk/Session.cc:1063 ../gtk/Session.cc:1088
+#: ../gtk/Session.cc:1043 ../gtk/Session.cc:1068
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "Kan de slaapstand van het bureaublad niet belemmeren: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1084
+#: ../gtk/Session.cc:1064
 msgid "Allowing desktop hibernation"
 msgstr "Slaapstand computer toestaan"
 
-#: ../gtk/Session.cc:1202
+#: ../gtk/Session.cc:1182
 msgid "Couldn't find pending RPC request for tag {tag}"
 msgstr "Kan lopende RPC-aanvraag voor tag {tag} niet vinden"
 
@@ -942,297 +942,305 @@ msgstr "_Wissen"
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
 msgstr "Deze statistieken zijn alleen bedoeld als informatie voor u. Het op nul zetten ervan heeft geen invloed op de statistieken die worden bijgehouden door uw BitTorrent-trackers."
 
-#: ../gtk/SystemTrayIcon.cc:216
+#: ../gtk/SystemTrayIcon.cc:217
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr "{upload_speed} ▲ {download_speed} ▼"
 
-#: ../gtk/Torrent.cc:338
+#: ../gtk/Torrent.cc:439
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr "Lokale gegevens verifiëren ({percent_done}% getest)"
 
-#: ../gtk/Torrent.cc:365
+#: ../gtk/Torrent.cc:466
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr "{current_size} of {complete_size} ({percent_done}%)"
 
-#: ../gtk/Torrent.cc:375
+#: ../gtk/Torrent.cc:476
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr "{current_size} van {complete_size} ({percent_complete}%), geüpload {uploaded_size} (Ratio: {ratio}, Doel: {seed_ratio})"
 
-#: ../gtk/Torrent.cc:387
+#: ../gtk/Torrent.cc:488
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr "{current_size} van {complete_size} ({percent_complete}%), geüpload {uploaded_size} (Ratio: {ratio})"
 
-#: ../gtk/Torrent.cc:397
+#: ../gtk/Torrent.cc:498
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr "{complete_size}, geüpload {uploaded_size} (Ratio: {ratio}, Doel: {seed_ratio})"
 
-#: ../gtk/Torrent.cc:406
+#: ../gtk/Torrent.cc:507
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr "{complete_size}, geüpload {uploaded_size} (Ratio: {ratio})"
 
-#: ../gtk/Torrent.cc:419
+#: ../gtk/Torrent.cc:520
 msgid "Remaining time unknown"
 msgstr "Resterende tijd onbekend"
 
-#: ../gtk/Torrent.cc:462
+#: ../gtk/Torrent.cc:617
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr "{download_speed} ▼  {upload_speed} ▲"
 
-#: ../gtk/Torrent.cc:474
+#: ../gtk/Torrent.cc:629
 msgid "Stalled"
 msgstr "Onderbroken"
 
-#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2179
+#: ../gtk/Torrent.cc:640
 msgid "Tracker warning: '{warning}'"
 msgstr "Tracker waarschuwing: '{warning}'"
 
-#: ../gtk/Torrent.cc:488
+#: ../gtk/Torrent.cc:643
 msgid "Tracker Error: '{error}'"
 msgstr "Tracker fout: '{error}'"
 
-#: ../gtk/Torrent.cc:491
+#: ../gtk/Torrent.cc:646
 msgid "Local error: '{error}'"
 msgstr "Lokale fout: '{error}'"
 
-#: ../gtk/Torrent.cc:515
+#: ../gtk/Torrent.cc:670
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] "Metadata downloaden van {active_count} verbonden peers ({percent_done}% gedaan)"
 msgstr[1] "Metadata downloaden van {active_count} verbonden peers ({percent_done}% gedaan)"
 
-#: ../gtk/Torrent.cc:526
+#: ../gtk/Torrent.cc:681
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] "Downloaden vanaf {active_count} van {connected_count} verbonden peer en webseed"
 msgstr[1] "Downloaden vanaf {active_count} van {connected_count} verbonden peers en webseeds"
 
-#: ../gtk/Torrent.cc:537
+#: ../gtk/Torrent.cc:692
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] "Downloaden vanaf {active_count} webseed"
 msgstr[1] "Downloaden vanaf {active_count} webseeds"
 
-#: ../gtk/Torrent.cc:545
+#: ../gtk/Torrent.cc:700
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] "Downloaden vanaf {active_count} van {connected_count} verbonden peer"
 msgstr[1] "Downloaden vanaf {active_count} van {connected_count} verbonden peers"
 
-#: ../gtk/Torrent.cc:554
+#: ../gtk/Torrent.cc:709
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] "Seeden naar {active_count} van {connected_count} verbonden peer"
 msgstr[1] "Seeden naar {active_count} van {connected_count} verbonden peers"
 
-#: ../gtk/Utils.cc:66
-msgid "KiB"
-msgstr "KiB"
-
-#: ../gtk/Utils.cc:67
-msgid "MiB"
-msgstr "MiB"
-
-#: ../gtk/Utils.cc:68
-msgid "GiB"
-msgstr "GiB"
-
-#: ../gtk/Utils.cc:69
-msgid "TiB"
-msgstr "TiB"
-
-#: ../gtk/Utils.cc:72
-msgid "kB"
-msgstr "kB"
-
-#: ../gtk/Utils.cc:73
-msgid "MB"
-msgstr "MB"
-
-#: ../gtk/Utils.cc:74
-msgid "GB"
-msgstr "GB"
-
-#: ../gtk/Utils.cc:75
-msgid "TB"
-msgstr "TB"
-
-#: ../gtk/Utils.cc:78
-msgid "kB/s"
-msgstr "kB/s"
-
-#: ../gtk/Utils.cc:79
-msgid "MB/s"
-msgstr "MB/s"
-
-#: ../gtk/Utils.cc:80
-msgid "GB/s"
-msgstr "GB/s"
-
-#: ../gtk/Utils.cc:81
-msgid "TB/s"
-msgstr "TB/s"
-
-#: ../gtk/Utils.cc:148
+#: ../gtk/Utils.cc:134
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
 msgstr[0] "{days_from_now:L} dag vanaf nu"
 msgstr[1] "{days_from_now:L} dagen vanaf nu"
 
-#: ../gtk/Utils.cc:155
+#: ../gtk/Utils.cc:141
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
 msgstr[0] "{hours_from_now:L} uur vanaf nu"
 msgstr[1] "{hours_from_now:L} uren vanaf nu"
 
-#: ../gtk/Utils.cc:162
+#: ../gtk/Utils.cc:148
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
 msgstr[0] "{minutes_from_now:L} minuut vanaf nu"
 msgstr[1] "{minutes_from_now:L} minuten vanaf nu"
 
-#: ../gtk/Utils.cc:169
+#: ../gtk/Utils.cc:155
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
 msgstr[0] "{seconds_from_now:L} seconde vanaf nu"
 msgstr[1] "{seconds_from_now:L} seconden vanaf nu"
 
-#: ../gtk/Utils.cc:173 ../gtk/Utils.cc:204 ../gtk/Utils.cc:231 ../gtk/Utils.cc:264
+#: ../gtk/Utils.cc:159 ../gtk/Utils.cc:190 ../gtk/Utils.cc:217 ../gtk/Utils.cc:250
 msgid "now"
 msgstr "nu"
 
-#: ../gtk/Utils.cc:180
+#: ../gtk/Utils.cc:166
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
 msgstr[0] "{days_ago:L} dag geleden"
 msgstr[1] "{days_ago:L} dagen geleden"
 
-#: ../gtk/Utils.cc:186
+#: ../gtk/Utils.cc:172
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
 msgstr[0] "{hours_ago:L} uur geleden"
 msgstr[1] "{hours_ago:L} uren geleden"
 
-#: ../gtk/Utils.cc:193
+#: ../gtk/Utils.cc:179
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
 msgstr[0] "{minutes_ago:L} minuut geleden"
 msgstr[1] "{minutes_ago:L} minuten geleden"
 
-#: ../gtk/Utils.cc:200
+#: ../gtk/Utils.cc:186
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
 msgstr[0] "{seconds_ago:L} seconde geleden"
 msgstr[1] "{seconds_ago:L} seconden geleden"
 
-#: ../gtk/Utils.cc:213
+#: ../gtk/Utils.cc:199
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] "{days:L} dag"
 msgstr[1] "{days:L} dagen"
 
-#: ../gtk/Utils.cc:218
+#: ../gtk/Utils.cc:204
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
 msgstr[0] "{hours:L} uur"
 msgstr[1] "{hours:L} uren"
 
-#: ../gtk/Utils.cc:223
+#: ../gtk/Utils.cc:209
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
 msgstr[0] "{minutes:L} minuut"
 msgstr[1] "{minutes:L} minuten"
 
-#: ../gtk/Utils.cc:228
+#: ../gtk/Utils.cc:214
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
 msgstr[0] "{seconds:L} seconde"
 msgstr[1] "{seconds:L} seconden"
 
-#: ../gtk/Utils.cc:239
+#: ../gtk/Utils.cc:225
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] "{days_left:L} dag over"
 msgstr[1] "{days_left:L} dagen over"
 
-#: ../gtk/Utils.cc:246
+#: ../gtk/Utils.cc:232
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] "{hours_left:L} uur over"
 msgstr[1] "{hours_left:L} uren over"
 
-#: ../gtk/Utils.cc:253
+#: ../gtk/Utils.cc:239
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
 msgstr[0] "{minutes_left:L} minuut over"
 msgstr[1] "{minutes_left:L} minuten over"
 
-#: ../gtk/Utils.cc:260
+#: ../gtk/Utils.cc:246
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] "{seconds_left:L} seconde over"
 msgstr[1] "{seconds_left:L} seconden over"
 
-#: ../gtk/Utils.cc:279
+#: ../gtk/Utils.cc:265
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr "Het torrent-bestand '{path}' is al in gebruik bij '{torrent_name}'."
 
-#: ../gtk/Utils.cc:290
+#: ../gtk/Utils.cc:276
 msgid "Couldn't open torrent"
 msgstr "Kon torrent niet openen"
 
-#: ../gtk/Utils.cc:429
+#: ../gtk/Utils.cc:536
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
 msgstr "Kon '{path}' niet verplaatsen naar de prullenbak: {error} ({error_code})"
 
-#: ../gtk/Utils.cc:537
+#: ../gtk/Utils.cc:643
 msgid "Couldn't open '{url}'"
 msgstr "Kon '{url}' niet openen"
 
-#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:860 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
 msgstr "Niet ondersteunde URL: '{url}'"
 
 #. modal
-#: ../gtk/Utils.cc:760
+#: ../gtk/Utils.cc:866
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr "Transmissie weet niet hoe '{url}' te gebruiken"
 
-#: ../gtk/Utils.cc:765
+#: ../gtk/Utils.cc:871
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr "Deze magneetlink lijkt bedoeld te zijn voor iets anders dan BitTorrent."
 
-#: ../gtk/main.cc:64 ../gtk/transmission-gtk.desktop.in:3
+#: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.cc:80
+#: ../gtk/main.cc:79
 msgid "Where to look for configuration files"
 msgstr "Locaties voor configuratiebestanden"
 
-#: ../gtk/main.cc:81
+#: ../gtk/main.cc:80
 msgid "Start with all torrents paused"
 msgstr "Starten met alle torrents gepauzeerd"
 
-#: ../gtk/main.cc:82
+#: ../gtk/main.cc:81
 msgid "Start minimized in notification area"
 msgstr "Geminimaliseerd in het notificatievak starten"
 
-#: ../gtk/main.cc:83
+#: ../gtk/main.cc:82
 msgid "Show version number and exit"
 msgstr "Versienummer tonen en afsluiten"
 
-#: ../gtk/main.cc:91
+#: ../gtk/main.cc:90
 msgid "[torrent files or urls]"
 msgstr "[torrentbestanden of url’s]"
 
-#: ../gtk/main.cc:107
+#: ../gtk/main.cc:106
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
 msgstr "Voer '{program} --help' uit om een volledige lijst met beschikbare opdrachtregelopties weer te geven.\n"
+
+#: ../gtk/main.cc:120
+msgid "B/s"
+msgstr ""
+
+#: ../gtk/main.cc:120
+msgid "GB/s"
+msgstr "GB/s"
+
+#: ../gtk/main.cc:120
+msgid "MB/s"
+msgstr "MB/s"
+
+#: ../gtk/main.cc:120
+msgid "TB/s"
+msgstr "TB/s"
+
+#: ../gtk/main.cc:120
+msgid "kB/s"
+msgstr "kB/s"
+
+#: ../gtk/main.cc:121 ../gtk/main.cc:122
+msgid "B"
+msgstr ""
+
+#: ../gtk/main.cc:121
+msgid "GiB"
+msgstr "GiB"
+
+#: ../gtk/main.cc:121
+msgid "KiB"
+msgstr "KiB"
+
+#: ../gtk/main.cc:121
+msgid "MiB"
+msgstr "MiB"
+
+#: ../gtk/main.cc:121
+msgid "TiB"
+msgstr "TiB"
+
+#: ../gtk/main.cc:122
+msgid "GB"
+msgstr "GB"
+
+#: ../gtk/main.cc:122
+msgid "MB"
+msgstr "MB"
+
+#: ../gtk/main.cc:122
+msgid "TB"
+msgstr "TB"
+
+#: ../gtk/main.cc:122
+msgid "kB"
+msgstr "kB"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1315,11 +1323,11 @@ msgstr "_Voorkeuren"
 msgid "_Torrent"
 msgstr "_Torrent"
 
-#: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:91
+#: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:96 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
 msgstr "_Eigenschappen"
 
-#: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:77
+#: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:93 ../gtk/ui/gtk4/MainWindow.ui:78
 msgid "Torrent properties"
 msgstr "Torrenteigenschappen"
 
@@ -1387,7 +1395,7 @@ msgstr "Lokale gegevens verif_iëren"
 msgid "Copy _Magnet Link to Clipboard"
 msgstr "_Magnetkoppeling kopiëren naar klembord"
 
-#: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:63
+#: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:68 ../gtk/ui/gtk3/MainWindow.ui:70 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
 msgstr "Torrent verwijderen"
 
@@ -1639,7 +1647,7 @@ msgstr "Peerverbindingen"
 msgid "_Maximum peers:"
 msgstr "_Maximum aantal peers:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:982
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:170 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:136 ../gtk/ui/gtk4/PrefsDialog.ui:982
 msgid "Options"
 msgstr "Opties"
 
@@ -1659,11 +1667,11 @@ msgstr ""
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
 msgstr "Zie ook Standaard openbare trackers in Bewerken > Voorkeuren > Netwerk"
 
-#: ../gtk/ui/gtk3/MainWindow.ui:143 ../gtk/ui/gtk4/MainWindow.ui:130
+#: ../gtk/ui/gtk3/MainWindow.ui:144
 msgid "Torrent"
 msgstr "Torrent"
 
-#: ../gtk/ui/gtk3/MainWindow.ui:251 ../gtk/ui/gtk3/StatsDialog.ui:8 ../gtk/ui/gtk4/MainWindow.ui:202 ../gtk/ui/gtk4/StatsDialog.ui:5
+#: ../gtk/ui/gtk3/MainWindow.ui:252 ../gtk/ui/gtk3/StatsDialog.ui:8 ../gtk/ui/gtk4/MainWindow.ui:190 ../gtk/ui/gtk4/StatsDialog.ui:5
 msgid "Statistics"
 msgstr "Statistieken"
 
@@ -2119,41 +2127,41 @@ msgstr "Torrent vanaf URL openen"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:448
+#: ../libtransmission/announcer-http.cc:441
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "Kan aankondigingsantwoord niet parseren: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:659
+#: ../libtransmission/announcer-http.cc:648
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "Kon scrapereactie niet parseren: {error} ({error_code})"
 
-#: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:237
+#: ../libtransmission/announcer-udp.cc:146 ../libtransmission/announcer-udp.cc:247
 msgid "Unknown error"
 msgstr "Onbekende fout"
 
-#: ../libtransmission/announcer-udp.cc:327
+#: ../libtransmission/announcer-udp.cc:341
 msgid "Connection failed"
 msgstr "Verbinding mislukt"
 
-#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:567
+#: ../libtransmission/announcer-udp.cc:444 ../libtransmission/tr-dht.cc:566
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr "Kon '{address}niet opzoeken:{port}': {error} ({error_code})"
 
-#: ../libtransmission/announcer.cc:879
-msgid "Announce error: {error}"
-msgstr "Aankondigingsfout:{error}"
+#: ../libtransmission/announcer.cc:884
+msgid "Announce error: {error} ({url})"
+msgstr ""
 
-#: ../libtransmission/announcer.cc:889
-msgid "Announce error: {error} (Retrying in {count} second)"
-msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
-msgstr[0] "Aankondigingsfout: {error} (Opnieuw proberen in {count} seconde)"
-msgstr[1] "Aankondigingsfout: {error} (Opnieuw proberen in {count} seconden)"
+#: ../libtransmission/announcer.cc:894
+msgid "Announce error: {error} (Retrying in {count} second) ({url})"
+msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1019 ../libtransmission/announcer.cc:1347
 msgid "Could not connect to tracker"
 msgstr "Kon geen verbinding met tracker maken"
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
+#: ../libtransmission/announcer.cc:1023 ../libtransmission/announcer.cc:1351
 msgid "Tracker did not respond"
 msgstr "Tracker gaf geen antwoord"
 
@@ -2161,82 +2169,94 @@ msgstr "Tracker gaf geen antwoord"
 msgid "Success"
 msgstr "Geslaagd"
 
-#: ../libtransmission/blocklist.cc:66 ../libtransmission/blocklist.cc:400
+#: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:401
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] "Zwarte lijst '{path}' heeft {count} regel"
 msgstr[1] "Zwarte lijst '{path}' heeft {count} regels"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.cc:242
+#: ../libtransmission/blocklist.cc:257
 msgid "Couldn't parse line: '{line}'"
 msgstr "Kan regel niet parseren: '{line}'"
 
-#: ../libtransmission/blocklist.cc:384
+#: ../libtransmission/blocklist.cc:385
 msgid "Rewriting old blocklist file format to new format"
 msgstr "Oude zwarte lijst-bestandsindeling herschrijven naar een nieuwe indeling"
 
-#: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
+#: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:42 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:45
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr "{crypto_library} fout: {error} ({error_code})"
 
-#: ../libtransmission/inout.cc:126 ../libtransmission/inout.cc:151
+#: ../libtransmission/global-ip-cache.cc:277
+msgid "Successfully updated source {protocol} address to {ip}"
+msgstr ""
+
+#: ../libtransmission/global-ip-cache.cc:291
+msgid "Your machine does not support {protocol}"
+msgstr ""
+
+#: ../libtransmission/global-ip-cache.cc:315
+msgid "Successfully updated global {type} address to {ip} using {url}"
+msgstr ""
+
+#: ../libtransmission/inout.cc:119
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet verkrijgen: {error} ({error_code})"
 
-#: ../libtransmission/log.cc:300
+#: ../libtransmission/log.cc:274
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "Te veel van dit soort berichten! Ik zal dit bericht in deze sessie niet meer loggen."
 
-#: ../libtransmission/makemeta.cc:75 ../libtransmission/watchdir.cc:53
+#: ../libtransmission/makemeta.cc:80 ../libtransmission/watchdir.cc:52
 msgid "Skipping '{path}': {error} ({error_code})"
 msgstr "Overslaan van '{path}': {error} ({error_code})"
 
-#: ../libtransmission/net.cc:151
+#: ../libtransmission/net.cc:186
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr "Kon geen socket maken: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:226
+#: ../libtransmission/net.cc:262
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr "Kon het bronadres niet instellen {address} op {socket}: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:246
+#: ../libtransmission/net.cc:282
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr "Kan geen socket aansluiten {socket} naar {address}:{port}: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:313
+#: ../libtransmission/net.cc:347
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "Kan poort niet binden {port} op {address}: {error} ({error_code}) -- Is er al een ander exemplaar van Transmission actief?"
 
-#: ../libtransmission/net.cc:314
+#: ../libtransmission/net.cc:348
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "Kan poort niet binden {port} op {address}: {error} ({error_code})"
 
-#: ../libtransmission/open-files.cc:184
+#: ../libtransmission/open-files.cc:192
 msgid "Couldn't open '{path}': {error} ({error_code})"
 msgstr "Kan '{path}' niet openen: {error} ({error_code})"
 
-#: ../libtransmission/open-files.cc:213
+#: ../libtransmission/open-files.cc:220
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet vooraf toewijzen: {error} ({error_code})"
 
-#: ../libtransmission/open-files.cc:233
+#: ../libtransmission/open-files.cc:239
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Kon '{path}' niet afkorten: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:673
+#: ../libtransmission/peer-io.cc:675
 msgid "Unknown state: {state}"
 msgstr "Onbekende staat: {state}"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:86
+#: ../libtransmission/port-forwarding-natpmp.cc:90
 msgid "Found public address '{address}'"
 msgstr "Gevonden openbaar adres '{address}'"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:123
+#: ../libtransmission/port-forwarding-natpmp.cc:127
 msgid "Port {port} is no longer forwarded"
 msgstr "Poort {port} wordt niet meer doorgestuurd"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:177
+#: ../libtransmission/port-forwarding-natpmp.cc:181
 msgid "Port {port} forwarded successfully"
 msgstr "Poort {port} succesvol doorgestuurd"
 
@@ -2292,268 +2312,265 @@ msgstr "Privé poort {private_port} naar openbare poort {public_port}overgezet"
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr "Status veranderd van '{old_state}' naar '{state}'"
 
-#: ../libtransmission/rpc-server.cc:578
+#: ../libtransmission/rpc-server.cc:104
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Unix socket pad moet minder zijn dan {count} lettertekens (inclusief '{prefix}' prefix)"
 
-#: ../libtransmission/rpc-server.cc:612
+#: ../libtransmission/rpc-server.cc:598
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Unix-sockets worden niet ondersteund in Windows. Gelieve  '{key}' te wijzigen in uw instellingen."
 
-#: ../libtransmission/rpc-server.cc:639
+#: ../libtransmission/rpc-server.cc:625
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "Kan de RPC-socketmodus niet instellen op {mode:#o}, herstellen naar 0755"
 
-#: ../libtransmission/rpc-server.cc:702
+#: ../libtransmission/rpc-server.cc:688
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "Kon niet binden aan {address} na {count} poging, ik geef het op"
 msgstr[1] "Kon niet binden aan {address} na {count} pogingen, ik geef het op"
 
-#: ../libtransmission/rpc-server.cc:713
+#: ../libtransmission/rpc-server.cc:699
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "Luisteren naar RPC- en webverzoeken op '{address}'"
 
-#: ../libtransmission/rpc-server.cc:741
+#: ../libtransmission/rpc-server.cc:727
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "Niet meer luisteren naar RPC- en webaanvragen op '{address}'"
 
-#: ../libtransmission/rpc-server.cc:763
+#: ../libtransmission/rpc-server.cc:749
 msgid "Added '{entry}' to host whitelist"
 msgstr "'{entry}' toegevoegd naar de whitelist van hosts"
 
-#: ../libtransmission/rpc-server.cc:893
+#: ../libtransmission/rpc-server.cc:883
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "De '{key}' instelling is '{value}' maar moet een IPv4- of IPv6-adres of een Unix-socketpad zijn. We gebruiken standaardwaarde '0.0.0.0'"
 
-#: ../libtransmission/rpc-server.cc:907
+#: ../libtransmission/rpc-server.cc:896
 msgid "Serving RPC and Web requests on {address}"
 msgstr "RPC- en webaanvragen verwerken op {address}"
 
-#: ../libtransmission/rpc-server.cc:912
+#: ../libtransmission/rpc-server.cc:901
 msgid "Whitelist enabled"
 msgstr "Witte lijst ingeschakeld"
 
-#: ../libtransmission/rpc-server.cc:917
+#: ../libtransmission/rpc-server.cc:906
 msgid "Password required"
 msgstr "Wachtwoord vereist"
 
-#: ../libtransmission/rpc-server.cc:923
+#: ../libtransmission/rpc-server.cc:912
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "Het verwerken van RPC- en webverzoeken van '{path}'"
 
-#: ../libtransmission/rpcimpl.cc:1384
+#: ../libtransmission/rpcimpl.cc:1199
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr "Kon poort niet testen: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1418
+#: ../libtransmission/rpcimpl.cc:1261
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "Kan de zwarte lijst niet ophalen: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1552
+#: ../libtransmission/rpcimpl.cc:1399
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "Kan torrent niet ophalen: {error} ({error_code})"
 
-#: ../libtransmission/session-alt-speeds.cc:91
+#: ../libtransmission/session-alt-speeds.cc:98
 msgid "Time to turn off turtle mode"
 msgstr "Tijd om de schildpad-modus uit te schakelen"
 
-#: ../libtransmission/session-alt-speeds.cc:91
+#: ../libtransmission/session-alt-speeds.cc:98
 msgid "Time to turn on turtle mode"
 msgstr "Tijd om de schildpad-modus in te schakelen"
 
-#: ../libtransmission/session-id.cc:154
+#: ../libtransmission/session-id.cc:150
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "Kan sessievergrendelingsbestand niet openen '{path}': {error} ({error_code})"
 
-#: ../libtransmission/session.cc:405
+#: ../libtransmission/session.cc:418
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Luisteren naar inkomende peer-verbindingen op {hostport}"
 
-#: ../libtransmission/session.cc:646
+#: ../libtransmission/session.cc:730
 msgid "Transmission version {version} starting"
 msgstr "Transmission versie {version} starten"
 
-#: ../libtransmission/session.cc:1328
+#: ../libtransmission/session.cc:1410
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission versie {version} sluit af"
 
-#: ../libtransmission/session.cc:1407
+#: ../libtransmission/session.cc:1457
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} torrent geladen"
 msgstr[1] "{count} torrents geladen"
 
-#: ../libtransmission/torrent-magnet.cc:318
-msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
-msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-msgstr[0] "Kon magneet metainfo niet parseren: '{error}'. Opnieuw downloaden van {piece_count} stukje"
-msgstr[1] "Kon magneet metainfo niet parseren: '{error}'. Opnieuw downloaden van {piece_count} fragmenten"
-
-#: ../libtransmission/torrent-metainfo.cc:717
+#: ../libtransmission/torrent-metainfo.cc:713
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Torrent-bestand gemigreerd van '{old_path}' naar '{path}'"
 
-#: ../libtransmission/torrent.cc:120
+#: ../libtransmission/torrent.cc:138
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "Kon metainfo van '{path}' niet gebruiken voor '{magnet}': {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:157
-msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-msgstr "Geen gegevens gevonden! Ga na of uw stations zijn aangesloten of gebruik ‘Locatie instellen’, of wis de torrent en begin opnieuw."
+#: ../libtransmission/torrent.cc:167
+msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
+msgstr ""
 
-#: ../libtransmission/torrent.cc:464
+#: ../libtransmission/torrent.cc:400
 msgid "Calling script '{path}'"
 msgstr "aanroepen van script '{path}'"
 
-#: ../libtransmission/torrent.cc:473
+#: ../libtransmission/torrent.cc:408
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "Kon script '{path}'niet aanroepen: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:525
+#: ../libtransmission/torrent.cc:442
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Seed ratio bereikt; torrent pauzeren"
 
-#: ../libtransmission/torrent.cc:532
+#: ../libtransmission/torrent.cc:449
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Seeding inactief limiet bereikt; torrent pauzeren"
 
-#: ../libtransmission/torrent.cc:848
+#: ../libtransmission/torrent.cc:707
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Handmatig herstart -- seedverhouding wordt uitgeschakeld"
 
-#: ../libtransmission/torrent.cc:868
+#: ../libtransmission/torrent.cc:760
 msgid "Pausing torrent"
 msgstr "Torrent pauzeren"
 
-#: ../libtransmission/torrent.cc:922
+#: ../libtransmission/torrent.cc:813
 msgid "Removing torrent"
 msgstr "Bezig met verwijderen van torrent"
 
-#: ../libtransmission/torrent.cc:1250 ../libtransmission/torrent.cc:2306
+#: ../libtransmission/torrent.cc:1121 ../libtransmission/torrent.cc:2159
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "Kon '{old_path}' niet verplaatsen naar '{path}': {error} ({error_code})"
 
-#: ../libtransmission/tr-dht.cc:541
+#: ../libtransmission/torrent.cc:1569
+msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
+msgstr ""
+
+#: ../libtransmission/torrent.cc:2043
+msgid "Tracker warning: '{warning}' ({url})"
+msgstr ""
+
+#: ../libtransmission/tr-dht.cc:540
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr "Kon  '{filename}' line: '{line}' niet parseren"
 
-#: ../libtransmission/tr-lpd.cc:258
+#: ../libtransmission/tr-lpd.cc:255
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr "Kon LPD niet initialiseren: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:159
+#: ../libtransmission/tr-udp.cc:165
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
 msgstr "Kan IPv4-socket {address}niet binden: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:193
+#: ../libtransmission/tr-udp.cc:199
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
 msgstr "Kon IPv6-socket niet binden {address}: {error} ({error_code})"
 
-#: ../libtransmission/tr-utp.cc:102
+#: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
 msgstr "Onbekende socket familie"
 
-#: ../libtransmission/utils.cc:83
+#: ../libtransmission/utils.cc:134
 msgid "Couldn't read '{path}': Not a regular file"
 msgstr "Kan '{path}' niet lezen: geen gewoon bestand"
 
-#: ../libtransmission/variant-json.cc:98
+#: ../libtransmission/variant-json.cc:236
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
 msgstr "Kon JSON niet parseren op positie {position} '{text}': {error} ({error_code})"
 
-#. did caller give us an uninitialized val?
-#: ../libtransmission/variant.cc:860
-msgid "Invalid metadata"
-msgstr "Ongeldige metagegevens"
-
-#: ../libtransmission/watchdir-inotify.cc:79 ../libtransmission/watchdir-inotify.cc:91 ../libtransmission/watchdir-inotify.cc:103 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
+#: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
 msgid "Couldn't watch '{path}': {error} ({error_code})"
 msgstr "Kon niet '{path}' bekijken: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:135 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:271
+#: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:270
 msgid "Couldn't read event: {error} ({error_code})"
 msgstr "Kon event niet lezen: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:144 ../libtransmission/watchdir-win32.cc:280
+#: ../libtransmission/watchdir-inotify.cc:151 ../libtransmission/watchdir-win32.cc:279
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
 msgstr "Kon evenement niet lezen: verwachtte {expected_size}, kreeg {actual_size}"
 
-#: ../libtransmission/watchdir-inotify.cc:161 ../libtransmission/watchdir-win32.cc:305
+#: ../libtransmission/watchdir-inotify.cc:168 ../libtransmission/watchdir-win32.cc:304
 msgid "Couldn't read filename: {error} ({error_code})"
 msgstr "Kon bestandsnaam niet lezen: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-inotify.cc:170 ../libtransmission/watchdir-win32.cc:314
+#: ../libtransmission/watchdir-inotify.cc:177 ../libtransmission/watchdir-win32.cc:313
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
 msgstr "Kan bestandsnaam niet lezen: verwachtte {expected_size}, kreeg {actual_size}"
 
-#: ../libtransmission/watchdir-win32.cc:142
+#: ../libtransmission/watchdir-win32.cc:141
 msgid "Couldn't convert '{path}' to native path"
 msgstr "Kan '{path}' niet converteren naar oorspronkelijke pad"
 
-#: ../libtransmission/watchdir-win32.cc:171
+#: ../libtransmission/watchdir-win32.cc:170
 msgid "Couldn't create pipe: {error} ({error_code})"
 msgstr "Kon geen pipe maken: {error} ({error_code})"
 
-#: ../libtransmission/watchdir-win32.cc:195
+#: ../libtransmission/watchdir-win32.cc:194
 msgid "Couldn't create thread"
 msgstr "Kan geen draadje maken"
 
-#: ../libtransmission/watchdir-win32.cc:224
+#: ../libtransmission/watchdir-win32.cc:223
 msgid "Couldn't read directory changes"
 msgstr "Kan map wijzigingen niet lezen"
 
-#: ../libtransmission/watchdir-win32.cc:231
+#: ../libtransmission/watchdir-win32.cc:230
 msgid "Couldn't wait for directory changes"
 msgstr "Kon niet wachten op map wijzigingen"
 
-#: ../libtransmission/web.cc:175
+#: ../libtransmission/web.cc:185
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "Zal tracker certs verifiëren met behulp van envvar CURL_CA_BUNDLE: {bundle}"
 
-#: ../libtransmission/web.cc:176
+#: ../libtransmission/web.cc:186
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: dit werkt alleen als je tegen libcurl bouwt met openssl of gnutls, NIET nss"
 
-#: ../libtransmission/web.cc:177
+#: ../libtransmission/web.cc:187
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: Ongeldige certificaten worden weergegeven als 'Kan geen verbinding maken met tracker' zoals bij veel andere fouten"
 
-#: ../libtransmission/web.cc:448
+#: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
-#: ../utils/create.cc:226
+#: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
 msgstr[0] "{file_count:L} bestand, {total_size}\n"
 msgstr[1] "{file_count:L} bestanden, {total_size}\n"
 
-#: ../utils/create.cc:232
+#: ../utils/create.cc:241
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] "{piece_count:L} stukje, {piece_size}\n"
 msgstr[1] "{piece_count:L} fragmenten, {piece_size} elk\n"
 
-#: ../utils/remote.cc:139
+#: ../utils/remote.cc:143
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "uur"
 msgstr[1] "uren"
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:144
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minuut"
 msgstr[1] "minuten"
 
-#: ../utils/remote.cc:141 ../utils/remote.cc:161
+#: ../utils/remote.cc:145 ../utils/remote.cc:165
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] "seconde"
 msgstr[1] "seconden"
 
-#: ../utils/remote.cc:145
+#: ../utils/remote.cc:149
 msgid "day"
 msgid_plural "days"
 msgstr[0] "dg"

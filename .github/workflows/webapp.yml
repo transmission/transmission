@@ -62,6 +62,7 @@ jobs:
       - name: Get dependencies
         run: |
           set -e # abort if any command fails
+          sudo apt-get update
           sudo apt-get install -y npm
       - name: Check for style diffs
         id: check-for-diffs
@@ -110,9 +111,12 @@ jobs:
           echo
           echo Please undo your changes to these files:
           git diff --exit-code --name-only --merge-base "origin/$GITHUB_BASE_REF" -- \
+              web/public_html/transmission-app.css \
+              web/public_html/transmission-app.css.LEGAL.txt \
+              web/public_html/transmission-app.css.map \
               web/public_html/transmission-app.js \
-              web/public_html/transmission-app.js.map \
-              web/public_html/transmission-app.js.LICENSE.txt
+              web/public_html/transmission-app.js.LEGAL.txt \
+              web/public_html/transmission-app.js.map
 
   update-generated-files:
     runs-on: ubuntu-latest

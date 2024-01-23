@@ -1,89 +1,20 @@
 set(LINGUAS
-    an
-    ar
-    ast
-    az
-    be
-    bg
-    bn
-    br
-    bs
-    ca
-    ca@valencia
-    ceb
-    ckb
-    cs
-    cy
     da
-    de
-    el
-    en_AU
-    en_CA
-    en_GB
-    eo
     es
-    et
     eu
-    fa
     fi
-    fil
-    fo
     fr
-    fr_CA
-    ga
-    gl
-    gv
     he
-    hi
-    hr
     hu
-    hy
-    ia
-    id
     is
-    it
     ja
-    jbo
-    ka
-    kk
-    ko
-    ku
-    ky
-    li
-    lt
-    lv
-    mk
-    ml
-    mr
-    ms
-    mt
-    nb
     nl
-    nn
-    oc
     pl
-    pt
-    pt_BR
-    pt_PT
-    ro
     ru
-    si
-    sk
-    sl
-    sq
-    sr
     sv
-    ta
-    te
-    th
     tr
-    ug
     uk
-    ur
-    uz
-    vi
     zh_CN
-    zh_HK
     zh_TW)
 
 set(GETTEXT_PACKAGE ${TR_NAME}-gtk)

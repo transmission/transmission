@@ -18,9 +18,19 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         FORCE)
 endif()
 
+if(VCPKG_TARGET_ANDROID)
+    include(cmake/VcpkgAndroid.cmake)
+endif()
+
 project(transmission)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(TR_THIRD_PARTY_DIR_NAME third-party)
+set(TR_THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+set(TR_THIRD_PARTY_BINARY_DIR ${PROJECT_BINARY_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+
+list(APPEND CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/cmake"
+    "${TR_THIRD_PARTY_SOURCE_DIR}/rpavlik-cmake-modules")
 
 set(CMAKE_MACOSX_RPATH ON)
 
@@ -40,7 +50,7 @@ set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
-set(OPENSSL_MINIMUM 0.9.7)
+set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 1.3)
 set(NPM_MINIMUM 8.1.307) # Node.js 14
 set(PSL_MINIMUM 0.21.1)
@@ -142,9 +152,16 @@ else()
 endif()
 string(APPEND TR_PEER_ID_PREFIX "-")
 
-set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
+set(TR_VCS_REVISION_FILE "${PROJECT_SOURCE_DIR}/REVISION")
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+## Compiler standard version
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
 
@@ -153,11 +170,9 @@ if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
 elseif(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE TR_VCS_REVISION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    include(GetGitRevisionDescription)
+    get_git_head_revision(TR_REFSPEC TR_VCS_REVISION)
+    unset(TR_REFSPEC)
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -204,9 +219,11 @@ if(WIN32)
     endforeach()
 endif()
 
-set(CMAKE_FOLDER "third-party")
+set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
+
 find_package(FastFloat)
 find_package(Fmt)
+find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
@@ -215,11 +232,6 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-if(NOT TARGET CURL::libcurl)
-    add_library(CURL::libcurl INTERFACE IMPORTED)
-    target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
-    target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
-endif()
 
 if(ENABLE_DEPRECATED STREQUAL "AUTO")
     if(DEFINED ENV{CI})
@@ -456,8 +468,6 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
-set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
-
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
@@ -507,8 +517,7 @@ target_compile_definitions(miniupnpc::libminiupnpc
         SYSTEM_MINIUPNP
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
-add_subdirectory(third-party/jsonsl)
-add_subdirectory(third-party/wildmat)
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht dht
     TARGET dht::dht)
@@ -530,7 +539,7 @@ tr_add_external_auto_library(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-set(TR_WEB_ASSETS ${CMAKE_SOURCE_DIR}/web/public_html)
+set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
@@ -598,13 +607,6 @@ if(WIN32)
 endif()
 
 unset(CMAKE_FOLDER)
-
-## Compiler standard version
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ### Compiler Warnings
 
@@ -830,7 +832,7 @@ if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
     string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "+r${TR_VCS_REVISION}")
 endif()
 list(APPEND CPACK_SOURCE_IGNORE_FILES
-    "${CMAKE_BINARY_DIR}"
+    "${PROJECT_BINARY_DIR}"
     "[.]git"
     "node_modules")
 
@@ -839,17 +841,17 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
 if(GIT_FOUND)
     execute_process(
         COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE TR_GIT_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
-        configure_file("${CMAKE_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
+        configure_file("${PROJECT_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh" --check
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         set_property(
             TARGET check-format format
             PROPERTY FOLDER "utility")

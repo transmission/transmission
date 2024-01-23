@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,6 +11,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/torrent-metainfo.h>
 
@@ -205,7 +206,7 @@ void OptionsDialog::onSessionUpdated()
     }
 }
 
-void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priority)
+void OptionsDialog::onPriorityChanged(file_indices_t const& file_indices, int priority)
 {
     for (int const i : file_indices)
     {
@@ -213,7 +214,7 @@ void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priorit
     }
 }
 
-void OptionsDialog::onWantedChanged(QSet<int> const& file_indices, bool is_wanted)
+void OptionsDialog::onWantedChanged(file_indices_t const& file_indices, bool is_wanted)
 {
     for (int const i : file_indices)
     {
@@ -297,7 +298,10 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    session_.addTorrent(add_, &args, ui_.trashCheck->isChecked());
+    auto const disposal = ui_.trashCheck->isChecked() ? AddData::FilenameDisposal::Delete : AddData::FilenameDisposal::NoAction;
+    add_.setFileDisposal(disposal);
+
+    session_.addTorrent(add_, &args);
 
     deleteLater();
 }

@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,6 +15,7 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/file.h>
 
+struct event_base;
 struct tr_error;
 struct tr_session;
 
@@ -33,9 +34,9 @@ public:
 #endif /* signalfd API */
     }
 
-    bool spawn(bool foreground, int* exit_code, tr_error** error);
+    bool spawn(bool foreground, int* exit_code, tr_error& error);
     bool init(int argc, char const* const argv[], bool* foreground, int* ret);
-    void handle_error(tr_error*) const;
+    void handle_error(tr_error const&) const;
     int start(bool foreground);
     void periodic_update();
     void reconfigure();
@@ -54,8 +55,6 @@ private:
     char const* log_file_name_ = nullptr;
     struct event_base* ev_base_ = nullptr;
     tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
-    tr_quark key_pidfile_ = tr_quark_new("pidfile");
-    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic");
 
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);

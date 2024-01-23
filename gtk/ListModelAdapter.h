@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,6 +14,7 @@
 #include <gtkmm/treemodel.h>
 #include <gtkmm/treemodelcolumn.h>
 
+#include <cstdint>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -25,7 +26,7 @@ class ListModelAdapter
     using IdGetter = std::function<int(Glib::RefPtr<Glib::ObjectBase const> const&)>;
     using ValueGetter = std::function<void(Glib::RefPtr<Glib::ObjectBase const> const&, int, Glib::ValueBase&)>;
 
-    enum class PositionAdjustment
+    enum class PositionAdjustment : int8_t
     {
         DECREMENT = -1,
         INCREMENT = 1,

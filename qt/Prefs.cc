@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,7 +19,6 @@
 #endif
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
@@ -30,9 +29,7 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -211,7 +208,7 @@ bool isValidUtf8(QByteArray const& byteArray)
 ***/
 
 Prefs::Prefs(QString config_dir)
-    : config_dir_(std::move(config_dir))
+    : config_dir_{ std::move(config_dir) }
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -225,17 +222,15 @@ Prefs::Prefs(QString config_dir)
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    temporary_prefs_ << FILTER_TEXT;
+    temporary_prefs_.insert(FILTER_TEXT);
 
-    tr_variant top;
-    tr_variantInitDict(&top, 0);
-    initDefaults(&top);
-    tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
-    ensureSoundCommandIsAList(&top);
+    auto const app_defaults = get_default_app_settings();
+    auto settings = tr_sessionLoadSettings(&app_defaults, config_dir_.toUtf8().constData(), nullptr);
+    ensureSoundCommandIsAList(&settings);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
+        tr_variant const* b = tr_variantDictFind(&settings, Items[i].key);
 
         switch (Items[i].type)
         {
@@ -328,7 +323,7 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (temporary_prefs_.contains(i))
+        if (temporary_prefs_.count(i) != 0U)
         {
             continue;
         }
@@ -420,7 +415,7 @@ Prefs::~Prefs()
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-void Prefs::initDefaults(tr_variant* d) const
+tr_variant Prefs::get_default_app_settings()
 {
     auto constexpr FilterMode = std::string_view{ "all" };
     auto constexpr SessionHost = std::string_view{ "localhost" };
@@ -432,46 +427,47 @@ void Prefs::initDefaults(tr_variant* d) const
 
     auto const download_dir = tr_getDefaultDownloadDir();
 
-    tr_variantDictReserve(d, 38);
-    dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
-    dictAdd(d, TR_KEY_compact_view, false);
-    dictAdd(d, TR_KEY_inhibit_desktop_hibernation, false);
-    dictAdd(d, TR_KEY_prompt_before_exit, true);
-    dictAdd(d, TR_KEY_remote_session_enabled, false);
-    dictAdd(d, TR_KEY_remote_session_requres_authentication, false);
-    dictAdd(d, TR_KEY_show_backup_trackers, false);
-    dictAdd(d, TR_KEY_show_extra_peer_details, false);
-    dictAdd(d, TR_KEY_show_filterbar, true);
-    dictAdd(d, TR_KEY_show_notification_area_icon, false);
-    dictAdd(d, TR_KEY_start_minimized, false);
-    dictAdd(d, TR_KEY_show_options_window, true);
-    dictAdd(d, TR_KEY_show_statusbar, true);
-    dictAdd(d, TR_KEY_show_toolbar, true);
-    dictAdd(d, TR_KEY_show_tracker_scrapes, false);
-    dictAdd(d, TR_KEY_sort_reversed, false);
-    dictAdd(d, TR_KEY_torrent_added_notification_enabled, true);
-    dictAdd(d, TR_KEY_torrent_complete_notification_enabled, true);
-    dictAdd(d, TR_KEY_torrent_complete_sound_enabled, true);
-    dictAdd(d, TR_KEY_user_has_given_informed_consent, false);
-    dictAdd(d, TR_KEY_watch_dir_enabled, false);
-    dictAdd(d, TR_KEY_blocklist_date, 0);
-    dictAdd(d, TR_KEY_main_window_height, 500);
-    dictAdd(d, TR_KEY_main_window_width, 300);
-    dictAdd(d, TR_KEY_main_window_x, 50);
-    dictAdd(d, TR_KEY_main_window_y, 50);
-    dictAdd(d, TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
-    dictAdd(d, TR_KEY_download_dir, download_dir);
-    dictAdd(d, TR_KEY_filter_mode, FilterMode);
-    dictAdd(d, TR_KEY_main_window_layout_order, WindowLayout);
-    dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath());
-    dictAdd(d, TR_KEY_remote_session_https, false);
-    dictAdd(d, TR_KEY_remote_session_host, SessionHost);
-    dictAdd(d, TR_KEY_remote_session_password, SessionPassword);
-    dictAdd(d, TR_KEY_remote_session_username, SessionUsername);
-    dictAdd(d, TR_KEY_sort_mode, SortMode);
-    dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
-    dictAdd(d, TR_KEY_watch_dir, download_dir);
-    dictAdd(d, TR_KEY_read_clipboard, false);
+    auto settings = tr_variant::Map{};
+    settings.try_emplace(TR_KEY_blocklist_updates_enabled, true);
+    settings.try_emplace(TR_KEY_compact_view, false);
+    settings.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
+    settings.try_emplace(TR_KEY_prompt_before_exit, true);
+    settings.try_emplace(TR_KEY_remote_session_enabled, false);
+    settings.try_emplace(TR_KEY_remote_session_requres_authentication, false);
+    settings.try_emplace(TR_KEY_show_backup_trackers, false);
+    settings.try_emplace(TR_KEY_show_extra_peer_details, false);
+    settings.try_emplace(TR_KEY_show_filterbar, true);
+    settings.try_emplace(TR_KEY_show_notification_area_icon, false);
+    settings.try_emplace(TR_KEY_start_minimized, false);
+    settings.try_emplace(TR_KEY_show_options_window, true);
+    settings.try_emplace(TR_KEY_show_statusbar, true);
+    settings.try_emplace(TR_KEY_show_toolbar, true);
+    settings.try_emplace(TR_KEY_show_tracker_scrapes, false);
+    settings.try_emplace(TR_KEY_sort_reversed, false);
+    settings.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
+    settings.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
+    settings.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
+    settings.try_emplace(TR_KEY_user_has_given_informed_consent, false);
+    settings.try_emplace(TR_KEY_watch_dir_enabled, false);
+    settings.try_emplace(TR_KEY_blocklist_date, 0);
+    settings.try_emplace(TR_KEY_main_window_height, 500);
+    settings.try_emplace(TR_KEY_main_window_width, 300);
+    settings.try_emplace(TR_KEY_main_window_x, 50);
+    settings.try_emplace(TR_KEY_main_window_y, 50);
+    settings.try_emplace(TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
+    settings.try_emplace(TR_KEY_download_dir, download_dir);
+    settings.try_emplace(TR_KEY_filter_mode, FilterMode);
+    settings.try_emplace(TR_KEY_main_window_layout_order, WindowLayout);
+    settings.try_emplace(TR_KEY_open_dialog_dir, QDir::home().absolutePath().toStdString());
+    settings.try_emplace(TR_KEY_remote_session_https, false);
+    settings.try_emplace(TR_KEY_remote_session_host, SessionHost);
+    settings.try_emplace(TR_KEY_remote_session_password, SessionPassword);
+    settings.try_emplace(TR_KEY_remote_session_username, SessionUsername);
+    settings.try_emplace(TR_KEY_sort_mode, SortMode);
+    settings.try_emplace(TR_KEY_statusbar_stats, StatsMode);
+    settings.try_emplace(TR_KEY_watch_dir, download_dir);
+    settings.try_emplace(TR_KEY_read_clipboard, false);
+    return tr_variant{ std::move(settings) };
 }
 
 /***
@@ -514,9 +510,7 @@ QDateTime Prefs::getDateTime(int key) const
     return values_[key].toDateTime();
 }
 
-/***
-****
-***/
+// ---
 
 void Prefs::toggleBool(int key)
 {

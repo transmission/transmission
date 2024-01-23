@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -16,6 +16,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
 #import "VDKQueue.h"
@@ -126,6 +127,41 @@ static NSString* const kDonateURL = @"https://transmissionbt.com/donate/";
 
 static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
 
+static void initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
+    // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
+    int const ArbitraryPluralNumber = 17;
+
+    NSByteCountFormatter* unitFormatter = [[NSByteCountFormatter alloc] init];
+    unitFormatter.includesCount = NO;
+    unitFormatter.allowsNonnumericFormatting = NO;
+    unitFormatter.allowedUnits = NSByteCountFormatterUseBytes;
+    NSString* b_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
+    NSString* k_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseMB;
+    NSString* m_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseGB;
+    NSString* g_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
+    NSString* t_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    Config::Memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+    Config::Storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                        m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+
+    b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)");
+    k_str = NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)");
+    m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)");
+    g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)");
+    t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)");
+    Config::Speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                      m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+}
+
 static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
 {
     NSDictionary* dict = @{@"Active" : @(active), @"ByUser" : @(byUser)};
@@ -203,7 +239,7 @@ static void removeKeRangerRansomware()
             pid_t const krProcessId = [line substringFromIndex:1].intValue;
             if (kill(krProcessId, SIGKILL) == -1)
             {
-                NSLog(@"Unable to forcibly terminate ransomware process (kernel_service, pid %d), please do so manually", (int)krProcessId);
+                NSLog(@"Unable to forcibly terminate ransomware process (kernel_service, pid %d), please do so manually", krProcessId);
             }
         }
     }
@@ -417,9 +453,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //upgrading from versions < 2.40: clear recent items
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
-        tr_variant settings;
-        tr_variantInitDict(&settings, 41);
-        tr_sessionGetDefaultSettings(&settings);
+        auto settings = tr_sessionGetDefaultSettings();
 
         BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
@@ -516,37 +550,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
         }
 
-        NSByteCountFormatter* unitFormatter = [[NSByteCountFormatter alloc] init];
-        unitFormatter.includesCount = NO;
-        unitFormatter.allowsNonnumericFormatting = NO;
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
-        // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
-        // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
-        NSString* kbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseMB;
-        NSString* mbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseGB;
-        NSString* gbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
-        NSString* tbString = [unitFormatter stringFromByteCount:17];
-
-        tr_formatter_size_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
-
-        tr_formatter_speed_init(
-            1000,
-            NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)").UTF8String,
-            NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)").UTF8String,
-            NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)").UTF8String,
-            NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)").UTF8String); //why not?
-
-        tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
+        initUnits();
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, &settings);
+        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
         tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
@@ -601,6 +608,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+
     Toolbar* toolbar = [[Toolbar alloc] initWithIdentifier:@"TRMainToolbar"];
     toolbar.delegate = self;
     toolbar.allowsUserCustomization = YES;
@@ -890,7 +899,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //registering the Web UI to Bonjour
     if ([self.fDefaults boolForKey:@"RPC"] && [self.fDefaults boolForKey:@"RPCWebDiscovery"])
     {
-        [BonjourController.defaultController startWithPort:[self.fDefaults integerForKey:@"RPCPort"]];
+        [BonjourController.defaultController startWithPort:static_cast<int>([self.fDefaults integerForKey:@"RPCPort"])];
     }
 
     //shamelessly ask for donations
@@ -1164,6 +1173,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if (!error || error.code == NSURLErrorCancelled)
     {
         // no errors or we already displayed an alert
+        return;
+    }
+
+    NSString* urlString = task.currentRequest.URL.absoluteString;
+    if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+    {
+        // originalRequest was a redirect to a magnet
+        [self performSelectorOnMainThread:@selector(openMagnet:) withObject:urlString waitUntilDone:NO];
         return;
     }
 
@@ -1660,6 +1677,47 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             }
             self.fUrlSheetController = nil;
         }];
+    }
+}
+
+- (void)openPasteboard
+{
+    // 1. If Pasteboard contains URL objects, we treat those and only those
+    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
+
+    if (arrayOfURLs.count > 0)
+    {
+        for (NSURL* url in arrayOfURLs)
+        {
+            [self openURL:url.absoluteString];
+        }
+        return;
+    }
+
+    // 2. If Pasteboard contains String objects, we'll search for magnet or links
+    NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
+    if (arrayOfStrings.count == 0)
+    {
+        return;
+    }
+    NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    for (NSString* itemString in arrayOfStrings)
+    {
+        NSArray<NSString*>* itemLines = [itemString componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet];
+        for (__strong NSString* pbItem in itemLines)
+        {
+            pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+            {
+                [self openURL:pbItem];
+            }
+            else
+            {
+#warning only accept full text?
+                for (NSTextCheckingResult* result in [detector matchesInString:pbItem options:0 range:NSMakeRange(0, pbItem.length)])
+                    [self openURL:result.URL.absoluteString];
+            }
+        }
     }
 }
 
@@ -3239,6 +3297,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //set all groups as expanded
         [self.fTableView removeAllCollapsedGroups];
 
+        // we need to remember selected values
+        NSArray<Torrent*>* selectedTorrents = self.fTableView.selectedTorrents;
+
         beganUpdates = YES;
         [self.fTableView beginUpdates];
 
@@ -3282,6 +3343,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             for (TorrentGroup* group in self.fDisplayedTorrents)
                 [self.fTableView expandItem:group];
         }
+
+        self.fTableView.selectedTorrents = selectedTorrents;
     }
 
     //sort the torrents (won't sort the groups, though)
@@ -3329,7 +3392,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSView* senderView = sender;
     CGFloat width = NSWidth(senderView.frame);
 
-    if (NSMinX(self.fWindow.frame) < width || NSMaxX(self.fWindow.screen.frame) - NSMinX(self.fWindow.frame) < width * 2)
+    if (NSMinX(self.fWindow.frame) < width || NSMaxX(self.fWindow.screen.visibleFrame) - NSMinX(self.fWindow.frame) < width * 2)
     {
         // Ugly hack to hide NSPopover arrow.
         self.fPositioningView = [[NSView alloc] initWithFrame:senderView.bounds];
@@ -5266,12 +5329,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSScreen* screen = self.fWindow.screen;
     if (screen)
     {
-        NSSize maxSize = screen.frame.size;
+        NSSize maxSize = screen.visibleFrame.size;
         maxSize.height -= self.toolbarHeight;
         maxSize.height -= self.mainWindowComponentHeight;
-
-        //add a small buffer
-        maxSize.height -= 50;
 
         if (height > maxSize.height)
         {

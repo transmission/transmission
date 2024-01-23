@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,6 +26,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -69,10 +70,10 @@
 #include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -99,7 +100,7 @@ namespace
 auto const AppIconName = "transmission"sv; // TODO(C++20): Use ""s
 
 char const* const LICENSE =
-    "Copyright 2005-2023. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2024. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
     "GNU GPL, versions 2 or 3, or by any future license endorsed by Mnemosyne LLC."
@@ -473,34 +474,36 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
 
     case TR_RPC_SESSION_CHANGED:
         {
-            tr_variant tmp;
-            tr_variant* newval = nullptr;
-            tr_variant* oldvals = gtr_pref_get_all();
-            tr_quark key = TR_KEY_NONE;
-            std::vector<tr_quark> changed_keys;
             auto const* const session = core_->get_session();
-            tr_variantInitDict(&tmp, 100);
-            tr_sessionGetSettings(session, &tmp);
+            auto const newvals = tr_sessionGetSettings(session);
 
+            // determine which settings changed
+            auto changed_keys = std::set<tr_quark>{};
+            auto& oldvals = gtr_pref_get_all();
             auto const serde = tr_variant_serde::benc();
-            for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
+            if (auto const* const newvals_map = newvals.get_if<tr_variant::Map>(); newvals_map != nullptr)
             {
-                bool changed = true;
-
-                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval != nullptr)
+                for (auto const& [key, newval] : *newvals_map)
                 {
-                    changed = serde.to_string(*oldval) != serde.to_string(*newval);
-                }
+                    bool changed = true;
 
-                if (changed)
-                {
-                    changed_keys.push_back(key);
+                    if (tr_variant const* oldval = tr_variantDictFind(&oldvals, key); oldval != nullptr)
+                    {
+                        changed = serde.to_string(*oldval) != serde.to_string(newval);
+                    }
+
+                    if (changed)
+                    {
+                        changed_keys.emplace(key);
+                    }
                 }
             }
 
-            tr_sessionGetSettings(session, oldvals);
+            // update our settings
+            oldvals.merge(newvals);
 
-            for (auto const changed_key : changed_keys)
+            // emit change notifications
+            for (auto const& changed_key : changed_keys)
             {
                 core_->signal_prefs_changed().emit(changed_key);
             }
@@ -1009,7 +1012,7 @@ void Application::Impl::on_app_exit()
     p->attach(*icon, 0, 0, 1, 2);
 
     auto* top_label = Gtk::make_managed<Gtk::Label>();
-    top_label->set_markup(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Closing Connections…")));
+    top_label->set_markup(fmt::format("<b>{:s}</b>", _("Closing Connections…")));
     top_label->set_halign(TR_GTK_ALIGN(START));
     top_label->set_valign(TR_GTK_ALIGN(CENTER));
     p->attach(*top_label, 1, 0, 1, 1);
@@ -1447,7 +1450,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
 
     if (tr_variantListSize(ids) != 0)
     {
-        tr_rpc_request_exec_json(session, &top, nullptr, nullptr);
+        tr_rpc_request_exec(session, top, {});
         invoked = true;
     }
 
@@ -1469,7 +1472,7 @@ void Application::Impl::start_all_torrents()
 
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
-    tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
+    tr_rpc_request_exec(session, request, {});
 }
 
 void Application::Impl::pause_all_torrents()
@@ -1479,7 +1482,7 @@ void Application::Impl::pause_all_torrents()
 
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
-    tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
+    tr_rpc_request_exec(session, request, {});
 }
 
 void Application::Impl::copy_magnet_link_to_clipboard(Glib::RefPtr<Torrent> const& torrent) const
@@ -1513,7 +1516,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
-        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
+        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "show-stats")

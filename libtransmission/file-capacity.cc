@@ -1,10 +1,13 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdint> // int64_t
+#include <cstdio> // FILE
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -26,6 +29,9 @@
 #include <sys/fs/ufs_quota.h> /* quotactl */
 #else
 #include <sys/quota.h> /* quotactl() */
+#endif
+#if !defined(btodb) && defined(QIF_DQBLKSIZE_BITS)
+#define btodb(num) ((num) >> QIF_DQBLKSIZE_BITS)
 #endif
 #ifdef HAVE_GETMNTENT
 #ifdef __sun
@@ -63,12 +69,10 @@
 #include <xfs/xqm.h>
 #endif
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/tr-macros.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/utils.h" // tr_win32_utf8_to_native
 
 namespace
 {
@@ -508,9 +512,15 @@ tr_sys_path_capacity tr_device_info_get_disk_space(struct tr_device_info const& 
 
 } // namespace
 
-std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error** error)
+std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error* error)
 {
-    auto const info = tr_sys_path_get_info(path, 0, error);
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
+    auto const info = tr_sys_path_get_info(path, 0, &local_error);
     if (!info)
     {
         return {};
@@ -518,16 +528,15 @@ std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view pa
 
     if (!info->isFolder())
     {
-        tr_error_set_from_errno(error, ENOTDIR);
+        error->set_from_errno(ENOTDIR);
         return {};
     }
 
     auto const device = tr_device_info_create(path);
     auto capacity = tr_device_info_get_disk_space(device);
-
     if (capacity.free < 0 || capacity.total < 0)
     {
-        tr_error_set_from_errno(error, EINVAL);
+        error->set_from_errno(EINVAL);
         return {};
     }
 

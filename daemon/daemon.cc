@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,6 @@
 #include <array>
 #include <cerrno>
 #include <cstdio> /* printf */
-#include <cstdlib> /* atoi */
 #include <iostream>
 #include <iterator> /* std::back_inserter */
 #include <memory>
@@ -33,6 +32,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-strbuf.h>
@@ -62,39 +62,21 @@ struct tr_torrent;
 using namespace std::literals;
 using libtransmission::Watchdir;
 
-static char constexpr MyName[] = "transmission-daemon";
-static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
-                                "  https://transmissionbt.com/\n"
-                                "A fast and easy BitTorrent client\n"
-                                "\n"
-                                "transmission-daemon is a headless Transmission session that can be\n"
-                                "controlled via transmission-qt, transmission-remote, or its web interface.\n"
-                                "\n"
-                                "Usage: transmission-daemon [options]";
+namespace
+{
+char constexpr MyName[] = "transmission-daemon";
+char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
+                         "  https://transmissionbt.com/\n"
+                         "A fast and easy BitTorrent client\n"
+                         "\n"
+                         "transmission-daemon is a headless Transmission session that can be\n"
+                         "controlled via transmission-qt, transmission-remote, or its web interface.\n"
+                         "\n"
+                         "Usage: transmission-daemon [options]";
 
-static auto constexpr MemK = size_t{ 1024 };
-static char constexpr MemKStr[] = "KiB";
-static char constexpr MemMStr[] = "MiB";
-static char constexpr MemGStr[] = "GiB";
-static char constexpr MemTStr[] = "TiB";
+// --- Config File
 
-static auto constexpr DiskK = size_t{ 1000 };
-static char constexpr DiskKStr[] = "kB";
-static char constexpr DiskMStr[] = "MB";
-static char constexpr DiskGStr[] = "GB";
-static char constexpr DiskTStr[] = "TB";
-
-static auto constexpr SpeedK = size_t{ 1000 };
-static char constexpr SpeedKStr[] = "kB/s";
-static char constexpr SpeedMStr[] = "MB/s";
-static char constexpr SpeedGStr[] = "GB/s";
-static char constexpr SpeedTStr[] = "TB/s";
-
-/***
-****  Config File
-***/
-
-static auto constexpr Options = std::array<tr_option, 45>{
+auto constexpr Options = std::array<tr_option, 45>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
@@ -162,35 +144,7 @@ static auto constexpr Options = std::array<tr_option, 45>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-bool tr_daemon::reopen_log_file(char const* filename)
-{
-    tr_error* error = nullptr;
-    tr_sys_file_t const old_log_file = logfile_;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(
-        filename,
-        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
-        0666,
-        &error);
-
-    if (new_log_file == TR_BAD_SYS_FILE)
-    {
-        fprintf(stderr, "Couldn't (re)open log file \"%s\": %s\n", filename, error->message);
-        tr_error_free(error);
-        return false;
-    }
-
-    logfile_ = new_log_file;
-    logfile_flush_ = tr_sys_file_flush_possible(logfile_);
-
-    if (old_log_file != TR_BAD_SYS_FILE)
-    {
-        tr_sys_file_close(old_log_file);
-    }
-
-    return true;
-}
-
-static std::string getConfigDir(int argc, char const* const* argv)
+[[nodiscard]] std::string getConfigDir(int argc, char const* const* argv)
 {
     int c;
     char const* optstr;
@@ -209,7 +163,7 @@ static std::string getConfigDir(int argc, char const* const* argv)
     return tr_getDefaultConfigDir(MyName);
 }
 
-static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
+auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
     auto const is_torrent = tr_strv_ends_with(lowercase, ".torrent"sv);
@@ -235,15 +189,14 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     else // is_magnet
     {
         auto content = std::vector<char>{};
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         if (!tr_file_read(filename, content, &error))
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),
                 fmt::arg("path", basename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             retry = true;
         }
         else
@@ -274,18 +227,15 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
 
         if (test && trash)
         {
-            tr_error* error = nullptr;
-
             tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", basename)));
 
-            if (!tr_sys_path_remove(filename, &error))
+            if (auto error = tr_error{}; !tr_sys_path_remove(filename, &error))
             {
                 tr_logAddError(fmt::format(
                     _("Couldn't remove '{path}': {error} ({error_code})"),
                     fmt::arg("path", basename),
-                    fmt::arg("error", error->message),
-                    fmt::arg("error_code", error->code)));
-                tr_error_free(error);
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
             }
         }
         else
@@ -298,7 +248,7 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     return Watchdir::Action::Done;
 }
 
-static char const* levelName(tr_log_level level)
+[[nodiscard]] constexpr char const* levelName(tr_log_level level)
 {
     switch (level)
     {
@@ -317,7 +267,7 @@ static char const* levelName(tr_log_level level)
     }
 }
 
-static void printMessage(
+void printMessage(
     tr_sys_file_t file,
     tr_log_level level,
     std::string_view name,
@@ -379,7 +329,7 @@ static void printMessage(
 #endif
 }
 
-static void pumpLogMessages(tr_sys_file_t file, bool flush)
+void pumpLogMessages(tr_sys_file_t file, bool flush)
 {
     tr_log_message* list = tr_logGetQueue();
 
@@ -396,7 +346,65 @@ static void pumpLogMessages(tr_sys_file_t file, bool flush)
     tr_logFreeQueue(list);
 }
 
-void tr_daemon::report_status(void)
+void periodic_update(evutil_socket_t /*fd*/, short /*what*/, void* arg)
+{
+    static_cast<tr_daemon*>(arg)->periodic_update();
+}
+
+tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_type type, tr_torrent* /*tor*/, void* arg)
+{
+    if (type == TR_RPC_SESSION_CLOSE)
+    {
+        static_cast<tr_daemon*>(arg)->stop();
+    }
+    return TR_RPC_OK;
+}
+
+tr_variant load_settings(char const* config_dir)
+{
+    auto app_defaults = tr_variant::make_map();
+    tr_variantDictAddStr(&app_defaults, TR_KEY_watch_dir, ""sv);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+    return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
+}
+
+} // namespace
+
+bool tr_daemon::reopen_log_file(char const* filename)
+{
+    auto error = tr_error{};
+    tr_sys_file_t const old_log_file = logfile_;
+    tr_sys_file_t const new_log_file = tr_sys_file_open(
+        filename,
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+        0666,
+        &error);
+
+    if (new_log_file == TR_BAD_SYS_FILE)
+    {
+        auto const errmsg = fmt::format(
+            "Couldn't open '{path}': {error} ({error_code})",
+            fmt::arg("path", filename),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code()));
+        fmt::print(stderr, "{:s}\n", errmsg);
+        return false;
+    }
+
+    logfile_ = new_log_file;
+    logfile_flush_ = tr_sys_file_flush_possible(logfile_);
+
+    if (old_log_file != TR_BAD_SYS_FILE)
+    {
+        tr_sys_file_close(old_log_file);
+    }
+
+    return true;
+}
+
+void tr_daemon::report_status()
 {
     double const up = tr_sessionGetRawSpeed_KBps(my_session_, TR_UP);
     double const dn = tr_sessionGetRawSpeed_KBps(my_session_, TR_DOWN);
@@ -411,28 +419,10 @@ void tr_daemon::report_status(void)
     }
 }
 
-void tr_daemon::periodic_update(void)
+void tr_daemon::periodic_update()
 {
     pumpLogMessages(logfile_, logfile_flush_);
     report_status();
-}
-
-static void periodic_update(evutil_socket_t /*fd*/, short /*what*/, void* arg)
-{
-    static_cast<tr_daemon*>(arg)->periodic_update();
-}
-
-static tr_rpc_callback_status on_rpc_callback(
-    tr_session* /*session*/,
-    tr_rpc_callback_type type,
-    tr_torrent* /*tor*/,
-    void* arg)
-{
-    if (type == TR_RPC_SESSION_CLOSE)
-    {
-        static_cast<tr_daemon*>(arg)->stop();
-    }
-    return TR_RPC_OK;
 }
 
 bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
@@ -518,7 +508,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'p':
-            tr_variantDictAddInt(&settings_, TR_KEY_rpc_port, atoi(optstr));
+            if (auto const rpc_port = tr_num_parse<uint16_t>(optstr); rpc_port)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_rpc_port, *rpc_port);
+            }
             break;
 
         case 't':
@@ -542,7 +535,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'P':
-            tr_variantDictAddInt(&settings_, TR_KEY_peer_port, atoi(optstr));
+            if (auto const peer_port = tr_num_parse<uint16_t>(optstr); peer_port)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_peer_port, *peer_port);
+            }
             break;
 
         case 'm':
@@ -554,11 +550,17 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'L':
-            tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_global, atoi(optstr));
+            if (auto const peer_limit_global = tr_num_parse<int64_t>(optstr); peer_limit_global && *peer_limit_global >= 0)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_global, *peer_limit_global);
+            }
             break;
 
         case 'l':
-            tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_per_torrent, atoi(optstr));
+            if (auto const peer_limit_tor = tr_num_parse<int64_t>(optstr); peer_limit_tor && *peer_limit_tor >= 0)
+            {
+                tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_per_torrent, *peer_limit_tor);
+            }
             break;
 
         case 800:
@@ -590,7 +592,10 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 953:
-            tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, atof(optstr));
+            if (auto const ratio_limit = tr_num_parse<double>(optstr); optstr)
+            {
+                tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, *ratio_limit);
+            }
             tr_variantDictAddBool(&settings_, TR_KEY_ratio_limit_enabled, true);
             break;
 
@@ -599,7 +604,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'x':
-            tr_variantDictAddStr(&settings_, key_pidfile_, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_pidfile, optstr);
             break;
 
         case 'y':
@@ -660,7 +665,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
     return true;
 }
 
-void tr_daemon::reconfigure(void)
+void tr_daemon::reconfigure()
 {
     if (my_session_ == nullptr)
     {
@@ -669,7 +674,6 @@ void tr_daemon::reconfigure(void)
     }
     else
     {
-        tr_variant newsettings;
         char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
@@ -680,34 +684,25 @@ void tr_daemon::reconfigure(void)
 
         configDir = tr_sessionGetConfigDir(my_session_);
         tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
-        tr_variantInitDict(&newsettings, 0);
-        tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&newsettings, configDir, MyName);
-        tr_sessionSet(my_session_, &newsettings);
+
+        tr_sessionSet(my_session_, load_settings(configDir));
         tr_sessionReloadBlocklists(my_session_);
     }
 }
 
-void tr_daemon::stop(void)
+void tr_daemon::stop()
 {
     event_base_loopexit(ev_base_, nullptr);
 }
 
 int tr_daemon::start([[maybe_unused]] bool foreground)
 {
-    bool boolVal;
-    bool pidfile_created = false;
-    tr_session* session = nullptr;
-    struct event* status_ev = nullptr;
-    struct event* sig_ev = nullptr;
-    auto watchdir = std::unique_ptr<Watchdir>{};
-    char const* const cdir = this->config_dir_.c_str();
-
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
     /* setup event state */
     ev_base_ = event_base_new();
 
+    event* sig_ev = nullptr;
     if (ev_base_ == nullptr || !setup_signals(sig_ev))
     {
         auto const error_code = errno;
@@ -721,20 +716,19 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
-    session = tr_sessionInit(cdir, true, &settings_);
+    auto const* const cdir = this->config_dir_.c_str();
+    auto* session = tr_sessionInit(cdir, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
-    tr_sessionSaveSettings(session, cdir, &settings_);
+    tr_sessionSaveSettings(session, cdir, settings_);
 
     auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
+    (void)tr_variantDictFindStrView(&settings_, TR_KEY_pidfile, &sv);
     auto const sz_pid_filename = std::string{ sv };
+    auto pidfile_created = false;
     if (!std::empty(sz_pid_filename))
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         tr_sys_file_t fp = tr_sys_file_open(
             sz_pid_filename.c_str(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
@@ -754,13 +748,12 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             tr_logAddError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", sz_pid_filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
         }
     }
 
-    if (tr_variantDictFindBool(&settings_, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
+    if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_rpc_authentication_required, &tmp_bool) && tmp_bool)
     {
         tr_logAddInfo(_("Requiring authentication"));
     }
@@ -774,10 +767,11 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* maybe add a watchdir */
-    if (tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
+    auto watchdir = std::unique_ptr<Watchdir>{};
+    if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &tmp_bool) && tmp_bool)
     {
         auto force_generic = bool{ false };
-        (void)tr_variantDictFindBool(&settings_, key_watch_dir_force_generic_, &force_generic);
+        (void)tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_force_generic, &force_generic);
 
         auto dir = std::string_view{};
         (void)tr_variantDictFindStrView(&settings_, TR_KEY_watch_dir, &dir);
@@ -819,6 +813,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 #endif
 
     /* Create new timer event to report daemon status */
+    event* status_ev;
     {
         constexpr auto one_sec = timeval{ 1, 0 }; // 1 second
         status_ev = event_new(ev_base_, -1, EV_PERSIST, &::periodic_update, this);
@@ -873,7 +868,7 @@ CLEANUP:
 
     event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(my_session_, cdir, &settings_);
+    tr_sessionSaveSettings(my_session_, cdir, settings_);
     tr_sessionClose(my_session_);
     pumpLogMessages(logfile_, logfile_flush_);
     printf(" done.\n");
@@ -905,9 +900,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(&settings_, 0);
-    tr_variantDictAddBool(&settings_, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&settings_, config_dir_.c_str(), MyName);
+    settings_ = load_settings(config_dir_.c_str());
 
     bool dumpSettings;
 
@@ -916,7 +909,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     /* overwrite settings from the command line */
     if (!parse_args(argc, argv, &dumpSettings, foreground, ret))
     {
-        goto EXIT_EARLY;
+        return false;
     }
 
     if (*foreground && logfile_ == TR_BAD_SYS_FILE)
@@ -925,30 +918,19 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
         logfile_flush_ = tr_sys_file_flush_possible(logfile_);
     }
 
-    if (!loaded)
-    {
-        printMessage(logfile_, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        *ret = 1;
-        goto EXIT_EARLY;
-    }
-
     if (dumpSettings)
     {
         fmt::print("{:s}\n", tr_variant_serde::json().to_string(settings_));
-        goto EXIT_EARLY;
+        return false;
     }
 
     return true;
-
-EXIT_EARLY:
-    return false;
 }
 
-void tr_daemon::handle_error(tr_error* error) const
+void tr_daemon::handle_error(tr_error const& error) const
 {
-    auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
+    auto const errmsg = fmt::format("Couldn't daemonize: {:s} ({:d})", error.message(), error.code());
     printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
-    tr_error_free(error);
 }
 
 int tr_main(int argc, char* argv[])
@@ -957,16 +939,15 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    int ret;
-    tr_daemon daemon;
-    bool foreground;
-    tr_error* error = nullptr;
-
+    auto foreground = bool{};
+    auto ret = int{};
+    auto daemon = tr_daemon{};
     if (!daemon.init(argc, argv, &foreground, &ret))
     {
         return ret;
     }
-    if (!daemon.spawn(foreground, &ret, &error))
+
+    if (auto error = tr_error{}; !daemon.spawn(foreground, &ret, error))
     {
         daemon.handle_error(error);
     }

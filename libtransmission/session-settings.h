@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,6 +12,8 @@
 
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/open-files.h" // for tr_open_files::Preallocation
+#include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/quark.h"
 
 struct tr_variant;
@@ -23,7 +25,7 @@ struct tr_variant;
     V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::", "") \
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false, "") \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist", "") \
-    V(TR_KEY_cache_size_mb, cache_size_mb, size_t, 4U, "") \
+    V(TR_KEY_cache_size_mb, cache_size_mbytes, size_t, 4U, "") \
     V(TR_KEY_default_trackers, default_trackers_str, std::string, "", "") \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true, "") \
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir(), "") \
@@ -50,8 +52,7 @@ struct tr_variant;
     V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "") \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true, "") \
-    V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE, "") \
-    V(TR_KEY_prefetch_enabled, is_prefetch_enabled, bool, true, "") \
+    V(TR_KEY_preallocation, preallocation_mode, tr_open_files::Preallocation, tr_open_files::Preallocation::Sparse, "") \
     V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true, "") \
     V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U, "") \
     V(TR_KEY_ratio_limit, ratio_limit, double, 2.0, "") \
@@ -76,19 +77,21 @@ struct tr_variant;
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
+    V(TR_KEY_preferred_transport, preferred_transport, tr_preferred_transport, TR_PREFER_UTP, "") \
     V(TR_KEY_torrent_added_verify_mode, torrent_added_verify_mode, tr_verify_added_mode, TR_VERIFY_ADDED_FAST, "")
 
 struct tr_session_settings
 {
     tr_session_settings() = default;
 
-    explicit tr_session_settings(tr_variant* src)
+    explicit tr_session_settings(tr_variant const& src)
     {
         load(src);
     }
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
 #define V(key, name, type, default_value, comment) type name = type{ default_value };
     SESSION_SETTINGS_FIELDS(V)

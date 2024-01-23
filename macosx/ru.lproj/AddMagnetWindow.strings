@@ -12,7 +12,7 @@
 "20.title" = "Добавить";
 
 /* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "22"; */
-"22.title" = "Отменить";
+"22.title" = "Отмена";
 
 /* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
 "41.title" = "Группа:";

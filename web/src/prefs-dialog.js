@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -43,10 +43,13 @@ export class PrefsDialog extends EventTarget {
   }
 
   _checkPort() {
-    const element = this.elements.network.port_status_label;
-    delete element.dataset.open;
-    setTextContent(element, 'Checking...');
-    this.remote.checkPort(this._onPortChecked, this);
+    for (const [key, element] of Object.entries(
+      this.elements.network.port_status_label,
+    )) {
+      delete element.dataset.open;
+      setTextContent(element, 'Checking...');
+      this.remote.checkPort(key, this._onPortChecked, this);
+    }
   }
 
   _onPortChecked(response) {
@@ -54,8 +57,9 @@ export class PrefsDialog extends EventTarget {
       return;
     }
 
-    const element = this.elements.network.port_status_label;
-    const is_open = response.arguments['port-is-open'];
+    const element =
+      this.elements.network.port_status_label[response.arguments['ipProtocol']];
+    const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
     setTextContent(element, is_open ? 'Open' : 'Closed');
   }
@@ -95,6 +99,12 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
+  _onMaybePortChanged(key) {
+    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
+      this._checkPort();
+    }
+  }
+
   // this callback is for controls whose changes can be applied
   // immediately, like checkboxs, radioboxes, and selects
   _onControlChanged(event_) {
@@ -102,9 +112,7 @@ export class PrefsDialog extends EventTarget {
     this.remote.savePrefs({
       [key]: PrefsDialog._getValue(event_.target),
     });
-    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
-      this._checkPort();
-    }
+    this._onMaybePortChanged(key);
   }
 
   _onDialogClosed() {
@@ -112,14 +120,12 @@ export class PrefsDialog extends EventTarget {
   }
 
   // update the dialog's controls
-  _update(o) {
-    if (!o) {
-      return;
-    }
-
+  _update() {
     this._setBlocklistButtonEnabled(true);
 
-    for (const [key, value] of Object.entries(o)) {
+    for (const [key, value] of Object.entries(
+      this.session_manager.session_properties,
+    )) {
       for (const element of this.elements.root.querySelectorAll(
         `[data-key="${key}"]`,
       )) {
@@ -131,10 +137,7 @@ export class PrefsDialog extends EventTarget {
           switch (element.type) {
             case 'checkbox':
             case 'radio':
-              if (element.checked !== value) {
-                element.checked = value;
-                element.dispatchEvent(new Event('change'));
-              }
+              element.checked = value;
               break;
             case 'text':
             case 'textarea':
@@ -144,20 +147,16 @@ export class PrefsDialog extends EventTarget {
             case 'search':
               // don't change the text if the user's editing it.
               // it's very annoying when that happens!
-              if (
+              if (element !== document.activeElement) {
                 // eslint-disable-next-line eqeqeq
-                element.value != value &&
-                element !== document.activeElement
-              ) {
+                if (element.value != value) {
+                  this._onMaybePortChanged(key);
+                }
                 element.value = value;
-                element.dispatchEvent(new Event('change'));
               }
               break;
             case 'select-one':
-              if (element.value !== value) {
-                element.value = value;
-                element.dispatchEvent(new Event('change'));
-              }
+              element.value = value;
               break;
             default:
               console.log(element.type);
@@ -673,12 +672,20 @@ export class PrefsDialog extends EventTarget {
     const port_status_div = document.createElement('div');
     port_status_div.classList.add('port-status');
     label = document.createElement('label');
-    label.textContent = 'Port is';
+    label.textContent = 'IPv4 port is';
     port_status_div.append(label);
-    const port_status_label = document.createElement('label');
-    port_status_label.textContent = '?';
-    port_status_label.classList.add('port-status-label');
-    port_status_div.append(port_status_label);
+    const port_status_label_ipv4 = document.createElement('label');
+    port_status_label_ipv4.textContent = '?';
+    port_status_label_ipv4.classList.add('port-status-label');
+    port_status_div.append(port_status_label_ipv4);
+    port_status_div.append(document.createElement('br'));
+    label = document.createElement('label');
+    label.textContent = 'IPv6 port is';
+    port_status_div.append(label);
+    const port_status_label_ipv6 = document.createElement('label');
+    port_status_label_ipv6.textContent = '?';
+    port_status_label_ipv6.classList.add('port-status-label');
+    port_status_div.append(port_status_label_ipv6);
     root.append(port_status_div);
 
     let cal = PrefsDialog._createCheckAndLabel(
@@ -738,7 +745,10 @@ export class PrefsDialog extends EventTarget {
       default_trackers_textarea,
       port_forwarding_check,
       port_input,
-      port_status_label,
+      port_status_label: {
+        ipv4: port_status_label_ipv4,
+        ipv6: port_status_label_ipv6,
+      },
       random_port_check,
       root,
       utp_check,
@@ -769,8 +779,7 @@ export class PrefsDialog extends EventTarget {
     this.closed = false;
     this.session_manager = session_manager;
     this.remote = remote;
-    this.update_soon = () =>
-      this._update(this.session_manager.session_properties);
+    this.update_from_session = () => this._update();
 
     this.elements = PrefsDialog._create();
     this.elements.peers.blocklist_update_button.addEventListener(
@@ -823,8 +832,11 @@ export class PrefsDialog extends EventTarget {
     walk(this.elements.speed);
     walk(this.elements.torrents);
 
-    this.session_manager.addEventListener('session-change', this.update_soon);
-    this.update_soon();
+    this.session_manager.addEventListener(
+      'session-change',
+      this.update_from_session,
+    );
+    this.update_from_session();
 
     document.body.append(this.elements.root);
   }
@@ -834,7 +846,7 @@ export class PrefsDialog extends EventTarget {
       this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
-        this.update_soon,
+        this.update_from_session,
       );
       this.elements.root.remove();
       dispatchEvent(new Event('close'));

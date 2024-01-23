@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -52,7 +52,7 @@ export class StatisticsDialog extends EventTarget {
     let ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
     setTextContent(this.elements.session.up, fmt.size(s.uploadedBytes));
     setTextContent(this.elements.session.down, fmt.size(s.downloadedBytes));
-    setTextContent(this.elements.session.ratio, fmt.ratioString(ratio));
+    this.elements.session.ratio.innerHTML = fmt.ratioString(ratio);
     setTextContent(
       this.elements.session.time,
       fmt.timeInterval(s.secondsActive),
@@ -62,7 +62,7 @@ export class StatisticsDialog extends EventTarget {
     ratio = Utils.ratio(s.uploadedBytes, s.downloadedBytes);
     setTextContent(this.elements.total.up, fmt.size(s.uploadedBytes));
     setTextContent(this.elements.total.down, fmt.size(s.downloadedBytes));
-    setTextContent(this.elements.total.ratio, fmt.ratioString(ratio));
+    this.elements.total.ratio.innerHTML = fmt.ratioString(ratio);
     setTextContent(this.elements.total.time, fmt.timeInterval(s.secondsActive));
   }
 

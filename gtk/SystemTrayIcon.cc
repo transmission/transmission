@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -49,6 +49,7 @@
 #endif
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -214,6 +215,6 @@ std::string SystemTrayIcon::Impl::make_tooltip_text() const
     auto const* const session = core_->get_session();
     return fmt::format(
         _("{upload_speed} ▲ {download_speed} ▼"),
-        fmt::arg("upload_speed", tr_formatter_speed_KBps(tr_sessionGetRawSpeed_KBps(session, TR_UP))),
-        fmt::arg("download_speed", tr_formatter_speed_KBps(tr_sessionGetRawSpeed_KBps(session, TR_DOWN))));
+        fmt::arg("upload_speed", Speed{ tr_sessionGetRawSpeed_KBps(session, TR_UP), Speed::Units::KByps }.to_string()),
+        fmt::arg("download_speed", Speed{ tr_sessionGetRawSpeed_KBps(session, TR_DOWN), Speed::Units::KByps }.to_string()));
 }

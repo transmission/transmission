@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,6 +11,7 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
 #include "Application.h"
@@ -201,6 +202,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(isFinished, is_finished, IS_FINISHED)
             HANDLE_KEY(isPrivate, is_private, IS_PRIVATE)
             HANDLE_KEY(isStalled, is_stalled, IS_STALLED)
+            HANDLE_KEY(labels, labels, LABELS)
             HANDLE_KEY(leftUntilDone, left_until_done, LEFT_UNTIL_DONE)
             HANDLE_KEY(manualAnnounceTime, manual_announce_time, MANUAL_ANNOUNCE_TIME)
             HANDLE_KEY(metadataPercentComplete, metadata_percent_complete, METADATA_PERCENT_COMPLETE)

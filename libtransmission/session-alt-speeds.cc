@@ -1,10 +1,11 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <chrono>
 #include <cstddef> // size_t
+#include <ctime>
+#include <utility>
 
 #include <fmt/chrono.h>
 
@@ -17,41 +18,44 @@
 
 using namespace std::literals;
 
-void tr_session_alt_speeds::load(tr_variant* src)
+void tr_session_alt_speeds::load(tr_variant const& src)
 {
+    auto const* const src_map = src.get_if<tr_variant::Map>();
+    if (src_map != nullptr)
+    {
 #define V(key, field, type, default_value, comment) \
-    if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
+    if (auto const iter = src_map->find(key); iter != std::end(*src_map)) \
     { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
+        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(iter->second); val) \
         { \
             this->field = *val; \
         } \
     }
-    ALT_SPEEDS_FIELDS(V)
+        ALT_SPEEDS_FIELDS(V)
 #undef V
+    }
 
     update_scheduler();
 }
 
-void tr_session_alt_speeds::save(tr_variant* tgt) const
+tr_variant tr_session_alt_speeds::settings() const
 {
+    auto settings = tr_variant::Map{};
 #define V(key, field, type, default_value, comment) \
-    tr_variantDictRemove(tgt, key); \
-    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
+    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     ALT_SPEEDS_FIELDS(V)
 #undef V
+    return tr_variant{ std::move(settings) };
 }
 
-void tr_session_alt_speeds::default_settings(tr_variant* tgt)
+tr_variant tr_session_alt_speeds::default_settings()
 {
+    auto settings = tr_variant::Map{};
 #define V(key, field, type, default_value, comment) \
-    { \
-        type const val = default_value; \
-        tr_variantDictRemove(tgt, key); \
-        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), val); \
-    }
+    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(static_cast<type>(default_value)));
     ALT_SPEEDS_FIELDS(V)
 #undef V
+    return tr_variant{ std::move(settings) };
 }
 
 // --- minutes

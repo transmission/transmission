@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,6 +8,7 @@
 #include "Flags.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/values.h>
 
 #include <giomm/icon.h>
 #include <glibmm/extraclassinit.h>
@@ -18,6 +19,7 @@
 
 #include <algorithm>
 #include <bitset>
+#include <cstdint>
 #include <initializer_list>
 #include <memory>
 
@@ -37,7 +39,7 @@ public:
         Gtk::TreeModelColumn<Glib::ustring> name_collated;
     };
 
-    enum class ChangeFlag
+    enum class ChangeFlag : uint8_t
     {
         ACTIVE_PEER_COUNT,
         ACTIVE_PEERS_DOWN,
@@ -71,6 +73,9 @@ public:
     using ChangeFlags = Flags<ChangeFlag>;
 
 public:
+    using Speed = libtransmission::Values::Speed;
+    using Storage = libtransmission::Values::Storage;
+
     int get_active_peer_count() const;
     int get_active_peers_down() const;
     int get_active_peers_up() const;
@@ -92,10 +97,10 @@ public:
     float get_ratio() const;
     Percents get_recheck_progress() const;
     Percents get_seed_ratio_percent_done() const;
-    float get_speed_down() const;
-    float get_speed_up() const;
+    Speed get_speed_down() const;
+    Speed get_speed_up() const;
     tr_torrent& get_underlying() const;
-    uint64_t get_total_size() const;
+    Storage get_total_size() const;
     unsigned int get_trackers() const;
 
     Glib::RefPtr<Gio::Icon> get_icon() const;

@@ -1,0 +1,39 @@
+
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
+"5.title" = "Torrent Sortzailea";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
+"70.title" = "Iruzkina:";
+
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
+"71.title" = "Aztarnariak:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
+"73.title" = "Aldatu...";
+
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
+"74.title" = "Torrent fitxategia";
+
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
+"77.title" = "Pribatua";
+
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
+"78.title" = "Sortu";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
+"79.title" = "Ezeztatu";
+
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
+"81.title" = "Ireki sortzerakoan";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
+"82.title" = "Ezeztatu";
+
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
+"83.title" = "Torrent fitxategia sortzen...";
+
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
+"108.title" = "Aztarnari bakoitza bere maila propioan kokatuko da";
+
+/* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
+"f1g-Kk-weU.title" = "Jatorria:";

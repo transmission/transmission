@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -459,6 +459,7 @@ export class OverflowMenu extends EventTarget {
 
     for (const action_name of [
       'show-preferences-dialog',
+      'show-shortcuts-dialog',
       'pause-all-torrents',
       'start-all-torrents',
     ]) {
@@ -466,50 +467,22 @@ export class OverflowMenu extends EventTarget {
       actions[action_name] = make_button(section, text, action_name, on_click);
     }
 
-    section = make_section('info', 'Info');
+    section = make_section('help', 'Help');
     root.append(section);
 
     options = document.createElement('div');
     section.append(options);
 
-    for (const action_name of [
-      'show-about-dialog',
-      'show-shortcuts-dialog',
-      'show-statistics-dialog',
-    ]) {
+    for (const action_name of ['show-statistics-dialog', 'show-about-dialog']) {
       const text = this.action_manager.text(action_name);
       actions[action_name] = make_button(options, text, action_name, on_click);
     }
 
-    section = make_section('links', 'Links');
-    root.append(section);
-
-    options = document.createElement('ul');
-    section.append(options);
-
-    let e = document.createElement('a');
-    e.href = 'https://transmissionbt.com/';
-    e.tabindex = '0';
-    e.textContent = 'Homepage';
-    let li = document.createElement('li');
-    li.append(e);
-    options.append(li);
-
-    e = document.createElement('a');
-    e.href = 'https://transmissionbt.com/donate/';
-    e.tabindex = '0';
-    e.textContent = 'Tip Jar';
-    li = document.createElement('li');
-    li.append(e);
-    options.append(li);
-
-    e = document.createElement('a');
-    e.href = 'https://github.com/transmission/transmission/';
-    e.tabindex = '0';
-    e.textContent = 'Source Code';
-    li = document.createElement('li');
-    li.append(e);
-    options.append(li);
+    const e = document.createElement('a');
+    e.href = 'https://transmissionbt.com/donate.html';
+    e.target = '_blank';
+    e.textContent = 'Donate';
+    options.append(e);
 
     this._updateElement = this._updateElement.bind(this);
 

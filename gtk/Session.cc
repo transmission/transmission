@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -18,7 +18,6 @@
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-assert.h>
 #include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/variant.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
@@ -45,12 +44,14 @@
 #include <fmt/core.h>
 
 #include <algorithm>
+#include <array>
 #include <cinttypes> // PRId64
 #include <cstring> // strstr
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -75,15 +76,18 @@ public:
 
     size_t get_active_torrent_count() const;
 
+    bool get_port_test_pending(PortTestIpProtocol ip_protocol);
+    void set_port_test_pending(bool pending, PortTestIpProtocol ip_protocol);
+
     void update();
     void torrents_added();
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
-    int add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
+    void add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
 
-    void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
+    void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
 
     void commit_prefs_change(tr_quark key);
 
@@ -170,7 +174,7 @@ private:
     sigc::signal<void(bool)> signal_blocklist_updated_;
     sigc::signal<void(bool)> signal_busy_;
     sigc::signal<void(tr_quark)> signal_prefs_changed_;
-    sigc::signal<void(bool)> signal_port_tested_;
+    sigc::signal<void(std::optional<bool>, PortTestIpProtocol)> signal_port_tested_;
     sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)> signal_torrents_changed_;
 
     Glib::RefPtr<Gio::FileMonitor> monitor_;
@@ -183,6 +187,7 @@ private:
     bool inhibit_allowed_ = false;
     bool have_inhibit_cookie_ = false;
     bool dbus_error_ = false;
+    std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};
     guint inhibit_cookie_ = 0;
     gint busy_count_ = 0;
     Glib::RefPtr<Gio::ListStore<Torrent>> raw_model_;
@@ -690,12 +695,12 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
     return Torrent::create(tor);
 }
 
-int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
+void Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 {
     auto const* metainfo = tr_ctorGetMetainfo(ctor);
     if (metainfo == nullptr)
     {
-        return TR_PARSE_ERR;
+        return;
     }
 
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
@@ -709,18 +714,17 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
         }
 
         tr_ctorFree(ctor);
-        return TR_PARSE_DUPLICATE;
+        return;
     }
 
     if (!do_prompt)
     {
         add_torrent(create_new_torrent(ctor), do_notify);
         tr_ctorFree(ctor);
-        return 0;
+        return;
     }
 
     signal_add_prompt_.emit(ctor);
-    return 0;
 }
 
 namespace
@@ -802,7 +806,7 @@ void Session::Impl::add_file_async_callback(
 
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
-    auto const* const session = get_session();
+    auto* const session = get_session();
     if (session == nullptr)
     {
         return false;
@@ -911,7 +915,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error** error)
+            [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr);
     }
@@ -968,7 +972,7 @@ void Session::start_now(tr_torrent_id_t id)
     auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
-    exec(&top);
+    exec(top);
 }
 
 void Session::Impl::update()
@@ -1187,19 +1191,16 @@ bool core_read_rpc_response_idle(tr_variant& response)
     return false;
 }
 
-void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
+void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 {
-    auto owned_response = std::make_shared<tr_variant>();
-    tr_variantInitBool(owned_response.get(), false);
-    std::swap(*owned_response, *response);
-
+    auto owned_response = std::make_shared<tr_variant>(std::move(response));
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
 }
 
 } // namespace
 
 void Session::Impl::send_rpc_request(
-    tr_variant const* request,
+    tr_variant const& request,
     int64_t tag,
     std::function<void(tr_variant&)> const& response_func)
 {
@@ -1217,7 +1218,7 @@ void Session::Impl::send_rpc_request(
         gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
 #endif
 
-        tr_rpc_request_exec_json(session_, request, core_read_rpc_response, nullptr);
+        tr_rpc_request_exec(session_, request, core_read_rpc_response);
     }
 }
 
@@ -1225,31 +1226,65 @@ void Session::Impl::send_rpc_request(
 ****  Sending a test-port request via RPC
 ***/
 
-void Session::port_test()
+void Session::port_test(PortTestIpProtocol const ip_protocol)
 {
-    auto const tag = nextTag;
-    ++nextTag;
+    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
 
-    tr_variant request;
-    tr_variantInitDict(&request, 2);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "port-test");
-    tr_variantDictAddInt(&request, TR_KEY_tag, tag);
+    if (port_test_pending(ip_protocol))
+    {
+        return;
+    }
+    impl_->set_port_test_pending(true, ip_protocol);
+
+    auto const tag = nextTag++;
+
+    auto arguments_map = tr_variant::Map{ 1U };
+    arguments_map.try_emplace(TR_KEY_ipProtocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
+
+    auto request_map = tr_variant::Map{ 3U };
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));
+    request_map.try_emplace(TR_KEY_tag, tag);
+    request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
+
     impl_->send_rpc_request(
-        &request,
+        tr_variant{ std::move(request_map) },
         tag,
-        [this](auto& response)
+        [this, ip_protocol](tr_variant& response)
         {
-            tr_variant* args = nullptr;
-            bool is_open = false;
+            impl_->set_port_test_pending(false, ip_protocol);
 
-            if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
-                !tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open))
+            auto status = std::optional<bool>{};
+            if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
             {
-                is_open = false;
+                if (auto result = bool{}; tr_variantDictFindBool(args, TR_KEY_port_is_open, &result))
+                {
+                    status = result;
+                }
             }
 
-            impl_->signal_port_tested().emit(is_open);
+            // If for whatever reason the status optional is empty here,
+            // then something must have gone wrong with the port test,
+            // so the UI should show the "error" state
+            impl_->signal_port_tested().emit(status, ip_protocol);
         });
+}
+
+bool Session::port_test_pending(Session::PortTestIpProtocol ip_protocol) const noexcept
+{
+    return impl_->get_port_test_pending(ip_protocol);
+}
+
+bool Session::Impl::get_port_test_pending(Session::PortTestIpProtocol ip_protocol)
+{
+    return ip_protocol < NUM_PORT_TEST_IP_PROTOCOL && port_test_pending_[ip_protocol];
+}
+
+void Session::Impl::set_port_test_pending(bool pending, Session::PortTestIpProtocol ip_protocol)
+{
+    if (ip_protocol < NUM_PORT_TEST_IP_PROTOCOL)
+    {
+        port_test_pending_[ip_protocol] = pending;
+    }
 }
 
 /***
@@ -1266,7 +1301,7 @@ void Session::blocklist_update()
     tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        &request,
+        request,
         tag,
         [this](auto& response)
         {
@@ -1292,7 +1327,7 @@ void Session::blocklist_update()
 ****
 ***/
 
-void Session::exec(tr_variant const* request)
+void Session::exec(tr_variant const& request)
 {
     auto const tag = nextTag;
     ++nextTag;
@@ -1391,7 +1426,7 @@ sigc::signal<void(tr_quark)>& Session::signal_prefs_changed()
     return impl_->signal_prefs_changed();
 }
 
-sigc::signal<void(bool)>& Session::signal_port_tested()
+sigc::signal<void(std::optional<bool>, Session::PortTestIpProtocol)>& Session::signal_port_tested()
 {
     return impl_->signal_port_tested();
 }

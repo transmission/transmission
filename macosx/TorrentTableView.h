@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -6,7 +6,7 @@
 
 @class Torrent;
 
-extern const CGFloat kGroupSeparatorHeight;
+extern CGFloat const kGroupSeparatorHeight;
 
 @interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
 
@@ -17,9 +17,7 @@ extern const CGFloat kGroupSeparatorHeight;
 - (void)removeAllCollapsedGroups;
 - (void)saveCollapsedGroups;
 
-- (void)restoreSelectionIndexes;
-
-@property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
+@property(nonatomic) NSArray<Torrent*>* selectedTorrents;
 
 - (NSRect)iconRectForRow:(NSInteger)row;
 
@@ -34,15 +32,6 @@ extern const CGFloat kGroupSeparatorHeight;
 - (IBAction)toggleControlForTorrent:(id)sender;
 
 - (IBAction)displayTorrentActionPopover:(id)sender;
-
-- (IBAction)setQuickLimitMode:(id)sender;
-- (void)setQuickLimit:(id)sender;
-- (IBAction)setGlobalLimit:(id)sender;
-
-- (IBAction)setQuickRatioMode:(id)sender;
-- (void)setQuickRatio:(id)sender;
-
-- (IBAction)setPriority:(id)sender;
 
 - (void)togglePiecesBar;
 @property(nonatomic, readonly) CGFloat piecesBarPercent;

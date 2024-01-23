@@ -1,11 +1,16 @@
 set_property(GLOBAL PROPERTY AUTOGEN_SOURCE_GROUP "Generated Files")
 
+# https://doc.qt.io/qt-6/macos.html#supported-versions
+set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
+
 add_executable(${TR_NAME}-qt WIN32)
 
 target_sources(${TR_NAME}-qt
     PRIVATE
         AboutDialog.cc
         AboutDialog.h
+        AccessibleSqueezeLabel.cc
+        AccessibleSqueezeLabel.h
         AddData.cc
         AddData.h
         Application.cc
@@ -154,9 +159,11 @@ set(LINGUAS
     eu
     fi
     fr
+    he
     hu
     id
-    it_IT
+    is
+    it
     ja
     ka
     kk
@@ -173,7 +180,8 @@ set(LINGUAS
     sv
     tr
     uk
-    zh_CN)
+    zh_CN
+    zh_TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})

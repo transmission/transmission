@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -48,11 +48,6 @@
         [window addChildWindow:self ordered:NSWindowAbove];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)setTorrents:(NSArray<NSString*>*)files

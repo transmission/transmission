@@ -32,7 +32,7 @@
 "%lu cache" = "%lu önbellek";
 
 /* Inspector -> Peers tab -> peers */
-"%lu Connected" = "%lu Bağlı";
+"%lu Connected" = "%lu bağlı";
 
 /* Inspector -> Peers tab -> peers */
 "%lu DHT" = "%lu DHT";
@@ -51,6 +51,9 @@
 
 /* Prefs -> blocklist -> message */
 "%lu IP address rules in list" = "Dizelgede %lu IP adresi kuralı";
+
+/* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu yerel bulum";
@@ -88,7 +91,7 @@
 "%u pieces, %@ each" = "%1$u parça, her biri %2$@";
 
 /* Inspector -> Peers tab -> peers */
-"1 Connected" = "1 Bağlı";
+"1 Connected" = "1 bağlı";
 
 /* Add torrent -> info
    Create torrent -> info
@@ -214,6 +217,9 @@
 /* inspector -> peer table -> header tool tip */
 "Available" = "Kullanılabilir";
 
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bant Genişliği";
 
@@ -239,7 +245,7 @@
 "Change transfer settings" = "Aktarım ayarlarını değiştir";
 
 /* File Outline -> Menu */
-"Check Selected" = "Seçiliyi denetle";
+"Check Selected" = "Seçiliyi Denetle";
 
 /* Torrent -> status string */
 "Checking existing data" = "Var olan veri denetleniyor";
@@ -251,7 +257,7 @@
 "Client" = "İstemci";
 
 /* View menu -> Quick Look */
-"Close Quick Look" = "Göz At'ı kapat";
+"Close Quick Look" = "Göz At'ı Kapat";
 
 /* Blocklist -> message */
 "Connecting to site" = "Alana bağlanıyor";
@@ -295,7 +301,6 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "DL" = "İN";
 
@@ -444,6 +449,9 @@
 /* View menu -> Status Bar */
 "Hide Status Bar" = "Durum Çubuğunu Gizle";
 
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Araç Çubuğunu Gizle";
+
 /* File Outline -> Priority Menu */
 "High" = "Yüksek";
 
@@ -477,6 +485,9 @@
 
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/sn";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
 
 /* Tracker last announce */
 "Last Announce" = "Son Duyuru";
@@ -673,9 +684,6 @@
    Preferences -> toolbar item title */
 "Peers" = "Eşler";
 
-/* Inspector -> Peers tab -> table row tooltip */
-"Port: %@" = "Kapı: %@";
-
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Kapı denetim alanı çalışmıyor";
 
@@ -684,6 +692,9 @@
 
 /* Preferences -> Network -> port status */
 "Port is open" = "Kapı açık";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "Kapı: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";
@@ -859,7 +870,7 @@
 "Share" = "Paylaş";
 
 /* Share toolbar item -> tooltip */
-"Share torrent file" = "Torrent dosyası paylaş";
+"Share torrent file" = "Torrent dosyasını paylaş";
 
 /* Main window -> 1st bottom left button (action) tooltip */
 "Shortcuts for changing global settings." = "Genel ayarları değiştirmek için kısayollar.";
@@ -881,6 +892,9 @@
 
 /* Torrent cell -> button info */
 "Show the data file in Finder" = "Veri dosyasını Finder'da Göster";
+
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
 
 /* Dock item
    Status Bar -> speed tooltip */

@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -21,23 +21,6 @@ export const Utils = {
     }
 
     return result;
-  },
-
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
   },
 };
 

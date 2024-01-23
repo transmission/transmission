@@ -31,7 +31,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Activity">
+        <customView clipsToBounds="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Activity">
             <rect key="frame" x="0.0" y="0.0" width="358" height="358"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2aX-cc-oXC">
@@ -112,7 +112,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <imageView verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="PiecesView">
+                                <imageView clipsToBounds="YES" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="19" customClass="PiecesView">
                                     <rect key="frame" x="241" y="89" width="93" height="93"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="93" id="bsS-qa-kx6"/>
