@@ -171,7 +171,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 251 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // but we only want the first piece
     mediator.client_wants_piece_.insert(0);
@@ -195,7 +195,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
     mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 251 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // and we want all three pieces
     mediator.client_wants_piece_.insert(0);
@@ -235,7 +235,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
     mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 251 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // and we want all three pieces
     mediator.client_wants_piece_.insert(0);
@@ -274,7 +274,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
     mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 251 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // and we want all three pieces
     mediator.client_wants_piece_.insert(0);
@@ -313,7 +313,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 251 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // and we want all three pieces
     mediator.client_wants_piece_.insert(0);
@@ -359,7 +359,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
-    mediator.block_span_[2] = { 200, 251 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
