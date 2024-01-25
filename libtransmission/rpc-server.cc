@@ -650,7 +650,9 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     WSADATA wsaData;
     wVersionRequested = MAKEWORD(2, 2);
     if (WSAStartup(wVersionRequested, &wsaData) != 0)
+    {
         return evhttp_bind_socket(httpd, address, port);
+    }
     struct addrinfo* result = NULL;
     struct addrinfo hints;
     ZeroMemory(&hints, sizeof(hints));
@@ -661,16 +663,14 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
 
     if (getaddrinfo(address, std::to_string(port).c_str(), &hints, &result) != 0)
     {
-        WSACleanup();
-        return evhttp_bind_socket(httpd, address, port);
+        goto CLEANUP_AND_FALLBACK;
     }
 
     int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (fd == INVALID_SOCKET)
     {
         freeaddrinfo(result);
-        WSACleanup();
-        return evhttp_bind_socket(httpd, address, port);
+        goto CLEANUP_AND_FALLBACK;
     }
     evutil_make_socket_nonblocking(fd);
     evutil_make_listen_socket_reuseable(fd);
@@ -679,30 +679,28 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     if (result->ai_family == AF_INET6)
     {
         int off = 0;
-        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&off, (ev_socklen_t)sizeof(off));
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char*>(&off), sizeof(off));
     }
     // Set keep alive
     int on = 1;
-    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&on, sizeof(on));
+    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&on), sizeof(on));
     if (bind(fd, result->ai_addr, result->ai_addrlen) != 0)
     {
         freeaddrinfo(result);
-        closesocket(fd);
-        WSACleanup();
-        return evhttp_bind_socket(httpd, address, port);
+        goto CLEANUP_SOCKET;
     }
     freeaddrinfo(result);
     if (listen(fd, 128) == -1)
     {
-        closesocket(fd);
-        WSACleanup();
-        return evhttp_bind_socket(httpd, address, port);
+        goto CLEANUP_SOCKET;
     }
     if (evhttp_accept_socket(httpd, fd) == 0)
         return 0;
 
-    // fallback to evhttp_bind_socket
+CLEANUP_SOCKET:
     closesocket(fd);
+CLEANUP_AND_FALLBACK:
+    // clean up WSA and fallback to evhttp_bind_socket
     WSACleanup();
 #endif
     return evhttp_bind_socket(httpd, address, port);
