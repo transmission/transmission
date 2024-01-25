@@ -651,7 +651,7 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     wVersionRequested = MAKEWORD(2, 2);
     if (WSAStartup(wVersionRequested, &wsaData) != 0)
     {
-        return evhttp_bind_socket(httpd, address, port);
+        goto FALLBACK;
     }
     struct addrinfo* result = NULL;
     struct addrinfo hints;
@@ -663,14 +663,13 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
 
     if (getaddrinfo(address, std::to_string(port).c_str(), &hints, &result) != 0)
     {
-        goto CLEANUP_AND_FALLBACK;
+        goto CLEANUP_WINSOCKET;
     }
 
     int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (fd == INVALID_SOCKET)
     {
-        freeaddrinfo(result);
-        goto CLEANUP_AND_FALLBACK;
+        goto CLEANUP_ADDRINFO;
     }
     evutil_make_socket_nonblocking(fd);
     evutil_make_listen_socket_reuseable(fd);
@@ -686,22 +685,25 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&on), sizeof(on));
     if (bind(fd, result->ai_addr, result->ai_addrlen) != 0)
     {
-        freeaddrinfo(result);
         goto CLEANUP_SOCKET;
     }
-    freeaddrinfo(result);
     if (listen(fd, 128) == -1)
     {
         goto CLEANUP_SOCKET;
     }
     if (evhttp_accept_socket(httpd, fd) == 0)
+    {
+        freeaddrinfo(result);
         return 0;
+    }
 
 CLEANUP_SOCKET:
     closesocket(fd);
-CLEANUP_AND_FALLBACK:
-    // clean up WSA and fallback to evhttp_bind_socket
+CLEANUP_ADDRINFO:
+    freeaddrinfo(result);
+CLEANUP_WINSOCKET:
     WSACleanup();
+FALLBACK:
 #endif
     return evhttp_bind_socket(httpd, address, port);
 }
@@ -778,6 +780,10 @@ void stop_server(tr_rpc_server* server)
     {
         unlink(address.c_str() + std::size(TrUnixSocketPrefix));
     }
+
+#ifdef _WIN32
+    WSACleanup();
+#endif
 
     tr_logAddInfo(fmt::format(
         _("Stopped listening for RPC and Web requests on '{address}'"),
