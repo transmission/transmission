@@ -1234,9 +1234,9 @@ void tr_peerMgrFree(tr_peerMgr* manager)
  *    This is used for cancelling requests that have been waiting
  *    for too long and avoiding duplicate requests.
  *
- * 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
- *    pieces that we want to request. It's used to decide which blocks to
- *    return next when tr_peerMgrGetBlockRequests() is called.
+ * 2. tr_swarm::wishlist, a class that tracks the pieces that we want to
+ *    request. It's used to decide which blocks to return next when
+ *    tr_peerMgrGetNextRequests() is called.
  */
 
 // --- struct block_request
