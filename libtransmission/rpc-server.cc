@@ -646,13 +646,6 @@ void rpc_server_start_retry_cancel(tr_rpc_server* server)
 int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t port)
 {
 #ifdef _WIN32
-    WORD wVersionRequested;
-    WSADATA wsaData;
-    wVersionRequested = MAKEWORD(2, 2);
-    if (WSAStartup(wVersionRequested, &wsaData) != 0)
-    {
-        goto FALLBACK;
-    }
     struct addrinfo* result = NULL;
     struct addrinfo hints;
     ZeroMemory(&hints, sizeof(hints));
@@ -663,7 +656,7 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
 
     if (getaddrinfo(address, std::to_string(port).c_str(), &hints, &result) != 0)
     {
-        goto CLEANUP_WINSOCKET;
+        goto FALLBACK;
     }
 
     int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
@@ -701,8 +694,6 @@ CLEANUP_SOCKET:
     closesocket(fd);
 CLEANUP_ADDRINFO:
     freeaddrinfo(result);
-CLEANUP_WINSOCKET:
-    WSACleanup();
 FALLBACK:
 #endif
     return evhttp_bind_socket(httpd, address, port);
@@ -780,10 +771,6 @@ void stop_server(tr_rpc_server* server)
     {
         unlink(address.c_str() + std::size(TrUnixSocketPrefix));
     }
-
-#ifdef _WIN32
-    WSACleanup();
-#endif
 
     tr_logAddInfo(fmt::format(
         _("Stopped listening for RPC and Web requests on '{address}'"),
