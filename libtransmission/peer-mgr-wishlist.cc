@@ -144,7 +144,6 @@ void Wishlist::maybe_rebuild_candidate_list()
         candidates_
             .emplace_back(piece, mediator_->count_piece_replication(piece), mediator_->priority(piece), salt, mediator_.get());
     }
-    candidates_.shrink_to_fit();
     std::sort(std::begin(candidates_), std::end(candidates_));
 }
 
