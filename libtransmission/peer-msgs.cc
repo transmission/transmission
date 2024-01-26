@@ -535,11 +535,7 @@ public:
     }
 
     // how many blocks could we request from this peer right now?
-    [[nodiscard]] RequestLimit can_request() const noexcept override
-    {
-        auto const max_blocks = max_available_reqs();
-        return RequestLimit{ max_blocks, max_blocks };
-    }
+    [[nodiscard]] size_t max_available_reqs() const;
 
     void send_pex();
 
@@ -552,46 +548,6 @@ public:
     }
 
 private:
-    [[nodiscard]] size_t max_available_reqs() const
-    {
-        if (torrent->is_done() || !torrent->has_metainfo() || client_is_choked() || !client_is_interested())
-        {
-            return 0;
-        }
-
-        // Get the rate limit we should use.
-        // TODO: this needs to consider all the other peers as well...
-        uint64_t const now = tr_time_msec();
-        auto rate = get_piece_speed(now, TR_PEER_TO_CLIENT);
-        if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
-        {
-            rate = std::min(rate, torrent->speed_limit(TR_PEER_TO_CLIENT));
-        }
-
-        // honor the session limits, if enabled
-        if (torrent->uses_session_limits())
-        {
-            if (auto const limit = torrent->session->active_speed_limit(TR_PEER_TO_CLIENT); limit)
-            {
-                rate = std::min(rate, *limit);
-            }
-        }
-
-        // use this desired rate to figure out how
-        // many requests we should send to this peer
-        size_t constexpr Floor = 32;
-        size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
-        size_t const ceil = reqq ? *reqq : 250;
-
-        auto max_reqs = estimated_blocks_in_period;
-        max_reqs = std::min(max_reqs, ceil);
-        max_reqs = std::max(max_reqs, Floor);
-        return max_reqs;
-    }
-
-    // ---
-
     void update_active()
     {
         update_active(TR_UP);
@@ -1737,7 +1693,7 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
 
 void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 {
-    msgs->desired_request_count = msgs->can_request().max_blocks;
+    msgs->desired_request_count = msgs->max_available_reqs();
 }
 
 void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
@@ -1934,6 +1890,45 @@ void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
         protocol_send_message(msgs, BtPeerMsgs::Bitfield, msgs->torrent->create_piece_bitfield());
     }
 }
+
+// ---
+
+size_t tr_peerMsgsImpl::max_available_reqs() const
+{
+    if (torrent->is_done() || !torrent->has_metainfo() || client_is_choked() || !client_is_interested())
+    {
+        return 0;
+    }
+
+    // Get the rate limit we should use.
+    // TODO: this needs to consider all the other peers as well...
+    uint64_t const now = tr_time_msec();
+    auto rate = get_piece_speed(now, TR_PEER_TO_CLIENT);
+    if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
+    {
+        rate = std::min(rate, torrent->speed_limit(TR_PEER_TO_CLIENT));
+    }
+
+    // honor the session limits, if enabled
+    if (torrent->uses_session_limits())
+    {
+        if (auto const limit = torrent->session->active_speed_limit(TR_PEER_TO_CLIENT); limit)
+        {
+            rate = std::min(rate, *limit);
+        }
+    }
+
+    // use this desired rate to figure out how
+    // many requests we should send to this peer
+    static auto constexpr Floor = size_t{ 32 };
+    static size_t constexpr Seconds = RequestBufSecs;
+    size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
+    auto const ceil = reqq.value_or(250);
+
+    return std::clamp(estimated_blocks_in_period, Floor, ceil);
+}
+
+// ---
 
 void tr_peerMsgsImpl::send_pex()
 {

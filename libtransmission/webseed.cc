@@ -168,6 +168,16 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 class tr_webseed final : public tr_peer
 {
 public:
+    struct RequestLimit
+    {
+        // How many spans those blocks could be in.
+        // This is for webseeds, which make parallel requests.
+        size_t max_spans = 0;
+
+        // How many blocks we could request.
+        size_t max_blocks = 0;
+    };
+
     tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
         : tr_peer{ tor }
         , torrent_id{ tr_torrentId(tor) }
@@ -269,7 +279,7 @@ public:
         }
     }
 
-    [[nodiscard]] RequestLimit can_request() const noexcept override
+    [[nodiscard]] RequestLimit max_available_reqs() const noexcept
     {
         auto const n_slots = connection_limiter.slotsAvailable();
         if (n_slots == 0)
@@ -285,7 +295,7 @@ public:
         // Prefer to request large, contiguous chunks from webseeds.
         // The actual value of '64' is arbitrary here;
         // we could probably be smarter about this.
-        auto constexpr PreferredBlocksPerTask = size_t{ 64 };
+        static auto constexpr PreferredBlocksPerTask = size_t{ 64 };
         return { n_slots, n_slots * PreferredBlocksPerTask };
     }
 
@@ -413,7 +423,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 
 void on_idle(tr_webseed* webseed)
 {
-    auto const [max_spans, max_blocks] = webseed->can_request();
+    auto const [max_spans, max_blocks] = webseed->max_available_reqs();
     if (max_spans == 0 || max_blocks == 0)
     {
         return;

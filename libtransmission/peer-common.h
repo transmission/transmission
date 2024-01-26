@@ -212,19 +212,6 @@ public:
 
     virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    struct RequestLimit
-    {
-        // How many blocks we could request.
-        size_t max_spans = 0;
-
-        // How many spans those blocks could be in.
-        // This is for webseeds, which make parallel requests.
-        size_t max_blocks = 0;
-    };
-
-    // how many blocks could we request from this peer right now?
-    [[nodiscard]] virtual RequestLimit can_request() const noexcept = 0;
-
     tr_session* const session;
 
     tr_swarm* const swarm;
