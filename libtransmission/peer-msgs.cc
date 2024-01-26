@@ -10,8 +10,8 @@
 #include <cstddef>
 #include <cstdint> // uint8_t, uint32_t, int64_t
 #include <ctime>
+#include <deque>
 #include <iterator>
-#include <map>
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <queue>
@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -58,13 +59,13 @@ struct tr_error;
 
 using namespace std::literals;
 
+namespace
+{
 // initial capacity is big enough to hold a BtPeerMsgs::Piece message
 using MessageBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 using MessageReader = libtransmission::BufferReader<std::byte>;
 using MessageWriter = libtransmission::BufferWriter<std::byte>;
 
-namespace
-{
 // these values are hardcoded by various BEPs as noted
 namespace BtPeerMsgs
 {
@@ -170,12 +171,12 @@ auto constexpr Reject = int{ 2 };
 
 } // namespace MetadataMsgType
 
-auto constexpr MinChokePeriodSec = int{ 10 };
+auto constexpr MinChokePeriodSec = time_t{ 10 };
 
 // idle seconds before we send a keepalive
-auto constexpr KeepaliveIntervalSecs = int{ 100 };
+auto constexpr KeepaliveIntervalSecs = time_t{ 100 };
 
-auto constexpr MetadataReqQ = int{ 64 };
+auto constexpr MetadataReqQ = size_t{ 64U };
 
 auto constexpr ReqQ = int{ 512 };
 
@@ -184,11 +185,11 @@ auto constexpr ReqQ = int{ 512 };
 // when we're making requests from another peer,
 // batch them together to send enough requests to
 // meet our bandwidth goals for the next N seconds
-auto constexpr RequestBufSecs = int{ 10 };
+auto constexpr RequestBufSecs = time_t{ 10 };
 
 // ---
 
-auto constexpr MaxPexPeerCount = size_t{ 50 };
+auto constexpr MaxPexPeerCount = size_t{ 50U };
 
 // ---
 
@@ -264,7 +265,7 @@ struct tr_incoming
         size_t const block_size_;
     };
 
-    std::map<tr_block_index_t, incoming_piece_data> blocks;
+    std::unordered_map<tr_block_index_t, incoming_piece_data> blocks;
 };
 
 class tr_peerMsgsImpl;
@@ -624,7 +625,7 @@ public:
 
     std::shared_ptr<tr_peerIo> const io;
 
-    std::vector<peer_request> peer_requested_;
+    std::deque<peer_request> peer_requested_;
 
     std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex;
 
@@ -1765,15 +1766,10 @@ void updateBlockRequests(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    auto const n_wanted = msgs->desired_request_count - n_active;
-    if (n_wanted == 0)
-    {
-        return;
-    }
-
     TR_ASSERT(msgs->client_is_interested());
     TR_ASSERT(!msgs->client_is_choked());
 
+    auto const n_wanted = msgs->desired_request_count - n_active;
     if (auto const requests = tr_peerMgrGetNextRequests(tor, msgs, n_wanted); !std::empty(requests))
     {
         msgs->requestBlocks(std::data(requests), std::size(requests));
@@ -1813,13 +1809,13 @@ namespace peer_pulse_helpers
 
 [[nodiscard]] size_t add_next_piece(tr_peerMsgsImpl* msgs, uint64_t now)
 {
-    if (msgs->io->get_write_buffer_space(now) == 0U || std::empty(msgs->peer_requested_))
+    if (std::empty(msgs->peer_requested_) || msgs->io->get_write_buffer_space(now) == 0U)
     {
         return {};
     }
 
     auto const req = msgs->peer_requested_.front();
-    msgs->peer_requested_.erase(std::begin(msgs->peer_requested_));
+    msgs->peer_requested_.pop_front();
 
     auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
     auto ok = msgs->isValidRequest(req) && msgs->torrent->has_piece(req.index);
