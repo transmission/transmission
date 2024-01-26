@@ -65,12 +65,10 @@ using MessageWriter = libtransmission::BufferWriter<std::byte>;
 
 namespace
 {
-
 // these values are hardcoded by various BEPs as noted
 namespace BtPeerMsgs
 {
-
-// http://bittorrent.org/beps/bep_0003.html#peer-messages
+// https://www.bittorrent.org/beps/bep_0003.html#peer-messages
 auto constexpr Choke = uint8_t{ 0 };
 auto constexpr Unchoke = uint8_t{ 1 };
 auto constexpr Interested = uint8_t{ 2 };
@@ -81,7 +79,7 @@ auto constexpr Request = uint8_t{ 6 };
 auto constexpr Piece = uint8_t{ 7 };
 auto constexpr Cancel = uint8_t{ 8 };
 
-// http://bittorrent.org/beps/bep_0005.html
+// https://www.bittorrent.org/beps/bep_0005.html#bittorrent-protocol-extension
 auto constexpr Port = uint8_t{ 9 };
 
 // https://www.bittorrent.org/beps/bep_0006.html
@@ -91,7 +89,7 @@ auto constexpr FextHaveNone = uint8_t{ 15 };
 auto constexpr FextReject = uint8_t{ 16 };
 auto constexpr FextAllowedFast = uint8_t{ 17 };
 
-// http://bittorrent.org/beps/bep_0010.html
+// https://www.bittorrent.org/beps/bep_0010.html
 // see also LtepMessageIds below
 auto constexpr Ltep = uint8_t{ 20 };
 
@@ -141,12 +139,12 @@ auto constexpr Ltep = uint8_t{ 20 };
 namespace LtepMessages
 {
 
-// http://bittorrent.org/beps/bep_0010.html
+// https://www.bittorrent.org/beps/bep_0010.html
 auto constexpr Handshake = uint8_t{ 0 };
 
 } // namespace LtepMessages
 
-// http://bittorrent.org/beps/bep_0010.html
+// https://www.bittorrent.org/beps/bep_0010.html
 // Client-defined extension message IDs that we tell peers about
 // in the LTEP handshake and will respond to when sent in an LTEP
 // message.
@@ -162,7 +160,7 @@ enum LtepMessageIds : uint8_t
     UT_METADATA_ID = 3,
 };
 
-// http://bittorrent.org/beps/bep_0009.html
+// https://www.bittorrent.org/beps/bep_0009.html
 namespace MetadataMsgType
 {
 
@@ -930,7 +928,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr->addr.addr6, sizeof(addr->addr.addr6));
     }
 
-    // http://bittorrent.org/beps/bep_0009.html
+    // https://www.bittorrent.org/beps/bep_0009.html
     // It also adds "metadata_size" to the handshake message (not the
     // "m" dictionary) specifying an integer value of the number of
     // bytes of the metadata.
@@ -940,14 +938,14 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
     }
 
-    // http://bittorrent.org/beps/bep_0010.html
+    // https://www.bittorrent.org/beps/bep_0010.html
     // Local TCP listen port. Allows each side to learn about the TCP
     // port number of the other side. Note that there is no need for the
     // receiving side of the connection to send this extension message,
     // since its port number is already known.
     tr_variantDictAddInt(&val, TR_KEY_p, msgs->session->advertisedPeerPort().host());
 
-    // http://bittorrent.org/beps/bep_0010.html
+    // https://www.bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
     // client supports without dropping any. The default in in
     // libtorrent is 250.
@@ -966,13 +964,13 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         tr_variantDictAddRaw(&val, TR_KEY_yourip, begin, len);
     }
 
-    // http://bittorrent.org/beps/bep_0010.html
+    // https://www.bittorrent.org/beps/bep_0010.html
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
     tr_variantDictAddStrView(&val, TR_KEY_v, TR_NAME " " USERAGENT_PREFIX);
 
-    // http://bittorrent.org/beps/bep_0021.html
+    // https://www.bittorrent.org/beps/bep_0021.html
     // A peer that is a partial seed SHOULD include an extra header in
     // the extension handshake 'upload_only'. Setting the value of this
     // key to 1 indicates that this peer is not interested in downloading
@@ -1071,7 +1069,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         pex.flags |= ADDED_F_SEED_FLAG;
     }
 
-    // http://bittorrent.org/beps/bep_0010.html
+    // https://www.bittorrent.org/beps/bep_0010.html
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
@@ -1468,7 +1466,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         break;
 
     case BtPeerMsgs::Port:
-        // http://bittorrent.org/beps/bep_0005.html
+        // https://www.bittorrent.org/beps/bep_0005.html
         // Peers supporting the DHT set the last bit of the 8-byte reserved flags
         // exchanged in the BitTorrent protocol handshake. Peer receiving a handshake
         // indicating the remote peer supports the DHT should send a PORT message.
