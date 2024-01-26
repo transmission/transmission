@@ -1933,19 +1933,16 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
 void tr_peerMsgsImpl::send_pex()
 {
     // only send pex if both the torrent and peer support it
-    if (!this->peerSupportsPex || !this->torrent->allows_pex())
+    if (!peerSupportsPex || !torrent->allows_pex())
     {
         return;
     }
 
-    static auto constexpr MaxPexAdded = size_t{ 50 };
-    static auto constexpr MaxPexDropped = size_t{ 50 };
+    static auto constexpr MaxPexAdded = size_t{ 50U };
+    static auto constexpr MaxPexDropped = size_t{ 50U };
 
-    auto val = tr_variant{};
-    tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
-
+    auto map = tr_variant::Map{ 4U };
     auto tmpbuf = small::vector<std::byte, 2048U>{};
-
     for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         static auto constexpr AddedMap = std::array{ TR_KEY_added, TR_KEY_added6 };
@@ -1954,7 +1951,7 @@ void tr_peerMsgsImpl::send_pex()
         auto const ip_type = static_cast<tr_address_type>(i);
 
         auto& old_pex = pex[i];
-        auto new_pex = tr_peerMgrGetPeers(this->torrent, ip_type, TR_PEERS_CONNECTED, MaxPexPeerCount);
+        auto new_pex = tr_peerMgrGetPeers(torrent, ip_type, TR_PEERS_CONNECTED, MaxPexPeerCount);
         auto added = std::vector<tr_pex>{};
         added.reserve(std::size(new_pex));
         std::set_difference(
@@ -2005,7 +2002,7 @@ void tr_peerMsgsImpl::send_pex()
             tmpbuf.reserve(std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added));
             TR_ASSERT(std::size(tmpbuf) == std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
-            tr_variantDictAddRaw(&val, AddedMap[i], std::data(tmpbuf), std::size(tmpbuf));
+            map.try_emplace(AddedMap[i], std::string_view{ reinterpret_cast<char*>(std::data(tmpbuf)), std::size(tmpbuf) });
 
             // "added.f"
             tmpbuf.resize(std::size(added));
@@ -2016,8 +2013,9 @@ void tr_peerMsgsImpl::send_pex()
                 *walk++ = std::byte{ p.flags };
             }
 
-            TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
-            tr_variantDictAddRaw(&val, AddedFMap[i], begin, walk - begin);
+            auto const f_len = static_cast<size_t>(walk - begin);
+            TR_ASSERT(f_len == std::size(added));
+            map.try_emplace(AddedFMap[i], std::string_view{ reinterpret_cast<char*>(begin), f_len });
         }
 
         if (!std::empty(dropped))
@@ -2027,11 +2025,11 @@ void tr_peerMsgsImpl::send_pex()
             tmpbuf.reserve(std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
             TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
-            tr_variantDictAddRaw(&val, DroppedMap[i], std::data(tmpbuf), std::size(tmpbuf));
+            map.try_emplace(DroppedMap[i], std::string_view{ reinterpret_cast<char*>(std::data(tmpbuf)), std::size(tmpbuf) });
         }
     }
 
-    protocol_send_message(this, BtPeerMsgs::Ltep, this->ut_pex_id, tr_variant_serde::benc().to_string(val));
+    protocol_send_message(this, BtPeerMsgs::Ltep, ut_pex_id, tr_variant_serde::benc().to_string(tr_variant{ std::move(map) }));
 }
 
 } // namespace
@@ -2057,8 +2055,8 @@ tr_peerMsgs::tr_peerMsgs(
 tr_peerMsgs::~tr_peerMsgs()
 {
     peer_info->set_connected(tr_time(), false);
-    [[maybe_unused]] auto const n_prev = n_peers--;
-    TR_ASSERT(n_prev > 0U);
+    TR_ASSERT(n_peers > 0U);
+    --n_peers;
 }
 
 tr_peerMsgs* tr_peerMsgsNew(
