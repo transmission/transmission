@@ -780,7 +780,7 @@ private:
         // didn't have the metadata before now... so refresh them all...
         for (auto* peer : peers)
         {
-            peer->onTorrentGotMetainfo();
+            peer->on_torrent_got_metainfo();
 
             if (peer->isSeed())
             {
@@ -1759,8 +1759,8 @@ namespace peer_stat_helpers
     stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
     stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
-    stats.activeReqsToPeer = peer->activeReqCount(TR_CLIENT_TO_PEER);
-    stats.activeReqsToClient = peer->activeReqCount(TR_PEER_TO_CLIENT);
+    stats.activeReqsToPeer = peer->active_req_count(TR_CLIENT_TO_PEER);
+    stats.activeReqsToClient = peer->active_req_count(TR_PEER_TO_CLIENT);
 
     char* pch = stats.flagStr;
 

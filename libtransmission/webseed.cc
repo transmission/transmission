@@ -204,7 +204,7 @@ public:
         return dir == TR_DOWN ? bandwidth_.get_piece_speed(now, dir) : Speed{};
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t activeReqCount(tr_direction dir) const noexcept override
+    [[nodiscard]] TR_CONSTEXPR20 size_t active_req_count(tr_direction dir) const noexcept override
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
         {
@@ -250,7 +250,7 @@ public:
         }
     }
 
-    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
+    void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
         if (tor == nullptr || !tor->is_running() || tor->is_done())
@@ -269,7 +269,7 @@ public:
         }
     }
 
-    [[nodiscard]] RequestLimit canRequest() const noexcept override
+    [[nodiscard]] RequestLimit can_request() const noexcept override
     {
         auto const n_slots = connection_limiter.slotsAvailable();
         if (n_slots == 0)
@@ -413,7 +413,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 
 void on_idle(tr_webseed* webseed)
 {
-    auto const [max_spans, max_blocks] = webseed->canRequest();
+    auto const [max_spans, max_blocks] = webseed->can_request();
     if (max_spans == 0 || max_blocks == 0)
     {
         return;
@@ -427,7 +427,7 @@ void on_idle(tr_webseed* webseed)
     {
         spans.resize(max_spans);
     }
-    webseed->requestBlocks(std::data(spans), std::size(spans));
+    webseed->request_blocks(std::data(spans), std::size(spans));
 }
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)

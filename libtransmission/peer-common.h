@@ -208,9 +208,9 @@ public:
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
 
     // requests that have been made but haven't been fulfilled yet
-    [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
+    [[nodiscard]] virtual size_t active_req_count(tr_direction) const noexcept = 0;
 
-    virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
+    virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
     struct RequestLimit
     {
@@ -223,7 +223,7 @@ public:
     };
 
     // how many blocks could we request from this peer right now?
-    [[nodiscard]] virtual RequestLimit canRequest() const noexcept = 0;
+    [[nodiscard]] virtual RequestLimit can_request() const noexcept = 0;
 
     tr_session* const session;
 

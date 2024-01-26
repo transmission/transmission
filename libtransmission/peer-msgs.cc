@@ -180,8 +180,6 @@ auto constexpr MetadataReqQ = size_t{ 64U };
 
 auto constexpr ReqQ = int{ 512 };
 
-// used in lowering the outMessages queue period
-
 // when we're making requests from another peer,
 // batch them together to send enough requests to
 // meet our bandwidth goals for the next N seconds
@@ -212,13 +210,13 @@ struct peer_request
     {
         return this->index == that.index && this->offset == that.offset && this->length == that.length;
     }
-};
 
-peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
-{
-    auto const loc = tor->block_loc(block);
-    return peer_request{ loc.piece, loc.piece_offset, tor->block_size(block) };
-}
+    [[nodiscard]] static auto from_block(tr_torrent const& tor, tr_block_index_t block) noexcept
+    {
+        auto const loc = tor.block_loc(block);
+        return peer_request{ loc.piece, loc.piece_offset, tor.block_size(block) };
+    }
+};
 
 // ---
 
@@ -262,7 +260,7 @@ struct tr_incoming
 
     private:
         std::bitset<tr_block_info::BlockSize> have_;
-        size_t const block_size_;
+        uint32_t const block_size_;
     };
 
     std::unordered_map<tr_block_index_t, incoming_piece_data> blocks;
@@ -270,11 +268,9 @@ struct tr_incoming
 
 class tr_peerMsgsImpl;
 // TODO: make these to be member functions
-ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
-void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
-void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs);
 void gotError(tr_peerIo* io, tr_error const& err, void* vmsgs);
 void peerPulse(void* vmsgs);
+size_t protocolSendReject(tr_peerMsgsImpl* const msgs, struct peer_request const* req);
 size_t protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 size_t protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
 size_t protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
@@ -338,7 +334,7 @@ public:
     {
         if (torrent->allows_pex())
         {
-            pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
+            pex_timer_ = session->timerMaker().create([this]() { send_pex(); });
             pex_timer_->start_repeating(SendPexInterval);
         }
 
@@ -354,7 +350,7 @@ public:
             protocolSendPort(this, session->udpPort());
         }
 
-        io->set_callbacks(canRead, didWrite, gotError, this);
+        io->set_callbacks(can_read, did_write, gotError, this);
         updateDesiredRequestCount(this);
 
         update_active();
@@ -376,12 +372,14 @@ public:
         }
     }
 
+    // ---
+
     [[nodiscard]] Speed get_piece_speed(uint64_t now, tr_direction dir) const override
     {
         return io->get_piece_speed(now, dir);
     }
 
-    [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
+    [[nodiscard]] size_t active_req_count(tr_direction dir) const noexcept override
     {
         switch (dir)
         {
@@ -412,21 +410,38 @@ public:
         return have_;
     }
 
-    void onTorrentGotMetainfo() noexcept override
+    // ---
+
+    void on_torrent_got_metainfo() noexcept override
     {
-        invalidatePercentDone();
+        invalidate_percent_done();
 
         update_active();
     }
 
-    void invalidatePercentDone()
+    void invalidate_percent_done()
     {
-        updateInterest();
+        update_interest();
     }
 
     void cancel_block_request(tr_block_index_t block) override
     {
-        protocolSendCancel(this, blockToReq(torrent, block));
+        protocolSendCancel(this, peer_request::from_block(*torrent, block));
+    }
+
+    void reject_all_requests()
+    {
+        auto& queue = peer_requested_;
+
+        if (auto const must_send_rej = io->supports_fext(); must_send_rej)
+        {
+            for (auto const& req : queue)
+            {
+                protocolSendReject(this, &req);
+            }
+        }
+
+        queue.clear();
     }
 
     void set_choke(bool peer_is_choked) override
@@ -444,7 +459,7 @@ public:
 
             if (peer_is_choked)
             {
-                cancelAllRequestsToClient(this);
+                reject_all_requests();
             }
 
             protocolSendChoke(this, peer_is_choked);
@@ -463,7 +478,7 @@ public:
         protocolSendHave(this, piece);
 
         // since we have more pieces now, we might not be interested in this peer
-        updateInterest();
+        update_interest();
     }
 
     void set_interested(bool interested) override
@@ -476,19 +491,19 @@ public:
         }
     }
 
-    void updateInterest()
+    void update_interest()
     {
         // TODO -- might need to poke the mgr on startup
     }
 
     //
 
-    [[nodiscard]] bool isValidRequest(peer_request const& req) const
+    [[nodiscard]] bool is_valid_request(peer_request const& req) const
     {
         return tr_torrentReqIsValid(torrent, req.index, req.offset, req.length);
     }
 
-    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
+    void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         TR_ASSERT(torrent->client_can_download());
         TR_ASSERT(client_is_interested());
@@ -520,13 +535,13 @@ public:
     }
 
     // how many blocks could we request from this peer right now?
-    [[nodiscard]] RequestLimit canRequest() const noexcept override
+    [[nodiscard]] RequestLimit can_request() const noexcept override
     {
-        auto const max_blocks = maxAvailableReqs();
+        auto const max_blocks = max_available_reqs();
         return RequestLimit{ max_blocks, max_blocks };
     }
 
-    void sendPex();
+    void send_pex();
 
     void publish(tr_peer_event const& peer_event)
     {
@@ -537,7 +552,7 @@ public:
     }
 
 private:
-    [[nodiscard]] size_t maxAvailableReqs() const
+    [[nodiscard]] size_t max_available_reqs() const
     {
         if (torrent->is_done() || !torrent->has_metainfo() || client_is_choked() || !client_is_interested())
         {
@@ -575,6 +590,20 @@ private:
         return max_reqs;
     }
 
+    // ---
+
+    void update_active()
+    {
+        update_active(TR_UP);
+        update_active(TR_DOWN);
+    }
+
+    void update_active(tr_direction direction)
+    {
+        TR_ASSERT(tr_isDirection(direction));
+        set_active(direction, calculate_active(direction));
+    }
+
     [[nodiscard]] bool calculate_active(tr_direction direction) const
     {
         if (direction == TR_CLIENT_TO_PEER)
@@ -594,18 +623,10 @@ private:
         return active;
     }
 
-    void update_active()
-    {
-        update_active(TR_UP);
-        update_active(TR_DOWN);
-    }
+    // ---
 
-    void update_active(tr_direction direction)
-    {
-        TR_ASSERT(tr_isDirection(direction));
-
-        set_active(direction, calculate_active(direction));
-    }
+    static void did_write(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs);
+    static ReadState can_read(tr_peerIo* io, void* vmsgs, size_t* piece);
 
 public:
     bool peerSupportsPex = false;
@@ -638,10 +659,10 @@ public:
     /* when we started batching the outMessages */
     // time_t outMessagesBatchedAt = 0;
 
-    struct tr_incoming incoming = {};
+    tr_incoming incoming = {};
 
-    /* if the peer supports the Extension Protocol in BEP 10 and
-       supplied a reqq argument, it's stored here. */
+    // if the peer supports the Extension Protocol in BEP 10 and
+    // supplied a reqq argument, it's stored here.
     std::optional<size_t> reqq;
 
     std::unique_ptr<libtransmission::Timer> pex_timer_;
@@ -656,7 +677,7 @@ private:
     tr_peer_callback_bt const callback_;
     void* const callback_data_;
 
-    // seconds between periodic sendPex() calls
+    // seconds between periodic send_pex() calls
     static auto constexpr SendPexInterval = 90s;
 };
 
@@ -822,7 +843,7 @@ size_t protocol_send_keepalive(tr_peerMsgsImpl* msgs)
     return n_bytes_added;
 }
 
-auto protocolSendReject(tr_peerMsgsImpl* const msgs, struct peer_request const* req)
+size_t protocolSendReject(tr_peerMsgsImpl* const msgs, struct peer_request const* req)
 {
     TR_ASSERT(msgs->io->supports_fext());
     return protocol_send_message(msgs, BtPeerMsgs::FextReject, req->index, req->offset, req->length);
@@ -835,7 +856,7 @@ size_t protocolSendCancel(tr_peerMsgsImpl* const msgs, peer_request const& req)
 
 size_t protocolSendRequest(tr_peerMsgsImpl* const msgs, struct peer_request const& req)
 {
-    TR_ASSERT(msgs->isValidRequest(req));
+    TR_ASSERT(msgs->is_valid_request(req));
     return protocol_send_message(msgs, BtPeerMsgs::Request, req.index, req.offset, req.length);
 }
 
@@ -873,21 +894,6 @@ std::optional<int> popNextMetadataRequest(tr_peerMsgsImpl* msgs)
     auto next = reqs.front();
     reqs.pop();
     return next;
-}
-
-void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
-{
-    auto& queue = msgs->peer_requested_;
-
-    if (auto const must_send_rej = msgs->io->supports_fext(); must_send_rej)
-    {
-        for (auto const& req : queue)
-        {
-            protocolSendReject(msgs, &req);
-        }
-    }
-
-    queue.clear();
 }
 
 // ---
@@ -1217,7 +1223,7 @@ void parseLtep(tr_peerMsgsImpl* msgs, MessageReader& payload)
         if (msgs->io->supports_ltep())
         {
             sendLtepHandshake(msgs);
-            msgs->sendPex();
+            msgs->send_pex();
         }
     }
     else if (ltep_msgid == UT_PEX_ID)
@@ -1415,7 +1421,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
             msgs->publish(tr_peer_event::GotHave(ui32));
         }
 
-        msgs->invalidatePercentDone();
+        msgs->invalidate_percent_done();
         break;
 
     case BtPeerMsgs::Bitfield:
@@ -1423,7 +1429,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : std::size(payload) * 8 };
         msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(std::data(payload)), std::size(payload));
         msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
-        msgs->invalidatePercentDone();
+        msgs->invalidate_percent_done();
         break;
 
     case BtPeerMsgs::Request:
@@ -1524,7 +1530,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         {
             msgs->have_.set_has_all();
             msgs->publish(tr_peer_event::GotHaveAll());
-            msgs->invalidatePercentDone();
+            msgs->invalidate_percent_done();
         }
         else
         {
@@ -1541,7 +1547,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         {
             msgs->have_.set_has_none();
             msgs->publish(tr_peer_event::GotHaveNone());
-            msgs->invalidatePercentDone();
+            msgs->invalidate_percent_done();
         }
         else
         {
@@ -1633,7 +1639,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<Cache::BlockData> bloc
     return 0;
 }
 
-void didWrite(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
+void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
     auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -1645,7 +1651,7 @@ void didWrite(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void
     peerPulse(msgs);
 }
 
-ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
+ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -1731,7 +1737,7 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
 void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 {
-    msgs->desired_request_count = msgs->canRequest().max_blocks;
+    msgs->desired_request_count = msgs->can_request().max_blocks;
 }
 
 void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
@@ -1772,7 +1778,7 @@ void updateBlockRequests(tr_peerMsgsImpl* msgs)
     auto const n_wanted = msgs->desired_request_count - n_active;
     if (auto const requests = tr_peerMgrGetNextRequests(tor, msgs, n_wanted); !std::empty(requests))
     {
-        msgs->requestBlocks(std::data(requests), std::size(requests));
+        msgs->request_blocks(std::data(requests), std::size(requests));
     }
 }
 
@@ -1818,7 +1824,7 @@ namespace peer_pulse_helpers
     msgs->peer_requested_.pop_front();
 
     auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
-    auto ok = msgs->isValidRequest(req) && msgs->torrent->has_piece(req.index);
+    auto ok = msgs->is_valid_request(req) && msgs->torrent->has_piece(req.index);
 
     if (ok)
     {
@@ -1929,7 +1935,7 @@ void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
     }
 }
 
-void tr_peerMsgsImpl::sendPex()
+void tr_peerMsgsImpl::send_pex()
 {
     // only send pex if both the torrent and peer support it
     if (!this->peerSupportsPex || !this->torrent->allows_pex())
