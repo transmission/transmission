@@ -155,7 +155,7 @@ void FilterBar::refreshTrackers()
         return i;
     };
 
-    auto new_trackers = std::map<QString, int>(torrents_per_sitename.begin(), torrents_per_sitename.end());
+    auto new_trackers = small::map<QString, int>{ torrents_per_sitename.begin(), torrents_per_sitename.end() };
     auto old_it = sitename_counts_.cbegin();
     auto new_it = new_trackers.cbegin();
     auto const old_end = sitename_counts_.cend();
