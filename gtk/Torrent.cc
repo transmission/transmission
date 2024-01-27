@@ -146,7 +146,6 @@ public:
         Storage size_when_done;
         Storage total_size;
         Storage uploaded_ever;
-        Storage uploaded_this_session;
 
         Speed speed_down;
         Speed speed_up;
@@ -332,11 +331,6 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     update_cache_value(
         cache_.uploaded_ever,
         Storage{ stats->uploadedEver, Storage::Units::Bytes },
-        result,
-        ChangeFlag::LONG_PROGRESS);
-    update_cache_value(
-        cache_.uploaded_this_session,
-        Storage{ stats->uploadedThisSession, Storage::Units::Bytes },
         result,
         ChangeFlag::LONG_PROGRESS);
 
