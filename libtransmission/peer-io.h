@@ -298,8 +298,10 @@ private:
         filter_.encrypt(buflen, buf);
     }
 
+#ifdef WITH_UTP
     void on_utp_state_change(int new_state);
     void on_utp_error(int errcode);
+#endif
 
     void close();
 
