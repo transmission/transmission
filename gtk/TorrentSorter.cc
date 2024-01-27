@@ -13,6 +13,8 @@
 #include <libtransmission/utils.h>
 
 #include <algorithm>
+#include <array>
+#include <utility>
 
 using namespace std::string_view_literals;
 
@@ -178,7 +180,8 @@ TorrentSorter::TorrentSorter()
 
 void TorrentSorter::set_mode(std::string_view mode)
 {
-    static auto const compare_funcs = std::map<std::string_view, CompareFunc>({
+    static auto constexpr DefaultCompareFunc = &compare_by_name;
+    static auto constexpr CompareFuncs = std::array<std::pair<std::string_view, CompareFunc>, 9U>{ {
         { "sort-by-activity"sv, &compare_by_activity },
         { "sort-by-age"sv, &compare_by_age },
         { "sort-by-name"sv, &compare_by_name },
@@ -188,14 +191,13 @@ void TorrentSorter::set_mode(std::string_view mode)
         { "sort-by-size"sv, &compare_by_size },
         { "sort-by-state"sv, &compare_by_state },
         { "sort-by-time-left"sv, &compare_by_eta },
-    });
+    } };
 
-    auto compare_func = &compare_by_name;
-    if (auto const compare_func_it = compare_funcs.find(mode); compare_func_it != compare_funcs.end())
-    {
-        compare_func = compare_func_it->second;
-    }
-
+    auto const iter = std::find_if(
+        std::begin(CompareFuncs),
+        std::end(CompareFuncs),
+        [key = mode](auto const& row) { return row.first == key; });
+    auto const compare_func = iter != std::end(CompareFuncs) ? iter->second : DefaultCompareFunc;
     if (compare_func_ == compare_func)
     {
         return;
@@ -224,8 +226,7 @@ int TorrentSorter::compare(Torrent const& lhs, Torrent const& rhs) const
 void TorrentSorter::update(Torrent::ChangeFlags changes)
 {
     using Flag = Torrent::ChangeFlag;
-
-    static auto const compare_flags = std::map<CompareFunc, Torrent::ChangeFlags>({
+    static auto constexpr CompareFlags = std::array<std::pair<CompareFunc, Torrent::ChangeFlags>, 9U>{ {
         { &compare_by_activity, Flag::ACTIVE_PEER_COUNT | Flag::QUEUE_POSITION | Flag::SPEED_DOWN | Flag::SPEED_UP },
         { &compare_by_age, Flag::ADDED_DATE | Flag::NAME },
         { &compare_by_eta, Flag::ETA | Flag::NAME },
@@ -235,10 +236,13 @@ void TorrentSorter::update(Torrent::ChangeFlags changes)
         { &compare_by_ratio, Flag::QUEUE_POSITION | Flag::RATIO },
         { &compare_by_size, Flag::NAME | Flag::TOTAL_SIZE },
         { &compare_by_state, Flag::ACTIVITY | Flag::QUEUE_POSITION },
-    });
+    } };
 
-    if (auto const compare_flags_it = compare_flags.find(compare_func_);
-        compare_flags_it != compare_flags.end() && changes.test(compare_flags_it->second))
+    if (auto const iter = std::find_if(
+            std::begin(CompareFlags),
+            std::end(CompareFlags),
+            [key = compare_func_](auto const& row) { return row.first == key; });
+        iter != std::end(CompareFlags) && changes.test(iter->second))
     {
         changed(Change::DIFFERENT);
     }

@@ -493,18 +493,20 @@ std::vector<int> tr_num_parse_range(std::string_view str)
 {
     using namespace tr_num_parse_range_impl;
 
-    auto values = std::set<int>{};
+    auto values = std::vector<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
     while (tr_strv_sep(&str, &token, ',') && parseNumberSection(token, range))
     {
         for (auto i = range.low; i <= range.high; ++i)
         {
-            values.insert(i);
+            values.emplace_back(i);
         }
     }
 
-    return { std::begin(values), std::end(values) };
+    std::sort(std::begin(values), std::end(values));
+    values.erase(std::unique(std::begin(values), std::end(values)), std::end(values));
+    return values;
 }
 
 // ---

@@ -54,8 +54,6 @@ private slots:
     void onSessionUpdated();
 
 private:
-    using mybins_t = std::map<uint32_t, int32_t>;
-
     void reload();
     void updateWidgetsLocality();
     void clearInfo();

@@ -7,9 +7,10 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <set>
+
+#include <small/map.hpp>
 
 #include <libtransmission/transmission.h> // priorities
 
@@ -470,7 +471,7 @@ void FileTreeModel::emitSubtreeChanged(QModelIndex const& idx, int first_column,
 
 void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 {
-    std::map<bool, QModelIndexList> wanted_indices;
+    auto wanted_indices = small::max_size_map<bool, QModelIndexList, 2U>{};
 
     for (QModelIndex const& i : getOrphanIndices(indices))
     {
@@ -489,7 +490,7 @@ void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 
 void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
 {
-    std::map<int, QModelIndexList> priority_indices;
+    auto priority_indices = small::max_size_map<int, QModelIndexList, 8U>{};
 
     for (QModelIndex const& i : getOrphanIndices(indices))
     {

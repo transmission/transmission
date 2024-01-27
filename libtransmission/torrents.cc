@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <ctime>
-#include <set>
 #include <string_view>
 #include <vector>
 
@@ -91,15 +90,18 @@ void tr_torrents::remove(tr_torrent const* tor, time_t current_time)
 
 std::vector<tr_torrent_id_t> tr_torrents::removedSince(time_t timestamp) const
 {
-    auto ids = std::set<tr_torrent_id_t>{};
+    auto ids = std::vector<tr_torrent_id_t>{};
+    ids.reserve(std::size(removed_));
 
     for (auto const& [id, removed_at] : removed_)
     {
         if (removed_at >= timestamp)
         {
-            ids.insert(id);
+            ids.emplace_back(id);
         }
     }
 
-    return { std::begin(ids), std::end(ids) };
+    std::sort(std::begin(ids), std::end(ids));
+    ids.erase(std::unique(std::begin(ids), std::end(ids)), std::end(ids));
+    return ids;
 }
