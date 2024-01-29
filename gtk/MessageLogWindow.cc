@@ -36,9 +36,10 @@
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
+#include <array>
 #include <fstream>
-#include <map>
 #include <memory>
+#include <utility>
 
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {
@@ -95,7 +96,14 @@ private:
     tr_log_level maxLevel_ = TR_LOG_INFO;
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
-    std::map<tr_log_level, char const*> const level_names_;
+
+    static auto const inline level_names_ = std::array<std::pair<tr_log_level, char const*>, 5U>{ {
+        { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+        { TR_LOG_ERROR, C_("Logging level", "Error") },
+        { TR_LOG_WARN, C_("Logging level", "Warning") },
+        { TR_LOG_INFO, C_("Logging level", "Information") },
+        { TR_LOG_DEBUG, C_("Logging level", "Debug") },
+    } };
 };
 
 namespace
@@ -163,6 +171,7 @@ void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
 
     auto has_pref_level = false;
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
+    items.reserve(std::size(level_names_));
     for (auto const& [level, name] : level_names_)
     {
         items.emplace_back(name, level);
@@ -213,8 +222,11 @@ void MessageLogWindow::Impl::doSave(std::string const& filename)
             auto const* const node = row.get_value(message_log_cols.tr_msg);
             auto const date = gtr_asctime(node->when);
 
-            auto const it = level_names_.find(node->level);
-            auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
+            auto const iter = std::find_if(
+                std::begin(level_names_),
+                std::end(level_names_),
+                [key = node->level](auto const& item) { return item.first == key; });
+            auto const* const level_str = iter != std::end(level_names_) ? iter->second : "???";
 
             fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
@@ -477,13 +489,6 @@ MessageLogWindow::Impl::Impl(
     , refresh_tag_(Glib::signal_timeout().connect_seconds(
           sigc::mem_fun(*this, &Impl::onRefresh),
           SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
-    , level_names_{ {
-          { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
-          { TR_LOG_ERROR, C_("Logging level", "Error") },
-          { TR_LOG_WARN, C_("Logging level", "Warning") },
-          { TR_LOG_INFO, C_("Logging level", "Information") },
-          { TR_LOG_DEBUG, C_("Logging level", "Debug") },
-      } }
 {
     /**
     ***  toolbar
