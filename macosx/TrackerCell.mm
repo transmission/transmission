@@ -20,6 +20,10 @@ static CGFloat const kPaddingBetweenLines = 1.0;
 static CGFloat const kPaddingBetweenLinesOnSameLine = 4.0;
 static CGFloat const kCountWidth = 60.0;
 
+// make the favicons accessible to all tracker cells
+static NSCache* fTrackerIconCache;
+static NSMutableSet* fTrackerIconLoading;
+
 @interface TrackerCell ()
 
 @property(nonatomic, readonly) NSImage* favIcon;
@@ -31,12 +35,11 @@ static CGFloat const kCountWidth = 60.0;
 
 @implementation TrackerCell
 
-//make the favicons accessible to all tracker cells
-NSCache* fTrackerIconCache;
-NSMutableSet* fTrackerIconLoading;
-
 + (void)initialize
 {
+    if (self != [TrackerCell self])
+        return;
+
     fTrackerIconCache = [[NSCache alloc] init];
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
