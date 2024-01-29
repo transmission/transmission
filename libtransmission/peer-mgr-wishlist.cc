@@ -29,6 +29,7 @@ std::vector<tr_block_span_t> make_spans(small::set<tr_block_index_t> const& bloc
     }
 
     auto spans = std::vector<tr_block_span_t>{};
+    spans.reserve(std::size(blocks));
     for (auto span_begin = std::begin(blocks), end = std::end(blocks); span_begin != end;)
     {
         static auto constexpr NotAdjacent = [](tr_block_index_t const lhs, tr_block_index_t const rhs)
