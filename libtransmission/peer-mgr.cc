@@ -782,7 +782,7 @@ private:
         {
             peer->on_torrent_got_metainfo();
 
-            if (peer->isSeed())
+            if (peer->is_seed())
             {
                 mark_peer_as_seed(*peer->peer_info);
             }
@@ -1006,7 +1006,7 @@ size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piec
         std::begin(swarm_.peers),
         std::end(swarm_.peers),
         size_t{},
-        [piece](size_t acc, tr_peer* peer) { return acc + (peer->hasPiece(piece) ? 1U : 0U); });
+        [piece](size_t acc, tr_peer* peer) { return acc + (peer->has_piece(piece) ? 1U : 0U); });
 }
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
@@ -1262,7 +1262,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     }
     return swarm.wishlist->next(
         numwant,
-        [peer](tr_piece_index_t p) { return peer->hasPiece(p); },
+        [peer](tr_piece_index_t p) { return peer->has_piece(p); },
         [peer, &swarm](tr_block_index_t b) { return swarm.active_requests.has(b, peer); });
 }
 
@@ -1634,7 +1634,7 @@ int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece
     }
 
     auto const& peers = tor->swarm->peers;
-    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->hasPiece(piece); });
+    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->has_piece(piece); });
 }
 
 void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs)
@@ -1740,7 +1740,7 @@ namespace peer_stat_helpers
     stats.client = peer->user_agent().c_str();
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
-    stats.progress = peer->percentDone();
+    stats.progress = peer->percent_done();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
     stats.rateToPeer_KBps = peer->get_piece_speed(now_msec, TR_CLIENT_TO_PEER).count(Speed::Units::KByps);
@@ -1752,7 +1752,7 @@ namespace peer_stat_helpers
     stats.isIncoming = peer->is_incoming_connection();
     stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
     stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
-    stats.isSeed = peer->isSeed();
+    stats.isSeed = peer->is_seed();
 
     stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
     stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
@@ -1866,14 +1866,14 @@ namespace update_interest_helpers
     TR_ASSERT(!tor->is_done());
     TR_ASSERT(tor->client_can_download());
 
-    if (peer->isSeed())
+    if (peer->is_seed())
     {
         return true;
     }
 
     for (tr_piece_index_t i = 0; i < tor->piece_count(); ++i)
     {
-        if (piece_is_interesting[i] && peer->hasPiece(i))
+        if (piece_is_interesting[i] && peer->has_piece(i))
         {
             return true;
         }
@@ -2009,7 +2009,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     auto salter = tr_salt_shaker{};
     for (auto* const peer : peers)
     {
-        if (peer->isSeed())
+        if (peer->is_seed())
         {
             /* choke seeds and partial seeds */
             peer->set_choke(true);
@@ -2150,7 +2150,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     auto const* const info = peer->peer_info;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->is_done() && peer->isSeed())
+    if (tor->is_done() && peer->is_seed())
     {
         return !tor->allows_pex() || info->idle_secs(now).value_or(0U) >= 30U;
     }

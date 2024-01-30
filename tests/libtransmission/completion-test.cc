@@ -187,7 +187,7 @@ TEST_F(CompletionTest, percentCompleteAndDone)
     EXPECT_DOUBLE_EQ(0.5, completion.percent_done());
 
     // but marking some of the pieces we have as unwanted
-    // should not change percentDone
+    // should not change percent_done
     for (size_t i = 0; i < 16; ++i)
     {
         torrent.dnd_pieces.insert(i);
@@ -197,7 +197,7 @@ TEST_F(CompletionTest, percentCompleteAndDone)
     EXPECT_DOUBLE_EQ(0.5, completion.percent_done());
 
     // but marking some of the pieces we DON'T have as unwanted
-    // SHOULD change percentDone
+    // SHOULD change percent_done
     for (size_t i = 32; i < 48; ++i)
     {
         torrent.dnd_pieces.insert(i);

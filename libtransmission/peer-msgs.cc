@@ -436,7 +436,7 @@ public:
 
         if (chokeChangedAt > fibrillation_time)
         {
-            // TODO logtrace(msgs, "Not changing choke to %d to avoid fibrillation", peer_is_choked);
+            logtrace(this, fmt::format("Not changing choke to {} to avoid fibrillation", peer_is_choked));
         }
         else if (this->peer_is_choked() != peer_is_choked)
         {
@@ -562,7 +562,7 @@ public:
 
     // ---
 
-    [[nodiscard]] std::optional<int> pop_next_metadata_request();
+    [[nodiscard]] std::optional<int64_t> pop_next_metadata_request();
     [[nodiscard]] size_t add_next_metadata_piece();
     [[nodiscard]] size_t add_next_piece(uint64_t now);
     [[nodiscard]] size_t fill_output_buffer(time_t now_sec, uint64_t now_msec);
@@ -623,7 +623,7 @@ public:
 
     std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex_;
 
-    std::queue<int> peerAskedForMetadata;
+    std::queue<int64_t> peerAskedForMetadata;
 
     time_t clientSentAnythingAt = 0;
 
@@ -652,7 +652,7 @@ private:
 
 // ---
 
-[[nodiscard]] constexpr bool messageLengthIsCorrect(tr_torrent const* const tor, uint8_t id, uint32_t len)
+[[nodiscard]] constexpr bool is_message_length_correct(tr_torrent const* const tor, uint8_t id, uint32_t len)
 {
     switch (id)
     {
@@ -784,7 +784,7 @@ void build_peer_message(tr_peerMsgsImpl const* const msgs, MessageWriter& out, u
     out.add_uint8(type);
     (add_param(out, args), ...);
 
-    TR_ASSERT(messageLengthIsCorrect(msgs->torrent, type, msg_len));
+    TR_ASSERT(is_message_length_correct(msgs->torrent, type, msg_len));
 }
 } // namespace protocol_send_message_helpers
 
@@ -849,7 +849,7 @@ void tr_peerMsgsImpl::protocol_send_interest(bool b) const
     protocol_send_message(b ? BtPeerMsgs::Interested : BtPeerMsgs::NotInterested);
 }
 
-[[nodiscard]] std::optional<int> tr_peerMsgsImpl::pop_next_metadata_request()
+[[nodiscard]] std::optional<int64_t> tr_peerMsgsImpl::pop_next_metadata_request()
 {
     auto& reqs = peerAskedForMetadata;
 
@@ -1320,7 +1320,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
             static_cast<int>(id),
             std::size(payload)));
 
-    if (!messageLengthIsCorrect(torrent, id, sizeof(id) + std::size(payload)))
+    if (!is_message_length_correct(torrent, id, sizeof(id) + std::size(payload)))
     {
         logdbg(
             this,

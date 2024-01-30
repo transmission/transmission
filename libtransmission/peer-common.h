@@ -183,22 +183,22 @@ class tr_peer
 public:
     using Speed = libtransmission::Values::Speed;
 
-    tr_peer(tr_torrent const* tor);
+    explicit tr_peer(tr_torrent const* tor);
     virtual ~tr_peer();
 
     [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] bool has_piece(tr_piece_index_t piece) const noexcept
     {
         return has().test(piece);
     }
 
-    [[nodiscard]] float percentDone() const noexcept
+    [[nodiscard]] float percent_done() const noexcept
     {
         return has().percent();
     }
 
-    [[nodiscard]] bool isSeed() const noexcept
+    [[nodiscard]] bool is_seed() const noexcept
     {
         return has().has_all();
     }
