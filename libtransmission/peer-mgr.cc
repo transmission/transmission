@@ -1892,11 +1892,11 @@ void updateInterest(tr_swarm* swarm)
 
     if (auto const& peers = swarm->peers; !std::empty(peers))
     {
-        int const n = tor->piece_count();
+        auto const n = tor->piece_count();
 
         // build a bitfield of interesting pieces...
         auto piece_is_interesting = std::vector<bool>(n);
-        for (int i = 0; i < n; ++i)
+        for (tr_piece_index_t i = 0U; i < n; ++i)
         {
             piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
         }
