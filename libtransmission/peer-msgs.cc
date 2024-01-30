@@ -994,7 +994,7 @@ void tr_peerMsgsImpl::send_ut_pex()
     static auto constexpr MaxPexDropped = size_t{ 50U };
 
     auto map = tr_variant::Map{ 4U };
-    auto tmpbuf = small::vector<std::byte, 2048U>{};
+    auto tmpbuf = small::vector<std::byte, std::max(MaxPexAdded, MaxPexDropped) * tr_socket_address::CompactSockAddrMaxBytes>{};
     for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         static auto constexpr AddedMap = std::array{ TR_KEY_added, TR_KEY_added6 };
