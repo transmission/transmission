@@ -5,9 +5,10 @@
 
 #include <algorithm> // std::min, std::partial_sort
 #include <cstddef>
-#include <set>
 #include <utility>
 #include <vector>
+
+#include <small/set.hpp>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
@@ -136,11 +137,12 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 
     // We usually won't need all the candidates to be sorted until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
-    static auto constexpr MaxSortedPieces = size_t{ 30 };
+    static auto constexpr MaxSortedPieces = size_t{ 30U };
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
-    auto blocks = std::set<tr_block_index_t>{};
+    auto blocks = small::set<tr_block_index_t, 4096U>{};
+    blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates)
     {
         // do we have enough?

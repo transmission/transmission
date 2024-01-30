@@ -6,7 +6,8 @@
 #pragma once
 
 #include <bitset>
-#include <map>
+
+#include <small/map.hpp>
 
 #include <QLineEdit>
 #include <QStandardItemModel>
@@ -63,7 +64,7 @@ private:
     FilterBarComboBox* const tracker_combo_ = createTrackerCombo(tracker_model_);
     QLineEdit* const line_edit_ = new QLineEdit{ this };
 
-    std::map<QString, int> sitename_counts_;
+    small::map<QString, int> sitename_counts_;
     QTimer recount_timer_;
     Pending pending_ = {};
     bool is_bootstrapping_ = {};

@@ -8,7 +8,7 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <iterator> // back_insert_iterator, empty
-#include <map>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <string>
@@ -21,6 +21,8 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
+
+#include <small/map.hpp>
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
@@ -246,12 +248,12 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     auto const lock = log_state.unique_lock();
 
     // don't log the same warning ad infinitum.
-    // it's not useful after some point.
+    // at some point, it stops being useful.
     bool last_one = false;
     if (level == TR_LOG_CRITICAL || level == TR_LOG_ERROR || level == TR_LOG_WARN)
     {
         static auto constexpr MaxRepeat = size_t{ 30 };
-        static auto counts = new std::map<std::pair<std::string_view, int>, size_t>{};
+        static auto* const counts = new small::map<std::pair<std::string_view, long>, size_t>{};
 
         auto& count = (*counts)[std::make_pair(filename, line)];
         ++count;
@@ -267,12 +269,8 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     logAddImpl(filename, line, level, std::move(msg), name);
     if (last_one)
     {
-        logAddImpl(
-            filename,
-            line,
-            level,
-            _("Too many messages like this! I won't log this message anymore this session."),
-            name);
+        char const* final_msg = _("Too many messages like this! I won't log this message anymore this session.");
+        logAddImpl(filename, line, level, final_msg, name);
     }
 
     errno = err;
