@@ -54,6 +54,7 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "VersionComparator.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -5646,6 +5647,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (void)updaterWillRelaunchApplication:(SUUpdater*)updater
 {
     self.fQuitRequested = YES;
+}
+
+- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater*)updater
+{
+    return [VersionComparator new];
 }
 
 @end
