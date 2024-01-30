@@ -305,7 +305,7 @@ class tr_peerMsgsImpl final : public tr_peerMsgs
 public:
     tr_peerMsgsImpl(
         tr_torrent* torrent_in,
-        tr_peer_info* const peer_info_in,
+        tr_peer_info& peer_info_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_interned_string client,
         tr_peer_callback_bt callback,
@@ -1020,7 +1020,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
             // Transmission doesn't support this extension yet.
             // But its presence does indicate µTP supports,
             // which we do care about...
-            peer_info->set_utp_supported(true);
+            peer_info.set_utp_supported(true);
         }
     }
 
@@ -2031,7 +2031,7 @@ void tr_peerMsgsImpl::send_pex()
 
 tr_peerMsgs::tr_peerMsgs(
     tr_torrent const* tor,
-    tr_peer_info* peer_info_in,
+    tr_peer_info& peer_info_in,
     tr_interned_string user_agent,
     bool connection_is_encrypted,
     bool connection_is_incoming,
@@ -2043,20 +2043,20 @@ tr_peerMsgs::tr_peerMsgs(
     , connection_is_incoming_{ connection_is_incoming }
     , connection_is_utp_{ connection_is_utp }
 {
-    peer_info->set_connected(tr_time());
+    peer_info.set_connected(tr_time());
     ++n_peers;
 }
 
 tr_peerMsgs::~tr_peerMsgs()
 {
-    peer_info->set_connected(tr_time(), false);
+    peer_info.set_connected(tr_time(), false);
     TR_ASSERT(n_peers > 0U);
     --n_peers;
 }
 
 tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* const torrent,
-    tr_peer_info* const peer_info,
+    tr_peer_info& peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
     tr_peer_callback_bt callback,
