@@ -352,11 +352,7 @@ public:
 
         if (session->allowsDHT() && io->supports_dht())
         {
-            // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (auto const addr = session->bind_address(TR_AF_INET6); !addr.is_any())
-            {
-                protocolSendPort(this, session->udpPort());
-            }
+            protocolSendPort(this, session->udpPort());
         }
 
         io->set_callbacks(canRead, didWrite, gotError, this);
