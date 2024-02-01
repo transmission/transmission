@@ -1481,7 +1481,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
             if (auto const dht_port = tr_port::from_host(hport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
-                msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);
+                msgs->session->maybe_add_dht_node(msgs->io->address(), msgs->dht_port);
             }
         }
         break;

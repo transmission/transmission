@@ -176,7 +176,7 @@ public:
         tr_logAddTrace("Done uninitializing DHT");
     }
 
-    void add_node(tr_address const& addr, tr_port port) override
+    void maybe_add_node(tr_address const& addr, tr_port port) override
     {
         if (addr.is_ipv4())
         {
@@ -309,7 +309,7 @@ private:
 
         auto [address, port] = bootstrap_queue_.front();
         bootstrap_queue_.pop_front();
-        add_node(address, port);
+        maybe_add_node(address, port);
         ++n_bootstrapped_;
 
         bootstrap_timer_->start_single_shot(bootstrap_interval(n_bootstrapped_));
