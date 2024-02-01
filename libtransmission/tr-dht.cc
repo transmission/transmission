@@ -207,7 +207,7 @@ public:
     }
 
 private:
-    [[nodiscard]] constexpr tr_socket_t udpSocket(int af) const noexcept
+    [[nodiscard]] constexpr tr_socket_t udp_socket(int af) const noexcept
     {
         switch (af)
         {
@@ -224,7 +224,7 @@ private:
 
     [[nodiscard]] SwarmStatus swarm_status(int family, int* const setme_node_count = nullptr) const
     {
-        if (udpSocket(family) == TR_BAD_SOCKET)
+        if (udp_socket(family) == TR_BAD_SOCKET)
         {
             if (setme_node_count != nullptr)
             {
@@ -414,11 +414,11 @@ private:
     void save_state() const
     {
         auto constexpr MaxNodes = int{ 300 };
-        auto constexpr PortLen = size_t{ 2 };
-        auto constexpr CompactAddrLen = size_t{ 4 };
-        auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
-        auto constexpr Compact6AddrLen = size_t{ 16 };
-        auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
+        auto constexpr PortLen = tr_port::CompactPortBytes;
+        auto constexpr CompactAddrLen = tr_address::CompactAddrBytes[TR_AF_INET];
+        auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        auto constexpr Compact6AddrLen = tr_address::CompactAddrBytes[TR_AF_INET6];
+        auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
 
         auto sins4 = std::array<struct sockaddr_in, MaxNodes>{};
         auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
