@@ -139,11 +139,9 @@ public:
     {
         tr_logAddDebug(fmt::format("Starting DHT on port {port}", fmt::arg("port", peer_port.host())));
 
-        // load up the bootstrap nodes
-        if (tr_sys_path_exists(state_filename_.c_str()))
-        {
-            std::tie(id_, bootstrap_queue_) = load_state(state_filename_);
-        }
+        // init state from scratch, or load from state file if it exists
+        std::tie(id_, bootstrap_queue_) = init_state(state_filename_);
+
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
         get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
         bootstrap_timer_->start_single_shot(100ms);
@@ -464,55 +462,62 @@ private:
         tr_variant_serde::benc().to_file(benc, state_filename_);
     }
 
-    [[nodiscard]] static std::pair<Id, Nodes> load_state(std::string_view filename)
+    [[nodiscard]] static std::pair<Id, Nodes> init_state(std::string_view filename)
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
         auto id = tr_rand_obj<Id>();
 
+        if (!tr_sys_path_exists(std::data(filename)))
+        {
+            return { id, {} };
+        }
+
+        auto otop = tr_variant_serde::benc().parse_file(filename);
+        if (!otop)
+        {
+            return { id, {} };
+        }
+
+        auto& top = *otop;
         auto nodes = Nodes{};
 
-        if (auto otop = tr_variant_serde::benc().parse_file(filename); otop)
+        if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
         {
-            auto& top = *otop;
+            std::copy(std::begin(sv), std::end(sv), std::begin(id));
+        }
 
-            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
+        size_t raw_len = 0U;
+        std::byte const* raw = nullptr;
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
+        {
+            auto* walk = raw;
+            auto const* const end = raw + raw_len;
+            while (walk < end)
             {
-                std::copy(std::begin(sv), std::end(sv), std::begin(id));
-            }
-
-            size_t raw_len = 0U;
-            std::byte const* raw = nullptr;
-            if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
-            {
-                auto* walk = raw;
-                auto const* const end = raw + raw_len;
-                while (walk < end)
-                {
-                    auto addr = tr_address{};
-                    auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
-                    std::tie(port, walk) = tr_port::from_compact(walk);
-                    nodes.emplace_back(addr, port);
-                }
-            }
-
-            if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
-            {
-                auto* walk = raw;
-                auto const* const end = raw + raw_len;
-                while (walk < end)
-                {
-                    auto addr = tr_address{};
-                    auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
-                    std::tie(port, walk) = tr_port::from_compact(walk);
-                    nodes.emplace_back(addr, port);
-                }
+                auto addr = tr_address{};
+                auto port = tr_port{};
+                std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
+                std::tie(port, walk) = tr_port::from_compact(walk);
+                nodes.emplace_back(addr, port);
             }
         }
 
-        return std::make_pair(id, nodes);
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
+        {
+            auto* walk = raw;
+            auto const* const end = raw + raw_len;
+            while (walk < end)
+            {
+                auto addr = tr_address{};
+                auto port = tr_port{};
+                std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
+                std::tie(port, walk) = tr_port::from_compact(walk);
+                nodes.emplace_back(addr, port);
+            }
+        }
+
+        return { id, std::move(nodes) };
     }
 
     ///
