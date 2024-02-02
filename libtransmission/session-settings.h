@@ -7,6 +7,7 @@
 
 #include <cstddef> // for size_t
 #include <string>
+#include <chrono>
 
 #include "libtransmission/transmission.h"
 
@@ -67,6 +68,7 @@ struct tr_variant;
     V(TR_KEY_script_torrent_done_seeding_filename, script_torrent_done_seeding_filename, std::string, "", "") \
     V(TR_KEY_seed_queue_enabled, seed_queue_enabled, bool, false, "") \
     V(TR_KEY_seed_queue_size, seed_queue_size, size_t, 10U, "") \
+    V(TR_KEY_sleep_per_seconds_during_verify, sleep_per_seconds_during_verify, std::chrono::milliseconds, 100, "") \
     V(TR_KEY_speed_limit_down, speed_limit_down, size_t, 100U, "") \
     V(TR_KEY_speed_limit_down_enabled, speed_limit_down_enabled, bool, false, "") \
     V(TR_KEY_speed_limit_up, speed_limit_up, size_t, 100U, "") \

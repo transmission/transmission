@@ -25,15 +25,16 @@ using namespace std::chrono_literals;
 
 namespace
 {
-auto constexpr SleepPerSecondDuringVerify = 100ms;
-
 [[nodiscard]] auto current_time_secs()
 {
     return std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::steady_clock::now());
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(
+    Mediator& verify_mediator,
+    std::atomic<bool> const& abort_flag,
+    std::chrono::milliseconds const sleep_per_seconds_during_verify)
 {
     verify_mediator.on_verify_started();
 
@@ -94,7 +95,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
             if (auto const now = current_time_secs(); last_slept_at != now)
             {
                 last_slept_at = now;
-                std::this_thread::sleep_for(SleepPerSecondDuringVerify);
+                std::this_thread::sleep_for(sleep_per_seconds_during_verify);
             }
 
             sha->clear();
@@ -148,7 +149,7 @@ void tr_verify_worker::verify_thread_func()
             current_node_ = std::move(todo_.extract(std::begin(todo_)).value());
         }
 
-        verify_torrent(*current_node_->mediator_, stop_current_);
+        verify_torrent(*current_node_->mediator_, stop_current_, sleep_per_seconds_during_verify_);
     }
 }
 
@@ -199,6 +200,11 @@ tr_verify_worker::~tr_verify_worker()
     {
         std::this_thread::sleep_for(20ms);
     }
+}
+
+void tr_verify_worker::set_sleep_per_seconds_during_verify(std::chrono::milliseconds const sleep_per_seconds_during_verify)
+{
+    sleep_per_seconds_during_verify_ = sleep_per_seconds_during_verify;
 }
 
 int tr_verify_worker::Node::compare(Node const& that) const noexcept

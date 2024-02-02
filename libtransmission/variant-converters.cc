@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <chrono> //std::chrono::milliseconds
 
 #include <fmt/core.h>
 
@@ -422,6 +423,23 @@ tr_variant VariantConverter::save<tr_verify_added_mode>(tr_verify_added_mode con
     }
 
     return static_cast<int64_t>(val);
+}
+
+template<>
+std::optional<std::chrono::milliseconds> VariantConverter::load<std::chrono::milliseconds>(tr_variant const& src)
+{
+    if (auto val = src.get_if<int64_t>(); val != nullptr)
+    {
+        return std::chrono::milliseconds(*val);
+    }
+
+    return {};
+}
+
+template<>
+tr_variant VariantConverter::save<std::chrono::milliseconds>(std::chrono::milliseconds const& val)
+{
+    return val.count();
 }
 
 } // namespace libtransmission

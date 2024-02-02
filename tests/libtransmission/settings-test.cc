@@ -454,3 +454,45 @@ TEST_F(SettingsTest, canSavePreferredTransport)
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ("tcp", val);
 }
+
+TEST_F(SettingsTest, canLoadSleepPerSecondsDuringVerify)
+{
+    static auto constexpr Key = TR_KEY_sleep_per_seconds_during_verify;
+    auto constexpr ExpectedValue = 90ms;
+
+    auto settings = std::make_unique<tr_session_settings>();
+    auto const default_value = settings->sleep_per_seconds_during_verify;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 1);
+    tr_variantDictAddInt(&var, Key, ExpectedValue.count());
+    settings->load(var);
+    EXPECT_EQ(ExpectedValue, settings->sleep_per_seconds_during_verify);
+    var.clear();
+
+    settings = std::make_unique<tr_session_settings>();
+    tr_variantInitDict(&var, 1);
+    tr_variantDictAddInt(&var, Key, 90);
+    settings->load(var);
+    EXPECT_EQ(ExpectedValue, settings->sleep_per_seconds_during_verify);
+}
+
+TEST_F(SettingsTest, canSaveSleepPerSecondsDuringVerify)
+{
+    static auto constexpr Key = TR_KEY_sleep_per_seconds_during_verify;
+    static auto constexpr ExpectedValue = 90ms;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.sleep_per_seconds_during_verify;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 100);
+    settings.sleep_per_seconds_during_verify = ExpectedValue;
+    var = settings.settings();
+
+    int64_t val_raw;
+    EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val_raw));
+    EXPECT_EQ(ExpectedValue, std::chrono::milliseconds{ val_raw });
+}
