@@ -636,6 +636,7 @@ private:
 
     size_t protocol_send_have(tr_piece_index_t const index) const
     {
+        static_assert(sizeof(tr_piece_index_t) == sizeof(uint32_t));
         return protocol_send_message(BtPeerMsgs::Have, index);
     }
 
@@ -695,9 +696,6 @@ private:
     time_t client_sent_at_ = 0;
 
     time_t choke_changed_at_ = 0;
-
-    /* when we started batching the outMessages */
-    // time_t outMessagesBatchedAt = 0;
 
     tr_incoming incoming_ = {};
 

@@ -26,9 +26,9 @@
  * @{
  */
 
-class tr_peer;
 class tr_swarm;
 struct tr_bandwidth;
+struct tr_peer;
 
 // --- Peer Publish / Subscribe
 
@@ -178,9 +178,8 @@ using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& ev
  * @see tr_peer_info
  * @see tr_peerMsgs
  */
-class tr_peer
+struct tr_peer
 {
-public:
     using Speed = libtransmission::Values::Speed;
 
     explicit tr_peer(tr_torrent const* tor);

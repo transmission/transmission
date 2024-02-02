@@ -30,8 +30,8 @@
  * @{
  */
 
-class tr_peer;
 class tr_peer_socket;
+struct tr_peer;
 struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_session;

@@ -271,7 +271,6 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         return {};
     }
 
-    auto ret = tr_peer_socket{};
     if (connect(s, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1 &&
 #ifdef _WIN32
         sockerrno != WSAEWOULDBLOCK &&
@@ -291,15 +290,12 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         }
 
         tr_net_close_socket(s);
-    }
-    else
-    {
-        ret = tr_peer_socket{ session, socket_address, s };
+        return {};
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
-    return ret;
+    return { session, socket_address, s };
 }
 
 namespace
