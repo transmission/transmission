@@ -411,12 +411,12 @@ private:
 
     void save_state() const
     {
-        auto constexpr MaxNodes = int{ 300 };
-        auto constexpr PortLen = tr_port::CompactPortBytes;
-        auto constexpr CompactAddrLen = tr_address::CompactAddrBytes[TR_AF_INET];
-        auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
-        auto constexpr Compact6AddrLen = tr_address::CompactAddrBytes[TR_AF_INET6];
-        auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
+        static auto constexpr MaxNodes = int{ 300 };
+        static auto constexpr PortLen = tr_port::CompactPortBytes;
+        static auto constexpr CompactAddrLen = tr_address::CompactAddrBytes[TR_AF_INET];
+        static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        static auto constexpr Compact6AddrLen = tr_address::CompactAddrBytes[TR_AF_INET6];
+        static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
 
         auto sins4 = std::array<struct sockaddr_in, MaxNodes>{};
         auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
@@ -479,6 +479,9 @@ private:
             return { id, {} };
         }
 
+        static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
+
         auto& top = *otop;
         auto nodes = Nodes{};
 
@@ -489,7 +492,7 @@ private:
 
         size_t raw_len = 0U;
         std::byte const* raw = nullptr;
-        if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % CompactLen == 0)
         {
             auto* walk = raw;
             auto const* const end = raw + raw_len;
@@ -503,7 +506,7 @@ private:
             }
         }
 
-        if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % Compact6Len == 0)
         {
             auto* walk = raw;
             auto const* const end = raw + raw_len;
@@ -561,11 +564,9 @@ private:
         hints.ai_protocol = 0;
         hints.ai_flags = 0;
 
-        auto port_str = std::array<char, 16>{};
-        *fmt::format_to(std::data(port_str), "{:d}", port_in.host()) = '\0';
-
+        auto const port_str = fmt::format("{:d}", port_in.host());
         addrinfo* info = nullptr;
-        if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)
+        if (int const rc = getaddrinfo(name, port_str.c_str(), &hints, &info); rc != 0)
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
