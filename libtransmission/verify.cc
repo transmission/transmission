@@ -90,12 +90,15 @@ void tr_verify_worker::verify_torrent(
             auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
             verify_mediator.on_piece_checked(piece, has_piece);
 
-            /* sleeping even just a few msec per second goes a long
-             * way towards reducing IO load... */
-            if (auto const now = current_time_secs(); last_slept_at != now)
+            if (sleep_per_seconds_during_verify > std::chrono::milliseconds::zero())
             {
-                last_slept_at = now;
-                std::this_thread::sleep_for(sleep_per_seconds_during_verify);
+                /* sleeping even just a few msec per second goes a long
+                 * way towards reducing IO load... */
+                if (auto const now = current_time_secs(); last_slept_at != now)
+                {
+                    last_slept_at = now;
+                    std::this_thread::sleep_for(sleep_per_seconds_during_verify);
+                }
             }
 
             sha->clear();
