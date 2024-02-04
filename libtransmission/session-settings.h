@@ -21,8 +21,8 @@ struct tr_variant;
 #define SESSION_SETTINGS_FIELDS(V) \
     V(TR_KEY_announce_ip, announce_ip, std::string, "", "") \
     V(TR_KEY_announce_ip_enabled, announce_ip_enabled, bool, false, "") \
-    V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "0.0.0.0", "") \
-    V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::", "") \
+    V(TR_KEY_bind_address_ipv4, bind_address_ipv4, std::string, "", "") \
+    V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "", "") \
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false, "") \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist", "") \
     V(TR_KEY_cache_size_mb, cache_size_mbytes, size_t, 4U, "") \

@@ -93,8 +93,8 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **preferred-transport:** String ("utp" = Prefer µTP, "tcp" = Prefer TCP; default = "utp") Choose your preferred transport protocol (has no effect if one of them is disabled).
 
 #### Peers
- * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".
- * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections. When no valid IPv6 address is provided, Transmission will try to bind to your default global IPv6 address. If that didn't work, then Transmission will bind to "::".
+ * **bind-address-ipv4:** String (default = "") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".
+ * **bind-address-ipv6:** String (default = "") Where to listen for peer connections. When no valid IPv6 address is provided, Transmission will try to bind to your default global IPv6 address. If that didn't work, then Transmission will bind to "::".
  * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer-limit-global:** Number (default = 240)
  * **peer-limit-per-torrent:** Number (default =  60)
