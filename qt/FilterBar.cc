@@ -223,14 +223,16 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     , prefs_{ prefs }
     , torrents_{ torrents }
     , filter_{ filter }
-    , count_label_{ new QLabel{ tr("Show:"), this } }
+    , activity_label_{ new QLabel{ tr("Status:"), this } }
+    , tracker_label_{ new QLabel{ tr("Tracker:"), this } }
     , is_bootstrapping_{ true }
 {
     auto* h = new QHBoxLayout{ this };
     h->setContentsMargins(3, 3, 3, 3);
 
-    h->addWidget(count_label_);
+    h->addWidget(activity_label_);
     h->addWidget(activity_combo_);
+    h->addWidget(tracker_label_);
     h->addWidget(tracker_combo_);
     h->addStretch();
     h->addWidget(line_edit_, 1);
