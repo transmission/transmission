@@ -460,18 +460,18 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
-    ret.merge(tr_session_settings::default_settings());
-    ret.merge(tr_rpc_server::default_settings());
+    ret.merge(tr_rpc_settings{}.save());
     ret.merge(tr_session_alt_speeds::default_settings());
+    ret.merge(tr_session_settings::default_settings());
     return ret;
 }
 
 tr_variant tr_sessionGetSettings(tr_session const* session)
 {
     auto settings = tr_variant::make_map();
-    settings.merge(session->settings_.settings());
     settings.merge(session->alt_speeds_.settings());
-    settings.merge(session->rpc_server_->settings());
+    settings.merge(session->rpc_server_->settings().save());
+    settings.merge(session->settings_.settings());
     tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
     return settings;
 }
@@ -752,7 +752,7 @@ void tr_session::setSettings(tr_variant const& settings, bool force)
 
     // delegate loading out the other settings
     alt_speeds_.load(settings);
-    rpc_server_->load(settings);
+    rpc_server_->load(tr_rpc_settings{ settings });
 }
 
 void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
@@ -2117,7 +2117,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
-    , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
+    , rpc_server_{ std::make_unique<tr_rpc_server>(this, tr_rpc_settings{ settings_dict }) }
     , now_timer_{ timer_maker_->create([this]() { on_now_timer(); }) }
     , queue_timer_{ timer_maker_->create([this]() { on_queue_timer(); }) }
     , save_timer_{ timer_maker_->create([this]() { on_save_timer(); }) }
