@@ -20,7 +20,6 @@
 #include "libtransmission/net.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/settings.h"
-#include "libtransmission/utils-ev.h"
 
 class tr_rpc_address;
 struct tr_session;
