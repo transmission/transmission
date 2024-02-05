@@ -22,7 +22,7 @@ struct LoadVisitor
     template<typename T>
     void operator()(T* const tgt)
     {
-        if (auto val = libtransmission::VariantConverter::load<T>(src_))
+        if (auto val = VariantConverter::load<T>(src_))
         {
             *tgt = *val;
         }
@@ -43,7 +43,7 @@ struct SaveVisitor
     template<typename T>
     void operator()(T const* const src)
     {
-        tgt_.try_emplace(key_, libtransmission::VariantConverter::save<T>(*src));
+        tgt_.try_emplace(key_, VariantConverter::save<T>(*src));
     }
 
 private:
