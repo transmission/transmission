@@ -55,14 +55,14 @@ private:
 };
 } // unnamed namespace
 
-SettingsHelper::SettingsHelper(std::initializer_list<value_type> args)
+Settings::Fields::Fields(std::initializer_list<value_type> args)
     : props_{ args }
 {
 }
 
 // ---
 
-void SettingsHelper::load(tr_variant const& src)
+void Settings::Fields::load(tr_variant const& src)
 {
     auto const* map = src.get_if<tr_variant::Map>();
     if (map == nullptr)
@@ -79,7 +79,7 @@ void SettingsHelper::load(tr_variant const& src)
     }
 }
 
-tr_variant SettingsHelper::save() const
+tr_variant Settings::Fields::save() const
 {
     auto map = tr_variant::Map{};
     map.reserve(std::size(props_));

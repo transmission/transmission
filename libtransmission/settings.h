@@ -23,58 +23,6 @@
 
 namespace libtransmission
 {
-class SettingsHelper
-{
-public:
-    using key_type = tr_quark;
-    using mapped_type = std::variant<
-        bool*,
-        double*,
-        size_t*,
-        std::string*,
-        tr_encryption_mode*,
-        tr_log_level*,
-        tr_mode_t*,
-        tr_open_files::Preallocation*,
-        tr_port*,
-        tr_preferred_transport*,
-        tr_tos_t*,
-        tr_verify_added_mode*>;
-    using value_type = std::pair<const key_type, mapped_type>;
-
-    SettingsHelper(std::initializer_list<value_type> args);
-
-    [[nodiscard]] auto size() const noexcept
-    {
-        return std::size(props_);
-    }
-
-    [[nodiscard]] auto begin() const noexcept
-    {
-        return std::cbegin(props_);
-    }
-
-    [[nodiscard]] auto begin() noexcept
-    {
-        return std::begin(props_);
-    }
-
-    [[nodiscard]] auto end() const noexcept
-    {
-        return std::cend(props_);
-    }
-
-    [[nodiscard]] auto end() noexcept
-    {
-        return std::end(props_);
-    }
-
-    void load(tr_variant const& src);
-    [[nodiscard]] tr_variant save() const;
-
-private:
-    std::vector<value_type> props_;
-};
 
 class Settings
 {
@@ -92,7 +40,60 @@ public:
 protected:
     Settings() = default;
 
+    class Fields
+    {
+    public:
+        using key_type = tr_quark;
+        using mapped_type = std::variant<
+            bool*,
+            double*,
+            size_t*,
+            std::string*,
+            tr_encryption_mode*,
+            tr_log_level*,
+            tr_mode_t*,
+            tr_open_files::Preallocation*,
+            tr_port*,
+            tr_preferred_transport*,
+            tr_tos_t*,
+            tr_verify_added_mode*>;
+        using value_type = std::pair<const key_type, mapped_type>;
+
+        Fields(std::initializer_list<value_type> args);
+
+        [[nodiscard]] auto size() const noexcept
+        {
+            return std::size(props_);
+        }
+
+        [[nodiscard]] auto begin() const noexcept
+        {
+            return std::cbegin(props_);
+        }
+
+        [[nodiscard]] auto begin() noexcept
+        {
+            return std::begin(props_);
+        }
+
+        [[nodiscard]] auto end() const noexcept
+        {
+            return std::cend(props_);
+        }
+
+        [[nodiscard]] auto end() noexcept
+        {
+            return std::end(props_);
+        }
+
+        void load(tr_variant const& src);
+        [[nodiscard]] tr_variant save() const;
+
+    private:
+        std::vector<value_type> props_;
+    };
+
 private:
-    [[nodiscard]] virtual libtransmission::SettingsHelper fields() = 0;
+    [[nodiscard]] virtual Fields fields() = 0;
 };
 } // namespace libtransmission

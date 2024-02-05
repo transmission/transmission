@@ -60,7 +60,7 @@ public:
     tr_port port = tr_port::from_host(TR_DEFAULT_RPC_PORT);
 
 private:
-    [[nodiscard]] libtransmission::SettingsHelper fields() override
+    [[nodiscard]] Fields fields() override
     {
         return {
             { TR_KEY_anti_brute_force_enabled, &is_anti_brute_force_enabled },
