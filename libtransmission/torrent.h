@@ -421,16 +421,16 @@ struct tr_torrent final : public tr_completion::torrent_view
         return file_priorities_.piece_priority(piece);
     }
 
-    void set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
-    {
-        file_priorities_.set(files, file_count, priority);
-        set_dirty();
-    }
+    void set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority);
 
     void set_file_priority(tr_file_index_t file, tr_priority_t priority)
     {
-        file_priorities_.set(file, priority);
-        set_dirty();
+        if (priority != file_priorities_.file_priority(file))
+        {
+            file_priorities_.set(file, priority);
+            priority_changed_.emit(this, &file, 1U, priority);
+            set_dirty();
+        }
     }
 
     /// LOCATION
@@ -728,9 +728,13 @@ struct tr_torrent final : public tr_completion::torrent_view
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primary_mime_type() const;
 
-    constexpr void set_sequential_download(bool is_sequential) noexcept
+    void set_sequential_download(bool is_sequential) noexcept
     {
-        sequential_download_ = is_sequential;
+        if (is_sequential != sequential_download_)
+        {
+            sequential_download_ = is_sequential;
+            sequential_download_changed_.emit(this, is_sequential);
+        }
     }
 
     [[nodiscard]] constexpr auto is_sequential_download() const noexcept
@@ -955,6 +959,8 @@ struct tr_torrent final : public tr_completion::torrent_view
     libtransmission::SimpleObservable<tr_torrent*> started_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
+    libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
