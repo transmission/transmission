@@ -42,7 +42,7 @@ public:
         load(src);
     }
 
-    // NB: When adding a new field here, you must also add it to
+    // NB: When adding a field here, you must also add it to
     // fields() if you want it to be in session-settings.json
     size_t anti_brute_force_limit = 100U;
     bool authentication_required = false;
