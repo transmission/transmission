@@ -57,7 +57,7 @@ private:
 
 // ---
 
-void Settings::Fields::load(tr_variant const& src)
+void Settings::load(tr_variant const& src)
 {
     auto const* map = src.get_if<tr_variant::Map>();
     if (map == nullptr)
@@ -65,7 +65,7 @@ void Settings::Fields::load(tr_variant const& src)
         return;
     }
 
-    for (auto& [key, prop_vptr] : props_)
+    for (auto& [key, prop_vptr] : fields())
     {
         if (auto const iter = map->find(key); iter != std::end(*map))
         {
@@ -74,12 +74,14 @@ void Settings::Fields::load(tr_variant const& src)
     }
 }
 
-tr_variant Settings::Fields::save() const
+tr_variant Settings::save() const
 {
-    auto map = tr_variant::Map{};
-    map.reserve(std::size(props_));
+    auto const fields = const_cast<Settings*>(this)->fields();
 
-    for (auto const& [key, prop_vptr] : props_)
+    auto map = tr_variant::Map{};
+    map.reserve(std::size(fields));
+
+    for (auto const& [key, prop_vptr] : fields)
     {
         std::visit(SaveVisitor{ map, key }, prop_vptr);
     }
