@@ -3,10 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cassert>
 #include <variant>
-
-#include <fmt/core.h>
 
 #include "libtransmission/settings.h"
 #include "libtransmission/variant.h"
@@ -54,8 +51,6 @@ private:
     tr_quark key_;
 };
 } // unnamed namespace
-
-// ---
 
 void Settings::load(tr_variant const& src)
 {
