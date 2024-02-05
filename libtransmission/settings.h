@@ -31,8 +31,8 @@ public:
     [[nodiscard]] tr_variant save() const;
 
 protected:
-    using key_type = tr_quark;
-    using mapped_type = std::variant<
+    using field_key_type = tr_quark;
+    using field_mapped_type = std::variant<
         bool*,
         double*,
         size_t*,
@@ -45,8 +45,8 @@ protected:
         tr_preferred_transport*,
         tr_tos_t*,
         tr_verify_added_mode*>;
-    using value_type = std::pair<const key_type, mapped_type>;
-    using Fields = std::vector<value_type>;
+    using field_value_type = std::pair<const field_key_type, field_mapped_type>;
+    using Fields = std::vector<field_value_type>;
 
     Settings() = default;
 
