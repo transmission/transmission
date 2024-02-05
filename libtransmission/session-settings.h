@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include <chrono> // for tr_sleep_per_seconds_during_verify
 #include <cstddef> // for size_t
 #include <string>
-#include <chrono>
 
 #include "libtransmission/transmission.h"
 
