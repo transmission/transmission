@@ -55,11 +55,6 @@ private:
 };
 } // unnamed namespace
 
-Settings::Fields::Fields(std::initializer_list<value_type> args)
-    : props_{ args }
-{
-}
-
 // ---
 
 void Settings::Fields::load(tr_variant const& src)

@@ -59,7 +59,10 @@ protected:
             tr_verify_added_mode*>;
         using value_type = std::pair<const key_type, mapped_type>;
 
-        Fields(std::initializer_list<value_type> args);
+        Fields(std::initializer_list<value_type> args)
+            : props_{ args }
+        {
+        }
 
         [[nodiscard]] auto size() const noexcept
         {
