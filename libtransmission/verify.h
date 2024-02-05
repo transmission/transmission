@@ -47,7 +47,7 @@ public:
 
     void remove(tr_sha1_digest_t const& info_hash);
 
-    void set_sleep_per_seconds_during_verify(std::chrono::milliseconds sleep_time);
+    void set_sleep_per_seconds_during_verify(std::chrono::milliseconds sleep_per_seconds_during_verify);
 
     [[nodiscard]] constexpr auto sleep_per_seconds_during_verify() const noexcept
     {
