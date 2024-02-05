@@ -901,11 +901,11 @@ public:
 
     void addTorrent(tr_torrent* tor);
 
-    void addDhtNode(tr_address const& addr, tr_port port)
+    void maybe_add_dht_node(tr_address const& addr, tr_port port)
     {
         if (dht_)
         {
-            dht_->add_node(addr, port);
+            dht_->maybe_add_node(addr, port);
         }
     }
 
