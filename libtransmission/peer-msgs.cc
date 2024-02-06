@@ -404,6 +404,7 @@ public:
 
     void cancel_block_request(tr_block_index_t block) override
     {
+        cancels_sent_to_peer.add(tr_time(), 1);
         protocol_send_cancel(peer_request::from_block(*tor_, block));
     }
 

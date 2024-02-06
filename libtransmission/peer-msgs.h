@@ -97,8 +97,6 @@ public:
 
     [[nodiscard]] virtual tr_socket_address socket_address() const = 0;
 
-    virtual void cancel_block_request(tr_block_index_t block) = 0;
-
     virtual void set_choke(bool peer_is_choked) = 0;
     virtual void set_interested(bool client_is_interested) = 0;
 

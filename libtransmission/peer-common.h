@@ -211,6 +211,10 @@ struct tr_peer
 
     virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
+    virtual void cancel_block_request(tr_block_index_t /*block*/)
+    {
+    }
+
     tr_session* const session;
 
     tr_swarm* const swarm;

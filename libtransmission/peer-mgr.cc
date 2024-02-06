@@ -680,11 +680,9 @@ private:
 
     static void maybe_send_cancel_request(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
     {
-        auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
-        if (msgs != nullptr && msgs != muted)
+        if (peer != nullptr && peer != muted)
         {
-            peer->cancels_sent_to_peer.add(tr_time(), 1);
-            msgs->cancel_block_request(block);
+            peer->cancel_block_request(block);
         }
     }
 
