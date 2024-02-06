@@ -106,6 +106,14 @@ public:
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 
+    static tr_peerMsgs* create(
+        tr_torrent* torrent,
+        tr_peer_info& peer_info,
+        std::shared_ptr<tr_peerIo> io,
+        tr_interned_string user_agent,
+        tr_peer_callback_bt callback,
+        void* callback_data);
+
 protected:
     constexpr void set_client_choked(bool val) noexcept
     {
@@ -165,13 +173,5 @@ private:
     // whether or not the peer has indicated it will download from us
     bool peer_is_interested_ = false;
 };
-
-tr_peerMsgs* tr_peerMsgsNew(
-    tr_torrent* torrent,
-    tr_peer_info& peer_info,
-    std::shared_ptr<tr_peerIo> io,
-    tr_interned_string user_agent,
-    tr_peer_callback_bt callback,
-    void* callback_data);
 
 /* @} */

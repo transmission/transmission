@@ -1297,7 +1297,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 
     tr_swarm* swarm = tor->swarm;
 
-    auto* peer = tr_peerMsgsNew(tor, peer_info, std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
+    auto* peer = tr_peerMsgs::create(tor, peer_info, std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
 
     swarm->peers.push_back(peer);
 

@@ -2048,7 +2048,7 @@ tr_peerMsgs::~tr_peerMsgs()
     --n_peers;
 }
 
-tr_peerMsgs* tr_peerMsgsNew(
+tr_peerMsgs* tr_peerMsgs::create(
     tr_torrent* const torrent,
     tr_peer_info& peer_info,
     std::shared_ptr<tr_peerIo> io,
