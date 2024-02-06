@@ -178,15 +178,15 @@ public:
         size_t max_blocks = 0;
     };
 
-    tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
+    tr_webseed(tr_torrent& tor, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
         : tr_peer{ tor }
-        , torrent_id{ tr_torrentId(tor) }
+        , torrent_id{ tor.id() }
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
-        , have_{ tor->piece_count() }
-        , bandwidth_{ &tor->bandwidth() }
+        , have_{ tor.piece_count() }
+        , bandwidth_{ &tor.bandwidth() }
     {
         have_.set_has_all();
         idle_timer_->start_repeating(IdleTimerInterval);
@@ -533,9 +533,9 @@ void task_request_next_chunk(tr_webseed_task* task)
 
 // ---
 
-tr_peer* tr_webseedNew(tr_torrent* torrent, std::string_view url, tr_peer_callback_webseed callback, void* callback_data)
+tr_peer* tr_webseedNew(tr_torrent& torrent, std::string_view url, tr_peer_callback_webseed callback, void* callback_data)
 {
-    return new tr_webseed(torrent, url, callback, callback_data);
+    return new tr_webseed{ torrent, url, callback, callback_data };
 }
 
 tr_webseed_view tr_webseedView(tr_peer const* peer)

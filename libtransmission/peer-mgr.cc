@@ -645,7 +645,7 @@ private:
         webseeds.reserve(n);
         for (size_t i = 0; i < n; ++i)
         {
-            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
+            webseeds.emplace_back(tr_webseedNew(*tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
         }
         webseeds.shrink_to_fit();
 
@@ -1192,10 +1192,10 @@ private:
 
 // --- tr_peer virtual functions
 
-tr_peer::tr_peer(tr_torrent const* tor)
-    : session{ tor->session }
-    , swarm{ tor->swarm }
-    , blame{ tor->block_count() }
+tr_peer::tr_peer(tr_torrent const& tor)
+    : session{ tor.session }
+    , swarm{ tor.swarm }
+    , blame{ tor.block_count() }
 {
 }
 
@@ -1290,12 +1290,11 @@ namespace
 {
 namespace handshake_helpers
 {
-void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_peer_info& peer_info, tr_interned_string client)
+void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_peer_info& peer_info, tr_interned_string client)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->swarm != nullptr);
+    TR_ASSERT(tor.swarm != nullptr);
 
-    tr_swarm* swarm = tor->swarm;
+    tr_swarm* swarm = tor.swarm;
 
     auto* peer = tr_peerMsgs::create(tor, peer_info, std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
 
@@ -1394,7 +1393,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
 
     result.io->set_bandwidth(&swarm->tor->bandwidth());
-    create_bit_torrent_peer(swarm->tor, result.io, *info, client);
+    create_bit_torrent_peer(*swarm->tor, result.io, *info, client);
 
     return true;
 }

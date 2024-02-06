@@ -36,7 +36,7 @@ class tr_peerMsgs : public tr_peer
 {
 public:
     tr_peerMsgs(
-        tr_torrent const* tor,
+        tr_torrent const& tor,
         tr_peer_info& peer_info_in,
         tr_interned_string user_agent,
         bool connection_is_encrypted,
@@ -107,7 +107,7 @@ public:
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 
     static tr_peerMsgs* create(
-        tr_torrent* torrent,
+        tr_torrent& torrent,
         tr_peer_info& peer_info,
         std::shared_ptr<tr_peerIo> io,
         tr_interned_string user_agent,
