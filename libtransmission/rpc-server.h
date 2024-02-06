@@ -32,59 +32,59 @@ namespace libtransmission
 class Timer;
 }
 
-class tr_rpc_settings final : public libtransmission::Settings
-{
-public:
-    tr_rpc_settings() = default;
-
-    explicit tr_rpc_settings(tr_variant const& src)
-    {
-        load(src);
-    }
-
-    // NB: When adding a field here, you must also add it to
-    // fields() if you want it to be in session-settings.json
-    size_t anti_brute_force_limit = 100U;
-    bool authentication_required = false;
-    std::string bind_address_str = "0.0.0.0";
-    std::string host_whitelist_str = "";
-    bool is_anti_brute_force_enabled = false;
-    bool is_enabled = false;
-    bool is_host_whitelist_enabled = true;
-    bool is_whitelist_enabled = true;
-    tr_port port = tr_port::from_host(TR_DEFAULT_RPC_PORT);
-    std::string salted_password = "";
-    tr_mode_t socket_mode = 0750;
-    std::string url = TR_DEFAULT_RPC_URL_STR;
-    std::string username = "";
-    std::string whitelist_str = TR_DEFAULT_RPC_WHITELIST;
-
-private:
-    [[nodiscard]] Fields fields() override
-    {
-        return {
-            { TR_KEY_anti_brute_force_enabled, &is_anti_brute_force_enabled },
-            { TR_KEY_anti_brute_force_threshold, &anti_brute_force_limit },
-            { TR_KEY_rpc_authentication_required, &authentication_required },
-            { TR_KEY_rpc_bind_address, &bind_address_str },
-            { TR_KEY_rpc_enabled, &is_enabled },
-            { TR_KEY_rpc_host_whitelist, &host_whitelist_str },
-            { TR_KEY_rpc_host_whitelist_enabled, &is_host_whitelist_enabled },
-            { TR_KEY_rpc_port, &port },
-            { TR_KEY_rpc_password, &salted_password },
-            { TR_KEY_rpc_socket_mode, &socket_mode },
-            { TR_KEY_rpc_url, &url },
-            { TR_KEY_rpc_username, &username },
-            { TR_KEY_rpc_whitelist, &whitelist_str },
-            { TR_KEY_rpc_whitelist_enabled, &is_whitelist_enabled },
-        };
-    }
-};
-
 class tr_rpc_server
 {
 public:
-    tr_rpc_server(tr_session* session, tr_rpc_settings settings);
+    class Settings final : public libtransmission::Settings
+    {
+    public:
+        Settings() = default;
+
+        explicit Settings(tr_variant const& src)
+        {
+            load(src);
+        }
+
+        // NB: When adding a field here, you must also add it to
+        // fields() if you want it to be in session-settings.json
+        size_t anti_brute_force_limit = 100U;
+        bool authentication_required = false;
+        std::string bind_address_str = "0.0.0.0";
+        std::string host_whitelist_str = "";
+        bool is_anti_brute_force_enabled = false;
+        bool is_enabled = false;
+        bool is_host_whitelist_enabled = true;
+        bool is_whitelist_enabled = true;
+        tr_port port = tr_port::from_host(TR_DEFAULT_RPC_PORT);
+        std::string salted_password = "";
+        tr_mode_t socket_mode = 0750;
+        std::string url = TR_DEFAULT_RPC_URL_STR;
+        std::string username = "";
+        std::string whitelist_str = TR_DEFAULT_RPC_WHITELIST;
+
+    private:
+        [[nodiscard]] Fields fields() override
+        {
+            return {
+                { TR_KEY_anti_brute_force_enabled, &is_anti_brute_force_enabled },
+                { TR_KEY_anti_brute_force_threshold, &anti_brute_force_limit },
+                { TR_KEY_rpc_authentication_required, &authentication_required },
+                { TR_KEY_rpc_bind_address, &bind_address_str },
+                { TR_KEY_rpc_enabled, &is_enabled },
+                { TR_KEY_rpc_host_whitelist, &host_whitelist_str },
+                { TR_KEY_rpc_host_whitelist_enabled, &is_host_whitelist_enabled },
+                { TR_KEY_rpc_port, &port },
+                { TR_KEY_rpc_password, &salted_password },
+                { TR_KEY_rpc_socket_mode, &socket_mode },
+                { TR_KEY_rpc_url, &url },
+                { TR_KEY_rpc_username, &username },
+                { TR_KEY_rpc_whitelist, &whitelist_str },
+                { TR_KEY_rpc_whitelist_enabled, &is_whitelist_enabled },
+            };
+        }
+    };
+
+    tr_rpc_server(tr_session* session, Settings settings);
     ~tr_rpc_server();
 
     tr_rpc_server(tr_rpc_server&) = delete;
@@ -92,9 +92,9 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    void load(tr_rpc_settings settings);
+    void load(Settings settings);
 
-    [[nodiscard]] constexpr tr_rpc_settings const& settings() const
+    [[nodiscard]] constexpr Settings const& settings() const
     {
         return settings_;
     }
@@ -184,7 +184,7 @@ public:
         return settings_.socket_mode;
     }
 
-    tr_rpc_settings settings_;
+    Settings settings_;
 
     std::vector<std::string> host_whitelist_;
     std::vector<std::string> whitelist_;
