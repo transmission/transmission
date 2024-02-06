@@ -589,7 +589,7 @@ private:
 
     void update_metadata_requests(time_t now) const;
     [[nodiscard]] size_t add_next_metadata_piece();
-    [[nodiscard]] size_t add_next_piece(uint64_t now);
+    [[nodiscard]] size_t add_next_block(time_t now_sec, uint64_t now_msec);
     [[nodiscard]] size_t fill_output_buffer(time_t now_sec, uint64_t now_msec);
 
     // ---
@@ -1865,7 +1865,7 @@ void tr_peerMsgsImpl::update_block_requests()
     for (;;)
     {
         auto const old_len = n_bytes_written;
-        n_bytes_written += add_next_piece(now_msec);
+        n_bytes_written += add_next_block(now_sec, now_msec);
         if (old_len == n_bytes_written)
         {
             break;
@@ -1909,9 +1909,9 @@ void tr_peerMsgsImpl::update_block_requests()
     return protocol_send_message(BtPeerMsgs::Ltep, ut_metadata_id_, tr_variant_serde::benc().to_string(tmp), *data);
 }
 
-[[nodiscard]] size_t tr_peerMsgsImpl::add_next_piece(uint64_t now)
+[[nodiscard]] size_t tr_peerMsgsImpl::add_next_block(time_t now_sec, uint64_t now_msec)
 {
-    if (std::empty(peer_requested_) || io_->get_write_buffer_space(now) == 0U)
+    if (std::empty(peer_requested_) || io_->get_write_buffer_space(now_msec) == 0U)
     {
         return {};
     }
@@ -1939,6 +1939,7 @@ void tr_peerMsgsImpl::update_block_requests()
 
     if (ok)
     {
+        blocks_sent_to_peer.add(now_sec, 1);
         auto const piece_data = std::string_view{ reinterpret_cast<char const*>(std::data(buf)), req.length };
         return protocol_send_message(BtPeerMsgs::Piece, req.index, req.offset, piece_data);
     }
