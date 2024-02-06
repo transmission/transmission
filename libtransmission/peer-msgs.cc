@@ -421,12 +421,15 @@ public:
         {
             set_peer_choked(peer_is_choked);
 
+            // https://www.bittorrent.org/beps/bep_0006.html#reject-request
+            // A peer SHOULD choke first and then reject requests so that
+            // the peer receiving the choke does not re-request the pieces.
+            protocol_send_choke(peer_is_choked);
             if (peer_is_choked)
             {
                 reject_all_requests();
             }
 
-            protocol_send_choke(peer_is_choked);
             choke_changed_at_ = now;
             update_active(TR_CLIENT_TO_PEER);
         }
