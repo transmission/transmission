@@ -397,6 +397,8 @@ a {
 #speed-dn-label,
 #speed-up-label {
   text-align: right;
+  width: 100px;
+  white-space: nowrap;
 }
 
 /// TORRENT CONTAINER
