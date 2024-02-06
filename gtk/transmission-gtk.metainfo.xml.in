@@ -9,6 +9,10 @@ Copyright 2017 Endless Mobile, Inc.
   <project_license>GPL-2.0 OR GPL-3.0</project_license>
 
   <name>Transmission</name>
+  <developer_name>The Transmission Project</developer_name>
+  <developer id="transmissionbt.com">
+    <name>The Transmission Project</name>
+  </developer>
   <summary>Download and share files over BitTorrent</summary>
 
   <description>
