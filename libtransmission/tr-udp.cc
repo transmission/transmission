@@ -115,7 +115,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
         // - all UDP tracker packets start with a 32-bit (!) "action", which
         //   is between 0 and 3
         // - the above cannot be µTP packets, since these start with a 4-bit
-        //   version number (1).
+        //   "type" between 0 and 4, followed by a 4-bit version number (1)
         if (buf[0] == 'd')
         {
             if (session->dht_)
