@@ -408,7 +408,7 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
     auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
     auto const sockfd = accept(listening_sockfd, reinterpret_cast<sockaddr*>(&sock), &len);
-    if (sockfd == TR_BAD_SOCKET)
+    if (sockfd == TR_BAD_SOCKET || len == 0)
     {
         return {};
     }
