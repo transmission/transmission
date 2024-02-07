@@ -155,11 +155,11 @@ void restart_timer(tr_session* session)
     }
     else
     {
-        /* If somebody has disabled µTP, then we still want to run
-           utp_check_timeouts, in order to let closed sockets finish
-           gracefully and so on.  However, since we're not particularly
-           interested in that happening in a timely manner, we might as
-           well use a large timeout. */
+        // If somebody has disabled µTP, then we still want to run
+        // utp_check_timeouts, in order to let closed sockets finish
+        // gracefully and so on.  However, since we're not particularly
+        // interested in that happening in a timely manner, we might as
+        // well use a large timeout.
         static auto constexpr MinInterval = 2s;
         static auto constexpr MaxInterval = 3s;
         auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);

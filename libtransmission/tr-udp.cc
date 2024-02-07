@@ -28,8 +28,8 @@
 namespace
 {
 
-/* Since we use a single UDP socket in order to implement multiple
-   µTP sockets, try to set up huge buffers. */
+// Since we use a single UDP socket in order to implement multiple
+// µTP sockets, try to set up huge buffers.
 void set_socket_buffers(tr_socket_t fd, bool large)
 {
     static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
@@ -42,33 +42,25 @@ void set_socket_buffers(tr_socket_t fd, bool large)
     socklen_t sbuf_len = sizeof(sbuf);
 
     int size = large ? RecvBufferSize : SmallBufferSize;
-    int rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
-
-    if (rc < 0)
+    if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size)) < 0)
     {
         tr_logAddDebug(fmt::format("Couldn't set receive buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     size = large ? SendBufferSize : SmallBufferSize;
-    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&size), sizeof(size));
-
-    if (rc < 0)
+    if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&size), sizeof(size)) < 0)
     {
         tr_logAddDebug(fmt::format("Couldn't set send buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     if (large)
     {
-        rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&rbuf), &rbuf_len);
-
-        if (rc < 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&rbuf), &rbuf_len) < 0)
         {
             rbuf = 0;
         }
 
-        rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&sbuf), &sbuf_len);
-
-        if (rc < 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&sbuf), &sbuf_len) < 0)
         {
             sbuf = 0;
         }
@@ -119,7 +111,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
 
         // Since most packets we receive here are µTP, make quick inline
         // checks for the other protocols. The logic is as follows:
-        // - all DHT packets start with 'd'
+        // - all DHT packets start with 'd' (100)
         // - all UDP tracker packets start with a 32-bit (!) "action", which
         //   is between 0 and 3
         // - the above cannot be µTP packets, since these start with a 4-bit
