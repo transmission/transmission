@@ -448,6 +448,8 @@
 		ED20B87C28589274005FA6BE /* common_defs.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87B28589274005FA6BE /* common_defs.h */; };
 		ED20B87F285892C5005FA6BE /* crc32_multipliers.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87D285892C5005FA6BE /* crc32_multipliers.h */; };
 		ED20B880285892C5005FA6BE /* crc32_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87E285892C5005FA6BE /* crc32_tables.h */; };
+		ED67FB422B70FCE400D8A037 /* settings.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED67FB402B70FCE400D8A037 /* settings.cc */; };
+		ED67FB432B70FCE400D8A037 /* settings.h in Headers */ = {isa = PBXBuildFile; fileRef = ED67FB412B70FCE400D8A037 /* settings.h */; };
 		ED86936F2ADAE34D00342B1A /* DefaultAppHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */; };
 		ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */; };
 		ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */; };
@@ -1363,6 +1365,8 @@
 		ED20B87B28589274005FA6BE /* common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common_defs.h; sourceTree = "<group>"; };
 		ED20B87D285892C5005FA6BE /* crc32_multipliers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_multipliers.h; path = lib/crc32_multipliers.h; sourceTree = "<group>"; };
 		ED20B87E285892C5005FA6BE /* crc32_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_tables.h; path = lib/crc32_tables.h; sourceTree = "<group>"; };
+		ED67FB402B70FCE400D8A037 /* settings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = settings.cc; sourceTree = "<group>"; };
+		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
 		ED86936D2ADAE34D00342B1A /* DefaultAppHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAppHelper.h; sourceTree = "<group>"; };
 		ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DefaultAppHelper.mm; sourceTree = "<group>"; };
 		ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "peer-mgr-active-requests.h"; sourceTree = "<group>"; };
@@ -1884,6 +1888,8 @@
 				CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */,
 				D5C306568A7346FFFB8EFAD1 /* session-settings.cc */,
 				D5C306568A7346FFFB8EFAD3 /* session-settings.h */,
+				ED67FB402B70FCE400D8A037 /* settings.cc */,
+				ED67FB412B70FCE400D8A037 /* settings.h */,
 				D9057D68C13B75636539B681 /* variant-converters.cc */,
 				A25D2CBB0CF4C7190096A262 /* stats.cc */,
 				A25D2CBA0CF4C7190096A262 /* stats.h */,
@@ -2398,6 +2404,7 @@
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
 				C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */,
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
+				ED67FB432B70FCE400D8A037 /* settings.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
@@ -3173,6 +3180,7 @@
 				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */,
+				ED67FB422B70FCE400D8A037 /* settings.cc in Sources */,
 				1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */,
 				A25964A6106D73A800453B31 /* announcer.cc in Sources */,
 				66F977825E65AD498C028BB0 /* announce-list.cc in Sources */,
