@@ -400,6 +400,7 @@
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
 		C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
 		C82B30312953337B0001BD6E /* NSDataAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C809AEE6291ECFD000BFDBE1 /* NSDataAdditions.mm */; };
+		C83B17212B7341BC00B2EAE4 /* tr-assert.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.cc */; };
 		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C843FC8429C51B9400491854 /* utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = C843FC8329C51B9400491854 /* utils.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
@@ -441,7 +442,6 @@
 		D9057D68C13B75636539B680 /* variant-converters.cc in Sources */ = {isa = PBXBuildFile; fileRef = D9057D68C13B75636539B681 /* variant-converters.cc */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
 		E975121263DD973CAF4AEBA0 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA1 /* timer.h */; };
 		E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA3 /* timer-ev.h */; };
 		E975121263DD973CAF4AEBA4 /* timer-ev.cc in Sources */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA5 /* timer-ev.cc */; };
@@ -1358,7 +1358,6 @@
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "interned-string.h"; sourceTree = "<group>"; };
-		E71A5564279C2DD600EBFA1E /* tr-assert.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "tr-assert.mm"; sourceTree = "<group>"; };
 		E975121263DD973CAF4AEBA1 /* timer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = timer.h; sourceTree = "<group>"; };
 		E975121263DD973CAF4AEBA3 /* timer-ev.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "timer-ev.h"; sourceTree = "<group>"; };
 		E975121263DD973CAF4AEBA5 /* timer-ev.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "timer-ev.cc"; sourceTree = "<group>"; };
@@ -1911,7 +1910,6 @@
 				2B9BA6C508B488FE586A0AB3 /* torrents.h */,
 				C1425B321EE9C5EA001DB85F /* tr-assert.cc */,
 				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
-				E71A5564279C2DD600EBFA1E /* tr-assert.mm */,
 				A263C6B1F6718E2486DB20E1 /* tr-buffer.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.cc */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
@@ -3165,6 +3163,7 @@
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.cc in Sources */,
 				C1077A50183EB29600634C22 /* file-posix.cc in Sources */,
 				ED8A16422735A8AA000D61F9 /* peer-mgr-wishlist.cc in Sources */,
+				C83B17212B7341BC00B2EAE4 /* tr-assert.cc in Sources */,
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.cc in Sources */,
 				A25D2CBD0CF4C73E0096A262 /* stats.cc in Sources */,
 				A201527E0D1C270F0081714F /* torrent-ctor.cc in Sources */,
@@ -3174,7 +3173,6 @@
 				A2A4E9220DE0F7EB000CE197 /* web.cc in Sources */,
 				A292A6E80DFB45FC004B9C0A /* webseed.cc in Sources */,
 				A25E03E30E4015380086C225 /* tr-getopt.cc in Sources */,
-				E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */,
 				C1305EBE186A13B100F03351 /* file.cc in Sources */,
 				A21FBBAC0EDA78C300BC3C51 /* bandwidth.cc in Sources */,
 				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
