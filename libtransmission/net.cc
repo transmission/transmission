@@ -408,7 +408,7 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
     auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
     auto const sockfd = accept(listening_sockfd, reinterpret_cast<sockaddr*>(&sock), &len);
-    if (sockfd == TR_BAD_SOCKET || len == 0)
+    if (sockfd == TR_BAD_SOCKET)
     {
         return {};
     }
@@ -740,7 +740,7 @@ std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockadd
         return tr_socket_address{ addr, tr_port::from_network(sin6->sin6_port) };
     }
 
-    TR_ASSERT_MSG(false, "invalid address family");
+    tr_logAddDebug(fmt::format("Unsupported address family {:d}", from->sa_family));
     return {};
 }
 
