@@ -3,13 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::adjacent_find
+#include <algorithm> // std::adjacent_find, std::sort
 #include <cstddef>
 #include <functional>
 #include <utility>
 #include <vector>
 
-#include <small/set.hpp>
+#include <small/vector.hpp>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
@@ -21,7 +21,7 @@
 
 namespace
 {
-std::vector<tr_block_span_t> make_spans(small::set<tr_block_index_t> const& blocks)
+std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
 {
     if (std::empty(blocks))
     {
@@ -79,7 +79,7 @@ std::vector<tr_block_span_t> Wishlist::next(
 
     maybe_rebuild_candidate_list();
 
-    auto blocks = small::set<tr_block_index_t>{};
+    auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
     {
@@ -114,10 +114,13 @@ std::vector<tr_block_span_t> Wishlist::next(
                 continue;
             }
 
-            blocks.insert(block);
+            blocks.emplace_back(block);
         }
     }
 
+    // Ensure the list of blocks are sorted
+    // The list needs to be unique as well, but that should come naturally
+    std::sort(std::begin(blocks), std::end(blocks));
     return make_spans(blocks);
 }
 
