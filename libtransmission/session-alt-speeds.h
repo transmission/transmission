@@ -41,12 +41,12 @@ public:
         // NB: When adding a field here, you must also add it to
         // fields() if you want it to be in session-settings.json
         bool is_active{ false };
-        size_t speed_up_kbyps{ 50U };
-        size_t speed_down_kbyps{ 50U };
         bool scheduler_enabled{ false }; // whether alt speeds toggle on and off on schedule
-        size_t use_on_these_weekdays{ TR_SCHED_ALL };
         size_t minute_begin{ 540U }; // minutes past midnight; 9AM
         size_t minute_end{ 1020U }; // minutes past midnight; 5PM
+        size_t speed_down_kbyps{ 50U };
+        size_t speed_up_kbyps{ 50U };
+        size_t use_on_these_weekdays{ TR_SCHED_ALL };
 
     private:
         [[nodiscard]] Fields fields() override

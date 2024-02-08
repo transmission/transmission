@@ -47,20 +47,20 @@ public:
 
         // NB: When adding a field here, you must also add it to
         // fields() if you want it to be in session-settings.json
-        size_t anti_brute_force_limit = 100U;
         bool authentication_required = false;
-        std::string bind_address_str = "0.0.0.0";
-        std::string host_whitelist_str = "";
         bool is_anti_brute_force_enabled = false;
         bool is_enabled = false;
         bool is_host_whitelist_enabled = true;
         bool is_whitelist_enabled = true;
-        tr_port port = tr_port::from_host(TR_DEFAULT_RPC_PORT);
+        size_t anti_brute_force_limit = 100U;
+        std::string bind_address_str = "0.0.0.0";
+        std::string host_whitelist_str = "";
         std::string salted_password = "";
-        tr_mode_t socket_mode = 0750;
         std::string url = TR_DEFAULT_RPC_URL_STR;
         std::string username = "";
         std::string whitelist_str = TR_DEFAULT_RPC_WHITELIST;
+        tr_mode_t socket_mode = 0750;
+        tr_port port = tr_port::from_host(TR_DEFAULT_RPC_PORT);
 
     private:
         [[nodiscard]] Fields fields() override
