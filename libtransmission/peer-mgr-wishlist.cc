@@ -275,19 +275,19 @@ void Wishlist::resort_piece(CandidateVec::iterator const pos_old)
         return;
     }
 
-    TR_ASSERT(pos_old != std::end(candidates_));
-    if (auto const pos_next = std::next(pos_old); std::is_sorted(
-            pos_old == std::begin(candidates_) ? pos_old : std::prev(pos_old),
-            pos_next == std::end(candidates_) ? pos_next : std::next(pos_next)))
+    // Candidate needs to be moved towards the front of the list
+    if (auto const pos_next = std::next(pos_old), pos_begin = std::begin(candidates_);
+        pos_old > pos_begin && *pos_old < *std::prev(pos_old))
     {
-        return;
+        auto const pos_new = std::lower_bound(pos_begin, pos_old, *pos_old);
+        std::rotate(pos_new, pos_old, pos_next);
     }
-
-    auto const tmp = *pos_old;
-    candidates_.erase(pos_old);
-
-    auto const pos_new = std::lower_bound(std::begin(candidates_), std::end(candidates_), tmp);
-    candidates_.insert(pos_new, tmp);
+    // Candidate needs to be moved towards the end of the list
+    else if (auto const pos_end = std::end(candidates_); pos_next < pos_end && *pos_next < *pos_old)
+    {
+        auto const pos_new = std::lower_bound(pos_next, pos_end, *pos_old);
+        std::rotate(pos_old, pos_next, pos_new);
+    }
 }
 
 void Wishlist::remove_piece(tr_piece_index_t const piece)
