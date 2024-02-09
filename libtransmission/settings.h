@@ -45,7 +45,7 @@ protected:
         tr_preferred_transport*,
         tr_tos_t*,
         tr_verify_added_mode*>;
-    using field_value_type = std::pair<const field_key_type, field_mapped_type>;
+    using field_value_type = std::pair<field_key_type const, field_mapped_type>;
     using Fields = std::vector<field_value_type>;
 
     Settings() = default;
