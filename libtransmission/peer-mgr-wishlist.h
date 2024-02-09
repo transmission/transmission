@@ -64,54 +64,8 @@ public:
         virtual ~Mediator() = default;
     };
 
-private:
-    struct Candidate
-    {
-        Candidate(
-            tr_piece_index_t piece_in,
-            size_t replication_in,
-            tr_priority_t priority_in,
-            tr_piece_index_t salt_in,
-            Mediator const* mediator)
-            : piece{ piece_in }
-            , replication{ replication_in }
-            , priority{ priority_in }
-            , salt{ salt_in }
-            , mediator_{ mediator }
-        {
-        }
-
-        [[nodiscard]] int compare(Candidate const& that) const noexcept; // <=>
-
-        [[nodiscard]] auto operator<(Candidate const& that) const // less than
-        {
-            return compare(that) < 0;
-        }
-
-        tr_piece_index_t piece;
-
-        // Caching the following 2 values are highly beneficial, because:
-        // - they are often used (mainly because resort_piece() is called
-        //   every time we receive a block)
-        // - does not change as often compared to missing blocks
-        // - calculating their values involves sifting through bitfield(s),
-        //   which is expensive.
-        size_t replication;
-        tr_priority_t priority;
-
-        tr_piece_index_t salt;
-
-    private:
-        Mediator const* mediator_;
-    };
-
-public:
     explicit Wishlist(std::unique_ptr<Mediator> mediator_in);
-
-    constexpr void set_candidates_dirty() noexcept
-    {
-        candidates_dirty_ = true;
-    }
+    ~Wishlist();
 
     // the next blocks that we should request from a peer
     [[nodiscard]] std::vector<tr_block_span_t> next(
@@ -119,26 +73,7 @@ public:
         std::function<bool(tr_piece_index_t)> const& peer_has_piece,
         std::function<bool(tr_block_index_t)> const& has_active_pending_to_peer);
 
-    void dec_replication();
-    void dec_replication_from_bitfield(tr_bitfield const& bitfield);
-    void inc_replication();
-    void inc_replication_from_bitfield(tr_bitfield const& bitfield);
-    void inc_replication_piece(tr_piece_index_t piece);
-
-    void remove_piece(tr_piece_index_t piece);
-    void resort_piece(tr_piece_index_t piece);
-
 private:
-    using CandidateVec = std::vector<Candidate>;
-
-    CandidateVec::iterator piece_lookup(tr_piece_index_t piece);
-    void maybe_rebuild_candidate_list();
-    void resort_piece(CandidateVec::iterator pos_old);
-
-    CandidateVec candidates_;
-    bool candidates_dirty_ = true;
-
-    std::array<libtransmission::ObserverTag, 8U> const tags_;
-
-    std::unique_ptr<Mediator> const mediator_;
+    class Impl;
+    std::unique_ptr<Impl> impl_;
 };
