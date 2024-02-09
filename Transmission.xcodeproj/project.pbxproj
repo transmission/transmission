@@ -2909,8 +2909,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
@@ -3041,10 +3040,13 @@
 			files = (
 			);
 			inputPaths = (
+				"update-version-h.sh",
+				CMakeLists.txt,
 			);
 			name = "Generate version file";
 			outputPaths = (
 				"$(SRCROOT)/libtransmission/version.h",
+				"$(SRCROOT)/libtransmission/version.h.new",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
