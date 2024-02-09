@@ -355,6 +355,7 @@ public:
     {
     public:
         Settings() = default;
+        virtual ~Settings() = default;
 
         explicit Settings(tr_variant const& src)
         {
@@ -533,6 +534,11 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
+    [[nodiscard]] constexpr auto const& settings() const noexcept
+    {
+        return settings_;
+    }
+
     // paths
 
     [[nodiscard]] constexpr auto const& configDir() const noexcept
@@ -552,7 +558,7 @@ public:
 
     [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
-        return settings_.download_dir;
+        return settings().download_dir;
     }
 
     void setDownloadDir(std::string_view dir)
@@ -565,7 +571,7 @@ public:
 
     [[nodiscard]] constexpr auto const& defaultTrackersStr() const noexcept
     {
-        return settings_.default_trackers_str;
+        return settings().default_trackers_str;
     }
 
     [[nodiscard]] constexpr auto const& defaultTrackers() const noexcept
@@ -579,7 +585,7 @@ public:
 
     [[nodiscard]] constexpr auto const& incompleteDir() const noexcept
     {
-        return settings_.incomplete_dir;
+        return settings().incomplete_dir;
     }
 
     void setIncompleteDir(std::string_view dir)
@@ -589,7 +595,7 @@ public:
 
     [[nodiscard]] constexpr auto useIncompleteDir() const noexcept
     {
-        return settings_.incomplete_dir_enabled;
+        return settings().incomplete_dir_enabled;
     }
 
     constexpr void useIncompleteDir(bool enabled) noexcept
@@ -634,12 +640,12 @@ public:
 
     [[nodiscard]] auto blocklist_enabled() const noexcept
     {
-        return settings_.blocklist_enabled;
+        return settings().blocklist_enabled;
     }
 
     [[nodiscard]] constexpr auto const& blocklistUrl() const noexcept
     {
-        return settings_.blocklist_url;
+        return settings().blocklist_url;
     }
 
     void setBlocklistUrl(std::string_view url)
@@ -659,7 +665,7 @@ public:
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
     {
-        return settings_.peer_congestion_algorithm;
+        return settings().peer_congestion_algorithm;
     }
 
     void setPeerCongestionAlgorithm(std::string_view algorithm)
@@ -674,12 +680,12 @@ public:
 
     [[nodiscard]] constexpr auto peerLimit() const noexcept
     {
-        return settings_.peer_limit_global;
+        return settings().peer_limit_global;
     }
 
     [[nodiscard]] constexpr auto peerLimitPerTorrent() const noexcept
     {
-        return settings_.peer_limit_per_torrent;
+        return settings().peer_limit_per_torrent;
     }
 
     // bandwidth
@@ -700,7 +706,7 @@ public:
 
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
     {
-        return settings_.announce_ip;
+        return settings().announce_ip;
     }
 
     void setAnnounceIP(std::string_view ip)
@@ -710,7 +716,7 @@ public:
 
     [[nodiscard]] constexpr bool useAnnounceIP() const noexcept
     {
-        return settings_.announce_ip_enabled;
+        return settings().announce_ip_enabled;
     }
 
     constexpr void useAnnounceIP(bool enabled) noexcept
@@ -847,17 +853,17 @@ public:
 
     [[nodiscard]] constexpr auto queueStalledEnabled() const noexcept
     {
-        return settings_.queue_stalled_enabled;
+        return settings().queue_stalled_enabled;
     }
 
     [[nodiscard]] constexpr auto queueStalledMinutes() const noexcept
     {
-        return settings_.queue_stalled_minutes;
+        return settings().queue_stalled_minutes;
     }
 
     [[nodiscard]] constexpr auto uploadSlotsPerTorrent() const noexcept
     {
-        return settings_.upload_slots_per_torrent;
+        return settings().upload_slots_per_torrent;
     }
 
     [[nodiscard]] constexpr auto isClosing() const noexcept
@@ -867,17 +873,17 @@ public:
 
     [[nodiscard]] constexpr auto encryptionMode() const noexcept
     {
-        return settings_.encryption_mode;
+        return settings().encryption_mode;
     }
 
     [[nodiscard]] constexpr auto preallocationMode() const noexcept
     {
-        return settings_.preallocation_mode;
+        return settings().preallocation_mode;
     }
 
     [[nodiscard]] constexpr auto shouldScrapePausedTorrents() const noexcept
     {
-        return settings_.should_scrape_paused_torrents;
+        return settings().should_scrape_paused_torrents;
     }
 
     [[nodiscard]] constexpr auto shouldPauseAddedTorrents() const noexcept
@@ -887,49 +893,49 @@ public:
 
     [[nodiscard]] constexpr auto shouldFullyVerifyAddedTorrents() const noexcept
     {
-        return settings_.torrent_added_verify_mode == TR_VERIFY_ADDED_FULL;
+        return settings().torrent_added_verify_mode == TR_VERIFY_ADDED_FULL;
     }
 
     [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept
     {
-        return settings_.should_delete_source_torrents;
+        return settings().should_delete_source_torrents;
     }
 
     [[nodiscard]] constexpr auto allowsDHT() const noexcept
     {
-        return settings_.dht_enabled;
+        return settings().dht_enabled;
     }
 
     [[nodiscard]] constexpr bool allowsLPD() const noexcept
     {
-        return settings_.lpd_enabled;
+        return settings().lpd_enabled;
     }
 
     [[nodiscard]] constexpr auto allows_pex() const noexcept
     {
-        return settings_.pex_enabled;
+        return settings().pex_enabled;
     }
 
     [[nodiscard]] constexpr auto allowsTCP() const noexcept
     {
-        return settings_.tcp_enabled;
+        return settings().tcp_enabled;
     }
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
     [[nodiscard]] constexpr auto preferred_transport() const noexcept
     {
-        return settings_.preferred_transport;
+        return settings().preferred_transport;
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
     {
-        return settings_.idle_seeding_limit_enabled;
+        return settings().idle_seeding_limit_enabled;
     }
 
     [[nodiscard]] constexpr auto idleLimitMinutes() const noexcept
     {
-        return settings_.idle_seeding_limit_minutes;
+        return settings().idle_seeding_limit_minutes;
     }
 
     /*module_visible*/
@@ -998,22 +1004,22 @@ public:
 
     [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
-        return settings_.is_incomplete_file_naming_enabled;
+        return settings().is_incomplete_file_naming_enabled;
     }
 
     [[nodiscard]] constexpr auto isPortRandom() const noexcept
     {
-        return settings_.peer_port_random_on_start;
+        return settings().peer_port_random_on_start;
     }
 
     [[nodiscard]] constexpr auto isRatioLimited() const noexcept
     {
-        return settings_.ratio_limit_enabled;
+        return settings().ratio_limit_enabled;
     }
 
     [[nodiscard]] constexpr auto desiredRatio() const noexcept
     {
-        return settings_.ratio_limit;
+        return settings().ratio_limit;
     }
 
     void verify_add(tr_torrent* tor);

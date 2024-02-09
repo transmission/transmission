@@ -9,6 +9,7 @@ Checks: >
   cert-*,
   -cert-err58-cpp,
   clang-analyzer-*,
+  -clang-analyzer-optin.core.EnumCastOutOfRange,
   cppcoreguidelines-avoid-do-while,
   cppcoreguidelines-avoid-goto,
   cppcoreguidelines-avoid-reference-coroutine-parameters,

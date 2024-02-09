@@ -860,12 +860,11 @@ TEST_F(FileTest, pathDirname)
     for (auto const& [input, expected] : DirnameTests)
     {
         EXPECT_EQ(expected, tr_sys_path_dirname(input)) << "input[" << input << "] expected [" << expected << "] actual ["
-                                                        << tr_sys_path_dirname(input) << ']' << std::endl;
+                                                        << tr_sys_path_dirname(input) << "]\n";
 
         auto path = tr_pathbuf{ input };
         path.popdir();
-        EXPECT_EQ(expected, path) << "input[" << input << "] expected [" << expected << "] actual [" << path << ']'
-                                  << std::endl;
+        EXPECT_EQ(expected, path) << "input[" << input << "] expected [" << expected << "] actual [" << path << "]\n";
     }
 
     /* TODO: is_same(dirname(x) + '/' + basename(x), x) */
