@@ -1019,6 +1019,21 @@ void tr_rpc_server::set_whitelist(std::string_view whitelist)
     whitelist_ = parse_whitelist(whitelist);
 }
 
+void tr_rpc_server::set_ssl_enabled(bool ssl_enabled)
+{
+    settings_.ssl_enabled = ssl_enabled;
+}
+
+void tr_rpc_server::set_ssl_cert(std::string_view ssl_cert)
+{
+    settings_.ssl_cert = ssl_cert;
+}
+
+void tr_rpc_server::set_ssl_key(std::string_view ssl_key)
+{
+    settings_.ssl_key = ssl_key;
+}
+
 // --- PASSWORD
 
 void tr_rpc_server::set_username(std::string_view username)

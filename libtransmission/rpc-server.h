@@ -59,7 +59,7 @@ public:
         std::string salted_password = "";
         tr_mode_t socket_mode = 0750;
         std::string ssl_cert = "";
-        bool is_ssl_enabled = false;
+        bool ssl_enabled = false;
         std::string ssl_key = "";
         std::string url = TR_DEFAULT_RPC_URL_STR;
         std::string username = "";
@@ -80,7 +80,7 @@ public:
                 { TR_KEY_rpc_password, &salted_password },
                 { TR_KEY_rpc_socket_mode, &socket_mode },
                 { TR_KEY_rpc_ssl_cert, &ssl_cert },
-                { TR_KEY_rpc_ssl_enabled, &is_ssl_enabled },
+                { TR_KEY_rpc_ssl_enabled, &ssl_enabled },
                 { TR_KEY_rpc_ssl_key, &ssl_key },
                 { TR_KEY_rpc_url, &url },
                 { TR_KEY_rpc_username, &username },
@@ -192,7 +192,7 @@ public:
 
     [[nodiscard]] constexpr auto is_ssl_enabled() const noexcept
     {
-        return settings_.is_ssl_enabled;
+        return settings_.ssl_enabled;
     }
 
     [[nodiscard]] constexpr auto const& ssl_cert() const noexcept
@@ -204,6 +204,11 @@ public:
     {
         return settings_.ssl_key;
     }
+
+    void set_ssl_enabled(bool ssl_enabled);
+    void set_ssl_cert(std::string_view ssl_cert);
+    void set_ssl_key(std::string_view ssl_key);
+
     Settings settings_;
 
     std::vector<std::string> host_whitelist_;
