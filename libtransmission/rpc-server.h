@@ -85,7 +85,7 @@ public:
         }
     };
 
-    tr_rpc_server(tr_session* session, Settings settings);
+    tr_rpc_server(tr_session* session, Settings&& settings);
     ~tr_rpc_server();
 
     tr_rpc_server(tr_rpc_server&) = delete;
@@ -93,7 +93,7 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    void load(Settings settings);
+    void load(Settings&& settings);
 
     [[nodiscard]] constexpr Settings const& settings() const
     {

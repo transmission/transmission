@@ -30,6 +30,7 @@ Checks: >
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
+  -performance-move-const-arg,
   portability-*,
   readability-*,
   -readability-function-cognitive-complexity,
