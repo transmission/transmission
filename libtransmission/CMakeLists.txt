@@ -118,6 +118,8 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
+        settings.cc
+        settings.h
         stats.cc
         stats.h
         subprocess-posix.cc
