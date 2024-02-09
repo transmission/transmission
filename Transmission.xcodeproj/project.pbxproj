@@ -437,7 +437,6 @@
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
 		CCEBA596277340F6DF9F4480 /* session-alt-speeds.cc in Sources */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */; };
 		CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */; };
-		D9057D68C13B75636539B680 /* variant-converters.cc in Sources */ = {isa = PBXBuildFile; fileRef = D9057D68C13B75636539B681 /* variant-converters.cc */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E975121263DD973CAF4AEBA0 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = E975121263DD973CAF4AEBA1 /* timer.h */; };
@@ -1350,7 +1349,6 @@
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "mime-types.h"; sourceTree = "<group>"; };
 		CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-alt-speeds.cc"; sourceTree = "<group>"; };
 		CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "session-alt-speeds.h"; sourceTree = "<group>"; };
-		D9057D68C13B75636539B681 /* variant-converters.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-converters.cc"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "interned-string.h"; sourceTree = "<group>"; };
@@ -1883,7 +1881,6 @@
 				CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */,
 				ED67FB402B70FCE400D8A037 /* settings.cc */,
 				ED67FB412B70FCE400D8A037 /* settings.h */,
-				D9057D68C13B75636539B681 /* variant-converters.cc */,
 				A25D2CBB0CF4C7190096A262 /* stats.cc */,
 				A25D2CBA0CF4C7190096A262 /* stats.h */,
 				C11DEA141FCD31C0009E22B9 /* subprocess-posix.cc */,
@@ -3127,7 +3124,6 @@
 				ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */,
 				BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */,
 				CCEBA596277340F6DF9F4480 /* session-alt-speeds.cc in Sources */,
-				D9057D68C13B75636539B680 /* variant-converters.cc in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */,
 				2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */,
 				BE7AA337F6752914B0C416B2 /* utils-ev.cc in Sources */,
