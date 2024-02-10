@@ -248,7 +248,7 @@ char const* torrentRemove(tr_session* session, tr_variant::Map const& args_in, t
     {
         if (auto const status = session->rpcNotify(type, tor); (status & TR_RPC_NOREMOVE) == 0)
         {
-            tr_torrentRemove(tor, delete_flag, nullptr, nullptr);
+            tr_torrentRemove(tor, delete_flag, nullptr, nullptr, nullptr, nullptr);
         }
     }
 

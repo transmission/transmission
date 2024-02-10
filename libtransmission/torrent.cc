@@ -749,7 +749,13 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
-void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+void tr_torrentRemoveInSessionThread(
+    tr_torrent* tor,
+    bool delete_flag,
+    tr_fileFunc delete_func,
+    void* delete_user_data,
+    tr_SuccessNotifyFunc notify_func,
+    void* notify_user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -765,9 +771,9 @@ void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileF
             delete_func = start_stop_helpers::removeTorrentFile;
         }
 
-        auto const delete_func_wrapper = [&delete_func, user_data](char const* filename)
+        auto const delete_func_wrapper = [&delete_func, delete_user_data](char const* filename)
         {
-            delete_func(filename, user_data, nullptr);
+            delete_func(filename, delete_user_data, nullptr);
         };
 
         tr_error error;
@@ -789,6 +795,11 @@ void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileF
     {
         tr_torrentFreeInSessionThread(tor);
     }
+
+    if (notify_func != nullptr)
+    {
+        notify_func(ok, notify_user_data);
+    }
 }
 
 void tr_torrentStop(tr_torrent* tor)
@@ -805,7 +816,13 @@ void tr_torrentStop(tr_torrent* tor)
     tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
 }
 
-void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+void tr_torrentRemove(
+    tr_torrent* tor,
+    bool delete_flag,
+    tr_fileFunc delete_func,
+    void* delete_user_data,
+    tr_SuccessNotifyFunc notify_func,
+    void* notify_user_data)
 {
     using namespace start_stop_helpers;
 
@@ -813,7 +830,14 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 
     tor->is_deleting_ = true;
 
-    tor->session->run_in_session_thread(tr_torrentRemoveInSessionThread, tor, delete_flag, delete_func, user_data);
+    tor->session->run_in_session_thread(
+        tr_torrentRemoveInSessionThread,
+        tor,
+        delete_flag,
+        delete_func,
+        delete_user_data,
+        notify_func,
+        notify_user_data);
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)

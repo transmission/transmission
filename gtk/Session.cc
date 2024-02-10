@@ -18,7 +18,6 @@
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/tr-assert.h>
 #include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/variant.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
@@ -35,6 +34,8 @@
 #include <glibmm/miscutils.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/variant.h>
+
+#include <glib.h>
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/sortlistmodel.h>
@@ -81,7 +82,6 @@ public:
     void set_port_test_pending(bool pending, PortTestIpProtocol ip_protocol);
 
     void update();
-    void update_torrent_list(size_t expected_count = 0);
     void torrents_added();
 
     void add_files(std::vector<Glib::RefPtr<Gio::File>> const& files, bool do_start, bool do_prompt, bool do_notify);
@@ -658,12 +658,12 @@ void Session::Impl::add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_no
 {
     if (torrent != nullptr)
     {
+        raw_model_->insert_sorted(torrent, &Torrent::compare_by_id);
+
         if (do_notify)
         {
             gtr_notify_torrent_added(get_core_ptr(), torrent->get_id());
         }
-
-        update_torrent_list();
     }
 }
 
@@ -908,6 +908,12 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
+    struct CallbackUserData
+    {
+        std::weak_ptr<Impl> impl;
+        tr_torrent_id_t id;
+    };
+
     if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         /* remove the torrent */
@@ -916,7 +922,37 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
             delete_files,
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
-            nullptr);
+            nullptr,
+            [](bool succeeded, void* user_data)
+            {
+                if (succeeded)
+                {
+                    // Unfortunatelly, there is no thread-safe C++ binding to
+                    // this function, so we have to use the C API directly.
+                    g_idle_add(
+                        [](gpointer user_data_) -> gboolean
+                        {
+                            auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data_));
+                            if (auto const impl = ud->impl.lock(); impl)
+                            {
+                                if (auto const& [torrent_, position_] = impl->find_torrent_by_id(ud->id); torrent_)
+                                {
+                                    /* remove from the gui */
+                                    impl->get_raw_model()->remove(position_);
+                                }
+                            }
+
+                            return G_SOURCE_REMOVE;
+                        },
+                        user_data);
+                }
+                else
+                {
+                    delete static_cast<CallbackUserData*>(user_data);
+                    // Let the GUI normal polling get the error message.
+                }
+            },
+            new CallbackUserData{ impl_, id });
     }
 }
 
@@ -935,7 +971,17 @@ void Session::load(bool force_paused)
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
     tr_ctorFree(ctor);
 
-    impl_->update_torrent_list(n_torrents);
+    auto raw_torrents = std::vector<tr_torrent*>{};
+    raw_torrents.resize(n_torrents);
+    tr_sessionGetAllTorrents(session, std::data(raw_torrents), std::size(raw_torrents));
+
+    auto torrents = std::vector<Glib::RefPtr<Torrent>>();
+    torrents.reserve(raw_torrents.size());
+    std::transform(raw_torrents.begin(), raw_torrents.end(), std::back_inserter(torrents), &Torrent::create);
+    std::sort(torrents.begin(), torrents.end(), &Torrent::less_by_id);
+
+    auto const model = impl_->get_raw_model();
+    model->splice(0, model->get_n_items(), torrents);
 }
 
 void Session::clear()
@@ -969,9 +1015,6 @@ void Session::Impl::update()
     auto torrent_ids = std::unordered_set<tr_torrent_id_t>();
     auto changes = Torrent::ChangeFlags();
 
-    /* update the torrent list itself */
-    update_torrent_list();
-
     /* update the model */
     for (auto i = 0U, count = raw_model_->get_n_items(); i < count; ++i)
     {
@@ -990,52 +1033,6 @@ void Session::Impl::update()
     {
         signal_torrents_changed_.emit(torrent_ids, changes);
     }
-}
-
-void Session::Impl::update_torrent_list(size_t expected_count)
-{
-    auto torrents = std::vector<tr_torrent*>{};
-    do
-    {
-        torrents.resize(expected_count);
-        expected_count = tr_sessionGetAllTorrents(session_, std::data(torrents), std::size(torrents));
-    } while (torrents.size() < expected_count);
-    torrents.resize(expected_count);
-
-    std::sort(torrents.begin(), torrents.end(), [](tr_torrent* a, tr_torrent* b) { return tr_torrentId(a) < tr_torrentId(b); });
-
-    // don't rebuild the model, because that would disrupt UI
-    // instead, iterate both lists and fix the differences
-    for (size_t i = 0; i < torrents.size();)
-    {
-        auto existing = raw_model_->get_item(i);
-
-        auto* incoming = torrents[i];
-        if (!existing || existing->get_id() > tr_torrentId(incoming))
-        {
-            // new torrent detected
-            raw_model_->insert(i, Torrent::create(incoming));
-            ++i;
-        }
-        else if (existing->get_id() < tr_torrentId(incoming))
-        {
-            // existing torrent was removed
-            raw_model_->remove(i);
-        }
-        else
-        {
-            // torrent is the same in both lists:
-            ++i;
-        }
-    }
-
-    // remove any remaining elements from the model
-    if (auto mlen = raw_model_->get_n_items(); mlen > torrents.size())
-    {
-        raw_model_->splice(torrents.size(), mlen - torrents.size(), {});
-    }
-
-    TR_ASSERT(raw_model_->get_n_items() == torrents.size());
 }
 
 /**
