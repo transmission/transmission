@@ -18,6 +18,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-assert.h>
 #include <libtransmission/utils.h> // tr_time()
 #include <libtransmission/variant.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValid()
