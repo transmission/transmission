@@ -8,7 +8,7 @@
 	branch = post-1.2.1-transmission
 [submodule "third-party/libevent"]
 	path = third-party/libevent
-	url = https://github.com/herbyuan/libevent
+	url = https://github.com/transmission/libevent
 	branch = post-2.1.12-transmission
 [submodule "third-party/libnatpmp"]
 	path = third-party/libnatpmp
