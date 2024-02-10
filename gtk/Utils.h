@@ -30,6 +30,7 @@
 #include <fmt/core.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <ctime>
 #include <functional>
 #include <list>
@@ -52,7 +53,7 @@ void gtr_error(std::string const& message);
 ****
 ***/
 
-enum class GtrUnicode
+enum class GtrUnicode : uint8_t
 {
     Up,
     Down,

@@ -619,7 +619,7 @@ TEST_F(DhtTest, pingsAddedNodes)
     EXPECT_TRUE(addr.has_value());
     assert(addr.has_value());
     auto constexpr Port = tr_port::from_host(128);
-    dht->add_node(*addr, Port);
+    dht->maybe_add_node(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
     EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().addrport.address());

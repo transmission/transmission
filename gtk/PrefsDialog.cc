@@ -14,7 +14,6 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 
 #include <glibmm/date.h>
@@ -43,11 +42,14 @@
 
 #include <fmt/core.h>
 
+#include <array>
 #include <limits>
 #include <map>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 using namespace libtransmission::Values;
 
@@ -879,9 +881,22 @@ public:
     TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
+    enum PortTestStatus : uint8_t
+    {
+        PORT_TEST_UNKNOWN = 0U,
+        PORT_TEST_CHECKING,
+        PORT_TEST_OPEN,
+        PORT_TEST_CLOSED,
+        PORT_TEST_ERROR
+    };
+
+    void portTestSetSensitive();
+    void updatePortStatusText();
     void onCorePrefsChanged(tr_quark key);
-    void onPortTested(bool isOpen);
+    void onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
     void onPortTest();
+
+    static std::string_view getPortStatusText(PortTestStatus status) noexcept;
 
 private:
     Glib::RefPtr<Session> core_;
@@ -892,15 +907,18 @@ private:
 
     sigc::connection portTag_;
     sigc::connection prefsTag_;
+
+    std::array<PortTestStatus, Session::NUM_PORT_TEST_IP_PROTOCOL> portTestStatus_ = {};
 };
 
 void NetworkPage::onCorePrefsChanged(tr_quark const key)
 {
     if (key == TR_KEY_peer_port)
     {
-        gtr_label_set_text(*portLabel_, _("Status unknown"));
-        portButton_->set_sensitive(true);
-        portSpin_->set_sensitive(true);
+        portTestStatus_[Session::PORT_TEST_IPV4] = PORT_TEST_UNKNOWN;
+        portTestStatus_[Session::PORT_TEST_IPV6] = PORT_TEST_UNKNOWN;
+        updatePortStatusText();
+        portTestSetSensitive();
     }
 }
 
@@ -910,28 +928,79 @@ NetworkPage::~NetworkPage()
     portTag_.disconnect();
 }
 
-void NetworkPage::onPortTested(bool isOpen)
+std::string_view NetworkPage::getPortStatusText(PortTestStatus const status) noexcept
 {
-    portLabel_->set_markup(fmt::format(
-        isOpen ? _("Port is {markup_begin}open{markup_end}") : _("Port is {markup_begin}closed{markup_end}"),
-        fmt::arg("markup_begin", "<b>"),
-        fmt::arg("markup_end", "</b>")));
-    portButton_->set_sensitive(true);
-    portSpin_->set_sensitive(true);
+    switch (status)
+    {
+    case PORT_TEST_UNKNOWN:
+        return C_("Port test status", "unknown");
+    case PORT_TEST_CHECKING:
+        return C_("Port test status", "checking…");
+    case PORT_TEST_OPEN:
+        return C_("Port test status", "open");
+    case PORT_TEST_CLOSED:
+        return C_("Port test status", "closed");
+    case PORT_TEST_ERROR:
+        return C_("Port test status", "error");
+    default:
+        return {};
+    }
+}
+
+void NetworkPage::updatePortStatusText()
+{
+    auto const status_ipv4 = getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV4]);
+    auto const status_ipv6 = getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV6]);
+
+    portLabel_->set_markup(
+        portTestStatus_[Session::PORT_TEST_IPV4] == portTestStatus_[Session::PORT_TEST_IPV6] ?
+            fmt::format(_("Status: <b>{status}</b>"), fmt::arg("status", status_ipv4)) :
+            fmt::format(
+                _("Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"),
+                fmt::arg("status_ipv4", status_ipv4),
+                fmt::arg("status_ipv6", status_ipv6)));
+}
+
+void NetworkPage::portTestSetSensitive()
+{
+    // Depend on the RPC call status instead of the UI status, so that the widgets
+    // won't be enabled even if the port peer port changed while we have port-test
+    // RPC call(s) in-flight.
+    auto const sensitive = !core_->port_test_pending(Session::PORT_TEST_IPV4) &&
+        !core_->port_test_pending(Session::PORT_TEST_IPV6);
+    portButton_->set_sensitive(sensitive);
+    portSpin_->set_sensitive(sensitive);
+}
+
+void NetworkPage::onPortTested(std::optional<bool> const result, Session::PortTestIpProtocol const ip_protocol)
+{
+    // Only update the UI if the current status is "checking", so that
+    // we won't show the port test results for the old peer port if it
+    // changed while we have port-test RPC call(s) in-flight.
+    if (portTestStatus_[ip_protocol] == PORT_TEST_CHECKING)
+    {
+        portTestStatus_[ip_protocol] = result ? (*result ? PORT_TEST_OPEN : PORT_TEST_CLOSED) : PORT_TEST_ERROR;
+        updatePortStatusText();
+    }
+    portTestSetSensitive();
 }
 
 void NetworkPage::onPortTest()
 {
-    portButton_->set_sensitive(false);
-    portSpin_->set_sensitive(false);
-    portLabel_->set_text(_("Testing TCP port…"));
+    portTestStatus_[Session::PORT_TEST_IPV4] = PORT_TEST_CHECKING;
+    portTestStatus_[Session::PORT_TEST_IPV6] = PORT_TEST_CHECKING;
+    updatePortStatusText();
 
     if (!portTag_.connected())
     {
-        portTag_ = core_->signal_port_tested().connect([this](bool is_open) { onPortTested(is_open); });
+        portTag_ = core_->signal_port_tested().connect(
+            [this](std::optional<bool> status, Session::PortTestIpProtocol ip_protocol) { onPortTested(status, ip_protocol); });
     }
 
-    core_->port_test();
+    core_->port_test(Session::PORT_TEST_IPV4);
+    core_->port_test(Session::PORT_TEST_IPV6);
+
+    portTestSetSensitive();
 }
 
 NetworkPage::NetworkPage(
@@ -945,6 +1014,7 @@ NetworkPage::NetworkPage(
     , portSpin_(init_spin_button("listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
 {
     portButton_->signal_clicked().connect([this]() { onPortTest(); });
+    updatePortStatusText();
 
     prefsTag_ = core_->signal_prefs_changed().connect([this](auto key) { onCorePrefsChanged(key); });
 

@@ -13,7 +13,6 @@
 #include <QUrl>
 
 #include "Application.h" // qApp
-#include "Filters.h"
 #include "Speed.h"
 #include "Torrent.h"
 
@@ -178,8 +177,14 @@ bool change(TrackerStat& setme, tr_variant const* value)
         changed = true;
     }
 
-    if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty() && trApp != nullptr)
+    if (site_changed && !setme.announce.isEmpty() && trApp != nullptr)
     {
+        if (setme.sitename.isEmpty())
+        {
+            QStringList const separated_host = QUrl{ setme.announce }.host().split(QStringLiteral("."));
+            setme.sitename = separated_host.at(separated_host.size() - 2);
+        }
+
         setme.announce = trApp->intern(setme.announce);
         trApp->load_favicon(setme.announce);
     }

@@ -460,25 +460,31 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
-    ret.merge(tr_session_settings::default_settings());
-    ret.merge(tr_rpc_server::default_settings());
+    ret.merge(tr_rpc_server::Settings{}.save());
     ret.merge(tr_session_alt_speeds::default_settings());
+    ret.merge(tr_session_settings::default_settings());
     return ret;
 }
 
 tr_variant tr_sessionGetSettings(tr_session const* session)
 {
     auto settings = tr_variant::make_map();
-    settings.merge(session->settings_.settings());
     settings.merge(session->alt_speeds_.settings());
-    settings.merge(session->rpc_server_->settings());
+    settings.merge(session->rpc_server_->settings().save());
+    settings.merge(session->settings_.settings());
     tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
     return settings;
 }
 
-tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name)
+tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name)
 {
     auto settings = tr_sessionGetDefaultSettings();
+
+    // if app defaults are provided, override libtransmission defaults
+    if (app_defaults != nullptr && app_defaults->holds_alternative<tr_variant::Map>())
+    {
+        settings.merge(*app_defaults);
+    }
 
     // if a settings file exists, use it to override the defaults
     if (auto const filename = fmt::format(
@@ -554,11 +560,11 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     // - client settings
     // - previous session's values in settings.json
     // - hardcoded defaults
-    auto settings = tr_sessionLoadSettings(config_dir, nullptr);
+    auto settings = tr_sessionLoadSettings(nullptr, config_dir, nullptr);
     settings.merge(client_settings);
 
     // if logging is desired, start it now before doing more work
-    if (auto const* settings_map = client_settings.get_if<tr_variant::Map>(); settings_map != nullptr)
+    if (auto const* settings_map = settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
         if (auto const* val = settings_map->find_if<bool>(TR_KEY_message_level); val != nullptr)
         {
@@ -746,7 +752,7 @@ void tr_session::setSettings(tr_variant const& settings, bool force)
 
     // delegate loading out the other settings
     alt_speeds_.load(settings);
-    rpc_server_->load(settings);
+    rpc_server_->load(tr_rpc_server::Settings{ settings });
 }
 
 void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
@@ -2111,7 +2117,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
-    , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
+    , rpc_server_{ std::make_unique<tr_rpc_server>(this, tr_rpc_server::Settings{ settings_dict }) }
     , now_timer_{ timer_maker_->create([this]() { on_now_timer(); }) }
     , queue_timer_{ timer_maker_->create([this]() { on_queue_timer(); }) }
     , save_timer_{ timer_maker_->create([this]() { on_save_timer(); }) }

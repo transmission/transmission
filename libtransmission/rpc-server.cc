@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <cstring> /* for strcspn() */
 #include <ctime>
 #include <memory>
@@ -77,7 +78,7 @@ auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(((struct sockaddr_un*)nu
                                                  std::size(TrUnixSocketPrefix) };
 #endif
 
-enum tr_rpc_address_type
+enum tr_rpc_address_type : uint8_t
 {
     TR_RPC_INET_ADDR,
     TR_RPC_UNIX_ADDR
@@ -399,7 +400,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
     }
 
     /* If whitelist is disabled, no restrictions. */
-    if (!server->is_host_whitelist_enabled_)
+    if (!server->settings_.is_host_whitelist_enabled)
     {
         return true;
     }
@@ -459,7 +460,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
     auto decoded = std::string_view{ decoded_str };
     auto const username = tr_strv_sep(&decoded, ':');
     auto const password = decoded;
-    return server->username() == username && tr_ssha1_matches(server->salted_password_, password);
+    return server->username() == username && tr_ssha1_matches(server->settings().salted_password, password);
 }
 
 void handle_request(struct evhttp_request* req, void* arg)
@@ -473,7 +474,7 @@ void handle_request(struct evhttp_request* req, void* arg)
     {
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->anti_brute_force_limit_)
+        if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
         {
             send_simple_response(req, HttpErrorForbidden);
             return;
@@ -658,7 +659,7 @@ void start_server(tr_rpc_server* server)
     auto const port = server->port();
 
     bool const success = server->bind_address_->is_unix_addr() ?
-        bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_) :
+        bindUnixSocket(base, httpd, address.c_str(), server->settings().socket_mode) :
         (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
 
     auto const addr_port_str = server->bind_address_->to_string(port);
@@ -749,12 +750,12 @@ auto parse_whitelist(std::string_view whitelist)
 
 void tr_rpc_server::set_enabled(bool is_enabled)
 {
-    is_enabled_ = is_enabled;
+    settings_.is_enabled = is_enabled;
 
     session->run_in_session_thread(
         [this]()
         {
-            if (!is_enabled_)
+            if (!settings_.is_enabled)
             {
                 stop_server(this);
             }
@@ -767,12 +768,12 @@ void tr_rpc_server::set_enabled(bool is_enabled)
 
 void tr_rpc_server::set_port(tr_port port) noexcept
 {
-    if (port_ == port)
+    if (settings_.port == port)
     {
         return;
     }
 
-    port_ = port;
+    settings_.port = port;
 
     if (is_enabled())
     {
@@ -782,35 +783,34 @@ void tr_rpc_server::set_port(tr_port port) noexcept
 
 void tr_rpc_server::set_url(std::string_view url)
 {
-    url_ = url;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our URL to '{:s}'"), url_));
+    settings_.url = url;
+    tr_logAddDebug(fmt::format("setting our URL to '{:s}'", url));
 }
 
 void tr_rpc_server::set_whitelist(std::string_view whitelist)
 {
-    this->whitelist_str_ = whitelist;
-    this->whitelist_ = parse_whitelist(whitelist);
+    settings_.whitelist_str = whitelist;
+    whitelist_ = parse_whitelist(whitelist);
 }
 
 // --- PASSWORD
 
 void tr_rpc_server::set_username(std::string_view username)
 {
-    username_ = username;
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
+    settings_.username = username;
+    tr_logAddDebug(fmt::format("setting our username to '{:s}'", username));
 }
 
 void tr_rpc_server::set_password(std::string_view password) noexcept
 {
     auto const is_salted = tr_ssha1_test(password);
-    salted_password_ = is_salted ? password : tr_ssha1(password);
-
-    tr_logAddDebug(fmt::format(FMT_STRING("setting our salted password to '{:s}'"), salted_password_));
+    settings_.salted_password = is_salted ? password : tr_ssha1(password);
+    tr_logAddDebug(fmt::format("setting our salted password to '{:s}'", settings_.salted_password));
 }
 
 void tr_rpc_server::set_password_enabled(bool enabled)
 {
-    is_password_enabled_ = enabled;
+    settings_.authentication_required = enabled;
     tr_logAddDebug(fmt::format("setting password-enabled to '{}'", enabled));
 }
 
@@ -821,7 +821,7 @@ std::string tr_rpc_server::get_bind_address() const
 
 void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 {
-    is_anti_brute_force_enabled_ = enabled;
+    settings_.is_anti_brute_force_enabled = enabled;
 
     if (!enabled)
     {
@@ -831,60 +831,47 @@ void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 
 // --- LIFECYCLE
 
-tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant const& settings)
+tr_rpc_server::tr_rpc_server(tr_session* session_in, Settings settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
     , bind_address_{ std::make_unique<class tr_rpc_address>() }
     , session{ session_in }
 {
-    load(settings);
+    load(std::move(settings));
 }
 
-void tr_rpc_server::load(tr_variant const& src)
+void tr_rpc_server::load(Settings settings)
 {
-    auto const* const src_map = src.get_if<tr_variant::Map>();
-    if (src_map != nullptr)
+    settings_ = std::move(settings);
+
+    if (!tr_strv_ends_with(settings_.url, '/'))
     {
-#define V(key, field, type, default_value, comment) \
-    if (auto const iter = src_map->find(key); iter != std::end(*src_map)) \
-    { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(iter->second); val) \
-        { \
-            this->field = *val; \
-        } \
-    }
-        RPC_SETTINGS_FIELDS(V)
-#undef V
+        settings_.url = fmt::format("{:s}/", settings_.url);
     }
 
-    if (!tr_strv_ends_with(url_, '/'))
-    {
-        url_ = fmt::format(FMT_STRING("{:s}/"), url_);
-    }
+    host_whitelist_ = parse_whitelist(settings_.host_whitelist_str);
+    set_password_enabled(settings_.authentication_required);
+    set_whitelist(settings_.whitelist_str);
+    set_username(settings_.username);
+    set_password(settings_.salted_password);
 
-    this->host_whitelist_ = parse_whitelist(host_whitelist_str_);
-    this->set_password_enabled(authentication_required_);
-    this->set_whitelist(whitelist_str_);
-    this->set_username(username_);
-    this->set_password(salted_password_);
-
-    if (!bind_address_->from_string(bind_address_str_))
+    if (!bind_address_->from_string(settings_.bind_address_str))
     {
         // NOTE: bind_address_ is default initialized to INADDR_ANY
         tr_logAddWarn(fmt::format(
             _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
             fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
-            fmt::arg("value", bind_address_str_)));
+            fmt::arg("value", settings_.bind_address_str)));
     }
 
     if (bind_address_->is_unix_addr())
     {
-        this->set_whitelist_enabled(false);
-        this->is_host_whitelist_enabled_ = false;
+        set_whitelist_enabled(false);
+        settings_.is_host_whitelist_enabled = false;
     }
     if (this->is_enabled())
     {
-        auto const rpc_uri = bind_address_->to_string(this->port()) + this->url_;
+        auto const rpc_uri = bind_address_->to_string(port()) + settings_.url;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
         session->run_in_session_thread(start_server, this);
 
@@ -903,26 +890,6 @@ void tr_rpc_server::load(tr_variant const& src)
     {
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests from '{path}'"), fmt::arg("path", web_client_dir_)));
     }
-}
-
-tr_variant tr_rpc_server::settings() const
-{
-    auto settings = tr_variant::Map{};
-#define V(key, field, type, default_value, comment) \
-    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
-    RPC_SETTINGS_FIELDS(V)
-#undef V
-    return tr_variant{ std::move(settings) };
-}
-
-tr_variant tr_rpc_server::default_settings()
-{
-    auto settings = tr_variant::Map{};
-#define V(key, field, type, default_value, comment) \
-    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(default_value));
-    RPC_SETTINGS_FIELDS(V)
-#undef V
-    return tr_variant{ std::move(settings) };
 }
 
 tr_rpc_server::~tr_rpc_server()

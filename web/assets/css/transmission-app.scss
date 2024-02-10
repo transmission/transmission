@@ -253,6 +253,10 @@ a {
     margin: 0;
     padding: 0;
   }
+
+  .flexible-space {
+    margin-right: auto;
+  }
 }
 
 #mainwin-workarea {
@@ -397,10 +401,6 @@ a {
 
 /// TORRENT CONTAINER
 
-.flexible-space {
-  margin-right: auto;
-}
-
 #torrent-container {
   flex-grow: 1;
   left: 0;
@@ -501,7 +501,7 @@ a {
     }
 
     .torrent-labels {
-      font-size: x-small;
+      font-size: small;
       font-weight: normal;
       margin-bottom: 2px;
       margin-top: 2px;
@@ -512,7 +512,7 @@ a {
 
       &.compact {
         flex: 1;
-        font-size: x-small;
+        font-size: small;
       }
     }
 
@@ -669,7 +669,7 @@ a {
     }
 
     &.compact {
-      min-width: 50px;
+      min-width: 100px;
       width: 10vw;
     }
 
@@ -1685,28 +1685,6 @@ dialog {
   font-style: italic;
 }
 
-.ui-menu {
-  width: 200px;
-}
-
 .upload-div {
   display: none;
-}
-
-.dropzone {
-  background: var(--color-bg-primary);
-  border: 2px dashed var(--color-border-stark);
-  border-radius: 5px;
-  color: var(--color-fg-primary);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  font-size: 1.2em;
-  font-weight: bold;
-  height: 100%;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  width: 100%;
 }

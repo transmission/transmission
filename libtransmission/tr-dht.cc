@@ -117,7 +117,7 @@ private:
     using Nodes = std::deque<Node>;
     using Id = std::array<unsigned char, 20>;
 
-    enum class SwarmStatus
+    enum class SwarmStatus : uint8_t
     {
         Stopped,
         Broken,
@@ -139,11 +139,9 @@ public:
     {
         tr_logAddDebug(fmt::format("Starting DHT on port {port}", fmt::arg("port", peer_port.host())));
 
-        // load up the bootstrap nodes
-        if (tr_sys_path_exists(state_filename_.c_str()))
-        {
-            std::tie(id_, bootstrap_queue_) = load_state(state_filename_);
-        }
+        // init state from scratch, or load from state file if it exists
+        std::tie(id_, bootstrap_queue_) = init_state(state_filename_);
+
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
         get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
         bootstrap_timer_->start_single_shot(100ms);
@@ -176,7 +174,7 @@ public:
         tr_logAddTrace("Done uninitializing DHT");
     }
 
-    void add_node(tr_address const& addr, tr_port port) override
+    void maybe_add_node(tr_address const& addr, tr_port port) override
     {
         if (addr.is_ipv4())
         {
@@ -207,7 +205,7 @@ public:
     }
 
 private:
-    [[nodiscard]] constexpr tr_socket_t udpSocket(int af) const noexcept
+    [[nodiscard]] constexpr tr_socket_t udp_socket(int af) const noexcept
     {
         switch (af)
         {
@@ -224,7 +222,7 @@ private:
 
     [[nodiscard]] SwarmStatus swarm_status(int family, int* const setme_node_count = nullptr) const
     {
-        if (udpSocket(family) == TR_BAD_SOCKET)
+        if (udp_socket(family) == TR_BAD_SOCKET)
         {
             if (setme_node_count != nullptr)
             {
@@ -309,7 +307,7 @@ private:
 
         auto [address, port] = bootstrap_queue_.front();
         bootstrap_queue_.pop_front();
-        add_node(address, port);
+        maybe_add_node(address, port);
         ++n_bootstrapped_;
 
         bootstrap_timer_->start_single_shot(bootstrap_interval(n_bootstrapped_));
@@ -413,12 +411,12 @@ private:
 
     void save_state() const
     {
-        auto constexpr MaxNodes = int{ 300 };
-        auto constexpr PortLen = size_t{ 2 };
-        auto constexpr CompactAddrLen = size_t{ 4 };
-        auto constexpr CompactLen = size_t{ CompactAddrLen + PortLen };
-        auto constexpr Compact6AddrLen = size_t{ 16 };
-        auto constexpr Compact6Len = size_t{ Compact6AddrLen + PortLen };
+        static auto constexpr MaxNodes = int{ 300 };
+        static auto constexpr PortLen = tr_port::CompactPortBytes;
+        static auto constexpr CompactAddrLen = tr_address::CompactAddrBytes[TR_AF_INET];
+        static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        static auto constexpr Compact6AddrLen = tr_address::CompactAddrBytes[TR_AF_INET6];
+        static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
 
         auto sins4 = std::array<struct sockaddr_in, MaxNodes>{};
         auto sins6 = std::array<struct sockaddr_in6, MaxNodes>{};
@@ -464,55 +462,65 @@ private:
         tr_variant_serde::benc().to_file(benc, state_filename_);
     }
 
-    [[nodiscard]] static std::pair<Id, Nodes> load_state(std::string_view filename)
+    [[nodiscard]] static std::pair<Id, Nodes> init_state(std::string_view filename)
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
         auto id = tr_rand_obj<Id>();
 
+        if (!tr_sys_path_exists(std::data(filename)))
+        {
+            return { id, {} };
+        }
+
+        auto otop = tr_variant_serde::benc().parse_file(filename);
+        if (!otop)
+        {
+            return { id, {} };
+        }
+
+        static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+        static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
+
+        auto& top = *otop;
         auto nodes = Nodes{};
 
-        if (auto otop = tr_variant_serde::benc().parse_file(filename); otop)
+        if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
         {
-            auto& top = *otop;
+            std::copy(std::begin(sv), std::end(sv), std::begin(id));
+        }
 
-            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
+        size_t raw_len = 0U;
+        std::byte const* raw = nullptr;
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % CompactLen == 0)
+        {
+            auto* walk = raw;
+            auto const* const end = raw + raw_len;
+            while (walk < end)
             {
-                std::copy(std::begin(sv), std::end(sv), std::begin(id));
-            }
-
-            size_t raw_len = 0U;
-            std::byte const* raw = nullptr;
-            if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
-            {
-                auto* walk = raw;
-                auto const* const end = raw + raw_len;
-                while (walk < end)
-                {
-                    auto addr = tr_address{};
-                    auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
-                    std::tie(port, walk) = tr_port::from_compact(walk);
-                    nodes.emplace_back(addr, port);
-                }
-            }
-
-            if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
-            {
-                auto* walk = raw;
-                auto const* const end = raw + raw_len;
-                while (walk < end)
-                {
-                    auto addr = tr_address{};
-                    auto port = tr_port{};
-                    std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
-                    std::tie(port, walk) = tr_port::from_compact(walk);
-                    nodes.emplace_back(addr, port);
-                }
+                auto addr = tr_address{};
+                auto port = tr_port{};
+                std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
+                std::tie(port, walk) = tr_port::from_compact(walk);
+                nodes.emplace_back(addr, port);
             }
         }
 
-        return std::make_pair(id, nodes);
+        if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % Compact6Len == 0)
+        {
+            auto* walk = raw;
+            auto const* const end = raw + raw_len;
+            while (walk < end)
+            {
+                auto addr = tr_address{};
+                auto port = tr_port{};
+                std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
+                std::tie(port, walk) = tr_port::from_compact(walk);
+                nodes.emplace_back(addr, port);
+            }
+        }
+
+        return { id, std::move(nodes) };
     }
 
     ///
@@ -556,11 +564,9 @@ private:
         hints.ai_protocol = 0;
         hints.ai_flags = 0;
 
-        auto port_str = std::array<char, 16>{};
-        *fmt::format_to(std::data(port_str), "{:d}", port_in.host()) = '\0';
-
+        auto const port_str = fmt::format("{:d}", port_in.host());
         addrinfo* info = nullptr;
-        if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)
+        if (int const rc = getaddrinfo(name, port_str.c_str(), &hints, &info); rc != 0)
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't look up '{address}:{port}': {error} ({error_code})"),

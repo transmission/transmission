@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
 
 #include <libutp/utp.h>
 
@@ -121,7 +122,7 @@ uint64 utp_callback(utp_callback_arguments* args)
     {
 #ifdef TR_UTP_TRACE
     case UTP_LOG:
-        fmt::print(stderr, FMT_STRING("[µTP] {}\n"), args->buf);
+        fmt::print(stderr, "[µTP] {}\n", args->buf);
         break;
 #endif
 

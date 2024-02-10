@@ -17,34 +17,22 @@
 
 TEST(Bitfield, count)
 {
-    auto constexpr IterCount = int{ 10000 };
+    auto constexpr IterCount = size_t{ 10000U };
 
-    for (auto i = 0; i < IterCount; ++i)
+    for (size_t i = 0; i < IterCount; ++i)
     {
-        auto const bit_count = 100U + tr_rand_int(1000U);
-
         // generate a random bitfield
-        tr_bitfield bf(bit_count);
-
-        for (size_t j = 0, n = tr_rand_int(bit_count); j < n; ++j)
+        auto const bit_count = 100U + tr_rand_int(1000U);
+        auto bf = tr_bitfield{ bit_count };
+        for (size_t idx = 0U; idx < bit_count; ++idx)
         {
-            bf.set(tr_rand_int(bit_count));
+            bf.set(idx, tr_rand_int(2U) != 0U);
         }
 
-        int begin = tr_rand_int(bit_count);
-        int end = 0;
-        do
-        {
-            end = tr_rand_int(bit_count);
-        } while (end == begin);
-
-        // ensure end <= begin
-        if (end < begin)
-        {
-            int const tmp = begin;
-            begin = end;
-            end = tmp;
-        }
+        // pick arbitrary endpoints in the 1st and 2nd half of the bitfield
+        auto const midpt = bit_count / 2U;
+        auto const begin = tr_rand_int(midpt);
+        auto const end = midpt + tr_rand_int(midpt);
 
         // test the bitfield
         unsigned long count1 = {};

@@ -175,7 +175,9 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 #endif
 }
 
-static tr_socket_t createSocket(int domain, int type)
+namespace
+{
+tr_socket_t createSocket(int domain, int type)
 {
     auto const sockfd = socket(domain, type, 0);
     if (sockfd == TR_BAD_SOCKET)
@@ -220,6 +222,7 @@ static tr_socket_t createSocket(int domain, int type)
 
     return sockfd;
 }
+} // namespace
 
 tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
 {
@@ -299,7 +302,9 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
     return ret;
 }
 
-static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppress_msgs, int* err_out)
+namespace
+{
+tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppress_msgs, int* err_out)
 {
     TR_ASSERT(addr.is_valid());
 
@@ -387,6 +392,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
     return fd;
 }
+} // namespace
 
 tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs)
 {

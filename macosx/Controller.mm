@@ -345,6 +345,9 @@ static void removeKeRangerRansomware()
 
 + (void)initialize
 {
+    if (self != [Controller self])
+        return;
+
     removeKeRangerRansomware();
 
     //make sure another Transmission.app isn't running already

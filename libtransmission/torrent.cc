@@ -1961,6 +1961,21 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 
 // ---
 
+void tr_torrent::set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
+{
+    if (std::any_of(
+            files,
+            files + file_count,
+            [this, priority](tr_file_index_t file) { return priority != file_priorities_.file_priority(file); }))
+    {
+        file_priorities_.set(files, file_count, priority);
+        priority_changed_.emit(this, files, file_count, priority);
+        set_dirty();
+    }
+}
+
+// ---
+
 bool tr_torrent::check_piece(tr_piece_index_t const piece) const
 {
     auto const pass = tr_ioTestPiece(*this, piece);
@@ -2190,8 +2205,7 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
     set_needs_completeness_check();
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const [file_begin, file_end] = fpm_.file_span_for_piece(piece);
-    for (auto file = file_begin; file < file_end; ++file)
+    for (auto [file, file_end] = fpm_.file_span_for_piece(piece); file < file_end; ++file)
     {
         if (completion_.has_blocks(block_span_for_file(file)))
         {
@@ -2422,7 +2436,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
         }
         else
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}"sv), newname, subpath.substr(oldpath_len + 1));
+            name = fmt::format("{:s}/{:s}"sv, newname, subpath.substr(oldpath_len + 1));
         }
     }
     else
@@ -2436,11 +2450,11 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 
         if (oldpath_len >= std::size(subpath))
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}"sv), tmp, newname);
+            name = fmt::format("{:s}/{:s}"sv, tmp, newname);
         }
         else
         {
-            name = fmt::format(FMT_STRING("{:s}/{:s}/{:s}"sv), tmp, newname, subpath.substr(oldpath_len + 1));
+            name = fmt::format("{:s}/{:s}/{:s}"sv, tmp, newname, subpath.substr(oldpath_len + 1));
         }
     }
 

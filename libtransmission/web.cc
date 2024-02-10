@@ -106,10 +106,9 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
-} // namespace
 
 #ifdef _WIN32
-static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
+CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
     auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
@@ -162,6 +161,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     return CURLE_OK;
 }
 #endif
+} // namespace
 
 // ---
 

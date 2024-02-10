@@ -70,7 +70,7 @@ auto tau_transaction_new()
 }
 
 // used in the "action" field of a request. Values defined in bep 15.
-enum tau_action_t
+enum tau_action_t : uint8_t
 {
     TAU_ACTION_CONNECT = 0,
     TAU_ACTION_ANNOUNCE = 1,
@@ -254,7 +254,7 @@ struct tau_announce_request
         return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
     }
 
-    enum tau_announce_event
+    enum tau_announce_event : uint8_t
     {
         // Used in the "event" field of an announce request.
         // These values come from BEP 15

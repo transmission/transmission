@@ -54,7 +54,7 @@ auto constexpr RpcVersion = int64_t{ 18 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
 auto constexpr RpcVersionSemver = "5.4.0"sv;
 
-enum class TrFormat
+enum class TrFormat : uint8_t
 {
     Object,
     Table
@@ -142,10 +142,6 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
         {
             add_torrent_from_var(ids_var);
         }
-    }
-    else if (auto const id_iter = args.find(TR_KEY_ids); id_iter != std::end(args))
-    {
-        add_torrent_from_var(id_iter->second);
     }
     else // all of them
     {
@@ -739,8 +735,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
     }
 
     auto keys = std::vector<tr_quark>{};
-    auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields);
-    if (fields_vec != nullptr)
+    if (auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields); fields_vec != nullptr)
     {
         auto const n_fields = std::size(*fields_vec);
         keys.reserve(n_fields);
@@ -811,7 +806,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
         }
     }
 
-    return { labels, nullptr };
+    return { std::move(labels), nullptr };
 }
 
 char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
@@ -827,7 +822,7 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
     return nullptr;
 }
 
-[[nodiscard]] std::pair<char const*, std::vector<tr_file_index_t>> get_file_indices(
+[[nodiscard]] std::pair<std::vector<tr_file_index_t>, char const*> get_file_indices(
     tr_torrent const* tor,
     tr_variant::Vector const& files_vec)
 {
@@ -853,18 +848,18 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
                 }
                 else
                 {
-                    return { "file index out of range", {} };
+                    return { {}, "file index out of range" };
                 }
             }
         }
     }
 
-    return { nullptr, std::move(files) };
+    return { std::move(files), nullptr };
 }
 
 char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_variant::Vector const& files_vec)
 {
-    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    auto const [indices, errmsg] = get_file_indices(tor, files_vec);
     if (errmsg != nullptr)
     {
         return errmsg;
@@ -876,7 +871,7 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
 
 [[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
 {
-    auto const [errmsg, indices] = get_file_indices(tor, files_vec);
+    auto const [indices, errmsg] = get_file_indices(tor, files_vec);
     if (errmsg != nullptr)
     {
         return errmsg;
@@ -985,7 +980,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
 
         if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted); val != nullptr && errmsg == nullptr)
         {
-            errmsg = set_file_dls(tor, false, *val);
+            errmsg = set_file_dls(tor, true, *val);
         }
 
         if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
@@ -1149,6 +1144,12 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
+    if (auto const addr = tr_address::from_string(primary_ip);
+        data->args_out.find_if<std::string_view>(TR_KEY_ipProtocol) == nullptr && addr && addr->is_valid())
+    {
+        data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+    }
+
     if (status != 200)
     {
         tr_idle_function_done(
@@ -1160,30 +1161,30 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    auto const addr = tr_address::from_string(primary_ip);
-    if (!addr || !addr->is_valid())
-    {
-        tr_idle_function_done(data, "Unknown error, please file a bug report to us");
-        return;
-    }
-
     data->args_out.try_emplace(TR_KEY_port_is_open, tr_strv_starts_with(body, '1'));
-    data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     tr_idle_function_done(data, SuccessResult);
 }
 
 char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct tr_rpc_idle_data* idle_data)
 {
-    auto ip_proto = tr_web::FetchOptions::IPProtocol::ANY;
+    static auto constexpr TimeoutSecs = 20s;
+
+    auto const port = session->advertisedPeerPort();
+    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
+    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
+    options.timeout_secs = TimeoutSecs;
+
     if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_ipProtocol); val != nullptr)
     {
         if (*val == "ipv4"sv)
         {
-            ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv4"sv);
         }
         else if (*val == "ipv6"sv)
         {
-            ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv6"sv);
         }
         else
         {
@@ -1191,10 +1192,6 @@ char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct
         }
     }
 
-    auto const port = session->advertisedPeerPort();
-    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
-    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
-    options.ip_proto = ip_proto;
     session->fetch(std::move(options));
     return nullptr;
 }
@@ -2117,55 +2114,35 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
 
     auto const* const request_map = request.get_if<tr_variant::Map>();
 
-    if (callback == nullptr)
+    if (!callback)
     {
         callback = noop_response_callback;
     }
 
-    // find the args
     auto const empty_args = tr_variant::Map{};
     auto const* args_in = &empty_args;
+    auto method_name = std::string_view{};
     if (request_map != nullptr)
     {
+        // find the args
         if (auto const* val = request_map->find_if<tr_variant::Map>(TR_KEY_arguments); val != nullptr)
         {
             args_in = val;
         }
-    }
 
-    auto const tag = args_in->value_if<int64_t>(TR_KEY_tag);
-
-    // find the requested method
-    auto method_name = std::string_view{};
-    if (request_map != nullptr)
-    {
+        // find the requested method
         if (auto const* val = request_map->find_if<std::string_view>(TR_KEY_method); val != nullptr)
         {
             method_name = *val;
         }
     }
 
+    auto const tag = request_map->value_if<int64_t>(TR_KEY_tag);
+
     auto const test = [method_name](auto const& handler)
     {
         return handler.first == method_name;
     };
-
-    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
-    {
-        auto args_out = tr_variant::Map{};
-        char const* const result = (*handler->second)(session, *args_in, args_out);
-
-        auto response = tr_variant::Map{ 3U };
-        response.try_emplace(TR_KEY_arguments, std::move(args_out));
-        response.try_emplace(TR_KEY_result, result != nullptr ? result : "success");
-        if (tag.has_value())
-        {
-            response.try_emplace(TR_KEY_tag, *tag);
-        }
-
-        (callback)(session, tr_variant{ std::move(response) });
-        return;
-    }
 
     if (auto const end = std::end(AsyncHandlers), handler = std::find_if(std::begin(AsyncHandlers), end, test); handler != end)
     {
@@ -2181,16 +2158,28 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
         return;
     }
 
-    // couldn't find a handler
     auto response = tr_variant::Map{ 3U };
-    response.try_emplace(TR_KEY_arguments, 0);
-    response.try_emplace(TR_KEY_result, "no method name");
     if (tag.has_value())
     {
         response.try_emplace(TR_KEY_tag, *tag);
     }
 
-    (callback)(session, tr_variant{ std::move(response) });
+    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
+    {
+        auto args_out = tr_variant::Map{};
+        char const* const result = (handler->second)(session, *args_in, args_out);
+
+        response.try_emplace(TR_KEY_arguments, std::move(args_out));
+        response.try_emplace(TR_KEY_result, result != nullptr ? result : "success");
+    }
+    else
+    {
+        // couldn't find a handler
+        response.try_emplace(TR_KEY_arguments, 0);
+        response.try_emplace(TR_KEY_result, "no method name");
+    }
+
+    callback(session, tr_variant{ std::move(response) });
 }
 
 /**

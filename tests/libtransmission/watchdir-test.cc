@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <set>
 #include <string>
@@ -50,7 +51,7 @@ static_assert(ProcessEventsTimeout > GenericRescanInterval);
 namespace libtransmission::test
 {
 
-enum class WatchMode
+enum class WatchMode : uint8_t
 {
     NATIVE,
     GENERIC

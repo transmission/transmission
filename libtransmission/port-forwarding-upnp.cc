@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
+#include <cstdint>
 #include <future>
 #include <optional>
 #include <string>
@@ -35,7 +36,7 @@
 
 namespace
 {
-enum class UpnpState
+enum class UpnpState : uint8_t
 {
     Idle,
     Failed,
@@ -219,7 +220,7 @@ void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, tr_port 
     UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, port_str.c_str(), proto, nullptr);
 }
 
-enum
+enum : uint8_t
 {
     UPNP_IGD_NONE = 0,
     UPNP_IGD_VALID_CONNECTED = 1,

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -37,8 +38,9 @@
 #include "RpcQueue.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
-#include "Utils.h"
 #include "VariantHelpers.h"
+
+using namespace std::literals;
 
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
@@ -82,30 +84,41 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
     exec("session-set", &args);
 }
 
-void Session::portTest()
+void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
 {
+    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
+
+    if (portTestPending(ip_protocol))
+    {
+        return;
+    }
+    port_test_pending_[ip_protocol] = true;
+
+    auto args = tr_variant::make_map(1U);
+    tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, IpStr[ip_protocol]);
+
+    auto const response_func = [this, ip_protocol](RpcResponse const& r)
+    {
+        port_test_pending_[ip_protocol] = false;
+
+        // If for whatever reason the status optional is empty here,
+        // then something must have gone wrong with the port test,
+        // so the UI should show the "error" state
+        emit portTested(dictFind<bool>(r.args.get(), TR_KEY_port_is_open), ip_protocol);
+    };
+
     auto* q = new RpcQueue{};
 
-    q->add([this]() { return exec("port-test", nullptr); });
+    q->add([this, &args]() { return exec("port-test", &args); }, response_func);
 
-    q->add(
-        [this](RpcResponse const& r)
-        {
-            bool is_open = false;
-
-            if (r.success)
-            {
-                auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open);
-                if (value)
-                {
-                    is_open = *value;
-                }
-            }
-
-            emit portTested(is_open);
-        });
+    q->add(response_func);
 
     q->run();
+}
+
+bool Session::portTestPending(Session::PortTestIpProtocol const ip_protocol) const noexcept
+{
+    return ip_protocol < NUM_PORT_TEST_IP_PROTOCOL && port_test_pending_[ip_protocol];
 }
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)
@@ -357,7 +370,7 @@ void Session::start()
     }
     else
     {
-        auto const settings = tr_sessionLoadSettings(config_dir_.toUtf8().constData(), "qt");
+        auto const settings = tr_sessionLoadSettings(nullptr, config_dir_.toUtf8().constData(), "qt");
         session_ = tr_sessionInit(config_dir_.toUtf8().constData(), true, settings);
 
         rpc_.start(session_);

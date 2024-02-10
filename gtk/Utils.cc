@@ -26,8 +26,6 @@
 #include <glibmm/quark.h>
 #include <glibmm/spawn.h>
 #include <gtkmm/cellrenderertext.h>
-#include <gtkmm/eventcontroller.h>
-#include <gtkmm/gesture.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/treemodel.h>
@@ -35,6 +33,8 @@
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gdkmm/clipboard.h>
+#include <gtkmm/eventcontroller.h>
+#include <gtkmm/gesture.h>
 #include <gtkmm/gestureclick.h>
 #else
 #include <gdkmm/window.h>
@@ -45,7 +45,6 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
 #include <stack>
 #include <stdexcept>
 #include <utility>
@@ -54,6 +53,8 @@
 #include <gtk/gtk.h>
 
 #if GTK_CHECK_VERSION(4, 0, 0) && defined(GDK_WINDOWING_X11)
+#include <optional>
+
 #include <gdk/x11/gdkx.h>
 #endif
 
@@ -645,9 +646,7 @@ void gtr_open_uri(Glib::ustring const& uri)
     }
 }
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -735,9 +734,7 @@ void gtr_priority_combo_init(Gtk::ComboBox& combo)
         });
 }
 
-/***
-****
-***/
+// ---
 
 void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 {
@@ -847,9 +844,7 @@ void gtr_window_raise([[maybe_unused]] Gtk::Window& window)
 #endif
 }
 
-/***
-****
-***/
+// ---
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {

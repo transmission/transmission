@@ -608,12 +608,12 @@ void gtr_text_buffer_set_text(Glib::RefPtr<Gtk::TextBuffer> const& b, Glib::ustr
 
 [[nodiscard]] std::string get_date_string(time_t t)
 {
-    return t == 0 ? _("N/A") : fmt::format(FMT_STRING("{:%x}"), fmt::localtime(t));
+    return t == 0 ? _("N/A") : fmt::format("{:%x}", fmt::localtime(t));
 }
 
 [[nodiscard]] std::string get_date_time_string(time_t t)
 {
-    return t == 0 ? _("N/A") : fmt::format(FMT_STRING("{:%c}"), fmt::localtime(t));
+    return t == 0 ? _("N/A") : fmt::format("{:%c}", fmt::localtime(t));
 }
 
 } // namespace
@@ -1327,7 +1327,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
     auto make_key = [](tr_torrent const* tor, tr_peer_stat const* ps)
     {
-        return fmt::format(FMT_STRING("{:d}.{:s}"), tr_torrentId(tor), ps->addr);
+        return fmt::format("{:d}.{:s}", tr_torrentId(tor), ps->addr);
     };
 
     /* step 3: add any new peers */
@@ -1395,7 +1395,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
 
     auto make_key = [](tr_torrent const* tor, char const* url)
     {
-        return fmt::format(FMT_STRING("{:d}.{:s}"), tr_torrentId(tor), url);
+        return fmt::format("{:d}.{:s}", tr_torrentId(tor), url);
     };
 
     /* step 1: mark all webseeds as not-updated */
@@ -1957,7 +1957,7 @@ void buildTrackerSummary(
     gstr << text_dir_mark.at(static_cast<int>(direction));
     gstr << (tracker.isBackup ? "<i>" : "<b>");
     gstr << Glib::Markup::escape_text(
-        !key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host_and_port, key) : tracker.host_and_port);
+        !key.empty() ? fmt::format("{:s} - {:s}", tracker.host_and_port, key) : tracker.host_and_port);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
 
     if (!tracker.isBackup)

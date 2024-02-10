@@ -18,6 +18,10 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         FORCE)
 endif()
 
+if(VCPKG_TARGET_ANDROID)
+    include(cmake/VcpkgAndroid.cmake)
+endif()
+
 project(transmission)
 
 set(TR_THIRD_PARTY_DIR_NAME third-party)

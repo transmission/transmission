@@ -231,7 +231,7 @@ export class TorrentRendererFull {
 
     // progress details
     e = root._progress_details_container;
-    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
+    e.innerHTML = TorrentRendererFull.getProgressDetails(controller, t);
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);

@@ -9,7 +9,6 @@
 #include <cstddef>
 #include <optional>
 #include <string_view>
-#include <utility> // std::move
 
 #include <fmt/core.h>
 

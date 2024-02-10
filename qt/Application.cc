@@ -25,6 +25,10 @@
 #include <QDBusReply>
 #endif
 
+#if QT_CONFIG(accessibility)
+#include <QAccessible>
+#endif
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/tr-getopt.h>
@@ -32,8 +36,8 @@
 #include <libtransmission/values.h>
 #include <libtransmission/version.h>
 
+#include "AccessibleSqueezeLabel.h"
 #include "AddData.h"
-#include "Formatter.h"
 #include "InteropHelper.h"
 #include "MainWindow.h"
 #include "OptionsDialog.h"
@@ -90,6 +94,25 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     // if that fails, use our own as the fallback
     return QIcon{ QStringLiteral(":/icons/transmission.svg") };
 }
+
+#if QT_CONFIG(accessibility)
+
+QAccessibleInterface* accessibleFactory(QString const& className, QObject* object)
+{
+    auto* widget = qobject_cast<QWidget*>(object);
+
+    if (widget != nullptr)
+    {
+        if (className == QStringLiteral("SqueezeLabel"))
+        {
+            return new AccessibleSqueezeLabel(widget);
+        }
+    }
+
+    return nullptr;
+}
+
+#endif // QT_CONFIG(accessibility)
 
 } // namespace
 
@@ -273,6 +296,10 @@ Application::Application(int& argc, char** argv)
     {
         minimized = false;
     }
+
+#if QT_CONFIG(accessibility)
+    QAccessible::installFactory(&accessibleFactory);
+#endif
 
     session_ = std::make_unique<Session>(config_dir, *prefs_);
     model_ = std::make_unique<TorrentModel>(*prefs_);

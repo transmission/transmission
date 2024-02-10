@@ -33,15 +33,6 @@ extern CGFloat const kGroupSeparatorHeight;
 
 - (IBAction)displayTorrentActionPopover:(id)sender;
 
-- (IBAction)setQuickLimitMode:(id)sender;
-- (void)setQuickLimit:(id)sender;
-- (IBAction)setGlobalLimit:(id)sender;
-
-- (IBAction)setQuickRatioMode:(id)sender;
-- (void)setQuickRatio:(id)sender;
-
-- (IBAction)setPriority:(id)sender;
-
 - (void)togglePiecesBar;
 @property(nonatomic, readonly) CGFloat piecesBarPercent;
 

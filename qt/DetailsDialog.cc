@@ -53,9 +53,7 @@
 class Prefs;
 class Session;
 
-/****
-*****
-****/
+// ---
 
 namespace
 {
@@ -92,10 +90,20 @@ private:
     QTimer timer_;
 };
 
-} // namespace
-
-namespace
+constexpr tr_quark priorityKey(int priority)
 {
+    switch (priority)
+    {
+    case TR_PRI_LOW:
+        return TR_KEY_priority_low;
+
+    case TR_PRI_HIGH:
+        return TR_KEY_priority_high;
+
+    default:
+        return TR_KEY_priority_normal;
+    }
+}
 
 int constexpr DebounceIntervalMSec = 100;
 int constexpr RefreshIntervalMSec = 4000;
@@ -124,44 +132,9 @@ int measureViewItem(QTreeWidget const* view, int column, QString const& text)
     return std::max(item_width, header_width);
 }
 
-QString collateAddress(QString const& address)
-{
-    auto collated = QString{};
-
-    if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
-    {
-        if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
-        {
-            quint32 const ipv4_address = ip_address.toIPv4Address();
-            collated = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
-        }
-        else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
-        {
-            Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
-            QByteArray tmp(16, '\0');
-
-            for (int i = 0; i < 16; ++i)
-            {
-                tmp[i] = ipv6_address[i];
-            }
-
-            collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
-        }
-    }
-
-    if (collated.isEmpty())
-    {
-        collated = QStringLiteral("3-") + address.toLower();
-    }
-
-    return collated;
-}
-
 } // namespace
 
-/***
-****
-***/
+// ---
 
 class PeerItem : public QTreeWidgetItem
 {
@@ -233,11 +206,43 @@ private:
 
         return collated_address_;
     }
+
+    [[nodiscard]] static QString collateAddress(QString const& address)
+    {
+        auto collated = QString{};
+
+        if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
+        {
+            if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                quint32 const ipv4_address = ip_address.toIPv4Address();
+                collated = QStringLiteral("1-") +
+                    QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
+            }
+            else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
+                QByteArray tmp(16, '\0');
+
+                for (int i = 0; i < 16; ++i)
+                {
+                    tmp[i] = ipv6_address[i];
+                }
+
+                collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
+            }
+        }
+
+        if (collated.isEmpty())
+        {
+            collated = QStringLiteral("3-") + address.toLower();
+        }
+
+        return collated;
+    }
 };
 
-/***
-****
-***/
+// ---
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 int DetailsDialog::prev_tab_index_ = 0;
@@ -257,7 +262,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     initOptionsTab();
 
     adjustSize();
-    ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui_.commentTextEdit->setMaximumHeight(QWIDGETSIZE_MAX);
     ui_.tabs->setCurrentIndex(prev_tab_index_);
 
     static std::array<int, 2> constexpr InitKeys = {
@@ -328,9 +333,7 @@ void DetailsDialog::refreshPref(int key)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::refreshModel()
 {
@@ -897,7 +900,7 @@ void DetailsDialog::refreshUI()
         if (torrents.empty())
         {
             labels_baseline_.clear();
-            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlainText({});
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(true);
             ui_.labelsTextEdit->setEnabled(true);
@@ -908,7 +911,7 @@ void DetailsDialog::refreshUI()
                      [&baseline](auto const* tor) { return tor->labels() == baseline; }))
         {
             labels_baseline_ = baseline.join(QStringLiteral(", "));
-            ui_.labelsTextEdit->setText(labels_baseline_);
+            ui_.labelsTextEdit->setPlainText(labels_baseline_);
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(false);
             ui_.labelsTextEdit->setEnabled(true);
@@ -916,7 +919,7 @@ void DetailsDialog::refreshUI()
         else // mixed
         {
             labels_baseline_.clear();
-            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlainText({});
             ui_.labelsTextEdit->setPlaceholderText(mixed);
             ui_.labelsTextEdit->setEnabled(false);
         }
@@ -941,12 +944,12 @@ void DetailsDialog::refreshUI()
         }
     }
 
-    if (ui_.commentBrowser->toPlainText() != string)
+    if (ui_.commentTextEdit->toPlainText() != string)
     {
-        ui_.commentBrowser->setText(string);
+        ui_.commentTextEdit->setPlainText(string);
     }
 
-    ui_.commentBrowser->setEnabled(!is_comment_mixed && !string.isEmpty());
+    ui_.commentTextEdit->setEnabled(!is_comment_mixed && !string.isEmpty());
 
     // myOriginLabel
     string = none;
@@ -1041,7 +1044,7 @@ void DetailsDialog::refreshUI()
         }
     }
 
-    ui_.addedLabelValue->setText(string);
+    ui_.addedValueLabel->setText(string);
 
     ///
     ///  Options Tab
@@ -1317,18 +1320,16 @@ void DetailsDialog::setEnabled(bool enabled)
     ui_.tabs->setEnabled(enabled);
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initInfoTab()
 {
-    int const cbh = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
-    ui_.commentBrowser->setFixedHeight(cbh);
+    int const cbh = QFontMetrics{ ui_.commentTextEdit->font() }.lineSpacing() * 4;
+    ui_.commentTextEdit->setFixedHeight(cbh);
 
     int const lteh = QFontMetrics{ ui_.labelsTextEdit->font() }.lineSpacing() * 2;
     ui_.labelsTextEdit->setFixedHeight(lteh);
-    ui_.labelsTextEdit->setText(QStringLiteral("Initializing..."));
+    ui_.labelsTextEdit->setPlainText(QStringLiteral("Initializing..."));
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);
@@ -1336,9 +1337,7 @@ void DetailsDialog::initInfoTab()
     cr->update();
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::onShowTrackerScrapesToggled(bool val)
 {
@@ -1551,8 +1550,7 @@ void DetailsDialog::initOptionsTab()
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedSectionLayout);
-    cr->addLayout(ui_.seedingLimitsSectionRatioLayout);
-    cr->addLayout(ui_.seedingLimitsSectionIdleLayout);
+    cr->addLayout(ui_.seedingLimitsSectionLayout);
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 
@@ -1572,9 +1570,7 @@ void DetailsDialog::initOptionsTab()
     connect(ui_.singleUpSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initTrackerTab()
 {
@@ -1616,9 +1612,7 @@ void DetailsDialog::initTrackerTab()
     onTrackerSelectionChanged();
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initPeersTab()
 {
@@ -1635,9 +1629,7 @@ void DetailsDialog::initPeersTab()
     ui_.peersView->setColumnWidth(COL_ADDRESS, measureViewItem(ui_.peersView, COL_ADDRESS, QStringLiteral("888.888.888.888")));
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initFilesTab() const
 {
@@ -1645,21 +1637,6 @@ void DetailsDialog::initFilesTab() const
     connect(ui_.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
     connect(ui_.filesView, &FileTreeView::priorityChanged, this, &DetailsDialog::onFilePriorityChanged);
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
-}
-
-static constexpr tr_quark priorityKey(int priority)
-{
-    switch (priority)
-    {
-    case TR_PRI_LOW:
-        return TR_KEY_priority_low;
-
-    case TR_PRI_HIGH:
-        return TR_KEY_priority_high;
-
-    default:
-        return TR_KEY_priority_normal;
-    }
 }
 
 void DetailsDialog::onFilePriorityChanged(file_indices_t const& indices, int priority)
