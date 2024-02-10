@@ -749,21 +749,7 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
-void tr_torrentStop(tr_torrent* tor)
-{
-    if (!tr_isTorrent(tor))
-    {
-        return;
-    }
-
-    auto const lock = tor->unique_lock();
-
-    tor->start_when_stable_ = false;
-    tor->set_dirty();
-    tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
-}
-
-void tr_torrent::removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+void tr_torrentRemoveInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -805,6 +791,20 @@ void tr_torrent::removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag,
     }
 }
 
+void tr_torrentStop(tr_torrent* tor)
+{
+    if (!tr_isTorrent(tor))
+    {
+        return;
+    }
+
+    auto const lock = tor->unique_lock();
+
+    tor->start_when_stable_ = false;
+    tor->set_dirty();
+    tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
+}
+
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     using namespace start_stop_helpers;
@@ -813,7 +813,7 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 
     tor->is_deleting_ = true;
 
-    tor->session->run_in_session_thread(tr_torrent::removeTorrentInSessionThread, tor, delete_flag, delete_func, user_data);
+    tor->session->run_in_session_thread(tr_torrentRemoveInSessionThread, tor, delete_flag, delete_func, user_data);
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)

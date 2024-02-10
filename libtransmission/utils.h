@@ -65,11 +65,15 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
 
 /**
  * Tries to move a file by renaming, but never by copying.
+ *
+ * Creates the destination directory if it doesn't exist.
  */
 bool tr_file_move_strict(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error = nullptr);
 
 /**
  * Tries to move a file by renaming, and if that fails, by copying.
+ *
+ * Creates the destination directory if it doesn't exist.
  */
 bool tr_file_move(std::string_view oldpath, std::string_view newpath, tr_error* error = nullptr);
 

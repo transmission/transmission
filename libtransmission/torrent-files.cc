@@ -259,7 +259,6 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
             tr_pathbuf to;
         };
         std::vector<moved_file> moved_files;
-        bool successfully_moved = true;
 
         auto const paths = std::array<std::string_view, 1>{ parent.sv() };
         for (tr_file_index_t idx = 0, n_files = fileCount(); idx < n_files; ++idx)
@@ -268,28 +267,14 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
             {
                 moved_file f{ found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() } };
 
-                // if moving the file fails, stop
+                // if moving a file fails, give up and let the error propagate
                 if (!tr_file_move_strict(f.from, f.to, error))
                 {
-                    successfully_moved = false;
-                    break;
+                    return;
                 }
 
                 moved_files.push_back(f);
             }
-        }
-
-        // if moving failed for some file, rollback
-        if (!successfully_moved)
-        {
-            for (auto const& m : moved_files)
-            {
-                // if rollback fails, I don't know what to do...
-                tr_file_move_strict(m.to, m.from);
-            }
-            // remove tmp directories
-            depthFirstWalk(tmpdir, [](char const* f) { tr_sys_path_remove(f); });
-            return;
         }
     }
 

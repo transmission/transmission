@@ -562,7 +562,7 @@ namespace
 namespace tr_file_move_impl
 {
 
-bool pathChecks(std::string_view& oldpath, std::string_view& newpath, tr_error* error)
+bool check_paths(std::string_view const oldpath, std::string_view const newpath, tr_error* error)
 {
     auto local_error = tr_error{};
     if (error == nullptr)
@@ -600,7 +600,7 @@ bool pathChecks(std::string_view& oldpath, std::string_view& newpath, tr_error* 
 
 bool tr_file_move_strict(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error)
 {
-    if (!tr_file_move_impl::pathChecks(oldpath_in, newpath_in, error))
+    if (!tr_file_move_impl::check_paths(oldpath_in, newpath_in, error))
     {
         return false;
     }
@@ -620,7 +620,7 @@ bool tr_file_move_strict(std::string_view oldpath_in, std::string_view newpath_i
 
 bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error)
 {
-    if (!tr_file_move_impl::pathChecks(oldpath_in, newpath_in, error))
+    if (!tr_file_move_impl::check_paths(oldpath_in, newpath_in, error))
     {
         return false;
     }
