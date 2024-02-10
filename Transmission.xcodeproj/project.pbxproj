@@ -3080,7 +3080,7 @@
 			);
 			name = "Copy libevent headers";
 			outputPaths = (
-				"$(SRCROOT)/third-party/libevent/evconfig-private.h",
+				"$(SRCROOT)/third-party/libevent/include/evconfig-private.h",
 				"$(SRCROOT)/third-party/libevent/include/event2/event-config.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
