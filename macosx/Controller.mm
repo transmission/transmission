@@ -1711,7 +1711,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     // But `tr_urlParse` acknowledges that magnet links can be malformed by "not escaping text in the display name".
     // Those malformed magnets aren't URI anymore, and since a display name can potentially contain any Unicode except '/' (see `isUnixReservedChar`), we may want to be liberal on what we accept.
     // In practice, copy-pasted magnets might most often be separated by Horizontal tab, Line feed, Carriage Return, Space, XML delimiters '<' '>', JSON delimiter '"' and Markdown delimiter '`'.
-    // But for now, we'll keep the historical separator choice from #5777, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
+    // But for now, we'll keep the historical separator choice from 8392476b30491ffe7d8d64210f5cf3c3dd1d69ca, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
     NSRegularExpression* magnetDetector = [NSRegularExpression regularExpressionWithPattern:@"magnet:?([^\\p{Z}\\v])+" options:kNilOptions
                                                                                       error:nil];
     for (NSString* itemString in arrayOfStrings)
@@ -1719,12 +1719,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         // We open all links
         for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0
                                                                      range:NSMakeRange(0, itemString.length)])
+        {
             [self openURL:result.URL.absoluteString];
+        }
 
         // We open all magnets
         for (NSTextCheckingResult* result in [magnetDetector matchesInString:itemString options:0
                                                                        range:NSMakeRange(0, itemString.length)])
+        {
             [self openURL:[itemString substringWithRange:result.range]];
+        }
     }
 }
 
