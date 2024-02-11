@@ -399,6 +399,7 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
+        std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::string announce_ip;
         std::string bind_address_ipv4;
         std::string bind_address_ipv6;
@@ -455,6 +456,7 @@ public:
                 { TR_KEY_pex_enabled, &pex_enabled },
                 { TR_KEY_port_forwarding_enabled, &port_forwarding_enabled },
                 { TR_KEY_preallocation, &preallocation_mode },
+                { TR_KEY_preferred_transport, &preferred_transport },
                 { TR_KEY_queue_stalled_enabled, &queue_stalled_enabled },
                 { TR_KEY_queue_stalled_minutes, &queue_stalled_minutes },
                 { TR_KEY_ratio_limit, &ratio_limit },
@@ -469,18 +471,18 @@ public:
                 { TR_KEY_script_torrent_done_seeding_filename, &script_torrent_done_seeding_filename },
                 { TR_KEY_seed_queue_enabled, &seed_queue_enabled },
                 { TR_KEY_seed_queue_size, &seed_queue_size },
+                { TR_KEY_sleep_per_seconds_during_verify, &sleep_per_seconds_during_verify },
                 { TR_KEY_speed_limit_down, &speed_limit_down },
                 { TR_KEY_speed_limit_down_enabled, &speed_limit_down_enabled },
                 { TR_KEY_speed_limit_up, &speed_limit_up },
                 { TR_KEY_speed_limit_up_enabled, &speed_limit_up_enabled },
                 { TR_KEY_start_added_torrents, &should_start_added_torrents },
                 { TR_KEY_tcp_enabled, &tcp_enabled },
+                { TR_KEY_torrent_added_verify_mode, &torrent_added_verify_mode },
                 { TR_KEY_trash_original_torrent_files, &should_delete_source_torrents },
                 { TR_KEY_umask, &umask },
                 { TR_KEY_upload_slots_per_torrent, &upload_slots_per_torrent },
                 { TR_KEY_utp_enabled, &utp_enabled },
-                { TR_KEY_preferred_transport, &preferred_transport },
-                { TR_KEY_torrent_added_verify_mode, &torrent_added_verify_mode },
             };
         }
     };
