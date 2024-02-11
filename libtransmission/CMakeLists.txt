@@ -142,7 +142,6 @@ target_sources(${TR_NAME}
         torrents.h
         tr-assert.cc
         tr-assert.h
-        tr-assert.mm
         tr-buffer.h
         tr-dht.cc
         tr-dht.h
@@ -207,10 +206,7 @@ tr_allow_compile_if(
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
     [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
-        tr-assert.mm
         utils.mm
-    [=[[NOT (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")]]=]
-        tr-assert.cc
     [=[[WIN32]]=]
         file-win32.cc
         subprocess-win32.cc
