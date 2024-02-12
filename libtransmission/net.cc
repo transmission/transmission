@@ -740,7 +740,7 @@ std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockadd
         return tr_socket_address{ addr, tr_port::from_network(sin6->sin6_port) };
     }
 
-    TR_ASSERT_MSG(false, "invalid address family");
+    tr_logAddDebug(fmt::format("Unsupported address family {:d}", from->sa_family));
     return {};
 }
 
