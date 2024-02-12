@@ -871,6 +871,12 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
     }
 
+    if (auto const& val = new_settings.sleep_per_seconds_during_verify;
+        force || val != old_settings.sleep_per_seconds_during_verify)
+    {
+        verifier_->set_sleep_per_seconds_during_verify(val);
+    }
+
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
     update_bandwidth(TR_UP);
