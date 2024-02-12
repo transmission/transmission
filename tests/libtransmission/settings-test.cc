@@ -456,7 +456,7 @@ TEST_F(SettingsTest, canLoadSleepPerSecondsDuringVerify)
     static auto constexpr Key = TR_KEY_sleep_per_seconds_during_verify;
     auto constexpr ExpectedValue = 90ms;
 
-    auto settings = std::make_unique<tr_session_settings>();
+    auto settings = std::make_unique<tr_session::Settings>();
     auto const default_value = settings->sleep_per_seconds_during_verify;
     ASSERT_NE(ExpectedValue, default_value);
 
@@ -467,7 +467,7 @@ TEST_F(SettingsTest, canLoadSleepPerSecondsDuringVerify)
     EXPECT_EQ(ExpectedValue, settings->sleep_per_seconds_during_verify);
     var.clear();
 
-    settings = std::make_unique<tr_session_settings>();
+    settings = std::make_unique<tr_session::Settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, 90);
     settings->load(var);
@@ -479,16 +479,16 @@ TEST_F(SettingsTest, canSaveSleepPerSecondsDuringVerify)
     static auto constexpr Key = TR_KEY_sleep_per_seconds_during_verify;
     static auto constexpr ExpectedValue = 90ms;
 
-    auto settings = tr_session_settings{};
+    auto settings = tr_session::Settings{};
     auto const default_value = settings.sleep_per_seconds_during_verify;
     ASSERT_NE(ExpectedValue, default_value);
 
     auto var = tr_variant{};
     tr_variantInitDict(&var, 100);
     settings.sleep_per_seconds_during_verify = ExpectedValue;
-    var = settings.settings();
+    var = settings.save();
 
-    int64_t val_raw;
+    auto val_raw = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val_raw));
     EXPECT_EQ(ExpectedValue, std::chrono::milliseconds{ val_raw });
 }
