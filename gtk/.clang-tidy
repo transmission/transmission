@@ -7,6 +7,7 @@ Checks: >
   -bugprone-narrowing-conversions,
   cert-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
