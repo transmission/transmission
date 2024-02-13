@@ -203,7 +203,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
     /* Walk through all the torrents, tallying how many matches there are
      * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
-    auto n_torrents = int{ 0 };
+    auto n_torrents = 0;
     auto site_infos = std::unordered_map<std::string /*site*/, site_info>{};
     for (auto i = 0U, count = torrents_model->get_n_items(); i < count; ++i)
     {
