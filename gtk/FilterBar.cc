@@ -32,8 +32,6 @@
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/filterlistmodel.h>
-#else
-#include <gtkmm/treemodelfilter.h>
 #endif
 
 #include <fmt/core.h>
