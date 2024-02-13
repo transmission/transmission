@@ -9,6 +9,7 @@
 #include <cstdint> // int64_t
 #include <map>
 #include <optional>
+#include <set>
 #include <string_view>
 #include <vector>
 
@@ -69,6 +70,11 @@ public:
     [[nodiscard]] constexpr auto blocklistSize() const noexcept
     {
         return blocklist_size_;
+    }
+
+    [[nodiscard]] constexpr auto& dynamicMainStatKeys() noexcept
+    {
+        return dynamic_main_stat_keys_;
     }
 
     enum PortTestIpProtocol : uint8_t
@@ -183,6 +189,8 @@ private:
     Prefs& prefs_;
 
     std::map<TorrentProperties, std::vector<std::string_view>> names_;
+
+    std::set<tr_quark> dynamic_main_stat_keys_ = {};
 
     int64_t blocklist_size_ = -1;
     std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};

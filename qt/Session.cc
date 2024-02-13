@@ -520,7 +520,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 {
     std::vector<std::string_view>& names = names_[props];
 
-    if (names.empty())
+    if (names.empty() || !dynamic_main_stat_keys_.empty())
     {
         // unchanging fields needed by the main window
         static auto constexpr MainInfoKeys = std::array<tr_quark, 9>{
@@ -625,6 +625,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         case TorrentProperties::MainAll:
             std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
             std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
+            std::for_each(dynamic_main_stat_keys_.begin(), dynamic_main_stat_keys_.end(), append);
             break;
 
         case TorrentProperties::MainInfo:
@@ -633,6 +634,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         case TorrentProperties::MainStats:
             std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
+            std::for_each(dynamic_main_stat_keys_.begin(), dynamic_main_stat_keys_.end(), append);
             break;
 
         case TorrentProperties::Rename:
