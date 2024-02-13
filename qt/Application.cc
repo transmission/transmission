@@ -626,7 +626,7 @@ void Application::addWatchdirTorrent(QString const& filename) const
 
 void Application::addTorrent(AddData addme) const
 {
-    if (addme.type == addme.NONE)
+    if (addme.type == AddData::NONE)
     {
         return;
     }
