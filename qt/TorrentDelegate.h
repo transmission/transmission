@@ -14,6 +14,7 @@
 class QStyle;
 class QStyleOptionProgressBar;
 
+class Prefs;
 class Torrent;
 
 class TorrentDelegate : public QStyledItemDelegate
@@ -22,7 +23,7 @@ class TorrentDelegate : public QStyledItemDelegate
     TR_DISABLE_COPY_MOVE(TorrentDelegate)
 
 public:
-    explicit TorrentDelegate(QObject* parent = nullptr);
+    explicit TorrentDelegate(Prefs& prefs, QObject* parent = nullptr);
 
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
@@ -52,6 +53,8 @@ protected:
     mutable QStyleOptionProgressBar progress_bar_style_ = {};
 
 private:
+    Prefs& prefs_;
+
     mutable std::optional<int> height_hint_;
     mutable QFont height_font_;
     mutable QIcon warning_emblem_;

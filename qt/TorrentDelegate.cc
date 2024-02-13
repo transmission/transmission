@@ -17,6 +17,7 @@
 
 #include "Formatter.h"
 #include "IconCache.h"
+#include "Prefs.h"
 #include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
@@ -145,8 +146,9 @@ ItemLayout::ItemLayout(
 
 } // namespace
 
-TorrentDelegate::TorrentDelegate(QObject* parent)
-    : QStyledItemDelegate{ parent }
+TorrentDelegate::TorrentDelegate(Prefs& prefs, QObject* parent)
+    : prefs_{ prefs }
+    , QStyledItemDelegate{ parent }
 {
     progress_bar_style_.minimum = 0;
     progress_bar_style_.maximum = 1000;
@@ -601,47 +603,52 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     auto const brush = progress_bar_style_.palette.brush(QPalette::Highlight);
     float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+    bool const piecebar_active = prefs_.getBool(Prefs::SHOW_PIECEBAR);
 
     painter->fillRect(layout.bar_rect, option.palette.color(QPalette::Base));
 
-    QRect progress_bar_fill_rect = layout.progress_bar_rect;
+    QRect progress_bar_fill_rect = piecebar_active ? layout.progress_bar_rect : layout.bar_rect;
     progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
     painter->fillRect(progress_bar_fill_rect, brush);
 
     painter->setPen(progress_bar_style_.palette.color(QPalette::Base));
-    painter->drawRect(layout.progress_bar_rect);
 
-    if (progress == 1.0)
+    if (piecebar_active)
     {
-        painter->fillRect(layout.bar_rect, brush);
-    }
-    else
-    {
-        float const piece_width = static_cast<float>(layout.piece_bar_rect.width() - 3) / tor.pieceCount();
-
-        int offset = 0;
-        int section_width = 0;
-
-        for (int i = 0; i < tor.pieceCount(); i++)
+        if (progress == 1.0)
         {
-            if (!tor.pieces()[i] || i == tor.pieceCount() - 1)
-            {
-                QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2,
-                                           layout.piece_bar_rect.top() + 1,
-                                           static_cast<int>(section_width * piece_width + 1),
-                                           PIECE_BAR_HEIGHT - 3 };
+            painter->fillRect(layout.bar_rect, brush);
+        }
+        else
+        {
+            float const piece_width = static_cast<float>(layout.piece_bar_rect.width() - 3) / tor.pieceCount();
 
-                painter->fillRect(piece_rect, brush);
-                section_width = 0;
-            }
-            else
+            int offset = 0;
+            int section_width = 0;
+
+            for (int i = 0; i < tor.pieceCount(); i++)
             {
-                if (section_width == 0)
+                if (!tor.pieces()[i] || i == tor.pieceCount() - 1)
                 {
-                    offset = i * piece_width;
+                    QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2,
+                                               layout.piece_bar_rect.top() + 1,
+                                               static_cast<int>(section_width * piece_width + 1),
+                                               PIECE_BAR_HEIGHT - 3 };
+
+                    painter->fillRect(piece_rect, brush);
+                    section_width = 0;
                 }
-                section_width++;
+                else
+                {
+                    if (section_width == 0)
+                    {
+                        offset = i * piece_width;
+                    }
+                    section_width++;
+                }
             }
+
+            painter->drawRect(layout.progress_bar_rect);
         }
     }
 

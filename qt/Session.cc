@@ -536,7 +536,7 @@ std::set<std::string_view> const& Session::getKeyNames(TorrentProperties props)
         };
 
         // changing fields needed by the main window
-        static auto constexpr MainStatKeys = std::array<tr_quark, 27>{
+        static auto constexpr MainStatKeys = std::array<tr_quark, 25>{
             TR_KEY_downloadedEver, //
             TR_KEY_editDate, //
             TR_KEY_error, //
@@ -552,8 +552,6 @@ std::set<std::string_view> const& Session::getKeyNames(TorrentProperties props)
             TR_KEY_peersGettingFromUs, //
             TR_KEY_peersSendingToUs, //
             TR_KEY_percentDone, //
-            TR_KEY_pieceCount, //
-            TR_KEY_pieces, //
             TR_KEY_queuePosition, //
             TR_KEY_rateDownload, //
             TR_KEY_rateUpload, //
@@ -759,6 +757,12 @@ void Session::refreshAllTorrents()
 
 void Session::initTorrents(torrent_ids_t const& ids)
 {
+    if (prefs_.getBool(Prefs::SHOW_PIECEBAR))
+    {
+        addKeyName(TorrentProperties::MainStats, TR_KEY_pieceCount);
+        addKeyName(TorrentProperties::MainStats, TR_KEY_pieces);
+    }
+
     refreshTorrents(ids, TorrentProperties::MainAll);
 }
 

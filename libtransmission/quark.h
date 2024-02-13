@@ -346,6 +346,7 @@ enum
     TR_KEY_show_filterbar,
     TR_KEY_show_notification_area_icon,
     TR_KEY_show_options_window,
+    TR_KEY_show_piecebar,
     TR_KEY_show_statusbar,
     TR_KEY_show_toolbar,
     TR_KEY_show_tracker_scrapes,

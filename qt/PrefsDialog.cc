@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <optional>
+#include <set>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -283,7 +284,24 @@ void PrefsDialog::checkBoxToggled(bool checked)
 
     if (pref_widget.is<QCheckBox>())
     {
-        setPref(pref_widget.getPrefKey(), checked);
+        auto key = pref_widget.getPrefKey();
+        setPref(key, checked);
+
+        switch (key)
+        {
+        case Prefs::SHOW_PIECEBAR:
+            if (checked)
+            {
+                session_.addKeyName(Session::TorrentProperties::MainStats, TR_KEY_pieceCount);
+                session_.addKeyName(Session::TorrentProperties::MainStats, TR_KEY_pieces);
+            }
+            else
+            {
+                session_.removeKeyName(Session::TorrentProperties::MainStats, TR_KEY_pieceCount);
+                session_.removeKeyName(Session::TorrentProperties::MainStats, TR_KEY_pieces);
+            }
+            break;
+        }
     }
 }
 
@@ -420,6 +438,7 @@ void PrefsDialog::initDesktopTab()
 {
     linkWidgetToPref(ui_.showTrayIconCheck, Prefs::SHOW_TRAY_ICON);
     linkWidgetToPref(ui_.startMinimizedCheck, Prefs::START_MINIMIZED);
+    linkWidgetToPref(ui_.showPiecebar, Prefs::SHOW_PIECEBAR);
     linkWidgetToPref(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
     linkWidgetToPref(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
     linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
