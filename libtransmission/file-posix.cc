@@ -273,7 +273,7 @@ std::string_view tr_sys_path_dirname(std::string_view path)
 
     auto const has_root = path[0] == '/';
     auto end = std::string_view::npos;
-    auto matched_slash = bool{ true };
+    auto matched_slash = true;
 
     for (auto i = len - 1; i >= 1U; --i)
     {
@@ -1128,7 +1128,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* e
 {
     TR_ASSERT(path != nullptr);
 
-    auto ret = bool{ false };
+    auto ret = false;
     auto local_error = tr_error{};
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)

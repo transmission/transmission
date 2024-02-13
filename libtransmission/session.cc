@@ -193,7 +193,7 @@ tr_peer_id_t tr_peerIdInit()
 
     // remainder is randomly-generated characters
     auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
-    auto total = int{ 0 };
+    auto total = 0;
     tr_rand_buffer(it, end - it);
     while (it + 1 < end)
     {

@@ -1101,7 +1101,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
 {
     TR_ASSERT(session->am_in_session_thread());
 
-    auto ok = bool{ true };
+    auto ok = true;
     if (move_from_old_path)
     {
         if (setme_state != nullptr)
@@ -2459,7 +2459,7 @@ void tr_torrent::rename_path_in_session_thread(
 {
     using namespace rename_helpers;
 
-    auto error = int{ 0 };
+    auto error = 0;
 
     if (!renameArgsAreValid(this, oldpath, newname))
     {

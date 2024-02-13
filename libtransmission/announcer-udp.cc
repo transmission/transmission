@@ -587,7 +587,7 @@ private:
     time_t addr_expires_at_ = 0;
 
     static inline constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
-    static inline constexpr auto ConnectionRequestTtl = int{ 30 };
+    static inline constexpr auto ConnectionRequestTtl = 30;
 };
 
 // --- SESSION

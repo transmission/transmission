@@ -576,7 +576,7 @@ void handle_request(struct evhttp_request* req, void* arg)
     }
 }
 
-auto constexpr ServerStartRetryCount = int{ 10 };
+auto constexpr ServerStartRetryCount = 10;
 auto constexpr ServerStartRetryDelayIncrement = 5s;
 auto constexpr ServerStartRetryMaxDelay = 60s;
 
