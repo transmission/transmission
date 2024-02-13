@@ -83,7 +83,7 @@ public:
     }
 
 private:
-    QObject* const object_;
+    QObject* object_;
 };
 
 char const* const PreferenceWidget::PrefKey = "pref-key";
