@@ -24,7 +24,7 @@
 
 namespace
 {
-auto constexpr Spacing = int{ 6 };
+auto constexpr Spacing = 6;
 
 auto constexpr Margin = QSize{ 10, 10 };
 

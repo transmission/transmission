@@ -66,9 +66,9 @@ char const* getUsage()
            "  transmission [OPTIONS...] [torrent files]";
 }
 
-auto constexpr StatsRefreshIntervalMsec = int{ 3000 };
-auto constexpr SessionRefreshIntervalMsec = int{ 3000 };
-auto constexpr ModelRefreshIntervalMsec = int{ 3000 };
+auto constexpr StatsRefreshIntervalMsec = 3000;
+auto constexpr SessionRefreshIntervalMsec = 3000;
+auto constexpr ModelRefreshIntervalMsec = 3000;
 
 bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale, QStringList const& search_directories)
 {
