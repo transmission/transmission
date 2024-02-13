@@ -233,6 +233,9 @@ void Session::updatePref(int key)
             case 2:
                 sessionSet(prefs_.getKey(key), QStringLiteral("required"));
                 break;
+
+            default:
+                break;
             }
 
             break;

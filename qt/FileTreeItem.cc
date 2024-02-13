@@ -165,6 +165,9 @@ QVariant FileTreeItem::data(int column, int role) const
             }
 
             break;
+
+        default:
+            break;
         }
 
         break;
@@ -183,6 +186,9 @@ QVariant FileTreeItem::data(int column, int role) const
             }
         }
 
+        break;
+
+    default:
         break;
     }
 

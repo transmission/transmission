@@ -110,6 +110,9 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
             item_texts << FileTreeItem::tr("Low") << FileTreeItem::tr("Normal") << FileTreeItem::tr("High")
                        << FileTreeItem::tr("Mixed");
             break;
+
+        default:
+            break;
         }
 
         int item_width = 0;
@@ -407,6 +410,9 @@ Qt::CheckState FileTreeView::getCumulativeCheckState(QModelIndexList const& indi
 
         case Qt::PartiallyChecked:
             return Qt::PartiallyChecked;
+
+        default:
+            break;
         }
 
         if (have_checked && have_unchecked)
