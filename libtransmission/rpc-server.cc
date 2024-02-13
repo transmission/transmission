@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    std::string unix_socket_path_ = {};
+    std::string unix_socket_path_;
 };
 } // namespace
 
