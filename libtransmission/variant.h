@@ -174,7 +174,14 @@ public:
     };
 
     constexpr tr_variant() noexcept = default;
+#if __apple_build_version__ && __apple_build_version__ < 12000000
+    // old clang incompatibility in Xcode 11.3.1 of `std::pair` with `delete`
+    tr_variant(tr_variant const&)
+    {
+    }
+#else
     tr_variant(tr_variant const&) = delete;
+#endif
     tr_variant(tr_variant&& that) noexcept = default;
     tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
