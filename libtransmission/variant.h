@@ -46,7 +46,9 @@ public:
     class Map
     {
     public:
-        Map(size_t const n_reserve = 0U)
+        Map() = default;
+
+        Map(size_t const n_reserve)
         {
             vec_.reserve(n_reserve);
         }

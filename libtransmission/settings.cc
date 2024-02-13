@@ -518,8 +518,7 @@ tr_variant Settings::save() const
 {
     auto const fields = const_cast<Settings*>(this)->fields();
 
-    auto map = tr_variant::Map{};
-    map.reserve(std::size(fields));
+    auto map = tr_variant::Map{ std::size(fields) };
 
     for (auto const& [key, prop_vptr] : fields)
     {
