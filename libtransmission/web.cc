@@ -736,7 +736,7 @@ public:
                     auto* const e = msg->easy_handle;
 
                     Task* task = nullptr;
-                    curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
+                    curl_easy_getinfo(e, CURLINFO_PRIVATE, static_cast<void*>(&task));
 
                     auto req_bytes_sent = long{};
                     auto total_time = double{};
