@@ -69,8 +69,8 @@ struct tr_rpc_idle_data
 {
     std::optional<int64_t> tag;
     tr_session* session = nullptr;
-    tr_variant::Map args_out = {};
-    tr_rpc_response_func callback = {};
+    tr_variant::Map args_out;
+    tr_rpc_response_func callback;
 };
 
 auto constexpr SuccessResult = "success"sv;

@@ -372,8 +372,8 @@ void tr_peerIo::can_read_wrapper()
     auto const keep_alive = shared_from_this();
 
     auto const now = tr_time_msec();
-    auto done = bool{ false };
-    auto err = bool{ false };
+    auto done = false;
+    auto err = false;
 
     // In normal conditions, only continue processing if we still have bandwidth
     // quota for it.

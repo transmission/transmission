@@ -166,27 +166,27 @@ enum LtepMessageIds : uint8_t
 namespace MetadataMsgType
 {
 
-auto constexpr Request = int{ 0 };
-auto constexpr Data = int{ 1 };
-auto constexpr Reject = int{ 2 };
+auto constexpr Request = 0;
+auto constexpr Data = 1;
+auto constexpr Reject = 2;
 
 } // namespace MetadataMsgType
 
-auto constexpr MinChokePeriodSec = int{ 10 };
+auto constexpr MinChokePeriodSec = 10;
 
 // idle seconds before we send a keepalive
-auto constexpr KeepaliveIntervalSecs = int{ 100 };
+auto constexpr KeepaliveIntervalSecs = 100;
 
-auto constexpr MetadataReqQ = int{ 64 };
+auto constexpr MetadataReqQ = 64;
 
-auto constexpr ReqQ = int{ 512 };
+auto constexpr ReqQ = 512;
 
 // used in lowering the outMessages queue period
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
 // meet our bandwidth goals for the next N seconds
-auto constexpr RequestBufSecs = int{ 10 };
+auto constexpr RequestBufSecs = 10;
 
 // ---
 
