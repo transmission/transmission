@@ -994,6 +994,10 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     case TR_SYS_FILE_LOCK_UN:
         fl.l_type = F_UNLCK;
         break;
+
+    default:
+        errno = EINVAL;
+        break;
     }
 
     fl.l_whence = SEEK_SET;
