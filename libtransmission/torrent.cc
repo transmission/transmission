@@ -1513,7 +1513,7 @@ void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 
 void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 {
-    return tor->amount_done_bins(tabs, n_tabs);
+    tor->amount_done_bins(tabs, n_tabs);
 }
 
 // --- Start/Stop Callback
