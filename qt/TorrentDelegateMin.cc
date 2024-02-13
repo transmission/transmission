@@ -29,7 +29,7 @@ enum
 {
     GUI_PAD = 6,
     BAR_WIDTH = 50,
-    BAR_HEIGHT = 16,
+    PROGRESS_BAR_HEIGHT = 16,
     LINE_SPACING = 4
 };
 
@@ -54,7 +54,7 @@ public:
     QRect emblem_rect;
     QRect name_rect;
     QRect status_rect;
-    QRect bar_rect;
+    QRect progress_bar_rect;
 
     ItemLayout(
         QString name_text,
@@ -67,7 +67,7 @@ public:
 
     [[nodiscard]] QSize size() const
     {
-        return (icon_rect | name_rect | status_rect | bar_rect).size();
+        return (icon_rect | name_rect | status_rect | progress_bar_rect).size();
     }
 
     [[nodiscard]] QString nameText() const
@@ -114,7 +114,7 @@ ItemLayout::ItemLayout(
     QSize const status_size(status_fm.size(0, status_text_));
 
     QStyleOptionProgressBar bar_style;
-    bar_style.rect = QRect{ 0, 0, BAR_WIDTH, BAR_HEIGHT };
+    bar_style.rect = QRect{ 0, 0, BAR_WIDTH, PROGRESS_BAR_HEIGHT };
     bar_style.maximum = 100;
     bar_style.progress = 100;
     bar_style.textVisible = true;
@@ -131,8 +131,8 @@ ItemLayout::ItemLayout(
         Qt::AlignRight | Qt::AlignBottom,
         emblem_icon.actualSize(icon_rect.size() / 2, QIcon::Normal, QIcon::On),
         icon_rect);
-    bar_rect = QStyle::alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, bar_size, base_rect);
-    Utils::narrowRect(base_rect, icon_rect.width() + GUI_PAD, bar_rect.width() + GUI_PAD, direction);
+    progress_bar_rect = QStyle::alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, bar_size, base_rect);
+    Utils::narrowRect(base_rect, icon_rect.width() + GUI_PAD, progress_bar_rect.width() + GUI_PAD, direction);
     status_rect = QStyle::alignedRect(
         direction,
         Qt::AlignRight | Qt::AlignVCenter,
@@ -244,7 +244,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     painter->drawText(layout.name_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.nameText());
     painter->setFont(layout.status_font);
     painter->drawText(layout.status_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
-    progress_bar_style_.rect = layout.bar_rect;
+    progress_bar_style_.rect = layout.progress_bar_rect;
 
     if (tor.isDownloading())
     {
@@ -270,7 +270,21 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+
+    auto const brush = progress_bar_style_.palette.brush(QPalette::Highlight);
+    float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+
+    painter->fillRect(layout.progress_bar_rect, progress_bar_style_.palette.color(QPalette::Light));
+
+    QRect progress_bar_fill_rect = layout.progress_bar_rect;
+    progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
+    painter->fillRect(progress_bar_fill_rect, brush);
+
+    painter->setPen(progress_bar_style_.palette.color(QPalette::Base));
+    painter->drawRect(layout.progress_bar_rect);
+
+    painter->setPen(progress_bar_style_.palette.color(QPalette::Text));
+    painter->drawText(layout.progress_bar_rect, progress_bar_style_.text, QTextOption{ Qt::AlignCenter });
 
     painter->restore();
 }

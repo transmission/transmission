@@ -214,6 +214,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(peersSendingToUs, peers_sending_to_us, PEERS_SENDING_TO_US)
             HANDLE_KEY(percentDone, percent_done, PERCENT_DONE)
             HANDLE_KEY(pieceCount, piece_count, PIECE_COUNT)
+            HANDLE_KEY(pieces, pieces_b64, PIECES)
             HANDLE_KEY(pieceSize, piece_size, PIECE_SIZE)
             HANDLE_KEY(primary_mime_type, primary_mime_type, PRIMARY_MIME_TYPE)
             HANDLE_KEY(queuePosition, queue_position, QUEUE_POSITION)
@@ -272,6 +273,25 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
                     files_[i].index = i;
                 }
                 break;
+
+            case TR_KEY_pieces:
+                {
+                    auto const ba = QByteArray::fromBase64(pieces_b64_.toLocal8Bit());
+                    pieces_.clear();
+
+                    for (int i = 0; i < ba.count(); ++i)
+                    {
+                        for (int b = 0; b < 8; b++)
+                        {
+                            if (i * 8 + b >= piece_count_)
+                            {
+                                break;
+                            }
+                            pieces_.emplace_back(ba.at(i) & (1 << (7 - b)));
+                        }
+                    }
+                    break;
+                }
 
             case TR_KEY_trackers:
                 {

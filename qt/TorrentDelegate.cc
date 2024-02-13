@@ -26,7 +26,8 @@
 enum
 {
     GUI_PAD = 6,
-    BAR_HEIGHT = 12
+    PROGRESS_BAR_HEIGHT = 4,
+    PIECE_BAR_HEIGHT = 8,
 };
 
 namespace
@@ -49,6 +50,8 @@ public:
     QRect name_rect;
     QRect status_rect;
     QRect bar_rect;
+    QRect progress_bar_rect;
+    QRect piece_bar_rect;
     QRect progress_rect;
 
     ItemLayout(
@@ -124,8 +127,10 @@ ItemLayout::ItemLayout(
 
     name_rect = base_rect.adjusted(0, 0, 0, name_size.height());
     status_rect = name_rect.adjusted(0, name_rect.height() + 1, 0, status_size.height() + 1);
-    bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, BAR_HEIGHT + 1);
-    progress_rect = bar_rect.adjusted(0, bar_rect.height() + 1, 0, progress_size.height() + 1);
+    bar_rect = status_rect.adjusted(0, status_rect.height() + 1, 0, PROGRESS_BAR_HEIGHT + PIECE_BAR_HEIGHT + 1);
+    progress_bar_rect = bar_rect.adjusted(0, 0, 0, -PIECE_BAR_HEIGHT);
+    piece_bar_rect = bar_rect.adjusted(0, PROGRESS_BAR_HEIGHT + 1, 0, 0);
+    progress_rect = bar_rect.adjusted(0, bar_rect.height() + 1, 0, progress_size.height());
     icon_rect = QStyle::alignedRect(
         direction,
         Qt::AlignLeft | Qt::AlignVCenter,
@@ -570,7 +575,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     painter->drawText(layout.status_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
     painter->setFont(layout.progress_font);
     painter->drawText(layout.progress_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText());
-    progress_bar_style_.rect = layout.bar_rect;
+    progress_bar_style_.rect = layout.progress_bar_rect;
 
     if (tor.isDownloading())
     {
@@ -594,7 +599,53 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    auto const brush = progress_bar_style_.palette.brush(QPalette::Highlight);
+    float const progress = static_cast<float>(progress_bar_style_.progress) / static_cast<float>(progress_bar_style_.maximum);
+
+    painter->fillRect(layout.bar_rect, progress_bar_style_.palette.color(QPalette::Light));
+
+    QRect progress_bar_fill_rect = layout.progress_bar_rect;
+    progress_bar_fill_rect.setWidth(progress * layout.progress_bar_rect.width());
+    painter->fillRect(progress_bar_fill_rect, brush);
+
+    painter->setPen(progress_bar_style_.palette.color(QPalette::Base));
+    painter->drawRect(layout.progress_bar_rect);
+
+    if (progress == 1.0)
+    {
+        painter->fillRect(layout.bar_rect, brush);
+    }
+    else
+    {
+        float const piece_width = static_cast<float>(layout.piece_bar_rect.width() - 3) / tor.pieceCount();
+
+        int offset = 0;
+        int section_width = 0;
+
+        for (int i = 0; i < tor.pieceCount(); i++)
+        {
+            if (!tor.pieces()[i] || i == tor.pieceCount() - 1)
+            {
+                QRect const piece_rect = { layout.piece_bar_rect.left() + offset + 2,
+                                           layout.piece_bar_rect.top() + 1,
+                                           static_cast<int>(section_width * piece_width + 1),
+                                           PIECE_BAR_HEIGHT - 3 };
+
+                painter->fillRect(piece_rect, brush);
+                section_width = 0;
+            }
+            else
+            {
+                if (section_width == 0)
+                {
+                    offset = i * piece_width;
+                }
+                section_width++;
+            }
+        }
+    }
+
+    painter->drawRect(layout.bar_rect);
 
     painter->restore();
 }
