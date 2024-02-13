@@ -761,12 +761,7 @@ void DetailsDialog::refreshUI()
 
         for (Torrent const* const t : torrents)
         {
-            auto const dt = t->lastActivity();
-
-            if (latest < dt)
-            {
-                latest = dt;
-            }
+            latest = std::max(latest, t->lastActivity());
         }
 
         auto const seconds = static_cast<int>(std::difftime(now, latest));
