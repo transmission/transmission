@@ -116,7 +116,7 @@ Torrent::Columns::Columns()
 class Torrent::Impl
 {
 public:
-    enum class Property : guint
+    enum class Property : guint8
     {
         ICON = 1,
         NAME,
