@@ -48,17 +48,20 @@ export class PrefsDialog extends EventTarget {
     )) {
       delete element.dataset.open;
       setTextContent(element, 'Checking...');
-      this.remote.checkPort(key, this._onPortChecked, this);
+      this.remote.checkPort(
+        key,
+        (response) => this._onPortChecked(key, response),
+        this,
+      );
     }
   }
 
-  _onPortChecked(response) {
+  _onPortChecked(ipProtocol, response) {
     if (this.closed) {
       return;
     }
 
-    const element =
-      this.elements.network.port_status_label[response.arguments['ipProtocol']];
+    const element = this.elements.network.port_status_label[ipProtocol];
     const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
     setTextContent(element, is_open ? 'Open' : 'Closed');
