@@ -165,9 +165,9 @@ enum LtepMessageIds : uint8_t
 namespace MetadataMsgType
 {
 
-auto constexpr Request = int{ 0 };
-auto constexpr Data = int{ 1 };
-auto constexpr Reject = int{ 2 };
+auto constexpr Request = 0;
+auto constexpr Data = 1;
+auto constexpr Reject = 2;
 
 } // namespace MetadataMsgType
 
@@ -178,7 +178,7 @@ auto constexpr KeepaliveIntervalSecs = time_t{ 100 };
 
 auto constexpr MetadataReqQ = size_t{ 64U };
 
-auto constexpr ReqQ = int{ 512 };
+auto constexpr ReqQ = 512;
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to

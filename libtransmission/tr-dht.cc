@@ -411,7 +411,7 @@ private:
 
     void save_state() const
     {
-        static auto constexpr MaxNodes = int{ 300 };
+        static auto constexpr MaxNodes = 300;
         static auto constexpr PortLen = tr_port::CompactPortBytes;
         static auto constexpr CompactAddrLen = tr_address::CompactAddrBytes[TR_AF_INET];
         static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];

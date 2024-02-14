@@ -58,7 +58,7 @@
 using namespace std::literals;
 using namespace libtransmission::Values;
 
-static auto constexpr CancelHistorySec = int{ 60 };
+static auto constexpr CancelHistorySec = 60;
 
 // ---
 
@@ -951,10 +951,10 @@ private:
     // ---
 
     // number of bad pieces a peer is allowed to send before we ban them
-    static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
+    static auto constexpr MaxBadPiecesPerPeer = 5;
 
     // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = int{ 90 };
+    static auto constexpr RequestTtlSecs = 90;
 
     std::array<libtransmission::ObserverTag, 8> const tags_;
 

@@ -268,7 +268,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 
     auto const protocol = tr_ip_protocol_to_sv(type);
 
-    auto err = int{ 0 };
+    auto err = 0;
     auto const& source_addr = get_global_source_address(bind_addr(type), err);
     if (source_addr)
     {

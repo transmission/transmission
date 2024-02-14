@@ -194,7 +194,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool Int64(int64_t value, Context const& /*context*/) override
     {
-        auto unhandled = bool{ false };
+        auto unhandled = false;
 
         if (state_ == State::FilesIgnored)
         {
@@ -272,7 +272,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     {
         auto const curdepth = depth();
         auto const current_key = currentKey();
-        auto unhandled = bool{ false };
+        auto unhandled = false;
 
         if (state_ == State::FilesIgnored)
         {

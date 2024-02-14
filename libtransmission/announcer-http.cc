@@ -319,7 +319,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         tr_announce_response& response_;
         std::string_view const log_name_;
         std::optional<size_t> row_;
-        tr_pex pex_ = {};
+        tr_pex pex_;
 
         explicit AnnounceHandler(tr_announce_response& response, std::string_view log_name)
             : response_{ response }
@@ -480,7 +480,7 @@ public:
 
 private:
     tr_scrape_response response_ = {};
-    tr_scrape_response_func response_func_ = {};
+    tr_scrape_response_func response_func_;
     std::string log_name_;
 };
 
