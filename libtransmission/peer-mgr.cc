@@ -921,7 +921,7 @@ private:
 
         if (CompareAtomsByUsefulness(info_this, info_that))
         {
-            auto it = std::find_if(
+            auto const it = std::find_if(
                 std::begin(peers),
                 std::end(peers),
                 [&info_that](tr_peerMsgs const* const peer) { return peer->peer_info == &info_that; });
@@ -2561,14 +2561,14 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
     }
 
     // only keep the best `max` candidates
-    if (auto const max = tr_peerMgr::OutboundCandidates::requested_inline_size; max < std::size(candidates))
+    if (static auto constexpr Max = tr_peerMgr::OutboundCandidates::requested_inline_size; Max < std::size(candidates))
     {
         std::partial_sort(
             std::begin(candidates),
-            std::begin(candidates) + max,
+            std::begin(candidates) + Max,
             std::end(candidates),
             [](auto const& a, auto const& b) { return a.score < b.score; });
-        candidates.resize(max);
+        candidates.resize(Max);
     }
 
     // put the best candidates at the end of the list
@@ -2638,8 +2638,7 @@ void tr_peerMgr::make_new_peer_connections()
 
     // initiate connections to the last N candidates
     auto const n_this_pass = std::min(std::size(candidates), MaxConnectionsPerPulse);
-    auto const it_end = std::crbegin(candidates) + n_this_pass;
-    for (auto it = std::crbegin(candidates); it != it_end; ++it)
+    for (auto it = std::crbegin(candidates), end = std::crbegin(candidates) + n_this_pass; it != end; ++it)
     {
         auto const& [tor_id, sock_addr] = *it;
 
