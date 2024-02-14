@@ -863,7 +863,7 @@ private:
             // if there is an existing connection to this peer, keep the better one
             if (info_that->is_connected() && on_got_port_duplicate_connection(msgs, info_that))
             {
-                return;
+                goto EXIT;
             }
 
             // merge the peer info objects
@@ -888,6 +888,7 @@ private:
         ++stats.known_peer_from_count[info_this->from_first()];
         connectable_pool.insert_or_assign(info_this->listen_socket_address(), std::move(info_this));
 
+EXIT:
         mark_all_seeds_flag_dirty();
     }
 
@@ -913,7 +914,6 @@ private:
         msgs->do_purge = true;
         stats.known_peer_from_count[info_this->from_first()] -= connectable_pool.erase(info_this->listen_socket_address());
 
-        mark_all_seeds_flag_dirty();
         return true;
     }
 
