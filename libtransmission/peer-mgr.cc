@@ -847,10 +847,11 @@ private:
 
     void on_got_port(tr_peerMsgs* const msgs, tr_peer_event const& event)
     {
-        auto const info_this = msgs->peer_info;
+        auto info_this = msgs->peer_info;
         TR_ASSERT(info_this->is_connected());
+        TR_ASSERT(info_this->listen_port() != event.port);
 
-        // If we already know about this peer, merge the info objects
+        // we already know about this peer
         if (auto it_that = connectable_pool.find({ info_this->listen_address(), event.port });
             it_that != std::end(connectable_pool))
         {
@@ -859,32 +860,40 @@ private:
             TR_ASSERT(it_that->first.address() == info_this->listen_address());
             TR_ASSERT(it_that->first.port() != info_this->listen_port());
 
-            // If there is an existing connection to this peer, keep the better one
-            if (info_that->is_connected() && on_got_port_duplicate_connection(msgs, it_that))
+            // if there is an existing connection to this peer, keep the better one
+            if (info_that->is_connected() && on_got_port_duplicate_connection(msgs, info_that))
             {
                 return;
             }
 
+            // merge the peer info objects
             info_this->merge(*info_that);
-            stats.known_peer_from_count[info_that->from_first()] -= connectable_pool.erase(info_that->listen_socket_address());
+
+            // info_that will be replaced by info_this later, so decrement stat
+            --stats.known_peer_from_count[info_that->from_first()];
         }
+        // we are going to insert a brand-new peer info object to the pool
         else if (std::empty(info_this->listen_port()))
         {
             info_this->set_connectable();
         }
 
-        // TODO maybe move instead of erase then insert?
-        stats.known_peer_from_count[info_this->from_first()] += 1U - connectable_pool.erase(info_this->listen_socket_address());
+        // erase the old peer info entry
+        stats.known_peer_from_count[info_this->from_first()] -= connectable_pool.erase(info_this->listen_socket_address());
+
+        // set new listen port
         info_this->set_listen_port(event.port);
-        connectable_pool[info_this->listen_socket_address()] = msgs->peer_info;
+
+        // insert or replace the peer info ptr at the target location
+        ++stats.known_peer_from_count[info_this->from_first()];
+        connectable_pool.insert_or_assign(info_this->listen_socket_address(), std::move(info_this));
 
         mark_all_seeds_flag_dirty();
     }
 
-    bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, Pool::iterator it_that)
+    bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, std::shared_ptr<tr_peer_info> info_that)
     {
-        auto info_this = msgs->peer_info;
-        auto info_that = it_that->second;
+        auto const info_this = msgs->peer_info;
 
         TR_ASSERT(info_that->is_connected());
 
@@ -896,10 +905,6 @@ private:
                 [&info_that](tr_peerMsgs const* const peer) { return peer->peer_info == info_that; });
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
-
-            --stats.known_peer_from_count[info_that->from_first()];
-            // Note that it_that is invalid after this point
-            connectable_pool.erase(it_that);
 
             return false;
         }
