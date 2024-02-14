@@ -1260,6 +1260,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     {
         swarm.wishlist = std::make_unique<Wishlist>(std::make_unique<tr_swarm::WishlistMediator>(swarm));
     }
+    swarm.update_endgame();
     return swarm.wishlist->next(
         numwant,
         [peer](tr_piece_index_t p) { return peer->hasPiece(p); },
