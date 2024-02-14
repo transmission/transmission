@@ -64,7 +64,11 @@ export class PrefsDialog extends EventTarget {
     const element = this.elements.network.port_status_label[ipProtocol];
     const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
-    setTextContent(element, is_open ? 'Open' : 'Closed');
+    if ('port-is-open' in response.arguments) {
+      setTextContent(element, is_open ? 'Open' : 'Closed');
+    } else {
+      setTextContent(element, 'Error');
+    }
   }
 
   _setBlocklistButtonEnabled(b) {
