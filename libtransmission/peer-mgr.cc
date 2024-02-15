@@ -20,7 +20,6 @@
 #include <utility>
 #include <vector>
 
-#include <small/map.hpp>
 #include <small/vector.hpp>
 
 #include <fmt/core.h>
@@ -284,7 +283,8 @@ class tr_swarm
 {
 public:
     using Peers = std::vector<tr_peerMsgs*>;
-    using Pool = small::map<tr_socket_address, std::shared_ptr<tr_peer_info>>;
+    // FIXME(tearfur) replace std::unordered_map with small::map after their bugs are fixed
+    using Pool = std::unordered_map<tr_socket_address, std::shared_ptr<tr_peer_info>>;
 
     class WishlistMediator final : public Wishlist::Mediator
     {
@@ -378,7 +378,11 @@ public:
     void remove_inactive_peer_info() noexcept
     {
         auto const now = tr_time();
-        for (auto iter = std::begin(connectable_pool), end = std::end(connectable_pool); iter != end;)
+
+        // N.B. Unlike `std::map`, erasing elements in `small::map` seems to invalidate
+        // iterators other than the one being erased. So make sure `std::end()` is called
+        // every iteration
+        for (auto iter = std::begin(connectable_pool); iter != std::end(connectable_pool);)
         {
             auto const& [socket_address, peer_info] = *iter;
             if (peer_info->is_inactive(now))
