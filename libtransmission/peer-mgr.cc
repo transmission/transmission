@@ -417,12 +417,13 @@ public:
 
         peer_disconnect.emit(tor, peer->has());
 
-        auto& peer_info = peer->peer_info;
+        auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
         [[maybe_unused]] auto const is_incoming = peer->is_incoming_connection();
+        TR_ASSERT(peer_info != nullptr);
 
         --stats.peer_count;
-        --stats.peer_from_count[peer_info.from_first()];
+        --stats.peer_from_count[peer_info->from_first()];
 
         if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
         {
@@ -432,7 +433,7 @@ public:
 
         delete peer;
 
-        if (std::empty(peer_info.listen_port())) // is not connectable
+        if (std::empty(peer_info->listen_port())) // is not connectable
         {
             TR_ASSERT(is_incoming);
             [[maybe_unused]] auto const count = incoming_pool.erase(socket_address);
@@ -440,7 +441,7 @@ public:
         }
         else
         {
-            graveyard_pool.erase(peer_info.listen_socket_address());
+            graveyard_pool.erase(peer_info->listen_socket_address());
         }
     }
 
@@ -533,7 +534,7 @@ public:
                 tor->set_date_active(now);
                 tor->session->add_uploaded(event.length);
 
-                msgs->peer_info.set_latest_piece_data_time(now);
+                msgs->peer_info->set_latest_piece_data_time(now);
             }
 
             break;
@@ -542,7 +543,7 @@ public:
             {
                 auto const now = tr_time();
                 on_client_got_piece_data(s->tor, event.length, now);
-                msgs->peer_info.set_latest_piece_data_time(now);
+                msgs->peer_info->set_latest_piece_data_time(now);
             }
 
             break;
@@ -573,7 +574,7 @@ public:
                 // Do nothing
             }
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            else if (auto const& info = msgs->peer_info; std::empty(info.listen_port()))
+            else if (auto const& info = *msgs->peer_info; std::empty(info.listen_port()))
             {
                 s->on_got_port(msgs, event, false);
             }
@@ -660,7 +661,7 @@ private:
 
         if (++peer->strikes >= MaxBadPiecesPerPeer)
         {
-            peer->peer_info.ban();
+            peer->peer_info->ban();
             peer->do_purge = true;
             tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
         }
@@ -781,7 +782,7 @@ private:
 
             if (peer->is_seed())
             {
-                mark_peer_as_seed(peer->peer_info);
+                mark_peer_as_seed(*peer->peer_info);
             }
         }
     }
@@ -864,7 +865,7 @@ private:
 
     void on_got_port(tr_peerMsgs* const msgs, tr_peer_event const& event, bool was_connectable)
     {
-        auto& info_this = msgs->peer_info;
+        auto& info_this = *msgs->peer_info;
         TR_ASSERT(info_this.is_connected());
         TR_ASSERT(was_connectable != std::empty(info_this.listen_port()));
 
@@ -914,7 +915,7 @@ private:
 
     bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, Pool::iterator& it_that, bool was_connectable)
     {
-        auto& info_this = msgs->peer_info;
+        auto& info_this = *msgs->peer_info;
         auto& info_that = it_that->second;
 
         TR_ASSERT(info_that.is_connected());
@@ -924,7 +925,7 @@ private:
             auto it = std::find_if(
                 std::begin(peers),
                 std::end(peers),
-                [&info_that](tr_peerMsgs const* const peer) { return &peer->peer_info == &info_that; });
+                [&info_that](tr_peerMsgs const* const peer) { return peer->peer_info == &info_that; });
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
@@ -1290,8 +1291,9 @@ namespace
 {
 namespace handshake_helpers
 {
-void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_peer_info& peer_info, tr_interned_string client)
+void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_peer_info* peer_info, tr_interned_string client)
 {
+    TR_ASSERT(peer_info != nullptr);
     TR_ASSERT(tor.swarm != nullptr);
 
     tr_swarm* swarm = tor.swarm;
@@ -1301,10 +1303,10 @@ void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_
     swarm->peers.push_back(peer);
 
     ++swarm->stats.peer_count;
-    ++swarm->stats.peer_from_count[peer_info.from_first()];
+    ++swarm->stats.peer_from_count[peer_info->from_first()];
 
     TR_ASSERT(swarm->stats.peer_count == swarm->peerCount());
-    TR_ASSERT(swarm->stats.peer_from_count[peer_info.from_first()] <= swarm->stats.peer_count);
+    TR_ASSERT(swarm->stats.peer_from_count[peer_info->from_first()] <= swarm->stats.peer_count);
 }
 
 /* FIXME: this is kind of a mess. */
@@ -1393,7 +1395,7 @@ void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_
     }
 
     result.io->set_bandwidth(&swarm->tor->bandwidth());
-    create_bit_torrent_peer(*swarm->tor, result.io, *info, client);
+    create_bit_torrent_peer(*swarm->tor, result.io, info, client);
 
     return true;
 }
@@ -1554,7 +1556,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         {
             if (peer->socket_address().address().type == address_type)
             {
-                infos.emplace_back(&peer->peer_info);
+                infos.emplace_back(peer->peer_info);
             }
         }
     }
@@ -1734,7 +1736,7 @@ namespace peer_stat_helpers
     addr.display_name(stats.addr, sizeof(stats.addr));
     stats.client = peer->user_agent().c_str();
     stats.port = port.host();
-    stats.from = peer->peer_info.from_first();
+    stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
@@ -2142,12 +2144,12 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     }
 
     auto const* tor = s->tor;
-    auto const& info = peer->peer_info;
+    auto const* const info = peer->peer_info;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
     if (tor->is_done() && peer->is_seed())
     {
-        return !tor->allows_pex() || info.idle_secs(now).value_or(0U) >= 30U;
+        return !tor->allows_pex() || info->idle_secs(now).value_or(0U) >= 30U;
     }
 
     /* disconnect if it's been too long since piece data has been transferred.
@@ -2163,7 +2165,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
         auto const hi = MaxUploadIdleSecs;
         time_t const limit = hi - (hi - lo) * strictness;
 
-        if (auto const idle_secs = info.idle_secs(now); idle_secs && *idle_secs > limit)
+        if (auto const idle_secs = info->idle_secs(now); idle_secs && *idle_secs > limit)
         {
             tr_logAddTraceSwarm(
                 s,
@@ -2193,7 +2195,7 @@ constexpr struct
             return a->do_purge ? 1 : -1;
         }
 
-        return -a->peer_info.compare_by_piece_data_time(b->peer_info);
+        return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
     }
 
     [[nodiscard]] constexpr bool operator()(tr_peerMsgs const* a, tr_peerMsgs const* b) const // less than

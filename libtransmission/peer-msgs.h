@@ -37,7 +37,7 @@ class tr_peerMsgs : public tr_peer
 public:
     tr_peerMsgs(
         tr_torrent const& tor,
-        tr_peer_info& peer_info_in,
+        tr_peer_info* peer_info_in,
         tr_interned_string user_agent,
         bool connection_is_encrypted,
         bool connection_is_incoming,
@@ -108,7 +108,7 @@ public:
 
     static tr_peerMsgs* create(
         tr_torrent& torrent,
-        tr_peer_info& peer_info,
+        tr_peer_info* peer_info,
         std::shared_ptr<tr_peerIo> io,
         tr_interned_string user_agent,
         tr_peer_callback_bt callback,
@@ -146,7 +146,8 @@ protected:
     }
 
 public:
-    tr_peer_info& peer_info;
+    // TODO(tearfur): change this to reference
+    tr_peer_info* const peer_info;
 
 private:
     static inline auto n_peers = std::atomic<size_t>{};
