@@ -43,13 +43,13 @@ private:
     template<typename T, size_t N>
     using Lookup = std::array<std::pair<std::string_view, T>, N>;
 
-    static inline auto constexpr EncryptionKeys = Lookup<tr_encryption_mode, 3U>{ {
+    static auto constexpr EncryptionKeys = Lookup<tr_encryption_mode, 3U>{ {
         { "required", TR_ENCRYPTION_REQUIRED },
         { "preferred", TR_ENCRYPTION_PREFERRED },
         { "allowed", TR_CLEAR_PREFERRED },
     } };
 
-    static inline auto constexpr LogKeys = Lookup<tr_log_level, 7U>{ {
+    static auto constexpr LogKeys = Lookup<tr_log_level, 7U>{ {
         { "critical", TR_LOG_CRITICAL },
         { "debug", TR_LOG_DEBUG },
         { "error", TR_LOG_ERROR },
@@ -59,7 +59,7 @@ private:
         { "warn", TR_LOG_WARN },
     } };
 
-    static inline auto constexpr PreallocationKeys = Lookup<tr_open_files::Preallocation, 5U>{ {
+    static auto constexpr PreallocationKeys = Lookup<tr_open_files::Preallocation, 5U>{ {
         { "off", tr_open_files::Preallocation::None },
         { "none", tr_open_files::Preallocation::None },
         { "fast", tr_open_files::Preallocation::Sparse },
@@ -67,19 +67,19 @@ private:
         { "full", tr_open_files::Preallocation::Full },
     } };
 
-    static inline auto constexpr VerifyModeKeys = Lookup<tr_verify_added_mode, 2U>{ {
+    static auto constexpr VerifyModeKeys = Lookup<tr_verify_added_mode, 2U>{ {
         { "fast", TR_VERIFY_ADDED_FAST },
         { "full", TR_VERIFY_ADDED_FULL },
     } };
 
-    static inline auto constexpr PreferredTransportKeys = Lookup<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{ {
+    static auto constexpr PreferredTransportKeys = Lookup<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{ {
         { "utp", TR_PREFER_UTP },
         { "tcp", TR_PREFER_TCP },
     } };
 };
 
 template<>
-std::optional<bool> VariantConverter::load<bool>(tr_variant const& src)
+std::optional<bool> VariantConverter::load(tr_variant const& src)
 {
     if (auto val = src.get_if<bool>(); val != nullptr)
     {
@@ -90,7 +90,7 @@ std::optional<bool> VariantConverter::load<bool>(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<bool>(bool const& val)
+tr_variant VariantConverter::save(bool const& val)
 {
     return val;
 }
@@ -98,7 +98,7 @@ tr_variant VariantConverter::save<bool>(bool const& val)
 // ---
 
 template<>
-std::optional<std::chrono::milliseconds> VariantConverter::load<std::chrono::milliseconds>(tr_variant const& src)
+std::optional<std::chrono::milliseconds> VariantConverter::load(tr_variant const& src)
 {
     if (auto val = src.get_if<int64_t>(); val != nullptr)
     {
@@ -109,7 +109,7 @@ std::optional<std::chrono::milliseconds> VariantConverter::load<std::chrono::mil
 }
 
 template<>
-tr_variant VariantConverter::save<std::chrono::milliseconds>(std::chrono::milliseconds const& val)
+tr_variant VariantConverter::save(std::chrono::milliseconds const& val)
 {
     return val.count();
 }
@@ -117,7 +117,7 @@ tr_variant VariantConverter::save<std::chrono::milliseconds>(std::chrono::millis
 // ---
 
 template<>
-std::optional<double> VariantConverter::load<double>(tr_variant const& src)
+std::optional<double> VariantConverter::load(tr_variant const& src)
 {
     if (auto val = src.get_if<double>(); val != nullptr)
     {
@@ -128,7 +128,7 @@ std::optional<double> VariantConverter::load<double>(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<double>(double const& val)
+tr_variant VariantConverter::save(double const& val)
 {
     return val;
 }
@@ -168,7 +168,7 @@ std::optional<tr_encryption_mode> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<tr_encryption_mode>(tr_encryption_mode const& val)
+tr_variant VariantConverter::save(tr_encryption_mode const& val)
 {
     return static_cast<int64_t>(val);
 }
@@ -208,7 +208,7 @@ std::optional<tr_log_level> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<tr_log_level>(tr_log_level const& val)
+tr_variant VariantConverter::save(tr_log_level const& val)
 {
     return static_cast<int64_t>(val);
 }
@@ -235,7 +235,7 @@ std::optional<tr_mode_t> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<tr_mode_t>(tr_mode_t const& val)
+tr_variant VariantConverter::save(tr_mode_t const& val)
 {
     return fmt::format("{:#03o}", val);
 }
@@ -254,7 +254,7 @@ std::optional<tr_port> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<tr_port>(tr_port const& val)
+tr_variant VariantConverter::save(tr_port const& val)
 {
     return int64_t{ val.host() };
 }
@@ -294,7 +294,7 @@ std::optional<tr_open_files::Preallocation> VariantConverter::load(tr_variant co
 }
 
 template<>
-tr_variant VariantConverter::save<tr_open_files::Preallocation>(tr_open_files::Preallocation const& val)
+tr_variant VariantConverter::save(tr_open_files::Preallocation const& val)
 {
     return static_cast<int64_t>(val);
 }
@@ -334,7 +334,7 @@ std::optional<tr_preferred_transport> VariantConverter::load(tr_variant const& s
 }
 
 template<>
-tr_variant VariantConverter::save<tr_preferred_transport>(tr_preferred_transport const& val)
+tr_variant VariantConverter::save(tr_preferred_transport const& val)
 {
     for (auto const& [key, value] : PreferredTransportKeys)
     {
@@ -361,7 +361,7 @@ std::optional<size_t> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<size_t>(size_t const& val)
+tr_variant VariantConverter::save(size_t const& val)
 {
     return uint64_t{ val };
 }
@@ -380,7 +380,7 @@ std::optional<std::string> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<std::string>(std::string const& val)
+tr_variant VariantConverter::save(std::string const& val)
 {
     return val;
 }
@@ -404,7 +404,7 @@ std::optional<tr_tos_t> VariantConverter::load(tr_variant const& src)
 }
 
 template<>
-tr_variant VariantConverter::save<tr_tos_t>(tr_tos_t const& val)
+tr_variant VariantConverter::save(tr_tos_t const& val)
 {
     return val.toString();
 }
@@ -444,7 +444,7 @@ std::optional<tr_verify_added_mode> VariantConverter::load(tr_variant const& src
 }
 
 template<>
-tr_variant VariantConverter::save<tr_verify_added_mode>(tr_verify_added_mode const& val)
+tr_variant VariantConverter::save(tr_verify_added_mode const& val)
 {
     for (auto const& [key, value] : VerifyModeKeys)
     {
@@ -488,7 +488,7 @@ struct SaveVisitor
     template<typename T>
     void operator()(T const* const src)
     {
-        tgt_.try_emplace(key_, VariantConverter::save<T>(*src));
+        tgt_.try_emplace(key_, VariantConverter::save(*src));
     }
 
 private:
