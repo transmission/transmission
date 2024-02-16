@@ -1,10 +1,13 @@
 **We strongly recommend that you use the [current version](https://github.com/transmission/transmission/releases/latest) of Transmission unless you have a legacy operating system version shown below.**
 
 If you have a legacy operating system version, this table shows the best Transmission version to use:
- * **Mac OS X 10.7 (Lion), 10.8 (Mountain Lion), 10.9 (Mavericks)**
+
+  * **OS X 10.10 (Yosemite), OS X 10.11 (El Capitan), macOS 10.12 (Sierra)**
+    Latest Version: [Transmission 3.00](https://github.com/transmission/transmission-releases/raw/master/Transmission-3.00.dmg)
+    SHA256 hash: [`f9984b6ba51a02bb8f880c538b28e2c7d6a3b7a22257a166cc3e1d55a133ab34`](https://www.virustotal.com/gui/file/f9984b6ba51a02bb8f880c538b28e2c7d6a3b7a22257a166cc3e1d55a133ab34/detection)
+  * **Mac OS X 10.7 (Lion), OS X 10.8 (Mountain Lion), OS X 10.9 (Mavericks)**
     Latest version: [Transmission 2.94](https://github.com/transmission/transmission-releases/raw/master/Transmission-2.94.dmg)
     SHA256 hash: [`2cae915ae0e37fc5983406ca7fbd53a054a7153d3bfd7a6cef117a8a28d8a78a`](https://www.virustotal.com/gui/file/2cae915ae0e37fc5983406ca7fbd53a054a7153d3bfd7a6cef117a8a28d8a78a/detection)
-
   * **Mac OS X 10.6 Intel (Snow Leopard)**
     Latest version: [Transmission 2.84](https://github.com/transmission/transmission-releases/raw/master/Transmission-2.84.dmg)
     SHA256 hash: [`53d08a55a5ca55010d409acb10f0285a649b8879085cad83f2cbcb7faa489ad5`](https://www.virustotal.com/en/file/53d08a55a5ca55010d409acb10f0285a649b8879085cad83f2cbcb7faa489ad5/analysis/)
