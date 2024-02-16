@@ -152,7 +152,7 @@ TEST_P(WatchDirTest, initialScan)
     // setup: start with an empty directory.
     // this block confirms that it's empty
     {
-        auto called = bool{ false };
+        auto called = false;
         auto callback = [&called](std::string_view /*dirname*/, std::string_view /*basename*/)
         {
             called = true;
