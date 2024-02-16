@@ -473,9 +473,13 @@ void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpPr
     constexpr auto StatusFromResult = [](const std::optional<bool> result)
     {
         if (!result)
+        {
             return PORT_TEST_ERROR;
+        }
         if (!*result)
+        {
             return PORT_TEST_CLOSED;
+        }
         return PORT_TEST_OPEN;
     };
 
