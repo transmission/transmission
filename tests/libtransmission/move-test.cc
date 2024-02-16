@@ -165,7 +165,7 @@ TEST_F(MoveTest, setLocation)
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // now move it
-    auto state = int{ -1 };
+    auto state = -1;
     tr_torrentSetLocation(tor, target_dir, true, &state);
     auto test = [&state]()
     {
