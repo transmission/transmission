@@ -201,7 +201,7 @@ bool isValidUtf8(QByteArray const& byteArray)
 #endif
 }
 
-[[nodiscard]] constexpr auto PrefIsSavable(int pref)
+[[nodiscard]] constexpr auto prefIsSavable(int pref)
 {
     switch (pref)
     {
@@ -332,7 +332,7 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (!PrefIsSavable(i))
+        if (!prefIsSavable(i))
         {
             continue;
         }
