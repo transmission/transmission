@@ -81,7 +81,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<Cache::BlockData> buf = {};
+        std::unique_ptr<Cache::BlockData> buf;
         bool done = {};
     };
 
