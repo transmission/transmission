@@ -183,7 +183,7 @@ class tr_peer
 public:
     using Speed = libtransmission::Values::Speed;
 
-    tr_peer(tr_torrent const* tor);
+    explicit tr_peer(tr_torrent const* tor);
     virtual ~tr_peer();
 
     [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
