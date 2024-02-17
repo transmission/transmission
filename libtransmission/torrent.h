@@ -54,9 +54,6 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-/** save a torrent's .resume file if it's changed since the last time it was saved */
-void tr_torrentSave(tr_torrent* tor);
-
 namespace libtransmission::test
 {
 

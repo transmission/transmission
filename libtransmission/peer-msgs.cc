@@ -296,7 +296,7 @@ struct tr_incoming
 
     if (err != 0)
     {
-        tr_logAddTraceTor(tor, fmt::format("index {} offset {} length {} err {}", index, offset, length, err));
+        tr_logAddTraceTor(&tor, fmt::format("index {} offset {} length {} err {}", index, offset, length, err));
     }
 
     return err == 0;
@@ -519,7 +519,7 @@ public:
 
     [[nodiscard]] bool isValidRequest(peer_request const& req) const
     {
-        return is_valid_request(torrent, req.index, req.offset, req.length);
+        return is_valid_request(*torrent, req.index, req.offset, req.length);
     }
 
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
@@ -1288,7 +1288,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         return false;
     }
 
-    if (!is_valid_request(msgs->torrent, req.index, req.offset, req.length))
+    if (!is_valid_request(*msgs->torrent, req.index, req.offset, req.length))
     {
         logtrace(msgs, "rejecting an invalid request.");
         return false;
