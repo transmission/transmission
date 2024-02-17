@@ -112,6 +112,9 @@ private:
         {
         }
 
+        InFlightData(InFlightData const&) = delete;
+        InFlightData& operator=(InFlightData const&) = delete;
+
         [[nodiscard]] constexpr auto const& sitename() const noexcept
         {
             return sitename_;
