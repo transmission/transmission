@@ -1893,41 +1893,6 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 
 // ---
 
-bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    int err = 0;
-
-    if (index >= tor->piece_count())
-    {
-        err = 1;
-    }
-    else if (length < 1)
-    {
-        err = 2;
-    }
-    else if (offset + length > tor->piece_size(index))
-    {
-        err = 3;
-    }
-    else if (length > tr_block_info::BlockSize)
-    {
-        err = 4;
-    }
-    else if (tor->piece_loc(index, offset, length).byte > tor->total_size())
-    {
-        err = 5;
-    }
-
-    if (err != 0)
-    {
-        tr_logAddTraceTor(tor, fmt::format("index {} offset {} length {} err {}", index, offset, length, err));
-    }
-
-    return err == 0;
-}
-
 tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) const noexcept
 {
     auto const [begin_byte, end_byte] = byte_span_for_file(file);
