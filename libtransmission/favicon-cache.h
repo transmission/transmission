@@ -133,7 +133,7 @@ private:
 
         [[nodiscard]] auto get_responses()
         {
-            auto lock = std::lock_guard{ responses_mutex_ };
+            auto lock = std::scoped_lock{ responses_mutex_ };
 
             auto tmp = decltype(responses_){};
             std::swap(tmp, responses_);
@@ -142,7 +142,7 @@ private:
 
         void add_response(std::string contents, long code)
         {
-            auto lock = std::lock_guard{ responses_mutex_ };
+            auto lock = std::scoped_lock{ responses_mutex_ };
 
             responses_.emplace_back(std::move(contents), code);
         }
