@@ -525,6 +525,11 @@ tr_variant Settings::save() const
         std::visit(SaveVisitor{ map, key }, prop_vptr);
     }
 
+#if defined(__clang__) && TR_LLVM_MAJOR < 13
+    // clang 12 and older incompatibility of `std::pair` with `delete` (https://godbolt.org/z/9Tj67ab9Y)
     return std::move(map);
+#else
+    return map;
+#endif
 }
 } // namespace libtransmission
