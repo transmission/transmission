@@ -463,9 +463,9 @@ TEST_F(VariantTest, boolAndIntRecast)
 TEST_F(VariantTest, dictFindType)
 {
     auto constexpr ExpectedStr = "this-is-a-string"sv;
-    auto constexpr ExpectedBool = bool{ true };
-    auto constexpr ExpectedInt = int{ 1234 };
-    auto constexpr ExpectedReal = double{ 0.3 };
+    auto constexpr ExpectedBool = true;
+    auto constexpr ExpectedInt = 1234;
+    auto constexpr ExpectedReal = 0.3;
 
     auto const key_bool = tr_quark_new("this-is-a-bool"sv);
     auto const key_real = tr_quark_new("this-is-a-real"sv);

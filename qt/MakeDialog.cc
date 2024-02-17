@@ -111,7 +111,7 @@ void MakeProgressDialog::onProgress()
     }
 
     // progress bar
-    auto progress = int{ 100 }; // [0..100]
+    auto progress = 100; // [0..100]
     if (!is_done)
     {
         auto const [current, total] = builder_.checksum_status();
