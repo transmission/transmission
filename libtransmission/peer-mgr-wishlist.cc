@@ -282,7 +282,7 @@ private:
         auto const pos_begin = std::begin(candidates_);
 
         // Candidate needs to be moved towards the front of the list
-        if (auto const pos_next = std::next(pos_old), pos_old > pos_begin && *pos_old < *std::prev(pos_old))
+        if (auto const pos_next = std::next(pos_old); pos_old > pos_begin && *pos_old < *std::prev(pos_old))
         {
             auto const pos_new = std::lower_bound(pos_begin, pos_old, *pos_old);
             std::rotate(pos_new, pos_old, pos_next);
