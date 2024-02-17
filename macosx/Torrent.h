@@ -42,7 +42,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)startTransfer;
 - (void)startMagnetTransferAfterMetaDownload;
 - (void)stopTransfer;
-- (void)startQueue;
 - (void)sleep;
 - (void)wakeUp;
 - (void)idleLimitHit;
