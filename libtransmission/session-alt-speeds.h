@@ -32,7 +32,7 @@ public:
     {
     public:
         Settings() = default;
-        virtual ~Settings() = default;
+        virtual ~Settings() override = default;
 
         explicit Settings(tr_variant const& src)
         {
