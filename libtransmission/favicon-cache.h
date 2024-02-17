@@ -46,7 +46,7 @@ public:
 
     void load(
         std::string_view url_in,
-        IconFunc callback = [](Icon const&) {})
+        IconFunc callback = [](Icon const&) { /*default callback is a no-op */ })
     {
         std::call_once(scan_once_flag_, &FaviconCache::scan_file_cache, this);
 
