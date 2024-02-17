@@ -38,7 +38,7 @@ public:
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
     };
 
-    enum PortTestIpProtocol : uint8_t
+    enum class PortTestIpProtocol : uint8_t
     {
         PORT_TEST_IPV4,
         PORT_TEST_IPV6,
