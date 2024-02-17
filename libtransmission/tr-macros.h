@@ -40,33 +40,6 @@
 #define TR_IF_WIN32(ThenValue, ElseValue) ElseValue
 #endif
 
-#ifdef __clang__
-// https://en.wikipedia.org/wiki/Xcode#Toolchain_versions
-#ifndef __apple_build_version__
-#define TR_LLVM_MAJOR __clang_major__
-#elif __clang_major__ >= 15 // Xcode 15.0 - 15.3
-#define TR_LLVM_MAJOR 16
-#elif __clang_major__ >= 14 && __clang_patchlevel__ >= 3 // Xcode 14.3
-#define TR_LLVM_MAJOR 15
-#elif __clang_major__ >= 14 // Xcode 14.0 - 14.2
-#define TR_LLVM_MAJOR 14
-#elif __clang_major__ >= 13 && __clang_minor__ >= 1 // Xcode 13.3 - 13.4
-#define TR_LLVM_MAJOR 13
-#elif __clang_major__ >= 13 // Xcode 13.0 - 13.2
-#define TR_LLVM_MAJOR 12
-#elif __clang_major__ >= 12 && __clang_patchlevel__ >= 5 // Xcode 12.5
-#define TR_LLVM_MAJOR 11
-#elif __clang_major__ >= 12 // Xcode 12.0 - 12.4
-#define TR_LLVM_MAJOR 10
-#elif __clang_major__ >= 11 && __clang_patchlevel__ >= 3 // Xcode 11.4 - 11.7
-#define TR_LLVM_MAJOR 9
-#elif __clang_major__ >= 11 // Xcode 11.0 - 11.3
-#define TR_LLVM_MAJOR 8
-#else // unsupported Xcode versions
-#define TR_LLVM_MAJOR 1
-#endif // __apple_build_version__
-#endif // __clang__
-
 #ifdef __GNUC__
 #define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else

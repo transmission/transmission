@@ -180,7 +180,7 @@ public:
     tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
-    tr_variant(Val value)
+    tr_variant(Val&& value)
     {
         *this = std::move(value);
     }
