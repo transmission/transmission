@@ -83,7 +83,7 @@ public:
     }
 
 private:
-    QObject* const object_;
+    QObject* object_;
 };
 
 char const* const PreferenceWidget::PrefKey = "pref-key";
@@ -470,12 +470,25 @@ void PrefsDialog::portTestSetEnabled()
 
 void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol)
 {
+    constexpr auto StatusFromResult = [](const std::optional<bool> result)
+    {
+        if (!result)
+        {
+            return PORT_TEST_ERROR;
+        }
+        if (!*result)
+        {
+            return PORT_TEST_CLOSED;
+        }
+        return PORT_TEST_OPEN;
+    };
+
     // Only update the UI if the current status is "checking", so that
     // we won't show the port test results for the old peer port if it
     // changed while we have port-test RPC call(s) in-flight.
     if (port_test_status_[ip_protocol] == PORT_TEST_CHECKING)
     {
-        port_test_status_[ip_protocol] = result ? (*result ? PORT_TEST_OPEN : PORT_TEST_CLOSED) : PORT_TEST_ERROR;
+        port_test_status_[ip_protocol] = StatusFromResult(result);
         updatePortStatusLabel();
     }
     portTestSetEnabled();

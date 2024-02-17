@@ -113,7 +113,6 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
-        session-settings.cc
         session-thread.cc
         session-thread.h
         session.cc
@@ -161,7 +160,6 @@ target_sources(${TR_NAME}
         utils.h
         utils.mm
         variant-benc.cc
-        variant-converters.cc
         variant-json.cc
         variant.cc
         variant.h
