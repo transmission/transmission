@@ -134,7 +134,7 @@ void tr_verify_worker::verify_thread_func()
     for (;;)
     {
         {
-            auto const lock = std::lock_guard{ verify_mutex_ };
+            auto const lock = std::scoped_lock{ verify_mutex_ };
 
             if (stop_current_)
             {
@@ -158,7 +158,7 @@ void tr_verify_worker::verify_thread_func()
 
 void tr_verify_worker::add(std::unique_ptr<Mediator> mediator, tr_priority_t priority)
 {
-    auto const lock = std::lock_guard{ verify_mutex_ };
+    auto const lock = std::scoped_lock{ verify_mutex_ };
 
     mediator->on_verify_queued();
     todo_.emplace(std::move(mediator), priority);
@@ -194,7 +194,7 @@ void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
 tr_verify_worker::~tr_verify_worker()
 {
     {
-        auto const lock = std::lock_guard{ verify_mutex_ };
+        auto const lock = std::scoped_lock{ verify_mutex_ };
         stop_current_ = true;
         todo_.clear();
     }
