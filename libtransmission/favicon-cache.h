@@ -99,8 +99,8 @@ public:
         }
     }
 
-    static inline constexpr auto Width = 16;
-    static inline constexpr auto Height = 16;
+    static constexpr auto Width = 16;
+    static constexpr auto Height = 16;
 
 private:
     class InFlightData
