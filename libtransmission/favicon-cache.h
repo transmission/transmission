@@ -204,7 +204,7 @@ private:
         }
     }
 
-    void mark_site_as_scraped(std::string_view sitename)
+    void mark_site_as_scraped(std::string_view sitename) const
     {
         if (auto ofs = std::ofstream{ scraped_sitenames_filename_, std::ios_base::out | std::ios_base::app }; ofs.is_open())
         {
