@@ -46,14 +46,13 @@ namespace
 {
 void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
-    auto& out = std::cerr;
-    static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE");
-    if (!verbose)
+    if (static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE"); !verbose)
     {
         return;
     }
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
+    auto& out = std::cerr;
     out << description << '\n' << "[raw]"sv << direction_sv;
     for (unsigned char const ch : message)
     {
