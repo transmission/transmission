@@ -516,11 +516,11 @@ void Session::torrentRenamePath(torrent_ids_t const& torrent_ids, QString const&
     q->run();
 }
 
-std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties props)
+std::set<std::string_view> const& Session::getKeyNames(TorrentProperties props)
 {
-    std::vector<std::string_view>& names = names_[props];
+    std::set<std::string_view>& names = names_[props];
 
-    if (names.empty() || !dynamic_main_stat_keys_.empty())
+    if (names.empty())
     {
         // unchanging fields needed by the main window
         static auto constexpr MainInfoKeys = std::array<tr_quark, 9>{
@@ -609,7 +609,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         auto const append = [&names](tr_quark key)
         {
-            names.emplace_back(tr_quark_get_string_view(key));
+            names.emplace(tr_quark_get_string_view(key));
         };
 
         switch (props)
@@ -625,7 +625,6 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         case TorrentProperties::MainAll:
             std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
             std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
-            std::for_each(dynamic_main_stat_keys_.begin(), dynamic_main_stat_keys_.end(), append);
             break;
 
         case TorrentProperties::MainInfo:
@@ -634,7 +633,6 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         case TorrentProperties::MainStats:
             std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
-            std::for_each(dynamic_main_stat_keys_.begin(), dynamic_main_stat_keys_.end(), append);
             break;
 
         case TorrentProperties::Rename:
@@ -644,10 +642,6 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         // must be in every torrent req
         append(TR_KEY_id);
-
-        // sort and remove dupes
-        std::sort(names.begin(), names.end());
-        names.erase(std::unique(names.begin(), names.end()), names.end());
     }
 
     return names;

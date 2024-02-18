@@ -72,11 +72,6 @@ public:
         return blocklist_size_;
     }
 
-    [[nodiscard]] constexpr auto& dynamicMainStatKeys() noexcept
-    {
-        return dynamic_main_stat_keys_;
-    }
-
     enum PortTestIpProtocol : uint8_t
     {
         PORT_TEST_IPV4,
@@ -139,6 +134,26 @@ public:
         Rename
     };
 
+    void addKeyName(TorrentProperties props, tr_quark const key)
+    {
+        // populate names cache with default values
+        if (names_[props].empty())
+        {
+            getKeyNames(props);
+        }
+
+        names_[props].emplace(tr_quark_get_string_view(key));
+    }
+
+    void removeKeyName(TorrentProperties props, tr_quark const key)
+    {
+        // do not remove id because it must be in every torrent req
+        if (key != TR_KEY_id)
+        {
+            names_[props].erase(tr_quark_get_string_view(key));
+        }
+    }
+
 public slots:
     void addTorrent(AddData add_me);
     void launchWebInterface() const;
@@ -179,7 +194,7 @@ private:
     void pumpRequests();
     void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
-    std::vector<std::string_view> const& getKeyNames(TorrentProperties props);
+    std::set<std::string_view> const& getKeyNames(TorrentProperties props);
 
     static void updateStats(tr_variant* args_dict, tr_session_stats* stats);
 
@@ -188,9 +203,7 @@ private:
     QString const config_dir_;
     Prefs& prefs_;
 
-    std::map<TorrentProperties, std::vector<std::string_view>> names_;
-
-    std::set<tr_quark> dynamic_main_stat_keys_ = {};
+    std::map<TorrentProperties, std::set<std::string_view>> names_;
 
     int64_t blocklist_size_ = -1;
     std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};
