@@ -2318,15 +2318,13 @@ namespace rename_helpers
 {
 bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
-    if (std::empty(oldpath) || std::empty(newname) || newname == "."sv || newname == ".."sv ||
-        tr_strv_contains(newname, TR_PATH_DELIMITER))
+    if (std::empty(oldpath) || std::empty(newname) || newname == "."sv || newname == ".."sv || tr_strv_contains(newname, '/'))
     {
         return false;
     }
 
-    auto const newpath = tr_strv_contains(oldpath, TR_PATH_DELIMITER) ?
-        tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
-        tr_pathbuf{ newname };
+    auto const newpath = tr_strv_contains(oldpath, '/') ? tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
+                                                          tr_pathbuf{ newname };
 
     if (newpath == oldpath)
     {
@@ -2412,7 +2410,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
     auto const subpath = std::string_view{ tor->file_subpath(file_index) };
     auto const oldpath_len = std::size(oldpath);
 
-    if (!tr_strv_contains(oldpath, TR_PATH_DELIMITER))
+    if (!tr_strv_contains(oldpath, '/'))
     {
         if (oldpath_len >= std::size(subpath))
         {
