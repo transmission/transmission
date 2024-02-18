@@ -330,6 +330,42 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
+  # Only verify build support on old macOS
+  macos-11:
+    runs-on: macos-11
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          sw_vers
+      - name: Get Dependencies
+        run: |
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+      - name: Get Source
+        uses: actions/checkout@v4
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
+            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+
   alpine-musl:
     needs: [ what-to-make ]
     runs-on: ubuntu-22.04
