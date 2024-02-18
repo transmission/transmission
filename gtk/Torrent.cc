@@ -140,15 +140,15 @@ public:
 
         std::string_view mime_type;
 
-        Storage have_unchecked = {};
-        Storage have_valid = {};
-        Storage left_until_done = {};
-        Storage size_when_done = {};
-        Storage total_size = {};
-        Storage uploaded_ever = {};
+        Storage have_unchecked;
+        Storage have_valid;
+        Storage left_until_done;
+        Storage size_when_done;
+        Storage total_size;
+        Storage uploaded_ever;
 
-        Speed speed_down = {};
-        Speed speed_up = {};
+        Speed speed_down;
+        Speed speed_up;
 
         size_t queue_position = {};
 
@@ -163,12 +163,12 @@ public:
         int active_peers_up = {};
         int error_code = {};
 
-        Percents activity_percent_done = {};
-        Percents metadata_percent_complete = {};
-        Percents percent_complete = {};
-        Percents percent_done = {};
-        Percents recheck_progress = {};
-        Percents seed_ratio_percent_done = {};
+        Percents activity_percent_done;
+        Percents metadata_percent_complete;
+        Percents percent_complete;
+        Percents percent_done;
+        Percents recheck_progress;
+        Percents seed_ratio_percent_done;
 
         uint16_t peers_connected = {};
         uint16_t peers_getting_from_us = {};

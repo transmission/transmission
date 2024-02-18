@@ -92,7 +92,6 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     [self setWebSeedTableHidden:YES animate:NO];
 }
 
-#warning subclass?
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed

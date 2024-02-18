@@ -183,7 +183,7 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
     }
 
     // Save the contents. This might take >1 pass.
-    auto ok = bool{ true };
+    auto ok = true;
     while (!std::empty(contents))
     {
         auto n_written = uint64_t{};

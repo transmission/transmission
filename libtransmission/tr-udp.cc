@@ -159,7 +159,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
     if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto optval = int{ 1 };
+        auto optval = 1;
         (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
         auto const addr = session_.bind_address(TR_AF_INET);
@@ -204,7 +204,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     }
     else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto optval = int{ 1 };
+        auto optval = 1;
         (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
         auto const addr = session_.bind_address(TR_AF_INET6);
