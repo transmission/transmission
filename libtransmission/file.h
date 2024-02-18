@@ -45,13 +45,6 @@ using tr_sys_dir_t = tr_sys_dir_win32*;
 /** @brief Platform-specific invalid directory descriptor constant. */
 #define TR_BAD_SYS_DIR ((tr_sys_dir_t) nullptr)
 
-enum tr_std_sys_file_t
-{
-    TR_STD_SYS_FILE_IN,
-    TR_STD_SYS_FILE_OUT,
-    TR_STD_SYS_FILE_ERR
-};
-
 enum tr_sys_file_open_flags_t
 {
     TR_SYS_FILE_READ = (1 << 0),
@@ -300,19 +293,6 @@ bool tr_sys_path_remove(T const& path, tr_error* error = nullptr)
 char* tr_sys_path_native_separators(char* path);
 
 /* File-related wrappers */
-
-/**
- * @brief Get handle to one of standard I/O files.
- *
- * @param[in]  std_file Standard file identifier.
- * @param[out] error    Pointer to error object. Optional, pass `nullptr` if you
- *                      are not interested in error details.
- *
- * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
- *         `error` set accordingly). DO NOT pass this descriptor to
- *         @ref tr_sys_file_close (unless you know what you are doing).
- */
-tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error = nullptr);
 
 /**
  * @brief Portability wrapper for `open()`.

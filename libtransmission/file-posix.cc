@@ -545,37 +545,6 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error)
-{
-    tr_sys_file_t ret = TR_BAD_SYS_FILE;
-
-    switch (std_file)
-    {
-    case TR_STD_SYS_FILE_IN:
-        ret = STDIN_FILENO;
-        break;
-
-    case TR_STD_SYS_FILE_OUT:
-        ret = STDOUT_FILENO;
-        break;
-
-    case TR_STD_SYS_FILE_ERR:
-        ret = STDERR_FILENO;
-        break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format("unknown standard file {:d}", static_cast<int>(std_file)));
-
-        if (error != nullptr)
-        {
-            error->set_from_errno(EINVAL);
-        }
-        break;
-    }
-
-    return ret;
-}
-
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
