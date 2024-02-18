@@ -811,23 +811,6 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error)
     return ret;
 }
 
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    if (struct stat statbuf = {}; fstat(handle, &statbuf) == 0)
-    {
-        return S_ISREG(statbuf.st_mode);
-    }
-
-    if (error != nullptr)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return false;
-}
-
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);

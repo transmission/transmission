@@ -448,9 +448,6 @@ bool tr_sys_file_write_at(
  */
 bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error = nullptr);
 
-/* @brief Check whether `handle` may be flushed via `tr_sys_file_flush()`. */
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error = nullptr);
-
 /**
  * @brief Portability wrapper for `ftruncate()`.
  *

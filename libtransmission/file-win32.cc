@@ -1097,21 +1097,6 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error)
     return ret;
 }
 
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    DWORD type = GetFileType(handle);
-
-    if (type == FILE_TYPE_UNKNOWN)
-    {
-        set_system_error(error, GetLastError());
-        return false;
-    }
-
-    return type == FILE_TYPE_DISK;
-}
-
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
