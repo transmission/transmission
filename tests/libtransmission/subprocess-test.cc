@@ -33,7 +33,7 @@ std::string getTestProgramPath(std::string const& filename)
 {
     auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front().data());
     auto const exe_dir = tr_sys_path_dirname(exe_path);
-    return std::string{ exe_dir } + TR_PATH_DELIMITER + filename;
+    return fmt::format("{:s}/{:s}", exe_dir, filename);
 }
 
 class SubprocessTest
@@ -45,9 +45,7 @@ protected:
 
     [[nodiscard]] std::string buildSandboxPath(std::string const& filename) const
     {
-        auto path = sandbox_.path();
-        path += TR_PATH_DELIMITER;
-        path += filename;
+        auto path = fmt::format("{:s}/{:s}", sandbox_.path(), filename);
         tr_sys_path_native_separators(&path.front());
         return path;
     }
