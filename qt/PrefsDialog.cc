@@ -470,7 +470,7 @@ void PrefsDialog::portTestSetEnabled()
 
 void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol)
 {
-    constexpr auto StatusFromResult = [](const std::optional<bool> res)
+    constexpr auto StatusFromResult = [](std::optional<bool> const res)
     {
         if (!res)
         {
