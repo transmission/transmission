@@ -39,7 +39,6 @@ public:
     {
     public:
         Settings() = default;
-        virtual ~Settings() = default;
 
         explicit Settings(tr_variant const& src)
         {

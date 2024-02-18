@@ -1475,9 +1475,9 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might download */
-    if (auto const is_done_a = a->tor->is_done(), is_done_b = b->tor->is_done(); is_done_a != is_done_b)
+    if (auto const val = tr_compare_3way(a->tor->is_done(), b->tor->is_done()); val != 0)
     {
-        return is_done_a ? 1 : -1;
+        return val;
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */

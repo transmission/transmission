@@ -229,7 +229,7 @@ bool tr_rand_buffer_crypto(void* buffer, size_t length)
     auto constexpr ChunkSize = size_t{ MBEDTLS_CTR_DRBG_MAX_REQUEST };
     static_assert(ChunkSize > 0U);
 
-    auto const lock = std::lock_guard(rng_mutex_);
+    auto const lock = std::scoped_lock{ rng_mutex_ };
 
     for (auto offset = size_t{ 0 }; offset < length; offset += ChunkSize)
     {
