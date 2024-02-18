@@ -77,7 +77,7 @@ private:
         uint64_t sequence_ = InvalidSeq;
     };
 
-    void erase(Entry& entry)
+    void erase(Entry& entry) const
     {
         entry.key_ = {};
         entry.val_ = {};

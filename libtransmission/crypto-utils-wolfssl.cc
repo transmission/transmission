@@ -180,6 +180,6 @@ bool tr_rand_buffer_crypto(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
-    auto const lock = std::lock_guard(rng_mutex_);
+    auto const lock = std::lock_guard{ rng_mutex_ };
     return check_result(wc_RNG_GenerateBlock(get_rng(), static_cast<byte*>(buffer), length));
 }

@@ -311,7 +311,7 @@ public:
 
     [[nodiscard]] auto is_inactive(time_t const now) const noexcept
     {
-        return !is_in_use() && now - connection_changed_at_ >= UselessThresSecs;
+        return !is_in_use() && now > 0 && connection_changed_at_ > 0 && now - connection_changed_at_ >= InactiveThresSecs;
     }
 
     // ---
@@ -431,7 +431,7 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
-    static auto constexpr UselessThresSecs = time_t{ 24 * 60 * 60 };
+    static auto constexpr InactiveThresSecs = time_t{ 24 * 60 * 60 };
 
     static auto inline n_known_connectable = size_t{};
 
