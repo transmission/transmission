@@ -488,26 +488,6 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
  */
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error* error = nullptr);
 
-/* File-related wrappers (utility) */
-
-/**
- * @brief Portability wrapper for `fputs()`, appending EOL internally.
- *
- * Special care should be taken when writing to one of standard output streams
- * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
- *
- * Writing to other streams (files, pipes) also leaves data untouched, so it
- * should already be in UTF-8 encoding, or whichever else you expect.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[in]  buffer String to write.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_error* error = nullptr);
-
 /* Directory-related wrappers */
 
 /**
