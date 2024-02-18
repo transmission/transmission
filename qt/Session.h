@@ -92,7 +92,7 @@ public:
     }
 
     /** returns true if isServer() is true or if the remote address is the localhost */
-    [[nodiscard]] constexpr auto isLocal() const noexcept
+    [[nodiscard]] auto isLocal() const noexcept
     {
         return !session_id_.isEmpty() ? is_definitely_local_session_ : rpc_.isLocal();
     }
