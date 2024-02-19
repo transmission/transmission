@@ -29,12 +29,17 @@ protected:
 
     template<typename T>
     using Load = bool (*)(tr_variant const& src, T* tgt);
+
     template<typename T>
     using Save = tr_variant (*)(T const& src);
+
     template<typename T>
     void add_type_handler(Load<T> load, Save<T> save)
     {
         auto const key = std::type_index(typeid(T*));
+
+        // put load + save into void* wrappers
+        // so that they can be stored into maps
 
         load_[key] = [load](tr_variant const& src, void* tgt)
         {
@@ -47,8 +52,9 @@ protected:
         };
     }
 
-    struct Field
+    class Field
     {
+    public:
         template<typename T>
         Field(tr_quark key_in, T* ptr_in)
             : key{ key_in }
@@ -56,6 +62,9 @@ protected:
             , ptr{ ptr_in }
         {
         }
+
+    private:
+        friend Settings;
 
         tr_quark key;
         std::type_info const& type;
