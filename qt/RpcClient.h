@@ -55,12 +55,19 @@ class RpcClient : public QObject
 public:
     explicit RpcClient(QObject* parent = nullptr);
 
+    [[nodiscard]] constexpr auto const& url() const noexcept
+    {
+        return url_;
+    }
+
+    [[nodiscard]] constexpr auto isLocal() const noexcept
+    {
+        return session_ != nullptr || url_is_loopback_;
+    }
+
     void stop();
     void start(tr_session* session);
     void start(QUrl const& url);
-
-    bool isLocal() const;
-    QUrl const& url() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
@@ -94,4 +101,5 @@ private:
     std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
+    bool url_is_loopback_ = false;
 };

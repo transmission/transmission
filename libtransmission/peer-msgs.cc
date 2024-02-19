@@ -533,10 +533,7 @@ private:
 
     // ---
 
-    [[nodiscard]] bool is_valid_request(peer_request const& req) const
-    {
-        return tr_torrentReqIsValid(&tor_, req.index, req.offset, req.length);
-    }
+    [[nodiscard]] bool is_valid_request(peer_request const& req) const;
 
     void reject_all_requests()
     {
@@ -1955,6 +1952,39 @@ void tr_peerMsgsImpl::update_block_requests()
 }
 
 // ---
+
+bool tr_peerMsgsImpl::is_valid_request(peer_request const& req) const
+{
+    int err = 0;
+
+    if (req.index >= tor_.piece_count())
+    {
+        err = 1;
+    }
+    else if (req.length < 1)
+    {
+        err = 2;
+    }
+    else if (req.offset + req.length > tor_.piece_size(req.index))
+    {
+        err = 3;
+    }
+    else if (req.length > tr_block_info::BlockSize)
+    {
+        err = 4;
+    }
+    else if (tor_.piece_loc(req.index, req.offset, req.length).byte > tor_.total_size())
+    {
+        err = 5;
+    }
+
+    if (err != 0)
+    {
+        tr_logAddTraceTor(&tor_, fmt::format("index {} offset {} length {} err {}", req.index, req.offset, req.length, err));
+    }
+
+    return err == 0;
+}
 
 [[nodiscard]] bool tr_peerMsgsImpl::can_add_request_from_peer(peer_request const& req)
 {
