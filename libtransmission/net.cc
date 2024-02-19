@@ -41,10 +41,6 @@
 
 using namespace std::literals;
 
-#ifndef IN_MULTICAST
-#define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
-#endif
-
 std::string tr_net_strerror(int err)
 {
 #ifdef _WIN32
