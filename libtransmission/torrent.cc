@@ -384,6 +384,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const trackers_str = buildTrackersString(tor);
     auto const bytes_downloaded_str = std::to_string(tor->bytes_downloaded_.ever());
     auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time()));
+    auto const priority_str = std::to_string(tor->get_priority());
 
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
@@ -394,6 +395,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         { "TR_TORRENT_ID"sv, id_str },
         { "TR_TORRENT_LABELS"sv, labels_str },
         { "TR_TORRENT_NAME"sv, tor->name() },
+        { "TR_TORRENT_PRIORITY"sv, priority_str },
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
