@@ -67,27 +67,8 @@ void RpcClient::start(tr_session* session)
 void RpcClient::start(QUrl const& url)
 {
     url_ = url;
+    url_is_loopback_ = QHostAddress{ url_.host() }.isLoopback();
     request_.reset();
-}
-
-bool RpcClient::isLocal() const
-{
-    if (session_ != nullptr)
-    {
-        return true;
-    }
-
-    if (QHostAddress{ url_.host() }.isLoopback())
-    {
-        return true;
-    }
-
-    return false;
-}
-
-QUrl const& RpcClient::url() const
-{
-    return url_;
 }
 
 RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
