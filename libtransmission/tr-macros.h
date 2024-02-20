@@ -72,8 +72,6 @@
 
 // ---
 
-#define TR_PATH_DELIMITER '/'
-
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_ADDRSTRLEN 64

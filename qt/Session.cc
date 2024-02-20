@@ -386,24 +386,7 @@ void Session::start()
     emit sourceChanged();
 }
 
-bool Session::isServer() const
-{
-    return session_ != nullptr;
-}
-
-bool Session::isLocal() const
-{
-    if (!session_id_.isEmpty())
-    {
-        return is_definitely_local_session_;
-    }
-
-    return rpc_.isLocal();
-}
-
-/***
-****
-***/
+// ---
 
 void Session::addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const
 {
