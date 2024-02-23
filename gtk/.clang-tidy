@@ -7,6 +7,7 @@ Checks: >
   -bugprone-narrowing-conversions,
   cert-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
@@ -20,6 +21,7 @@ Checks: >
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-magic-numbers,
+  -readability-qualified-auto,
   -readability-redundant-access-specifiers
 
 CheckOptions:

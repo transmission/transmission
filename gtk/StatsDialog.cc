@@ -20,7 +20,7 @@
 
 #include <memory>
 
-static auto constexpr TR_RESPONSE_RESET = int{ 1 };
+static auto constexpr TR_RESPONSE_RESET = 1;
 
 class StatsDialog::Impl
 {

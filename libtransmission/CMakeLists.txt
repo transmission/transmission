@@ -113,7 +113,6 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
-        session-settings.cc
         session-thread.cc
         session-thread.h
         session.cc
@@ -142,7 +141,6 @@ target_sources(${TR_NAME}
         torrents.h
         tr-assert.cc
         tr-assert.h
-        tr-assert.mm
         tr-buffer.h
         tr-dht.cc
         tr-dht.h
@@ -162,7 +160,6 @@ target_sources(${TR_NAME}
         utils.h
         utils.mm
         variant-benc.cc
-        variant-converters.cc
         variant-json.cc
         variant.cc
         variant.h
@@ -207,10 +204,7 @@ tr_allow_compile_if(
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
     [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
-        tr-assert.mm
         utils.mm
-    [=[[NOT (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")]]=]
-        tr-assert.cc
     [=[[WIN32]]=]
         file-win32.cc
         subprocess-win32.cc

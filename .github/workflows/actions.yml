@@ -62,7 +62,7 @@ jobs:
           get_changes dist     dist release
           get_changes docs     docs
           get_changes gtk      CMakeLists.txt cmake third-party libtransmission gtk
-          get_changes mac      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          get_changes mac      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx
           get_changes qt       CMakeLists.txt cmake third-party libtransmission qt
           get_changes tests    CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils    CMakeLists.txt cmake third-party libtransmission utils

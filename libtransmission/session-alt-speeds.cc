@@ -18,47 +18,11 @@
 
 using namespace std::literals;
 
-void tr_session_alt_speeds::load(tr_variant const& src)
+void tr_session_alt_speeds::load(Settings&& settings)
 {
-    auto const* const src_map = src.get_if<tr_variant::Map>();
-    if (src_map != nullptr)
-    {
-#define V(key, field, type, default_value, comment) \
-    if (auto const iter = src_map->find(key); iter != std::end(*src_map)) \
-    { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(iter->second); val) \
-        { \
-            this->field = *val; \
-        } \
-    }
-        ALT_SPEEDS_FIELDS(V)
-#undef V
-    }
-
+    settings_ = std::move(settings);
     update_scheduler();
 }
-
-tr_variant tr_session_alt_speeds::settings() const
-{
-    auto settings = tr_variant::Map{};
-#define V(key, field, type, default_value, comment) \
-    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
-    ALT_SPEEDS_FIELDS(V)
-#undef V
-    return tr_variant{ std::move(settings) };
-}
-
-tr_variant tr_session_alt_speeds::default_settings()
-{
-    auto settings = tr_variant::Map{};
-#define V(key, field, type, default_value, comment) \
-    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(static_cast<type>(default_value)));
-    ALT_SPEEDS_FIELDS(V)
-#undef V
-    return tr_variant{ std::move(settings) };
-}
-
-// --- minutes
 
 void tr_session_alt_speeds::update_minutes()
 {
@@ -66,10 +30,11 @@ void tr_session_alt_speeds::update_minutes()
 
     for (int day = 0; day < 7; ++day)
     {
-        if ((static_cast<tr_sched_day>(use_on_these_weekdays_) & (1 << day)) != 0)
+        if ((static_cast<tr_sched_day>(settings_.use_on_these_weekdays) & (1 << day)) != 0)
         {
-            auto const begin = minute_begin_;
-            auto const end = minute_end_ > minute_begin_ ? minute_end_ : minute_end_ + MinutesPerDay;
+            auto const begin = settings_.minute_begin;
+            auto const end = settings_.minute_end > settings_.minute_begin ? settings_.minute_end :
+                                                                             settings_.minute_end + MinutesPerDay;
             for (auto i = begin; i < end; ++i)
             {
                 minutes_.set((i + day * MinutesPerDay) % MinutesPerWeek);
@@ -103,10 +68,10 @@ void tr_session_alt_speeds::check_scheduler()
 
 void tr_session_alt_speeds::set_active(bool active, ChangeReason reason)
 {
-    if (is_active_ != active)
+    if (auto& tgt = settings_.is_active; tgt != active)
     {
-        is_active_ = active;
-        mediator_.is_active_changed(is_active_, reason);
+        tgt = active;
+        mediator_.is_active_changed(tgt, reason);
     }
 }
 

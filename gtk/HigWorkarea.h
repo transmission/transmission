@@ -5,7 +5,7 @@
 
 #pragma once
 
-auto inline constexpr GUI_PAD_SMALL = int{ 3 };
-auto inline constexpr GUI_PAD = int{ 6 };
-auto inline constexpr GUI_PAD_BIG = int{ 12 };
-auto inline constexpr GUI_PAD_LARGE = int{ 12 };
+auto inline constexpr GUI_PAD_SMALL = 3;
+auto inline constexpr GUI_PAD = 6;
+auto inline constexpr GUI_PAD_BIG = 12;
+auto inline constexpr GUI_PAD_LARGE = 12;

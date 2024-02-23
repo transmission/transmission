@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef> // for size_t
 #include <string>
 #include <utility>
@@ -36,6 +37,7 @@ protected:
         bool*,
         double*,
         size_t*,
+        std::chrono::milliseconds*,
         std::string*,
         tr_encryption_mode*,
         tr_log_level*,
@@ -45,7 +47,7 @@ protected:
         tr_preferred_transport*,
         tr_tos_t*,
         tr_verify_added_mode*>;
-    using field_value_type = std::pair<const field_key_type, field_mapped_type>;
+    using field_value_type = std::pair<field_key_type const, field_mapped_type>;
     using Fields = std::vector<field_value_type>;
 
     Settings() = default;

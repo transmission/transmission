@@ -581,13 +581,13 @@ public:
 private:
     Mediator& mediator_;
 
-    std::optional<std::future<MaybeSockaddr>> addr_pending_dns_ = {};
+    std::optional<std::future<MaybeSockaddr>> addr_pending_dns_;
 
-    MaybeSockaddr addr_ = {};
+    MaybeSockaddr addr_;
     time_t addr_expires_at_ = 0;
 
-    static inline constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
-    static inline constexpr auto ConnectionRequestTtl = int{ 30 };
+    static constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
+    static constexpr auto ConnectionRequestTtl = 30;
 };
 
 // --- SESSION

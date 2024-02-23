@@ -46,14 +46,13 @@ namespace
 {
 void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
-    auto& out = std::cerr;
-    static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE");
-    if (!verbose)
+    if (static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE"); !verbose)
     {
         return;
     }
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
+    auto& out = std::cerr;
     out << description << '\n' << "[raw]"sv << direction_sv;
     for (unsigned char const ch : message)
     {
@@ -319,7 +318,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         tr_announce_response& response_;
         std::string_view const log_name_;
         std::optional<size_t> row_;
-        tr_pex pex_ = {};
+        tr_pex pex_;
 
         explicit AnnounceHandler(tr_announce_response& response, std::string_view log_name)
             : response_{ response }
@@ -480,7 +479,7 @@ public:
 
 private:
     tr_scrape_response response_ = {};
-    tr_scrape_response_func response_func_ = {};
+    tr_scrape_response_func response_func_;
     std::string log_name_;
 };
 

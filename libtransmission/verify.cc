@@ -25,15 +25,16 @@ using namespace std::chrono_literals;
 
 namespace
 {
-auto constexpr SleepPerSecondDuringVerify = 100ms;
-
 [[nodiscard]] auto current_time_secs()
 {
     return std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::steady_clock::now());
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(
+    Mediator& verify_mediator,
+    std::atomic<bool> const& abort_flag,
+    std::chrono::milliseconds const sleep_per_seconds_during_verify)
 {
     verify_mediator.on_verify_started();
 
@@ -89,12 +90,15 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
             auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
             verify_mediator.on_piece_checked(piece, has_piece);
 
-            /* sleeping even just a few msec per second goes a long
-             * way towards reducing IO load... */
-            if (auto const now = current_time_secs(); last_slept_at != now)
+            if (sleep_per_seconds_during_verify > std::chrono::milliseconds::zero())
             {
-                last_slept_at = now;
-                std::this_thread::sleep_for(SleepPerSecondDuringVerify);
+                /* sleeping even just a few msec per second goes a long
+                 * way towards reducing IO load... */
+                if (auto const now = current_time_secs(); last_slept_at != now)
+                {
+                    last_slept_at = now;
+                    std::this_thread::sleep_for(sleep_per_seconds_during_verify);
+                }
             }
 
             sha->clear();
@@ -130,7 +134,7 @@ void tr_verify_worker::verify_thread_func()
     for (;;)
     {
         {
-            auto const lock = std::lock_guard{ verify_mutex_ };
+            auto const lock = std::scoped_lock{ verify_mutex_ };
 
             if (stop_current_)
             {
@@ -148,13 +152,13 @@ void tr_verify_worker::verify_thread_func()
             current_node_ = std::move(todo_.extract(std::begin(todo_)).value());
         }
 
-        verify_torrent(*current_node_->mediator_, stop_current_);
+        verify_torrent(*current_node_->mediator_, stop_current_, sleep_per_seconds_during_verify_);
     }
 }
 
 void tr_verify_worker::add(std::unique_ptr<Mediator> mediator, tr_priority_t priority)
 {
-    auto const lock = std::lock_guard{ verify_mutex_ };
+    auto const lock = std::scoped_lock{ verify_mutex_ };
 
     mediator->on_verify_queued();
     todo_.emplace(std::move(mediator), priority);
@@ -190,7 +194,7 @@ void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
 tr_verify_worker::~tr_verify_worker()
 {
     {
-        auto const lock = std::lock_guard{ verify_mutex_ };
+        auto const lock = std::scoped_lock{ verify_mutex_ };
         stop_current_ = true;
         todo_.clear();
     }
@@ -199,6 +203,11 @@ tr_verify_worker::~tr_verify_worker()
     {
         std::this_thread::sleep_for(20ms);
     }
+}
+
+void tr_verify_worker::set_sleep_per_seconds_during_verify(std::chrono::milliseconds const sleep_per_seconds_during_verify)
+{
+    sleep_per_seconds_during_verify_ = sleep_per_seconds_during_verify;
 }
 
 int tr_verify_worker::Node::compare(Node const& that) const noexcept
