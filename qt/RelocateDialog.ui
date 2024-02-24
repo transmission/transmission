@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>275</width>
+    <width>320</width>
     <height>170</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Set Torrent Location</string>
+   <string>Set Location</string>
   </property>
   <layout class="QVBoxLayout" name="dialogLayout">
    <property name="sizeConstraint">
