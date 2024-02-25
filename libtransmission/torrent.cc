@@ -1794,10 +1794,16 @@ void tr_torrent::recheck_completeness()
                 get_completion_string(new_completeness)));
 
         completeness_ = new_completeness;
-        session->close_torrent_files(id());
+
+        if (is_done() && was_running)
+        {
+            tr_torrentVerify(this);
+        }
 
         if (is_done())
         {
+            session->close_torrent_files(id());
+
             if (recent_change)
             {
                 // https://www.bittorrent.org/beps/bep_0003.html
