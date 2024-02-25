@@ -819,42 +819,6 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error)
-{
-    tr_sys_file_t ret = TR_BAD_SYS_FILE;
-
-    switch (std_file)
-    {
-    case TR_STD_SYS_FILE_IN:
-        ret = GetStdHandle(STD_INPUT_HANDLE);
-        break;
-
-    case TR_STD_SYS_FILE_OUT:
-        ret = GetStdHandle(STD_OUTPUT_HANDLE);
-        break;
-
-    case TR_STD_SYS_FILE_ERR:
-        ret = GetStdHandle(STD_ERROR_HANDLE);
-        break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format("unknown standard file {:d}", std_file));
-        set_system_error(error, ERROR_INVALID_PARAMETER);
-        return TR_BAD_SYS_FILE;
-    }
-
-    if (ret == TR_BAD_SYS_FILE)
-    {
-        set_system_error(error, GetLastError());
-    }
-    else if (ret == nullptr)
-    {
-        ret = TR_BAD_SYS_FILE;
-    }
-
-    return ret;
-}
-
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
@@ -1095,21 +1059,6 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error)
     }
 
     return ret;
-}
-
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    DWORD type = GetFileType(handle);
-
-    if (type == FILE_TYPE_UNKNOWN)
-    {
-        set_system_error(error, GetLastError());
-        return false;
-    }
-
-    return type == FILE_TYPE_DISK;
 }
 
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
