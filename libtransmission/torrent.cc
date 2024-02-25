@@ -1778,10 +1778,16 @@ void tr_torrent::recheck_completeness()
         }
 
         completeness_ = new_completeness;
-        session->close_torrent_files(id());
+
+        if (is_done() && was_running)
+        {
+            tr_torrentVerify(this);
+        }
 
         if (is_done())
         {
+            session->close_torrent_files(id());
+
             if (recent_change)
             {
                 tr_announcerTorrentCompleted(this);
