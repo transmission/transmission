@@ -1795,7 +1795,7 @@ void tr_torrent::recheck_completeness()
 
         completeness_ = new_completeness;
 
-        if (is_done() && was_running)
+        if (is_done() && was_running && session->shouldFullyVerifyCompleteTorrents())
         {
             tr_torrentVerify(this);
         }

@@ -65,6 +65,15 @@ enum tr_verify_added_mode : uint8_t
     TR_VERIFY_ADDED_FULL = 1
 };
 
+enum tr_verify_complete_mode : uint8_t
+{
+    // Let newly-completed torrents skip verify.
+    TR_VERIFY_COMPLETE_FAST = 0,
+
+    // Force torrents to be fully verified as they are completed.
+    TR_VERIFY_COMPLETE_FULL = 1
+};
+
 enum tr_encryption_mode : uint8_t
 {
     TR_CLEAR_PREFERRED,
@@ -643,6 +652,11 @@ void tr_sessionSetQueueStalledEnabled(tr_session* session, bool enabled);
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
 void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
+
+// ---
+
+/** @brief Set verification mode when torrent download is complete */
+void tr_sessionSetCompleteVerifyMode(tr_session* session, tr_verify_complete_mode mode);
 
 // ---
 
