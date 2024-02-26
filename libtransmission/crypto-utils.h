@@ -19,7 +19,10 @@
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha256_d...
 #include "libtransmission/tr-strbuf.h"
 
-#if defined(WITH_OPENSSL)
+#if defined(WITH_MBEDTLS)
+#include <mbedtls/sha1.h>
+#include <mbedtls/sha256.h>
+#elif defined(WITH_OPENSSL)
 #include <openssl/evp.h>
 #elif defined(WITH_WOLFSSL)
 #include <wolfssl/wolfcrypt/sha.h>
@@ -55,7 +58,9 @@ public:
     }
 
 private:
-#if defined(WITH_OPENSSL)
+#if defined(WITH_MBEDTLS)
+    mbedtls_sha1_context handle_;
+#elif defined(WITH_OPENSSL)
     EVP_MD_CTX* handle_ = nullptr;
 #elif defined(WITH_WOLFSSL)
     wc_Sha handle_;
@@ -88,7 +93,9 @@ public:
     }
 
 private:
-#if defined(WITH_OPENSSL)
+#if defined(WITH_MBEDTLS)
+    mbedtls_sha256_context handle_;
+#elif defined(WITH_OPENSSL)
     EVP_MD_CTX* handle_ = nullptr;
 #elif defined(WITH_WOLFSSL)
     wc_Sha256 handle_;
