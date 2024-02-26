@@ -265,7 +265,14 @@ protected:
         auto const tmperr = errno;
 
         buildParentDir(path);
-        tr_file_save(path, std::string_view{ static_cast<char const*>(payload), n });
+
+        auto const fd = tr_sys_file_open(
+            tr_pathbuf{ path },
+            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+            0600,
+            nullptr);
+        blockingFileWrite(fd, payload, n);
+        tr_sys_file_close(fd);
         sync();
 
         errno = tmperr;
