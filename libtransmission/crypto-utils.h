@@ -21,6 +21,9 @@
 
 #if defined(WITH_OPENSSL)
 #include <openssl/evp.h>
+#elif defined(WITH_WOLFSSL)
+#include <wolfssl/wolfcrypt/sha.h>
+#include <wolfssl/wolfcrypt/sha256.h>
 #endif
 
 /**
@@ -52,7 +55,13 @@ public:
     }
 
 private:
+#if defined(WITH_OPENSSL)
     EVP_MD_CTX* handle_ = nullptr;
+#elif defined(WITH_WOLFSSL)
+    wc_Sha handle_;
+#else
+#error no crypto module defined
+#endif
 };
 
 class tr_sha256
@@ -81,6 +90,10 @@ public:
 private:
 #if defined(WITH_OPENSSL)
     EVP_MD_CTX* handle_ = nullptr;
+#elif defined(WITH_WOLFSSL)
+    wc_Sha256 handle_;
+#else
+#error no crypto module defined
 #endif
 };
 
