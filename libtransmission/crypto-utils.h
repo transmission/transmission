@@ -54,7 +54,7 @@ public:
     [[nodiscard]] tr_sha1_digest_t finish();
 
     template<typename... T>
-    [[nodiscard]] static tr_sha1_digest_t digest(T const&... args)
+    [[nodiscard]] static auto digest(T const&... args)
     {
         auto context = tr_sha1{};
         (context.add(std::data(args), std::size(args)), ...);
@@ -67,7 +67,7 @@ private:
 #elif defined(WITH_MBEDTLS)
     mbedtls_sha1_context handle_;
 #elif defined(WITH_OPENSSL)
-    EVP_MD_CTX* handle_ = nullptr;
+    EVP_MD_CTX* handle_;
 #elif defined(WITH_WOLFSSL)
     wc_Sha handle_;
 #endif
@@ -89,7 +89,7 @@ public:
     [[nodiscard]] tr_sha256_digest_t finish();
 
     template<typename... T>
-    [[nodiscard]] static tr_sha256_digest_t digest(T const&... args)
+    [[nodiscard]] static auto digest(T const&... args)
     {
         auto context = tr_sha256{};
         (context.add(std::data(args), std::size(args)), ...);
@@ -102,7 +102,7 @@ private:
 #elif defined(WITH_MBEDTLS)
     mbedtls_sha256_context handle_;
 #elif defined(WITH_OPENSSL)
-    EVP_MD_CTX* handle_ = nullptr;
+    EVP_MD_CTX* handle_;
 #elif defined(WITH_WOLFSSL)
     wc_Sha256 handle_;
 #endif
