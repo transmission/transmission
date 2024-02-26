@@ -33,7 +33,7 @@
     tr_logAddTrace(msg, fmt::format("handshake {}", (handshake)->peer_io_->display_name()))
 
 using namespace std::literals;
-using DH = tr_message_stream_encryption::DH;
+using key_bigend_t = tr_message_stream_encryption::DH::key_bigend_t;
 
 // --- Outgoing Connections
 
@@ -60,7 +60,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
         return READ_NOW;
     }
 
-    auto peer_public_key = DH::key_bigend_t{};
+    auto peer_public_key = key_bigend_t{};
     tr_logAddTraceHand(
         this,
         fmt::format("in read_yb... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
@@ -354,7 +354,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
         return READ_NOW;
     }
 
-    auto peer_public_key = DH::key_bigend_t{};
+    auto peer_public_key = key_bigend_t{};
     tr_logAddTraceHand(
         this,
         fmt::format("in read_ya... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));

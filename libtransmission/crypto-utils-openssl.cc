@@ -29,6 +29,10 @@
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha25...
 #include "libtransmission/utils.h"
 
+#if !defined(WITH_OPENSSL)
+#error OPENSSL module
+#endif
+
 namespace
 {
 void log_openssl_error(char const* file, int line)
@@ -78,136 +82,92 @@ bool check_openssl_result(int result, int expected_result, bool expected_equal, 
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
 
-namespace sha_helpers
+namespace digest_helpers
 {
-
-class ShaHelper
+void add_bytes(EVP_MD_CTX* ctx, void const* data, size_t data_length)
 {
-public:
-    using EvpFunc = decltype((EVP_sha1));
-
-    explicit ShaHelper(EvpFunc evp_func)
-        : evp_func_{ evp_func }
+    if (data_length != 0U)
     {
-        clear();
+        EVP_DigestUpdate(ctx, data, data_length);
     }
-
-    void clear() const
-    {
-        EVP_DigestInit_ex(handle_.get(), evp_func_(), nullptr);
-    }
-
-    void update(void const* data, size_t data_length) const
-    {
-        if (data_length != 0U)
-        {
-            EVP_DigestUpdate(handle_.get(), data, data_length);
-        }
-    }
-
-    template<typename DigestType>
-    [[nodiscard]] DigestType digest()
-    {
-        TR_ASSERT(handle_ != nullptr);
-
-        unsigned int hash_length = 0;
-        auto digest = DigestType{};
-        auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-        [[maybe_unused]] bool const ok = check_result(EVP_DigestFinal_ex(handle_.get(), digest_as_uchar, &hash_length));
-        TR_ASSERT(!ok || hash_length == std::size(digest));
-
-        clear();
-        return digest;
-    }
-
-private:
-    struct MessageDigestDeleter
-    {
-        void operator()(EVP_MD_CTX* ctx) const noexcept
-        {
-            EVP_MD_CTX_destroy(ctx);
-        }
-    };
-
-    EvpFunc evp_func_;
-    std::unique_ptr<EVP_MD_CTX, MessageDigestDeleter> const handle_{ EVP_MD_CTX_create() };
-};
-
-class Sha1Impl final : public tr_sha1
-{
-public:
-    Sha1Impl() = default;
-    Sha1Impl(Sha1Impl&&) = delete;
-    Sha1Impl(Sha1Impl const&) = delete;
-    ~Sha1Impl() override = default;
-    Sha1Impl& operator=(Sha1Impl&&) = delete;
-    Sha1Impl& operator=(Sha1Impl const&) = delete;
-
-    void clear() override
-    {
-        helper_.clear();
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        helper_.update(data, data_length);
-    }
-
-    [[nodiscard]] tr_sha1_digest_t finish() override
-    {
-        return helper_.digest<tr_sha1_digest_t>();
-    }
-
-private:
-    ShaHelper helper_{ EVP_sha1 };
-};
-
-class Sha256Impl final : public tr_sha256
-{
-public:
-    Sha256Impl() = default;
-    Sha256Impl(Sha256Impl&&) = delete;
-    Sha256Impl(Sha256Impl const&) = delete;
-    ~Sha256Impl() override = default;
-    Sha256Impl& operator=(Sha256Impl&&) = delete;
-    Sha256Impl& operator=(Sha256Impl const&) = delete;
-
-    void clear() override
-    {
-        helper_.clear();
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        helper_.update(data, data_length);
-    }
-
-    [[nodiscard]] tr_sha256_digest_t finish() override
-    {
-        return helper_.digest<tr_sha256_digest_t>();
-    }
-
-private:
-    ShaHelper helper_{ EVP_sha256 };
-};
-
-} // namespace sha_helpers
-} // namespace
-
-// --- sha
-
-std::unique_ptr<tr_sha1> tr_sha1::create()
-{
-    using namespace sha_helpers;
-
-    return std::make_unique<Sha1Impl>();
 }
 
-std::unique_ptr<tr_sha256> tr_sha256::create()
+template<typename DigestType>
+DigestType make_digest(EVP_MD_CTX* ctx)
 {
-    using namespace sha_helpers;
+    unsigned int hash_length = 0;
+    auto digest = DigestType{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    bool const ok = check_result(EVP_DigestFinal_ex(ctx, digest_as_uchar, &hash_length));
+    TR_ASSERT(!ok || hash_length == std::size(digest));
 
-    return std::make_unique<Sha256Impl>();
+    return digest;
+}
+} // namespace digest_helpers
+} // namespace
+
+// --- sha1
+
+tr_sha1::tr_sha1()
+    : handle_{ EVP_MD_CTX_create() }
+{
+    clear();
+}
+
+tr_sha1::~tr_sha1()
+{
+    EVP_MD_CTX_destroy(handle_);
+}
+
+void tr_sha1::clear()
+{
+    EVP_DigestInit_ex(handle_, EVP_sha1(), nullptr);
+}
+
+void tr_sha1::add(void const* data, size_t data_length)
+{
+    using namespace digest_helpers;
+    add_bytes(handle_, data, data_length);
+}
+
+tr_sha1_digest_t tr_sha1::finish()
+{
+    using namespace digest_helpers;
+    auto digest = make_digest<tr_sha1_digest_t>(handle_);
+    clear();
+    return digest;
+}
+
+// --- sha256
+
+tr_sha256::tr_sha256()
+    : handle_{ EVP_MD_CTX_create() }
+{
+    clear();
+}
+
+tr_sha256::~tr_sha256()
+{
+    EVP_MD_CTX_destroy(handle_);
+}
+
+void tr_sha256::clear()
+{
+    EVP_DigestInit_ex(handle_, EVP_sha256(), nullptr);
+}
+
+void tr_sha256::add(void const* data, size_t data_length)
+{
+    using namespace digest_helpers;
+    add_bytes(handle_, data, data_length);
+}
+
+tr_sha256_digest_t tr_sha256::finish()
+{
+    using namespace digest_helpers;
+    auto digest = make_digest<tr_sha256_digest_t>(handle_);
+    clear();
+    return digest;
 }
 
 // --- x509
