@@ -246,8 +246,6 @@ protected:
         auto error = tr_error{};
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
         blockingFileWrite(fd, payload, n, &error);
-        tr_sys_file_flush(fd, &error);
-        tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);
         if (error)
         {
@@ -267,16 +265,7 @@ protected:
         auto const tmperr = errno;
 
         buildParentDir(path);
-
-        auto const fd = tr_sys_file_open(
-            tr_pathbuf{ path },
-            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-            0600,
-            nullptr);
-        blockingFileWrite(fd, payload, n);
-        tr_sys_file_flush(fd);
-        tr_sys_file_flush(fd);
-        tr_sys_file_close(fd);
+        tr_file_save(path, std::string_view{ static_cast<char const*>(payload), n });
         sync();
 
         errno = tmperr;
@@ -437,8 +426,8 @@ protected:
                     tr_sys_file_write(fd, &ch, 1, nullptr);
                 }
 
-                tr_sys_file_flush(fd);
                 tr_sys_file_close(fd);
+                sync();
             }
         }
 
