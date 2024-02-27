@@ -140,6 +140,10 @@ export function createDialogContainer(id) {
 }
 
 export function makeUUID() {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
   // source: https://stackoverflow.com/a/2117523/6568470
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replaceAll(/[018]/g, (c) =>
     (
