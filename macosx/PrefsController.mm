@@ -918,8 +918,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)setVerifyDataOnCompletion:(id)sender
 {
-    tr_verify_complete_mode mode = [self.fDefaults boolForKey:@"VerifyDataOnCompletion"] ? TR_VERIFY_COMPLETE_FULL : TR_VERIFY_COMPLETE_FAST;
-    tr_sessionSetCompleteVerifyMode(self.fHandle, mode);
+    bool enabled = [self.fDefaults boolForKey:@"VerifyDataOnCompletion"];
+    tr_sessionSetCompleteVerifyEnabled(self.fHandle, enabled);
 }
 
 - (void)folderSheetShow:(id)sender
