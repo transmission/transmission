@@ -382,7 +382,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "torrent-complete-notification-enabled"sv,
     "torrent-complete-sound-command"sv,
     "torrent-complete-sound-enabled"sv,
-    "torrent-complete-verify-mode"sv,
     "torrent-duplicate"sv,
     "torrent-get"sv,
     "torrent-set"sv,

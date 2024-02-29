@@ -383,7 +383,6 @@ enum
     TR_KEY_torrent_complete_notification_enabled,
     TR_KEY_torrent_complete_sound_command,
     TR_KEY_torrent_complete_sound_enabled,
-    TR_KEY_torrent_complete_verify_mode,
     TR_KEY_torrent_duplicate,
     TR_KEY_torrent_get,
     TR_KEY_torrent_set,

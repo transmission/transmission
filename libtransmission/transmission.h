@@ -65,15 +65,6 @@ enum tr_verify_added_mode
     TR_VERIFY_ADDED_FULL = 1
 };
 
-enum tr_verify_complete_mode
-{
-    // Let newly-completed torrents skip verify.
-    TR_VERIFY_COMPLETE_FAST = 0,
-
-    // Force torrents to be fully verified as they are completed.
-    TR_VERIFY_COMPLETE_FULL = 1
-};
-
 enum tr_encryption_mode
 {
     TR_CLEAR_PREFERRED,
@@ -641,7 +632,7 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session);
     Stalled torrents are left running but are not counted by `tr_sessionGetQueueSize()`. */
 void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
 
-/** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
+/** @return true if torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
 
 /** @brief Set whether or not to count torrents idle for over N minutes as 'stalled' */
@@ -652,15 +643,14 @@ void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_se
 
 // ---
 
-/** @brief Set verification mode when torrent download is complete */
-void tr_sessionSetCompleteVerifyMode(tr_session* session, tr_verify_complete_mode mode);
+/** @brief Set whether or not to verify data when torrent download is complete */
+void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
 
 // ---
 
 /**
  * Load all the torrents in the session's torrent folder.
- * This can be used at startup to kickstart all the torrents
- * from the previous session.
+ * This can be used at startup to kickstart all the torrents from the previous session.
  *
  * @return the number of torrents in the session
  */
