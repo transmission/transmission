@@ -416,6 +416,7 @@ public:
         bool speed_limit_down_enabled = false;
         bool speed_limit_up_enabled = false;
         bool tcp_enabled = true;
+        bool torrent_complete_verify_enabled = false;
         bool utp_enabled = true;
         double ratio_limit = 2.0;
         size_t cache_size_mbytes = 4U;
@@ -452,7 +453,6 @@ public:
         tr_port peer_port = tr_port::from_host(TrDefaultPeerPort);
         tr_tos_t peer_socket_tos{ 0x04 };
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
-        bool torrent_complete_verify_enabled = false;
 
     private:
         [[nodiscard]] Fields fields() override
@@ -514,6 +514,7 @@ public:
                 { TR_KEY_start_added_torrents, &should_start_added_torrents },
                 { TR_KEY_tcp_enabled, &tcp_enabled },
                 { TR_KEY_torrent_added_verify_mode, &torrent_added_verify_mode },
+                { TR_KEY_torrent_complete_verify_enabled, &torrent_complete_verify_enabled },
                 { TR_KEY_trash_original_torrent_files, &should_delete_source_torrents },
                 { TR_KEY_umask, &umask },
                 { TR_KEY_upload_slots_per_torrent, &upload_slots_per_torrent },
