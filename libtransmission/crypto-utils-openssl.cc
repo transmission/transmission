@@ -37,33 +37,35 @@ namespace
 {
 void log_openssl_error(char const* file, int line)
 {
-    unsigned long const error_code = ERR_get_error();
-
-    if (tr_logLevelIsActive(TR_LOG_ERROR))
+    if (!tr_logLevelIsActive(TR_LOG_ERROR))
     {
-        if (static bool strings_loaded = false; !strings_loaded)
-        {
+        return;
+    }
+
+    auto const error_code = ERR_get_error();
+
+    if (static bool strings_loaded = false; !strings_loaded)
+    {
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
-            ERR_load_crypto_strings();
+        ERR_load_crypto_strings();
 #else
-            OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
+        OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
 #endif
 
-            strings_loaded = true;
-        }
-
-        auto buf = std::array<char, 512>{};
-        ERR_error_string_n(error_code, std::data(buf), std::size(buf));
-        tr_logAddMessage(
-            file,
-            line,
-            TR_LOG_ERROR,
-            fmt::format(
-                _("{crypto_library} error: {error} ({error_code})"),
-                fmt::arg("crypto_library", "OpenSSL"),
-                fmt::arg("error", std::data(buf)),
-                fmt::arg("error_code", error_code)));
+        strings_loaded = true;
     }
+
+    auto buf = std::array<char, 512>{};
+    ERR_error_string_n(error_code, std::data(buf), std::size(buf));
+    tr_logAddMessage(
+        file,
+        line,
+        TR_LOG_ERROR,
+        fmt::format(
+            _("{crypto_library} error: {error} ({error_code})"),
+            fmt::arg("crypto_library", "OpenSSL"),
+            fmt::arg("error", std::data(buf)),
+            fmt::arg("error_code", error_code)));
 }
 
 #define log_error() log_openssl_error(__FILE__, __LINE__)
@@ -82,9 +84,7 @@ bool check_openssl_result(int result, int expected_result, bool expected_equal, 
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
 
-namespace digest_helpers
-{
-void add_bytes(EVP_MD_CTX* ctx, void const* data, size_t data_length)
+void digest_add_bytes(EVP_MD_CTX* ctx, void const* data, size_t data_length)
 {
     if (data_length != 0U)
     {
@@ -93,7 +93,7 @@ void add_bytes(EVP_MD_CTX* ctx, void const* data, size_t data_length)
 }
 
 template<typename DigestType>
-DigestType make_digest(EVP_MD_CTX* ctx)
+DigestType digest_finish(EVP_MD_CTX* ctx)
 {
     unsigned int hash_length = 0;
     auto digest = DigestType{};
@@ -103,7 +103,6 @@ DigestType make_digest(EVP_MD_CTX* ctx)
 
     return digest;
 }
-} // namespace digest_helpers
 } // namespace
 
 // --- sha1
@@ -126,14 +125,12 @@ void tr_sha1::clear()
 
 void tr_sha1::add(void const* data, size_t data_length)
 {
-    using namespace digest_helpers;
-    add_bytes(handle_, data, data_length);
+    digest_add_bytes(handle_, data, data_length);
 }
 
 tr_sha1_digest_t tr_sha1::finish()
 {
-    using namespace digest_helpers;
-    auto digest = make_digest<tr_sha1_digest_t>(handle_);
+    auto digest = digest_finish<tr_sha1_digest_t>(handle_);
     clear();
     return digest;
 }
@@ -158,14 +155,12 @@ void tr_sha256::clear()
 
 void tr_sha256::add(void const* data, size_t data_length)
 {
-    using namespace digest_helpers;
-    add_bytes(handle_, data, data_length);
+    digest_add_bytes(handle_, data, data_length);
 }
 
 tr_sha256_digest_t tr_sha256::finish()
 {
-    using namespace digest_helpers;
-    auto digest = make_digest<tr_sha256_digest_t>(handle_);
+    auto digest = digest_finish<tr_sha256_digest_t>(handle_);
     clear();
     return digest;
 }
