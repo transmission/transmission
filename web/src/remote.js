@@ -24,7 +24,6 @@ export class Remote {
   // TODO: decouple from controller
   constructor(controller) {
     this._controller = controller;
-    this._error = '';
     this._session_id = '';
   }
 
