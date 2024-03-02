@@ -72,6 +72,8 @@ export class Remote {
           message:
             'Could not connect to the server. You may need to reload the page to reconnect.',
         });
+      })
+      .finally(() => {
         this._controller.setCurrentPopup(this._connection_alert);
       });
   }
