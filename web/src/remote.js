@@ -56,6 +56,8 @@ export class Remote {
         if (callback) {
           callback.call(context, payload, response_argument);
         }
+
+        this._connection_alert = null;
       })
       .catch((error) => {
         if (error.message === Remote._SessionHeader) {
