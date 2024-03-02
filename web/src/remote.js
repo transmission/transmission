@@ -23,6 +23,7 @@ export const RPC = {
 export class Remote {
   // TODO: decouple from controller
   constructor(controller) {
+    this._connection_alert = null;
     this._controller = controller;
     this._session_id = '';
   }
@@ -65,13 +66,13 @@ export class Remote {
         }
         console.trace(error);
         this._controller.togglePeriodicSessionRefresh(false);
-        this._controller.setCurrentPopup(
-          new AlertDialog({
-            heading: 'Connection failed',
-            message:
-              'Could not connect to the server. You may need to reload the page to reconnect.',
-          }),
-        );
+
+        this._connection_alert = new AlertDialog({
+          heading: 'Connection failed',
+          message:
+            'Could not connect to the server. You may need to reload the page to reconnect.',
+        });
+        this._controller.setCurrentPopup(this._connection_alert);
       });
   }
 
