@@ -65,7 +65,6 @@ struct tr_upnp
         FreeUPNPUrls(&urls);
     }
 
-    bool hasDiscovered = false;
     UPNPUrls urls = {};
     IGDdatas data = {};
     tr_port advertised_port;
@@ -135,7 +134,7 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
 [[nodiscard]] int get_specific_port_mapping_entry(tr_upnp const* handle, char const* proto)
 {
     auto int_client = std::array<char, 16>{};
-    auto int_port = std::array<char, 16>{};
+    auto int_port = std::array<char, 6>{};
 
     auto const port_str = std::to_string(handle->advertised_port.host());
 
@@ -295,7 +294,6 @@ tr_port_forwarding_state tr_upnpPulse(
             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
             tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", lanaddr.data())));
             handle->state = UpnpState::Idle;
-            handle->hasDiscovered = true;
             handle->lanaddr = std::data(lanaddr);
         }
         else
