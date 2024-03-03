@@ -116,7 +116,7 @@ void tr_sha1::add(void const* data, size_t data_length)
         return;
     }
 
-    CC_SHA1_Update(&handle_, sha_data, n_bytes);
+    CC_SHA1_Update(&handle_, data, data_length);
 }
 
 tr_sha1_digest_t tr_sha1::finish()
@@ -140,7 +140,7 @@ tr_sha256::~tr_sha256()
 
 void tr_sha256::clear()
 {
-    CC_SHA1_Init(&handle_);
+    CC_SHA256_Init(&handle_);
 }
 
 void tr_sha256::add(void const* data, size_t data_length)
@@ -150,7 +150,7 @@ void tr_sha256::add(void const* data, size_t data_length)
         return;
     }
 
-    CC_SHA1_Update(&handle_, sha_data, n_bytes);
+    CC_SHA256_Update(&handle_, data, data_length);
 }
 
 tr_sha256_digest_t tr_sha256::finish()
