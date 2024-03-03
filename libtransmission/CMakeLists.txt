@@ -279,7 +279,6 @@ target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
         deflate::deflate
-        transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
@@ -301,6 +300,7 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
     PUBLIC
+        transmission::crypto_impl
         fmt::fmt-header-only
         small::small
         libevent::event)
