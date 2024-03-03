@@ -1430,7 +1430,7 @@ msgstr "Copia collegamento _magnetico negli appunti"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:68 ../gtk/ui/gtk3/MainWindow.ui:70 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
-msgstr "Rimuove il torrent"
+msgstr "Rimuovi il torrent"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
