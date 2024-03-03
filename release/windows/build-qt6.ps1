@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.6.0'
+$global:Qt6Version = '6.6.2'
 
 $global:Qt6Deps = @(
     'DBus'
