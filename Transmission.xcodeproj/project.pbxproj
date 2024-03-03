@@ -4138,6 +4138,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFMT_HEADER_ONLY",
+					"-DWITH_CCRYPTO",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
@@ -4345,6 +4346,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFMT_HEADER_ONLY",
+					"-DWITH_CCRYPTO",
 					"-DNDEBUG",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
@@ -4448,6 +4450,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFMT_HEADER_ONLY",
+					"-DWITH_CCRYPTO",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
