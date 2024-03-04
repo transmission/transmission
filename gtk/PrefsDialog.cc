@@ -974,12 +974,25 @@ void NetworkPage::portTestSetSensitive()
 
 void NetworkPage::onPortTested(std::optional<bool> const result, Session::PortTestIpProtocol const ip_protocol)
 {
+    auto constexpr ResultToStatus = [](std::optional<bool> const res)
+    {
+        if (!res)
+        {
+            return PORT_TEST_ERROR;
+        }
+        if (!*res)
+        {
+            return PORT_TEST_CLOSED;
+        }
+        return PORT_TEST_OPEN;
+    };
+
     // Only update the UI if the current status is "checking", so that
     // we won't show the port test results for the old peer port if it
     // changed while we have port-test RPC call(s) in-flight.
-    if (portTestStatus_[ip_protocol] == PORT_TEST_CHECKING)
+    if (auto& status = portTestStatus_[ip_protocol]; status == PORT_TEST_CHECKING)
     {
-        portTestStatus_[ip_protocol] = result ? (*result ? PORT_TEST_OPEN : PORT_TEST_CLOSED) : PORT_TEST_ERROR;
+        status = ResultToStatus(result);
         updatePortStatusText();
     }
     portTestSetSensitive();

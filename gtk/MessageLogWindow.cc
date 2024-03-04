@@ -80,7 +80,7 @@ private:
 
     void scroll_to_bottom();
     void level_combo_changed_cb(Gtk::ComboBox* combo_box);
-    void level_combo_init(Gtk::ComboBox* level_combo) const;
+    static void level_combo_init(Gtk::ComboBox* level_combo);
 
     [[nodiscard]] bool is_pinned_to_new() const;
     [[nodiscard]] bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
@@ -164,7 +164,8 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 *****
 ****/
 
-void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
+// static
+void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
 {
     auto const pref_level = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     auto const default_level = TR_LOG_INFO;

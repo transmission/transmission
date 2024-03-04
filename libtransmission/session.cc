@@ -46,7 +46,6 @@
 #include "libtransmission/rpc-server.h"
 #include "libtransmission/session.h"
 #include "libtransmission/session-alt-speeds.h"
-#include "libtransmission/session-settings.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-ctor.h"
@@ -193,7 +192,7 @@ tr_peer_id_t tr_peerIdInit()
 
     // remainder is randomly-generated characters
     auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
-    auto total = int{ 0 };
+    auto total = 0;
     tr_rand_buffer(it, end - it);
     while (it + 1 < end)
     {
@@ -460,18 +459,18 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
-    ret.merge(tr_session_settings::default_settings());
-    ret.merge(tr_rpc_server::default_settings());
-    ret.merge(tr_session_alt_speeds::default_settings());
+    ret.merge(tr_rpc_server::Settings{}.save());
+    ret.merge(tr_session_alt_speeds::Settings{}.save());
+    ret.merge(tr_session::Settings{}.save());
     return ret;
 }
 
 tr_variant tr_sessionGetSettings(tr_session const* session)
 {
     auto settings = tr_variant::make_map();
-    settings.merge(session->settings_.settings());
-    settings.merge(session->alt_speeds_.settings());
-    settings.merge(session->rpc_server_->settings());
+    settings.merge(session->alt_speeds_.settings().save());
+    settings.merge(session->rpc_server_->settings().save());
+    settings.merge(session->settings_.save());
     tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
     return settings;
 }
@@ -748,14 +747,14 @@ void tr_session::setSettings(tr_variant const& settings, bool force)
     TR_ASSERT(am_in_session_thread());
     TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
-    setSettings(tr_session_settings{ settings }, force);
+    setSettings(tr_session::Settings{ settings }, force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(settings);
-    rpc_server_->load(settings);
+    alt_speeds_.load(tr_session_alt_speeds::Settings{ settings });
+    rpc_server_->load(tr_rpc_server::Settings{ settings });
 }
 
-void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
+void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 {
     auto const lock = unique_lock();
 
@@ -869,6 +868,12 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     else if (force || !dht_ || port_changed || addr_changed || new_settings.dht_enabled != old_settings.dht_enabled)
     {
         dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
+    }
+
+    if (auto const& val = new_settings.sleep_per_seconds_during_verify;
+        force || val != old_settings.sleep_per_seconds_during_verify)
+    {
+        verifier_->set_sleep_per_seconds_during_verify(val);
     }
 
     // We need to update bandwidth if speed settings changed.
@@ -2117,7 +2122,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
-    , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
+    , rpc_server_{ std::make_unique<tr_rpc_server>(this, tr_rpc_server::Settings{ settings_dict }) }
     , now_timer_{ timer_maker_->create([this]() { on_now_timer(); }) }
     , queue_timer_{ timer_maker_->create([this]() { on_queue_timer(); }) }
     , save_timer_{ timer_maker_->create([this]() { on_save_timer(); }) }

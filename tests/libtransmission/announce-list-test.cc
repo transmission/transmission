@@ -173,9 +173,9 @@ TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
 
     // confirm that each has a unique id
     auto ids = std::set<tr_tracker_id_t>{};
-    for (size_t i = 0, n = std::size(announce_list); i < n; ++i)
+    for (auto const& tracker : announce_list)
     {
-        ids.insert(announce_list.at(i).id);
+        ids.insert(tracker.id);
     }
     EXPECT_EQ(std::size(announce_list), std::size(ids));
 }

@@ -51,17 +51,17 @@ using namespace std::literals;
 namespace
 {
 /* unless the tracker says otherwise, rescrape this frequently */
-auto constexpr DefaultScrapeIntervalSec = int{ 60 * 30 };
+auto constexpr DefaultScrapeIntervalSec = 60 * 30;
 
 /* the value of the 'numwant' argument passed in tracker requests. */
-auto constexpr Numwant = int{ 80 };
+auto constexpr Numwant = 80;
 
 /* how often to announce & scrape */
-auto constexpr MaxAnnouncesPerUpkeep = int{ 20 };
-auto constexpr MaxScrapesPerUpkeep = int{ 20 };
+auto constexpr MaxAnnouncesPerUpkeep = 20;
+auto constexpr MaxScrapesPerUpkeep = 20;
 
 /* how many infohashes to remove when we get a scrape-too-long error */
-auto constexpr TrMultiscrapeStep = int{ 5 };
+auto constexpr TrMultiscrapeStep = 5;
 
 struct StopsCompare
 {
@@ -524,10 +524,10 @@ struct tr_tier
 
 private:
     // unless the tracker says otherwise, this is the announce interval
-    static auto constexpr DefaultAnnounceIntervalSec = int{ 60 * 10 };
+    static auto constexpr DefaultAnnounceIntervalSec = 60 * 10;
 
     // unless the tracker says otherwise, this is the announce min_interval
-    static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
+    static auto constexpr DefaultAnnounceMinIntervalSec = 60 * 2;
 
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, time_t interval_secs)
     {
@@ -1475,9 +1475,9 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might download */
-    if (auto const is_done_a = a->tor->is_done(), is_done_b = b->tor->is_done(); is_done_a != is_done_b)
+    if (auto const val = tr_compare_3way(a->tor->is_done(), b->tor->is_done()); val != 0)
     {
-        return is_done_a ? 1 : -1;
+        return val;
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */

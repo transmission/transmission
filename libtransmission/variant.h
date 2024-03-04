@@ -46,7 +46,9 @@ public:
     class Map
     {
     public:
-        Map(size_t const n_reserve = 0U)
+        Map() = default;
+
+        Map(size_t const n_reserve)
         {
             vec_.reserve(n_reserve);
         }
@@ -554,20 +556,5 @@ private:
     // This is set to the first unparsed character after `parse()`.
     char const* end_ = nullptr;
 };
-
-namespace libtransmission
-{
-
-struct VariantConverter
-{
-public:
-    template<typename T>
-    static std::optional<T> load(tr_variant const& src);
-
-    template<typename T>
-    static tr_variant save(T const& val);
-};
-
-} // namespace libtransmission
 
 /* @} */
