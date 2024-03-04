@@ -306,15 +306,15 @@ tr_port_forwarding_state tr_upnpPulse(
         freeUPNPDevlist(devlist);
     }
 
-    if ((handle->state <= UpnpState::Failed) && (handle->isMapped) &&
+    if (handle->state <= UpnpState::Failed && handle->isMapped &&
         (!is_enabled || handle->advertised_port != advertised_port || handle->local_port != local_port))
     {
         handle->state = UpnpState::WillUnmap;
     }
 
     if (is_enabled && handle->isMapped && do_port_check &&
-        ((get_specific_port_mapping_entry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
-         (get_specific_port_mapping_entry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
+        (get_specific_port_mapping_entry(handle, "TCP") != UPNPCOMMAND_SUCCESS ||
+         get_specific_port_mapping_entry(handle, "UDP") != UPNPCOMMAND_SUCCESS))
     {
         tr_logAddInfo(fmt::format(
             _("Local port {local_port} is not forwarded to {advertised_port}"),
@@ -339,7 +339,7 @@ tr_port_forwarding_state tr_upnpPulse(
         handle->local_port = {};
     }
 
-    if ((handle->state <= UpnpState::Failed) && is_enabled && !handle->isMapped)
+    if (handle->state <= UpnpState::Failed && is_enabled && !handle->isMapped)
     {
         handle->state = UpnpState::WillMap;
     }
