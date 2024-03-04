@@ -27,9 +27,11 @@ public:
 protected:
     Settings();
 
+    // convert from tr_variant to T
     template<typename T>
     using Load = bool (*)(tr_variant const& src, T* tgt);
 
+    // convert from T to tr_variant
     template<typename T>
     using Save = tr_variant (*)(T const& src);
 
@@ -38,8 +40,8 @@ protected:
     {
         auto const key = std::type_index(typeid(T*));
 
-        // put load + save into void* wrappers
-        // so that they can be stored into maps
+        // wrap load + save with void* wrappers so that
+        // they can be stored in the save_ and load_ maps
 
         load_[key] = [load](tr_variant const& src, void* tgt)
         {
