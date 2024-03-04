@@ -55,12 +55,12 @@ int main(int argc, char** argv)
     }
     else
     {
-        std::fclose(out);
-        std::remove(tmp_result_path.c_str());
+        (void)std::fclose(out);
+        (void)std::remove(tmp_result_path.c_str());
         return 1;
     }
 
-    std::fclose(out);
+    (void)std::fclose(out);
     tr_sys_path_rename(tmp_result_path.c_str(), result_path.c_str());
     return 0;
 }

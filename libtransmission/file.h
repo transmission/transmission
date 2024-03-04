@@ -418,17 +418,6 @@ bool tr_sys_file_write_at(
     tr_error* error = nullptr);
 
 /**
- * @brief Portability wrapper for `fsync()`.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error = nullptr);
-
-/**
  * @brief Portability wrapper for `ftruncate()`.
  *
  * @param[in]  handle Valid file descriptor.

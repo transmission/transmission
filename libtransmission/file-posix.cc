@@ -766,20 +766,6 @@ bool tr_sys_file_write_at(
     return ret;
 }
 
-bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    bool const ret = (fsync(handle) != -1);
-
-    if (error != nullptr && !ret)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return ret;
-}
-
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);

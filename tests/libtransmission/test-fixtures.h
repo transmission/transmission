@@ -246,8 +246,6 @@ protected:
         auto error = tr_error{};
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
         blockingFileWrite(fd, payload, n, &error);
-        tr_sys_file_flush(fd, &error);
-        tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);
         if (error)
         {
@@ -274,8 +272,6 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
-        tr_sys_file_flush(fd);
-        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 
@@ -437,8 +433,8 @@ protected:
                     tr_sys_file_write(fd, &ch, 1, nullptr);
                 }
 
-                tr_sys_file_flush(fd);
                 tr_sys_file_close(fd);
+                sync();
             }
         }
 
