@@ -15,13 +15,8 @@
 
 #include <fmt/core.h>
 
-#ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
-#else
-#include <miniupnp/miniupnpc.h>
-#include <miniupnp/upnpcommands.h>
-#endif
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
