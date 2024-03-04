@@ -37,7 +37,7 @@ jobs:
           fi
       - name: Get Source
         id: get-source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           path: src
@@ -82,7 +82,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           cat /etc/os-release
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Get Dependencies
@@ -102,7 +102,7 @@ jobs:
           cat style.diff
           set -e
       - name: Upload Diffs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         with:
           name: code-style.diff
@@ -147,7 +147,7 @@ jobs:
             ninja-build \
             npm
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           path: src
@@ -208,7 +208,7 @@ jobs:
             ninja-build \
             npm
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           path: src
@@ -249,7 +249,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install qt
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
@@ -282,7 +282,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
@@ -326,7 +326,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apk add --upgrade qt5-qtbase-dev qt5-qtsvg-dev qt5-qttools-dev
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
@@ -357,7 +357,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
@@ -391,7 +391,7 @@ jobs:
 
           Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
@@ -406,7 +406,7 @@ jobs:
               exit 1
           }
       - name: Get Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache
         with:
           path: ${{ env.DEPS_PREFIX }}
@@ -454,11 +454,11 @@ jobs:
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake --build obj --config RelWithDebInfo --target pack-msi
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}-${{ matrix.arch }}
           path: pfx/**/*
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}-${{ matrix.arch }}-msi
           path: obj/dist/msi/*.msi
@@ -484,7 +484,7 @@ jobs:
             libssl-dev \
             ninja-build
       - name: Get Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
@@ -496,7 +496,7 @@ jobs:
             -G Ninja
       - name: Create source tarball
         run: cmake --build obj --target package_source
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: source-tarball
           path: obj/transmission*.tar.*
@@ -521,7 +521,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install qt
       - name: Get Source
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: source-tarball
       - name: Extract Source
@@ -563,7 +563,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
@@ -610,7 +610,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: source-tarball
       - name: Extract Source
@@ -640,7 +640,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
@@ -686,7 +686,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel
       - name: Get Source
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: source-tarball
       - name: Extract Source
@@ -717,7 +717,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
@@ -759,7 +759,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: sudo apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: source-tarball
       - name: Extract Source
@@ -791,7 +791,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
@@ -811,18 +811,18 @@ jobs:
           ninja-build
 
     - name: Get Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
     
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v3
       with:
         gradle-version: 7.6
 
