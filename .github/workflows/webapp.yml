@@ -21,7 +21,7 @@ jobs:
       update-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '1'}}
     steps:
       - name: Get source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2 # >1 needed for merge base
       - name: Check push-to-main
@@ -58,7 +58,7 @@ jobs:
     if: ${{ needs.decide-what-jobs-to-run.outputs.test-style == 'true' }}
     steps:
       - name: Get source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get dependencies
         run: |
           set -e # abort if any command fails
@@ -98,7 +98,7 @@ jobs:
     if: ${{ needs.decide-what-jobs-to-run.outputs.test-generated-files == 'true' }}
     steps:
       - name: Get source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2 # >1 needed for merge base
       - name: Check for changes to generated files
@@ -131,7 +131,7 @@ jobs:
           set -e # abort if any command fails
           sudo apt-get install -y npm
       - name: Get source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2 # >1 needed for merge base
       - name: Generate webapp files
