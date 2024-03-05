@@ -371,7 +371,7 @@ tr_port_forwarding_state tr_upnpPulse(
         if (handle->isMapped)
         {
             tr_logAddInfo(fmt::format(
-                _("Port forwarded local port {local_port} to {advertised_port}"),
+                _("Forwarded local port {local_port} to {advertised_port}"),
                 fmt::arg("local_port", local_port.host()),
                 fmt::arg("advertised_port", advertised_port.host())));
             handle->advertised_port = advertised_port;
