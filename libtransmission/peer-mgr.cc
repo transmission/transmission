@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include <small/map.hpp>
 #include <small/vector.hpp>
 
 #include <fmt/core.h>
@@ -283,8 +284,9 @@ class tr_swarm
 {
 public:
     using Peers = std::vector<tr_peerMsgs*>;
-    // FIXME(tearfur) replace std::unordered_map with small::map after their bugs are fixed
-    using Pool = std::unordered_map<tr_socket_address, std::shared_ptr<tr_peer_info>>;
+    // FIXME(tearfur) replace std::vector with small::vector after their bugs are fixed
+    using Pool = small::detail::
+        associative_vector<true, false, true, std::vector<std::pair<tr_socket_address, std::shared_ptr<tr_peer_info>>>>;
 
     class WishlistMediator final : public Wishlist::Mediator
     {
