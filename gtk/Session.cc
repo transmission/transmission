@@ -911,10 +911,49 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
     {
         std::weak_ptr<Impl> impl;
         tr_torrent_id_t id;
+        bool succeeded = false;
     };
 
     if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
+        // This is the callback called from the Gtk main thread. If successfull,
+        // it removes the torrent entry from the GUI.
+        auto callback_this_thread = [](gpointer user_data) -> gboolean
+        {
+            auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data));
+            if (ud->succeeded)
+            {
+                if (auto const impl = ud->impl.lock(); impl)
+                {
+                    if (auto const& [torrent_, position_] = impl->find_torrent_by_id(ud->id); torrent_)
+                    {
+                        /* remove from the gui */
+                        impl->get_raw_model()->remove(position_);
+                    }
+                }
+            }
+
+            return G_SOURCE_REMOVE;
+        };
+        // Convert it explicitly to a constexpr C function pointer so it can be
+        // used from inside the next lambda without capturing (so that itself
+        // can be used as a C function pointer).
+        constexpr GSourceFunc CALLBACK_THIS_THREAD_PTR = callback_this_thread;
+
+        // This is the callback called from the libtransmission thread, it
+        // stores the result and schedules the callback to be called from the
+        // main thread.
+        auto callback_other_thread = [](bool succeeded, void* user_data)
+        {
+            // Store the result for the Gtk thread callback to use:
+            auto* ud = static_cast<CallbackUserData*>(user_data);
+            ud->succeeded = succeeded;
+
+            // Unfortunatelly, there is no thread-safe C++ binding to
+            // this function, so we have to use the C API directly.
+            g_idle_add(CALLBACK_THIS_THREAD_PTR, user_data);
+        };
+
         /* remove the torrent */
         tr_torrentRemove(
             &torrent->get_underlying(),
@@ -922,35 +961,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr,
-            [](bool succeeded, void* user_data)
-            {
-                if (succeeded)
-                {
-                    // Unfortunatelly, there is no thread-safe C++ binding to
-                    // this function, so we have to use the C API directly.
-                    g_idle_add(
-                        [](gpointer user_data_) -> gboolean
-                        {
-                            auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data_));
-                            if (auto const impl = ud->impl.lock(); impl)
-                            {
-                                if (auto const& [torrent_, position_] = impl->find_torrent_by_id(ud->id); torrent_)
-                                {
-                                    /* remove from the gui */
-                                    impl->get_raw_model()->remove(position_);
-                                }
-                            }
-
-                            return G_SOURCE_REMOVE;
-                        },
-                        user_data);
-                }
-                else
-                {
-                    delete static_cast<CallbackUserData*>(user_data);
-                    // Let the GUI normal polling get the error message.
-                }
-            },
+            callback_other_thread,
             new CallbackUserData{ impl_, id });
     }
 }
