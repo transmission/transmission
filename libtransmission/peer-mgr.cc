@@ -16,6 +16,7 @@
 #include <memory>
 #include <optional>
 #include <tuple> // std::tie
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -271,7 +272,9 @@ constexpr struct
         return compare(a, b) < 0;
     }
 
-    [[nodiscard]] constexpr bool operator()(tr_peer_info const* a, tr_peer_info const* b) const noexcept
+    template<typename T>
+    [[nodiscard]] constexpr std::enable_if_t<std::is_same_v<std::decay_t<decltype(*std::declval<T>())>, tr_peer_info>, bool>
+    operator()(T const& a, T const& b) const noexcept
     {
         return compare(*a, *b) < 0;
     }
@@ -1022,6 +1025,7 @@ struct tr_peerMgr
 {
 private:
     static auto constexpr BandwidthTimerPeriod = 500ms;
+    static auto constexpr PeerInfoPeriod = 1min;
     static auto constexpr RechokePeriod = 10s;
     static auto constexpr RefillUpkeepPeriod = 10s;
 
@@ -1056,11 +1060,13 @@ public:
         , blocklists_{ blocklist }
         , handshake_mediator_{ *session, timer_maker, torrents }
         , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
+        , peer_info_timer_{ timer_maker.create([this]() { peer_info_pulse(); }) }
         , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
         , refill_upkeep_timer_{ timer_maker.create([this]() { refill_upkeep(); }) }
         , blocklists_tag_{ blocklist.observe_changes([this]() { on_blocklists_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
+        peer_info_timer_->start_repeating(PeerInfoPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
         refill_upkeep_timer_->start_repeating(RefillUpkeepPeriod);
     }
@@ -1102,6 +1108,7 @@ public:
 private:
     void bandwidth_pulse();
     void make_new_peer_connections();
+    void peer_info_pulse();
     void rechoke_pulse() const;
     void reconnect_pulse();
     void refill_upkeep() const;
@@ -1133,6 +1140,7 @@ private:
     OutboundCandidates outbound_candidates_;
 
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
+    std::unique_ptr<libtransmission::Timer> const peer_info_timer_;
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
     std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
 
@@ -2281,6 +2289,93 @@ void tr_peerMgr::reconnect_pulse()
 
     // try to make new peer connections
     make_new_peer_connections();
+}
+
+// --- Peer Pool Size
+
+namespace
+{
+namespace peer_info_pulse_helpers
+{
+auto get_max_peer_info_count(tr_torrent const& tor)
+{
+    return std::min(uint16_t{ 50 }, static_cast<uint16_t>(tor.peer_limit() * 3U));
+}
+
+struct ComparePeerInfo
+{
+    [[nodiscard]] int compare(tr_peer_info const& a, tr_peer_info const& b) const noexcept
+    {
+        auto const is_a_inactive = a.is_inactive(now_);
+        auto const is_b_inactive = b.is_inactive(now_);
+        if (is_a_inactive != is_b_inactive)
+        {
+            return is_a_inactive ? 1 : -1;
+        }
+
+        return CompareAtomsByUsefulness.compare(a, b);
+    }
+
+    template<typename T>
+    [[nodiscard]] std::enable_if_t<std::is_same_v<std::decay_t<decltype(*std::declval<T>())>, tr_peer_info>, bool> operator()(
+        T const& a,
+        T const& b) const noexcept
+    {
+        return compare(*a, *b) < 0;
+    }
+
+    time_t const now_ = tr_time();
+};
+} // namespace peer_info_pulse_helpers
+} // namespace
+
+void tr_peerMgr::peer_info_pulse()
+{
+    using namespace peer_info_pulse_helpers;
+
+    auto const lock = unique_lock();
+    for (auto const* tor : torrents_)
+    {
+        auto& pool = tor->swarm->connectable_pool;
+        auto const max = get_max_peer_info_count(*tor);
+        auto const pool_size = std::size(pool);
+        if (pool_size <= max)
+        {
+            continue;
+        }
+
+        auto infos = std::vector<std::shared_ptr<tr_peer_info>>{};
+        infos.reserve(pool_size);
+        std::transform(
+            std::begin(pool),
+            std::end(pool),
+            std::back_inserter(infos),
+            [](auto const& keyval) { return keyval.second; });
+        pool.clear();
+
+        // Keep all peer info objects before test_begin unconditionally
+        auto const test_begin = std::partition(
+            std::begin(infos),
+            std::end(infos),
+            [](auto const& info) { return info->is_in_use(); });
+
+        auto const iter_max = std::begin(infos) + max;
+        if (iter_max > test_begin)
+        {
+            std::partial_sort(test_begin, iter_max, std::end(infos), ComparePeerInfo{});
+        }
+        infos.erase(std::max(test_begin, iter_max), std::end(infos));
+
+        pool.reserve(std::size(infos));
+        for (auto& info : infos)
+        {
+            pool.try_emplace(info->listen_socket_address(), std::move(info));
+        }
+
+        tr_logAddTraceSwarm(
+            tor->swarm,
+            fmt::format("max peer info count is {}... pruned from {} to {}", max, pool_size, std::size(pool)));
+    }
 }
 
 // --- Bandwidth Allocation
