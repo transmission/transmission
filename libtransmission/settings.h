@@ -42,16 +42,8 @@ protected:
 
         // wrap load + save with void* wrappers so that
         // they can be stored in the save_ and load_ maps
-
-        load_[key] = [load](tr_variant const& src, void* tgt)
-        {
-            return load(src, static_cast<T*>(tgt));
-        };
-
-        save_[key] = [save](void const* src)
-        {
-            return save(*static_cast<T const*>(src));
-        };
+        load_.insert_or_assign(key, [load](tr_variant const& src, void* tgt) { return load(src, static_cast<T*>(tgt)); });
+        save_.insert_or_assign(key, [save](void const* src) { return save(*static_cast<T const*>(src)); });
     }
 
     class Field
