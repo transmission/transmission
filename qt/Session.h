@@ -46,7 +46,7 @@ public:
     void stop();
     void restart();
 
-    QUrl const& getRemoteUrl() const
+    [[nodiscard]] constexpr auto const& getRemoteUrl() const noexcept
     {
         return rpc_.url();
     }
@@ -86,10 +86,16 @@ public:
     bool portTestPending(PortTestIpProtocol ip_protocol) const noexcept;
 
     /** returns true if the transmission session is being run inside this client */
-    bool isServer() const;
+    [[nodiscard]] constexpr auto isServer() const noexcept
+    {
+        return session_ != nullptr;
+    }
 
     /** returns true if isServer() is true or if the remote address is the localhost */
-    bool isLocal() const;
+    [[nodiscard]] auto isLocal() const noexcept
+    {
+        return !session_id_.isEmpty() ? is_definitely_local_session_ : rpc_.isLocal();
+    }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);

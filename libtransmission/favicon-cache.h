@@ -46,7 +46,7 @@ public:
 
     void load(
         std::string_view url_in,
-        IconFunc callback = [](Icon const&) {})
+        IconFunc callback = [](Icon const&) { /*default callback is a no-op */ })
     {
         std::call_once(scan_once_flag_, &FaviconCache::scan_file_cache, this);
 
@@ -99,8 +99,8 @@ public:
         }
     }
 
-    static inline constexpr auto Width = 16;
-    static inline constexpr auto Height = 16;
+    static constexpr auto Width = 16;
+    static constexpr auto Height = 16;
 
 private:
     class InFlightData
@@ -111,6 +111,9 @@ private:
             , sitename_{ sitename }
         {
         }
+
+        InFlightData(InFlightData const&) = delete;
+        InFlightData& operator=(InFlightData const&) = delete;
 
         [[nodiscard]] constexpr auto const& sitename() const noexcept
         {
@@ -133,7 +136,7 @@ private:
 
         [[nodiscard]] auto get_responses()
         {
-            auto lock = std::lock_guard{ responses_mutex_ };
+            auto lock = std::scoped_lock{ responses_mutex_ };
 
             auto tmp = decltype(responses_){};
             std::swap(tmp, responses_);
@@ -142,7 +145,7 @@ private:
 
         void add_response(std::string contents, long code)
         {
-            auto lock = std::lock_guard{ responses_mutex_ };
+            auto lock = std::scoped_lock{ responses_mutex_ };
 
             responses_.emplace_back(std::move(contents), code);
         }
@@ -201,7 +204,7 @@ private:
         }
     }
 
-    void mark_site_as_scraped(std::string_view sitename)
+    void mark_site_as_scraped(std::string_view sitename) const
     {
         if (auto ofs = std::ofstream{ scraped_sitenames_filename_, std::ios_base::out | std::ios_base::app }; ofs.is_open())
         {

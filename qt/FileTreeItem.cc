@@ -165,6 +165,9 @@ QVariant FileTreeItem::data(int column, int role) const
             }
 
             break;
+
+        default:
+            break;
         }
 
         break;
@@ -184,6 +187,9 @@ QVariant FileTreeItem::data(int column, int role) const
         }
 
         break;
+
+    default:
+        break;
     }
 
     return value;
@@ -191,8 +197,8 @@ QVariant FileTreeItem::data(int column, int role) const
 
 std::pair<uint64_t, uint64_t> FileTreeItem::get_subtree_wanted_size() const
 {
-    auto have = uint64_t{ is_wanted_ ? have_size_ : 0U };
-    auto total = uint64_t{ is_wanted_ ? total_size_ : 0U };
+    auto have = is_wanted_ ? have_size_ : 0U;
+    auto total = is_wanted_ ? total_size_ : 0U;
 
     for (auto const* const child : children_)
     {

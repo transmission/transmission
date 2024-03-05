@@ -313,7 +313,6 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
     self.fSet = YES;
 }
 
-#warning doesn't like blank addresses
 - (void)addTrackers
 {
     [self.view.window makeKeyWindow];

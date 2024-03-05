@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef> // for size_t
 #include <string>
 #include <utility>
@@ -36,6 +37,7 @@ protected:
         bool*,
         double*,
         size_t*,
+        std::chrono::milliseconds*,
         std::string*,
         tr_encryption_mode*,
         tr_log_level*,

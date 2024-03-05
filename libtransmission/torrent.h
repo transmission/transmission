@@ -54,11 +54,6 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
-
-/** save a torrent's .resume file if it's changed since the last time it was saved */
-void tr_torrentSave(tr_torrent* tor);
-
 namespace libtransmission::test
 {
 

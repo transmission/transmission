@@ -1141,7 +1141,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
 {
     TR_ASSERT(session->am_in_session_thread());
 
-    auto ok = bool{ true };
+    auto ok = true;
     if (move_from_old_path)
     {
         if (setme_state != nullptr)
@@ -1553,7 +1553,7 @@ void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 
 void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 {
-    return tor->amount_done_bins(tabs, n_tabs);
+    tor->amount_done_bins(tabs, n_tabs);
 }
 
 // --- Start/Stop Callback
@@ -1932,41 +1932,6 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 }
 
 // ---
-
-bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    int err = 0;
-
-    if (index >= tor->piece_count())
-    {
-        err = 1;
-    }
-    else if (length < 1)
-    {
-        err = 2;
-    }
-    else if (offset + length > tor->piece_size(index))
-    {
-        err = 3;
-    }
-    else if (length > tr_block_info::BlockSize)
-    {
-        err = 4;
-    }
-    else if (tor->piece_loc(index, offset, length).byte > tor->total_size())
-    {
-        err = 5;
-    }
-
-    if (err != 0)
-    {
-        tr_logAddTraceTor(tor, fmt::format("index {} offset {} length {} err {}", index, offset, length, err));
-    }
-
-    return err == 0;
-}
 
 tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) const noexcept
 {
@@ -2358,15 +2323,13 @@ namespace rename_helpers
 {
 bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
-    if (std::empty(oldpath) || std::empty(newname) || newname == "."sv || newname == ".."sv ||
-        tr_strv_contains(newname, TR_PATH_DELIMITER))
+    if (std::empty(oldpath) || std::empty(newname) || newname == "."sv || newname == ".."sv || tr_strv_contains(newname, '/'))
     {
         return false;
     }
 
-    auto const newpath = tr_strv_contains(oldpath, TR_PATH_DELIMITER) ?
-        tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
-        tr_pathbuf{ newname };
+    auto const newpath = tr_strv_contains(oldpath, '/') ? tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
+                                                          tr_pathbuf{ newname };
 
     if (newpath == oldpath)
     {
@@ -2452,7 +2415,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
     auto const subpath = std::string_view{ tor->file_subpath(file_index) };
     auto const oldpath_len = std::size(oldpath);
 
-    if (!tr_strv_contains(oldpath, TR_PATH_DELIMITER))
+    if (!tr_strv_contains(oldpath, '/'))
     {
         if (oldpath_len >= std::size(subpath))
         {
@@ -2499,7 +2462,7 @@ void tr_torrent::rename_path_in_session_thread(
 {
     using namespace rename_helpers;
 
-    auto error = int{ 0 };
+    auto error = 0;
 
     if (!renameArgsAreValid(this, oldpath, newname))
     {

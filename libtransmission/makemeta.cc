@@ -165,7 +165,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
 
     auto hashes = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * piece_count());
     auto* walk = std::data(hashes);
-    auto sha = tr_sha1::create();
+    auto sha = tr_sha1{};
 
     auto file_index = tr_file_index_t{ 0U };
     auto piece_index = tr_piece_index_t{ 0U };
@@ -229,10 +229,10 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
 
         TR_ASSERT(bufptr - std::data(buf) == (int)piece_size);
         TR_ASSERT(left_in_piece == 0);
-        sha->add(std::data(buf), std::size(buf));
-        auto const digest = sha->finish();
+        sha.add(std::data(buf), std::size(buf));
+        auto const digest = sha.finish();
         walk = std::copy(std::begin(digest), std::end(digest), walk);
-        sha->clear();
+        sha.clear();
 
         total_remain -= piece_size;
         ++piece_index;

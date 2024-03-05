@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    std::string unix_socket_path_ = {};
+    std::string unix_socket_path_;
 };
 } // namespace
 
@@ -576,7 +576,7 @@ void handle_request(struct evhttp_request* req, void* arg)
     }
 }
 
-auto constexpr ServerStartRetryCount = int{ 10 };
+auto constexpr ServerStartRetryCount = 10;
 auto constexpr ServerStartRetryDelayIncrement = 5s;
 auto constexpr ServerStartRetryMaxDelay = 60s;
 
@@ -831,7 +831,7 @@ void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 
 // --- LIFECYCLE
 
-tr_rpc_server::tr_rpc_server(tr_session* session_in, Settings settings)
+tr_rpc_server::tr_rpc_server(tr_session* session_in, Settings&& settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
     , bind_address_{ std::make_unique<class tr_rpc_address>() }
@@ -840,7 +840,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, Settings settings)
     load(std::move(settings));
 }
 
-void tr_rpc_server::load(Settings settings)
+void tr_rpc_server::load(Settings&& settings)
 {
     settings_ = std::move(settings);
 

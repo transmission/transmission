@@ -166,27 +166,27 @@ enum LtepMessageIds : uint8_t
 namespace MetadataMsgType
 {
 
-auto constexpr Request = int{ 0 };
-auto constexpr Data = int{ 1 };
-auto constexpr Reject = int{ 2 };
+auto constexpr Request = 0;
+auto constexpr Data = 1;
+auto constexpr Reject = 2;
 
 } // namespace MetadataMsgType
 
-auto constexpr MinChokePeriodSec = int{ 10 };
+auto constexpr MinChokePeriodSec = 10;
 
 // idle seconds before we send a keepalive
-auto constexpr KeepaliveIntervalSecs = int{ 100 };
+auto constexpr KeepaliveIntervalSecs = 100;
 
-auto constexpr MetadataReqQ = int{ 64 };
+auto constexpr MetadataReqQ = 64;
 
-auto constexpr ReqQ = int{ 512 };
+auto constexpr ReqQ = 512;
 
 // used in lowering the outMessages queue period
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
 // meet our bandwidth goals for the next N seconds
-auto constexpr RequestBufSecs = int{ 10 };
+auto constexpr RequestBufSecs = 10;
 
 // ---
 
@@ -268,6 +268,39 @@ struct tr_incoming
 
     std::map<tr_block_index_t, incoming_piece_data> blocks;
 };
+
+[[nodiscard]] bool is_valid_request(tr_torrent const& tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
+{
+    int err = 0;
+
+    if (index >= tor.piece_count())
+    {
+        err = 1;
+    }
+    else if (length < 1)
+    {
+        err = 2;
+    }
+    else if (offset + length > tor.piece_size(index))
+    {
+        err = 3;
+    }
+    else if (length > tr_block_info::BlockSize)
+    {
+        err = 4;
+    }
+    else if (tor.piece_loc(index, offset, length).byte > tor.total_size())
+    {
+        err = 5;
+    }
+
+    if (err != 0)
+    {
+        tr_logAddTraceTor(&tor, fmt::format("index {} offset {} length {} err {}", index, offset, length, err));
+    }
+
+    return err == 0;
+}
 
 class tr_peerMsgsImpl;
 // TODO: make these to be member functions
@@ -486,7 +519,7 @@ public:
 
     [[nodiscard]] bool isValidRequest(peer_request const& req) const
     {
-        return tr_torrentReqIsValid(torrent, req.index, req.offset, req.length);
+        return is_valid_request(*torrent, req.index, req.offset, req.length);
     }
 
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
@@ -1255,7 +1288,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
         return false;
     }
 
-    if (!tr_torrentReqIsValid(msgs->torrent, req.index, req.offset, req.length))
+    if (!is_valid_request(*msgs->torrent, req.index, req.offset, req.length))
     {
         logtrace(msgs, "rejecting an invalid request.");
         return false;

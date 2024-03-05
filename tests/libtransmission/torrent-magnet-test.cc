@@ -27,7 +27,7 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     auto benc = std::string{
         "d8:announce31:http://www.example.com/announce10:created by25:Transmission/2.61 (13407)13:creation datei1358704075e8:encoding5:UTF-84:info"
     };
-    auto piece = int{ 0 };
+    auto piece = 0;
     auto info_dict_size = size_t{ 0U };
     for (;;)
     {

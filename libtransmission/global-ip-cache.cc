@@ -207,7 +207,7 @@ bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const&
 {
     if (type == addr.type && addr.is_global_unicast_address())
     {
-        auto const lock = std::lock_guard{ global_addr_mutex_[addr.type] };
+        auto const lock = std::scoped_lock{ global_addr_mutex_[addr.type] };
         global_addr_[addr.type] = addr;
         tr_logAddTrace(fmt::format("Cached global address {}", addr.display_name()));
         return true;
@@ -268,7 +268,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 
     auto const protocol = tr_ip_protocol_to_sv(type);
 
-    auto err = int{ 0 };
+    auto err = 0;
     auto const& source_addr = get_global_source_address(bind_addr(type), err);
     if (source_addr)
     {
@@ -339,21 +339,21 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
 
 void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
-    auto const lock = std::lock_guard{ global_addr_mutex_[type] };
+    auto const lock = std::scoped_lock{ global_addr_mutex_[type] };
     global_addr_[type].reset();
     tr_logAddTrace(fmt::format("Unset {} global address cache", tr_ip_protocol_to_sv(type)));
 }
 
 void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
 {
-    auto const lock = std::lock_guard{ source_addr_mutex_[addr.type] };
+    auto const lock = std::scoped_lock{ source_addr_mutex_[addr.type] };
     source_addr_[addr.type] = addr;
     tr_logAddTrace(fmt::format("Cached source address {}", addr.display_name()));
 }
 
 void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 {
-    auto const lock = std::lock_guard{ source_addr_mutex_[type] };
+    auto const lock = std::scoped_lock{ source_addr_mutex_[type] };
     source_addr_[type].reset();
     tr_logAddTrace(fmt::format("Unset {} source address cache", tr_ip_protocol_to_sv(type)));
 
