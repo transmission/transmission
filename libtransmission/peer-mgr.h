@@ -431,7 +431,7 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
-    static auto constexpr InactiveThresSecs = time_t{ 24 * 60 * 60 };
+    static auto constexpr InactiveThresSecs = time_t{ 60 * 60 };
 
     static auto inline n_known_connectable = size_t{};
 
