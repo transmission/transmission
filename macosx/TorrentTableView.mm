@@ -125,7 +125,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSIndexSet* fullIndexSet = [NSIndexSet indexSetWithIndexesInRange:fullRange];
         NSMutableIndexSet* visibleIndexSet = [[NSMutableIndexSet alloc] init];
 
-        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
+        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
             id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
             if ([rowView isGroupRowStyle])
             {
@@ -151,7 +151,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     //redraw fControlButton
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
-    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
         id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
         if (![rowView isGroupRowStyle])
         {
