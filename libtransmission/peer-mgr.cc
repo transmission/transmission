@@ -375,28 +375,6 @@ public:
         }
     }
 
-    void remove_inactive_peer_info() noexcept
-    {
-        auto const now = tr_time();
-
-        // N.B. Unlike `std::map`, erasing elements in `small::map` seems to invalidate
-        // iterators other than the one being erased. So make sure `std::end()` is called
-        // every iteration
-        for (auto iter = std::begin(connectable_pool); iter != std::end(connectable_pool);)
-        {
-            auto const& [socket_address, peer_info] = *iter;
-            if (peer_info->is_inactive(now))
-            {
-                --stats.known_peer_from_count[peer_info->from_first()];
-                iter = connectable_pool.erase(iter);
-            }
-            else
-            {
-                ++iter;
-            }
-        }
-    }
-
     [[nodiscard]] uint16_t count_active_webseeds(uint64_t now) const noexcept
     {
         if (!tor->is_running() || tor->is_done())
@@ -1254,7 +1232,6 @@ void tr_peerMgr::refill_upkeep() const
     for (auto* const tor : torrents_)
     {
         tor->swarm->cancel_old_requests();
-        tor->swarm->remove_inactive_peer_info();
     }
 }
 
