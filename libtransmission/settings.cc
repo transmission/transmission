@@ -80,7 +80,7 @@ auto constexpr EncryptionKeys = Lookup<tr_encryption_mode, 3U>{ {
 
 bool load_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
 {
-    constexpr auto const& Keys = EncryptionKeys;
+    static constexpr auto& Keys = EncryptionKeys;
 
     if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
     {
@@ -130,7 +130,7 @@ auto constexpr LogKeys = Lookup<tr_log_level, 7U>{ {
 
 bool load_log_level(tr_variant const& src, tr_log_level* tgt)
 {
-    static constexpr auto Keys = LogKeys;
+    static constexpr auto& Keys = LogKeys;
 
     if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
     {
@@ -241,7 +241,7 @@ auto constexpr PreallocationKeys = Lookup<tr_open_files::Preallocation, 5U>{ {
 
 bool load_preallocation_mode(tr_variant const& src, tr_open_files::Preallocation* tgt)
 {
-    static constexpr auto Keys = PreallocationKeys;
+    static constexpr auto& Keys = PreallocationKeys;
 
     if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
     {
@@ -286,7 +286,7 @@ auto constexpr PreferredTransportKeys = Lookup<tr_preferred_transport, TR_NUM_PR
 
 bool load_preferred_transport(tr_variant const& src, tr_preferred_transport* tgt)
 {
-    static constexpr auto Keys = PreferredTransportKeys;
+    static constexpr auto& Keys = PreferredTransportKeys;
 
     if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
     {
