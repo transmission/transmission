@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.6.0'
+$global:Qt6Version = '6.6.2'
 
 $global:Qt6Deps = @(
     'DBus'
@@ -91,6 +91,8 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-nomake'; 'tests'
         '-I'; (Join-Path $DepsPrefixDir include).Replace('\', '/')
         '-L'; (Join-Path $DepsPrefixDir lib).Replace('\', '/')
+        '--'
+        "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
     )
 
     if ($env:LDFLAGS) {

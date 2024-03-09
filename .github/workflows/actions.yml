@@ -89,8 +89,8 @@ jobs:
         run: |
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
-          sudo apt-get install -y clang-format-15 npm
+          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
+          sudo apt-get install -y clang-format-17 npm
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -429,7 +429,7 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DCMAKE_INSTALL_PREFIX=pfx `
-            -DCMAKE_PREFIX_PATH="${Env:DepsPrefix}" `
+            -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_GTK=OFF `

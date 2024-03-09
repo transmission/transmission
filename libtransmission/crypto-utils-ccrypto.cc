@@ -93,101 +93,72 @@ bool check_ccrypto_result(CCCryptorStatus result, char const* file, long line)
 
 } // namespace
 
-// ---
+// --- sha1
 
-namespace
+tr_sha1::tr_sha1()
 {
-
-class Sha1Impl final : public tr_sha1
-{
-public:
-    Sha1Impl()
-    {
-        clear();
-    }
-
-    ~Sha1Impl() override = default;
-
-    void clear() override
-    {
-        CC_SHA1_Init(&handle_);
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        static auto constexpr Max = static_cast<size_t>(std::numeric_limits<CC_LONG>::max());
-        auto const* sha_data = static_cast<uint8_t const*>(data);
-        while (data_length > 0)
-        {
-            auto const n_bytes = static_cast<CC_LONG>(std::min(data_length, Max));
-            CC_SHA1_Update(&handle_, sha_data, n_bytes);
-            data_length -= n_bytes;
-            sha_data += n_bytes;
-        }
-    }
-
-    [[nodiscard]] tr_sha1_digest_t finish() override
-    {
-        auto digest = tr_sha1_digest_t{};
-        CC_SHA1_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
-        clear();
-        return digest;
-    }
-
-private:
-    CC_SHA1_CTX handle_ = {};
-};
-
-class Sha256Impl final : public tr_sha256
-{
-public:
-    Sha256Impl()
-    {
-        clear();
-    }
-
-    ~Sha256Impl() override = default;
-
-    void clear() override
-    {
-        CC_SHA256_Init(&handle_);
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        static auto constexpr Max = static_cast<size_t>(std::numeric_limits<CC_LONG>::max());
-        auto const* sha_data = static_cast<uint8_t const*>(data);
-        while (data_length > 0)
-        {
-            auto const n_bytes = static_cast<CC_LONG>(std::min(data_length, Max));
-            CC_SHA256_Update(&handle_, sha_data, n_bytes);
-            data_length -= n_bytes;
-            sha_data += n_bytes;
-        }
-    }
-
-    [[nodiscard]] tr_sha256_digest_t finish() override
-    {
-        auto digest = tr_sha256_digest_t{};
-        CC_SHA256_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
-        clear();
-        return digest;
-    }
-
-private:
-    CC_SHA256_CTX handle_;
-};
-
-} // namespace
-
-std::unique_ptr<tr_sha1> tr_sha1::create()
-{
-    return std::make_unique<Sha1Impl>();
+    clear();
 }
 
-std::unique_ptr<tr_sha256> tr_sha256::create()
+tr_sha1::~tr_sha1()
 {
-    return std::make_unique<Sha256Impl>();
+}
+
+void tr_sha1::clear()
+{
+    CC_SHA1_Init(&handle_);
+}
+
+void tr_sha1::add(void const* data, size_t data_length)
+{
+    if (data_length == 0U)
+    {
+        return;
+    }
+
+    CC_SHA1_Update(&handle_, data, data_length);
+}
+
+tr_sha1_digest_t tr_sha1::finish()
+{
+    auto digest = tr_sha1_digest_t{};
+    CC_SHA1_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
+    clear();
+    return digest;
+}
+
+// --- sha256
+
+tr_sha256::tr_sha256()
+{
+    clear();
+}
+
+tr_sha256::~tr_sha256()
+{
+}
+
+void tr_sha256::clear()
+{
+    CC_SHA256_Init(&handle_);
+}
+
+void tr_sha256::add(void const* data, size_t data_length)
+{
+    if (data_length == 0U)
+    {
+        return;
+    }
+
+    CC_SHA256_Update(&handle_, data, data_length);
+}
+
+tr_sha256_digest_t tr_sha256::finish()
+{
+    auto digest = tr_sha256_digest_t{};
+    CC_SHA256_Final(reinterpret_cast<unsigned char*>(std::data(digest)), &handle_);
+    clear();
+    return digest;
 }
 
 // ---

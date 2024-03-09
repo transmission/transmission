@@ -15,7 +15,6 @@ target_sources(libtransmission-test
         clients-test.cc
         completion-test.cc
         copy-test.cc
-        crypto-test-ref.h
         crypto-test.cc
         error-test.cc
         dht-test.cc
