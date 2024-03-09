@@ -46,9 +46,8 @@ protected:
         save_.insert_or_assign(key, [save](void const* src) { return save(*static_cast<T const*>(src)); });
     }
 
-    class Field
+    struct Field
     {
-    public:
         template<typename T>
         Field(tr_quark key_in, T* ptr_in)
             : key{ key_in }
@@ -56,9 +55,6 @@ protected:
             , ptr{ ptr_in }
         {
         }
-
-    private:
-        friend Settings;
 
         tr_quark key;
         std::type_info const& type;
