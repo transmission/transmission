@@ -180,9 +180,9 @@ public:
     tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
-    tr_variant(Val value)
+    tr_variant(Val&& value)
     {
-        *this = std::move(value);
+        *this = std::forward<Val>(value);
     }
 
     [[nodiscard]] static auto make_map(size_t const n_reserve = 0U) noexcept
