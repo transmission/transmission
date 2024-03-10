@@ -787,8 +787,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     }
     else
     {
-        auto const lastfileName = @(tr_torrentFile(self.fHandle, 0).name);
-        return [self.currentDirectory stringByAppendingPathComponent:lastfileName];
+        auto const lastFileName = @(tr_torrentFile(self.fHandle, 0).name);
+        return [self.currentDirectory stringByAppendingPathComponent:lastFileName];
     }
 }
 

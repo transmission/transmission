@@ -67,12 +67,12 @@
     self.fDataLocationField.stringValue = location ? location.stringByAbbreviatingWithTildeInPath : @"";
     self.fDataLocationField.toolTip = location ? location : @"";
 
-    self.fLastDataLabel.hidden = !!location;
-    self.fLastDataLocationField.hidden = !!location;
-    self.fLastDataLocationField.stringValue = !location ? lastKnownDataLocation.stringByAbbreviatingWithTildeInPath : @"";
-    self.fLastDataLocationField.toolTip = !location ? lastKnownDataLocation : @"";
+    self.fLastDataLabel.hidden = location ? YES : NO;
+    self.fLastDataLocationField.hidden = location ? YES : NO;
+    self.fLastDataLocationField.stringValue = location ? @"" : lastKnownDataLocation.stringByAbbreviatingWithTildeInPath;
+    self.fLastDataLocationField.toolTip = location ? @"" : lastKnownDataLocation;
 
-    self.fRevealDataButton.hidden = !location;
+    self.fRevealDataButton.hidden = location ? NO : YES;
 }
 
 - (void)revealDataFile:(id)sender
