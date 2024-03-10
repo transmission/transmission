@@ -525,6 +525,6 @@ tr_variant Settings::save() const
         std::visit(SaveVisitor{ map, key }, prop_vptr);
     }
 
-    return map;
+    return std::move(map);
 }
 } // namespace libtransmission
