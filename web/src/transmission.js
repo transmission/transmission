@@ -170,6 +170,12 @@ export class Transmission extends EventTarget {
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
           break;
+        case 'enable-sequential-downloading':
+          this._enableSequentialDownload(this.getSelectedTorrents());
+          break;
+        case 'disable-sequential-downloading':
+          this._disableSequentialDownload(this.getSelectedTorrents());
+          break;
         case 'trash-selected-torrents':
           this._removeSelectedTorrents(true);
           break;
@@ -851,6 +857,14 @@ TODO: fix this when notifications get fixed
       force,
       this.refreshTorrents,
       this,
+    );
+  }
+  _enableSequentialDownload(torrents) {
+    this.remote.enableSequentialDownload(Transmission._getTorrentIds(torrents));
+  }
+  _disableSequentialDownload(torrents) {
+    this.remote.disableSequentialDownload(
+      Transmission._getTorrentIds(torrents),
     );
   }
   _verifyTorrents(torrents) {
