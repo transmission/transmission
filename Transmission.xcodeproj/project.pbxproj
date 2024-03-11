@@ -2909,6 +2909,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
