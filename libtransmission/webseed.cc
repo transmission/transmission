@@ -60,6 +60,7 @@ public:
         , end_byte{ tor->block_loc(blocks.end - 1).byte + tor->block_size(blocks.end - 1) }
         , loc{ tor->block_loc(blocks.begin) }
     {
+        evbuffer_add_cb(content_.get(), onBufferGotData, this);
     }
 
     tr_webseed* const webseed;
@@ -72,6 +73,7 @@ public:
     void request_next_chunk();
 
     static void onPartialDataFetched(tr_web::FetchResponse const& web_response);
+    static void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
 
     tr_session* const session;
     tr_block_span_t const blocks;
@@ -163,8 +165,6 @@ private:
     size_t n_consecutive_failures = 0;
     time_t paused_until = 0;
 };
-
-void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
 
 class tr_webseed final : public tr_peer
 {
@@ -272,7 +272,6 @@ public:
         for (auto const *span = block_spans, *end = span + n_spans; span != end; ++span)
         {
             auto* const task = new tr_webseed_task{ tor, this, *span };
-            evbuffer_add_cb(task->content(), onBufferGotData, task);
             tasks.insert(task);
             task->request_next_chunk();
 
@@ -427,7 +426,7 @@ void useFetchedBlocks(tr_webseed_task* task)
 
 // ---
 
-void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask)
+void tr_webseed_task::onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask)
 {
     size_t const n_added = info->n_added;
     auto* const task = static_cast<tr_webseed_task*>(vtask);
