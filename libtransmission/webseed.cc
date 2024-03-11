@@ -98,37 +98,37 @@ private:
 class ConnectionLimiter
 {
 public:
-    constexpr void taskStarted() noexcept
+    constexpr void task_started() noexcept
     {
         ++n_tasks;
     }
 
-    void taskFinished(bool success)
+    void task_finished(bool success)
     {
         if (!success)
         {
-            taskFailed();
+            task_failed();
         }
 
         TR_ASSERT(n_tasks > 0);
         --n_tasks;
     }
 
-    constexpr void gotData() noexcept
+    constexpr void got_data() noexcept
     {
         TR_ASSERT(n_tasks > 0);
         n_consecutive_failures = 0;
         paused_until = 0;
     }
 
-    [[nodiscard]] size_t slotsAvailable() const noexcept
+    [[nodiscard]] size_t slots_available() const noexcept
     {
-        if (isPaused())
+        if (is_paused())
         {
             return 0;
         }
 
-        auto const max = maxConnections();
+        auto const max = max_connections();
         if (n_tasks >= max)
         {
             return 0;
@@ -138,17 +138,17 @@ public:
     }
 
 private:
-    [[nodiscard]] bool isPaused() const noexcept
+    [[nodiscard]] bool is_paused() const noexcept
     {
         return paused_until > tr_time();
     }
 
-    [[nodiscard]] constexpr size_t maxConnections() const noexcept
+    [[nodiscard]] constexpr size_t max_connections() const noexcept
     {
         return n_consecutive_failures > 0 ? 1 : MaxConnections;
     }
 
-    void taskFailed()
+    void task_failed()
     {
         TR_ASSERT(n_tasks > 0);
 
@@ -245,7 +245,7 @@ public:
     {
         bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, true, tr_time_msec());
         publish(tr_peer_event::GotPieceData(n_bytes));
-        connection_limiter.gotData();
+        connection_limiter.got_data();
     }
 
     void publishRejection(tr_block_span_t block_span)
@@ -294,7 +294,7 @@ public:
 
     [[nodiscard]] RequestLimit max_available_reqs() const noexcept
     {
-        auto const n_slots = connection_limiter.slotsAvailable();
+        auto const n_slots = connection_limiter.slots_available();
         if (n_slots == 0)
         {
             return {};
@@ -410,7 +410,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
     }
 
     auto* const webseed = task->webseed_;
-    webseed->connection_limiter.taskFinished(success);
+    webseed->connection_limiter.task_finished(success);
 
     if (!success)
     {
@@ -464,7 +464,7 @@ void tr_webseed_task::request_next_chunk()
     auto const this_chunk = std::min(left_in_file, left_in_task);
     TR_ASSERT(this_chunk > 0U);
 
-    webseed_->connection_limiter.taskStarted();
+    webseed_->connection_limiter.task_started();
 
     auto url = tr_urlbuf{};
     makeUrl(webseed_, tor.file_subpath(file_index), std::back_inserter(url));
