@@ -347,45 +347,6 @@ private:
 
 // ---
 
-struct write_block_data
-{
-private:
-    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
-
-public:
-    write_block_data(
-        tr_session* session,
-        tr_torrent_id_t tor_id,
-        tr_block_index_t block,
-        std::unique_ptr<Cache::BlockData> data,
-        tr_webseed* webseed)
-        : session_{ session }
-        , tor_id_{ tor_id }
-        , block_{ block }
-        , data_{ std::move(data) }
-        , webseed_{ webseed }
-    {
-    }
-
-    void write_block_func()
-    {
-        if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
-        {
-            session_->cache->write_block(tor_id_, block_, std::move(data_));
-            webseed_->publish(tr_peer_event::GotBlock(tor->block_info(), block_));
-        }
-
-        delete this;
-    }
-
-private:
-    tr_session* const session_;
-    tr_torrent_id_t const tor_id_;
-    tr_block_index_t const block_;
-    std::unique_ptr<Cache::BlockData> data_;
-    tr_webseed* const webseed_;
-};
-
 void tr_webseed_task::use_fetched_blocks()
 {
     auto const lock = session_->unique_lock();
@@ -410,10 +371,18 @@ void tr_webseed_task::use_fetched_blocks()
         }
         else
         {
-            auto block_buf = std::make_unique<Cache::BlockData>(block_size);
+            auto block_buf = new Cache::BlockData(block_size);
             evbuffer_remove(buf, std::data(*block_buf), std::size(*block_buf));
-            auto* const data = new write_block_data{ session_, tor->id(), loc_.block, std::move(block_buf), webseed_ };
-            session_->run_in_session_thread(&write_block_data::write_block_func, data);
+            session_->run_in_session_thread(
+                [session = session_, tor_id = tor->id(), block = loc_.block, block_buf, webseed = webseed_]()
+                {
+                    auto data = std::unique_ptr<Cache::BlockData>{ block_buf };
+                    if (auto const* const tor = tr_torrentFindFromId(session, tor_id); tor != nullptr)
+                    {
+                        session->cache->write_block(tor_id, block, std::move(data));
+                        webseed->publish(tr_peer_event::GotBlock(tor->block_info(), block));
+                    }
+                });
         }
 
         loc_ = tor->byte_loc(loc_.byte + block_size);
