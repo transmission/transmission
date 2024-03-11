@@ -8,6 +8,17 @@ import { Torrent } from './torrent.js';
 import { setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
+  createIcon: (torrent) => {
+    const icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.dataset.iconMimeType = torrent
+      .getPrimaryMimeType()
+      .split('/', 1)
+      .pop();
+    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    return icon;
+  },
+
   formatDL: (t) => {
     return `▼ ${Formatter.speedBps(t.getDownloadSpeed())}`;
   },
@@ -254,13 +265,7 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    const icon = TorrentRendererHelper.createIcon(torrent);
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
@@ -358,13 +363,7 @@ export class TorrentRendererCompact {
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'compact');
 
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    const icon = TorrentRendererHelper.createIcon(torrent);
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';
