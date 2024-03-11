@@ -70,6 +70,7 @@ public:
         return content_.get();
     }
 
+    void useFetchedBlocks();
     void request_next_chunk();
 
     static void onPartialDataFetched(tr_web::FetchResponse const& web_response);
@@ -385,27 +386,25 @@ private:
     tr_webseed* const webseed_;
 };
 
-void useFetchedBlocks(tr_webseed_task* task)
+void tr_webseed_task::useFetchedBlocks()
 {
-    auto* const session = task->session;
     auto const lock = session->unique_lock();
 
-    auto* const webseed = task->webseed;
     auto const* const tor = webseed->getTorrent();
     if (tor == nullptr)
     {
         return;
     }
 
-    for (auto* const buf = task->content();;)
+    for (auto* const buf = content();;)
     {
-        auto const block_size = tor->block_size(task->loc.block);
+        auto const block_size = tor->block_size(loc.block);
         if (evbuffer_get_length(buf) < block_size)
         {
             break;
         }
 
-        if (tor->has_block(task->loc.block))
+        if (tor->has_block(loc.block))
         {
             evbuffer_drain(buf, block_size);
         }
@@ -413,14 +412,14 @@ void useFetchedBlocks(tr_webseed_task* task)
         {
             auto block_buf = std::make_unique<Cache::BlockData>(block_size);
             evbuffer_remove(buf, std::data(*block_buf), std::size(*block_buf));
-            auto* const data = new write_block_data{ session, tor->id(), task->loc.block, std::move(block_buf), webseed };
+            auto* const data = new write_block_data{ session, tor->id(), loc.block, std::move(block_buf), webseed };
             session->run_in_session_thread(&write_block_data::write_block_func, data);
         }
 
-        task->loc = tor->byte_loc(task->loc.byte + block_size);
+        loc = tor->byte_loc(loc.byte + block_size);
 
-        TR_ASSERT(task->loc.byte <= task->end_byte);
-        TR_ASSERT(task->loc.byte == task->end_byte || task->loc.block_offset == 0);
+        TR_ASSERT(loc.byte <= end_byte);
+        TR_ASSERT(loc.byte == end_byte || loc.block_offset == 0);
     }
 }
 
@@ -468,7 +467,7 @@ void tr_webseed_task::onPartialDataFetched(tr_web::FetchResponse const& web_resp
         return;
     }
 
-    useFetchedBlocks(task);
+    task->useFetchedBlocks();
 
     if (task->loc.byte < task->end_byte)
     {
