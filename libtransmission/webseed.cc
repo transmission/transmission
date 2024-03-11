@@ -47,8 +47,6 @@ namespace
 {
 class tr_webseed;
 
-void on_idle(tr_webseed* w);
-
 class tr_webseed_task
 {
 private:
@@ -184,7 +182,7 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
+        , idle_timer_{ session->timerMaker().create([this]() { on_idle(); }) }
         , have_{ tor.piece_count() }
         , bandwidth_{ &tor.bandwidth() }
     {
@@ -277,6 +275,25 @@ public:
 
             tr_peerMgrClientSentRequests(tor, this, *span);
         }
+    }
+
+    void on_idle()
+    {
+        auto const [max_spans, max_blocks] = max_available_reqs();
+        if (max_spans == 0 || max_blocks == 0)
+        {
+            return;
+        }
+
+        // Prefer to request large, contiguous chunks from webseeds.
+        // The actual value of '64' is arbitrary here; we could probably
+        // be smarter about this.
+        auto spans = tr_peerMgrGetNextRequests(getTorrent(), this, max_blocks);
+        if (std::size(spans) > max_spans)
+        {
+            spans.resize(max_spans);
+        }
+        request_blocks(std::data(spans), std::size(spans));
     }
 
     [[nodiscard]] RequestLimit max_available_reqs() const noexcept
@@ -420,25 +437,6 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
     task->webseed->gotPieceData(n_added);
 }
 
-void on_idle(tr_webseed* webseed)
-{
-    auto const [max_spans, max_blocks] = webseed->max_available_reqs();
-    if (max_spans == 0 || max_blocks == 0)
-    {
-        return;
-    }
-
-    // Prefer to request large, contiguous chunks from webseeds.
-    // The actual value of '64' is arbitrary here; we could probably
-    // be smarter about this.
-    auto spans = tr_peerMgrGetNextRequests(webseed->getTorrent(), webseed, max_blocks);
-    if (std::size(spans) > max_spans)
-    {
-        spans.resize(max_spans);
-    }
-    webseed->request_blocks(std::data(spans), std::size(spans));
-}
-
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, primary_ip, did_connect, did_timeout, vtask] = web_response;
@@ -484,7 +482,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
     webseed->tasks.erase(task);
     delete task;
 
-    on_idle(webseed);
+    webseed->on_idle();
 }
 
 template<typename OutputIt>
