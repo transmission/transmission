@@ -69,6 +69,8 @@ public:
         return content_.get();
     }
 
+    void request_next_chunk();
+
     tr_session* const session;
     tr_block_span_t const blocks;
     uint64_t const end_byte;
@@ -160,7 +162,6 @@ private:
     time_t paused_until = 0;
 };
 
-void task_request_next_chunk(tr_webseed_task* task);
 void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
 
 class tr_webseed final : public tr_peer
@@ -271,7 +272,7 @@ public:
             auto* const task = new tr_webseed_task{ tor, this, *span };
             evbuffer_add_cb(task->content(), onBufferGotData, task);
             tasks.insert(task);
-            task_request_next_chunk(task);
+            task->request_next_chunk();
 
             tr_peerMgrClientSentRequests(tor, this, *span);
         }
@@ -473,7 +474,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         // Request finished successfully but there's still data missing.
         // That means we've reached the end of a file and need to request
         // the next one
-        task_request_next_chunk(task);
+        task->request_next_chunk();
         return;
     }
 
@@ -498,20 +499,19 @@ void makeUrl(tr_webseed const* const webseed, std::string_view name, OutputIt ou
     }
 }
 
-void task_request_next_chunk(tr_webseed_task* task)
+void tr_webseed_task::request_next_chunk()
 {
-    auto* const webseed = task->webseed;
     auto const* const tor = webseed->getTorrent();
     if (tor == nullptr)
     {
         return;
     }
 
-    auto const loc = tor->byte_loc(task->loc.byte + evbuffer_get_length(task->content()));
+    auto const downloaded_loc = tor->byte_loc(loc.byte + evbuffer_get_length(content()));
 
-    auto const [file_index, file_offset] = tor->file_offset(loc);
+    auto const [file_index, file_offset] = tor->file_offset(downloaded_loc);
     auto const left_in_file = tor->file_size(file_index) - file_offset;
-    auto const left_in_task = task->end_byte - loc.byte;
+    auto const left_in_task = end_byte - downloaded_loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);
     TR_ASSERT(this_chunk > 0U);
 
@@ -519,10 +519,10 @@ void task_request_next_chunk(tr_webseed_task* task)
 
     auto url = tr_urlbuf{};
     makeUrl(webseed, tor->file_subpath(file_index), std::back_inserter(url));
-    auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
+    auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, this };
     options.range = fmt::format("{:d}-{:d}", file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->id();
-    options.buffer = task->content();
+    options.buffer = content();
     tor->session->fetch(std::move(options));
 }
 
