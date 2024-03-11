@@ -599,7 +599,7 @@ jobs:
         run: |
           brew install cmake gettext ninja node pkg-config
       - name: Get Source
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: source-tarball
       - name: Extract Source
@@ -641,7 +641,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
