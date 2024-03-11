@@ -71,6 +71,8 @@ public:
 
     void request_next_chunk();
 
+    static void onPartialDataFetched(tr_web::FetchResponse const& web_response);
+
     tr_session* const session;
     tr_block_span_t const blocks;
     uint64_t const end_byte;
@@ -438,7 +440,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
     task->webseed->gotPieceData(n_added);
 }
 
-void onPartialDataFetched(tr_web::FetchResponse const& web_response)
+void tr_webseed_task::onPartialDataFetched(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, primary_ip, did_connect, did_timeout, vtask] = web_response;
     auto const success = status == 206;
