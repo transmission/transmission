@@ -153,9 +153,9 @@ private:
         }
     }
 
-    static time_t constexpr TimeoutIntervalSecs = 120;
-    static size_t constexpr MaxConnections = 4;
-    static size_t constexpr MaxConsecutiveFailures = MaxConnections;
+    static auto constexpr TimeoutIntervalSecs = time_t{ 120 };
+    static auto constexpr MaxConnections = size_t{ 4 };
+    static auto constexpr MaxConsecutiveFailures = MaxConnections;
 
     size_t n_tasks = 0;
     size_t n_consecutive_failures = 0;
@@ -231,7 +231,7 @@ public:
 
     [[nodiscard]] std::string display_name() const override
     {
-        if (auto const parsed = tr_urlParse(base_url); parsed)
+        if (auto const parsed = tr_urlParse(base_url))
         {
             return fmt::format("{:s}:{:d}", parsed->host, parsed->port);
         }
@@ -378,8 +378,7 @@ void useFetchedBlocks(tr_webseed_task* task)
         return;
     }
 
-    auto* const buf = task->content();
-    for (;;)
+    for (auto* const buf = task->content();;)
     {
         auto const block_size = tor->block_size(task->loc.block);
         if (evbuffer_get_length(buf) < block_size)
@@ -394,7 +393,7 @@ void useFetchedBlocks(tr_webseed_task* task)
         else
         {
             auto block_buf = std::make_unique<Cache::BlockData>(block_size);
-            evbuffer_remove(task->content(), std::data(*block_buf), std::size(*block_buf));
+            evbuffer_remove(buf, std::data(*block_buf), std::size(*block_buf));
             auto* const data = new write_block_data{ session, tor->id(), task->loc.block, std::move(block_buf), webseed };
             session->run_in_session_thread(&write_block_data::write_block_func, data);
         }
@@ -443,7 +442,7 @@ void on_idle(tr_webseed* webseed)
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, primary_ip, did_connect, did_timeout, vtask] = web_response;
-    bool const success = status == 206;
+    auto const success = status == 206;
 
     auto* const task = static_cast<tr_webseed_task*>(vtask);
 
