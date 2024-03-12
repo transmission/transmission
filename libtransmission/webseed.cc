@@ -184,11 +184,11 @@ public:
         : tr_peer{ tor_in }
         , tor{ tor_in }
         , base_url{ url }
-        , callback{ callback_in }
-        , callback_data{ callback_data_in }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(); }) }
         , have_{ tor_in.piece_count() }
         , bandwidth_{ &tor_in.bandwidth() }
+        , callback_{ callback_in }
+        , callback_data_{ callback_data_in }
     {
         have_.set_has_all();
         idle_timer_->start_repeating(IdleTimerInterval);
@@ -314,16 +314,14 @@ public:
 
     void publish(tr_peer_event const& peer_event)
     {
-        if (callback != nullptr)
+        if (callback_ != nullptr)
         {
-            (*callback)(this, peer_event, callback_data);
+            (*callback_)(this, peer_event, callback_data_);
         }
     }
 
     tr_torrent& tor;
     std::string const base_url;
-    tr_peer_callback_webseed const callback;
-    void* const callback_data;
 
     ConnectionLimiter connection_limiter;
     std::set<tr_webseed_task*> tasks;
@@ -336,6 +334,9 @@ private:
     tr_bitfield have_;
 
     tr_bandwidth bandwidth_;
+
+    tr_peer_callback_webseed const callback_;
+    void* const callback_data_;
 };
 
 // ---
