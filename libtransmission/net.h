@@ -144,7 +144,7 @@ private:
 
 enum tr_address_type : uint8_t
 {
-    TR_AF_INET,
+    TR_AF_INET = 0,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
 };

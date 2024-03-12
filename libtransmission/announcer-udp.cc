@@ -6,7 +6,6 @@
 #include <algorithm> // for std::find_if()
 #include <array>
 #include <chrono> // operator""ms, literals
-#include <climits> // CHAR_BIT
 #include <cstddef> // std::byte
 #include <cstdint> // uint32_t, uint64_t
 #include <cstring> // memcpy()
@@ -55,7 +54,7 @@ namespace
 {
 using namespace std::literals;
 
-// size defined by bep15
+// size defined by https://www.bittorrent.org/beps/bep_0015.html
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
@@ -69,7 +68,8 @@ auto tau_transaction_new()
     return tr_rand_obj<tau_transaction_t>();
 }
 
-// used in the "action" field of a request. Values defined in bep 15.
+// used in the "action" field of a request.
+// Values defined in https://www.bittorrent.org/beps/bep_0015.html
 enum tau_action_t : uint8_t
 {
     TAU_ACTION_CONNECT = 0,
@@ -85,11 +85,11 @@ struct tau_scrape_request
     tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func on_response)
         : on_response_{ std::move(on_response) }
     {
-        this->response.scrape_url = in.scrape_url;
-        this->response.row_count = in.info_hash_count;
-        for (int i = 0; i < this->response.row_count; ++i)
+        response.scrape_url = in.scrape_url;
+        response.row_count = in.info_hash_count;
+        for (int i = 0; i < response.row_count; ++i)
         {
-            this->response.rows[i].info_hash = in.info_hash[i];
+            response.rows[i].info_hash = in.info_hash[i];
         }
 
         // build the payload
@@ -100,7 +100,7 @@ struct tau_scrape_request
         {
             buf.add(in.info_hash[i]);
         }
-        this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
+        payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
     [[nodiscard]] auto has_callback() const noexcept
@@ -150,7 +150,7 @@ struct tau_scrape_request
 
     [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
-        return created_at_ + TR_SCRAPE_TIMEOUT_SEC.count();
+        return created_at_ + ScrapeTimeoutSec.count();
     }
 
     std::vector<std::byte> payload;
@@ -177,7 +177,7 @@ struct tau_announce_request
         : on_response_{ std::move(on_response) }
     {
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
-        static_assert(sizeof(tr_announce_request::key) * CHAR_BIT == 32);
+        static_assert(sizeof(tr_announce_request::key) == sizeof(uint32_t));
 
         response.info_hash = in.info_hash;
 
@@ -193,6 +193,7 @@ struct tau_announce_request
         buf.add_uint32(get_tau_announce_event(in.event));
         if (announce_ip && announce_ip->is_ipv4())
         {
+            // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
             buf.add_address(*announce_ip);
         }
         else
@@ -214,24 +215,24 @@ struct tau_announce_request
     {
         if (on_response_)
         {
-            on_response_(this->response);
+            on_response_(response);
         }
     }
 
     void fail(bool did_connect, bool did_timeout, std::string_view errmsg)
     {
-        this->response.did_connect = did_connect;
-        this->response.did_timeout = did_timeout;
-        this->response.errmsg = errmsg;
-        this->requestFinished();
+        response.did_connect = did_connect;
+        response.did_timeout = did_timeout;
+        response.errmsg = errmsg;
+        requestFinished();
     }
 
     void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
-        this->response.did_connect = true;
-        this->response.did_timeout = false;
+        response.did_connect = true;
+        response.did_timeout = false;
 
         if (action == TAU_ACTION_ANNOUNCE && buflen >= 3 * sizeof(uint32_t))
         {
@@ -251,13 +252,13 @@ struct tau_announce_request
 
     [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
-        return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
+        return created_at_ + AnnounceTimeoutSec.count();
     }
 
     enum tau_announce_event : uint8_t
     {
+        // https://www.bittorrent.org/beps/bep_0015.html
         // Used in the "event" field of an announce request.
-        // These values come from BEP 15
         TAU_ANNOUNCE_EVENT_NONE = 0,
         TAU_ANNOUNCE_EVENT_COMPLETED = 1,
         TAU_ANNOUNCE_EVENT_STARTED = 2,
@@ -301,13 +302,9 @@ struct tau_tracker
 {
     using Mediator = tr_announcer_udp::Mediator;
 
-    tau_tracker(
-        Mediator& mediator,
-        std::string_view const interned_authority,
-        std::string_view const interned_host,
-        tr_port const port_in)
-        : authority{ interned_authority }
-        , host{ interned_host }
+    tau_tracker(Mediator& mediator, std::string_view const authority_in, std::string_view const host_in, tr_port const port_in)
+        : authority{ authority_in }
+        , host{ host_in }
         , port{ port_in }
         , mediator_{ mediator }
     {
@@ -327,23 +324,23 @@ struct tau_tracker
 
     void on_connection_response(tau_action_t action, InBuf& buf)
     {
-        this->connecting_at = 0;
-        this->connection_transaction_id = 0;
+        connecting_at = 0;
+        connection_transaction_id = 0;
 
         if (action == TAU_ACTION_CONNECT)
         {
-            this->connection_id = buf.to_uint64();
-            this->connection_expiration_time = tr_time() + TauConnectionTtlSecs;
-            logdbg(log_name(), fmt::format("Got a new connection ID from tracker: {}", this->connection_id));
+            connection_id = buf.to_uint64();
+            connection_expiration_time = tr_time() + TauConnectionTtlSecs;
+            logdbg(log_name(), fmt::format("Got a new connection ID from tracker: {}", connection_id));
         }
         else if (action == TAU_ACTION_ERROR)
         {
             std::string errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
-            this->failAll(true, false, errmsg);
+            failAll(true, false, errmsg);
             logdbg(log_name(), std::move(errmsg));
         }
 
-        this->upkeep();
+        upkeep();
     }
 
     void upkeep(bool timeout_reqs = true)
@@ -359,7 +356,7 @@ struct tau_tracker
         }
 
         // are there any requests pending?
-        if (this->is_idle())
+        if (is_idle())
         {
             return;
         }
@@ -368,7 +365,7 @@ struct tau_tracker
         if (!addr_pending_dns_ && addr_expires_at_ <= now)
         {
             addr_.reset();
-            addr_pending_dns_ = std::async(std::launch::async, lookup, this->log_name(), this->host, this->port);
+            addr_pending_dns_ = std::async(std::launch::async, lookup, log_name(), host, port);
             return;
         }
 
@@ -377,23 +374,23 @@ struct tau_tracker
             fmt::format(
                 "connected {} ({} {}) -- connecting_at {}",
                 is_connected(now),
-                this->connection_expiration_time,
+                connection_expiration_time,
                 now,
-                this->connecting_at));
+                connecting_at));
 
-        /* also need a valid connection ID... */
-        if (addr_ && !is_connected(now) && this->connecting_at == 0)
+        // also need a valid connection ID...
+        if (addr_ && !is_connected(now) && connecting_at == 0)
         {
-            this->connecting_at = now;
-            this->connection_transaction_id = tau_transaction_new();
-            logtrace(log_name(), fmt::format("Trying to connect. Transaction ID is {}", this->connection_transaction_id));
+            connecting_at = now;
+            connection_transaction_id = tau_transaction_new();
+            logtrace(log_name(), fmt::format("Trying to connect. Transaction ID is {}", connection_transaction_id));
 
             auto buf = PayloadBuffer{};
             buf.add_uint64(0x41727101980LL);
             buf.add_uint32(TAU_ACTION_CONNECT);
-            buf.add_uint32(this->connection_transaction_id);
+            buf.add_uint32(connection_transaction_id);
 
-            this->sendto(std::data(buf), std::size(buf));
+            sendto(std::data(buf), std::size(buf));
         }
 
         if (timeout_reqs)
@@ -421,10 +418,7 @@ private:
         return connection_id != tau_connection_t{} && now < connection_expiration_time;
     }
 
-    [[nodiscard]] static MaybeSockaddr lookup(
-        std::string_view const interned_log_name,
-        std::string_view const interned_host,
-        tr_port const port)
+    [[nodiscard]] static MaybeSockaddr lookup(std::string_view const log_name, std::string_view const host, tr_port const port)
     {
         auto szport = std::array<char, 16>{};
         *fmt::format_to(std::data(szport), "{:d}", port.host()) = '\0';
@@ -435,14 +429,14 @@ private:
         hints.ai_socktype = SOCK_DGRAM;
 
         addrinfo* info = nullptr;
-        auto const szhost = tr_pathbuf{ interned_host };
+        auto const szhost = tr_urlbuf{ host };
         if (int const rc = getaddrinfo(szhost.c_str(), std::data(szport), &hints, &info); rc != 0)
         {
             logwarn(
-                interned_log_name,
+                log_name,
                 fmt::format(
                     _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
-                    fmt::arg("address", interned_host),
+                    fmt::arg("address", host),
                     fmt::arg("port", port.host()),
                     fmt::arg("error", gai_strerror(rc)),
                     fmt::arg("error_code", static_cast<int>(rc))));
@@ -454,38 +448,38 @@ private:
         memcpy(&ss, info->ai_addr, len);
         freeaddrinfo(info);
 
-        logdbg(interned_log_name, "DNS lookup succeeded");
+        logdbg(log_name, "DNS lookup succeeded");
         return std::make_pair(ss, len);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
     {
-        for (auto& req : this->scrapes)
+        for (auto& req : scrapes)
         {
             req.fail(did_connect, did_timeout, errmsg);
         }
 
-        for (auto& req : this->announces)
+        for (auto& req : announces)
         {
             req.fail(did_connect, did_timeout, errmsg);
         }
 
-        this->scrapes.clear();
-        this->announces.clear();
+        scrapes.clear();
+        announces.clear();
     }
 
-    ///
+    // ---
 
     void timeout_requests(time_t now)
     {
-        if (this->connecting_at != 0 && this->connecting_at + ConnectionRequestTtl < now)
+        if (connecting_at != 0 && connecting_at + ConnectionRequestTtl < now)
         {
             auto empty_buf = PayloadBuffer{};
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
-        timeout_requests(this->announces, now, "announce");
-        timeout_requests(this->scrapes, now, "scrape");
+        timeout_requests(announces, now, "announce"sv);
+        timeout_requests(scrapes, now, "scrape"sv);
     }
 
     template<typename T>
@@ -506,17 +500,17 @@ private:
         }
     }
 
-    ///
+    // ---
 
     void send_requests()
     {
         TR_ASSERT(!addr_pending_dns_);
         TR_ASSERT(addr_);
-        TR_ASSERT(this->connecting_at == 0);
-        TR_ASSERT(this->connection_expiration_time > tr_time());
+        TR_ASSERT(connecting_at == 0);
+        TR_ASSERT(connection_expiration_time > tr_time());
 
-        send_requests(this->announces);
-        send_requests(this->scrapes);
+        send_requests(announces);
+        send_requests(scrapes);
     }
 
     template<typename T>
@@ -551,13 +545,13 @@ private:
 
     void send_request(std::byte const* payload, size_t payload_len)
     {
-        logdbg(log_name(), fmt::format("sending request w/connection id {}", this->connection_id));
+        logdbg(log_name(), fmt::format("sending request w/connection id {}", connection_id));
 
         auto buf = PayloadBuffer{};
-        buf.add_uint64(this->connection_id);
+        buf.add_uint64(connection_id);
         buf.add(payload, payload_len);
 
-        this->sendto(std::data(buf), std::size(buf));
+        sendto(std::data(buf), std::size(buf));
     }
 
 public:
@@ -566,8 +560,8 @@ public:
         return authority;
     }
 
-    std::string_view const authority; // interned
-    std::string_view const host; // interned
+    std::string_view const authority;
+    std::string_view const host;
     tr_port const port;
 
     time_t connecting_at = 0;
@@ -587,7 +581,7 @@ private:
     time_t addr_expires_at_ = 0;
 
     static constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
-    static constexpr auto ConnectionRequestTtl = 30;
+    static constexpr auto ConnectionRequestTtl = time_t{ 30 };
 };
 
 // --- SESSION
@@ -608,7 +602,6 @@ public:
             return;
         }
 
-        // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         tracker->announces.emplace_back(mediator_.announce_ip(), request, std::move(on_response));
         tracker->upkeep(false);
     }
@@ -652,7 +645,7 @@ public:
             return false;
         }
 
-        /* extract the transaction_id and look for a match */
+        // extract the transaction_id and look for a match
         tau_transaction_t const transaction_id = buf.to_uint32();
 
         for (auto& tracker : trackers_)
@@ -675,9 +668,8 @@ public:
                     it != std::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is an announce request!", transaction_id));
-                    auto req = *it;
-                    it = reqs.erase(it);
-                    req.onResponse(action_id, buf);
+                    it->onResponse(action_id, buf);
+                    reqs.erase(it);
                     return true;
                 }
             }
@@ -692,15 +684,14 @@ public:
                     it != std::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is a scrape request!", transaction_id));
-                    auto req = *it;
-                    it = reqs.erase(it);
-                    req.onResponse(action_id, buf);
+                    it->onResponse(action_id, buf);
+                    reqs.erase(it);
                     return true;
                 }
             }
         }
 
-        /* no match... */
+        // no match...
         return false;
     }
 
