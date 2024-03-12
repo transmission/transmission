@@ -241,14 +241,14 @@ public:
         return have_;
     }
 
-    void gotPieceData(uint32_t n_bytes)
+    void got_piece_data(uint32_t n_bytes)
     {
         bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, true, tr_time_msec());
         publish(tr_peer_event::GotPieceData(n_bytes));
         connection_limiter.got_data();
     }
 
-    void publishRejection(tr_block_span_t block_span)
+    void publish_rejection(tr_block_span_t block_span)
     {
         for (auto block = block_span.begin; block < block_span.end; ++block)
         {
@@ -393,7 +393,7 @@ void tr_webseed_task::on_buffer_got_data(evbuffer* /*buf*/, evbuffer_cb_info con
     }
 
     auto const lock = task->session_->unique_lock();
-    task->webseed_->gotPieceData(n_added);
+    task->webseed_->got_piece_data(n_added);
 }
 
 void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_response)
@@ -414,7 +414,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
 
     if (!success)
     {
-        webseed->publishRejection({ task->loc_.block, task->blocks.end });
+        webseed->publish_rejection({ task->loc_.block, task->blocks.end });
         webseed->tasks.erase(task);
         delete task;
         return;
