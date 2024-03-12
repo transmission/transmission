@@ -108,7 +108,7 @@ struct tau_scrape_request
         return !!on_response_;
     }
 
-    void requestFinished() const
+    void request_finished() const
     {
         if (on_response_)
         {
@@ -121,10 +121,10 @@ struct tau_scrape_request
         response.did_connect = did_connect;
         response.did_timeout = did_timeout;
         response.errmsg = errmsg;
-        requestFinished();
+        request_finished();
     }
 
-    void onResponse(tau_action_t action, InBuf& buf)
+    void on_response(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -139,7 +139,7 @@ struct tau_scrape_request
                 row.leechers = buf.to_uint32();
             }
 
-            requestFinished();
+            request_finished();
         }
         else
         {
@@ -148,7 +148,7 @@ struct tau_scrape_request
         }
     }
 
-    [[nodiscard]] constexpr auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expires_at() const noexcept
     {
         return created_at_ + ScrapeTimeoutSec.count();
     }
@@ -213,7 +213,7 @@ struct tau_announce_request
         return !!on_response_;
     }
 
-    void requestFinished() const
+    void request_finished() const
     {
         if (on_response_)
         {
@@ -226,10 +226,10 @@ struct tau_announce_request
         response.did_connect = did_connect;
         response.did_timeout = did_timeout;
         response.errmsg = errmsg;
-        requestFinished();
+        request_finished();
     }
 
-    void onResponse(tr_address_type ip_protocol_resp, tau_action_t action, InBuf& buf)
+    void on_response(tr_address_type ip_protocol_resp, tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -253,7 +253,7 @@ struct tau_announce_request
             default:
                 break;
             }
-            requestFinished();
+            request_finished();
         }
         else
         {
@@ -262,7 +262,7 @@ struct tau_announce_request
         }
     }
 
-    [[nodiscard]] constexpr auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expires_at() const noexcept
     {
         return created_at_ + AnnounceTimeoutSec.count();
     }
@@ -368,7 +368,7 @@ struct tau_tracker
             std::string errmsg = !std::empty(buf) ?
                 buf.to_string() :
                 fmt::format(_("{ip_protocol} connection failed"), fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol)));
-            failAll(true, false, errmsg);
+            fail_all(true, false, errmsg);
             logdbg(log_name(), std::move(errmsg));
         }
 
@@ -518,7 +518,7 @@ private:
         return std::make_pair(ss, len);
     }
 
-    void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
+    void fail_all(bool did_connect, bool did_timeout, std::string_view errmsg)
     {
         for (auto& req : scrapes)
         {
@@ -556,7 +556,7 @@ private:
     {
         for (auto it = std::begin(requests); it != std::end(requests);)
         {
-            if (auto& req = *it; req.expiresAt() <= now)
+            if (auto& req = *it; req.expires_at() <= now)
             {
                 logtrace(log_name(), fmt::format("timeout {} req {}", name, fmt::ptr(&req)));
                 req.fail(false, true, "");
@@ -672,7 +672,7 @@ public:
 
     void announce(tr_announce_request const& request, tr_announce_response_func on_response) override
     {
-        auto* const tracker = getTrackerFromUrl(request.announce_url);
+        auto* const tracker = get_tracker_from_url(request.announce_url);
         if (tracker == nullptr)
         {
             return;
@@ -687,7 +687,7 @@ public:
 
     void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) override
     {
-        auto* const tracker = getTrackerFromUrl(request.scrape_url);
+        auto* const tracker = get_tracker_from_url(request.scrape_url);
         if (tracker == nullptr)
         {
             return;
@@ -719,7 +719,7 @@ public:
         buf.add(msg, msglen);
         auto const action_id = static_cast<tau_action_t>(buf.to_uint32());
 
-        if (!isResponseMessage(action_id, msglen))
+        if (!is_response_message(action_id, msglen))
         {
             return false;
         }
@@ -750,7 +750,7 @@ public:
                     it != std::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is an announce request!", transaction_id));
-                    it->onResponse(ip_protocol, action_id, buf);
+                    it->on_response(ip_protocol, action_id, buf);
                     reqs.erase(it);
                     return true;
                 }
@@ -766,7 +766,7 @@ public:
                     it != std::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is a scrape request!", transaction_id));
-                    it->onResponse(action_id, buf);
+                    it->on_response(action_id, buf);
                     reqs.erase(it);
                     return true;
                 }
@@ -785,7 +785,7 @@ public:
 private:
     // Finds the tau_tracker struct that corresponds to this url.
     // If it doesn't exist yet, create one.
-    tau_tracker* getTrackerFromUrl(tr_interned_string const announce_url)
+    tau_tracker* get_tracker_from_url(tr_interned_string const announce_url)
     {
         // build a lookup key for this tracker
         auto const parsed = tr_urlParseTracker(announce_url);
@@ -811,7 +811,7 @@ private:
         return &tracker;
     }
 
-    [[nodiscard]] static constexpr bool isResponseMessage(tau_action_t action, size_t msglen) noexcept
+    [[nodiscard]] static constexpr bool is_response_message(tau_action_t action, size_t msglen) noexcept
     {
         if (action == TAU_ACTION_CONNECT)
         {
