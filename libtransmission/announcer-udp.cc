@@ -93,14 +93,12 @@ struct tau_scrape_request
         }
 
         // build the payload
-        auto buf = PayloadBuffer{};
-        buf.add_uint32(TAU_ACTION_SCRAPE);
-        buf.add_uint32(transaction_id);
+        payload.add_uint32(TAU_ACTION_SCRAPE);
+        payload.add_uint32(transaction_id);
         for (int i = 0; i < in.info_hash_count; ++i)
         {
-            buf.add(in.info_hash[i]);
+            payload.add(in.info_hash[i]);
         }
-        payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
     [[nodiscard]] auto has_callback() const noexcept
@@ -153,7 +151,7 @@ struct tau_scrape_request
         return created_at_ + ScrapeTimeoutSec.count();
     }
 
-    std::vector<std::byte> payload;
+    PayloadBuffer payload;
 
     time_t sent_at = 0;
     tau_transaction_t const transaction_id = tau_transaction_new();
@@ -182,28 +180,26 @@ struct tau_announce_request
         response.info_hash = in.info_hash;
 
         // build the payload
-        auto buf = PayloadBuffer{};
-        buf.add_uint32(TAU_ACTION_ANNOUNCE);
-        buf.add_uint32(transaction_id);
-        buf.add(in.info_hash);
-        buf.add(in.peer_id);
-        buf.add_uint64(in.down);
-        buf.add_uint64(in.leftUntilComplete);
-        buf.add_uint64(in.up);
-        buf.add_uint32(get_tau_announce_event(in.event));
+        payload.add_uint32(TAU_ACTION_ANNOUNCE);
+        payload.add_uint32(transaction_id);
+        payload.add(in.info_hash);
+        payload.add(in.peer_id);
+        payload.add_uint64(in.down);
+        payload.add_uint64(in.leftUntilComplete);
+        payload.add_uint64(in.up);
+        payload.add_uint32(get_tau_announce_event(in.event));
         if (announce_ip && announce_ip->is_ipv4())
         {
             // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
-            buf.add_address(*announce_ip);
+            payload.add_address(*announce_ip);
         }
         else
         {
-            buf.add_uint32(0U);
+            payload.add_uint32(0U);
         }
-        buf.add_uint32(in.key);
-        buf.add_uint32(in.numwant);
-        buf.add_port(in.port);
-        payload.insert(std::end(payload), std::begin(buf), std::end(buf));
+        payload.add_uint32(in.key);
+        payload.add_uint32(in.numwant);
+        payload.add_port(in.port);
     }
 
     [[nodiscard]] auto has_callback() const noexcept
@@ -265,7 +261,7 @@ struct tau_announce_request
         TAU_ANNOUNCE_EVENT_STOPPED = 3
     };
 
-    std::vector<std::byte> payload;
+    PayloadBuffer payload;
 
     time_t sent_at = 0;
     tau_transaction_t const transaction_id = tau_transaction_new();
