@@ -16,8 +16,8 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
-#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -60,6 +60,8 @@ using tau_transaction_t = uint32_t;
 
 using InBuf = libtransmission::BufferReader<std::byte>;
 using PayloadBuffer = libtransmission::StackBuffer<4096, std::byte>;
+
+using ipp_t = std::underlying_type_t<tr_address_type>;
 
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
@@ -158,6 +160,8 @@ struct tau_scrape_request
 
     tr_scrape_response response = {};
 
+    static auto constexpr ip_protocol = TR_AF_UNSPEC;
+
 private:
     time_t const created_at_ = tr_time();
 
@@ -169,10 +173,12 @@ private:
 struct tau_announce_request
 {
     tau_announce_request(
+        tr_address_type ip_protocol_in,
         std::optional<tr_address> announce_ip,
         tr_announce_request const& in,
         tr_announce_response_func on_response)
-        : on_response_{ std::move(on_response) }
+        : ip_protocol{ ip_protocol_in }
+        , on_response_{ std::move(on_response) }
     {
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
         static_assert(sizeof(tr_announce_request::key) == sizeof(uint32_t));
@@ -223,7 +229,7 @@ struct tau_announce_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, InBuf& buf)
+    void onResponse(tr_address_type ip_protocol_resp, tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -236,7 +242,17 @@ struct tau_announce_request
             response.leechers = buf.to_uint32();
             response.seeders = buf.to_uint32();
 
-            response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
+            switch (ip_protocol_resp)
+            {
+            case TR_AF_INET:
+                response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
+                break;
+            case TR_AF_INET6:
+                response.pex = tr_pex::from_compact_ipv6(std::data(buf), std::size(buf), nullptr, 0);
+                break;
+            default:
+                break;
+            }
             requestFinished();
         }
         else
@@ -263,6 +279,7 @@ struct tau_announce_request
 
     PayloadBuffer payload;
 
+    tr_address_type const ip_protocol;
     time_t sent_at = 0;
     tau_transaction_t const transaction_id = tau_transaction_new();
 
@@ -306,32 +323,51 @@ struct tau_tracker
     {
     }
 
-    void sendto(std::byte const* buf, size_t buflen)
+    void sendto(tr_address_type ip_protocol, std::byte const* buf, size_t buflen)
     {
-        TR_ASSERT(addr_);
-        if (!addr_)
+        TR_ASSERT(ip_protocol < NUM_TR_AF_INET_TYPES);
+        if (ip_protocol >= NUM_TR_AF_INET_TYPES)
         {
             return;
         }
 
-        auto const& [ss, sslen] = *addr_;
+        TR_ASSERT(addr_[ip_protocol]);
+        if (!addr_[ip_protocol])
+        {
+            return;
+        }
+
+        auto const& [ss, sslen] = *addr_[ip_protocol];
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, InBuf& buf)
+    void on_connection_response(tr_address_type ip_protocol, tau_action_t action, InBuf& buf)
     {
-        connecting_at = 0;
-        connection_transaction_id = 0;
+        TR_ASSERT(ip_protocol < NUM_TR_AF_INET_TYPES);
+        if (ip_protocol >= NUM_TR_AF_INET_TYPES)
+        {
+            return;
+        }
+
+        connecting_at[ip_protocol] = 0;
+        connection_transaction_id[ip_protocol] = 0;
 
         if (action == TAU_ACTION_CONNECT)
         {
-            connection_id = buf.to_uint64();
-            connection_expiration_time = tr_time() + TauConnectionTtlSecs;
-            logdbg(log_name(), fmt::format("Got a new connection ID from tracker: {}", connection_id));
+            connection_id[ip_protocol] = buf.to_uint64();
+            connection_expiration_time[ip_protocol] = tr_time() + TauConnectionTtlSecs;
+            logdbg(
+                log_name(),
+                fmt::format(
+                    "Got a new {} connection ID from tracker: {}",
+                    tr_ip_protocol_to_sv(ip_protocol),
+                    connection_id[ip_protocol]));
         }
         else if (action == TAU_ACTION_ERROR)
         {
-            std::string errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
+            std::string errmsg = !std::empty(buf) ?
+                buf.to_string() :
+                fmt::format(_("{ip_protocol} connection failed"), fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol)));
             failAll(true, false, errmsg);
             logdbg(log_name(), std::move(errmsg));
         }
@@ -343,50 +379,76 @@ struct tau_tracker
     {
         time_t const now = tr_time();
 
-        // do we have a DNS request that's ready?
-        if (addr_pending_dns_ && addr_pending_dns_->wait_for(0ms) == std::future_status::ready)
+        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            addr_ = addr_pending_dns_->get();
-            addr_pending_dns_.reset();
-            addr_expires_at_ = now + DnsRetryIntervalSecs;
+            // do we have a DNS request that's ready?
+            if (addr_pending_dns_[ipp] && addr_pending_dns_[ipp]->wait_for(0ms) == std::future_status::ready)
+            {
+                addr_[ipp] = addr_pending_dns_[ipp]->get();
+                addr_pending_dns_[ipp].reset();
+                addr_expires_at_[ipp] = now + DnsRetryIntervalSecs;
+            }
         }
 
-        // are there any requests pending?
+        // are there any tracker requests pending?
         if (is_idle())
         {
             return;
         }
 
-        // update the addr if our lookup is past its shelf date
-        if (!addr_pending_dns_ && addr_expires_at_ <= now)
+        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            addr_.reset();
-            addr_pending_dns_ = std::async(std::launch::async, lookup, log_name(), host, port);
+            // update the addr if our lookup is past its shelf date
+            if (!addr_pending_dns_[ipp] && addr_expires_at_[ipp] <= now)
+            {
+                addr_[ipp].reset();
+                addr_pending_dns_[ipp] = std::async(
+                    std::launch::async,
+                    [this](tr_address_type ip_protocol) { return lookup(ip_protocol); },
+                    static_cast<tr_address_type>(ipp));
+            }
+        }
+
+        // are there any dns requests pending?
+        if (is_dns_pending())
+        {
             return;
         }
 
-        logtrace(
-            log_name(),
-            fmt::format(
-                "connected {} ({} {}) -- connecting_at {}",
-                is_connected(now),
-                connection_expiration_time,
-                now,
-                connecting_at));
-
-        // also need a valid connection ID...
-        if (addr_ && !is_connected(now) && connecting_at == 0)
+        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            connecting_at = now;
-            connection_transaction_id = tau_transaction_new();
-            logtrace(log_name(), fmt::format("Trying to connect. Transaction ID is {}", connection_transaction_id));
+            auto const ipp_enum = static_cast<tr_address_type>(ipp);
+            logtrace(
+                log_name(),
+                fmt::format(
+                    "{} connected {} ({} {}) -- connecting_at {}",
+                    tr_ip_protocol_to_sv(ipp_enum),
+                    is_connected(ipp_enum, now),
+                    connection_expiration_time[ipp],
+                    now,
+                    connecting_at[ipp]));
 
-            auto buf = PayloadBuffer{};
-            buf.add_uint64(0x41727101980LL);
-            buf.add_uint32(TAU_ACTION_CONNECT);
-            buf.add_uint32(connection_transaction_id);
+            // also need a valid connection ID...
+            if (addr_[ipp] && !is_connected(ipp_enum, now) && connecting_at[ipp] == 0)
+            {
+                TR_ASSERT(addr_[ipp]->first.ss_family == tr_ip_protocol_to_af(ipp_enum));
 
-            sendto(std::data(buf), std::size(buf));
+                connecting_at[ipp] = now;
+                connection_transaction_id[ipp] = tau_transaction_new();
+                logtrace(
+                    log_name(),
+                    fmt::format(
+                        "Trying to connect {}. Transaction ID is {}",
+                        tr_ip_protocol_to_sv(ipp_enum),
+                        connection_transaction_id[ipp]));
+
+                auto buf = PayloadBuffer{};
+                buf.add_uint64(0x41727101980LL);
+                buf.add_uint32(TAU_ACTION_CONNECT);
+                buf.add_uint32(connection_transaction_id[ipp]);
+
+                sendto(ipp_enum, std::data(buf), std::size(buf));
+            }
         }
 
         if (timeout_reqs)
@@ -394,33 +456,40 @@ struct tau_tracker
             timeout_requests(now);
         }
 
-        if (addr_ && is_connected(now))
-        {
-            send_requests();
-        }
+        maybe_send_requests(now);
     }
 
-    [[nodiscard]] bool is_idle() const noexcept
+    [[nodiscard]] constexpr bool is_idle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
+        return std::empty(announces) && std::empty(scrapes);
     }
 
 private:
     using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
 
-    [[nodiscard]] constexpr bool is_connected(time_t now) const noexcept
+    [[nodiscard]] constexpr bool is_connected(tr_address_type ip_protocol, time_t now) const noexcept
     {
-        return connection_id != tau_connection_t{} && now < connection_expiration_time;
+        return connection_id[ip_protocol] != tau_connection_t{} && now < connection_expiration_time[ip_protocol];
     }
 
-    [[nodiscard]] static MaybeSockaddr lookup(std::string_view const log_name, std::string_view const host, tr_port const port)
+    [[nodiscard]] TR_CONSTEXPR20 bool is_dns_pending() const noexcept
+    {
+        return std::any_of(std::begin(addr_pending_dns_), std::end(addr_pending_dns_), [](auto const& o) { return !!o; });
+    }
+
+    [[nodiscard]] TR_CONSTEXPR20 bool has_addr() const noexcept
+    {
+        return std::any_of(std::begin(addr_), std::end(addr_), [](auto const& o) { return !!o; });
+    }
+
+    [[nodiscard]] MaybeSockaddr lookup(tr_address_type ip_protocol)
     {
         auto szport = std::array<char, 16>{};
         *fmt::format_to(std::data(szport), "{:d}", port.host()) = '\0';
 
         auto hints = addrinfo{};
-        hints.ai_family = AF_INET; // https://github.com/transmission/transmission/issues/4719
+        hints.ai_family = tr_ip_protocol_to_af(ip_protocol);
         hints.ai_protocol = IPPROTO_UDP;
         hints.ai_socktype = SOCK_DGRAM;
 
@@ -429,11 +498,12 @@ private:
         if (int const rc = getaddrinfo(szhost.c_str(), std::data(szport), &hints, &info); rc != 0)
         {
             logwarn(
-                log_name,
+                log_name(),
                 fmt::format(
-                    _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
+                    _("Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"),
                     fmt::arg("address", host),
                     fmt::arg("port", port.host()),
+                    fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol)),
                     fmt::arg("error", gai_strerror(rc)),
                     fmt::arg("error_code", static_cast<int>(rc))));
             return {};
@@ -444,7 +514,7 @@ private:
         memcpy(&ss, info->ai_addr, len);
         freeaddrinfo(info);
 
-        logdbg(log_name, "DNS lookup succeeded");
+        logdbg(log_name(), fmt::format("{} DNS lookup succeeded", tr_ip_protocol_to_sv(ip_protocol)));
         return std::make_pair(ss, len);
     }
 
@@ -468,10 +538,13 @@ private:
 
     void timeout_requests(time_t now)
     {
-        if (connecting_at != 0 && connecting_at + ConnectionRequestTtl < now)
+        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            auto empty_buf = PayloadBuffer{};
-            on_connection_response(TAU_ACTION_ERROR, empty_buf);
+            if (connecting_at[ipp] != 0 && connecting_at[ipp] + ConnectionRequestTtl < now)
+            {
+                auto empty_buf = PayloadBuffer{};
+                on_connection_response(static_cast<tr_address_type>(ipp), TAU_ACTION_ERROR, empty_buf);
+            }
         }
 
         timeout_requests(announces, now, "announce"sv);
@@ -498,35 +571,33 @@ private:
 
     // ---
 
-    void send_requests()
+    void maybe_send_requests(time_t now)
     {
-        TR_ASSERT(!addr_pending_dns_);
-        TR_ASSERT(addr_);
-        TR_ASSERT(connecting_at == 0);
-        TR_ASSERT(connection_expiration_time > tr_time());
+        TR_ASSERT(!is_dns_pending());
+        if (is_dns_pending() || !has_addr())
+        {
+            return;
+        }
 
-        send_requests(announces);
-        send_requests(scrapes);
+        maybe_send_requests(announces, now);
+        maybe_send_requests(scrapes, now);
     }
 
     template<typename T>
-    void send_requests(std::list<T>& reqs)
+    void maybe_send_requests(std::list<T>& reqs, time_t now)
     {
-        auto const now = tr_time();
-
         for (auto it = std::begin(reqs); it != std::end(reqs);)
         {
             auto& req = *it;
 
-            if (req.sent_at != 0) // it's already been sent; we're awaiting a response
+            if (req.sent_at != 0 || // it's already been sent; we're awaiting a response
+                !maybe_send_request(req.ip_protocol, std::data(req.payload), std::size(req.payload), now))
             {
                 ++it;
                 continue;
             }
-
-            logdbg(log_name(), fmt::format("sending req {}", fmt::ptr(&req)));
+            logdbg(log_name(), fmt::format("sent req {}", fmt::ptr(&req)));
             req.sent_at = now;
-            send_request(std::data(req.payload), std::size(req.payload));
 
             if (req.has_callback())
             {
@@ -539,15 +610,24 @@ private:
         }
     }
 
-    void send_request(std::byte const* payload, size_t payload_len)
+    bool maybe_send_request(tr_address_type ip_protocol, std::byte const* payload, size_t payload_len, time_t now)
     {
-        logdbg(log_name(), fmt::format("sending request w/connection id {}", connection_id));
+        for (uint8_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
+        {
+            auto const ipp_enum = static_cast<tr_address_type>(ipp);
+            if (addr_[ipp] && (ip_protocol == TR_AF_UNSPEC || ipp == ip_protocol) && is_connected(ipp_enum, now))
+            {
+                logdbg(log_name(), fmt::format("sending request w/connection id {}", connection_id[ipp]));
 
-        auto buf = PayloadBuffer{};
-        buf.add_uint64(connection_id);
-        buf.add(payload, payload_len);
+                auto buf = PayloadBuffer{};
+                buf.add_uint64(connection_id[ipp]);
+                buf.add(payload, payload_len);
 
-        sendto(std::data(buf), std::size(buf));
+                sendto(ipp_enum, std::data(buf), std::size(buf));
+                return true;
+            }
+        }
+        return false;
     }
 
 public:
@@ -560,10 +640,10 @@ public:
     std::string_view const host;
     tr_port const port;
 
-    time_t connecting_at = 0;
-    time_t connection_expiration_time = 0;
-    tau_connection_t connection_id = {};
-    tau_transaction_t connection_transaction_id = {};
+    std::array<time_t, NUM_TR_AF_INET_TYPES> connecting_at = {};
+    std::array<time_t, NUM_TR_AF_INET_TYPES> connection_expiration_time = {};
+    std::array<tau_connection_t, NUM_TR_AF_INET_TYPES> connection_id = {};
+    std::array<tau_transaction_t, NUM_TR_AF_INET_TYPES> connection_transaction_id = {};
 
     std::list<tau_announce_request> announces;
     std::list<tau_scrape_request> scrapes;
@@ -571,10 +651,10 @@ public:
 private:
     Mediator& mediator_;
 
-    std::optional<std::future<MaybeSockaddr>> addr_pending_dns_;
+    std::array<std::optional<std::future<MaybeSockaddr>>, NUM_TR_AF_INET_TYPES> addr_pending_dns_;
 
-    MaybeSockaddr addr_;
-    time_t addr_expires_at_ = 0;
+    std::array<MaybeSockaddr, NUM_TR_AF_INET_TYPES> addr_ = {};
+    std::array<time_t, NUM_TR_AF_INET_TYPES> addr_expires_at_ = {};
 
     static constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
     static constexpr auto ConnectionRequestTtl = time_t{ 30 };
@@ -598,7 +678,10 @@ public:
             return;
         }
 
-        tracker->announces.emplace_back(mediator_.announce_ip(), request, std::move(on_response));
+        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
+        {
+            tracker->announces.emplace_back(static_cast<tr_address_type>(ipp), mediator_.announce_ip(), request, on_response);
+        }
         tracker->upkeep(false);
     }
 
@@ -624,7 +707,7 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    bool handle_message(uint8_t const* msg, size_t msglen) override
+    bool handle_message(uint8_t const* msg, size_t msglen, struct sockaddr const* from, socklen_t /*fromlen*/) override
     {
         if (msglen < sizeof(uint32_t) * 2)
         {
@@ -644,13 +727,16 @@ public:
         // extract the transaction_id and look for a match
         tau_transaction_t const transaction_id = buf.to_uint32();
 
+        auto const socket_address = tr_socket_address::from_sockaddr(from);
+        auto const ip_protocol = socket_address ? socket_address->address().type : NUM_TR_AF_INET_TYPES;
         for (auto& tracker : trackers_)
         {
             // is it a connection response?
-            if (tracker.connecting_at != 0 && transaction_id == tracker.connection_transaction_id)
+            if (ip_protocol < NUM_TR_AF_INET_TYPES && tracker.connecting_at[ip_protocol] != 0 &&
+                transaction_id == tracker.connection_transaction_id[ip_protocol])
             {
                 logtrace(tracker.log_name(), fmt::format("{} is my connection request!", transaction_id));
-                tracker.on_connection_response(action_id, buf);
+                tracker.on_connection_response(ip_protocol, action_id, buf);
                 return true;
             }
 
@@ -664,7 +750,7 @@ public:
                     it != std::end(reqs))
                 {
                     logtrace(tracker.log_name(), fmt::format("{} is an announce request!", transaction_id));
-                    it->onResponse(action_id, buf);
+                    it->onResponse(ip_protocol, action_id, buf);
                     reqs.erase(it);
                     return true;
                 }

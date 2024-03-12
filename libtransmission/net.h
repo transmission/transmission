@@ -146,7 +146,8 @@ enum tr_address_type : uint8_t
 {
     TR_AF_INET = 0,
     TR_AF_INET6,
-    NUM_TR_AF_INET_TYPES
+    NUM_TR_AF_INET_TYPES,
+    TR_AF_UNSPEC = NUM_TR_AF_INET_TYPES
 };
 
 std::string_view tr_ip_protocol_to_sv(tr_address_type type);
