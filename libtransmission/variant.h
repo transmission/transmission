@@ -219,25 +219,27 @@ public:
     }
 
     template<typename Val>
-    tr_variant& operator=(Val value)
+    tr_variant& operator=(Val&& value)
     {
-        if constexpr (std::is_same_v<Val, std::string_view>)
+        using RawVal = std::remove_cv_t<std::remove_reference_t<Val>>;
+
+        if constexpr (std::is_same_v<RawVal, std::string_view>)
         {
-            val_.emplace<StringHolder>(std::string{ value });
+            val_.emplace<StringHolder>(std::string{ std::forward<Val>(value) });
         }
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints
-        else if constexpr (std::is_same_v<Val, bool>)
+        else if constexpr (std::is_same_v<RawVal, bool>)
         {
             val_.emplace<bool>(value);
         }
-        else if constexpr (std::is_integral_v<Val> || std::is_enum_v<Val>)
+        else if constexpr (std::is_integral_v<RawVal> || std::is_enum_v<RawVal>)
         {
             val_ = static_cast<int64_t>(value);
         }
         else
         {
-            val_ = std::move(value);
+            val_ = std::forward<Val>(value);
         }
         return *this;
     }
