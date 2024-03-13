@@ -415,6 +415,8 @@ struct tau_tracker
             return;
         }
 
+        // N.B. This loop and others don't have to loop in the IPv4 -> IPv6 order in real
+        // operations, but we enforce that order so that our tests can run faster.
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             auto const ipp_enum = static_cast<tr_address_type>(ipp);
