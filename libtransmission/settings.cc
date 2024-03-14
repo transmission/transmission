@@ -525,6 +525,11 @@ tr_variant Settings::save() const
         std::visit(SaveVisitor{ map, key }, prop_vptr);
     }
 
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !TR_GNUC_CHECK_VERSION(8, 0)
+    // GCC 7.x incompatibility with `delete` (https://godbolt.org/z/TMx4nM1Tr)
     return std::move(map);
+#else
+    return map;
+#endif
 }
 } // namespace libtransmission
