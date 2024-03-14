@@ -45,12 +45,12 @@ using namespace libtransmission::Values;
 
 namespace
 {
-class tr_webseed;
+class tr_webseed_impl;
 
 class tr_webseed_task
 {
 public:
-    tr_webseed_task(tr_torrent const& tor, tr_webseed* webseed_in, tr_block_span_t blocks_in)
+    tr_webseed_task(tr_torrent const& tor, tr_webseed_impl* webseed_in, tr_block_span_t blocks_in)
         : blocks{ blocks_in }
         , webseed_{ webseed_in }
         , session_{ tor.session }
@@ -76,7 +76,7 @@ private:
     static void on_partial_data_fetched(tr_web::FetchResponse const& web_response);
     static void on_buffer_got_data(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
 
-    tr_webseed* const webseed_;
+    tr_webseed_impl* const webseed_;
     tr_session* const session_;
     uint64_t const end_byte_;
 
@@ -167,7 +167,7 @@ private:
     time_t paused_until = 0;
 };
 
-class tr_webseed final : public tr_peer
+class tr_webseed_impl final : public tr_webseed
 {
 public:
     struct RequestLimit
@@ -180,8 +180,8 @@ public:
         size_t max_blocks = 0;
     };
 
-    tr_webseed(tr_torrent& tor_in, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
-        : tr_peer{ tor_in }
+    tr_webseed_impl(tr_torrent& tor_in, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
+        : tr_webseed{ tor_in }
         , tor{ tor_in }
         , base_url{ url }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(); }) }
@@ -194,12 +194,12 @@ public:
         idle_timer_->start_repeating(IdleTimerInterval);
     }
 
-    tr_webseed(tr_webseed&&) = delete;
-    tr_webseed(tr_webseed const&) = delete;
-    tr_webseed& operator=(tr_webseed&&) = delete;
-    tr_webseed& operator=(tr_webseed const&) = delete;
+    tr_webseed_impl(tr_webseed_impl&&) = delete;
+    tr_webseed_impl(tr_webseed_impl const&) = delete;
+    tr_webseed_impl& operator=(tr_webseed_impl&&) = delete;
+    tr_webseed_impl& operator=(tr_webseed_impl const&) = delete;
 
-    ~tr_webseed() override
+    ~tr_webseed_impl() override
     {
         // flag all the pending tasks as dead
         std::for_each(std::begin(tasks), std::end(tasks), [](auto* task) { task->dead = true; });
@@ -209,6 +209,13 @@ public:
     [[nodiscard]] Speed get_piece_speed(uint64_t now, tr_direction dir) const override
     {
         return dir == TR_DOWN ? bandwidth_.get_piece_speed(now, dir) : Speed{};
+    }
+
+    [[nodiscard]] tr_webseed_view get_view() const override
+    {
+        auto const is_downloading = !std::empty(tasks);
+        auto const speed = get_piece_speed(tr_time_msec(), TR_DOWN);
+        return { base_url.c_str(), is_downloading, speed.base_quantity() };
     }
 
     [[nodiscard]] TR_CONSTEXPR20 size_t active_req_count(tr_direction dir) const noexcept override
@@ -441,7 +448,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
 }
 
 template<typename OutputIt>
-void makeUrl(tr_webseed const* const webseed, std::string_view name, OutputIt out)
+void makeUrl(tr_webseed_impl const* const webseed, std::string_view name, OutputIt out)
 {
     auto const& url = webseed->base_url;
 
@@ -480,20 +487,11 @@ void tr_webseed_task::request_next_chunk()
 
 // ---
 
-tr_peer* tr_webseedNew(tr_torrent& torrent, std::string_view url, tr_peer_callback_webseed callback, void* callback_data)
+std::unique_ptr<tr_webseed> tr_webseed::create(
+    tr_torrent& torrent,
+    std::string_view url,
+    tr_peer_callback_webseed callback,
+    void* callback_data)
 {
-    return new tr_webseed{ torrent, url, callback, callback_data };
-}
-
-tr_webseed_view tr_webseedView(tr_peer const* peer)
-{
-    auto const* const webseed = dynamic_cast<tr_webseed const*>(peer);
-    if (webseed == nullptr)
-    {
-        return {};
-    }
-
-    auto const is_downloading = !std::empty(webseed->tasks);
-    auto const speed = peer->get_piece_speed(tr_time_msec(), TR_DOWN);
-    return { webseed->base_url.c_str(), is_downloading, speed.base_quantity() };
+    return std::make_unique<tr_webseed_impl>(torrent, url, callback, callback_data);
 }
