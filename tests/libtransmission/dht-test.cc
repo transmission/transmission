@@ -63,7 +63,10 @@ namespace libtransmission::test
 
 bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
 {
-    return waitFor(event_base, []() { return false; }, msec);
+    return waitFor( //
+        event_base,
+        []() { return false; },
+        msec);
 }
 
 namespace
@@ -593,7 +596,10 @@ TEST_F(DhtTest, usesBootstrapFile)
     // Confirm that BootstrapNodeName gets pinged first.
     auto const expected = getSockaddr(BootstrapNodeName, BootstrapNodePort);
     auto& pinged = mediator.mock_dht_.pinged_;
-    waitFor(event_base_, [&pinged]() { return !std::empty(pinged); }, 5s);
+    waitFor( //
+        event_base_,
+        [&pinged]() { return !std::empty(pinged); },
+        5s);
     ASSERT_EQ(1U, std::size(pinged));
     auto const [actual_addrport, time] = pinged.front();
     EXPECT_EQ(expected.address(), actual_addrport.address());
