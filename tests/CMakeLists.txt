@@ -3,3 +3,5 @@ add_subdirectory(libtransmission)
 if(ENABLE_UTILS)
     add_subdirectory(utils)
 endif()
+
+# temporary comment to trigger the tests
