@@ -630,6 +630,7 @@ else()
         -Wextra
         -Wcast-align
         -Wduplicated-cond
+        -Wexit-time-destructors
         -Wextra-semi
         -Wextra-semi-stmt
         -Wextra-tokens

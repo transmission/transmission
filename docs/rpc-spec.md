@@ -303,7 +303,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view (**Note:** Not to be confused with `torrent-get.wanted`, which is an array of 0/1 instead of boolean)
+| `wanted` | number | tr_file_view (**Note:** For backwards compatibility, this is serialized as an array of `0` or `1` that should be treated as booleans)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -400,10 +400,8 @@ The 'source' column here corresponds to the data structure there.
 | `tier`                    | number     | tr_tracker_view
 
 
-`wanted`: An array of `tr_torrentFileCount()` 0/1, 1 (true) if the corresponding file is to be downloaded. (Source: `tr_file_view`)
+`wanted`: An array of `tr_torrentFileCount()` Booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
 
-**Note:** For backwards compatibility, in `4.x.x`, `wanted` is serialized as an array of `0` or `1` that should be treated as booleans.
-This will be fixed in `5.0.0` to return an array of booleans.
 
 Example:
 

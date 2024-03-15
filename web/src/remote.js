@@ -57,10 +57,7 @@ export class Remote {
           callback.call(context, payload, response_argument);
         }
 
-        if (this._connection_alert) {
-          this._connection_alert.close();
-          this._connection_alert = null;
-        }
+        this._connection_alert = null;
       })
       .catch((error) => {
         if (error.message === Remote._SessionHeader) {
@@ -77,6 +74,8 @@ export class Remote {
           message:
             'Could not connect to the server. You may need to reload the page to reconnect.',
         });
+      })
+      .finally(() => {
         this._controller.setCurrentPopup(this._connection_alert);
       });
   }

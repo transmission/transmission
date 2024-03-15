@@ -5,7 +5,6 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 #import "NSImageAdditions.h"
-#import "Utils.h"
 
 static CGFloat const kBetweenPadding = 2.0;
 static NSImage* kWhiteUpArrow = [[NSImage imageNamed:@"UpArrowTemplate"] imageWithColor:NSColor.whiteColor];
@@ -62,7 +61,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
-    if (isSpeedEqual(self.fDownloadRate, downloadRate) && isSpeedEqual(self.fUploadRate, uploadRate))
+    if (self.fDownloadRate == downloadRate && self.fUploadRate == uploadRate)
     {
         return NO;
     }

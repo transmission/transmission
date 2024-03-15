@@ -351,9 +351,9 @@ typedef NS_ENUM(NSUInteger, TabTag) {
         viewRect = [self.fOptionsViewController viewRect];
     }
 
-    CGFloat const viewHeightDifference = NSHeight(viewRect) - oldHeight;
-    windowRect.origin.y -= viewHeightDifference;
-    windowRect.size.height += viewHeightDifference;
+    CGFloat const difference = NSHeight(viewRect) - oldHeight;
+    windowRect.origin.y -= difference;
+    windowRect.size.height += difference;
     windowRect.size.width = MAX(NSWidth(windowRect), minWindowWidth);
 
     if ([self.fViewController respondsToSelector:@selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
@@ -363,11 +363,11 @@ typedef NS_ENUM(NSUInteger, TabTag) {
             CGFloat const screenHeight = NSHeight(window.screen.visibleFrame);
             if (NSHeight(windowRect) > screenHeight)
             {
-                CGFloat const windowHeightDifference = screenHeight - NSHeight(windowRect);
-                windowRect.origin.y -= windowHeightDifference;
-                windowRect.size.height += windowHeightDifference;
+                CGFloat const difference = screenHeight - NSHeight(windowRect);
+                windowRect.origin.y -= difference;
+                windowRect.size.height += difference;
 
-                viewRect.size.height += windowHeightDifference;
+                viewRect.size.height += difference;
             }
         }
 

@@ -44,7 +44,7 @@ public:
         return iter != std::end(icons_) ? &iter->second : nullptr;
     }
 
-    void load( //
+    void load(
         std::string_view url_in,
         IconFunc callback = [](Icon const&) { /*default callback is a no-op */ })
     {
