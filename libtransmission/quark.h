@@ -149,6 +149,7 @@ enum
     TR_KEY_honorsSessionLimits,
     TR_KEY_host,
     TR_KEY_id,
+    TR_KEY_id_timestamp,
     TR_KEY_idle_limit,
     TR_KEY_idle_mode,
     TR_KEY_idle_seeding_limit,

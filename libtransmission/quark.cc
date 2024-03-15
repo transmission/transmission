@@ -148,6 +148,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "honorsSessionLimits"sv,
     "host"sv,
     "id"sv,
+    "id_timestamp"sv,
     "idle-limit"sv,
     "idle-mode"sv,
     "idle-seeding-limit"sv,
