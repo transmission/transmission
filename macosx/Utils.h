@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <CoreFoundation/CoreFoundation.h>
+#import <Foundation/Foundation.h>
 
 // 0.1 precision
 bool isSpeedEqual(CGFloat old_speed, CGFloat new_speed);
