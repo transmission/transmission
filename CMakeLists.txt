@@ -471,8 +471,6 @@ if(ENABLE_MAC)
 
     if(APPLE)
         set(MAC_FOUND ON)
-        # unset default to build arm64 on x86_64, or x86_64 on arm64
-        unset(_CMAKE_APPLE_ARCHS_DEFAULT)
     else()
         set(MAC_FOUND OFF)
         if(MAC_IS_REQUIRED)
