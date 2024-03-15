@@ -158,9 +158,9 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_CXX_COMPILER='clang++-15' \
             -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
-            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_C_COMPILER='clang-15' \
             -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=OFF \
