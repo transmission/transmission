@@ -39,7 +39,7 @@ protected:
 
     void sleepMsec(std::chrono::milliseconds msec)
     {
-        EXPECT_FALSE(waitFor(
+        EXPECT_FALSE(waitFor( //
             evbase_.get(),
             []() { return false; },
             msec));

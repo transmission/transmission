@@ -147,8 +147,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
 
     if (verbose_)
     {
-        qInfo() << "sending"
-                << "POST" << qPrintable(url_.path());
+        qInfo() << "sending POST " << qPrintable(url_.path());
 
         for (QByteArray const& b : request_->rawHeaderList())
         {
