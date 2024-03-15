@@ -20,8 +20,8 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
+#include <sys/socket.h> /* socket(), bind() */
 #endif
 
 #include <event2/event.h>
@@ -410,7 +410,7 @@ private:
                 /* we want to join that LPD multicast group */
                 struct ipv6_mreq mcast_req = {};
                 mcast_req.ipv6mr_multiaddr = mcast6_addr_.sin6_addr;
-                mcast_req.ipv6mr_interface = 0; //FIXME
+                mcast_req.ipv6mr_interface = mediator_.bind_address(ip_protocol).to_interface_index().value_or(0);
 
                 if (setsockopt(
                         sock,
