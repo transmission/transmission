@@ -1367,7 +1367,7 @@
 		ED20B87D285892C5005FA6BE /* crc32_multipliers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_multipliers.h; path = lib/crc32_multipliers.h; sourceTree = "<group>"; };
 		ED20B87E285892C5005FA6BE /* crc32_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_tables.h; path = lib/crc32_tables.h; sourceTree = "<group>"; };
 		ED67FB402B70FCE400D8A037 /* settings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = settings.cc; sourceTree = "<group>"; };
-		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = settings.h; sourceTree = "<group>"; };
 		ED86936D2ADAE34D00342B1A /* DefaultAppHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAppHelper.h; sourceTree = "<group>"; };
 		ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DefaultAppHelper.mm; sourceTree = "<group>"; };
 		ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "peer-mgr-active-requests.h"; sourceTree = "<group>"; };
