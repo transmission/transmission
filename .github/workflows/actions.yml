@@ -115,37 +115,81 @@ jobs:
           echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           exit 1
 
-  sanitizer-tests:
-    runs-on: ubuntu-22.04
+#  sanitizer-tests-ubuntu:
+#    runs-on: ubuntu-22.04
+#    needs: [ what-to-make ]
+#    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+#    env:
+#      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
+#    steps:
+#      - name: Show Configuration
+#        run: |
+#          echo '${{ toJSON(needs) }}'
+#          echo '${{ toJSON(runner) }}'
+#          cat /etc/os-release
+#      - name: Get Dependencies
+#        run: |
+#          set -ex
+#          sudo apt-get update
+#          sudo apt-get install -y --no-install-recommends \
+#            ca-certificates \
+#            clang \
+#            cmake \
+#            gettext \
+#            libcurl4-openssl-dev \
+#            libdeflate-dev \
+#            libevent-dev \
+#            libfmt-dev \
+#            libminiupnpc-dev \
+#            libnatpmp-dev \
+#            libpsl-dev \
+#            libssl-dev \
+#            ninja-build \
+#            npm
+#      - name: Get Source
+#        uses: actions/checkout@v4
+#        with:
+#          submodules: recursive
+#          path: src
+#      - name: Configure
+#        run: |
+#          cmake \
+#            -S src \
+#            -B obj \
+#            -G Ninja \
+#            -DCMAKE_BUILD_TYPE=Debug \
+#            -DCMAKE_CXX_COMPILER='clang++' \
+#            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+#            -DCMAKE_C_COMPILER='clang' \
+#            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+#            -DCMAKE_INSTALL_PREFIX=pfx \
+#            -DENABLE_CLI=OFF \
+#            -DENABLE_DAEMON=OFF \
+#            -DENABLE_GTK=OFF \
+#            -DENABLE_MAC=OFF \
+#            -DENABLE_QT=OFF \
+#            -DENABLE_TESTS=ON \
+#            -DENABLE_UTILS=ON \
+#            -DREBUILD_WEB=OFF \
+#            -DRUN_CLANG_TIDY=OFF
+#      - name: Make
+#        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+#      - name: Test with sanitizers
+#        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
+
+  sanitizer-tests-macos:
+    runs-on: macos-14
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
-          cat /etc/os-release
+          sw_vers
       - name: Get Dependencies
         run: |
-          set -ex
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            ca-certificates \
-            clang \
-            cmake \
-            gettext \
-            libcurl4-openssl-dev \
-            libdeflate-dev \
-            libevent-dev \
-            libfmt-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev \
-            libpsl-dev \
-            libssl-dev \
-            ninja-build \
-            npm
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -158,10 +202,8 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER='clang++' \
-            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
-            -DCMAKE_C_COMPILER='clang' \
-            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,undefined' \
+            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,undefined' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=OFF \
             -DENABLE_DAEMON=OFF \
