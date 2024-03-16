@@ -168,15 +168,25 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 class tr_webseed final : public tr_peer
 {
 public:
-    tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
+    struct RequestLimit
+    {
+        // How many spans those blocks could be in.
+        // This is for webseeds, which make parallel requests.
+        size_t max_spans = 0;
+
+        // How many blocks we could request.
+        size_t max_blocks = 0;
+    };
+
+    tr_webseed(tr_torrent& tor, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
         : tr_peer{ tor }
-        , torrent_id{ tr_torrentId(tor) }
+        , torrent_id{ tor.id() }
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
-        , have_{ tor->piece_count() }
-        , bandwidth_{ &tor->bandwidth() }
+        , have_{ tor.piece_count() }
+        , bandwidth_{ &tor.bandwidth() }
     {
         have_.set_has_all();
         idle_timer_->start_repeating(IdleTimerInterval);
@@ -204,7 +214,7 @@ public:
         return dir == TR_DOWN ? bandwidth_.get_piece_speed(now, dir) : Speed{};
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t activeReqCount(tr_direction dir) const noexcept override
+    [[nodiscard]] TR_CONSTEXPR20 size_t active_req_count(tr_direction dir) const noexcept override
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
         {
@@ -250,7 +260,7 @@ public:
         }
     }
 
-    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
+    void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
         if (tor == nullptr || !tor->is_running() || tor->is_done())
@@ -269,7 +279,7 @@ public:
         }
     }
 
-    [[nodiscard]] RequestLimit canRequest() const noexcept override
+    [[nodiscard]] RequestLimit max_available_reqs() const noexcept
     {
         auto const n_slots = connection_limiter.slotsAvailable();
         if (n_slots == 0)
@@ -285,7 +295,7 @@ public:
         // Prefer to request large, contiguous chunks from webseeds.
         // The actual value of '64' is arbitrary here;
         // we could probably be smarter about this.
-        auto constexpr PreferredBlocksPerTask = size_t{ 64 };
+        static auto constexpr PreferredBlocksPerTask = size_t{ 64 };
         return { n_slots, n_slots * PreferredBlocksPerTask };
     }
 
@@ -413,7 +423,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 
 void on_idle(tr_webseed* webseed)
 {
-    auto const [max_spans, max_blocks] = webseed->canRequest();
+    auto const [max_spans, max_blocks] = webseed->max_available_reqs();
     if (max_spans == 0 || max_blocks == 0)
     {
         return;
@@ -427,7 +437,7 @@ void on_idle(tr_webseed* webseed)
     {
         spans.resize(max_spans);
     }
-    webseed->requestBlocks(std::data(spans), std::size(spans));
+    webseed->request_blocks(std::data(spans), std::size(spans));
 }
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)
@@ -523,9 +533,9 @@ void task_request_next_chunk(tr_webseed_task* task)
 
 // ---
 
-tr_peer* tr_webseedNew(tr_torrent* torrent, std::string_view url, tr_peer_callback_webseed callback, void* callback_data)
+tr_peer* tr_webseedNew(tr_torrent& torrent, std::string_view url, tr_peer_callback_webseed callback, void* callback_data)
 {
-    return new tr_webseed(torrent, url, callback, callback_data);
+    return new tr_webseed{ torrent, url, callback, callback_data };
 }
 
 tr_webseed_view tr_webseedView(tr_peer const* peer)

@@ -17,6 +17,6 @@
 
 using tr_peer_callback_webseed = tr_peer_callback_generic;
 
-tr_peer* tr_webseedNew(struct tr_torrent* torrent, std::string_view, tr_peer_callback_webseed callback, void* callback_data);
+tr_peer* tr_webseedNew(tr_torrent& torrent, std::string_view, tr_peer_callback_webseed callback, void* callback_data);
 
 tr_webseed_view tr_webseedView(tr_peer const* peer);

@@ -497,7 +497,13 @@ if(NOT USE_SYSTEM_NATPMP)
             NATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+if(WIN32)
+    # https://github.com/miniupnp/miniupnp/pull/304
+    set(TR_MINIUPNPC_LIBNAME libminiupnpc)
+else()
+    set(TR_MINIUPNPC_LIBNAME miniupnpc)
+endif()
+tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
@@ -508,9 +514,10 @@ if(NOT USE_SYSTEM_MINIUPNPC)
         INTERFACE
             MINIUPNP_STATICLIB)
 
-    set(MINIUPNPC_VERSION 1.9)
-    set(MINIUPNPC_API_VERSION 12)
+    set(MINIUPNPC_VERSION 2.2)
+    set(MINIUPNPC_API_VERSION 17)
 endif()
+unset(TR_MINIUPNPC_LIBNAME)
 
 target_compile_definitions(miniupnpc::libminiupnpc
     INTERFACE
@@ -630,7 +637,6 @@ else()
         -Wextra
         -Wcast-align
         -Wduplicated-cond
-        -Wexit-time-destructors
         -Wextra-semi
         -Wextra-semi-stmt
         -Wextra-tokens

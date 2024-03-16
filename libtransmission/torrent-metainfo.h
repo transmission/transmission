@@ -231,7 +231,7 @@ private:
 
     // Offset + size of the bencoded info dict subset of the bencoded data.
     // Used when loading pieces of it to sent to magnet peers.
-    // See http://bittorrent.org/beps/bep_0009.html
+    // See https://www.bittorrent.org/beps/bep_0009.html
     uint64_t info_dict_size_ = 0;
     uint64_t info_dict_offset_ = 0;
 

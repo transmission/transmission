@@ -4,6 +4,7 @@
 
 #import "StatusBarController.h"
 #import "NSStringAdditions.h"
+#import "Utils.h"
 
 typedef NSString* StatusRatioType NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -77,13 +78,13 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate
 {
     //set rates
-    if (dlRate != self.fPreviousDownloadRate)
+    if (!isSpeedEqual(self.fPreviousDownloadRate, dlRate))
     {
         self.fTotalDLField.stringValue = [NSString stringForSpeed:dlRate];
         self.fPreviousDownloadRate = dlRate;
     }
 
-    if (ulRate != self.fPreviousUploadRate)
+    if (!isSpeedEqual(self.fPreviousUploadRate, ulRate))
     {
         self.fTotalULField.stringValue = [NSString stringForSpeed:ulRate];
         self.fPreviousUploadRate = ulRate;

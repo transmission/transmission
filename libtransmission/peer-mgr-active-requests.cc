@@ -21,7 +21,7 @@
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/tr-assert.h"
 
-class tr_peer;
+struct tr_peer;
 
 class ActiveRequests::Impl
 {
