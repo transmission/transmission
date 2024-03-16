@@ -12,19 +12,19 @@ jobs:
   what-to-make:
     runs-on: ubuntu-22.04
     outputs:
-      make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' }}
-      make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' }}
-      make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' }}
-      make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' }}
+      make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
-      make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' }}
-      make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' }}
-      make-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' }}
-      make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' }}
-      make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
-      make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
+      make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-web: 'false' # this is handled in the webapp workflow
-      test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' }}
+      test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
     steps:
       - name: Check Push to Main Branch
         id: check-main-push
@@ -54,19 +54,20 @@ jobs:
             git diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
-          get_changes android  CMakeLists.txt cmake third-party libtransmission android
-          get_changes cli      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
-          get_changes any-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          get_changes our-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
-          get_changes daemon   CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
-          get_changes dist     dist release
-          get_changes docs     docs
-          get_changes gtk      CMakeLists.txt cmake third-party libtransmission gtk
-          get_changes mac      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx
-          get_changes qt       CMakeLists.txt cmake third-party libtransmission qt
-          get_changes tests    CMakeLists.txt cmake third-party libtransmission utils tests
-          get_changes utils    CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web      CMakeLists.txt cmake third-party libtransmission web
+          get_changes android    CMakeLists.txt cmake third-party libtransmission android
+          get_changes cli        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
+          get_changes any-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes daemon     CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
+          get_changes dist       dist release
+          get_changes docs       docs
+          get_changes gtk        CMakeLists.txt cmake third-party libtransmission gtk
+          get_changes mac        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx
+          get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
+          get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
+          get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
+          get_changes web        CMakeLists.txt cmake third-party libtransmission web
+          get_changes ci-actions .github/workflows/actions.yml
           cat "$GITHUB_OUTPUT"
 
   code-style:
@@ -310,7 +311,7 @@ jobs:
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=OFF \
+            -DENABLE_TESTS=ON \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
