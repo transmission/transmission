@@ -89,7 +89,6 @@
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
                             <connections>
-                                <action selector="setAutoUpdateToBeta:" target="-2" id="1900"/>
                                 <binding destination="365" name="value" keyPath="values.AutoUpdateBeta" id="1897"/>
                             </connections>
                         </button>
