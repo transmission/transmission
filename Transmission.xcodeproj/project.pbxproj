@@ -3092,7 +3092,7 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"third-party/miniupnpc/miniupnp",
+				"third-party/miniupnp/miniupnp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
