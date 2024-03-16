@@ -242,7 +242,7 @@ struct tr_address
     } addr;
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
-    static auto constexpr CompactAddrMaxBytes = 16U;
+    static auto constexpr CompactAddrMaxBytes = *std::max_element(std::begin(CompactAddrBytes), std::end(CompactAddrBytes));
     static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
     [[nodiscard]] static auto any(tr_address_type type) noexcept
@@ -397,6 +397,7 @@ struct tr_socket_address
 
     static auto constexpr CompactSockAddrBytes = std::array{ tr_address::CompactAddrBytes[0] + tr_port::CompactPortBytes,
                                                              tr_address::CompactAddrBytes[1] + tr_port::CompactPortBytes };
+    static auto constexpr CompactSockAddrMaxBytes = tr_address::CompactAddrMaxBytes + tr_port::CompactPortBytes;
     static_assert(std::size(CompactSockAddrBytes) == NUM_TR_AF_INET_TYPES);
 };
 
