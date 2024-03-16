@@ -2170,7 +2170,7 @@ void close_peer(tr_peerMsgs* peer)
 
 constexpr struct
 {
-    [[nodiscard]] constexpr static int compare(tr_peerMsgs const* a, tr_peerMsgs const* b) // <=>
+    [[nodiscard]] static int compare(tr_peerMsgs const* a, tr_peerMsgs const* b) // <=>
     {
         if (a->do_purge != b->do_purge)
         {
@@ -2180,7 +2180,7 @@ constexpr struct
         return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
     }
 
-    [[nodiscard]] constexpr bool operator()(tr_peerMsgs const* a, tr_peerMsgs const* b) const // less than
+    [[nodiscard]] bool operator()(tr_peerMsgs const* a, tr_peerMsgs const* b) const // less than
     {
         return compare(a, b) < 0;
     }
