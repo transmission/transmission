@@ -140,6 +140,14 @@ public:
         return sandbox_dir_;
     }
 
+    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
+    {
+        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        tr_sys_dir_create_temp(std::data(path));
+        tr_sys_path_native_separators(std::data(path));
+        return path;
+    }
+
 protected:
     static std::string get_default_parent_dir()
     {
@@ -150,14 +158,6 @@ protected:
 
         auto error = tr_error{};
         return tr_sys_dir_get_current(&error);
-    }
-
-    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
-    {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
-        tr_sys_dir_create_temp(std::data(path));
-        tr_sys_path_native_separators(std::data(path));
-        return path;
     }
 
     static void rimraf(std::string const& path, bool verbose = false)
