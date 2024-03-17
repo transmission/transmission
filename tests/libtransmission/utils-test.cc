@@ -262,6 +262,7 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
+    std::cout << "::testing::TempDir() " << ::testing::TempDir();
     filename.assign(::testing::TempDir(), "filename.txt"sv);
     auto contents = "these are the contents"sv;
     auto error = tr_error{};

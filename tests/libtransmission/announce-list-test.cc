@@ -363,6 +363,7 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
+    std::cout << "::testing::TempDir() " << ::testing::TempDir();
     auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
     auto error = tr_error{};
     EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
