@@ -55,6 +55,7 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "VersionComparator.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -5428,11 +5429,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
 }
 
-- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
-{
-    self.fQuitRequested = YES;
-}
-
 - (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct
 {
     @autoreleasepool
@@ -5582,6 +5578,20 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fTorrents sortUsingDescriptors:descriptors];
 
     [self sortTorrentsAndIncludeQueueOrder:YES];
+}
+
+@end
+
+@implementation Controller (SUUpdaterDelegate)
+
+- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
+{
+    self.fQuitRequested = YES;
+}
+
+- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater*)updater
+{
+    return [VersionComparator new];
 }
 
 @end
