@@ -874,7 +874,7 @@ bool tr_torrent::is_new_torrent_a_seed()
 
 void tr_torrent::on_metainfo_updated()
 {
-    completion_ = tr_completion{ this, &block_info() };
+    completion_ = tr_completion{ [this](tr_piece_index_t piece) { return piece_is_wanted(piece); }, &block_info() };
     obfuscated_hash_ = tr_sha1::digest("req2"sv, info_hash());
     fpm_ = tr_file_piece_map{ metainfo_ };
     file_mtimes_.resize(file_count());

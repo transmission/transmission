@@ -63,7 +63,7 @@ class RenameTest_singleFilenameTorrent_Test;
 } // namespace libtransmission::test
 
 /** @brief Torrent object */
-struct tr_torrent final : public tr_completion::torrent_view
+struct tr_torrent
 {
     using Speed = libtransmission::Values::Speed;
 
@@ -174,7 +174,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
-        , completion_{ this, &this->metainfo_.block_info() }
+        , completion_{ [this](tr_piece_index_t const piece) { return piece_is_wanted(piece); }, &metainfo_.block_info() }
     {
     }
 
@@ -389,7 +389,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     /// WANTED
 
-    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
+    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const
     {
         return files_wanted_.piece_wanted(piece);
     }

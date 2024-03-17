@@ -55,7 +55,7 @@ uint64_t tr_completion::compute_size_when_done() const
     auto size = uint64_t{ 0 };
     for (tr_piece_index_t piece = 0, n_pieces = block_info_->piece_count(); piece < n_pieces; ++piece)
     {
-        if (tor_->piece_is_wanted(piece))
+        if (piece_is_wanted_(piece))
         {
             size += block_info_->piece_size(piece);
         }
