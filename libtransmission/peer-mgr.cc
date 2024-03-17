@@ -2299,7 +2299,7 @@ namespace peer_info_pulse_helpers
 {
 auto get_max_peer_info_count(tr_torrent const& tor)
 {
-    return std::min(uint16_t{ 50 }, static_cast<uint16_t>(tor.peer_limit() * 3U));
+    return tor.is_done() ? tor.peer_limit() : tor.peer_limit() * 3U;
 }
 
 struct ComparePeerInfo
