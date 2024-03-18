@@ -3094,7 +3094,7 @@
 			);
 			name = symlinks;
 			outputPaths = (
-				"third-party/miniupnp/miniupnp",
+				"third-party/miniupnp/miniupnpc/miniupnpc/miniupnpc",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
