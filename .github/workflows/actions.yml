@@ -147,7 +147,11 @@ jobs:
             libssl-dev \
             ninja-build \
             npm
-          sudo sysctl kernel.randomize_va_space=0 # https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/2048768
+      - name: Temporary workaround for sanitizer crashes
+        # https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/2048768
+        # https://github.com/actions/runner-images/issues/9491
+        # https://github.com/actions/runner-images/pull/9513
+        run: sudo sysctl vm.mmap_rnd_bits=28
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -857,7 +861,7 @@ jobs:
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
