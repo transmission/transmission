@@ -150,7 +150,7 @@ struct tau_scrape_request
 
     [[nodiscard]] constexpr auto expires_at() const noexcept
     {
-        return created_at_ + ScrapeTimeoutSec.count();
+        return created_at_ + TrScrapeTimeoutSec.count();
     }
 
     PayloadBuffer payload;
@@ -264,7 +264,7 @@ struct tau_announce_request
 
     [[nodiscard]] constexpr auto expires_at() const noexcept
     {
-        return created_at_ + AnnounceTimeoutSec.count();
+        return created_at_ + TrAnnounceTimeoutSec.count();
     }
 
     enum tau_announce_event : uint8_t
