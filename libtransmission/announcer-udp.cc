@@ -325,8 +325,8 @@ struct tau_tracker
 
     void sendto(tr_address_type ip_protocol, std::byte const* buf, size_t buflen)
     {
-        TR_ASSERT(ip_protocol < NUM_TR_AF_INET_TYPES);
-        if (ip_protocol >= NUM_TR_AF_INET_TYPES)
+        TR_ASSERT(tr_address::is_valid(ip_protocol));
+        if (!tr_address::is_valid(ip_protocol))
         {
             return;
         }
@@ -343,8 +343,8 @@ struct tau_tracker
 
     void on_connection_response(tr_address_type ip_protocol, tau_action_t action, InBuf& buf)
     {
-        TR_ASSERT(ip_protocol < NUM_TR_AF_INET_TYPES);
-        if (ip_protocol >= NUM_TR_AF_INET_TYPES)
+        TR_ASSERT(tr_address::is_valid(ip_protocol));
+        if (!tr_address::is_valid(ip_protocol))
         {
             return;
         }
@@ -744,7 +744,7 @@ public:
         for (auto& tracker : trackers_)
         {
             // is it a connection response?
-            if (ip_protocol < NUM_TR_AF_INET_TYPES && tracker.connecting_at[ip_protocol] != 0 &&
+            if (tr_address::is_valid(ip_protocol) && tracker.connecting_at[ip_protocol] != 0 &&
                 transaction_id == tracker.connection_transaction_id[ip_protocol])
             {
                 logtrace(tracker.log_name(), fmt::format("{} is my connection request!", transaction_id));
