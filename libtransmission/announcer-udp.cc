@@ -510,14 +510,24 @@ private:
                     fmt::arg("error_code", static_cast<int>(rc))));
             return {};
         }
+        auto const info_uniq = std::unique_ptr<addrinfo, void (*)(addrinfo*)>{ info, freeaddrinfo };
 
-        auto ss = sockaddr_storage{};
-        auto const len = info->ai_addrlen;
-        memcpy(&ss, info->ai_addr, len);
-        freeaddrinfo(info);
+        // N.B. getaddrinfo() will return IPv4-mapped addresses by default on macOS
+        auto socket_address = tr_socket_address::from_sockaddr(info->ai_addr);
+        if (!socket_address || socket_address->address().is_ipv4_mapped_address())
+        {
+            logdbg(
+                log_name(),
+                fmt::format(
+                    "Couldn't look up '{address}:{port}' in {ip_protocol}: got invalid address",
+                    fmt::arg("address", host),
+                    fmt::arg("port", port.host()),
+                    fmt::arg("ip_protocol", tr_ip_protocol_to_sv(ip_protocol))));
+            return {};
+        }
 
         logdbg(log_name(), fmt::format("{} DNS lookup succeeded", tr_ip_protocol_to_sv(ip_protocol)));
-        return std::make_pair(ss, len);
+        return socket_address->to_sockaddr();
     }
 
     void fail_all(bool did_connect, bool did_timeout, std::string_view errmsg)

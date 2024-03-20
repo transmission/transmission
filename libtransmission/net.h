@@ -235,6 +235,16 @@ struct tr_address
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
 
+    [[nodiscard]] constexpr bool is_ipv4_mapped_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_link_local_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
+    }
+
     tr_address_type type;
     union
     {
