@@ -234,7 +234,7 @@ struct tr_address
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
 
-    tr_address_type type;
+    tr_address_type type = NUM_TR_AF_INET_TYPES;
     union
     {
         struct in6_addr addr6;
