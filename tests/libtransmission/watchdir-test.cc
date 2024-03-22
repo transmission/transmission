@@ -226,6 +226,7 @@ TEST_P(WatchDirTest, watch)
     EXPECT_TRUE(std::empty(names));
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_P(WatchDirTest, DISABLED_retry)
 {
     auto const path = sandboxDir();

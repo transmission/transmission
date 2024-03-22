@@ -112,6 +112,7 @@ TEST_F(LpdTest, HelloWorld)
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -134,6 +135,7 @@ TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
     EXPECT_EQ(0U, mediator_b.found_.count(info_hash_str));
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_canMultiAnnounce)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -170,6 +172,7 @@ TEST_F(LpdTest, DISABLED_canMultiAnnounce)
     }
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
 {
     auto mediator_a = MyMediator{ *session_ };
