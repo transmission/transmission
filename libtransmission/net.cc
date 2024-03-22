@@ -448,6 +448,7 @@ namespace is_valid_for_peers_helpers
    and is covered under the same license as third-party/dht/dht.c. */
 [[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
 {
+    static auto constexpr Zeroes = std::array<unsigned char, 16>{};
     auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
 
     switch (addr.type)
@@ -464,7 +465,7 @@ namespace is_valid_for_peers_helpers
         {
             auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
             return address[0] == 0xFF || // multicast address
-                (std::all_of(address, address + 15, [](char const c) { return c == 0; }) &&
+                (std::memcmp(address, std::data(Zeroes), 15) == 0 &&
                  (address[15] == 0 || // ::
                   (!loopback_allowed && address[15] == 1)) // ::1
                 );
