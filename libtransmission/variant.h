@@ -321,58 +321,6 @@ public:
         return {};
     }
 
-    template<>
-    [[nodiscard]] constexpr std::optional<int64_t> value_if() noexcept
-    {
-        switch (index())
-        {
-        case IntIndex:
-            return *get_if<IntIndex>();
-
-        case BoolIndex:
-            return *get_if<BoolIndex>() ? 1 : 0;
-
-        default:
-            return {};
-        }
-    }
-
-    template<>
-    [[nodiscard]] constexpr std::optional<bool> value_if() noexcept
-    {
-        switch (index())
-        {
-        case BoolIndex:
-            return *get_if<BoolIndex>();
-
-        case IntIndex:
-            if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
-            {
-                return val != 0;
-            }
-            break;
-
-        case StringIndex:
-            if (auto const val = *get_if<StringIndex>(); val == "true")
-            {
-                return true;
-            }
-            else if (val == "false")
-            {
-                return false;
-            }
-            break;
-
-        default:
-            break;
-        }
-
-        return {};
-    }
-
-    template<>
-    [[nodiscard]] std::optional<double> value_if() noexcept;
-
     template<typename Val>
     [[nodiscard]] std::optional<Val> value_if() const noexcept
     {
