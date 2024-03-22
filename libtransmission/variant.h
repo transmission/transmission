@@ -388,6 +388,13 @@ private:
     std::variant<std::monostate, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };
 
+template<>
+[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
+
 // --- Strings
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
