@@ -158,11 +158,11 @@ public:
         }
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 std::optional<Type> value_if(tr_quark const key) const noexcept
+        [[nodiscard]] std::optional<Type> value_if(tr_quark const key) const noexcept
         {
-            if (auto const* const value = find_if<Type>(key); value != nullptr)
+            if (auto it = find(key); it != end())
             {
-                return std::optional<Type>{ *value };
+                return it->second.value_if<Type>();
             }
 
             return {};
@@ -308,6 +308,75 @@ public:
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
         return const_cast<tr_variant*>(this)->get_if<Index>();
+    }
+
+    template<typename Val>
+    [[nodiscard]] constexpr std::optional<Val> value_if() noexcept
+    {
+        if (auto const* const val = get_if<Val>())
+        {
+            return *val;
+        }
+
+        return {};
+    }
+
+    template<>
+    [[nodiscard]] constexpr std::optional<int64_t> value_if() noexcept
+    {
+        switch (index())
+        {
+        case IntIndex:
+            return *get_if<IntIndex>();
+
+        case BoolIndex:
+            return *get_if<BoolIndex>() ? 1 : 0;
+
+        default:
+            return {};
+        }
+    }
+
+    template<>
+    [[nodiscard]] constexpr std::optional<bool> value_if() noexcept
+    {
+        switch (index())
+        {
+        case BoolIndex:
+            return *get_if<BoolIndex>();
+
+        case IntIndex:
+            if (auto const val = *get_if<IntIndex>(); val == 0 || val == 1)
+            {
+                return val != 0;
+            }
+            break;
+
+        case StringIndex:
+            if (auto const val = *get_if<StringIndex>(); val == "true")
+            {
+                return true;
+            }
+            else if (val == "false")
+            {
+                return false;
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        return {};
+    }
+
+    template<>
+    [[nodiscard]] std::optional<double> value_if() noexcept;
+
+    template<typename Val>
+    [[nodiscard]] std::optional<Val> value_if() const noexcept
+    {
+        return const_cast<tr_variant*>(this)->value_if<Val>();
     }
 
     template<typename Val>

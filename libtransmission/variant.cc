@@ -51,6 +51,21 @@ namespace
 }
 
 template<typename T>
+[[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
+{
+    if (var != nullptr)
+    {
+        if (auto val = var->value_if<T>())
+        {
+            *setme = *val;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+template<typename T>
 [[nodiscard]] tr_variant* dict_set(tr_variant* const var, tr_quark const key, T&& val)
 {
     TR_ASSERT(var != nullptr);
@@ -79,6 +94,27 @@ template<typename T>
     return {};
 }
 } // namespace
+
+// ---
+
+template<>
+std::optional<double> tr_variant::value_if() noexcept
+{
+    switch (index())
+    {
+    case DoubleIndex:
+        return *get_if<DoubleIndex>();
+
+    case IntIndex:
+        return static_cast<double>(*get_if<IntIndex>());
+
+    case StringIndex:
+        return tr_num_parse<double>(*get_if<StringIndex>());
+
+    default:
+        return {};
+    }
+}
 
 // ---
 
@@ -206,38 +242,12 @@ bool tr_variantListRemove(tr_variant* const var, size_t pos)
 
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::IntIndex:
-        if (setme != nullptr)
-        {
-            *setme = *var->get_if<tr_variant::IntIndex>();
-        }
-        return true;
-
-    case tr_variant::BoolIndex:
-        if (setme != nullptr)
-        {
-            *setme = *var->get_if<tr_variant::BoolIndex>() ? 1 : 0;
-        }
-        return true;
-
-    default:
-        return false;
-    }
+    return value_if(var, setme);
 }
 
 bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::StringIndex:
-        *setme = *var->get_if<tr_variant::StringIndex>();
-        return true;
-
-    default:
-        return false;
-    }
+    return value_if(var, setme);
 }
 
 bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
@@ -266,63 +276,12 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
 bool tr_variantGetBool(tr_variant const* const var, bool* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::BoolIndex:
-        *setme = *var->get_if<tr_variant::BoolIndex>();
-        return true;
-
-    case tr_variant::IntIndex:
-        if (auto const val = *var->get_if<tr_variant::IntIndex>(); val == 0 || val == 1)
-        {
-            *setme = val != 0;
-            return true;
-        }
-        break;
-
-    case tr_variant::StringIndex:
-        if (auto const val = *var->get_if<tr_variant::StringIndex>(); val == "true"sv)
-        {
-            *setme = true;
-            return true;
-        }
-        else if (val == "false"sv)
-        {
-            *setme = false;
-            return true;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return false;
+    return value_if(var, setme);
 }
 
 bool tr_variantGetReal(tr_variant const* const var, double* setme)
 {
-    switch (variant_index(var))
-    {
-    case tr_variant::DoubleIndex:
-        *setme = *var->get_if<tr_variant::DoubleIndex>();
-        return true;
-
-    case tr_variant::IntIndex:
-        *setme = static_cast<double>(*var->get_if<tr_variant::IntIndex>());
-        return true;
-
-    case tr_variant::StringIndex:
-        if (auto const val = tr_num_parse<double>(*var->get_if<tr_variant::StringIndex>()); val)
-        {
-            *setme = *val;
-            return true;
-        }
-        [[fallthrough]];
-
-    default:
-        return false;
-    }
+    return value_if(var, setme);
 }
 
 bool tr_variantDictFindInt(tr_variant* const var, tr_quark key, int64_t* setme)
