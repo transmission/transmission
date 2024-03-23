@@ -55,7 +55,7 @@ namespace
 {
 
 #if !defined(TR_SYS_TRAY_IMPL_NONE)
-auto const TrayIconName = Glib::ustring("transmission-tray-icon"s);
+auto const TrayIconName = Glib::ustring("transmission-symbolic"s);
 auto const AppIconName = Glib::ustring("transmission"s);
 #endif
 
