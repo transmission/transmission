@@ -52,7 +52,6 @@ using namespace std::literals;
 // the dht library needs us to implement these:
 extern "C"
 {
-
     // This function should return true when a node is blacklisted.
     // We don't support using a blacklist with the DHT in Transmission,
     // since massive (ab)use of this feature could harm the DHT. However,
