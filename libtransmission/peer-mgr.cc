@@ -347,7 +347,6 @@ public:
               tor_in->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
           } }
     {
-
         rebuild_webseeds();
     }
 

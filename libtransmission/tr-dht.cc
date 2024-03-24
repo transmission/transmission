@@ -52,7 +52,6 @@ using namespace std::literals;
 // the dht library needs us to implement these:
 extern "C"
 {
-
     // This function should return true when a node is blacklisted.
     // We don't support using a blacklist with the DHT in Transmission,
     // since massive (ab)use of this feature could harm the DHT. However,
@@ -140,7 +139,7 @@ public:
         tr_logAddDebug(fmt::format("Starting DHT on port {port}", fmt::arg("port", peer_port.host())));
 
         // init state from scratch, or load from state file if it exists
-        std::tie(id_, bootstrap_queue_) = init_state(state_filename_);
+        init_state(state_filename_);
 
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
         get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
@@ -426,8 +425,9 @@ private:
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
 
         tr_variant benc;
-        tr_variantInitDict(&benc, 3);
+        tr_variantInitDict(&benc, 4);
         tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(id_), std::size(id_));
+        tr_variantDictAddInt(&benc, TR_KEY_id_timestamp, id_timestamp_);
 
         if (num4 > 0)
         {
@@ -462,32 +462,38 @@ private:
         tr_variant_serde::benc().to_file(benc, state_filename_);
     }
 
-    [[nodiscard]] static std::pair<Id, Nodes> init_state(std::string_view filename)
+    void init_state(std::string_view filename)
     {
         // Note that DHT ids need to be distributed uniformly,
         // so it should be something truly random
-        auto id = tr_rand_obj<Id>();
+        id_ = tr_rand_obj<Id>();
+        id_timestamp_ = tr_time();
 
         if (!tr_sys_path_exists(std::data(filename)))
         {
-            return { id, {} };
+            return;
         }
 
         auto otop = tr_variant_serde::benc().parse_file(filename);
         if (!otop)
         {
-            return { id, {} };
+            return;
         }
 
         static auto constexpr CompactLen = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
         static auto constexpr Compact6Len = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
+        static auto constexpr IdTtl = time_t{ 30 * 24 * 60 * 60 }; // 30 days
 
         auto& top = *otop;
-        auto nodes = Nodes{};
 
-        if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
+        if (auto t = int64_t{}; tr_variantDictFindInt(&top, TR_KEY_id_timestamp, &t) && t + IdTtl > id_timestamp_)
         {
-            std::copy(std::begin(sv), std::end(sv), std::begin(id));
+            if (auto sv = std::string_view{};
+                tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id_))
+            {
+                id_timestamp_ = t;
+                std::copy(std::begin(sv), std::end(sv), std::begin(id_));
+            }
         }
 
         size_t raw_len = 0U;
@@ -502,7 +508,7 @@ private:
                 auto port = tr_port{};
                 std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
                 std::tie(port, walk) = tr_port::from_compact(walk);
-                nodes.emplace_back(addr, port);
+                bootstrap_queue_.emplace_back(addr, port);
             }
         }
 
@@ -516,11 +522,9 @@ private:
                 auto port = tr_port{};
                 std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
                 std::tie(port, walk) = tr_port::from_compact(walk);
-                nodes.emplace_back(addr, port);
+                bootstrap_queue_.emplace_back(addr, port);
             }
         }
-
-        return { id, std::move(nodes) };
     }
 
     ///
@@ -601,6 +605,7 @@ private:
     std::unique_ptr<libtransmission::Timer> const periodic_timer_;
 
     Id id_ = {};
+    int64_t id_timestamp_ = {};
 
     Nodes bootstrap_queue_;
     size_t n_bootstrapped_ = 0;
