@@ -60,6 +60,8 @@ using tr_socket_t = int;
 #define sockerrno errno
 #endif
 
+#include "libtransmission/transmission.h" // tr_peer_from
+
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // for tr_compare_3way()
 
@@ -234,7 +236,7 @@ struct tr_address
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
 
-    tr_address_type type;
+    tr_address_type type = NUM_TR_AF_INET_TYPES;
     union
     {
         struct in6_addr addr6;
@@ -306,7 +308,7 @@ struct tr_socket_address
         return address_.is_valid();
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept;
+    [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept;
 
     [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
     {

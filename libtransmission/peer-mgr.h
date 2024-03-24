@@ -517,9 +517,14 @@ struct tr_pex
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
-        return socket_address.is_valid_for_peers();
+        return socket_address.is_valid();
+    }
+
+    [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept
+    {
+        return socket_address.is_valid_for_peers(from);
     }
 
     tr_socket_address socket_address;
