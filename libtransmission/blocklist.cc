@@ -204,10 +204,12 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
         return {};
     }
 
-    auto const mask = uint32_t{ 0xFFFFFFFF } << (32 - *pflen);
-    auto const ip_u = htonl(addrpair.first.addr.addr4.s_addr);
-    addrpair.first.addr.addr4.s_addr = ntohl(ip_u & mask);
-    addrpair.second.addr.addr4.s_addr = ntohl(ip_u | (~mask));
+    auto const mask = ~(~uint32_t{ 0 } >> *pflen);
+    auto const ip_u = ntohl(addrpair.first.addr.addr4.s_addr);
+    auto tmp = htonl(ip_u & mask);
+    std::tie(addrpair.first, std::ignore) = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&tmp));
+    tmp = htonl(ip_u | (~mask));
+    std::tie(addrpair.second, std::ignore) = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&tmp));
     return addrpair;
 }
 

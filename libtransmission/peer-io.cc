@@ -129,11 +129,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
-    if (!socket_address.is_valid_for_peers())
-    {
-        return {};
-    }
-
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
     auto const func = small::max_size_map<preferred_key_t, std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
         { TR_PREFER_UTP,
