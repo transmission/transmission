@@ -386,7 +386,6 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 
 void TorrentUrlChooserDialog::onOpenURLResponse(int response, Gtk::Entry const& entry, Glib::RefPtr<Session> const& core)
 {
-
     if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
     {
         close();
