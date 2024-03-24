@@ -16,6 +16,7 @@
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
+@import Darwin.sys.sysctl;
 
 typedef NS_ENUM(NSUInteger, DownloadPopupIndex) {
     DownloadPopupIndexFolder = 0,
@@ -81,6 +82,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) IBOutlet NSTextField* fSpeedLimitUploadField;
 @property(nonatomic) IBOutlet NSTextField* fSpeedLimitDownloadField;
 @property(nonatomic) IBOutlet NSPopUpButton* fAutoSpeedDayTypePopUp;
+@property(nonatomic) IBOutlet NSTextField* fMemoryCacheField;
 
 @property(nonatomic) IBOutlet NSTextField* fPeersGlobalField;
 @property(nonatomic) IBOutlet NSTextField* fPeersTorrentField;
@@ -237,6 +239,13 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     //set speed limit
     self.fSpeedLimitUploadField.integerValue = [self.fDefaults integerForKey:@"SpeedLimitUploadLimit"];
     self.fSpeedLimitDownloadField.integerValue = [self.fDefaults integerForKey:@"SpeedLimitDownloadLimit"];
+
+    // set memory cache size
+    if (id memoryCacheSize = [self.fDefaults objectForKey:@"MemoryCacheSize"])
+    {
+        [self setMemoryCache:memoryCacheSize];
+    }
+    self.fMemoryCacheField.integerValue = tr_sessionGetCacheLimit_MB(_fHandle);
 
     //set port
     self.fPortField.intValue = static_cast<int>([self.fDefaults integerForKey:@"BindPort"]);
@@ -769,6 +778,27 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 - (void)setAutoSpeedLimitDay:(id)sender
 {
     tr_sessionSetAltSpeedDay(self.fHandle, static_cast<tr_sched_day>([sender selectedItem].tag));
+}
+
+- (IBAction)setMemoryCache:(id)sender
+{
+    [self.fDefaults setInteger:[sender integerValue] forKey:@"MemoryCacheSize"];
+
+    // Low cap is 0
+    NSInteger memoryCacheSize = MAX([sender integerValue], 0);
+
+    // High cap is 1/4th of physical memory since it is observed that apps often crash at 1/2 of physical memory (https://stackoverflow.com/a/15200855).
+    // Recommended value to use could be 1/256th of physical memory (4 MB of cache for 1 GB of RAM).
+    int mib[] = { CTL_HW, HW_MEMSIZE };
+    int64_t physical_memory = 0;
+    size_t length = sizeof(physical_memory);
+    if (sysctl(mib, 2, &physical_memory, &length, NULL, 0) != -1)
+    {
+        // Capping to 1/4th of total physical memory
+        MIN(memoryCacheSize, physical_memory / 4);
+    }
+
+    tr_sessionSetCacheLimit_MB(self.fHandle, memoryCacheSize);
 }
 
 + (int)dateToTimeSum:(NSDate*)date
