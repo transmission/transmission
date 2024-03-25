@@ -231,7 +231,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid_for_peers())
+    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
     {
         return {};
     }
@@ -436,23 +436,29 @@ namespace is_valid_for_peers_helpers
 
 /* isMartianAddr was written by Juliusz Chroboczek,
    and is covered under the same license as third-party/dht/dht.c. */
-[[nodiscard]] auto is_martian_addr(tr_address const& addr)
+[[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
 {
     static auto constexpr Zeroes = std::array<unsigned char, 16>{};
+    auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
 
     switch (addr.type)
     {
     case TR_AF_INET:
         {
             auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr4);
-            return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
+            return address[0] == 0 || // 0.x.x.x
+                (!loopback_allowed && address[0] == 127) || // 127.x.x.x
+                (address[0] & 0xE0) == 0xE0; // multicast address
         }
 
     case TR_AF_INET6:
         {
             auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
-            return address[0] == 0xFF ||
-                (memcmp(address, std::data(Zeroes), 15) == 0 && (address[15] == 0 || address[15] == 1));
+            return address[0] == 0xFF || // multicast address
+                (std::memcmp(address, std::data(Zeroes), 15) == 0 &&
+                 (address[15] == 0 || // ::
+                  (!loopback_allowed && address[15] == 1)) // ::1
+                );
         }
 
     default:
@@ -693,12 +699,12 @@ std::string tr_socket_address::display_name(tr_address const& address, tr_port p
     return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
 }
 
-bool tr_socket_address::is_valid_for_peers() const noexcept
+bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
     using namespace is_valid_for_peers_helpers;
 
     return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local_address() && !address_.is_ipv4_mapped_address() &&
-        !is_martian_addr(address_);
+        !is_martian_addr(address_, from);
 }
 
 std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
