@@ -79,24 +79,19 @@ namespace
 {
 int compareState(Torrent const* left, Torrent const* right)
 {
-    int val = tr_compare_3way(left->hasError(), right->hasError());
-
-    if (val == 0)
+    if (auto const val = tr_compare_3way(left->hasError(), right->hasError()); val != 0)
     {
-        val = tr_compare_3way(left->isFinished(), right->isFinished());
+        return val;
     }
-
-    if (val == 0)
+    if (auto const val = tr_compare_3way(left->isFinished(), right->isFinished()); val != 0)
     {
-        val = -tr_compare_3way(left->isPaused(), right->isPaused());
+        return val;
     }
-
-    if (val == 0)
+    if (auto const val = -tr_compare_3way(left->isPaused(), right->isPaused()); val != 0)
     {
-        val = -tr_compare_3way(!left->hasMetadata(), !right->hasMetadata());
+        return val;
     }
-
-    return val;
+    return -tr_compare_3way(!left->hasMetadata(), !right->hasMetadata());
 }
 } // namespace
 
