@@ -499,23 +499,29 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
     auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
 
-    auto addr = tr_address{};
-
-    addr.addr.addr4 = {};
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
+    auto ss = sockaddr_storage{};
+    auto sslen = int{ sizeof(ss) };
+    if (evutil_parse_sockaddr_port(address_sz, reinterpret_cast<sockaddr*>(&ss), &sslen) != 0)
     {
+        return {};
+    }
+
+    auto addr = tr_address{};
+    switch (ss.ss_family)
+    {
+    case AF_INET:
+        addr.addr.addr4 = reinterpret_cast<sockaddr_in*>(&ss)->sin_addr;
         addr.type = TR_AF_INET;
         return addr;
-    }
 
-    addr.addr.addr6 = {};
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
-    {
+    case AF_INET6:
+        addr.addr.addr6 = reinterpret_cast<sockaddr_in6*>(&ss)->sin6_addr;
         addr.type = TR_AF_INET6;
         return addr;
-    }
 
-    return {};
+    default:
+        return {};
+    }
 }
 
 std::string_view tr_address::display_name(char* out, size_t outlen) const
