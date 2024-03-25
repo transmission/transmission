@@ -900,7 +900,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     settings_ = load_settings(config_dir_.c_str());
 
     paused_ = false;
-    tr_variantDictFindBool(&settings_, TR_KEY_daemon_startPaused, &paused_);
+    tr_variantDictFindBool(&settings_, TR_KEY_start_paused, &paused_);
 
     bool dumpSettings;
 
