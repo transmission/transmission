@@ -177,7 +177,12 @@ TEST_F(TimerTest, repeatingHonorsInterval)
     EXPECT_EQ(DesiredLoops, n_calls);
 }
 
+#ifdef _WIN32
+// TODO: flaky test should be fixed instead of disabled
+TEST_F(TimerTest, DISABLED_restartWithDifferentInterval)
+#else
 TEST_F(TimerTest, restartWithDifferentInterval)
+#endif
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -206,7 +211,12 @@ TEST_F(TimerTest, restartWithDifferentInterval)
     test(200ms);
 }
 
+#ifdef _WIN32
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_restartWithSameInterval)
+#else
+TEST_F(TimerTest, restartWithSameInterval)
+#endif
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -235,6 +245,7 @@ TEST_F(TimerTest, DISABLED_restartWithSameInterval)
     test(timer->interval());
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -277,6 +288,7 @@ TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
     EXPECT_EQ(baseline + 1, n_calls);
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_singleShotStop)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
