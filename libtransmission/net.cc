@@ -322,18 +322,13 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
-#ifdef IPV6_V6ONLY
-
-    if (addr.is_ipv6() &&
-        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
-        (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
+    if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
+        sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
-
-#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
