@@ -320,7 +320,7 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
 
     int optval = 1;
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
-    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+    (void)evutil_make_listen_socket_reuseable(fd);
 
     if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
