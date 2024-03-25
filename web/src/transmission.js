@@ -1067,12 +1067,6 @@ TODO: fix this when notifications get fixed
     for (const row of dirty_rows) {
       const id = row.getTorrentId();
       const t = this._torrents[id];
-
-      // get private status of tracker
-      const get = this._torrents[id].getPrivateFlag();
-
-      console.log(get);
-
       if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
         temporary.push(row);
       }
