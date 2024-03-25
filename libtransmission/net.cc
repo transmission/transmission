@@ -707,7 +707,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
 std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
 {
-    return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
+    return fmt::format(address.is_ipv6() ? "[{:s}]:{:d}" : "{:s}:{:d}", address.display_name(), port.host());
 }
 
 bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
