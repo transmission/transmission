@@ -378,6 +378,7 @@ struct tr_socket_address
 
     // --- sockaddr helpers
 
+    [[nodiscard]] static std::optional<tr_socket_address> from_string(std::string_view sockaddr_sv);
     [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
     [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 

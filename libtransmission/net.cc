@@ -808,6 +808,19 @@ bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
         !is_martian_addr(address_, from);
 }
 
+std::optional<tr_socket_address> tr_socket_address::from_string(std::string_view sockaddr_sv)
+{
+    auto ss = sockaddr_storage{};
+    auto sslen = int{ sizeof(ss) };
+    if (evutil_parse_sockaddr_port(tr_strbuf<char, TR_ADDRSTRLEN>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) !=
+        0)
+    {
+        return {};
+    }
+
+    return from_sockaddr(reinterpret_cast<struct sockaddr const*>(&ss));
+}
+
 std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
 {
     if (from == nullptr)
