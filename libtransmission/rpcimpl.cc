@@ -2122,6 +2122,7 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
     auto const empty_args = tr_variant::Map{};
     auto const* args_in = &empty_args;
     auto method_name = std::string_view{};
+    auto tag = std::optional<int64_t>{};
     if (request_map != nullptr)
     {
         // find the args
@@ -2135,9 +2136,9 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
         {
             method_name = *val;
         }
-    }
 
-    auto const tag = request_map->value_if<int64_t>(TR_KEY_tag);
+        tag = request_map->value_if<int64_t>(TR_KEY_tag);
+    }
 
     auto const test = [method_name](auto const& handler)
     {
