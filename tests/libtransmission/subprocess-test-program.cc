@@ -7,8 +7,9 @@
 #include <libtransmission/utils.h> // tr_env_get_string()
 
 #include <fmt/core.h>
+#include <fmt/ostream.h>
 
-#include <cstdio>
+#include <fstream>
 #include <string>
 
 int main(int argc, char** argv)
@@ -22,8 +23,8 @@ int main(int argc, char** argv)
     auto const test_action = std::string{ argv[2] };
     auto const tmp_result_path = result_path + ".tmp";
 
-    FILE* out = std::fopen(tmp_result_path.c_str(), "w+");
-    if (out == nullptr)
+    auto out = std::ofstream(tmp_result_path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!out)
     {
         return 1;
     }
@@ -55,12 +56,12 @@ int main(int argc, char** argv)
     }
     else
     {
-        (void)std::fclose(out);
+        out.close();
         (void)std::remove(tmp_result_path.c_str());
         return 1;
     }
 
-    (void)std::fclose(out);
+    out.close();
     tr_sys_path_rename(tmp_result_path.c_str(), result_path.c_str());
     return 0;
 }
