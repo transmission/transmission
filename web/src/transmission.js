@@ -961,9 +961,22 @@ TODO: fix this when notifications get fixed
 
     // build the new html
     let string = '';
+    // All trackers option
     string += this.filterTracker
       ? '<option value="all">All</option>'
       : '<option value="all" selected="selected">All</option>';
+
+    // Public/private trackers options
+    string +=
+      this.filterTracker === 'public'
+        ? '<option value="public" selected="selected">Public</option>'
+        : '<option value="public">Public</option>';
+    string +=
+      this.filterTracker === 'private'
+        ? '<option value="private" selected="selected">Private</option>'
+        : '<option value="private">Private</option>';
+    string += '<option style="background-color: #000000;" disabled>--</option>';
+
     for (const sitename of sitenames) {
       string += `<option value="${sitename}"`;
       if (sitename === this.filterTracker) {
@@ -972,10 +985,7 @@ TODO: fix this when notifications get fixed
       string += `>${Transmission._displayName(sitename)}</option>`;
     }
 
-    if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
-      this.filterTrackersStr = string;
-      document.querySelector('#filter-tracker').innerHTML = string;
-    }
+    document.querySelector('#filter-tracker').innerHTML = string;
   }
 
   /// FILTER
@@ -1057,6 +1067,12 @@ TODO: fix this when notifications get fixed
     for (const row of dirty_rows) {
       const id = row.getTorrentId();
       const t = this._torrents[id];
+
+      // get private status of tracker
+      const get = this._torrents[id].getPrivateFlag();
+
+      console.log(get);
+
       if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
         temporary.push(row);
       }
