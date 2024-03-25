@@ -343,17 +343,9 @@ private:
                 }
             }
 
-            auto mcast_ss = sockaddr_storage{};
-            auto mcast_sslen = int{ sizeof(mcast_ss) };
-            if (evutil_parse_sockaddr_port(
-                    std::data(McastSockAddr[ip_protocol]),
-                    reinterpret_cast<sockaddr*>(&mcast_ss),
-                    &mcast_sslen) == -1)
-            {
-                return false;
-            }
-            auto mcast_sockaddr = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&mcast_ss));
+            auto const mcast_sockaddr = tr_socket_address::from_string(McastSockAddr[ip_protocol]);
             TR_ASSERT(mcast_sockaddr);
+            auto const [mcast_ss, mcast_sslen] = mcast_sockaddr->to_sockaddr();
 
             auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(
                 tr_address::any(ip_protocol),
