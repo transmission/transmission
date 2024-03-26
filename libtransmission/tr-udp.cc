@@ -159,8 +159,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
     if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto optval = 1;
-        (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+        (void)evutil_make_listen_socket_reuseable(sock);
 
         auto const addr = session_.bind_address(TR_AF_INET);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
@@ -204,8 +203,8 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     }
     else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto optval = 1;
-        (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+        (void)evutil_make_listen_socket_reuseable(sock);
+        (void)evutil_make_listen_socket_ipv6only(sock);
 
         auto const addr = session_.bind_address(TR_AF_INET6);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
@@ -240,13 +239,6 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             udp6_socket_ = sock;
             udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp6_event_.get(), nullptr);
-
-#ifdef IPV6_V6ONLY
-            // Since we always open an IPv4 socket on the same port,
-            // this shouldn't matter.  But I'm superstitious.
-            int one = 1;
-            (void)setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
-#endif
         }
     }
 }
