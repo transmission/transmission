@@ -38,7 +38,7 @@ using Lookup = std::array<std::pair<std::string_view, T>, N>;
 
 bool load_bool(tr_variant const& src, bool* tgt)
 {
-    if (auto val = src.get_if<bool>(); val != nullptr)
+    if (auto val = src.value_if<bool>())
     {
         *tgt = *val;
         return true;
@@ -56,7 +56,7 @@ tr_variant save_bool(bool const& val)
 
 bool load_double(tr_variant const& src, double* tgt)
 {
-    if (auto val = src.get_if<double>(); val != nullptr)
+    if (auto val = src.value_if<double>())
     {
         *tgt = *val;
         return true;
@@ -82,7 +82,7 @@ bool load_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
 {
     static constexpr auto& Keys = EncryptionKeys;
 
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         auto const needle = tr_strlower(tr_strv_strip(*val));
 
@@ -96,7 +96,7 @@ bool load_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
         }
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         for (auto const& [key, encryption] : Keys)
         {
@@ -132,7 +132,7 @@ bool load_log_level(tr_variant const& src, tr_log_level* tgt)
 {
     static constexpr auto& Keys = LogKeys;
 
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         auto const needle = tr_strlower(tr_strv_strip(*val));
 
@@ -146,7 +146,7 @@ bool load_log_level(tr_variant const& src, tr_log_level* tgt)
         }
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         for (auto const& [name, log_level] : Keys)
         {
@@ -170,7 +170,7 @@ tr_variant save_log_level(tr_log_level const& val)
 
 bool load_mode_t(tr_variant const& src, tr_mode_t* tgt)
 {
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         if (auto const mode = tr_num_parse<uint32_t>(*val, nullptr, 8); mode)
         {
@@ -179,7 +179,7 @@ bool load_mode_t(tr_variant const& src, tr_mode_t* tgt)
         }
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         *tgt = static_cast<tr_mode_t>(*val);
         return true;
@@ -197,7 +197,7 @@ tr_variant save_mode_t(tr_mode_t const& val)
 
 bool load_msec(tr_variant const& src, std::chrono::milliseconds* tgt)
 {
-    if (auto val = src.get_if<int64_t>(); val != nullptr)
+    if (auto val = src.value_if<int64_t>())
     {
         *tgt = std::chrono::milliseconds(*val);
         return true;
@@ -215,7 +215,7 @@ tr_variant save_msec(std::chrono::milliseconds const& src)
 
 bool load_port(tr_variant const& src, tr_port* tgt)
 {
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         *tgt = tr_port::from_host(*val);
         return true;
@@ -243,7 +243,7 @@ bool load_preallocation_mode(tr_variant const& src, tr_open_files::Preallocation
 {
     static constexpr auto& Keys = PreallocationKeys;
 
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         auto const needle = tr_strlower(tr_strv_strip(*val));
 
@@ -257,7 +257,7 @@ bool load_preallocation_mode(tr_variant const& src, tr_open_files::Preallocation
         }
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         for (auto const& [name, value] : Keys)
         {
@@ -288,7 +288,7 @@ bool load_preferred_transport(tr_variant const& src, tr_preferred_transport* tgt
 {
     static constexpr auto& Keys = PreferredTransportKeys;
 
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         auto const needle = tr_strlower(tr_strv_strip(*val));
 
@@ -302,7 +302,7 @@ bool load_preferred_transport(tr_variant const& src, tr_preferred_transport* tgt
         }
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         for (auto const& [name, value] : Keys)
         {
@@ -334,7 +334,7 @@ tr_variant save_preferred_transport(tr_preferred_transport const& val)
 
 bool load_size_t(tr_variant const& src, size_t* tgt)
 {
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         *tgt = static_cast<size_t>(*val);
         return true;
@@ -352,7 +352,7 @@ tr_variant save_size_t(size_t const& val)
 
 bool load_string(tr_variant const& src, std::string* tgt)
 {
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         *tgt = std::string{ *val };
         return true;
@@ -370,7 +370,7 @@ tr_variant save_string(std::string const& val)
 
 bool load_tos_t(tr_variant const& src, tr_tos_t* tgt)
 {
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         if (auto const tos = tr_tos_t::from_string(*val); tos)
         {
@@ -381,7 +381,7 @@ bool load_tos_t(tr_variant const& src, tr_tos_t* tgt)
         return false;
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         *tgt = tr_tos_t{ static_cast<int>(*val) };
         return true;
@@ -406,7 +406,7 @@ bool load_verify_added_mode(tr_variant const& src, tr_verify_added_mode* tgt)
 {
     static constexpr auto& Keys = VerifyModeKeys;
 
-    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = src.value_if<std::string_view>())
     {
         auto const needle = tr_strlower(tr_strv_strip(*val));
 
@@ -420,7 +420,7 @@ bool load_verify_added_mode(tr_variant const& src, tr_verify_added_mode* tgt)
         }
     }
 
-    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    if (auto const val = src.value_if<int64_t>())
     {
         for (auto const& [name, value] : Keys)
         {
