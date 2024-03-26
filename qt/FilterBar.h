@@ -59,8 +59,9 @@ private:
 
     QStandardItemModel* const tracker_model_ = new QStandardItemModel{ this };
 
-    QLabel* const count_label_ = {};
+    QLabel* const activity_label_ = {};
     FilterBarComboBox* const activity_combo_ = createActivityCombo();
+    QLabel* const tracker_label_ = {};
     FilterBarComboBox* const tracker_combo_ = createTrackerCombo(tracker_model_);
     QLineEdit* const line_edit_ = new QLineEdit{ this };
 
