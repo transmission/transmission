@@ -879,7 +879,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     tr_sessionSetQueueEnabled(self.fHandle, TR_UP, [self.fDefaults boolForKey:@"QueueSeed"]);
 
     //handle if any transfers switch from queued to paused
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateQueue" object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateTorrentsState" object:nil];
 }
 
 - (void)setQueueNumber:(id)sender
