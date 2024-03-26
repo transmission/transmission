@@ -385,10 +385,13 @@ a {
   }
 
   .speed-container {
-    width: 100px;
     display: inherit;
     align-items: inherit;
     flex-direction: inherit;
+
+    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
+      width: 100px;
+    }
   }
 
   #speed-up-icon,
