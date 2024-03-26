@@ -383,20 +383,27 @@ a {
   > * {
     margin-right: 5px;
   }
-}
 
-#speed-up-icon,
-#speed-dn-icon {
-  fill: var(--color-fg-primary);
-
-  svg {
-    width: 20px;
+  .speed-container {
+    width: 100px;
+    display: inherit;
+    align-items: inherit;
+    flex-direction: inherit;
   }
-}
 
-#speed-dn-label,
-#speed-up-label {
-  text-align: right;
+  #speed-up-icon,
+  #speed-dn-icon {
+    fill: var(--color-fg-primary);
+
+    svg {
+      width: 20px;
+    }
+  }
+
+  #speed-dn-label,
+  #speed-up-label {
+    text-align: right;
+  }
 }
 
 /// TORRENT CONTAINER
