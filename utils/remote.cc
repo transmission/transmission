@@ -347,19 +347,18 @@ void showUsage()
     tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
-[[nodiscard]] auto numarg(char const* arg)
+[[nodiscard]] auto numarg(char const* const arg)
 {
-    char* end = nullptr;
-    long const num = strtol(arg, &end, 10);
-
-    if (*end != '\0')
+    auto remainder = std::string_view{};
+    auto const num = tr_num_parse<int64_t>(arg != nullptr ? arg : "", &remainder);
+    if (!num || !std::empty(remainder))
     {
         fmt::print(stderr, "Not a number: '{:s}'\n", arg);
         showUsage();
         exit(EXIT_FAILURE);
     }
 
-    return num;
+    return *num;
 }
 
 enum
@@ -519,8 +518,6 @@ enum
         return MODE_TORRENT_SET_LOCATION;
 
     case 964: /* rename */
-        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
-
     case 965: /* path */
         return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
 
@@ -590,36 +587,24 @@ void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fal
     return addIdArg(args, config.torrent_ids, fallback);
 }
 
-void addTime(tr_variant* args, tr_quark const key, char const* arg)
+void addTime(tr_variant* args, tr_quark const key, char const* const arg)
 {
-    int time = 0;
-    bool success = false;
-
-    if (arg != nullptr && strlen(arg) == 4)
+    if (auto arg_sv = std::string_view{ arg != nullptr ? arg : "" }; std::size(arg_sv) == 4)
     {
-        char const hh[3] = { arg[0], arg[1], '\0' };
-        char const mm[3] = { arg[2], arg[3], '\0' };
-        int const hour = atoi(hh);
-        int const min = atoi(mm);
+        auto const hour = tr_num_parse<int>(arg_sv.substr(0, 2)).value_or(-1);
+        auto const min = tr_num_parse<int>(arg_sv.substr(2, 2)).value_or(-1);
 
         if (0 <= hour && hour < 24 && 0 <= min && min < 60)
         {
-            time = min + (hour * 60);
-            success = true;
+            tr_variantDictAddInt(args, key, min + hour * 60);
+            return;
         }
     }
 
-    if (success)
-    {
-        tr_variantDictAddInt(args, key, time);
-    }
-    else
-    {
-        fmt::print(stderr, "Please specify the time of day in 'hhmm' format.\n");
-    }
+    fmt::print(stderr, "Please specify the time of day in 'hhmm' format.\n");
 }
 
-void addDays(tr_variant* args, tr_quark const key, char const* arg)
+void addDays(tr_variant* args, tr_quark const key, char const* const arg)
 {
     int days = 0;
 
@@ -651,7 +636,7 @@ void addDays(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
+void addLabels(tr_variant* args, char const* const comma_delimited_labels)
 {
     tr_variant* labels;
     if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
@@ -659,16 +644,17 @@ void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
         labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
     }
 
+    auto labels_sv = std::string_view{ comma_delimited_labels != nullptr ? comma_delimited_labels : "" };
     auto label = std::string_view{};
-    while (tr_strv_sep(&comma_delimited_labels, &label, ','))
+    while (tr_strv_sep(&labels_sv, &label, ','))
     {
         tr_variantListAddStr(labels, label);
     }
 }
 
-void setGroup(tr_variant* args, std::string_view group)
+void setGroup(tr_variant* args, char const* const group)
 {
-    tr_variantDictAddStrView(args, TR_KEY_group, group);
+    tr_variantDictAddStrView(args, TR_KEY_group, group != nullptr ? group : "");
 }
 
 [[nodiscard]] auto make_files_list(char const* const str_in)
@@ -796,12 +782,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     if (line_len >= key_len && evutil_ascii_strncasecmp(line, key, key_len) == 0)
     {
         char const* begin = line + key_len;
-        char const* end = begin;
-
-        while (!isspace(*end))
-        {
-            ++end;
-        }
+        char const* end = std::find_if(begin, line + line_len, [](char c) { return isspace(c); });
 
         config.session_id.assign(begin, end - begin);
     }
@@ -811,7 +792,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
 
 [[nodiscard]] long getTimeoutSecs(std::string_view req)
 {
-    if (req.find("\"method\":\"blocklist-update\""sv) != std::string_view::npos)
+    if (req.find(R"("method":"blocklist-update")") != std::string_view::npos)
     {
         return 300L;
     }
@@ -892,10 +873,12 @@ auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
     "Invalid"sv,
 };
 
-char* format_date(char* buf, size_t buflen, time_t now)
+template<size_t N>
+std::string_view format_date(std::array<char, N>& buf, time_t now)
 {
-    *fmt::format_to_n(buf, buflen - 1, "{:%a %b %d %T %Y}", fmt::localtime(now)).out = '\0';
-    return buf;
+    auto begin = std::begin(buf);
+    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", fmt::localtime(now)).out;
+    return { begin, static_cast<size_t>(end - begin) };
 }
 
 void printDetails(tr_variant* top)
@@ -909,7 +892,7 @@ void printDetails(tr_variant* top)
         {
             tr_variant* t = tr_variantListChild(torrents, ti);
             tr_variant* l;
-            char buf[512];
+            std::array<char, 512> buf = {};
             int64_t i;
             int64_t j;
             int64_t k;
@@ -1071,7 +1054,7 @@ void printDetails(tr_variant* top)
 
             if (tr_variantDictFindList(t, TR_KEY_webseeds, &l) && tr_variantDictFindInt(t, TR_KEY_webseedsSendingToUs, &i))
             {
-                int64_t const n = tr_variantListSize(l);
+                auto const n = tr_variantListSize(l);
 
                 if (n > 0)
                 {
@@ -1085,22 +1068,22 @@ void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i != 0)
             {
-                fmt::print("  Date added:       {:s}\n", format_date(buf, sizeof(buf), i));
+                fmt::print("  Date added:       {:s}\n", format_date(buf, i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i != 0)
             {
-                fmt::print("  Date finished:    {:s}\n", format_date(buf, sizeof(buf), i));
+                fmt::print("  Date finished:    {:s}\n", format_date(buf, i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i != 0)
             {
-                fmt::print("  Date started:     {:s}\n", format_date(buf, sizeof(buf), i));
+                fmt::print("  Date started:     {:s}\n", format_date(buf, i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i != 0)
             {
-                fmt::print("  Latest activity:  {:s}\n", format_date(buf, sizeof(buf), i));
+                fmt::print("  Latest activity:  {:s}\n", format_date(buf, i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
@@ -1119,7 +1102,7 @@ void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i != 0)
             {
-                fmt::print("  Date created: {:s}\n", format_date(buf, sizeof(buf), i));
+                fmt::print("  Date created: {:s}\n", format_date(buf, i));
             }
 
             if (tr_variantDictFindBool(t, TR_KEY_isPrivate, &boolVal))
@@ -1250,7 +1233,7 @@ void printFileList(tr_variant* top)
             {
                 auto const jn = tr_variantListSize(files);
                 fmt::print("{:s} ({:d} files):\n", name, jn);
-                printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name");
+                fmt::print("{:>3s}  {:>5s} {:>8s} {:>3s} {:>9s}  {:s}\n", "#", "Done", "Priority", "Get", "Size", "Name");
 
                 for (size_t j = 0; j < jn; ++j)
                 {
@@ -1267,29 +1250,25 @@ void printFileList(tr_variant* top)
                         tr_variantGetInt(tr_variantListChild(priorities, j), &priority) &&
                         tr_variantGetBool(tr_variantListChild(wanteds, j), &wanted))
                     {
-                        double percent = (double)have / length;
-                        char const* pristr;
-
-                        switch (priority)
+                        auto const percent = static_cast<double>(have) / length;
+                        static auto constexpr Pristr = [](int64_t p)
                         {
-                        case TR_PRI_LOW:
-                            pristr = "Low";
-                            break;
-
-                        case TR_PRI_HIGH:
-                            pristr = "High";
-                            break;
-
-                        default:
-                            pristr = "Normal";
-                            break;
-                        }
+                            switch (p)
+                            {
+                            case TR_PRI_LOW:
+                                return "Low"sv;
+                            case TR_PRI_HIGH:
+                                return "High"sv;
+                            default:
+                                return "Normal"sv;
+                            }
+                        };
 
                         fmt::print(
-                            "{:3d}: {:3.0f}% {:<8s} {:<3s} {:9s}  {:s}\n",
+                            "{:3d}: {:>4s}% {:<8s} {:<3s} {:9s}  {:s}\n",
                             j,
-                            floor(100.0 * percent),
-                            pristr,
+                            strlpercent(100.0 * percent),
+                            Pristr(priority),
                             wanted ? "Yes" : "No",
                             strlsize(length),
                             filename);
@@ -1302,7 +1281,7 @@ void printFileList(tr_variant* top)
 
 void printPeersImpl(tr_variant* peers)
 {
-    printf("%-40s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
+    fmt::print("{:<40s}  {:<12s}  {:<5s} {:<6s}  {:<6s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
     for (size_t i = 0, n = tr_variantListSize(peers); i < n; ++i)
     {
@@ -1322,10 +1301,10 @@ void printPeersImpl(tr_variant* peers)
             tr_variantDictFindInt(d, TR_KEY_rateToPeer, &rateToPeer))
         {
             fmt::print(
-                "{:<40s}  {:<12s}  {:<5.1f} {:6.1f}  {:6.1f}  {:s}\n",
+                "{:<40s}  {:<12s}  {:<5s} {:6.1f}  {:6.1f}  {:s}\n",
                 address,
                 flagstr,
-                progress * 100.0,
+                strlpercent(progress * 100.0),
                 Speed{ rateToClient, Speed::Units::KByps }.count(Speed::Units::KByps),
                 Speed{ rateToPeer, Speed::Units::KByps }.count(Speed::Units::KByps),
                 client);
@@ -1364,17 +1343,17 @@ void printPiecesImpl(std::string_view raw, size_t piece_count)
     fmt::print("  ");
 
     size_t piece = 0;
-    size_t const col_width = 64;
+    static size_t constexpr col_width = 0b111111; // 64 - 1
     for (auto const ch : str)
     {
         for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
-            printf("%c", (ch & (1 << (7 - bit))) != 0 ? '1' : '0');
+            fmt::print("{:c}", (ch & (1 << (7 - bit))) != 0 ? '1' : '0');
         }
 
         fmt::print(" ");
 
-        if (piece % col_width == 0)
+        if ((piece & col_width) == 0) // piece % 64 == 0
         {
             fmt::print("\n  ");
         }
@@ -1400,7 +1379,7 @@ void printPieces(tr_variant* top)
                 tr_variantDictFindInt(torrent, TR_KEY_pieceCount, &j))
             {
                 assert(j >= 0);
-                printPiecesImpl(raw, (size_t)j);
+                printPiecesImpl(raw, static_cast<size_t>(j));
 
                 if (i + 1 < n)
                 {
@@ -1434,8 +1413,8 @@ void printTorrentList(tr_variant* top)
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &list))
     {
         int64_t total_size = 0;
-        double total_up = 0;
-        double total_down = 0;
+        uint64_t total_up = 0;
+        uint64_t total_down = 0;
 
         fmt::print(
             "{:>6s}   {:>5s}  {:>9s}  {:<9s}  {:>6s}  {:>6s}  {:<5s}  {:<11s}  {:<s}\n",
@@ -1630,6 +1609,9 @@ void printTrackersImpl(tr_variant* trackerStats)
                 case TR_TRACKER_ACTIVE:
                     fmt::print("  Asking for more peers now... {:s}\n", tr_strltime(now - lastAnnounceStartTime));
                     break;
+
+                default:
+                    break;
                 }
 
                 if (hasScraped)
@@ -1669,6 +1651,9 @@ void printTrackersImpl(tr_variant* trackerStats)
 
                 case TR_TRACKER_ACTIVE:
                     fmt::print("  Asking for peer counts now... {:s}\n", tr_strltime(now - lastScrapeStartTime));
+                    break;
+
+                default:
                     break;
                 }
             }
@@ -1868,12 +1853,12 @@ void printSession(tr_variant* top)
 
                 if (altTimeEnabled)
                 {
-                    printf(
-                        "  Turtle schedule: %02d:%02d - %02d:%02d  ",
-                        (int)(altBegin / 60),
-                        (int)(altBegin % 60),
-                        (int)(altEnd / 60),
-                        (int)(altEnd % 60));
+                    fmt::print(
+                        "  Turtle schedule: {:02d}:{:02d} - {:02d}:{:02d}  ",
+                        altBegin / 60,
+                        altBegin % 60,
+                        altEnd / 60,
+                        altEnd % 60);
 
                     if ((altDay & TR_SCHED_SUN) != 0)
                     {
@@ -2006,7 +1991,7 @@ void filterIds(tr_variant* top, RemoteConfig& config)
     tr_variant* args;
     tr_variant* list;
 
-    std::set<int> ids;
+    std::set<int64_t> ids;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &list))
     {
@@ -2534,6 +2519,9 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 }
 
                 break;
+
+            default:
+                break;
             }
         }
         else if (stepMode == MODE_TORRENT_GET)
@@ -2693,7 +2681,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 'e':
-                tr_variantDictAddInt(args, TR_KEY_cache_size_mb, atoi(optarg));
+                tr_variantDictAddInt(args, TR_KEY_cache_size_mb, tr_num_parse<int64_t>(optarg).value());
                 break;
 
             case 910:
@@ -2757,7 +2745,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 953:
-                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, atof(optarg));
+                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, tr_num_parse<double>(optarg).value());
                 tr_variantDictAddBool(args, TR_KEY_seedRatioLimited, true);
                 break;
 
@@ -2857,11 +2845,11 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             case 930:
                 if (targs != nullptr)
                 {
-                    tr_variantDictAddInt(targs, TR_KEY_peer_limit, atoi(optarg));
+                    tr_variantDictAddInt(targs, TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg).value());
                 }
                 else
                 {
-                    tr_variantDictAddInt(sargs, TR_KEY_peer_limit_global, atoi(optarg));
+                    tr_variantDictAddInt(sargs, TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg).value());
                 }
 
                 break;
@@ -2884,12 +2872,12 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     {
                         list = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
                     }
-                    tr_variantListAddInt(list, atoi(optarg));
+                    tr_variantListAddInt(list, tr_num_parse<int64_t>(optarg).value());
                     break;
                 }
 
             case 950:
-                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, atof(optarg));
+                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, tr_num_parse<double>(optarg).value());
                 tr_variantDictAddInt(args, TR_KEY_seedRatioMode, TR_RATIOLIMIT_SINGLE);
                 break;
 
@@ -2938,11 +2926,11 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 'L':
-                addLabels(args, optarg ? optarg : "");
+                addLabels(args, optarg);
                 break;
 
             case 730:
-                setGroup(args, optarg ? optarg : "");
+                setGroup(args, optarg);
                 break;
 
             case 731:
@@ -3172,10 +3160,8 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 }
 
             case 965:
-                {
-                    rename_from = optarg;
-                    break;
-                }
+                rename_from = optarg;
+                break;
 
             case 732:
                 {
@@ -3241,44 +3227,36 @@ void getHostAndPortAndRpcUrl(
         return;
     }
 
-    char const* const s = argv[1];
-    char const* const last_colon = strrchr(s, ':');
-
-    if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
+    auto const sv = std::string_view{ argv[1] };
+    if (tr_strv_starts_with(sv, "http://")) /* user passed in http rpc url */
     {
-        rpcurl = fmt::format("{:s}/rpc/", s + 7);
+        rpcurl = fmt::format("{:s}/rpc/", sv.substr(7));
     }
-    else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
+    else if (tr_strv_starts_with(sv, "https://")) /* user passed in https rpc url */
     {
         config.use_ssl = true;
-        rpcurl = fmt::format("{:s}/rpc/", s + 8);
+        rpcurl = fmt::format("{:s}/rpc/", sv.substr(8));
     }
-    else if (parsePortString(s, port))
+    else if (parsePortString(sv, port))
     {
         // it was just a port
     }
-    else if (last_colon == nullptr)
+    else if (auto const first_colon = sv.find(':'); first_colon == std::string_view::npos)
     {
         // it was a non-ipv6 host with no port
-        host = s;
+        host = sv;
+    }
+    else if (auto const last_colon = sv.rfind(':'); first_colon == last_colon)
+    {
+        // if only one colon, it's probably "$host:$port"
+        if (parsePortString(sv.substr(last_colon + 1), port))
+        {
+            host = sv.substr(0, last_colon);
+        }
     }
     else
     {
-        char const* hend;
-
-        // if only one colon, it's probably "$host:$port"
-        if ((strchr(s, ':') == last_colon) && parsePortString(last_colon + 1, port))
-        {
-            hend = last_colon;
-        }
-        else
-        {
-            hend = s + strlen(s);
-        }
-
-        bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != nullptr);
-
-        auto const sv = std::string_view{ s, size_t(hend - s) };
+        auto const is_unbracketed_ipv6 = !tr_strv_starts_with(sv, '[') && last_colon != std::string_view::npos;
         host = is_unbracketed_ipv6 ? fmt::format("[{:s}]", sv) : sv;
     }
 
