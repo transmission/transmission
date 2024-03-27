@@ -46,7 +46,6 @@
 // - Callbacks are only on the main thread.
 // - Unmaintained as a standalone project.
 
-#warning Adopt an alternative to VDKQueue (UKFSEventsWatcher, EonilFSEvents, FileWatcher, DTFolderMonitor or SFSMonitor)
 // ALTERNATIVES (from archaic to modern)
 //
 //  - FreeBSD 4.1: Kernel Queue API (kevent and kqueue)
