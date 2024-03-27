@@ -394,6 +394,13 @@ private:
                 {
                     return false;
                 }
+
+                // needed to announce to BT clients on the same interface
+                if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
+                    -1)
+                {
+                    return false;
+                }
             }
             else // TR_AF_INET6
             {
@@ -431,6 +438,17 @@ private:
                         IPV6_MULTICAST_IF,
                         reinterpret_cast<char const*>(&mcast_req.ipv6mr_interface),
                         sizeof(mcast_req.ipv6mr_interface)) == -1)
+                {
+                    return false;
+                }
+
+                // needed to announce to BT clients on the same interface
+                if (setsockopt(
+                        sock,
+                        IPPROTO_IPV6,
+                        IPV6_MULTICAST_LOOP,
+                        reinterpret_cast<char const*>(&opt_on),
+                        sizeof(opt_on)) == -1)
                 {
                     return false;
                 }
