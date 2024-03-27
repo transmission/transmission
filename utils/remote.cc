@@ -3214,7 +3214,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
     return status;
 }
 
-bool parsePortString(char const* s, int* port)
+bool parsePortString(char const* s, int& port)
 {
     int const errno_stack = errno;
     errno = 0;
@@ -3224,7 +3224,7 @@ bool parsePortString(char const* s, int* port)
     bool const ok = (end != nullptr) && (*end == '\0') && (errno == 0);
     if (ok)
     {
-        *port = i;
+        port = i;
     }
 
     errno = errno_stack;
@@ -3232,7 +3232,7 @@ bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl, RemoteConfig& config)
+void getHostAndPortAndRpcUrl( int& argc, char** argv, std::string& host, int& port, std::string& rpcurl, RemoteConfig& config)
 {
     if (*argv[1] == '-')
     {
@@ -3244,12 +3244,12 @@ void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* por
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
-        *rpcurl = fmt::format("{:s}/rpc/", s + 7);
+        rpcurl = fmt::format("{:s}/rpc/", s + 7);
     }
     else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
     {
         config.use_ssl = true;
-        *rpcurl = fmt::format("{:s}/rpc/", s + 8);
+        rpcurl = fmt::format("{:s}/rpc/", s + 8);
     }
     else if (parsePortString(s, port))
     {
@@ -3258,7 +3258,7 @@ void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* por
     else if (last_colon == nullptr)
     {
         // it was a non-ipv6 host with no port
-        *host = s;
+        host = s;
     }
     else
     {
@@ -3277,12 +3277,12 @@ void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* por
         bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != nullptr);
 
         auto const sv = std::string_view{ s, size_t(hend - s) };
-        *host = is_unbracketed_ipv6 ? fmt::format("[{:s}]", sv) : sv;
+        host = is_unbracketed_ipv6 ? fmt::format("[{:s}]", sv) : sv;
     }
 
-    *argc -= 1;
+    argc -= 1;
 
-    for (int i = 1; i < *argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         argv[i] = argv[i + 1];
     }
@@ -3306,7 +3306,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl, config);
+    getHostAndPortAndRpcUrl(argc, argv, host, port, rpcurl, config);
 
     if (std::empty(host))
     {
