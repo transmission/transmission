@@ -48,7 +48,7 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = int{ TR_DEFAULT_RPC_PORT };
+auto constexpr DefaultPort = uint16_t{ TR_DEFAULT_RPC_PORT };
 char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
@@ -3214,25 +3214,27 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
     return status;
 }
 
-bool parsePortString(char const* s, int& port)
+bool parsePortString(std::string_view sv, uint16_t& port)
 {
-    int const errno_stack = errno;
-    errno = 0;
-
-    char* end = nullptr;
-    auto const i = int(strtol(s, &end, 10));
-    bool const ok = (end != nullptr) && (*end == '\0') && (errno == 0);
+    auto remainder = std::string_view{};
+    auto parsed = tr_num_parse<uint16_t>(sv, &remainder);
+    auto ok = parsed && std::empty(remainder);
     if (ok)
     {
-        port = i;
+        port = *parsed;
     }
 
-    errno = errno_stack;
     return ok;
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-void getHostAndPortAndRpcUrl( int& argc, char** argv, std::string& host, int& port, std::string& rpcurl, RemoteConfig& config)
+void getHostAndPortAndRpcUrl(
+    int& argc,
+    char** argv,
+    std::string& host,
+    uint16_t& port,
+    std::string& rpcurl,
+    RemoteConfig& config)
 {
     if (*argv[1] == '-')
     {
