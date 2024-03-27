@@ -308,150 +308,133 @@ private:
 
         tr_logAddDebug(fmt::format("Initialising {} Local Peer Discovery", tr_ip_protocol_to_sv(ip_protocol)));
 
-        /* setup datagram socket */
+        // setup datagram socket
+        sock = socket(tr_ip_protocol_to_af(ip_protocol), SOCK_DGRAM, 0);
+
+        if (sock == TR_BAD_SOCKET)
         {
-            sock = socket(tr_ip_protocol_to_af(ip_protocol), SOCK_DGRAM, 0);
+            return false;
+        }
 
-            if (sock == TR_BAD_SOCKET)
-            {
-                return false;
-            }
+        if (evutil_make_socket_nonblocking(sock) == -1)
+        {
+            return false;
+        }
 
-            if (evutil_make_socket_nonblocking(sock) == -1)
-            {
-                return false;
-            }
-
-            if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
-            {
-                return false;
-            }
+        if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
+        {
+            return false;
+        }
 
 #if HAVE_SO_REUSEPORT
-            if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
-            {
-                return false;
-            }
+        if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
+        {
+            return false;
+        }
 #endif
 
-            if constexpr (ip_protocol == TR_AF_INET6)
+        if constexpr (ip_protocol == TR_AF_INET6)
+        {
+            // must be done before binding on Linux
+            if (evutil_make_listen_socket_ipv6only(sock) == -1)
             {
-                // must be done before binding on Linux
-                if (evutil_make_listen_socket_ipv6only(sock) == -1)
-                {
-                    return false;
-                }
+                return false;
             }
+        }
 
-            auto const mcast_sockaddr = tr_socket_address::from_string(McastSockAddr[ip_protocol]);
-            TR_ASSERT(mcast_sockaddr);
-            auto const [mcast_ss, mcast_sslen] = mcast_sockaddr->to_sockaddr();
+        auto const mcast_sockaddr = tr_socket_address::from_string(McastSockAddr[ip_protocol]);
+        TR_ASSERT(mcast_sockaddr);
+        auto const [mcast_ss, mcast_sslen] = mcast_sockaddr->to_sockaddr();
 
-            auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(
-                tr_address::any(ip_protocol),
-                mcast_sockaddr->port());
-            if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == -1)
+        auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(tr_address::any(ip_protocol), mcast_sockaddr->port());
+        if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == -1)
+        {
+            return false;
+        }
+
+        if constexpr (ip_protocol == TR_AF_INET)
+        {
+            std::memcpy(&mcast_addr_, &mcast_ss, mcast_sslen);
+
+            // we want to join that LPD multicast group
+            struct ip_mreq mcast_req = {};
+            mcast_req.imr_multiaddr = mcast_addr_.sin_addr;
+            mcast_req.imr_interface = mediator_.bind_address(ip_protocol).addr.addr4;
+
+            if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<char const*>(&mcast_req), sizeof(mcast_req)) ==
+                -1)
             {
                 return false;
             }
 
-            if constexpr (ip_protocol == TR_AF_INET)
+            // configure outbound multicast TTL
+            if (setsockopt(
+                    sock,
+                    IPPROTO_IP,
+                    IP_MULTICAST_TTL,
+                    reinterpret_cast<char const*>(&AnnounceScope),
+                    sizeof(AnnounceScope)) == -1)
             {
-                std::memcpy(&mcast_addr_, &mcast_ss, mcast_sslen);
-
-                /* we want to join that LPD multicast group */
-                struct ip_mreq mcast_req = {};
-                mcast_req.imr_multiaddr = mcast_addr_.sin_addr;
-                mcast_req.imr_interface = mediator_.bind_address(ip_protocol).addr.addr4;
-
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IP,
-                        IP_ADD_MEMBERSHIP,
-                        reinterpret_cast<char const*>(&mcast_req),
-                        sizeof(mcast_req)) == -1)
-                {
-                    return false;
-                }
-
-                /* configure outbound multicast TTL */
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IP,
-                        IP_MULTICAST_TTL,
-                        reinterpret_cast<char const*>(&AnnounceScope),
-                        sizeof(AnnounceScope)) == -1)
-                {
-                    return false;
-                }
-
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IP,
-                        IP_MULTICAST_IF,
-                        reinterpret_cast<char const*>(&mcast_req.imr_interface),
-                        sizeof(mcast_req.imr_interface)) == -1)
-                {
-                    return false;
-                }
-
-                // needed to announce to BT clients on the same interface
-                if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
-                    -1)
-                {
-                    return false;
-                }
+                return false;
             }
-            else // TR_AF_INET6
+
+            if (setsockopt(
+                    sock,
+                    IPPROTO_IP,
+                    IP_MULTICAST_IF,
+                    reinterpret_cast<char const*>(&mcast_req.imr_interface),
+                    sizeof(mcast_req.imr_interface)) == -1)
             {
-                std::memcpy(&mcast6_addr_, &mcast_ss, mcast_sslen);
+                return false;
+            }
 
-                /* we want to join that LPD multicast group */
-                struct ipv6_mreq mcast_req = {};
-                mcast_req.ipv6mr_multiaddr = mcast6_addr_.sin6_addr;
-                mcast_req.ipv6mr_interface = mediator_.bind_address(ip_protocol).to_interface_index().value_or(0);
+            // needed to announce to BT clients on the same interface
+            if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) == -1)
+            {
+                return false;
+            }
+        }
+        else // TR_AF_INET6
+        {
+            std::memcpy(&mcast6_addr_, &mcast_ss, mcast_sslen);
 
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IPV6,
-                        IPV6_JOIN_GROUP,
-                        reinterpret_cast<char const*>(&mcast_req),
-                        sizeof(mcast_req)) == -1)
-                {
-                    return false;
-                }
+            // we want to join that LPD multicast group
+            struct ipv6_mreq mcast_req = {};
+            mcast_req.ipv6mr_multiaddr = mcast6_addr_.sin6_addr;
+            mcast_req.ipv6mr_interface = mediator_.bind_address(ip_protocol).to_interface_index().value_or(0);
 
-                /* configure outbound multicast TTL */
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IPV6,
-                        IPV6_MULTICAST_HOPS,
-                        reinterpret_cast<char const*>(&AnnounceScope),
-                        sizeof(AnnounceScope)) == -1)
-                {
-                    return false;
-                }
+            if (setsockopt(sock, IPPROTO_IPV6, IPV6_JOIN_GROUP, reinterpret_cast<char const*>(&mcast_req), sizeof(mcast_req)) ==
+                -1)
+            {
+                return false;
+            }
 
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IPV6,
-                        IPV6_MULTICAST_IF,
-                        reinterpret_cast<char const*>(&mcast_req.ipv6mr_interface),
-                        sizeof(mcast_req.ipv6mr_interface)) == -1)
-                {
-                    return false;
-                }
+            // configure outbound multicast TTL
+            if (setsockopt(
+                    sock,
+                    IPPROTO_IPV6,
+                    IPV6_MULTICAST_HOPS,
+                    reinterpret_cast<char const*>(&AnnounceScope),
+                    sizeof(AnnounceScope)) == -1)
+            {
+                return false;
+            }
 
-                // needed to announce to BT clients on the same interface
-                if (setsockopt(
-                        sock,
-                        IPPROTO_IPV6,
-                        IPV6_MULTICAST_LOOP,
-                        reinterpret_cast<char const*>(&opt_on),
-                        sizeof(opt_on)) == -1)
-                {
-                    return false;
-                }
+            if (setsockopt(
+                    sock,
+                    IPPROTO_IPV6,
+                    IPV6_MULTICAST_IF,
+                    reinterpret_cast<char const*>(&mcast_req.ipv6mr_interface),
+                    sizeof(mcast_req.ipv6mr_interface)) == -1)
+            {
+                return false;
+            }
+
+            // needed to announce to BT clients on the same interface
+            if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
+                -1)
+            {
+                return false;
             }
         }
 
