@@ -65,8 +65,6 @@ char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
                          "\n"
                          "See the man page for detailed explanations and many examples.";
 
-auto constexpr Arguments = TR_KEY_arguments;
-
 struct RemoteConfig
 {
     std::string auth;
@@ -2212,7 +2210,7 @@ int processResponse(char const* rpcurl, std::string_view response, RemoteConfig&
                         int64_t i;
                         tr_variant* b = &top;
 
-                        if (tr_variantDictFindDict(&top, Arguments, &b) &&
+                        if (tr_variantDictFindDict(&top, TR_KEY_arguments, &b) &&
                             tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
                             config.torrent_ids = std::to_string(i);
@@ -2383,24 +2381,24 @@ tr_variant* ensure_sset(tr_variant& sset)
 {
     if (sset.has_value())
     {
-        return tr_variantDictFind(&sset, Arguments);
+        return tr_variantDictFind(&sset, TR_KEY_arguments);
     }
 
     tr_variantInitDict(&sset, 3);
     tr_variantDictAddStrView(&sset, TR_KEY_method, "session-set"sv);
-    return tr_variantDictAddDict(&sset, Arguments, 0);
+    return tr_variantDictAddDict(&sset, TR_KEY_arguments, 0);
 }
 
 tr_variant* ensure_tset(tr_variant& tset)
 {
     if (tset.has_value())
     {
-        return tr_variantDictFind(&tset, Arguments);
+        return tr_variantDictFind(&tset, TR_KEY_arguments);
     }
 
     tr_variantInitDict(&tset, 3);
     tr_variantDictAddStrView(&tset, TR_KEY_method, "torrent-set"sv);
-    return tr_variantDictAddDict(&tset, Arguments, 1);
+    return tr_variantDictAddDict(&tset, TR_KEY_arguments, 1);
 }
 
 int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
@@ -2438,14 +2436,14 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
                 if (tset.has_value())
                 {
-                    addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                    addIdArg(tr_variantDictFind(&tset, TR_KEY_arguments), config);
                     status |= flush(rpcurl, &tset, config);
                 }
 
                 tr_variantInitDict(&tadd, 3);
                 tr_variantDictAddStrView(&tadd, TR_KEY_method, "torrent-add"sv);
                 tr_variantDictAddInt(&tadd, TR_KEY_tag, TAG_TORRENT_ADD);
-                tr_variantDictAddDict(&tadd, Arguments, 0);
+                tr_variantDictAddDict(&tadd, TR_KEY_arguments, 0);
                 break;
 
             case 'b': /* debug */
@@ -2493,7 +2491,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
                 if (tset.has_value())
                 {
-                    addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                    addIdArg(tr_variantDictFind(&tset, TR_KEY_arguments), config);
                     status |= flush(rpcurl, &tset, config);
                 }
 
@@ -2517,7 +2515,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             case TR_OPT_UNK:
                 if (tadd.has_value())
                 {
-                    tr_variant* args = tr_variantDictFind(&tadd, Arguments);
+                    tr_variant* args = tr_variantDictFind(&tadd, TR_KEY_arguments);
                     auto const tmp = getEncodedMetainfo(optarg);
 
                     if (!std::empty(tmp))
@@ -2545,12 +2543,12 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             tr_variant* fields;
             tr_variantInitDict(&top, 3);
             tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-get"sv);
-            args = tr_variantDictAddDict(&top, Arguments, 0);
+            args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
             fields = tr_variantDictAddList(args, TR_KEY_fields, 0);
 
             if (tset.has_value())
             {
-                addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                addIdArg(tr_variantDictFind(&tset, TR_KEY_arguments), config);
                 status |= flush(rpcurl, &tset, config);
             }
 
@@ -2922,7 +2920,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
             if (tadd.has_value())
             {
-                args = tr_variantDictFind(&tadd, Arguments);
+                args = tr_variantDictFind(&tadd, TR_KEY_arguments);
             }
             else
             {
@@ -2995,7 +2993,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
         {
             if (tadd.has_value())
             {
-                tr_variant* args = tr_variantDictFind(&tadd, Arguments);
+                tr_variant* args = tr_variantDictFind(&tadd, TR_KEY_arguments);
                 tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
             }
             else
@@ -3003,7 +3001,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 auto top = tr_variant{};
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set-location"sv);
-                tr_variant* args = tr_variantDictAddDict(&top, Arguments, 3);
+                tr_variant* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
                 tr_variantDictAddStr(args, TR_KEY_location, optarg);
                 tr_variantDictAddBool(args, TR_KEY_move, false);
                 addIdArg(args, config);
@@ -3035,7 +3033,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    addIdArg(tr_variantDictAddDict(&top, TR_KEY_arguments, 1), config);
                     status |= flush(rpcurl, &top, config);
                 }
                 break;
@@ -3050,7 +3048,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-stop"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    addIdArg(tr_variantDictAddDict(&top, TR_KEY_arguments, 1), config);
                     status |= flush(rpcurl, &top, config);
                 }
 
@@ -3105,14 +3103,14 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     if (tset.has_value())
                     {
-                        addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                        addIdArg(tr_variantDictFind(&tset, TR_KEY_arguments), config);
                         status |= flush(rpcurl, &tset, config);
                     }
 
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-reannounce"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    addIdArg(tr_variantDictAddDict(&top, TR_KEY_arguments, 1), config);
                     status |= flush(rpcurl, &top, config);
                     break;
                 }
@@ -3121,14 +3119,14 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     if (tset.has_value())
                     {
-                        addIdArg(tr_variantDictFind(&tset, Arguments), config);
+                        addIdArg(tr_variantDictFind(&tset, TR_KEY_arguments), config);
                         status |= flush(rpcurl, &tset, config);
                     }
 
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-verify"sv);
-                    addIdArg(tr_variantDictAddDict(&top, Arguments, 1), config);
+                    addIdArg(tr_variantDictAddDict(&top, TR_KEY_arguments, 1), config);
                     status |= flush(rpcurl, &top, config);
                     break;
                 }
@@ -3139,7 +3137,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-remove"sv);
-                    auto* args = tr_variantDictAddDict(&top, Arguments, 2);
+                    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                     tr_variantDictAddBool(args, TR_KEY_delete_local_data, c == 840);
                     addIdArg(args, config);
                     status |= flush(rpcurl, &top, config);
@@ -3151,7 +3149,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set-location"sv);
-                    auto* args = tr_variantDictAddDict(&top, Arguments, 3);
+                    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_location, optarg);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, config);
@@ -3164,7 +3162,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto top = tr_variant{};
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-rename-path"sv);
-                    auto* args = tr_variantDictAddDict(&top, Arguments, 3);
+                    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_path, rename_from);
                     tr_variantDictAddStr(args, TR_KEY_name, optarg);
                     addIdArg(args, config);
@@ -3204,7 +3202,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
     if (tset.has_value())
     {
-        addIdArg(tr_variantDictFind(&tset, Arguments), config);
+        addIdArg(tr_variantDictFind(&tset, TR_KEY_arguments), config);
         status |= flush(rpcurl, &tset, config);
     }
 
