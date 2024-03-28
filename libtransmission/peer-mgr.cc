@@ -1828,8 +1828,6 @@ namespace peer_stat_helpers
 
 tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 {
-    using namespace peer_stat_helpers;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
@@ -1849,7 +1847,7 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
                 std::begin(peers),
                 std::end(peers),
                 ret,
-                [&now, &now_msec](auto const* peer) { return get_peer_stats(peer, now, now_msec); });
+                [&now, &now_msec](auto const* peer) { return peer_stat_helpers::get_peer_stats(peer, now, now_msec); });
             done_promise.set_value();
         });
     done_future.wait();
