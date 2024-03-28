@@ -1317,7 +1317,7 @@ void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_
     TR_ASSERT(result.io != nullptr);
     auto const& socket_address = result.io->socket_address();
     auto* const swarm = manager->get_existing_swarm(result.io->torrent_hash());
-    auto* info = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : nullptr;
+    auto* info = swarm != nullptr && socket_address.is_valid() ? swarm->get_existing_peer_info(socket_address) : nullptr;
 
     if (result.io->is_incoming())
     {
