@@ -22,8 +22,6 @@
   --logo-size: 64px;
   --pauseresume-size: 20px;
   --popup-top: 51px; // TODO: ugly that this is hardcoded
-  --progressbar-border: 1px;
-  --progressbar-height: 20px;
   --toolbar-height: 50px;
 
   /* colors related to torrent status */
@@ -109,9 +107,13 @@
     --color-fg-tertiary: var(--grey-500);
     --color-fg-warn: var(--dark-mode-black);
     --color-progressbar-paused: var(--grey-500);
+    --color-progressbar-paused-fg: #edefff;
+    --color-progressbar-paused-fg-2: #edefff;
     --color-progressbar-seed-1: var(--green-100);
     --color-progressbar-seed-2: var(--green-400);
     --color-progressbar-seed-paused: var(--grey-500);
+    --progress-bar-shadow: 1px 1px #000;
+    --progress-bar-shadow-2: 1px 1px #000;
 
     .contrast-more {
       --color-bg-even: var(--black);
@@ -136,12 +138,14 @@
       --color-progressbar-background-2: var(--white);
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
+      --color-progressbar-paused-fg: #fff;
+      --color-progressbar-paused-fg-2: #fff;
       --color-progressbar-queued: var(--blue-400);
-      --color-progressbar-seed-1: var(--black);
-      --color-progressbar-seed-2: var(--white);
+      --color-progressbar-seed-2: var(--black);
       --color-progressbar-seed-paused: var(--grey-500);
       --color-progressbar-verify: var(--yellow-300);
       --color-toolbar-background: var(--black);
+      --progress-bar-shadow: 1px 1px #000;
     }
   }
   @media (prefers-color-scheme: light) {
@@ -168,11 +172,15 @@
     --color-progressbar-leech: var(--blue-100);
     --color-progressbar-magnet: var(--yellow-300);
     --color-progressbar-paused: var(--grey-200);
+    --color-progressbar-paused-fg: #303030;
+    --color-progressbar-paused-fg-2: #edefff;
     --color-progressbar-queued: var(--blue-400);
     --color-progressbar-seed-1: var(--green-500);
     --color-progressbar-seed-2: var(--green-300);
     --color-progressbar-seed-paused: var(--grey-200);
     --color-progressbar-verify: var(--yellow-300);
+    --progress-bar-shadow: 0;
+    --progress-bar-shadow-2: 1px 1px #000;
 
     .contrast-more {
       --color-bg-even: var(--white);
@@ -198,12 +206,14 @@
       --color-progressbar-leech: var(--blue-200);
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
+      --color-progressbar-paused-fg: #fff;
+      --color-progressbar-paused-fg-2: #fff;
       --color-progressbar-queued: var(--blue-400);
-      --color-progressbar-seed-1: var(--black);
-      --color-progressbar-seed-2: var(--white);
+      --color-progressbar-seed-2: var(--black);
       --color-progressbar-seed-paused: var(--grey-500);
       --color-progressbar-verify: var(--yellow-300);
       --color-toolbar-background: var(--white);
+      --progress-bar-shadow: 1px 1px #000;
     }
   }
 }
@@ -619,6 +629,10 @@ a {
     &.paused {
       color: var(--color-fg-disabled);
 
+      &:not(.selected) .torrent-progress-bar {
+        color: var(--color-fg-primary);
+      }
+
       .icon {
         background-color: var(--color-fg-disabled);
       }
@@ -666,12 +680,11 @@ a {
   }
 
   .torrent-progress-bar {
-    background-repeat: no-repeat;
-    border-color: var(--color-border-starkest);
+    font-size: 14px;
+    position: relative;
+    border: 1px solid var(--color-border-starkest);
     border-radius: 3px;
-    border-style: solid;
-    border-width: 1px;
-    height: calc(var(--progressbar-height) - var(--progressbar-border) * 2);
+    height: 18px;
 
     &.full {
       flex-grow: 1;
@@ -680,78 +693,95 @@ a {
 
     &.compact {
       min-width: 100px;
-      width: 10vw;
     }
 
     &.leech {
-      &.queued {
-        background: linear-gradient(
-            to right,
-            var(--color-progressbar-queued) 0,
-            var(--color-progressbar-queued) var(--progress, 30%),
-            transparent var(--progress, 30%)
-          ),
-          no-repeat;
+      &.queued::before {
+        background: var(--color-progressbar-queued);
       }
-
-      background: linear-gradient(
-          to right,
-          var(--color-progressbar-leech) 0,
-          var(--color-progressbar-leech) var(--progress, 30%),
-          transparent var(--progress, 30%)
-        ),
-        no-repeat;
     }
 
-    &.magnet {
-      background: linear-gradient(
-          to right,
-          var(--color-progressbar-magnet) 0,
-          var(--color-progressbar-magnet) var(--progress, 30%),
-          transparent var(--progress, 30%)
-        ),
-        no-repeat;
+    &.leech::before {
+      background: var(--color-progressbar-leech);
+      color: var(--color-progressbar-paused-fg);
+      text-shadow: var(--progress-bar-shadow);
+    }
+
+    &.magnet::before {
+      background: var(--color-progressbar-magnet);
+      color: #000;
     }
 
     &.seed {
-      &.paused {
-        background-color: var(--color-progressbar-seed-paused);
+      &.paused::before {
+        background: var(--color-progressbar-seed-paused);
+        color: var(--color-progressbar-paused-fg);
+        text-shadow: var(--progress-bar-shadow);
       }
 
-      &:not(.paused) {
-        background: linear-gradient(
-            to right,
-            var(--color-progressbar-seed-1) 0,
-            var(--color-progressbar-seed-1) var(--progress, 30%),
-            var(--color-progressbar-seed-2) var(--progress, 30%)
-          ),
-          no-repeat;
+      &:not(.paused)::before {
+        background: var(--color-progressbar-seed-1);
+        color: var(--color-progressbar-paused-fg-2);
+        text-shadow: var(--progress-bar-shadow-2);
       }
 
-      &.queued {
-        background-color: var(--color-progressbar-seed-paused);
+      &:not(.paused)::after {
+        background: var(--color-progressbar-seed-2);
+        color: var(--color-progressbar-paused-fg-2);
+        text-shadow: var(--progress-bar-shadow-2);
+      }
+
+      &.queued::before {
+        background-color: var(--color-progressbar-seed-1);
       }
     }
 
-    &.verify {
-      background: linear-gradient(
-          to right,
-          var(--color-progressbar-verify) 0,
-          var(--color-progressbar-verify) var(--progress, 30%),
-          transparent var(--progress, 30%)
-        ),
-        no-repeat;
+    &.seed::before {
+      background-color: var(--color-progressbar-seed-1);
+      color: var(--color-progressbar-paused-fg-2);
+      text-shadow: var(--progress-bar-shadow-2);
     }
 
-    &.paused {
-      background: linear-gradient(
-          to right,
-          var(--color-progressbar-paused) 0,
-          var(--color-progressbar-paused) var(--progress, 30%),
-          transparent var(--progress, 30%)
-        ),
-        no-repeat;
+    &.verify::before {
+      background: var(--color-progressbar-verify);
+      color: #000;
     }
+
+    &.paused::before {
+      background: var(--color-progressbar-paused);
+      color: var(--color-progressbar-paused-fg);
+      text-shadow: var(--progress-bar-shadow);
+    }
+  }
+
+  .torrent-progress-bar::before {
+    content: attr(data-progress);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    border-radius: 2px;
+    text-align: center;
+    clip-path: polygon(
+      0 0,
+      var(--progress, 30%) 0,
+      var(--progress, 30%) 100%,
+      0 100%
+    );
+  }
+
+  .torrent-progress-bar::after {
+    content: attr(data-progress);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    border-radius: 2px;
+    text-align: center;
+    clip-path: polygon(
+      var(--progress, 30%) 0,
+      100% 0,
+      100% 100%,
+      var(--progress, 30%) 100%
+    );
   }
 }
 
