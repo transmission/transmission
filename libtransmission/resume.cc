@@ -467,14 +467,16 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
     // add the 'checked pieces' bitfield
     bitfieldToRaw(helper.checked_pieces(), tr_variantDictAdd(prog, TR_KEY_pieces));
 
-    /* add the progress */
+    // add the progress
     if (tor->is_seed())
     {
+        // shortcut for faster load times for when we have all blocks
         tr_variantDictAddStrView(prog, TR_KEY_have, "all"sv);
     }
-
-    /* add the blocks bitfield */
-    bitfieldToRaw(helper.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
+    else
+    {
+        bitfieldToRaw(helper.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
+    }
 }
 
 /*
