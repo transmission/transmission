@@ -754,7 +754,8 @@ a {
     }
   }
 
-  .torrent-progress-bar::before, .torrent-progress-bar::after {
+  .torrent-progress-bar::before,
+  .torrent-progress-bar::after {
     content: attr(data-progress);
     height: 100%;
     width: 100%;
