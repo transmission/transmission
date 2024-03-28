@@ -222,7 +222,6 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
         $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
-        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC

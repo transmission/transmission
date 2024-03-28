@@ -534,7 +534,6 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 target_compile_definitions(miniupnpc::libminiupnpc
     INTERFACE
-        SYSTEM_MINIUPNP
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
