@@ -82,6 +82,9 @@ const TorrentRendererHelper = {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     progressbar.className = info.classList.join(' ');
     progressbar.style.setProperty('--progress', `${info.percent.toFixed(2)}%`);
+    progressbar.dataset.progress = `${Number.parseFloat(
+      info.percent.toFixed(2),
+    )}%`;
   },
 };
 
