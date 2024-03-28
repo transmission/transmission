@@ -1828,8 +1828,6 @@ namespace peer_stat_helpers
 
 tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 {
-    using namespace peer_stat_helpers;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
