@@ -645,6 +645,14 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->set_state(State::AwaitingHandshake);
             return;
         }
+
+        // the above reconnect() may have invalidated the socket
+        if (!io->socket_address().is_valid())
+        {
+            tr_logAddTraceHand(handshake, "handshake failed and reconnect failed");
+            handshake->done(false);
+            return;
+        }
     }
 
     /* if the error happened while we were sending a public key, we might
