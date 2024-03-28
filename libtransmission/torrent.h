@@ -729,6 +729,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         {
             sequential_download_ = is_sequential;
             sequential_download_changed_.emit(this, is_sequential);
+            set_dirty();
         }
     }
 
