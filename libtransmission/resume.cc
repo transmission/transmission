@@ -359,24 +359,21 @@ void saveName(tr_variant* dict, tr_torrent const* tor)
 
 auto loadName(tr_variant* dict, tr_torrent* tor)
 {
-    auto ret = tr_resume::fields_t{};
-
     auto name = std::string_view{};
     if (!tr_variantDictFindStrView(dict, TR_KEY_name, &name))
     {
-        return ret;
+        return tr_resume::fields_t{};
     }
 
     name = tr_strv_strip(name);
     if (std::empty(name))
     {
-        return ret;
+        return tr_resume::fields_t{};
     }
 
     tor->set_name(name);
-    ret |= tr_resume::Name;
 
-    return ret;
+    return tr_resume::Name;
 }
 
 // ---
@@ -393,12 +390,10 @@ void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 
 auto loadFilenames(tr_variant* dict, tr_torrent* tor)
 {
-    auto ret = tr_resume::fields_t{};
-
     tr_variant* list = nullptr;
     if (!tr_variantDictFindList(dict, TR_KEY_files, &list))
     {
-        return ret;
+        return tr_resume::fields_t{};
     }
 
     auto const n_files = tor->file_count();
@@ -412,8 +407,7 @@ auto loadFilenames(tr_variant* dict, tr_torrent* tor)
         }
     }
 
-    ret |= tr_resume::Filenames;
-    return ret;
+    return tr_resume::Filenames;
 }
 
 // ---
