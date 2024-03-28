@@ -683,6 +683,7 @@ a {
 
     &.compact {
       min-width: 100px;
+      width: 10vw;
     }
 
     &.leech {
@@ -693,8 +694,8 @@ a {
 
     &.leech::before {
       background: var(--color-progressbar-leech);
-      color: var(--color-progressbar-paused-fg);
-      text-shadow: var(--progress-bar-shadow);
+      color: var(--color-progressbar-paused-fg-2);
+      text-shadow: var(--progress-bar-shadow-2);
     }
 
     &.magnet::before {
@@ -744,13 +745,16 @@ a {
     }
   }
 
-  .torrent-progress-bar::before {
+  .torrent-progress-bar::before, .torrent-progress-bar::after {
     content: attr(data-progress);
     height: 100%;
     width: 100%;
     position: absolute;
     border-radius: 2px;
     text-align: center;
+  }
+
+  .torrent-progress-bar::before {
     clip-path: polygon(
       0 0,
       var(--progress, 30%) 0,
@@ -760,12 +764,6 @@ a {
   }
 
   .torrent-progress-bar::after {
-    content: attr(data-progress);
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    border-radius: 2px;
-    text-align: center;
     clip-path: polygon(
       var(--progress, 30%) 0,
       100% 0,
