@@ -370,6 +370,7 @@ tr_variant load_settings(char const* config_dir)
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_start_paused, false);
     return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
 }
 
@@ -428,7 +429,6 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
     int c;
     char const* optstr;
 
-    paused_ = false;
     *dump_settings = false;
     *foreground = false;
 
@@ -562,7 +562,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 800:
-            paused_ = true;
+            tr_variantDictAddBool(&settings_, TR_KEY_start_paused, true);
             break;
 
         case 910:
@@ -768,7 +768,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     auto watchdir = std::unique_ptr<Watchdir>{};
     if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &tmp_bool) && tmp_bool)
     {
-        auto force_generic = bool{ false };
+        auto force_generic = false;
         (void)tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_force_generic, &force_generic);
 
         auto dir = std::string_view{};
@@ -792,7 +792,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     {
         tr_ctor* ctor = tr_ctorNew(my_session_);
 
-        if (paused_)
+        if (auto paused = false; tr_variantDictFindBool(&settings_, TR_KEY_start_paused, &paused) && paused)
         {
             tr_ctorSetPaused(ctor, TR_FORCE, true);
         }
