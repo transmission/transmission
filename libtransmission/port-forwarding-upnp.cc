@@ -295,7 +295,8 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         freeUPNPDevlist(devlist);
     }
 
-    if ((handle->state == UpnpState::Idle) && (handle->isMapped) && (!is_enabled || handle->port != port))
+    if ((handle->state == UpnpState::Idle || handle->state == UpnpState::Failed) && (handle->isMapped) &&
+        (!is_enabled || handle->port != port))
     {
         handle->state = UpnpState::WillUnmap;
     }
@@ -323,7 +324,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         handle->port = {};
     }
 
-    if ((handle->state == UpnpState::Idle) && is_enabled && !handle->isMapped)
+    if ((handle->state == UpnpState::Idle || handle->state == UpnpState::Failed) && is_enabled && !handle->isMapped)
     {
         handle->state = UpnpState::WillMap;
     }

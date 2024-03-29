@@ -140,7 +140,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         }
     }
 
-    if (state_ == State::Idle)
+    if (state_ == State::Idle || state_ == State::Err)
     {
         if (is_enabled && !is_mapped_ && has_discovered_)
         {
