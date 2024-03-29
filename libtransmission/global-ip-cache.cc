@@ -38,7 +38,7 @@ static_assert(TR_AF_INET6 == 1);
 auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
                                              std::array{ "https://ip6.transmissionbt.com/"sv } };
 
-auto constexpr UpkeepInterval = 30min;
+auto constexpr UpkeepInterval = 10min;
 auto constexpr RetryUpkeepInterval = 30s;
 
 // Normally there should only ever be 1 cache instance during the entire program execution

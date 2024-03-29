@@ -31,6 +31,7 @@ tr_port_forwarding_state tr_upnpPulse(
     tr_port local_port,
     bool is_enabled,
     bool do_port_check,
-    std::string bindaddr);
+    std::string bindaddr,
+    std::optional<tr_address> pinhole_addr);
 
 /* @} */

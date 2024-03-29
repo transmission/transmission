@@ -31,6 +31,7 @@ public:
         [[nodiscard]] virtual tr_port advertised_peer_port() const = 0;
         [[nodiscard]] virtual tr_port local_peer_port() const = 0;
         [[nodiscard]] virtual tr_address incoming_peer_address() const = 0;
+        [[nodiscard]] virtual std::optional<tr_address> pinhole_address() const = 0;
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         virtual void on_port_forwarded(tr_port advertised_port) = 0;
     };
