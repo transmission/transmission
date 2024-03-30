@@ -174,7 +174,7 @@ struct tr_torrent
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
-        , completion_{ [this](tr_piece_index_t const piece) { return piece_is_wanted(piece); }, &metainfo_.block_info() }
+        , completion_{ this, &metainfo_.block_info() }
     {
     }
 

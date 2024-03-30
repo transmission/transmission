@@ -37,6 +37,8 @@ struct tr_completion
         blocks_.set_has_none();
     }
 
+    tr_completion(tr_torrent const* tor, tr_block_info const* block_info);
+
     [[nodiscard]] constexpr tr_bitfield const& blocks() const noexcept
     {
         return blocks_;
