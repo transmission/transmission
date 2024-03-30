@@ -75,7 +75,7 @@ struct tr_upnp
     struct
     {
         char const* proto;
-        char proto_no[8];
+        char const* proto_no;
         char id[8];
     } pinhole[2] = { { "TCP", XSTR(IPPROTO_TCP) }, { "UDP", XSTR(IPPROTO_UDP) } };
     bool isMapped = false;
