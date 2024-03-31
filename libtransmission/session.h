@@ -203,6 +203,11 @@ private:
             return session_.bind_address(TR_AF_INET);
         }
 
+        [[nodiscard]] tr_port advertised_peer_port() const override
+        {
+            return session_.advertisedPeerPort();
+        }
+
         [[nodiscard]] tr_port local_peer_port() const override
         {
             return session_.localPeerPort();
