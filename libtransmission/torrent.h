@@ -729,6 +729,7 @@ struct tr_torrent
         {
             sequential_download_ = is_sequential;
             sequential_download_changed_.emit(this, is_sequential);
+            set_dirty();
         }
     }
 
