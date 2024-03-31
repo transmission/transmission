@@ -180,6 +180,10 @@ a {
     margin: 0;
     padding: 0;
   }
+
+  .flexible-space {
+    margin-right: auto;
+  }
 }
 
 .mainwin-workarea {
@@ -187,12 +191,6 @@ a {
   flex: 1;
   flex-direction: row;
   overflow: auto;
-}
-
-input {
-  border: 1px solid var(--color-border);
-  border-radius: 3px;
-  padding: 4px 5px;
 }
 
 /// TOOLBAR
@@ -273,46 +271,40 @@ $toolbar-height: $toolbar-height-number * 1px;
 /// FILTERBAR
 
 .mainwin-filterbar {
+  white-space: nowrap;
   align-items: center;
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
   height: 30px;
-  width: 100%;
+  padding-left: 5px;
 
   @include for-phone-only {
-    padding: 5px 10px;
-
-    :not(select):not(input):not(option) {
+    :not(select):not(input):not(option):not(.flexible-space) {
       display: none;
     }
+  }
 
-    #torrent-search {
-      padding: 5px;
-    }
+  #torrent-search {
+    width: 100%;
+    max-width: 160px;
+  }
+
+  select {
+    width: 70px;
   }
 
   > * {
     margin-right: 5px;
-    padding: 0 5px;
   }
 }
 
 $speed-icon-size: 20px;
 
-.speed-up-icon {
-  fill: var(--color-fg-primary);
-  margin: 0 auto;
-
-  svg {
-    width: $speed-icon-size;
-  }
-}
-
+.speed-up-icon,
 .speed-dn-icon {
   fill: var(--color-fg-primary);
-  margin: 0 auto;
 
   svg {
     width: $speed-icon-size;
@@ -322,7 +314,6 @@ $speed-icon-size: 20px;
 #speed-dn-label,
 #speed-up-label {
   text-align: right;
-  width: 70px;
 }
 
 /// TORRENT CONTAINER
@@ -332,10 +323,6 @@ $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border: 1;
 $progressbar-height: 20;
 $popup-top: 61px; // TODO: ugly that this is hardcoded
-
-.flex {
-  flex-grow: 1;
-}
 
 #torrent-container {
   flex-grow: 1;
@@ -686,11 +673,6 @@ $video-image: '../img/film.svg';
 /// PREFERENCES DIALOG
 
 @include for-phone-only {
-  html,
-  body {
-    overflow: hidden;
-  }
-
   input[type='checkbox'] {
     height: 20px;
     width: 20px;
@@ -1281,7 +1263,7 @@ $video-image: '../img/film.svg';
   top: 50px;
   z-index: $z-index-popup;
 
-  @include for-phone-only() {
+  @include for-phone-only {
     height: 80vh;
   }
 
@@ -1514,7 +1496,7 @@ dialog {
   padding: 0;
   z-index: $z-index-popup;
 
-  @include for-tablet-portrait-up() {
+  @include for-tablet-portrait-up {
     border: 0;
     border-radius: 8px;
     max-width: 50%;
