@@ -306,7 +306,7 @@ tr_port_forwarding_state tr_upnpPulse(
         freeUPNPDevlist(devlist);
     }
 
-    if (handle->state <= UpnpState::Failed && handle->isMapped &&
+    if ((handle->state == UpnpState::Idle || handle->state == UpnpState::Failed) && handle->isMapped &&
         (!is_enabled || handle->advertised_port != advertised_port || handle->local_port != local_port))
     {
         handle->state = UpnpState::WillUnmap;
@@ -339,7 +339,7 @@ tr_port_forwarding_state tr_upnpPulse(
         handle->local_port = {};
     }
 
-    if (handle->state <= UpnpState::Failed && is_enabled && !handle->isMapped)
+    if ((handle->state == UpnpState::Idle || handle->state == UpnpState::Failed) && is_enabled && !handle->isMapped)
     {
         handle->state = UpnpState::WillMap;
     }

@@ -96,7 +96,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         }
     }
 
-    if (state_ <= State::Err && is_mapped_ && (!is_enabled || local_port_ != local_port))
+    if ((state_ == State::Idle || state_ == State::Err) && is_mapped_ && (!is_enabled || local_port_ != local_port))
     {
         state_ = State::SendUnmap;
     }
@@ -140,7 +140,8 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         }
     }
 
-    if (state_ <= State::Err && (is_mapped_ ? tr_time() >= renew_time_ : is_enabled && has_discovered_))
+    if ((state_ == State::Idle || state_ == State::Err) &&
+        (is_mapped_ ? tr_time() >= renew_time_ : is_enabled && has_discovered_))
     {
         state_ = State::SendMap;
     }
