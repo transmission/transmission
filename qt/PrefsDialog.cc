@@ -438,7 +438,7 @@ void PrefsDialog::initDesktopTab()
 {
     linkWidgetToPref(ui_.showTrayIconCheck, Prefs::SHOW_TRAY_ICON);
     linkWidgetToPref(ui_.startMinimizedCheck, Prefs::START_MINIMIZED);
-    linkWidgetToPref(ui_.showPiecebar, Prefs::SHOW_PIECEBAR);
+    linkWidgetToPref(ui_.showPiecebarCheck, Prefs::SHOW_PIECEBAR);
     linkWidgetToPref(ui_.notifyOnTorrentAddedCheck, Prefs::SHOW_NOTIFICATION_ON_ADD);
     linkWidgetToPref(ui_.notifyOnTorrentCompletedCheck, Prefs::SHOW_NOTIFICATION_ON_COMPLETE);
     linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
