@@ -384,6 +384,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const trackers_str = buildTrackersString(tor);
     auto const bytes_downloaded_str = std::to_string(tor->bytes_downloaded_.ever());
     auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time()));
+    auto const priority_str = std::to_string(tor->get_priority());
 
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
@@ -394,6 +395,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         { "TR_TORRENT_ID"sv, id_str },
         { "TR_TORRENT_LABELS"sv, labels_str },
         { "TR_TORRENT_NAME"sv, tor->name() },
+        { "TR_TORRENT_PRIORITY"sv, priority_str },
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
@@ -496,15 +498,18 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
 {
     using namespace queue_helpers;
 
-    auto current = size_t{};
+    auto max_pos = size_t{};
     auto const old_pos = queue_position_;
-
-    queue_position_ = MaxQueuePosition;
 
     auto& torrents = session->torrents();
     for (auto* const walk : torrents)
     {
-        if ((old_pos < new_pos) && (old_pos <= walk->queue_position_) && (walk->queue_position_ <= new_pos))
+        if (walk == this)
+        {
+            continue;
+        }
+
+        if ((old_pos < new_pos) && (old_pos < walk->queue_position_) && (walk->queue_position_ <= new_pos))
         {
             --walk->queue_position_;
             walk->mark_changed();
@@ -516,10 +521,10 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
             walk->mark_changed();
         }
 
-        current = std::max(current, walk->queue_position_ + 1U);
+        max_pos = std::max(max_pos, walk->queue_position_);
     }
 
-    queue_position_ = std::min(new_pos, current);
+    queue_position_ = std::min(new_pos, max_pos + 1);
     mark_changed();
 
     TR_ASSERT(torrents_are_sorted_by_queue_position(torrents.get_all()));

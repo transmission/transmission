@@ -55,6 +55,7 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "VersionComparator.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -508,6 +509,17 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [_fDefaults integerForKey:@"PeersTotal"]);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [_fDefaults integerForKey:@"PeersTorrent"]);
+
+        NSInteger bindPort = [_fDefaults integerForKey:@"BindPort"];
+        if (bindPort <= 0 || bindPort > 65535)
+        {
+            // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
+            // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
+            // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152–65535
+            // https://datatracker.ietf.org/doc/html/rfc6335#section-6
+            uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
+            [_fDefaults setInteger:defaultPort forKey:@"BindPort"];
+        }
 
         BOOL const randomPort = [_fDefaults boolForKey:@"RandomPort"];
         tr_variantDictAddBool(&settings, TR_KEY_peer_port_random_on_start, randomPort);
@@ -5431,11 +5443,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
 }
 
-- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
-{
-    self.fQuitRequested = YES;
-}
-
 - (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct
 {
     @autoreleasepool
@@ -5585,6 +5592,20 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fTorrents sortUsingDescriptors:descriptors];
 
     [self sortTorrentsAndIncludeQueueOrder:YES];
+}
+
+@end
+
+@implementation Controller (SUUpdaterDelegate)
+
+- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
+{
+    self.fQuitRequested = YES;
+}
+
+- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater*)updater
+{
+    return [VersionComparator new];
 }
 
 @end

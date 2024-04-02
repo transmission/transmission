@@ -11,22 +11,6 @@
 #include "libtransmission/file.h"
 #include "libtransmission/tr-assert.h"
 
-using namespace std::literals;
-
-#ifdef _WIN32
-static auto constexpr NativeEol = "\r\n"sv;
-#else
-static auto constexpr NativeEol = "\n"sv;
-#endif
-
-bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    return tr_sys_file_write(handle, std::data(buffer), std::size(buffer), nullptr, error) &&
-        tr_sys_file_write(handle, std::data(NativeEol), std::size(NativeEol), nullptr, error);
-}
-
 std::vector<std::string> tr_sys_dir_get_files(
     std::string_view folder,
     std::function<bool(std::string_view)> const& test,

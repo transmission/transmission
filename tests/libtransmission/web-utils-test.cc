@@ -126,8 +126,8 @@ TEST_F(WebUtilsTest, urlParse)
     url = "http://[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]:8080/announce"sv;
     parsed = tr_urlParse(url);
     EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"sv, parsed->sitename);
-    EXPECT_EQ("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"sv, parsed->host);
+    EXPECT_EQ("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]"sv, parsed->sitename);
+    EXPECT_EQ("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]"sv, parsed->host);
     EXPECT_EQ("/announce"sv, parsed->path);
     EXPECT_EQ(8080, parsed->port);
 
@@ -135,8 +135,8 @@ TEST_F(WebUtilsTest, urlParse)
     url = "http://[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]/announce"sv;
     parsed = tr_urlParse(url);
     EXPECT_EQ("http"sv, parsed->scheme);
-    EXPECT_EQ("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"sv, parsed->sitename);
-    EXPECT_EQ("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"sv, parsed->host);
+    EXPECT_EQ("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]"sv, parsed->sitename);
+    EXPECT_EQ("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]"sv, parsed->host);
     EXPECT_EQ("/announce"sv, parsed->path);
     EXPECT_EQ(80, parsed->port);
 

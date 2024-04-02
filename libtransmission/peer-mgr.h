@@ -30,8 +30,8 @@
  * @{
  */
 
-class tr_peer;
 class tr_peer_socket;
+struct tr_peer;
 struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_session;
@@ -517,9 +517,14 @@ struct tr_pex
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
-        return socket_address.is_valid_for_peers();
+        return socket_address.is_valid();
+    }
+
+    [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept
+    {
+        return socket_address.is_valid_for_peers(from);
     }
 
     tr_socket_address socket_address;

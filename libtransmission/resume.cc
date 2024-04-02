@@ -735,6 +735,13 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         fields_loaded |= tr_resume::BandwidthPriority;
     }
 
+    if (auto val = bool{};
+        (fields_to_load & tr_resume::SequentialDownload) != 0 && tr_variantDictFindBool(&top, TR_KEY_sequentialDownload, &val))
+    {
+        tor->set_sequential_download(val);
+        fields_loaded |= tr_resume::SequentialDownload;
+    }
+
     if ((fields_to_load & tr_resume::Peers) != 0)
     {
         fields_loaded |= loadPeers(&top, tor);
