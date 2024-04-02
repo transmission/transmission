@@ -16,6 +16,12 @@
 #include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/torrent.h"
+
+tr_completion::tr_completion(tr_torrent const* tor, tr_block_info const* block_info)
+    : tr_completion{ [tor](tr_piece_index_t const piece) { return tor->piece_is_wanted(piece); }, block_info }
+{
+}
 
 uint64_t tr_completion::compute_has_valid() const
 {
@@ -55,7 +61,7 @@ uint64_t tr_completion::compute_size_when_done() const
     auto size = uint64_t{ 0 };
     for (tr_piece_index_t piece = 0, n_pieces = block_info_->piece_count(); piece < n_pieces; ++piece)
     {
-        if (tor_->piece_is_wanted(piece))
+        if (piece_is_wanted_(piece))
         {
             size += block_info_->piece_size(piece);
         }

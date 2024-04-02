@@ -165,7 +165,7 @@ NSString const* VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevoke
     }
 }
 
-- (void)watcherThread:(id)sender
+- (void)watcherThread:(id)__unused sender
 {
 #if DEBUG_LOG_THREAD_LIFETIME
     NSLog(@"watcherThread started.");

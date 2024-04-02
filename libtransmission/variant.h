@@ -158,11 +158,11 @@ public:
         }
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 std::optional<Type> value_if(tr_quark const key) const noexcept
+        [[nodiscard]] std::optional<Type> value_if(tr_quark const key) const noexcept
         {
-            if (auto const* const value = find_if<Type>(key); value != nullptr)
+            if (auto it = find(key); it != end())
             {
-                return std::optional<Type>{ *value };
+                return it->second.value_if<Type>();
             }
 
             return {};
@@ -311,6 +311,23 @@ public:
     }
 
     template<typename Val>
+    [[nodiscard]] constexpr std::optional<Val> value_if() noexcept
+    {
+        if (auto const* const val = get_if<Val>())
+        {
+            return *val;
+        }
+
+        return {};
+    }
+
+    template<typename Val>
+    [[nodiscard]] std::optional<Val> value_if() const noexcept
+    {
+        return const_cast<tr_variant*>(this)->value_if<Val>();
+    }
+
+    template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
@@ -370,6 +387,13 @@ private:
 
     std::variant<std::monostate, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };
+
+template<>
+[[nodiscard]] std::optional<int64_t> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
 
 // --- Strings
 

@@ -14,8 +14,6 @@
 	<true/>
 	<key>BadgeUploadRate</key>
 	<true/>
-	<key>BindPort</key>
-	<integer>51413</integer>
 	<key>BlocklistAutoUpdate</key>
 	<false/>
 	<key>BlocklistNew</key>
