@@ -343,7 +343,7 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew install cmake gettext libdeflate libevent libpsl ninja node pkg-config
       - name: Get Source
         uses: actions/checkout@v4
         with:
