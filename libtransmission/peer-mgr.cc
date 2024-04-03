@@ -615,7 +615,7 @@ public:
     ActiveRequests active_requests;
 
     // depends-on: active_requests
-    std::vector<std::unique_ptr<tr_peer>> webseeds;
+    std::vector<std::unique_ptr<tr_webseed>> webseeds;
 
     // depends-on: active_requests
     Peers peers;
@@ -645,7 +645,7 @@ private:
         webseeds.reserve(n);
         for (size_t i = 0; i < n; ++i)
         {
-            webseeds.emplace_back(tr_webseedNew(*tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
+            webseeds.emplace_back(tr_webseed::create(*tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
         }
         webseeds.shrink_to_fit();
 
@@ -1719,7 +1719,7 @@ tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i)
     size_t const n = std::size(tor->swarm->webseeds);
     TR_ASSERT(i < n);
 
-    return i >= n ? tr_webseed_view{} : tr_webseedView(tor->swarm->webseeds[i].get());
+    return i >= n ? tr_webseed_view{} : tor->swarm->webseeds[i]->get_view();
 }
 
 namespace
