@@ -436,7 +436,7 @@ void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
     }
 }
 
-void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHelper const& helper)
+void saveProgress(tr_variant* dict, tr_torrent::ResumeHelper const& helper)
 {
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
@@ -452,16 +452,8 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
     // add the 'checked pieces' bitfield
     bitfieldToRaw(helper.checked_pieces(), tr_variantDictAdd(prog, TR_KEY_pieces));
 
-    // add the progress
-    if (tor->is_seed())
-    {
-        // shortcut for faster load times for when we have all blocks
-        tr_variantDictAddStrView(prog, TR_KEY_have, "all"sv);
-    }
-    else
-    {
-        bitfieldToRaw(helper.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
-    }
+    // add the blocks bitfield
+    bitfieldToRaw(helper.blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 /*
@@ -577,24 +569,13 @@ tr_resume::fields_t loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::
                 rawToBitfield(blocks, buf, buflen);
             }
         }
-        else if (auto sv = std::string_view{}; tr_variantDictFindStrView(prog, TR_KEY_have, &sv))
-        {
-            if (sv == "all"sv)
-            {
-                blocks.set_has_all();
-            }
-            else
-            {
-                err = "Invalid value for HAVE";
-            }
-        }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
             blocks.set_raw(raw, rawlen);
         }
         else
         {
-            err = "Couldn't find 'pieces' or 'have' or 'bitfield'";
+            err = "Couldn't find 'pieces' or 'bitfield'";
         }
 
         if (err != nullptr)
@@ -901,7 +882,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
-        saveProgress(&top, tor, helper);
+        saveProgress(&top, helper);
     }
 
     saveSpeedLimits(&top, tor);
