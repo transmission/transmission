@@ -298,7 +298,7 @@ tr_port_forwarding_state tr_upnpPulse(
         }
         else
         {
-            handle->state = UpnpState::Failed;
+            handle->state = UpnpState::WillDiscover;
             tr_logAddDebug(fmt::format("UPNP_GetValidIGD failed: {} ({})", tr_strerror(errno), errno));
             tr_logAddDebug("If your router supports UPnP, please make sure UPnP is enabled!");
         }
