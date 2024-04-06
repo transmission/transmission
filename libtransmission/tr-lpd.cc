@@ -269,7 +269,7 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        auto const opt_on = int{ 1 };
+        auto const opt_on = 1;
 
         static_assert(AnnounceScope > 0);
 
@@ -543,14 +543,14 @@ private:
     // bogus data. Better to drop a few packets than get DoS'ed.
     static auto constexpr DosInterval = 5s;
     std::unique_ptr<libtransmission::Timer> dos_timer_;
-    static auto constexpr MaxIncomingPerSecond = int{ 10 };
+    static auto constexpr MaxIncomingPerSecond = 10;
     static auto constexpr MaxIncomingPerUpkeep = std::chrono::duration_cast<std::chrono::seconds>(DosInterval).count() *
         MaxIncomingPerSecond;
     // @brief throw away messages after this number exceeds MaxIncomingPerUpkeep
     size_t messages_received_since_upkeep_ = 0U;
 
     static auto constexpr TorrentAnnounceIntervalSec = time_t{ 240U }; // how frequently to reannounce the same torrent
-    static auto constexpr TtlSameSubnet = int{ 1 };
+    static auto constexpr TtlSameSubnet = 1;
     static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
 };
 

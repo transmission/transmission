@@ -28,7 +28,11 @@ public:
     void setNameFilter(QString const& name_filter);
 
     void setPath(QString const& path);
-    QString const& path() const;
+
+    [[nodiscard]] constexpr auto const& path() const noexcept
+    {
+        return path_;
+    }
 
     // QWidget
     QSize sizeHint() const override;

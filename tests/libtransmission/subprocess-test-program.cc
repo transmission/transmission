@@ -3,9 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/file.h> // tr_sys_file_write_line(), tr_sys_file_close(), tr_sy...
+#include <libtransmission/file.h> // tr_sys_dir_get_current()
 #include <libtransmission/utils.h> // tr_env_get_string()
 
+#include <fmt/core.h>
+#include <fmt/ostream.h>
+
+#include <fstream>
 #include <string>
 
 int main(int argc, char** argv)
@@ -19,13 +23,8 @@ int main(int argc, char** argv)
     auto const test_action = std::string{ argv[2] };
     auto const tmp_result_path = result_path + ".tmp";
 
-    auto fd = tr_sys_file_open(
-        tmp_result_path.data(), // NOLINT
-        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-        0644,
-        nullptr);
-
-    if (fd == TR_BAD_SYS_FILE)
+    auto out = std::ofstream(tmp_result_path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!out)
     {
         return 1;
     }
@@ -34,30 +33,35 @@ int main(int argc, char** argv)
     {
         for (int i = 3; i < argc; ++i)
         {
-            tr_sys_file_write_line(fd, argv[i]);
+            fmt::print(out, "{:s}\n", argv[i]);
         }
     }
     else if (test_action == "--dump-env")
     {
         for (int i = 3; i < argc; ++i)
         {
-            auto const value = tr_env_get_string(argv[i], "<null>");
-            tr_sys_file_write_line(fd, value);
+            fmt::print(out, "{:s}\n", tr_env_get_string(argv[i], "<null>"));
         }
     }
     else if (test_action == "--dump-cwd")
     {
-        auto const value = tr_sys_dir_get_current(nullptr);
-        tr_sys_file_write_line(fd, !std::empty(value) ? value : "<null>");
+        auto cwd = tr_sys_dir_get_current(nullptr);
+
+        if (std::empty(cwd))
+        {
+            cwd = "<null>";
+        }
+
+        fmt::print(out, "{:s}\n", cwd);
     }
     else
     {
-        tr_sys_file_close(fd);
-        tr_sys_path_remove(tmp_result_path.data());
+        out.close();
+        (void)std::remove(tmp_result_path.c_str());
         return 1;
     }
 
-    tr_sys_file_close(fd);
-    tr_sys_path_rename(tmp_result_path.data(), result_path.data());
+    out.close();
+    tr_sys_path_rename(tmp_result_path.c_str(), result_path.c_str());
     return 0;
 }

@@ -122,7 +122,7 @@ bool tr_session_id::is_local(std::string_view session_id) noexcept
         return false;
     }
 
-    auto is_local = bool{ false };
+    auto is_local = false;
     auto lockfile_path = tr_pathbuf{};
     get_lockfile_path(session_id, lockfile_path);
     auto error = tr_error{};

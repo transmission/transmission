@@ -129,11 +129,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
-    if (!socket_address.is_valid_for_peers())
-    {
-        return {};
-    }
-
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
     auto const func = small::max_size_map<preferred_key_t, std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
         { TR_PREFER_UTP,
@@ -250,12 +245,12 @@ bool tr_peerIo::reconnect()
         return false;
     }
 
-    socket_ = tr_netOpenPeerSocket(session_, socket_address(), is_seed());
-
-    if (!socket_.is_tcp())
+    auto sock = tr_netOpenPeerSocket(session_, socket_address(), is_seed());
+    if (!sock.is_tcp())
     {
         return false;
     }
+    socket_ = std::move(sock);
 
     this->event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, event_read_cb, this));
     this->event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
@@ -372,8 +367,8 @@ void tr_peerIo::can_read_wrapper()
     auto const keep_alive = shared_from_this();
 
     auto const now = tr_time_msec();
-    auto done = bool{ false };
-    auto err = bool{ false };
+    auto done = false;
+    auto err = false;
 
     // In normal conditions, only continue processing if we still have bandwidth
     // quota for it.

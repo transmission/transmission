@@ -9,6 +9,7 @@
 #include <cstdint> // int64_t
 #include <map>
 #include <optional>
+#include <set>
 #include <string_view>
 #include <vector>
 
@@ -46,7 +47,7 @@ public:
     void stop();
     void restart();
 
-    QUrl const& getRemoteUrl() const
+    [[nodiscard]] constexpr auto const& getRemoteUrl() const noexcept
     {
         return rpc_.url();
     }
@@ -86,10 +87,16 @@ public:
     bool portTestPending(PortTestIpProtocol ip_protocol) const noexcept;
 
     /** returns true if the transmission session is being run inside this client */
-    bool isServer() const;
+    [[nodiscard]] constexpr auto isServer() const noexcept
+    {
+        return session_ != nullptr;
+    }
 
     /** returns true if isServer() is true or if the remote address is the localhost */
-    bool isLocal() const;
+    [[nodiscard]] auto isLocal() const noexcept
+    {
+        return !session_id_.isEmpty() ? is_definitely_local_session_ : rpc_.isLocal();
+    }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
@@ -126,6 +133,26 @@ public:
         DetailStat,
         Rename
     };
+
+    void addKeyName(TorrentProperties props, tr_quark const key)
+    {
+        // populate names cache with default values
+        if (names_[props].empty())
+        {
+            getKeyNames(props);
+        }
+
+        names_[props].emplace(tr_quark_get_string_view(key));
+    }
+
+    void removeKeyName(TorrentProperties props, tr_quark const key)
+    {
+        // do not remove id because it must be in every torrent req
+        if (key != TR_KEY_id)
+        {
+            names_[props].erase(tr_quark_get_string_view(key));
+        }
+    }
 
 public slots:
     void addTorrent(AddData add_me);
@@ -167,7 +194,7 @@ private:
     void pumpRequests();
     void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
-    std::vector<std::string_view> const& getKeyNames(TorrentProperties props);
+    std::set<std::string_view> const& getKeyNames(TorrentProperties props);
 
     static void updateStats(tr_variant* args_dict, tr_session_stats* stats);
 
@@ -176,7 +203,7 @@ private:
     QString const config_dir_;
     Prefs& prefs_;
 
-    std::map<TorrentProperties, std::vector<std::string_view>> names_;
+    std::map<TorrentProperties, std::set<std::string_view>> names_;
 
     int64_t blocklist_size_ = -1;
     std::array<bool, NUM_PORT_TEST_IP_PROTOCOL> port_test_pending_ = {};

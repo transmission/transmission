@@ -54,11 +54,6 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
-
-/** save a torrent's .resume file if it's changed since the last time it was saved */
-void tr_torrentSave(tr_torrent* tor);
-
 namespace libtransmission::test
 {
 
@@ -68,7 +63,7 @@ class RenameTest_singleFilenameTorrent_Test;
 } // namespace libtransmission::test
 
 /** @brief Torrent object */
-struct tr_torrent final : public tr_completion::torrent_view
+struct tr_torrent
 {
     using Speed = libtransmission::Values::Speed;
 
@@ -179,7 +174,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
-        , completion_{ this, &this->metainfo_.block_info() }
+        , completion_{ this, &metainfo_.block_info() }
     {
     }
 
@@ -394,7 +389,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     /// WANTED
 
-    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
+    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const
     {
         return files_wanted_.piece_wanted(piece);
     }
@@ -734,6 +729,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         {
             sequential_download_ = is_sequential;
             sequential_download_changed_.emit(this, is_sequential);
+            set_dirty();
         }
     }
 

@@ -27,7 +27,7 @@ class RpcQueue : public QObject
 public:
     explicit RpcQueue(QObject* parent = nullptr);
 
-    void setTolerateErrors(bool tolerate_errors = true)
+    constexpr void setTolerateErrors(bool tolerate_errors = true)
     {
         tolerate_errors_ = tolerate_errors;
     }

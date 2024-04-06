@@ -17,7 +17,7 @@
 
 #include "libtransmission/transmission.h" // tr_block_index_t
 
-class tr_peer;
+struct tr_peer;
 
 /**
  * Bookkeeping for the active requests we have --

@@ -1389,7 +1389,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
 
 void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& torrents)
 {
-    auto has_any_webseeds = bool{ false };
+    auto has_any_webseeds = false;
     auto& hash = webseed_hash_;
     auto const& store = webseed_store_;
 

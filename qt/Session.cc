@@ -233,6 +233,9 @@ void Session::updatePref(int key)
             case 2:
                 sessionSet(prefs_.getKey(key), QStringLiteral("required"));
                 break;
+
+            default:
+                break;
             }
 
             break;
@@ -383,24 +386,7 @@ void Session::start()
     emit sourceChanged();
 }
 
-bool Session::isServer() const
-{
-    return session_ != nullptr;
-}
-
-bool Session::isLocal() const
-{
-    if (!session_id_.isEmpty())
-    {
-        return is_definitely_local_session_;
-    }
-
-    return rpc_.isLocal();
-}
-
-/***
-****
-***/
+// ---
 
 void Session::addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const
 {
@@ -530,9 +516,9 @@ void Session::torrentRenamePath(torrent_ids_t const& torrent_ids, QString const&
     q->run();
 }
 
-std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties props)
+std::set<std::string_view> const& Session::getKeyNames(TorrentProperties props)
 {
-    std::vector<std::string_view>& names = names_[props];
+    std::set<std::string_view>& names = names_[props];
 
     if (names.empty())
     {
@@ -623,7 +609,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         auto const append = [&names](tr_quark key)
         {
-            names.emplace_back(tr_quark_get_string_view(key));
+            names.emplace(tr_quark_get_string_view(key));
         };
 
         switch (props)
@@ -656,10 +642,6 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         // must be in every torrent req
         append(TR_KEY_id);
-
-        // sort and remove dupes
-        std::sort(names.begin(), names.end());
-        names.erase(std::unique(names.begin(), names.end()), names.end());
     }
 
     return names;

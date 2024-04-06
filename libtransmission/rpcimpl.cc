@@ -69,8 +69,8 @@ struct tr_rpc_idle_data
 {
     std::optional<int64_t> tag;
     tr_session* session = nullptr;
-    tr_variant::Map args_out = {};
-    tr_rpc_response_func callback = {};
+    tr_variant::Map args_out;
+    tr_rpc_response_func callback;
 };
 
 auto constexpr SuccessResult = "success"sv;
@@ -105,12 +105,12 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
     {
         tr_torrent* tor = nullptr;
 
-        if (auto const* val = var.get_if<int64_t>(); val != nullptr)
+        if (auto const val = var.value_if<int64_t>())
         {
             tor = torrents.get(*val);
         }
 
-        if (auto const* val = var.get_if<std::string_view>(); val != nullptr)
+        if (auto const val = var.value_if<std::string_view>())
         {
             if (*val == "recently-active"sv)
             {
@@ -741,7 +741,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
         keys.reserve(n_fields);
         for (auto const& field : *fields_vec)
         {
-            if (auto const* field_sv = field.get_if<std::string_view>(); field_sv != nullptr)
+            if (auto const field_sv = field.value_if<std::string_view>())
             {
                 if (auto const key = tr_quark_lookup(*field_sv); key && isSupportedTorrentGetField(*key))
                 {
@@ -788,7 +788,7 @@ char const* torrentGet(tr_session* session, tr_variant::Map const& args_in, tr_v
     labels.reserve(n_labels);
     for (auto const& label_var : labels_vec)
     {
-        if (auto const* value = label_var.get_if<std::string_view>(); value != nullptr)
+        if (auto const value = label_var.value_if<std::string_view>())
         {
             auto const label = tr_strv_strip(*value);
 
@@ -840,7 +840,7 @@ char const* set_labels(tr_torrent* tor, tr_variant::Vector const& list)
     {
         for (auto const& file_var : files_vec)
         {
-            if (auto const* val = file_var.get_if<int64_t>(); val != nullptr)
+            if (auto const val = file_var.value_if<int64_t>())
             {
                 if (auto const idx = static_cast<tr_file_index_t>(*val); idx < n_files)
                 {
@@ -887,7 +887,7 @@ char const* add_tracker_urls(tr_torrent* tor, tr_variant::Vector const& urls_vec
 
     for (auto const& url_var : urls_vec)
     {
-        if (auto const* val = url_var.get_if<std::string_view>(); val != nullptr)
+        if (auto const val = url_var.value_if<std::string_view>())
         {
             ann.add(*val);
         }
@@ -909,10 +909,10 @@ char const* replace_trackers(tr_torrent* tor, tr_variant::Vector const& urls_vec
 
     for (size_t i = 0, vec_size = std::size(urls_vec); i + 1 < vec_size; i += 2U)
     {
-        auto const* id = urls_vec[i].get_if<int64_t>();
-        auto const* url = urls_vec[i + 1U].get_if<std::string_view>();
+        auto const id = urls_vec[i].value_if<int64_t>();
+        auto const url = urls_vec[i + 1U].value_if<std::string_view>();
 
-        if (id != nullptr && url != nullptr)
+        if (id && url)
         {
             ann.replace(static_cast<tr_tracker_id_t>(*id), *url);
         }
@@ -934,7 +934,7 @@ char const* remove_trackers(tr_torrent* tor, tr_variant::Vector const& ids_vec)
 
     for (auto const& id_var : ids_vec)
     {
-        if (auto const* val = id_var.get_if<int64_t>(); val != nullptr)
+        if (auto const val = id_var.value_if<int64_t>())
         {
             ann.remove(static_cast<tr_tracker_id_t>(*val));
         }
@@ -955,7 +955,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_bandwidthPriority); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_bandwidthPriority))
         {
             if (auto const priority = static_cast<tr_priority_t>(*val); tr_isPriority(priority))
             {
@@ -963,7 +963,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             }
         }
 
-        if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_group); val != nullptr)
+        if (auto const val = args_in.value_if<std::string_view>(TR_KEY_group))
         {
             tor->set_bandwidth_group(*val);
         }
@@ -983,7 +983,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             errmsg = set_file_dls(tor, true, *val);
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit))
         {
             tr_torrentSetPeerLimit(tor, *val);
         }
@@ -1003,77 +1003,77 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             errmsg = set_file_priorities(tor, TR_PRI_NORMAL, *val);
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_downloadLimit))
         {
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
         }
 
-        if (auto const* val = args_in.find_if<bool>(TR_KEY_sequentialDownload); val != nullptr)
+        if (auto const val = args_in.value_if<bool>(TR_KEY_sequentialDownload))
         {
             tor->set_sequential_download(*val);
         }
 
-        if (auto const* val = args_in.find_if<bool>(TR_KEY_downloadLimited); val != nullptr)
+        if (auto const val = args_in.value_if<bool>(TR_KEY_downloadLimited))
         {
             tor->use_speed_limit(TR_DOWN, *val);
         }
 
-        if (auto const* val = args_in.find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
+        if (auto const val = args_in.value_if<bool>(TR_KEY_honorsSessionLimits))
         {
             tr_torrentUseSessionLimits(tor, *val);
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_uploadLimit))
         {
             tr_torrentSetSpeedLimit_KBps(tor, TR_UP, *val);
         }
 
-        if (auto const* val = args_in.find_if<bool>(TR_KEY_uploadLimited); val != nullptr)
+        if (auto const val = args_in.value_if<bool>(TR_KEY_uploadLimited))
         {
             tor->use_speed_limit(TR_UP, *val);
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seedIdleLimit); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_seedIdleLimit))
         {
             tor->set_idle_limit_minutes(static_cast<uint16_t>(*val));
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seedIdleMode); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_seedIdleMode))
         {
             tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*val));
         }
 
-        if (auto const* val = args_in.find_if<double>(TR_KEY_seedRatioLimit); val != nullptr)
+        if (auto const val = args_in.value_if<double>(TR_KEY_seedRatioLimit))
         {
             tor->set_seed_ratio(*val);
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seedRatioMode); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_seedRatioMode))
         {
             tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*val));
         }
 
-        if (auto const* val = args_in.find_if<int64_t>(TR_KEY_queuePosition); val != nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_queuePosition))
         {
             tr_torrentSetQueuePosition(tor, static_cast<size_t>(*val));
         }
 
-        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerAdd); val != nullptr)
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerAdd))
         {
             errmsg = add_tracker_urls(tor, *val);
         }
 
-        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerRemove); val != nullptr)
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerRemove))
         {
             errmsg = remove_trackers(tor, *val);
         }
 
-        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerReplace); val != nullptr)
+        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerReplace))
         {
             errmsg = replace_trackers(tor, *val);
         }
 
-        if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_trackerList); val != nullptr)
+        if (auto const val = args_in.value_if<std::string_view>(TR_KEY_trackerList))
         {
             if (!tor->set_announce_list(*val))
             {
@@ -1089,8 +1089,8 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
 
 char const* torrentSetLocation(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/)
 {
-    auto const* const location = args_in.find_if<std::string_view>(TR_KEY_location);
-    if (location == nullptr)
+    auto const location = args_in.value_if<std::string_view>(TR_KEY_location);
+    if (!location)
     {
         return "no location";
     }
@@ -1174,7 +1174,7 @@ char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     options.timeout_secs = TimeoutSecs;
 
-    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_ipProtocol); val != nullptr)
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ipProtocol))
     {
         if (*val == "ipv4"sv)
         {
@@ -1359,7 +1359,7 @@ bool isCurlURL(std::string_view url)
     files.reserve(n_files);
     for (auto const& idx_var : idx_vec)
     {
-        if (auto const* val = idx_var.get_if<int64_t>(); val != nullptr)
+        if (auto const val = idx_var.value_if<int64_t>())
         {
             files.emplace_back(static_cast<tr_file_index_t>(*val));
         }
@@ -1395,52 +1395,52 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
         ctor.set_download_dir(TR_FORCE, *download_dir);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_paused); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_paused))
     {
         ctor.set_paused(TR_FORCE, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit))
     {
         ctor.set_peer_limit(TR_FORCE, static_cast<uint16_t>(*val));
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_bandwidthPriority); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_bandwidthPriority))
     {
         ctor.set_bandwidth_priority(static_cast<tr_priority_t>(*val));
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_unwanted); val != nullptr)
+    if (auto const val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_unwanted))
     {
         auto const files = file_list_from_list(*val);
         ctor.set_files_wanted(std::data(files), std::size(files), false);
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted); val != nullptr)
+    if (auto const val = args_in.find_if<tr_variant::Vector>(TR_KEY_files_wanted))
     {
         auto const files = file_list_from_list(*val);
         ctor.set_files_wanted(std::data(files), std::size(files), true);
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_low); val != nullptr)
+    if (auto const val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_low))
     {
         auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_LOW);
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_normal); val != nullptr)
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_normal))
     {
         auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_NORMAL);
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_high); val != nullptr)
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_priority_high))
     {
         auto const files = file_list_from_list(*val);
         ctor.set_file_priorities(std::data(files), std::size(files), TR_PRI_HIGH);
     }
 
-    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_labels); val != nullptr)
+    if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_labels))
     {
         auto [labels, errmsg] = make_labels(*val);
 
@@ -1493,7 +1493,7 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
 
 void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const& var)
 {
-    if (auto const* val = var.get_if<std::string_view>(); val != nullptr)
+    if (auto const val = var.value_if<std::string_view>())
     {
         strings.insert(*val);
         return;
@@ -1548,29 +1548,29 @@ char const* groupSet(tr_session* session, tr_variant::Map const& args_in, tr_var
     auto& group = session->getBandwidthGroup(name);
     auto limits = group.get_limits();
 
-    if (auto const* const val = args_in.find_if<bool>(TR_KEY_speed_limit_down_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_down_enabled))
     {
         limits.down_limited = *val;
     }
 
-    if (auto const* const val = args_in.find_if<bool>(TR_KEY_speed_limit_up_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_up_enabled))
     {
         limits.up_limited = *val;
     }
 
-    if (auto const* const val = args_in.find_if<int64_t>(TR_KEY_speed_limit_down); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_down))
     {
         limits.down_limit = Speed{ *val, Speed::Units::KByps };
     }
 
-    if (auto const* const val = args_in.find_if<int64_t>(TR_KEY_speed_limit_up); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_up))
     {
         limits.up_limit = Speed{ *val, Speed::Units::KByps };
     }
 
     group.set_limits(limits);
 
-    if (auto const* const val = args_in.find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_honorsSessionLimits))
     {
         group.honor_parent_limits(TR_UP, *val);
         group.honor_parent_limits(TR_DOWN, *val);
@@ -1595,52 +1595,52 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         return "incomplete torrents directory path is not absolute";
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_cache_size_mb); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mb))
     {
         tr_sessionSetCacheLimit_MB(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_up); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_up))
     {
         tr_sessionSetAltSpeed_KBps(session, TR_UP, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_down); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_down))
     {
         tr_sessionSetAltSpeed_KBps(session, TR_DOWN, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_alt_speed_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_alt_speed_enabled))
     {
         tr_sessionUseAltSpeed(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_time_begin); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_begin))
     {
         tr_sessionSetAltSpeedBegin(session, static_cast<size_t>(*val));
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_time_end); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_end))
     {
         tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(*val));
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_alt_speed_time_day); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_day))
     {
         tr_sessionSetAltSpeedDay(session, static_cast<tr_sched_day>(*val));
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_alt_speed_time_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_alt_speed_time_enabled))
     {
         tr_sessionUseAltSpeedTime(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_blocklist_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_blocklist_enabled))
     {
         session->set_blocklist_enabled(*val);
     }
 
-    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_blocklist_url); val != nullptr)
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_blocklist_url))
     {
         session->setBlocklistUrl(*val);
     }
@@ -1650,27 +1650,27 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         session->setDownloadDir(*download_dir);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_queue_stalled_minutes); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_queue_stalled_minutes))
     {
         tr_sessionSetQueueStalledMinutes(session, static_cast<int>(*val));
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_queue_stalled_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_queue_stalled_enabled))
     {
         tr_sessionSetQueueStalledEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_default_trackers); val != nullptr)
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_default_trackers))
     {
         session->setDefaultTrackers(*val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_download_queue_size); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_download_queue_size))
     {
         tr_sessionSetQueueSize(session, TR_DOWN, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_download_queue_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_download_queue_enabled))
     {
         tr_sessionSetQueueEnabled(session, TR_DOWN, *val);
     }
@@ -1680,135 +1680,135 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         session->setIncompleteDir(*incomplete_dir);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_incomplete_dir_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_incomplete_dir_enabled))
     {
         session->useIncompleteDir(*val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit_global); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit_global))
     {
         tr_sessionSetPeerLimit(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_limit_per_torrent); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_limit_per_torrent))
     {
         tr_sessionSetPeerLimitPerTorrent(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_pex_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_pex_enabled))
     {
         tr_sessionSetPexEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_dht_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_dht_enabled))
     {
         tr_sessionSetDHTEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_utp_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_utp_enabled))
     {
         tr_sessionSetUTPEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_lpd_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_lpd_enabled))
     {
         tr_sessionSetLPDEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_peer_port_random_on_start); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_peer_port_random_on_start))
     {
         tr_sessionSetPeerPortRandomOnStart(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_peer_port); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_peer_port))
     {
         tr_sessionSetPeerPort(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_port_forwarding_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_port_forwarding_enabled))
     {
         tr_sessionSetPortForwardingEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_rename_partial_files); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_rename_partial_files))
     {
         tr_sessionSetIncompleteFileNamingEnabled(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<double>(TR_KEY_seedRatioLimit); val != nullptr)
+    if (auto const val = args_in.value_if<double>(TR_KEY_seedRatioLimit))
     {
         tr_sessionSetRatioLimit(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_seedRatioLimited); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_seedRatioLimited))
     {
         tr_sessionSetRatioLimited(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_idle_seeding_limit); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_idle_seeding_limit))
     {
         tr_sessionSetIdleLimit(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_idle_seeding_limit_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_idle_seeding_limit_enabled))
     {
         tr_sessionSetIdleLimited(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_start_added_torrents); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_start_added_torrents))
     {
         tr_sessionSetPaused(session, !*val);
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_seed_queue_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_seed_queue_enabled))
     {
         tr_sessionSetQueueEnabled(session, TR_UP, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_seed_queue_size); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_seed_queue_size))
     {
         tr_sessionSetQueueSize(session, TR_UP, *val);
     }
 
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        if (auto const* val = args_in.find_if<bool>(enabled_key); val != nullptr)
+        if (auto const val = args_in.value_if<bool>(enabled_key))
         {
             session->useScript(script, *val);
         }
 
-        if (auto const* val = args_in.find_if<std::string_view>(script_key); val != nullptr)
+        if (auto const val = args_in.value_if<std::string_view>(script_key))
         {
             session->setScript(script, *val);
         }
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_trash_original_torrent_files); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_trash_original_torrent_files))
     {
         tr_sessionSetDeleteSource(session, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_speed_limit_down); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_down))
     {
         session->set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_speed_limit_down_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_down_enabled))
     {
         tr_sessionLimitSpeed(session, TR_DOWN, *val);
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_speed_limit_up); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_up))
     {
         session->set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_speed_limit_up_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_up_enabled))
     {
         tr_sessionLimitSpeed(session, TR_UP, *val);
     }
 
-    if (auto const* val = args_in.find_if<std::string_view>(TR_KEY_encryption); val != nullptr)
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_encryption))
     {
         if (*val == "required"sv)
         {
@@ -1824,12 +1824,12 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         }
     }
 
-    if (auto const* val = args_in.find_if<int64_t>(TR_KEY_anti_brute_force_threshold); val != nullptr)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_anti_brute_force_threshold))
     {
         tr_sessionSetAntiBruteForceThreshold(session, static_cast<int>(*val));
     }
 
-    if (auto const* val = args_in.find_if<bool>(TR_KEY_anti_brute_force_enabled); val != nullptr)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_anti_brute_force_enabled))
     {
         tr_sessionSetAntiBruteForceEnabled(session, *val);
     }
@@ -1994,7 +1994,7 @@ namespace session_get_helpers
     {
         for (auto const& field_var : *fields_vec)
         {
-            if (auto const* field_name = field_var.get_if<std::string_view>(); field_name != nullptr)
+            if (auto const field_name = field_var.value_if<std::string_view>())
             {
                 if (auto const field_id = tr_quark_lookup(*field_name); field_id)
                 {
@@ -2122,22 +2122,23 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
     auto const empty_args = tr_variant::Map{};
     auto const* args_in = &empty_args;
     auto method_name = std::string_view{};
+    auto tag = std::optional<int64_t>{};
     if (request_map != nullptr)
     {
         // find the args
-        if (auto const* val = request_map->find_if<tr_variant::Map>(TR_KEY_arguments); val != nullptr)
+        if (auto const* val = request_map->find_if<tr_variant::Map>(TR_KEY_arguments))
         {
             args_in = val;
         }
 
         // find the requested method
-        if (auto const* val = request_map->find_if<std::string_view>(TR_KEY_method); val != nullptr)
+        if (auto const val = request_map->value_if<std::string_view>(TR_KEY_method))
         {
             method_name = *val;
         }
-    }
 
-    auto const tag = request_map->value_if<int64_t>(TR_KEY_tag);
+        tag = request_map->value_if<int64_t>(TR_KEY_tag);
+    }
 
     auto const test = [method_name](auto const& handler)
     {

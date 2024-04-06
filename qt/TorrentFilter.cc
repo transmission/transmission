@@ -52,6 +52,9 @@ void TorrentFilter::onPrefChanged(int key)
     case Prefs::SORT_REVERSED:
         msec = FastMSec;
         break;
+
+    default:
+        break;
     }
 
     // if this pref change affects filtering, ensure that a refilter is queued

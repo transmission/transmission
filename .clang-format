@@ -55,7 +55,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 FixNamespaceComments: true
 IndentGotoLabels: false
-KeepEmptyLinesAtTheStartOfBlocks: true
+KeepEmptyLinesAtTheStartOfBlocks: false
 QualifierAlignment: Right
 SortUsingDeclarations: true
 SpaceAfterTemplateKeyword: false

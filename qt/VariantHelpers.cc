@@ -45,7 +45,7 @@ bool change(TorrentHash& setme, tr_variant const* value)
 
 bool change(Peer& setme, tr_variant const* value)
 {
-    auto changed = bool{ false };
+    auto changed = false;
 
     auto pos = size_t{ 0 };
     auto key = tr_quark{};
@@ -85,7 +85,7 @@ bool change(Peer& setme, tr_variant const* value)
 
 bool change(TorrentFile& setme, tr_variant const* value)
 {
-    auto changed = bool{ false };
+    auto changed = false;
 
     auto pos = size_t{ 0 };
     auto key = tr_quark{};

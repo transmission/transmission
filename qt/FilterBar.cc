@@ -309,6 +309,9 @@ void FilterBar::refreshPref(int key)
 
             break;
         }
+
+    default:
+        break;
     }
 }
 
