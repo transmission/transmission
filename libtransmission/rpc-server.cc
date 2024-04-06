@@ -660,171 +660,6 @@ struct bufferevent* bevcb(struct event_base* base, void* arg)
     return r;
 }
 
-int tr_SSL_CTX_use_certificate_chain_file(SSL_CTX* ctx, char const* file)
-{
-#if OPENSSL_VERSION_NUMBER < 0x30000000
-    return SSL_CTX_use_certificate_chain_file(ctx, file);
-#else
-    /*Encountered some problem with BIO_s_file() in windows so read certs into mem first*/
-    if (ctx == nullptr)
-    {
-        return 0;
-    }
-    BIO* in = nullptr;
-    int ret = 0;
-    X509* x = nullptr;
-    pem_password_cb* passwd_callback = nullptr;
-    void* passwd_callback_userdata = nullptr;
-    ERR_clear_error(); /* clear error stack for  SSL_CTX_use_certificate() */
-    passwd_callback = SSL_CTX_get_default_passwd_cb(ctx);
-    passwd_callback_userdata = SSL_CTX_get_default_passwd_cb_userdata(ctx);
-
-    in = BIO_new(BIO_s_mem());
-    if (in == nullptr)
-    {
-        ERR_raise(ERR_LIB_SSL, ERR_R_BUF_LIB);
-        return ret;
-    }
-    std::ifstream ifs(file);
-    std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-    ifs.close();
-    BIO_write(in, content.c_str(), content.length());
-
-    OSSL_LIB_CTX* libctx = nullptr;
-    char const* propq = nullptr;
-    x = X509_new_ex(libctx, propq);
-    if (x == nullptr)
-    {
-        ERR_raise(ERR_LIB_SSL, ERR_R_ASN1_LIB);
-        X509_free(x);
-        BIO_free(in);
-        return ret;
-    }
-
-    if (PEM_read_bio_X509_AUX(in, &x, passwd_callback, passwd_callback_userdata) == nullptr)
-    {
-        ERR_raise(ERR_LIB_SSL, ERR_R_PEM_LIB);
-        X509_free(x);
-        BIO_free(in);
-        return ret;
-    }
-    ret = SSL_CTX_use_certificate(ctx, x);
-
-    if (ERR_peek_error() != 0)
-    {
-        ret = 0;
-    }
-
-    if (ret != 0)
-    {
-        /*
-         * If we could set up our certificate, now proceed to the CA
-         * certificates.
-         */
-        X509* ca = nullptr;
-        int r = 0;
-        unsigned long err = 0;
-
-        r = SSL_CTX_clear_chain_certs(ctx);
-
-        if (r == 0)
-        {
-            ret = 0;
-            X509_free(x);
-            BIO_free(in);
-            return ret;
-        }
-
-        while (true)
-        {
-            ca = X509_new_ex(nullptr, nullptr);
-            if (ca == nullptr)
-            {
-                ERR_raise(ERR_LIB_SSL, ERR_R_ASN1_LIB);
-                X509_free(x);
-                BIO_free(in);
-                return ret;
-            }
-            if (PEM_read_bio_X509(in, &ca, passwd_callback, passwd_callback_userdata) != nullptr)
-            {
-                r = SSL_CTX_add0_chain_cert(ctx, ca);
-                /*
-                 * Note that we must not free ca if it was successfully added to
-                 * the chain (while we must free the main certificate, since its
-                 * reference count is increased by SSL_CTX_use_certificate).
-                 */
-                if (r == 0)
-                {
-                    X509_free(ca);
-                    ret = 0;
-                    X509_free(x);
-                    BIO_free(in);
-                    return ret;
-                }
-            }
-            else
-            {
-                X509_free(ca);
-                break;
-            }
-        }
-        err = ERR_peek_last_error();
-        if (ERR_GET_LIB(err) == ERR_LIB_PEM && ERR_GET_REASON(err) == PEM_R_NO_START_LINE)
-        {
-            ERR_clear_error();
-        }
-        else
-        {
-            ret = 0;
-        }
-    }
-
-    X509_free(x);
-    BIO_free(in);
-    return ret;
-
-#endif
-}
-
-int tr_SSL_CTX_use_PrivateKey_PEM(SSL_CTX* ctx, char const* file)
-{
-#if OPENSSL_VERSION_NUMBER < 0x30000000
-    return SSL_CTX_use_PrivateKey_file(ctx, file, SSL_FILETYPE_PEM);
-#else
-    int ret = 0;
-    EVP_PKEY* pkey = nullptr;
-    BIO* in = BIO_new(BIO_s_mem());
-    if (in == nullptr)
-    {
-        ERR_raise(ERR_LIB_SSL, ERR_R_BUF_LIB);
-        return ret;
-    }
-
-    std::ifstream ifs(file);
-    std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-    ifs.close();
-    BIO_write(in, content.c_str(), content.length());
-
-    pkey = PEM_read_bio_PrivateKey_ex(
-        in,
-        nullptr,
-        SSL_CTX_get_default_passwd_cb(ctx),
-        SSL_CTX_get_default_passwd_cb_userdata(ctx),
-        nullptr,
-        nullptr);
-    if (pkey == nullptr)
-    {
-        ERR_raise(ERR_LIB_SSL, ERR_R_PEM_LIB);
-        BIO_free(in);
-        return ret;
-    }
-    ret = SSL_CTX_use_PrivateKey(ctx, pkey);
-    EVP_PKEY_free(pkey);
-    BIO_free(in);
-    return ret;
-#endif
-}
-
 SSL_CTX* tr_set_cert(char const* cert, char const* key)
 {
     SSL_CTX* m_ctx = SSL_CTX_new(SSLv23_server_method());
@@ -832,17 +667,17 @@ SSL_CTX* tr_set_cert(char const* cert, char const* key)
     {
         return nullptr;
     }
-    if (tr_SSL_CTX_use_certificate_chain_file(m_ctx, cert) != 1)
+    if (SSL_CTX_use_certificate_chain_file(m_ctx, cert) != 1)
     {
         tr_logAddWarn(fmt::format("Couldn't set RPC SSL with cert file {}", cert));
         return nullptr;
     }
-    if (tr_SSL_CTX_use_PrivateKey_PEM(m_ctx, key) != 1)
+    if (SSL_CTX_use_PrivateKey_file(m_ctx, key, SSL_FILETYPE_PEM) != 1)
     {
         tr_logAddWarn(fmt::format("Couldn't set RPC SSL with key file {}", key));
         return nullptr;
     }
-    if (1 == SSL_CTX_check_private_key(m_ctx))
+    if (SSL_CTX_check_private_key(m_ctx) == 1)
     {
         tr_logAddInfo(fmt::format("Set RPC SSL certs success"));
         return m_ctx;
