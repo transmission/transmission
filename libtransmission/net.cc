@@ -637,7 +637,7 @@ std::optional<unsigned> tr_address::to_interface_index() const noexcept
         {
             auto const ret = if_nametoindex(ifa->ifa_name);
             tr_logAddDebug(fmt::format("Found interface index for {}: {}", display_name(), ret));
-            return if_nametoindex(ifa->ifa_name);
+            return ret;
         }
     }
 #endif
