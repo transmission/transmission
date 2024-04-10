@@ -652,7 +652,10 @@ void start_server(tr_rpc_server* server)
 
     auto* const base = server->session->event_base();
     auto* const httpd = evhttp_new(base);
-
+    if (!httpd) 
+    {
+        return;
+    }
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 
     auto const address = server->get_bind_address();
