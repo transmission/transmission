@@ -347,18 +347,18 @@ void showUsage()
     tr_getopt_usage(MyName, Usage, std::data(Options));
 }
 
-[[nodiscard]] auto numarg(char const* const arg)
+[[nodiscard]] auto numarg(std::string_view arg)
 {
     auto remainder = std::string_view{};
-    auto const num = tr_num_parse<int64_t>(arg != nullptr ? arg : "", &remainder);
-    if (!num || !std::empty(remainder))
+    auto const o_num = tr_num_parse<int64_t>(arg, &remainder);
+    if (!o_num || !std::empty(remainder))
     {
         fmt::print(stderr, "Not a number: '{:s}'\n", arg);
         showUsage();
         exit(EXIT_FAILURE);
     }
 
-    return *num;
+    return *o_num;
 }
 
 enum
@@ -587,12 +587,12 @@ void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fal
     return addIdArg(args, config.torrent_ids, fallback);
 }
 
-void addTime(tr_variant* args, tr_quark const key, char const* const arg)
+void addTime(tr_variant* args, tr_quark const key, std::string_view arg)
 {
-    if (auto arg_sv = std::string_view{ arg != nullptr ? arg : "" }; std::size(arg_sv) == 4)
+    if (std::size(arg) == 4)
     {
-        auto const hour = tr_num_parse<int>(arg_sv.substr(0, 2)).value_or(-1);
-        auto const min = tr_num_parse<int>(arg_sv.substr(2, 2)).value_or(-1);
+        auto const hour = tr_num_parse<int>(arg.substr(0, 2)).value_or(-1);
+        auto const min = tr_num_parse<int>(arg.substr(2, 2)).value_or(-1);
 
         if (0 <= hour && hour < 24 && 0 <= min && min < 60)
         {
@@ -604,11 +604,11 @@ void addTime(tr_variant* args, tr_quark const key, char const* const arg)
     fmt::print(stderr, "Please specify the time of day in 'hhmm' format.\n");
 }
 
-void addDays(tr_variant* args, tr_quark const key, char const* const arg)
+void addDays(tr_variant* args, tr_quark const key, std::string_view arg)
 {
     int days = 0;
 
-    if (arg != nullptr)
+    if (!std::empty(arg))
     {
         for (int& day : tr_num_parse_range(arg))
         {
@@ -636,7 +636,7 @@ void addDays(tr_variant* args, tr_quark const key, char const* const arg)
     }
 }
 
-void addLabels(tr_variant* args, char const* const comma_delimited_labels)
+void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
 {
     tr_variant* labels;
     if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
@@ -644,35 +644,32 @@ void addLabels(tr_variant* args, char const* const comma_delimited_labels)
         labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
     }
 
-    auto labels_sv = std::string_view{ comma_delimited_labels != nullptr ? comma_delimited_labels : "" };
     auto label = std::string_view{};
-    while (tr_strv_sep(&labels_sv, &label, ','))
+    while (tr_strv_sep(&comma_delimited_labels, &label, ','))
     {
         tr_variantListAddStr(labels, label);
     }
 }
 
-void setGroup(tr_variant* args, char const* const group)
+void setGroup(tr_variant* args, std::string_view group)
 {
-    tr_variantDictAddStrView(args, TR_KEY_group, group != nullptr ? group : "");
+    tr_variantDictAddStrView(args, TR_KEY_group, group);
 }
 
-[[nodiscard]] auto make_files_list(char const* const str_in)
+[[nodiscard]] auto make_files_list(std::string_view str_in)
 {
-    auto str = std::string_view{ str_in != nullptr ? str_in : "" };
-
-    if (std::empty(str))
+    if (std::empty(str_in))
     {
         fmt::print(stderr, "No files specified!\n");
-        str = "-1"sv; // no file will have this index, so should be a no-op
+        str_in = "-1"sv; // no file will have this index, so should be a no-op
     }
 
     auto files = tr_variant::Vector{};
 
-    if (str != "all"sv)
+    if (str_in != "all"sv)
     {
         files.reserve(100U);
-        for (auto const& idx : tr_num_parse_range(str))
+        for (auto const& idx : tr_num_parse_range(str_in))
         {
             files.emplace_back(idx);
         }
@@ -2342,8 +2339,10 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
             break;
 
         default:
-            evbuffer_add(buf, "", 1);
-            fmt::print(stderr, "Unexpected response: {:s}\n", reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)));
+            fmt::print(
+                stderr,
+                "Unexpected response: {:s}\n",
+                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) });
             status |= EXIT_FAILURE;
             break;
         }
@@ -2403,6 +2402,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             break;
         }
 
+        auto const optarg_sv = std::string_view{ optarg != nullptr ? optarg : "" };
         int const stepMode = getOptMode(c);
         if (stepMode == 0) /* meta commands */
         {
@@ -2440,11 +2440,11 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 968: /* Unix domain socket */
-                config.unix_socket_path = optarg;
+                config.unix_socket_path = optarg_sv;
                 break;
 
             case 'n': /* auth */
-                config.auth = optarg;
+                config.auth = optarg_sv;
                 break;
 
             case 810: /* authenv */
@@ -2461,7 +2461,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 'N':
-                config.netrc = optarg;
+                config.netrc = optarg_sv;
                 break;
 
             case 820:
@@ -2480,7 +2480,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     status |= flush(rpcurl, &tset, config);
                 }
 
-                config.torrent_ids = optarg;
+                config.torrent_ids = optarg_sv;
                 break;
 
             case 'V': /* show version number */
@@ -2509,12 +2509,12 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     }
                     else
                     {
-                        tr_variantDictAddStr(args, TR_KEY_filename, optarg);
+                        tr_variantDictAddStr(args, TR_KEY_filename, optarg_sv);
                     }
                 }
                 else
                 {
-                    fmt::print(stderr, "Unknown option: {:s}\n", optarg);
+                    fmt::print(stderr, "Unknown option: {:s}\n", optarg_sv);
                     status |= EXIT_FAILURE;
                 }
 
@@ -2543,7 +2543,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             switch (c)
             {
             case 'F':
-                config.filter = optarg;
+                config.filter = optarg_sv;
                 tr_variantDictAddInt(&top, TR_KEY_tag, TAG_FILTER);
 
                 for (auto const& key : DetailsKeys)
@@ -2618,7 +2618,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             switch (c)
             {
             case 800:
-                tr_variantDictAddStr(args, TR_KEY_script_torrent_done_filename, optarg);
+                tr_variantDictAddStr(args, TR_KEY_script_torrent_done_filename, optarg_sv);
                 tr_variantDictAddBool(args, TR_KEY_script_torrent_done_enabled, true);
                 break;
 
@@ -2627,7 +2627,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 802:
-                tr_variantDictAddStr(args, TR_KEY_script_torrent_done_seeding_filename, optarg);
+                tr_variantDictAddStr(args, TR_KEY_script_torrent_done_seeding_filename, optarg_sv);
                 tr_variantDictAddBool(args, TR_KEY_script_torrent_done_seeding_enabled, true);
                 break;
 
@@ -2644,11 +2644,11 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 972:
-                tr_variantDictAddInt(args, TR_KEY_alt_speed_down, numarg(optarg));
+                tr_variantDictAddInt(args, TR_KEY_alt_speed_down, numarg(optarg_sv));
                 break;
 
             case 973:
-                tr_variantDictAddInt(args, TR_KEY_alt_speed_up, numarg(optarg));
+                tr_variantDictAddInt(args, TR_KEY_alt_speed_up, numarg(optarg_sv));
                 break;
 
             case 974:
@@ -2660,19 +2660,19 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 976:
-                addTime(args, TR_KEY_alt_speed_time_begin, optarg);
+                addTime(args, TR_KEY_alt_speed_time_begin, optarg_sv);
                 break;
 
             case 977:
-                addTime(args, TR_KEY_alt_speed_time_end, optarg);
+                addTime(args, TR_KEY_alt_speed_time_end, optarg_sv);
                 break;
 
             case 978:
-                addDays(args, TR_KEY_alt_speed_time_day, optarg);
+                addDays(args, TR_KEY_alt_speed_time_day, optarg_sv);
                 break;
 
             case 'c':
-                tr_variantDictAddStr(args, TR_KEY_incomplete_dir, optarg);
+                tr_variantDictAddStr(args, TR_KEY_incomplete_dir, optarg_sv);
                 tr_variantDictAddBool(args, TR_KEY_incomplete_dir_enabled, true);
                 break;
 
@@ -2681,7 +2681,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 'e':
-                tr_variantDictAddInt(args, TR_KEY_cache_size_mb, tr_num_parse<int64_t>(optarg).value());
+                tr_variantDictAddInt(args, TR_KEY_cache_size_mb, tr_num_parse<int64_t>(optarg_sv).value());
                 break;
 
             case 910:
@@ -2721,7 +2721,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 'p':
-                tr_variantDictAddInt(args, TR_KEY_peer_port, numarg(optarg));
+                tr_variantDictAddInt(args, TR_KEY_peer_port, numarg(optarg_sv));
                 break;
 
             case 'P':
@@ -2745,7 +2745,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 953:
-                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, tr_num_parse<double>(optarg).value());
+                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, tr_num_parse<double>(optarg_sv).value());
                 tr_variantDictAddBool(args, TR_KEY_seedRatioLimited, true);
                 break;
 
@@ -2793,12 +2793,12 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             case 'd':
                 if (targs != nullptr)
                 {
-                    tr_variantDictAddInt(targs, TR_KEY_downloadLimit, numarg(optarg));
+                    tr_variantDictAddInt(targs, TR_KEY_downloadLimit, numarg(optarg_sv));
                     tr_variantDictAddBool(targs, TR_KEY_downloadLimited, true);
                 }
                 else
                 {
-                    tr_variantDictAddInt(sargs, TR_KEY_speed_limit_down, numarg(optarg));
+                    tr_variantDictAddInt(sargs, TR_KEY_speed_limit_down, numarg(optarg_sv));
                     tr_variantDictAddBool(sargs, TR_KEY_speed_limit_down_enabled, true);
                 }
 
@@ -2819,12 +2819,12 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             case 'u':
                 if (targs != nullptr)
                 {
-                    tr_variantDictAddInt(targs, TR_KEY_uploadLimit, numarg(optarg));
+                    tr_variantDictAddInt(targs, TR_KEY_uploadLimit, numarg(optarg_sv));
                     tr_variantDictAddBool(targs, TR_KEY_uploadLimited, true);
                 }
                 else
                 {
-                    tr_variantDictAddInt(sargs, TR_KEY_speed_limit_up, numarg(optarg));
+                    tr_variantDictAddInt(sargs, TR_KEY_speed_limit_up, numarg(optarg_sv));
                     tr_variantDictAddBool(sargs, TR_KEY_speed_limit_up_enabled, true);
                 }
 
@@ -2845,11 +2845,11 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             case 930:
                 if (targs != nullptr)
                 {
-                    tr_variantDictAddInt(targs, TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg).value());
+                    tr_variantDictAddInt(targs, TR_KEY_peer_limit, tr_num_parse<int64_t>(optarg_sv).value());
                 }
                 else
                 {
-                    tr_variantDictAddInt(sargs, TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg).value());
+                    tr_variantDictAddInt(sargs, TR_KEY_peer_limit_global, tr_num_parse<int64_t>(optarg_sv).value());
                 }
 
                 break;
@@ -2872,12 +2872,12 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     {
                         list = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
                     }
-                    tr_variantListAddInt(list, tr_num_parse<int64_t>(optarg).value());
+                    tr_variantListAddInt(list, tr_num_parse<int64_t>(optarg_sv).value());
                     break;
                 }
 
             case 950:
-                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, tr_num_parse<double>(optarg).value());
+                tr_variantDictAddReal(args, TR_KEY_seedRatioLimit, tr_num_parse<double>(optarg_sv).value());
                 tr_variantDictAddInt(args, TR_KEY_seedRatioMode, TR_RATIOLIMIT_SINGLE);
                 break;
 
@@ -2918,35 +2918,35 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             switch (c)
             {
             case 'g':
-                *tr_variantDictAdd(args, TR_KEY_files_wanted) = make_files_list(optarg);
+                *tr_variantDictAdd(args, TR_KEY_files_wanted) = make_files_list(optarg_sv);
                 break;
 
             case 'G':
-                *tr_variantDictAdd(args, TR_KEY_files_unwanted) = make_files_list(optarg);
+                *tr_variantDictAdd(args, TR_KEY_files_unwanted) = make_files_list(optarg_sv);
                 break;
 
             case 'L':
-                addLabels(args, optarg);
+                addLabels(args, optarg_sv);
                 break;
 
             case 730:
-                setGroup(args, optarg);
+                setGroup(args, optarg_sv);
                 break;
 
             case 731:
-                setGroup(args, "");
+                setGroup(args, ""sv);
                 break;
 
             case 900:
-                *tr_variantDictAdd(args, TR_KEY_priority_high) = make_files_list(optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_high) = make_files_list(optarg_sv);
                 break;
 
             case 901:
-                *tr_variantDictAdd(args, TR_KEY_priority_normal) = make_files_list(optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_normal) = make_files_list(optarg_sv);
                 break;
 
             case 902:
-                *tr_variantDictAdd(args, TR_KEY_priority_low) = make_files_list(optarg);
+                *tr_variantDictAdd(args, TR_KEY_priority_low) = make_files_list(optarg_sv);
                 break;
 
             case 700:
@@ -2968,7 +2968,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     {
                         list = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
                     }
-                    tr_variantListAddStr(list, optarg);
+                    tr_variantListAddStr(list, optarg_sv);
                     break;
                 }
 
@@ -2982,7 +2982,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             if (tadd.has_value())
             {
                 tr_variant* args = tr_variantDictFind(&tadd, TR_KEY_arguments);
-                tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
+                tr_variantDictAddStr(args, TR_KEY_download_dir, optarg_sv);
             }
             else
             {
@@ -2990,7 +2990,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set-location"sv);
                 tr_variant* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
-                tr_variantDictAddStr(args, TR_KEY_location, optarg);
+                tr_variantDictAddStr(args, TR_KEY_location, optarg_sv);
                 tr_variantDictAddBool(args, TR_KEY_move, false);
                 addIdArg(args, config);
                 status |= flush(rpcurl, &top, config);
@@ -3045,7 +3045,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             case 'w':
                 {
                     auto* args = tadd.has_value() ? tr_variantDictFind(&tadd, TR_KEY_arguments) : ensure_sset(sset);
-                    tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
+                    tr_variantDictAddStr(args, TR_KEY_download_dir, optarg_sv);
                     break;
                 }
 
@@ -3138,7 +3138,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     tr_variantInitDict(&top, 2);
                     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set-location"sv);
                     auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
-                    tr_variantDictAddStr(args, TR_KEY_location, optarg);
+                    tr_variantDictAddStr(args, TR_KEY_location, optarg_sv);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, config);
                     status |= flush(rpcurl, &top, config);
@@ -3152,7 +3152,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-rename-path"sv);
                     auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_path, rename_from);
-                    tr_variantDictAddStr(args, TR_KEY_name, optarg);
+                    tr_variantDictAddStr(args, TR_KEY_name, optarg_sv);
                     addIdArg(args, config);
                     status |= flush(rpcurl, &top, config);
                     rename_from.clear();
@@ -3160,7 +3160,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 }
 
             case 965:
-                rename_from = optarg;
+                rename_from = optarg_sv;
                 break;
 
             case 732:
