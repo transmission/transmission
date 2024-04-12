@@ -363,22 +363,12 @@ void showUsage()
 
 enum
 {
-    MODE_TORRENT_START = (1 << 0),
-    MODE_TORRENT_STOP = (1 << 1),
-    MODE_TORRENT_VERIFY = (1 << 2),
-    MODE_TORRENT_REANNOUNCE = (1 << 3),
-    MODE_TORRENT_SET = (1 << 4),
-    MODE_TORRENT_GET = (1 << 5),
-    MODE_TORRENT_ADD = (1 << 6),
-    MODE_TORRENT_REMOVE = (1 << 7),
-    MODE_TORRENT_SET_LOCATION = (1 << 8),
-    MODE_SESSION_SET = (1 << 9),
-    MODE_SESSION_GET = (1 << 10),
-    MODE_SESSION_STATS = (1 << 11),
-    MODE_SESSION_CLOSE = (1 << 12),
-    MODE_BLOCKLIST_UPDATE = (1 << 13),
-    MODE_PORT_TEST = (1 << 14),
-    MODE_GROUP_GET = (1 << 15)
+    MODE_META_COMMAND = 0,
+    MODE_TORRENT_SET = (1 << 0),
+    MODE_TORRENT_GET = (1 << 1),
+    MODE_TORRENT_ADD = (1 << 2),
+    MODE_TORRENT_REMOVE = (1 << 3),
+    MODE_SESSION_SET = (1 << 4)
 };
 
 [[nodiscard]] int getOptMode(int val)
@@ -398,13 +388,13 @@ enum
     case 't': /* set current torrent */
     case 'V': /* show version number */
     case 944: /* print selected torrents' ids */
-        return 0;
+        return MODE_META_COMMAND;
 
     case 'c': /* incomplete-dir */
     case 'C': /* no-incomplete-dir */
     case 'e': /* cache */
     case 'm': /* portmap */
-    case 'M': /* "no-portmap */
+    case 'M': /* no-portmap */
     case 'o': /* dht */
     case 'O': /* no-dht */
     case 'p': /* incoming peer port */
@@ -447,9 +437,6 @@ enum
     case 985: /* no-honor-session */
         return MODE_TORRENT_SET;
 
-    case 920: /* session-info */
-        return MODE_SESSION_GET;
-
     case 'g': /* get */
     case 'G': /* no-get */
     case 'L': /* labels */
@@ -463,9 +450,6 @@ enum
     case 730: /* set bandwidth group */
     case 731: /* reset bandwidth group */
         return MODE_TORRENT_SET | MODE_TORRENT_ADD;
-
-    case 961: /* find */
-        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_ADD;
 
     case 'i': /* info */
     case 'l': /* list all torrents */
@@ -483,51 +467,31 @@ enum
     case 930: /* peers */
         return MODE_SESSION_SET | MODE_TORRENT_SET;
 
-    case 's': /* start */
-        return MODE_TORRENT_START | MODE_TORRENT_ADD;
-
-    case 'S': /* stop */
-        return MODE_TORRENT_STOP | MODE_TORRENT_ADD;
-
-    case 'w': /* download-dir */
-        return MODE_SESSION_SET | MODE_TORRENT_ADD;
-
-    case 850: /* session-close */
-        return MODE_SESSION_CLOSE;
-
-    case 963: /* blocklist-update */
-        return MODE_BLOCKLIST_UPDATE;
-
-    case 921: /* session-stats */
-        return MODE_SESSION_STATS;
-
-    case 'v': /* verify */
-        return MODE_TORRENT_VERIFY;
-
-    case 600: /* reannounce */
-        return MODE_TORRENT_REANNOUNCE;
-
-    case 962: /* port-test */
-        return MODE_PORT_TEST;
-
     case 'r': /* remove */
     case 840: /* remove and delete */
         return MODE_TORRENT_REMOVE;
 
+    case 's': /* start */
+    case 'S': /* stop */
+    case 'v': /* verify */
+    case 'w': /* download-dir */
+    case 600: /* reannounce */
+    case 850: /* session-close */
+    case 732: /* List groups */
+    case 920: /* session-info */
+    case 921: /* session-stats */
     case 960: /* move */
-        return MODE_TORRENT_SET_LOCATION;
-
+    case 961: /* find */
+    case 962: /* port-test */
+    case 963: /* blocklist-update */
     case 964: /* rename */
     case 965: /* path */
-        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
-
-    case 732: /* List groups */
-        return MODE_GROUP_GET;
+        return -1;
 
     default:
         fmt::print(stderr, "unrecognized argument {:d}\n", val);
         assert("unrecognized argument" && 0);
-        return 0;
+        return -2;
     }
 }
 
@@ -2404,7 +2368,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
         auto const optarg_sv = std::string_view{ optarg != nullptr ? optarg : "" };
         int const stepMode = getOptMode(c);
-        if (stepMode == 0) /* meta commands */
+        if (stepMode == MODE_META_COMMAND) /* meta commands */
         {
             switch (c)
             {
@@ -2977,25 +2941,16 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
             }
         }
-        else if (c == 961) /* set location */
+        else if (stepMode == MODE_TORRENT_REMOVE)
         {
-            if (tadd.has_value())
-            {
-                tr_variant* args = tr_variantDictFind(&tadd, TR_KEY_arguments);
-                tr_variantDictAddStr(args, TR_KEY_download_dir, optarg_sv);
-            }
-            else
-            {
-                auto top = tr_variant{};
-                tr_variantInitDict(&top, 2);
-                tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set-location"sv);
-                tr_variant* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
-                tr_variantDictAddStr(args, TR_KEY_location, optarg_sv);
-                tr_variantDictAddBool(args, TR_KEY_move, false);
-                addIdArg(args, config);
-                status |= flush(rpcurl, &top, config);
-                break;
-            }
+            auto top = tr_variant{};
+            tr_variantInitDict(&top, 2);
+            tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-remove"sv);
+            auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
+            tr_variantDictAddBool(args, TR_KEY_delete_local_data, c == 840);
+            addIdArg(args, config);
+            status |= flush(rpcurl, &top, config);
+            break;
         }
         else
         {
@@ -3119,19 +3074,6 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     break;
                 }
 
-            case 'r':
-            case 840:
-                {
-                    auto top = tr_variant{};
-                    tr_variantInitDict(&top, 2);
-                    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-remove"sv);
-                    auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-                    tr_variantDictAddBool(args, TR_KEY_delete_local_data, c == 840);
-                    addIdArg(args, config);
-                    status |= flush(rpcurl, &top, config);
-                    break;
-                }
-
             case 960:
                 {
                     auto top = tr_variant{};
@@ -3140,6 +3082,28 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
                     tr_variantDictAddStr(args, TR_KEY_location, optarg_sv);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
+                    addIdArg(args, config);
+                    status |= flush(rpcurl, &top, config);
+                    break;
+                }
+
+            case 961: /* set location */
+                // TODO (5.0.0):
+                // 1. Remove tadd.has_value() branch
+                // 2. Group with --move under MODE_TORRENT_SET_LOCATION
+                if (tadd.has_value())
+                {
+                    tr_variant* args = tr_variantDictFind(&tadd, TR_KEY_arguments);
+                    tr_variantDictAddStr(args, TR_KEY_download_dir, optarg_sv);
+                }
+                else
+                {
+                    auto top = tr_variant{};
+                    tr_variantInitDict(&top, 2);
+                    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set-location"sv);
+                    tr_variant* args = tr_variantDictAddDict(&top, TR_KEY_arguments, 3);
+                    tr_variantDictAddStr(args, TR_KEY_location, optarg_sv);
+                    tr_variantDictAddBool(args, TR_KEY_move, false);
                     addIdArg(args, config);
                     status |= flush(rpcurl, &top, config);
                     break;
