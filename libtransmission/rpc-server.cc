@@ -654,7 +654,7 @@ void start_server(tr_rpc_server* server)
     auto* const httpd = evhttp_new(base);
     if (!httpd) 
     {
-        tr_logAddError(fmt::format(_("Couldn't instantiate httpd for '{server}'"), fmt::arg("server", server)));
+        tr_logAddError(fmt::format(_("Couldn't instantiate httpd for '{}'"), static_cast<void*>(server)));
         return;
     }
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
