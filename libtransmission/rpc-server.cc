@@ -82,7 +82,7 @@ auto constexpr TrUnixSocketPrefix = "unix:"sv;
 #ifdef _WIN32
 auto inline constexpr TrUnixAddrStrLen = size_t{ INET6_ADDRSTRLEN };
 #else
-auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(((struct sockaddr_un*)nullptr)->sun_path) +
+auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(std::declval<struct sockaddr_un>().sun_path) +
                                                  std::size(TrUnixSocketPrefix) };
 #endif
 
