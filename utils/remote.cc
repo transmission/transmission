@@ -86,7 +86,7 @@ struct RemoteConfig
 {
     if (eta < 0)
     {
-        return "Unknown";
+        return "Unknown"s;
     }
 
     if (eta < 60)
@@ -119,7 +119,7 @@ struct RemoteConfig
         return fmt::format("{:d} years", eta / (60 * 60 * 24 * 365));
     }
 
-    return "∞";
+    return "∞"s;
 }
 
 [[nodiscard]] auto tr_strltime(time_t seconds)
@@ -767,35 +767,35 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     auto const o_status = t.value_if<int64_t>(TR_KEY_status);
     if (!o_status)
     {
-        return "";
+        return ""s;
     }
 
     switch (*o_status)
     {
     case TR_STATUS_DOWNLOAD_WAIT:
     case TR_STATUS_SEED_WAIT:
-        return "Queued";
+        return "Queued"s;
 
     case TR_STATUS_STOPPED:
         if (t.value_if<bool>(TR_KEY_isFinished).value_or(false))
         {
-            return "Finished";
+            return "Finished"s;
         }
-        return "Stopped";
+        return "Stopped"s;
 
     case TR_STATUS_CHECK_WAIT:
         if (auto o_percent = t.value_if<double>(TR_KEY_recheckProgress))
         {
             return fmt::format("Will Verify ({:.0f}%)", floor(*o_percent * 100.0));
         }
-        return "Will Verify";
+        return "Will Verify"s;
 
     case TR_STATUS_CHECK:
         if (auto o_percent = t.value_if<double>(TR_KEY_recheckProgress))
         {
             return fmt::format("Verifying ({:.0f}%)", floor(*o_percent * 100.0));
         }
-        return "Verifying";
+        return "Verifying"s;
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
@@ -803,24 +803,24 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
             to_us = t.value_if<int64_t>(TR_KEY_peersSendingToUs).value_or(0);
             from_us != 0 && to_us != 0)
         {
-            return "Up & Down";
+            return "Up & Down"s;
         }
         else if (to_us != 0)
         {
-            return "Downloading";
+            return "Downloading"s;
         }
         else if (from_us == 0)
         {
-            return "Idle";
+            return "Idle"s;
         }
         if (auto left_until_done = t.value_if<int64_t>(TR_KEY_leftUntilDone).value_or(0); left_until_done > 0)
         {
-            return "Uploading";
+            return "Uploading"s;
         }
-        return "Seeding";
+        return "Seeding"s;
 
     default:
-        return "Unknown";
+        return "Unknown"s;
     }
 }
 
