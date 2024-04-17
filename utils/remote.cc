@@ -82,7 +82,7 @@ struct RemoteConfig
 
 // --- Display Utilities
 
-[[nodiscard]] std::string etaToString(int64_t eta)
+[[nodiscard]] std::string eta_to_string(int64_t eta)
 {
     if (eta < 0)
     {
@@ -343,7 +343,7 @@ auto constexpr Options = std::array<tr_option, 98>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-void showUsage()
+void show_usage()
 {
     tr_getopt_usage(MyName, Usage, std::data(Options));
 }
@@ -355,7 +355,7 @@ void showUsage()
     if (!o_num || !std::empty(remainder))
     {
         fmt::print(stderr, "Not a number: '{:s}'\n", arg);
-        showUsage();
+        show_usage();
         exit(EXIT_FAILURE);
     }
 
@@ -365,14 +365,14 @@ void showUsage()
 enum
 {
     MODE_META_COMMAND = 0,
-    MODE_TORRENT_SET = (1 << 0),
-    MODE_TORRENT_GET = (1 << 1),
-    MODE_TORRENT_ADD = (1 << 2),
-    MODE_TORRENT_REMOVE = (1 << 3),
-    MODE_SESSION_SET = (1 << 4)
+    MODE_TORRENT_SET = 1 << 0,
+    MODE_TORRENT_GET = 1 << 1,
+    MODE_TORRENT_ADD = 1 << 2,
+    MODE_TORRENT_REMOVE = 1 << 3,
+    MODE_SESSION_SET = 1 << 4
 };
 
-[[nodiscard]] int getOptMode(int val)
+[[nodiscard]] int get_opt_mode(int val)
 {
     switch (val)
     {
@@ -496,7 +496,7 @@ enum
     }
 }
 
-[[nodiscard]] std::string getEncodedMetainfo(char const* filename)
+[[nodiscard]] std::string get_encoded_metainfo(char const* filename)
 {
     if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
@@ -506,7 +506,7 @@ enum
     return {};
 }
 
-void addIdArg(tr_variant::Map& args, std::string_view id_str, std::string_view fallback = "")
+void get_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view fallback = "")
 {
     if (std::empty(id_str))
     {
@@ -547,12 +547,12 @@ void addIdArg(tr_variant::Map& args, std::string_view id_str, std::string_view f
     }
 }
 
-void addIdArg(tr_variant::Map& args, RemoteConfig const& config, std::string_view fallback = "")
+void get_id_arg(tr_variant::Map& args, RemoteConfig const& config, std::string_view fallback = "")
 {
-    return addIdArg(args, config.torrent_ids, fallback);
+    return get_id_arg(args, config.torrent_ids, fallback);
 }
 
-void addTime(tr_variant::Map& args, tr_quark const key, std::string_view arg)
+void add_time(tr_variant::Map& args, tr_quark const key, std::string_view arg)
 {
     if (std::size(arg) == 4)
     {
@@ -569,7 +569,7 @@ void addTime(tr_variant::Map& args, tr_quark const key, std::string_view arg)
     fmt::print(stderr, "Please specify the time of day in 'hhmm' format.\n");
 }
 
-void addDays(tr_variant::Map& args, tr_quark const key, std::string_view arg)
+void add_days(tr_variant::Map& args, tr_quark const key, std::string_view arg)
 {
     int days = 0;
 
@@ -601,7 +601,7 @@ void addDays(tr_variant::Map& args, tr_quark const key, std::string_view arg)
     }
 }
 
-void addLabels(tr_variant::Map& args, std::string_view comma_delimited_labels)
+void add_labels(tr_variant::Map& args, std::string_view comma_delimited_labels)
 {
     auto* labels = args.find_if<tr_variant::Vector>(TR_KEY_labels);
     if (labels == nullptr)
@@ -616,7 +616,7 @@ void addLabels(tr_variant::Map& args, std::string_view comma_delimited_labels)
     }
 }
 
-void setGroup(tr_variant::Map& args, std::string_view group)
+void set_group(tr_variant::Map& args, std::string_view group)
 {
     args.insert_or_assign(TR_KEY_group, tr_variant::unmanaged_string(group));
 }
@@ -724,7 +724,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_uploadRatio,
 };
 
-[[nodiscard]] size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
+[[nodiscard]] size_t write_func(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
     auto* const buf = static_cast<evbuffer*>(vbuf);
     size_t const byteCount = size * nmemb;
@@ -733,7 +733,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
-[[nodiscard]] size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
+[[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
     auto& config = *static_cast<RemoteConfig*>(vconfig);
     auto const* const line = static_cast<char const*>(ptr);
@@ -752,7 +752,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     return line_len;
 }
 
-[[nodiscard]] long getTimeoutSecs(std::string_view req)
+[[nodiscard]] long get_timeout_secs(std::string_view req)
 {
     if (req.find(R"("method":"blocklist-update")") != std::string_view::npos)
     {
@@ -762,7 +762,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     return 60L; /* default value */
 }
 
-[[nodiscard]] std::string getStatusString(tr_variant::Map const& t)
+[[nodiscard]] std::string get_status_string(tr_variant::Map const& t)
 {
     auto const o_status = t.value_if<int64_t>(TR_KEY_status);
     if (!o_status)
@@ -839,7 +839,7 @@ std::string_view format_date(std::array<char, N>& buf, time_t now)
     return { begin, static_cast<size_t>(end - begin) };
 }
 
-void printDetails(tr_variant::Map const& map)
+void print_details(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -908,7 +908,7 @@ void printDetails(tr_variant::Map const& map)
         fmt::print("\n");
 
         fmt::print("TRANSFER\n");
-        fmt::print("  State: {:s}\n", getStatusString(*t));
+        fmt::print("  State: {:s}\n", get_status_string(*t));
 
         if (auto osv = t->value_if<std::string_view>(TR_KEY_downloadDir))
         {
@@ -1184,7 +1184,7 @@ void printDetails(tr_variant::Map const& map)
     }
 }
 
-void printFileList(tr_variant::Map const& map)
+void print_file_list(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1264,7 +1264,7 @@ void printFileList(tr_variant::Map const& map)
     }
 }
 
-void printPeersImpl(tr_variant::Vector const& peers)
+void print_peers_impl(tr_variant::Vector const& peers)
 {
     fmt::print("{:<40s}  {:<12s}  {:<5s} {:<6s}  {:<6s}  {:s}\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
@@ -1297,7 +1297,7 @@ void printPeersImpl(tr_variant::Vector const& peers)
     }
 }
 
-void printPeers(tr_variant::Map const& map)
+void print_peers(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1321,7 +1321,7 @@ void printPeers(tr_variant::Map const& map)
 
         if (auto* peers = t->find_if<tr_variant::Vector>(TR_KEY_peers))
         {
-            printPeersImpl(*peers);
+            print_peers_impl(*peers);
 
             if (it < std::prev(end))
             {
@@ -1331,7 +1331,7 @@ void printPeers(tr_variant::Map const& map)
     }
 }
 
-void printPiecesImpl(std::string_view raw, size_t piece_count)
+void print_pieces_impl(std::string_view raw, size_t piece_count)
 {
     auto const str = tr_base64_decode(raw);
     fmt::print("  ");
@@ -1356,7 +1356,7 @@ void printPiecesImpl(std::string_view raw, size_t piece_count)
     fmt::print("\n");
 }
 
-void printPieces(tr_variant::Map const& map)
+void print_pieces(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1387,7 +1387,7 @@ void printPieces(tr_variant::Map const& map)
         }
 
         assert(*o_piece_count >= 0);
-        printPiecesImpl(*o_pieces, static_cast<size_t>(*o_piece_count));
+        print_pieces_impl(*o_pieces, static_cast<size_t>(*o_piece_count));
 
         if (it < std::prev(end))
         {
@@ -1396,7 +1396,7 @@ void printPieces(tr_variant::Map const& map)
     }
 }
 
-void printPortTest(tr_variant::Map const& map)
+void print_port_test(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1410,7 +1410,7 @@ void printPortTest(tr_variant::Map const& map)
     }
 }
 
-void printTorrentList(tr_variant::Map const& map)
+void print_torrent_list(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1484,7 +1484,7 @@ void printTorrentList(tr_variant::Map const& map)
         auto const size_when_done = *o_size_when_done;
         auto const left_until_done = *o_left_until_done;
 
-        auto const eta_str = size_when_done != 0 || eta != -1 ? etaToString(eta) : "Done";
+        auto const eta_str = size_when_done != 0 || eta != -1 ? eta_to_string(eta) : "Done";
         auto const error_mark = t->value_if<int64_t>(TR_KEY_error).value_or(0) != 0 ? '*' : ' ';
         auto const done_str = size_when_done != 0 ?
             strlpercent(100.0 * (size_when_done - left_until_done) / size_when_done) + '%' :
@@ -1500,7 +1500,7 @@ void printTorrentList(tr_variant::Map const& map)
             Speed{ up, Speed::Units::Byps }.count(Speed::Units::KByps),
             Speed{ down, Speed::Units::Byps }.count(Speed::Units::KByps),
             strlratio2(*o_ratio),
-            getStatusString(*t),
+            get_status_string(*t),
             *o_name);
 
         total_up += up;
@@ -1515,7 +1515,7 @@ void printTorrentList(tr_variant::Map const& map)
         Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
 }
 
-void printTrackersImpl(tr_variant::Vector const& tracker_stats)
+void print_trackers_impl(tr_variant::Vector const& tracker_stats)
 {
     for (auto const& t_var : tracker_stats)
     {
@@ -1654,7 +1654,7 @@ void printTrackersImpl(tr_variant::Vector const& tracker_stats)
     }
 }
 
-void printTrackers(tr_variant::Map const& map)
+void print_trackers(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1682,7 +1682,7 @@ void printTrackers(tr_variant::Map const& map)
             continue;
         }
 
-        printTrackersImpl(*tracker_stats);
+        print_trackers_impl(*tracker_stats);
 
         if (it < std::prev(end))
         {
@@ -1691,7 +1691,7 @@ void printTrackers(tr_variant::Map const& map)
     }
 }
 
-void printSession(tr_variant::Map const& map)
+void print_session(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1907,7 +1907,7 @@ void printSession(tr_variant::Map const& map)
     }
 }
 
-void printSessionStats(tr_variant::Map const& map)
+void print_session_stats(tr_variant::Map const& map)
 {
     auto* args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1950,7 +1950,7 @@ void printSessionStats(tr_variant::Map const& map)
     }
 }
 
-void printGroups(tr_variant::Map const& map)
+void print_groups(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -1990,7 +1990,7 @@ void printGroups(tr_variant::Map const& map)
     }
 }
 
-void filterIds(tr_variant::Map const& map, RemoteConfig& config)
+void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -2029,7 +2029,7 @@ void filterIds(tr_variant::Map const& map, RemoteConfig& config)
             continue;
         }
         bool include = negate;
-        auto const status = getStatusString(*t);
+        auto const status = get_status_string(*t);
         switch (config.filter[pos])
         {
         case 'i': // Status = Idle
@@ -2118,7 +2118,7 @@ void filterIds(tr_variant::Map const& map, RemoteConfig& config)
     }
 }
 
-int processResponse(char const* rpcurl, std::string_view response, RemoteConfig& config)
+int process_response(char const* rpcurl, std::string_view response, RemoteConfig& config)
 {
     auto status = int{ EXIT_SUCCESS };
 
@@ -2158,47 +2158,47 @@ int processResponse(char const* rpcurl, std::string_view response, RemoteConfig&
             switch (tag)
             {
             case TAG_SESSION:
-                printSession(map);
+                print_session(map);
                 break;
 
             case TAG_STATS:
-                printSessionStats(map);
+                print_session_stats(map);
                 break;
 
             case TAG_DETAILS:
-                printDetails(map);
+                print_details(map);
                 break;
 
             case TAG_FILES:
-                printFileList(map);
+                print_file_list(map);
                 break;
 
             case TAG_LIST:
-                printTorrentList(map);
+                print_torrent_list(map);
                 break;
 
             case TAG_PEERS:
-                printPeers(map);
+                print_peers(map);
                 break;
 
             case TAG_PIECES:
-                printPieces(map);
+                print_pieces(map);
                 break;
 
             case TAG_PORTTEST:
-                printPortTest(map);
+                print_port_test(map);
                 break;
 
             case TAG_TRACKERS:
-                printTrackers(map);
+                print_trackers(map);
                 break;
 
             case TAG_GROUPS:
-                printGroups(map);
+                print_groups(map);
                 break;
 
             case TAG_FILTER:
-                filterIds(map, config);
+                filter_ids(map, config);
                 break;
 
             case TAG_TORRENT_ADD:
@@ -2244,10 +2244,10 @@ CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, LONG_VERSION_STRING).c_str());
-    (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_func);
     (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     (void)curl_easy_setopt(curl, CURLOPT_HEADERDATA, &config);
-    (void)curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, parseResponseHeader);
+    (void)curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, parse_response_header);
     (void)curl_easy_setopt(curl, CURLOPT_POST, 1);
     (void)curl_easy_setopt(curl, CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
     (void)curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
@@ -2316,7 +2316,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
     auto* curl = tr_curl_easy_init(buf, config);
     (void)curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
-    (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, getTimeoutSecs(json));
+    (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, get_timeout_secs(json));
 
     if (config.debug)
     {
@@ -2337,7 +2337,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
         switch (response)
         {
         case 200:
-            status |= processResponse(
+            status |= process_response(
                 rpcurl,
                 std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) },
                 config);
@@ -2433,14 +2433,14 @@ tr_variant::Map& ensure_tadd(tr_variant& tadd)
     return *args;
 }
 
-int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
+int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
 {
-    int status = EXIT_SUCCESS;
+    auto status = int{ EXIT_SUCCESS };
     char const* optarg;
     auto sset = tr_variant{};
     auto tset = tr_variant{};
     auto tadd = tr_variant{};
-    std::string rename_from;
+    auto rename_from = std::string{};
 
     for (;;)
     {
@@ -2451,8 +2451,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
         }
 
         auto const optarg_sv = std::string_view{ optarg != nullptr ? optarg : "" };
-        int const stepMode = getOptMode(c);
-        if (stepMode == MODE_META_COMMAND) /* meta commands */
+        if (auto const step_mode = get_opt_mode(c); step_mode == MODE_META_COMMAND) /* meta commands */
         {
             switch (c)
             {
@@ -2471,7 +2470,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
                     {
-                        addIdArg(*args_map, config);
+                        get_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
                     }
                 }
@@ -2526,7 +2525,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
                     {
-                        addIdArg(*args_map, config);
+                        get_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
                     }
                 }
@@ -2544,7 +2543,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
             case TR_OPT_ERR:
                 fmt::print(stderr, "invalid option\n");
-                showUsage();
+                show_usage();
                 status |= EXIT_FAILURE;
                 break;
 
@@ -2553,7 +2552,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
                     {
-                        if (auto const metainfo = getEncodedMetainfo(optarg); !std::empty(metainfo))
+                        if (auto const metainfo = get_encoded_metainfo(optarg); !std::empty(metainfo))
                         {
                             args_map->try_emplace(TR_KEY_metainfo, metainfo);
                         }
@@ -2575,13 +2574,13 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
             }
         }
-        else if (stepMode == MODE_TORRENT_GET)
+        else if (step_mode == MODE_TORRENT_GET)
         {
             if (auto* tset_map = tset.get_if<tr_variant::Map>())
             {
                 if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
                 {
-                    addIdArg(*args_map, config);
+                    get_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
                 }
             }
@@ -2601,7 +2600,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                addIdArg(args, config, "all");
+                get_id_arg(args, config, "all");
                 break;
             case 'i':
                 map.insert_or_assign(TR_KEY_tag, TAG_DETAILS);
@@ -2611,7 +2610,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                addIdArg(args, config);
+                get_id_arg(args, config);
                 break;
 
             case 'l':
@@ -2622,7 +2621,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                addIdArg(args, config, "all");
+                get_id_arg(args, config, "all");
                 break;
 
             case 940:
@@ -2633,26 +2632,26 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                addIdArg(args, config);
+                get_id_arg(args, config);
                 break;
 
             case 941:
                 map.insert_or_assign(TR_KEY_tag, TAG_PEERS);
                 fields.emplace_back(tr_variant::unmanaged_string("peers"sv));
-                addIdArg(args, config);
+                get_id_arg(args, config);
                 break;
 
             case 942:
                 map.insert_or_assign(TR_KEY_tag, TAG_PIECES);
                 fields.emplace_back(tr_variant::unmanaged_string("pieces"sv));
                 fields.emplace_back(tr_variant::unmanaged_string("pieceCount"sv));
-                addIdArg(args, config);
+                get_id_arg(args, config);
                 break;
 
             case 943:
                 map.insert_or_assign(TR_KEY_tag, TAG_TRACKERS);
                 fields.emplace_back(tr_variant::unmanaged_string("trackerStats"sv));
-                addIdArg(args, config);
+                get_id_arg(args, config);
                 break;
 
             default:
@@ -2665,7 +2664,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
         }
-        else if (stepMode == MODE_SESSION_SET)
+        else if (step_mode == MODE_SESSION_SET)
         {
             auto& args = ensure_sset(sset);
 
@@ -2714,15 +2713,15 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 976:
-                addTime(args, TR_KEY_alt_speed_time_begin, optarg_sv);
+                add_time(args, TR_KEY_alt_speed_time_begin, optarg_sv);
                 break;
 
             case 977:
-                addTime(args, TR_KEY_alt_speed_time_end, optarg_sv);
+                add_time(args, TR_KEY_alt_speed_time_end, optarg_sv);
                 break;
 
             case 978:
-                addDays(args, TR_KEY_alt_speed_time_day, optarg_sv);
+                add_days(args, TR_KEY_alt_speed_time_day, optarg_sv);
                 break;
 
             case 'c':
@@ -2828,7 +2827,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
             }
         }
-        else if (stepMode == (MODE_SESSION_SET | MODE_TORRENT_SET))
+        else if (step_mode == (MODE_SESSION_SET | MODE_TORRENT_SET))
         {
             tr_variant::Map* targs = nullptr;
             tr_variant::Map* sargs = nullptr;
@@ -2913,7 +2912,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
             }
         }
-        else if (stepMode == MODE_TORRENT_SET)
+        else if (step_mode == MODE_TORRENT_SET)
         {
             tr_variant::Map& args = ensure_tset(tset);
 
@@ -2957,7 +2956,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
             }
         }
-        else if (stepMode == (MODE_TORRENT_SET | MODE_TORRENT_ADD))
+        else if (step_mode == (MODE_TORRENT_SET | MODE_TORRENT_ADD))
         {
             tr_variant::Map& args = tadd.has_value() ? ensure_tadd(tadd) : ensure_tset(tset);
 
@@ -2972,15 +2971,15 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
 
             case 'L':
-                addLabels(args, optarg_sv);
+                add_labels(args, optarg_sv);
                 break;
 
             case 730:
-                setGroup(args, optarg_sv);
+                set_group(args, optarg_sv);
                 break;
 
             case 731:
-                setGroup(args, ""sv);
+                set_group(args, ""sv);
                 break;
 
             case 900:
@@ -3024,13 +3023,13 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 break;
             }
         }
-        else if (stepMode == MODE_TORRENT_REMOVE)
+        else if (step_mode == MODE_TORRENT_REMOVE)
         {
             auto map = tr_variant::Map{ 2 };
             auto args = tr_variant::Map{ 2 };
 
             args.try_emplace(TR_KEY_delete_local_data, c == 840);
-            addIdArg(args, config);
+            get_id_arg(args, config);
 
             map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-remove"sv));
             map.try_emplace(TR_KEY_arguments, std::move(args));
@@ -3065,7 +3064,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     auto map = tr_variant::Map{ 2 };
                     auto args = tr_variant::Map{ 1 };
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-start"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
 
@@ -3086,7 +3085,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 {
                     auto map = tr_variant::Map{ 2 };
                     auto args = tr_variant::Map{ 1 };
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-stop"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
 
@@ -3147,14 +3146,14 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     {
                         if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
                         {
-                            addIdArg(*args_map, config);
+                            get_id_arg(*args_map, config);
                             status |= flush(rpcurl, &tset, config);
                         }
                     }
 
                     auto map = tr_variant::Map{ 2 };
                     auto args = tr_variant::Map{ 1 };
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-reannounce"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3168,14 +3167,14 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     {
                         if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
                         {
-                            addIdArg(*args_map, config);
+                            get_id_arg(*args_map, config);
                             status |= flush(rpcurl, &tset, config);
                         }
                     }
 
                     auto map = tr_variant::Map{ 2 };
                     auto args = tr_variant::Map{ 1 };
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-verify"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3189,7 +3188,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto args = tr_variant::Map{ 3 };
                     args.try_emplace(TR_KEY_location, optarg_sv);
                     args.try_emplace(TR_KEY_move, true);
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-set-location"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3214,7 +3213,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto args = tr_variant::Map{ 3 };
                     args.try_emplace(TR_KEY_location, optarg_sv);
                     args.try_emplace(TR_KEY_move, false);
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-set-location"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3228,7 +3227,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                     auto args = tr_variant::Map{ 3 };
                     args.try_emplace(TR_KEY_path, rename_from);
                     args.try_emplace(TR_KEY_name, optarg_sv);
-                    addIdArg(args, config);
+                    get_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-rename-path"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3253,7 +3252,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
             default:
                 fmt::print(stderr, "got opt [{:d}]\n", c);
-                showUsage();
+                show_usage();
                 break;
             }
         }
@@ -3268,7 +3267,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
     {
         if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
         {
-            addIdArg(*args_map, config);
+            get_id_arg(*args_map, config);
             status |= flush(rpcurl, &tset, config);
         }
     }
@@ -3281,7 +3280,7 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
     return status;
 }
 
-bool parsePortString(std::string_view sv, uint16_t& port)
+bool parse_port_string(std::string_view sv, uint16_t& port)
 {
     auto remainder = std::string_view{};
     auto parsed = tr_num_parse<uint16_t>(sv, &remainder);
@@ -3295,7 +3294,7 @@ bool parsePortString(std::string_view sv, uint16_t& port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-void getHostAndPortAndRpcUrl(
+void get_host_and_port_and_rpc_url(
     int& argc,
     char** argv,
     std::string& host,
@@ -3318,7 +3317,7 @@ void getHostAndPortAndRpcUrl(
         config.use_ssl = true;
         rpcurl = fmt::format("{:s}/rpc/", sv.substr(8));
     }
-    else if (parsePortString(sv, port))
+    else if (parse_port_string(sv, port))
     {
         // it was just a port
     }
@@ -3330,7 +3329,7 @@ void getHostAndPortAndRpcUrl(
     else if (auto const last_colon = sv.rfind(':'); first_colon == last_colon)
     {
         // if only one colon, it's probably "$host:$port"
-        if (parsePortString(sv.substr(last_colon + 1), port))
+        if (parse_port_string(sv.substr(last_colon + 1), port))
         {
             host = sv.substr(0, last_colon);
         }
@@ -3363,11 +3362,11 @@ int tr_main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        showUsage();
+        show_usage();
         return EXIT_FAILURE;
     }
 
-    getHostAndPortAndRpcUrl(argc, argv, host, port, rpcurl, config);
+    get_host_and_port_and_rpc_url(argc, argv, host, port, rpcurl, config);
 
     if (std::empty(host))
     {
@@ -3379,5 +3378,5 @@ int tr_main(int argc, char* argv[])
         rpcurl = fmt::format("{:s}:{:d}{:s}", host, port, DefaultUrl);
     }
 
-    return processArgs(rpcurl.c_str(), argc, (char const* const*)argv, config);
+    return process_args(rpcurl.c_str(), argc, (char const* const*)argv, config);
 }
