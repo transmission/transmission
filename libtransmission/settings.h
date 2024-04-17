@@ -36,14 +36,16 @@ protected:
     using Save = tr_variant (*)(T const& src);
 
     template<typename T>
-    void add_type_handler(Load<T> load, Save<T> save)
+    void add_type_handler(Load<T> load_handler, Save<T> save_handler)
     {
         auto const key = std::type_index(typeid(T*));
 
-        // wrap load + save with void* wrappers so that
+        // wrap load_handler + save_handler with void* wrappers so that
         // they can be stored in the save_ and load_ maps
-        load_.insert_or_assign(key, [load](tr_variant const& src, void* tgt) { return load(src, static_cast<T*>(tgt)); });
-        save_.insert_or_assign(key, [save](void const* src) { return save(*static_cast<T const*>(src)); });
+        load_.insert_or_assign(
+            key,
+            [load_handler](tr_variant const& src, void* tgt) { return load_handler(src, static_cast<T*>(tgt)); });
+        save_.insert_or_assign(key, [save_handler](void const* src) { return save_handler(*static_cast<T const*>(src)); });
     }
 
     struct Field

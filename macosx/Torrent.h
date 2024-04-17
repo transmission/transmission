@@ -111,6 +111,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* torrentLocation;
 @property(nonatomic, readonly) NSString* dataLocation;
+@property(nonatomic, readonly) NSString* lastKnownDataLocation;
 - (NSString*)fileLocation:(FileListNode*)node;
 
 - (void)renameTorrent:(NSString*)newName completionHandler:(void (^)(BOOL didRename))completionHandler;

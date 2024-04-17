@@ -205,6 +205,7 @@ private:
 
         upnp_state_ = tr_upnpPulse(
             upnp_,
+            mediator_.advertised_peer_port(),
             mediator_.local_peer_port(),
             is_enabled,
             do_check,

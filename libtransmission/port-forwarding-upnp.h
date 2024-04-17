@@ -25,6 +25,12 @@ tr_upnp* tr_upnpInit();
 
 void tr_upnpClose(tr_upnp* handle);
 
-tr_port_forwarding_state tr_upnpPulse(tr_upnp*, tr_port port, bool is_enabled, bool do_port_check, std::string bindaddr);
+tr_port_forwarding_state tr_upnpPulse(
+    tr_upnp*,
+    tr_port advertised_port,
+    tr_port local_port,
+    bool is_enabled,
+    bool do_port_check,
+    std::string bindaddr);
 
 /* @} */

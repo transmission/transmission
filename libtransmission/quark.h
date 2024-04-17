@@ -368,6 +368,7 @@ enum
     TR_KEY_start_added_torrents,
     TR_KEY_start_minimized,
     TR_KEY_startDate,
+    TR_KEY_start_paused,
     TR_KEY_status,
     TR_KEY_statusbar_stats,
     TR_KEY_tag,
