@@ -1153,7 +1153,6 @@ void print_details(tr_variant::Map const& map)
                 {
                     fmt::print("  Ratio Limit: {:s}\n", strlratio2(*od));
                 }
-
                 break;
 
             case TR_RATIOLIMIT_UNLIMITED:
@@ -2229,6 +2228,7 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
                 {
                     status |= EXIT_FAILURE;
                 }
+                break;
             }
         }
     }
@@ -3015,8 +3015,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                                    .first.get_if<tr_variant::Vector>();
                     }
                     list->emplace_back(optarg_sv);
-                    break;
                 }
+                break;
 
             default:
                 assert("unhandled value" && 0);
@@ -3049,8 +3049,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 's': /* start */
                 if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
@@ -3092,15 +3092,14 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
-
                 break;
 
             case 'w':
                 {
                     auto& args = tadd.has_value() ? ensure_tadd(tadd) : ensure_sset(sset);
                     args.insert_or_assign(TR_KEY_download_dir, optarg_sv);
-                    break;
                 }
+                break;
 
             case 850:
                 {
@@ -3108,8 +3107,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-close"sv));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 963:
                 {
@@ -3117,8 +3116,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("blocklist-update"sv));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 921:
                 {
@@ -3127,8 +3126,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_tag, TAG_STATS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 962:
                 {
@@ -3137,8 +3136,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_tag, TAG_PORTTEST);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 600:
                 {
@@ -3158,8 +3157,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 'v':
                 {
@@ -3179,8 +3178,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 960:
                 {
@@ -3193,8 +3192,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 961: /* set location */
                 // TODO (5.0.0):
@@ -3218,8 +3217,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             case 964:
                 {
@@ -3233,8 +3232,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                     rename_from.clear();
-                    break;
                 }
+                break;
 
             case 965:
                 rename_from = optarg_sv;
@@ -3247,8 +3246,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     map.try_emplace(TR_KEY_tag, TAG_GROUPS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
-                    break;
                 }
+                break;
 
             default:
                 fmt::print(stderr, "got opt [{:d}]\n", c);
