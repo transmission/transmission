@@ -158,12 +158,18 @@ struct tr_torrent
         ~VerifyMediator() override = default;
 
         [[nodiscard]] tr_torrent_metainfo const& metainfo() const override;
-        [[nodiscard]] std::optional<std::string> find_file(tr_file_index_t file_index) const override;
+        [[nodiscard]] std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index,  tr_error* error = nullptr) const override;
 
         void on_verify_queued() override;
         void on_verify_started() override;
         void on_piece_checked(tr_piece_index_t piece, bool has_piece) override;
         void on_verify_done(bool aborted) override;
+        void on_file_ok(tr_file_index_t /* index */) override
+        {
+        }
+        void on_file_error(tr_file_index_t /* index */, std::string_view /* error */) override
+        {
+        }
 
     private:
         tr_torrent* const tor_;
