@@ -365,11 +365,12 @@ void show_usage()
 enum
 {
     MODE_META_COMMAND = 0,
-    MODE_TORRENT_SET = 1 << 0,
+    MODE_TORRENT_ADD = 1 << 0,
     MODE_TORRENT_GET = 1 << 1,
-    MODE_TORRENT_ADD = 1 << 2,
-    MODE_TORRENT_REMOVE = 1 << 3,
-    MODE_SESSION_SET = 1 << 4
+    MODE_TORRENT_REMOVE = 1 << 2,
+    MODE_TORRENT_SET = 1 << 3,
+    MODE_TORRENT_START_STOP = 1 << 4,
+    MODE_SESSION_SET = 1 << 5
 };
 
 [[nodiscard]] int get_opt_mode(int val)
@@ -474,6 +475,8 @@ enum
 
     case 's': /* start */
     case 'S': /* stop */
+        return MODE_TORRENT_START_STOP;
+
     case 'v': /* verify */
     case 'w': /* download-dir */
     case 600: /* reannounce */
@@ -3037,6 +3040,28 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
         }
+        else if (step_mode == MODE_TORRENT_START_STOP)
+        {
+            auto const is_stop = c == 'S';
+            if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
+            {
+                if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                {
+                    args_map->insert_or_assign(TR_KEY_paused, is_stop);
+                }
+            }
+            else
+            {
+                auto map = tr_variant::Map{ 2 };
+                auto args = tr_variant::Map{ 1 };
+                get_id_arg(args, config);
+                map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(is_stop ? "torrent-stop"sv : "torrent-start"sv));
+                map.try_emplace(TR_KEY_arguments, std::move(args));
+
+                auto top = tr_variant{ std::move(map) };
+                status |= flush(rpcurl, &top, config);
+            }
+        }
         else
         {
             switch (c)
@@ -3046,48 +3071,6 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto map = tr_variant::Map{ 2 };
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-get"sv));
                     map.try_emplace(TR_KEY_tag, TAG_SESSION);
-
-                    auto top = tr_variant{ std::move(map) };
-                    status |= flush(rpcurl, &top, config);
-                }
-                break;
-
-            case 's': /* start */
-                if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
-                {
-                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
-                    {
-                        args_map->insert_or_assign(TR_KEY_paused, false);
-                    }
-                }
-                else
-                {
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 1 };
-                    get_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-start"sv));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
-
-                    auto top = tr_variant{ std::move(map) };
-                    status |= flush(rpcurl, &top, config);
-                }
-                break;
-
-            case 'S': /* stop */
-                if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
-                {
-                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
-                    {
-                        args_map->insert_or_assign(TR_KEY_paused, true);
-                    }
-                }
-                else
-                {
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 1 };
-                    get_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-stop"sv));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
 
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
