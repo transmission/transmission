@@ -840,7 +840,7 @@ auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
 template<size_t N>
 std::string_view format_date(std::array<char, N>& buf, time_t now)
 {
-    auto begin = std::begin(buf);
+    auto begin = std::data(buf);
     auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", fmt::localtime(now)).out;
     return { begin, static_cast<size_t>(end - begin) };
 }
