@@ -365,12 +365,13 @@ void show_usage()
 enum
 {
     MODE_META_COMMAND = 0,
-    MODE_TORRENT_ADD = 1 << 0,
-    MODE_TORRENT_GET = 1 << 1,
-    MODE_TORRENT_REMOVE = 1 << 2,
-    MODE_TORRENT_SET = 1 << 3,
-    MODE_TORRENT_START_STOP = 1 << 4,
-    MODE_SESSION_SET = 1 << 5
+    MODE_TORRENT_ACTION = 1 << 0,
+    MODE_TORRENT_ADD = 1 << 1,
+    MODE_TORRENT_GET = 1 << 2,
+    MODE_TORRENT_REMOVE = 1 << 3,
+    MODE_TORRENT_SET = 1 << 4,
+    MODE_TORRENT_START_STOP = 1 << 5,
+    MODE_SESSION_SET = 1 << 6
 };
 
 [[nodiscard]] int get_opt_mode(int val)
@@ -478,8 +479,10 @@ enum
         return MODE_TORRENT_START_STOP;
 
     case 'v': /* verify */
-    case 'w': /* download-dir */
     case 600: /* reannounce */
+        return MODE_TORRENT_ACTION;
+
+    case 'w': /* download-dir */
     case 850: /* session-close */
     case 732: /* List groups */
     case 920: /* session-info */
@@ -3062,6 +3065,39 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 status |= flush(rpcurl, &top, config);
             }
         }
+        else if (step_mode == MODE_TORRENT_ACTION)
+        {
+            static auto constexpr Method = [](int option)
+            {
+                switch (option)
+                {
+                case 'v':
+                    return "torrent-verify"sv;
+                case 600:
+                    return "torrent-reannounce"sv;
+                default:
+                    assert("unhandled value" && 0);
+                    return ""sv;
+                }
+            };
+
+            if (auto* tset_map = tset.get_if<tr_variant::Map>())
+            {
+                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                {
+                    get_id_arg(*args_map, config);
+                    status |= flush(rpcurl, &tset, config);
+                }
+            }
+
+            auto map = tr_variant::Map{ 2 };
+            auto args = tr_variant::Map{ 1 };
+            get_id_arg(args, config);
+            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(Method(c)));
+            map.try_emplace(TR_KEY_arguments, std::move(args));
+            auto top = tr_variant{ std::move(map) };
+            status |= flush(rpcurl, &top, config);
+        }
         else
         {
             switch (c)
@@ -3117,48 +3153,6 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto map = tr_variant::Map{ 2 };
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));
                     map.try_emplace(TR_KEY_tag, TAG_PORTTEST);
-                    auto top = tr_variant{ std::move(map) };
-                    status |= flush(rpcurl, &top, config);
-                }
-                break;
-
-            case 600:
-                {
-                    if (auto* tset_map = tset.get_if<tr_variant::Map>())
-                    {
-                        if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
-                        {
-                            get_id_arg(*args_map, config);
-                            status |= flush(rpcurl, &tset, config);
-                        }
-                    }
-
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 1 };
-                    get_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-reannounce"sv));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
-                    auto top = tr_variant{ std::move(map) };
-                    status |= flush(rpcurl, &top, config);
-                }
-                break;
-
-            case 'v':
-                {
-                    if (auto* tset_map = tset.get_if<tr_variant::Map>())
-                    {
-                        if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
-                        {
-                            get_id_arg(*args_map, config);
-                            status |= flush(rpcurl, &tset, config);
-                        }
-                    }
-
-                    auto map = tr_variant::Map{ 2 };
-                    auto args = tr_variant::Map{ 1 };
-                    get_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-verify"sv));
-                    map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
