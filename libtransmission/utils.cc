@@ -18,7 +18,6 @@
 #include <locale>
 #include <memory>
 #include <optional>
-#include <set>
 #include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>

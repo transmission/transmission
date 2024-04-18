@@ -7,7 +7,6 @@
 #include <array>
 #include <cassert>
 #include <cctype> /* isspace */
-#include <cerrno>
 #include <cmath> // floor
 #include <cstdint> // int64_t
 #include <cstdio>
@@ -18,6 +17,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <curl/curl.h>
