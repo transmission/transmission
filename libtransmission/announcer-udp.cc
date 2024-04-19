@@ -315,9 +315,15 @@ struct tau_tracker
 {
     using Mediator = tr_announcer_udp::Mediator;
 
-    tau_tracker(Mediator& mediator, std::string_view const authority_in, std::string_view const host_in, tr_port const port_in)
+    tau_tracker(
+        Mediator& mediator,
+        std::string_view const authority_in,
+        std::string_view const host_in,
+        std::string_view const host_lookup_in,
+        tr_port const port_in)
         : authority{ authority_in }
         , host{ host_in }
+        , host_lookup{ host_lookup_in }
         , port{ port_in }
         , mediator_{ mediator }
     {
@@ -496,7 +502,7 @@ private:
         hints.ai_socktype = SOCK_DGRAM;
 
         addrinfo* info = nullptr;
-        auto const szhost = tr_urlbuf{ host };
+        auto const szhost = tr_urlbuf{ host_lookup };
         if (int const rc = getaddrinfo(szhost.c_str(), std::data(szport), &hints, &info); rc != 0)
         {
             logwarn(
@@ -654,6 +660,7 @@ public:
 
     std::string_view const authority;
     std::string_view const host;
+    std::string_view const host_lookup;
     tr_port const port;
 
     std::array<time_t, NUM_TR_AF_INET_TYPES> connecting_at = {};
@@ -822,7 +829,12 @@ private:
         }
 
         // we don't have it -- build a new one
-        auto& tracker = trackers_.emplace_back(mediator_, authority, parsed->host, tr_port::from_host(parsed->port));
+        auto& tracker = trackers_.emplace_back(
+            mediator_,
+            authority,
+            parsed->host,
+            parsed->host_wo_brackets,
+            tr_port::from_host(parsed->port));
         logtrace(tracker.log_name(), "New tau_tracker created");
         return &tracker;
     }
