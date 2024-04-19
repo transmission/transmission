@@ -27,8 +27,6 @@
 
 #include <event2/event.h>
 
-#include <small/vector.hpp>
-
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include <libtransmission/announcer.h>
@@ -53,8 +51,6 @@ using tau_transaction_t = uint32_t;
 
 using MessageBuffer = libtransmission::StackBuffer<4096, std::byte>;
 
-using ipp_t = std::underlying_type_t<tr_address_type>;
-
 class AnnouncerUdpTest : public ::testing::Test
 {
 private:
@@ -65,83 +61,7 @@ private:
         tr_timeUpdate(time(nullptr));
     }
 
-    template<typename T>
-    struct IdSockaddr
-    {
-        IdSockaddr() = default;
-
-        IdSockaddr(T id_in, struct sockaddr const* sa, socklen_t salen)
-            : id_{ id_in }
-            , sslen_{ salen }
-        {
-            std::memcpy(&ss_, sa, salen);
-        }
-        IdSockaddr(IdSockaddr const&) = delete;
-        IdSockaddr& operator=(IdSockaddr const&) = delete;
-
-        IdSockaddr(IdSockaddr&& other) noexcept
-        {
-            *this = std::move(other);
-        }
-
-        IdSockaddr& operator=(IdSockaddr&& other) noexcept
-        {
-            id_ = other.id_;
-            std::memcpy(&ss_, &other.ss_, other.sslen_);
-            sslen_ = other.sslen_;
-            return *this;
-        }
-
-        [[nodiscard]] constexpr struct sockaddr const* getSaPtr() const noexcept
-        {
-            return reinterpret_cast<struct sockaddr const*>(&ss_);
-        }
-
-        T id_ = {};
-        struct sockaddr_storage ss_ = {};
-        socklen_t sslen_ = {};
-    };
-
 protected:
-    struct Sent
-    {
-        Sent() = default;
-
-        Sent(char const* buf, size_t buflen, struct sockaddr const* sa, socklen_t salen)
-            : sslen_{ salen }
-        {
-            buf_.insert(std::end(buf_), buf, buf + buflen);
-            std::memcpy(&ss_, sa, salen);
-        }
-        Sent(Sent const&) = delete;
-        Sent& operator=(Sent const&) = delete;
-
-        Sent(Sent&& other) noexcept
-        {
-            *this = std::move(other);
-        }
-
-        Sent& operator=(Sent&& other) noexcept
-        {
-            buf_ = std::move(other.buf_);
-            std::memcpy(&ss_, &other.ss_, other.sslen_);
-            sslen_ = other.sslen_;
-            return *this;
-        }
-
-        [[nodiscard]] struct sockaddr const* getSaPtr() const noexcept
-        {
-            return reinterpret_cast<struct sockaddr const*>(&ss_);
-        }
-
-        std::vector<char> buf_;
-        struct sockaddr_storage ss_ = {};
-        socklen_t sslen_ = {};
-    };
-
-    using Transaction = IdSockaddr<tau_transaction_t>;
-    using Connection = IdSockaddr<tau_connection_t>;
-
     class MockMediator final : public tr_announcer_udp::Mediator
     {
     public:
@@ -150,12 +70,11 @@ protected:
         {
         }
 
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* sa, socklen_t salen) override
+        void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
         {
             auto target = tr_socket_address::from_sockaddr(sa);
             ASSERT_TRUE(target);
-            EXPECT_TRUE(salen != 0);
-            sent_[target->address().type].emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
+            sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
         }
 
         [[nodiscard]] auto* eventBase()
@@ -168,7 +87,23 @@ protected:
             return {};
         }
 
-        std::array<std::deque<Sent>, NUM_TR_AF_INET_TYPES> sent_;
+        struct Sent
+        {
+            Sent() = default;
+
+            Sent(char const* buf, size_t buflen, sockaddr const* sa, socklen_t salen)
+                : sslen_{ salen }
+            {
+                buf_.insert(std::end(buf_), buf, buf + buflen);
+                std::memcpy(&ss_, sa, salen);
+            }
+
+            std::vector<char> buf_;
+            sockaddr_storage ss_ = {};
+            socklen_t sslen_ = {};
+        };
+
+        std::deque<Sent> sent_;
 
         std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
     };
@@ -201,12 +136,12 @@ protected:
         }
     }
 
-    [[nodiscard]] static auto parseConnectionRequest(Sent const& s)
+    [[nodiscard]] static tau_transaction_t parseConnectionRequest(std::vector<char> const& data)
     {
-        auto buf = MessageBuffer(s.buf_);
+        auto buf = MessageBuffer(data);
         EXPECT_EQ(ProtocolId, buf.to_uint64());
         EXPECT_EQ(ConnectAction, buf.to_uint32());
-        return Transaction{ buf.to_uint32(), s.getSaPtr(), s.sslen_ };
+        return buf.to_uint32();
     }
 
     [[nodiscard]] static auto buildScrapeRequestFromResponse(tr_scrape_response const& response)
@@ -254,14 +189,13 @@ protected:
         return std::make_pair(transaction_id, info_hashes);
     }
 
-    [[nodiscard]] static auto waitForAnnouncerToSendMessage(tr_address_type ip_protocol, MockMediator& mediator)
+    [[nodiscard]] static auto waitForAnnouncerToSendMessage(MockMediator& mediator)
     {
-        EXPECT_TRUE(libtransmission::test::waitFor(
-            mediator.eventBase(),
-            [ip_protocol, &mediator]() { return !std::empty(mediator.sent_[ip_protocol]); }));
-        auto back = std::move(mediator.sent_[ip_protocol].back());
-        mediator.sent_[ip_protocol].pop_back();
-        return back;
+        EXPECT_TRUE(
+            libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
+        auto buf = std::move(mediator.sent_.back().buf_);
+        mediator.sent_.pop_back();
+        return buf;
     }
 
     [[nodiscard]] static bool sendError(
@@ -283,21 +217,24 @@ protected:
         return announcer.handle_message(std::data(arr), response_size, from, fromlen);
     }
 
-    [[nodiscard]] static auto sendConnectionResponse(tr_announcer_udp& announcer, Transaction const& transaction)
+    [[nodiscard]] static auto sendConnectionResponse(
+        tr_announcer_udp& announcer,
+        tau_transaction_t transaction_id,
+        struct sockaddr const* from,
+        socklen_t fromlen)
     {
-        auto const connection_id = tr_rand_obj<uint64_t>();
+        auto const connection_id = tr_rand_obj<tau_connection_t>();
         auto buf = MessageBuffer{};
         buf.add_uint32(ConnectAction);
-        buf.add_uint32(transaction.id_);
+        buf.add_uint32(transaction_id);
         buf.add_uint64(connection_id);
 
-        auto from = transaction.getSaPtr();
         auto arr = std::array<uint8_t, 16>{};
         auto response_size = std::size(buf);
         buf.to_buf(std::data(arr), response_size);
-        EXPECT_TRUE(announcer.handle_message(std::data(arr), response_size, from, transaction.sslen_));
+        EXPECT_TRUE(announcer.handle_message(std::data(arr), response_size, from, fromlen));
 
-        return Connection{ connection_id, from, transaction.sslen_ };
+        return connection_id;
     }
 
     struct UdpAnnounceReq
@@ -384,14 +321,14 @@ protected:
         return timer;
     }
 
-    static auto ipProtocolFromUrl(std::string_view tracker_url)
+    static auto sockaddrFromUrl(std::string_view tracker_url)
     {
         auto parsed_url = tr_urlParse(tracker_url);
         EXPECT_TRUE(parsed_url);
         auto addr = tr_address::from_string(parsed_url->host);
         EXPECT_TRUE(addr);
 
-        return addr->type;
+        return tr_socket_address{ *addr, tr_port::from_host(parsed_url->port) }.to_sockaddr();
     }
 
     std::unique_ptr<tr_net_init_mgr> init_mgr_;
@@ -422,21 +359,22 @@ TEST_F(AnnouncerUdpTest, canScrape)
     // tell announcer to scrape
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
-    auto ip_protocol = ipProtocolFromUrl(request.scrape_url);
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
-    // The announcer should have sent a UDP connection request in IPv4.
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(request.scrape_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+
+    // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
+    auto connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
 
     // Have the tracker respond to the request
-    auto const connection = sendConnectionResponse(*announcer, connect_transaction);
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
-    auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(
-        waitForAnnouncerToSendMessage(ip_protocol, mediator).buf_,
-        connection.id_);
+    auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
     expectEqual(request, info_hashes);
 
     // Have the tracker respond to the request
@@ -449,7 +387,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, connection.getSaPtr(), connection.sslen_));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -464,9 +402,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    std::tie(scrape_transaction_id, info_hashes) = parseScrapeRequest(
-        waitForAnnouncerToSendMessage(ip_protocol, mediator).buf_,
-        connection.id_);
+    std::tie(scrape_transaction_id, info_hashes) = parseScrapeRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
     expectEqual(request, info_hashes);
 }
 
@@ -479,13 +415,12 @@ TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
     // tell announcer to scrape
     auto [request, expected_response] = buildSimpleScrapeRequestAndResponse();
     auto response = std::optional<tr_scrape_response>{};
-    auto const ip_protocol = ipProtocolFromUrl(request.scrape_url);
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
-    // The announcer should have sent a UDP connection request in IPv4.
+    // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto const connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
-    EXPECT_NE(0U, connect_transaction.id_);
+    auto const connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
+    EXPECT_NE(0U, connect_transaction_id);
 
     // now just end the test before responding to the request.
     // the announcer and mediator will go out-of-scope & be destroyed.
@@ -506,20 +441,21 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(expected_response.scrape_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+
     auto request = buildScrapeRequestFromResponse(expected_response);
     auto response = std::optional<tr_scrape_response>{};
-    auto const ip_protocol = ipProtocolFromUrl(request.scrape_url);
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
-    auto const connection = sendConnectionResponse(*announcer, connect_transaction);
+    auto connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
-    auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(
-        waitForAnnouncerToSendMessage(ip_protocol, mediator).buf_,
-        connection.id_);
+    auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
     expectEqual(request, info_hashes);
 
     // Have the tracker respond to the request
@@ -535,7 +471,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, connection.getSaPtr(), connection.sslen_));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // Confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -559,9 +495,12 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unrecognized info-hash";
 
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(expected_response.scrape_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+
     // build the request
     auto request = buildScrapeRequestFromResponse(expected_response);
-    auto const ip_protocol = ipProtocolFromUrl(request.scrape_url);
 
     // build the announcer
     auto mediator = MockMediator{};
@@ -572,22 +511,21 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
-    // The announcer should have sent a UDP connection request in IPv4.
+    // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
+    auto connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
 
     // Have the tracker respond to the request
-    auto const connection = sendConnectionResponse(*announcer, connect_transaction);
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
     auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(
-        waitForAnnouncerToSendMessage(ip_protocol, mediator).buf_,
-        connection.id_);
+        waitForAnnouncerToSendMessage(mediator),
+        connection_id);
 
     // Have the tracker respond to the request with an "unable to scrape" error
-    EXPECT_TRUE(
-        sendError(*announcer, scrape_transaction_id, expected_response.errmsg, connection.getSaPtr(), connection.sslen_));
+    EXPECT_TRUE(sendError(*announcer, scrape_transaction_id, expected_response.errmsg, from_ptr, fromlen));
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -611,6 +549,10 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unable to Connect";
 
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(expected_response.scrape_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+
     // build the announcer
     auto mediator = MockMediator{};
     auto announcer = tr_announcer_udp::create(mediator);
@@ -618,22 +560,16 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
 
     // tell the announcer to scrape
     auto response = std::optional<tr_scrape_response>{};
-    auto const ip_protocol = ipProtocolFromUrl(expected_response.scrape_url);
     announcer->scrape(
         buildScrapeRequestFromResponse(expected_response),
         [&response](tr_scrape_response const& resp) { response = resp; });
 
-    // The announcer should have sent a UDP connection request in IPv4.
+    // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
+    auto transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
 
     // Have the tracker respond to the request with an "unable to connect" error
-    EXPECT_TRUE(sendError(
-        *announcer,
-        connect_transaction.id_,
-        expected_response.errmsg,
-        connect_transaction.getSaPtr(),
-        connect_transaction.sslen_));
+    EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg, from_ptr, fromlen));
 
     // Confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -648,7 +584,10 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     request.scrape_url = DefaultScrapeUrl;
     request.info_hash_count = 1;
     request.info_hash[0] = tr_rand_obj<tr_sha1_digest_t>();
-    auto const ip_protocol = ipProtocolFromUrl(request.scrape_url);
+
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(request.scrape_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
 
     // build the announcer
     auto mediator = MockMediator{};
@@ -659,35 +598,33 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     auto response = std::optional<tr_scrape_response>{};
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
-    // The announcer should have sent a UDP connection request in IPv4.
+    // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
+    auto transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
 
-    // send a connection response but with an *invalid* connect_transaction id
+    // send a connection response but with an *invalid* transaction id
     auto buf = MessageBuffer{};
     buf.add_uint32(ConnectAction);
-    buf.add_uint32(connect_transaction.id_ + 1);
+    buf.add_uint32(transaction_id + 1);
     buf.add_uint64(tr_rand_obj<uint64_t>());
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_FALSE(
-        announcer->handle_message(std::data(arr), response_size, connect_transaction.getSaPtr(), connect_transaction.sslen_));
+    EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // send a connection response but with an *invalid* action
     buf.clear();
     buf.add_uint32(ScrapeAction);
-    buf.add_uint32(connect_transaction.id_);
+    buf.add_uint32(transaction_id);
     buf.add_uint64(tr_rand_obj<uint64_t>());
     response_size = std::size(buf);
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_FALSE(
-        announcer->handle_message(std::data(arr), response_size, connect_transaction.getSaPtr(), connect_transaction.sslen_));
+    EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // but after discarding invalid messages,
     // a valid connection response should still work
-    auto const connection = sendConnectionResponse(*announcer, connect_transaction);
-    EXPECT_NE(0, connection.id_);
+    auto const connection_id = sendConnectionResponse(*announcer, transaction_id, from_ptr, fromlen);
+    EXPECT_NE(0, connection_id);
 }
 
 TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
@@ -714,7 +651,10 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
     request.tracker_id = "fnord";
     request.peer_id = tr_peerIdInit();
     request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
-    auto const ip_protocol = ipProtocolFromUrl(request.announce_url);
+
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(request.announce_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
 
     auto expected_response = tr_announce_response{};
     expected_response.info_hash = request.info_hash;
@@ -741,12 +681,12 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
     announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
-    auto const connection = sendConnectionResponse(*announcer, connect_transaction);
+    auto connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
 
-    // The announcer should have sent a UDP announce request in IPv4.
+    // The announcer should have sent a UDP announce request.
     // Inspect that request for validity.
-    auto udp_ann_req = parseAnnounceRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator).buf_, connection.id_);
+    auto udp_ann_req = parseAnnounceRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
     expectEqual(request, udp_ann_req);
 
     // Have the tracker respond to the request
@@ -767,7 +707,7 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
     auto arr = std::array<uint8_t, 512>{};
     buf.to_buf(std::data(arr), response_size);
 
-    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, connection.getSaPtr(), connection.sslen_));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // Confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -799,7 +739,10 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
     request.tracker_id = "fnord";
     request.peer_id = tr_peerIdInit();
     request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
-    auto const ip_protocol = ipProtocolFromUrl(request.announce_url);
+
+    // Obtain the source socket address from tracker url
+    auto [from, fromlen] = sockaddrFromUrl(request.announce_url);
+    auto const* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
 
     auto expected_response = tr_announce_response{};
     expected_response.info_hash = request.info_hash;
@@ -826,12 +769,12 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
     announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
-    auto connect_transaction = parseConnectionRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator));
-    auto const connection = sendConnectionResponse(*announcer, connect_transaction);
+    auto connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator));
+    auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
 
-    // The announcer should have sent a UDP announce request in IPv6.
+    // The announcer should have sent a UDP announce request.
     // Inspect that request for validity.
-    auto udp_ann_req = parseAnnounceRequest(waitForAnnouncerToSendMessage(ip_protocol, mediator).buf_, connection.id_);
+    auto udp_ann_req = parseAnnounceRequest(waitForAnnouncerToSendMessage(mediator), connection_id);
     expectEqual(request, udp_ann_req);
 
     // Have the tracker respond to the request
@@ -852,7 +795,7 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
     auto arr = std::array<uint8_t, 512>{};
     buf.to_buf(std::data(arr), response_size);
 
-    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, connection.getSaPtr(), connection.sslen_));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size, from_ptr, fromlen));
 
     // Confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
