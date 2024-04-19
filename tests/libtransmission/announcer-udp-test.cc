@@ -753,8 +753,8 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
     expected_response.seeders = Seeders;
     expected_response.leechers = Leechers;
     expected_response.downloads = std::nullopt; // not specified in UDP announce
-    expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
-    expected_response.pex6 = {};
+    expected_response.pex = {};
+    expected_response.pex6 = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
     expected_response.errmsg = {};
     expected_response.warning = {};
     expected_response.tracker_id = {}; // not specified in UDP announce
