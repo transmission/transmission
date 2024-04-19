@@ -218,7 +218,9 @@ TEST_F(NetTest, ipCompare)
                                                 std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
                                                 std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
                                                 std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
-                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 } };
+                                                std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, 1 },
+                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 },
+                                                std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, 0 } };
 
     for (auto const& [sv1, sv2, res] : IpPairs)
     {

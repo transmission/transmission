@@ -320,20 +320,15 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
 
     int optval = 1;
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
-    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+    (void)evutil_make_listen_socket_reuseable(fd);
 
-#ifdef IPV6_V6ONLY
-
-    if (addr.is_ipv6() &&
-        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
-        (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
+    if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
+        sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
-
-#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
@@ -489,23 +484,29 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
     auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
 
-    auto addr = tr_address{};
-
-    addr.addr.addr4 = {};
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
+    auto ss = sockaddr_storage{};
+    auto sslen = int{ sizeof(ss) };
+    if (evutil_parse_sockaddr_port(address_sz, reinterpret_cast<sockaddr*>(&ss), &sslen) != 0)
     {
+        return {};
+    }
+
+    auto addr = tr_address{};
+    switch (ss.ss_family)
+    {
+    case AF_INET:
+        addr.addr.addr4 = reinterpret_cast<sockaddr_in*>(&ss)->sin_addr;
         addr.type = TR_AF_INET;
         return addr;
-    }
 
-    addr.addr.addr6 = {};
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
-    {
+    case AF_INET6:
+        addr.addr.addr6 = reinterpret_cast<sockaddr_in6*>(&ss)->sin6_addr;
         addr.type = TR_AF_INET6;
         return addr;
-    }
 
-    return {};
+    default:
+        return {};
+    }
 }
 
 std::string_view tr_address::display_name(char* out, size_t outlen) const
@@ -696,7 +697,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
 std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
 {
-    return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
+    return fmt::format(address.is_ipv6() ? "[{:s}]:{:d}" : "{:s}:{:d}", address.display_name(), port.host());
 }
 
 bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept

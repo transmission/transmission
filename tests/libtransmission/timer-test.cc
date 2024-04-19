@@ -177,12 +177,8 @@ TEST_F(TimerTest, repeatingHonorsInterval)
     EXPECT_EQ(DesiredLoops, n_calls);
 }
 
-#ifdef _WIN32
 // TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_restartWithDifferentInterval)
-#else
-TEST_F(TimerTest, restartWithDifferentInterval)
-#endif
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -211,12 +207,8 @@ TEST_F(TimerTest, restartWithDifferentInterval)
     test(200ms);
 }
 
-#ifdef _WIN32
 // TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_restartWithSameInterval)
-#else
-TEST_F(TimerTest, restartWithSameInterval)
-#endif
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
