@@ -247,7 +247,7 @@ public:
             event.reset();
         }
 
-        for (auto const sock : mcast_socket_)
+        for (auto const sock : mcast_sockets_)
         {
             if (sock != TR_BAD_SOCKET)
             {
@@ -265,8 +265,8 @@ private:
         if (!initImpl<TR_AF_INET>(event_base))
         {
             auto const err = sockerrno;
-            tr_net_close_socket(mcast_socket_[TR_AF_INET]);
-            mcast_socket_[TR_AF_INET] = TR_BAD_SOCKET;
+            tr_net_close_socket(mcast_sockets_[TR_AF_INET]);
+            mcast_sockets_[TR_AF_INET] = TR_BAD_SOCKET;
             tr_logAddWarn(fmt::format(
                 _("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"),
                 fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET)),
@@ -278,8 +278,8 @@ private:
         if (!initImpl<TR_AF_INET6>(event_base))
         {
             auto const err = sockerrno;
-            tr_net_close_socket(mcast_socket_[TR_AF_INET6]);
-            mcast_socket_[TR_AF_INET6] = TR_BAD_SOCKET;
+            tr_net_close_socket(mcast_sockets_[TR_AF_INET6]);
+            mcast_sockets_[TR_AF_INET6] = TR_BAD_SOCKET;
             tr_logAddWarn(fmt::format(
                 _("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"),
                 fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET6)),
@@ -301,7 +301,7 @@ private:
     bool initImpl(struct event_base* event_base)
     {
         auto const opt_on = 1;
-        auto& sock = mcast_socket_[ip_protocol];
+        auto& sock = mcast_sockets_[ip_protocol];
 
         static_assert(AnnounceScope > 0);
         static_assert(tr_address::is_valid(ip_protocol));
@@ -477,7 +477,7 @@ private:
         auto addr_len = socklen_t{ sizeof(foreign_addr) };
         auto foreign_msg = std::array<char, MaxDatagramLength>{};
         auto const res = recvfrom(
-            mcast_socket_[ip_protocol],
+            mcast_sockets_[ip_protocol],
             std::data(foreign_msg),
             MaxDatagramLength,
             0,
@@ -635,7 +635,7 @@ private:
             return false;
         }
 
-        if (mcast_socket_[ip_protocol] == TR_BAD_SOCKET)
+        if (mcast_sockets_[ip_protocol] == TR_BAD_SOCKET)
         {
             return true;
         }
@@ -643,7 +643,7 @@ private:
         auto const announce = makeAnnounceMsg(ip_protocol, cookie_, mediator_.port(), info_hash_strings);
         TR_ASSERT(std::size(announce) <= MaxDatagramLength);
         auto const res = sendto(
-            mcast_socket_[ip_protocol],
+            mcast_sockets_[ip_protocol],
             std::data(announce),
             std::size(announce),
             0,
@@ -655,7 +655,7 @@ private:
 
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
-    std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_socket_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; /**multicast socket */
+    std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_sockets_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; /**multicast sockets */
     std::array<libtransmission::evhelpers::event_unique_ptr, NUM_TR_AF_INET_TYPES> events_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
