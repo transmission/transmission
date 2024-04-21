@@ -404,7 +404,7 @@ struct tr_socket_address
 };
 
 template<>
-class std::hash<tr_socket_address>
+struct std::hash<tr_socket_address>
 {
 public:
     std::size_t operator()(tr_socket_address const& socket_address) const noexcept
