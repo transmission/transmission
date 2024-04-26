@@ -103,21 +103,8 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
     switch (prefs_.get<SortMode>(Prefs::SORT_MODE).mode())
     {
-    case SortMode::SORT_BY_NAME:
-        val = -tr_compare_3way(!a->hasMetadata(), !b->hasMetadata());
-        if (val == 0)
-        {
-            val = -a->name().compare(b->name(), Qt::CaseInsensitive);
-        }
-
-        break;
-
     case SortMode::SORT_BY_QUEUE:
-        val = compareState(a, b);
-        if (val == 0)
-        {
-            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
-        }
+        val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
 
         break;
 
@@ -136,9 +123,12 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         break;
 
-    case SortMode::SORT_BY_STATE:
+    case SortMode::SORT_BY_ETA:
+        val = a->compareETA(*b);
+
+        [[fallthrough]];
+
     case SortMode::SORT_BY_ACTIVITY:
-        val = compareState(a, b);
         if (val == 0)
         {
             val = tr_compare_3way(a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed());
@@ -153,12 +143,15 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         [[fallthrough]];
 
-    case SortMode::SORT_BY_PROGRESS:
+    case SortMode::SORT_BY_STATE:
         if (val == 0)
         {
             val = compareState(a, b);
         }
 
+        [[fallthrough]];
+
+    case SortMode::SORT_BY_PROGRESS:
         if (val == 0)
         {
             val = tr_compare_3way(a->metadataPercentDone(), b->metadataPercentDone());
@@ -190,14 +183,11 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         break;
 
-    case SortMode::SORT_BY_ETA:
-        val = compareState(a, b);
-        if (val == 0)
-        {
-            val = a->compareETA(*b);
-        }
-
+    case SortMode::SORT_BY_NAME:
+        // nothing to do: sorting by name is done after the switch
         break;
+
+        // TODO(coeur): SORT_BY_TRACKER
 
     default:
         break;
