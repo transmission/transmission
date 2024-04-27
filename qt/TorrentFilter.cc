@@ -159,6 +159,11 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         if (val == 0)
         {
+            val = tr_compare_3way(a->percentComplete(), b->percentComplete());
+        }
+
+        if (val == 0)
+        {
             val = a->compareSeedProgress(*b);
         }
 
