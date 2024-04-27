@@ -659,8 +659,8 @@ private:
     std::array<libtransmission::evhelpers::event_unique_ptr, NUM_TR_AF_INET_TYPES> events_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
-    sockaddr_in mcast_addr_ = {}; /**<initialized from the above constants in init() */
-    sockaddr_in6 mcast6_addr_ = {}; /**<initialized from the above constants in init() */
+    sockaddr_in mcast_addr_ = {}; // initialized from the above constants in init()
+    sockaddr_in6 mcast6_addr_ = {}; // initialized from the above constants in init()
 
     // BEP14: "To avoid causing multicast storms on large networks a
     // client should send no more than 1 announce per minute."
@@ -677,12 +677,11 @@ private:
     static auto constexpr MaxIncomingPerSecond = 10;
     static auto constexpr MaxIncomingPerUpkeep = std::chrono::duration_cast<std::chrono::seconds>(DosInterval).count() *
         MaxIncomingPerSecond;
-    // @brief throw away messages after this number exceeds MaxIncomingPerUpkeep
-    size_t messages_received_since_upkeep_ = 0U;
+    size_t messages_received_since_upkeep_ = 0U; // throw away messages after this number exceeds MaxIncomingPerUpkeep
 
     static auto constexpr TorrentAnnounceIntervalSec = time_t{ 240U }; // how frequently to reannounce the same torrent
     static auto constexpr TtlSameSubnet = 1;
-    static auto constexpr AnnounceScope = int{ TtlSameSubnet }; /**<the maximum scope for LPD datagrams */
+    static auto constexpr AnnounceScope = int{ TtlSameSubnet }; // the maximum scope for LPD datagrams
 };
 
 std::unique_ptr<tr_lpd> tr_lpd::create(Mediator& mediator, struct event_base* event_base)
