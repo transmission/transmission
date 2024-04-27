@@ -572,9 +572,9 @@ std::optional<unsigned> tr_address::to_interface_index() const noexcept
 
 #ifdef _WIN32
     auto p_addresses = std::unique_ptr<void, void (*)(void*)>{ nullptr, operator delete };
-    for (auto p_addesses_size = ULONG{ 15000 } /* 15KB */;;)
+    for (auto p_addresses_size = ULONG{ 15000 } /* 15KB */;;)
     {
-        p_addresses.reset(operator new(p_addesses_size, std::nothrow));
+        p_addresses.reset(operator new(p_addresses_size, std::nothrow));
         if (!p_addresses)
         {
             tr_logAddDebug("Could not allocate memory for interface list");
@@ -586,7 +586,7 @@ std::optional<unsigned> tr_address::to_interface_index() const noexcept
                 GAA_FLAG_SKIP_FRIENDLY_NAME,
                 nullptr,
                 reinterpret_cast<PIP_ADAPTER_ADDRESSES>(p_addresses.get()),
-                &p_addesses_size);
+                &p_addresses_size);
             ret != ERROR_BUFFER_OVERFLOW)
         {
             if (ret != ERROR_SUCCESS)
