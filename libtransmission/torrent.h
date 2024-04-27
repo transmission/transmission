@@ -599,6 +599,8 @@ struct tr_torrent
 
     /// METAINFO - MAGNET
 
+    void do_magnet_idle_work();
+
     void maybe_start_metadata_transfer(int64_t size) noexcept;
 
     [[nodiscard]] std::optional<tr_metadata_piece> get_metadata_piece(int64_t piece) const;
