@@ -655,7 +655,7 @@ private:
 
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
-    std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_sockets_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; /**multicast sockets */
+    std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_sockets_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; // multicast sockets
     std::array<libtransmission::evhelpers::event_unique_ptr, NUM_TR_AF_INET_TYPES> events_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
