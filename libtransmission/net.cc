@@ -572,6 +572,13 @@ std::optional<unsigned> tr_address::to_interface_index() const noexcept
 
 #ifdef _WIN32
     auto p_addresses = std::unique_ptr<void, void (*)(void*)>{ nullptr, operator delete };
+
+    // The recommended method of calling the GetAdaptersAddresses function is to
+    // pre-allocate a 15KB working buffer pointed to by the AdapterAddresses parameter.
+    // On typical computers, this dramatically reduces the chances that the
+    // GetAdaptersAddresses function returns ERROR_BUFFER_OVERFLOW, which would require
+    // calling GetAdaptersAddresses function multiple times.
+    // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
     for (auto p_addresses_size = ULONG{ 15000 } /* 15KB */;;)
     {
         p_addresses.reset(operator new(p_addresses_size, std::nothrow));
