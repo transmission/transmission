@@ -669,10 +669,10 @@ void DetailsDialog::refreshUI()
         }
 
         QString const dstr = Formatter::storage_to_string(d);
-        QString const fstr = Formatter::storage_to_string(f);
 
         if (f != 0)
         {
+            QString const fstr = Formatter::storage_to_string(f);
             string = tr("%1 (+%2 discarded after failed checksum)").arg(dstr).arg(fstr);
         }
         else
@@ -720,7 +720,7 @@ void DetailsDialog::refreshUI()
             uploaded_this_session += t->uploadedThisSession();
         }
 
-        string = tr("%1").arg(Formatter::storage_to_string(uploaded_this_session));
+        string = Formatter::storage_to_string(uploaded_this_session);
     }
 
     ui_.uploadedThisSessionValueLabel->setText(string);

@@ -1019,7 +1019,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         if (failed != 0)
         {
             str = fmt::format(
-                _("{downloaded_size} (+{discarded_size} discarded after failed checksum)"),
+                _("{downloaded_size} verified (+{discarded_size} discarded after failed checksum)"),
                 fmt::arg("downloaded_size", downloaded_str),
                 fmt::arg("discarded_size", tr_strlsize(failed)));
         }
@@ -1068,7 +1068,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             std::end(stats),
             uint64_t{},
             [](auto sum, auto const* st) { return sum + st->uploadedThisSession; });
-        str = fmt::format(_("{uploaded_size}"), fmt::arg("uploaded_size", tr_strlsize(uploaded)));
+        str = tr_strlsize(uploaded);
     }
 
     ul_ts_lb_->set_text(str);
