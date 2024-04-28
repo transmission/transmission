@@ -1029,4 +1029,7 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-set` | new arg `sequentialDownload`
 | `torrent-get` | new arg `files.beginPiece`
 | `torrent-get` | new arg `files.endPiece`
+| `torrent-get` | new arg `corruptThisSession`
+| `torrent-get` | new arg `downloadedThisSession`
+| `torrent-get` | new arg `uploadedThisSession`
 | `port-test` | new arg `ipProtocol`
