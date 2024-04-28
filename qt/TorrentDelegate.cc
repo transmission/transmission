@@ -194,15 +194,13 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %2 is the torrent's total size,
             //: %3 is a percentage of the two,
             //: %4 is how much we've uploaded,
-            //: %5 is how much we've uploaded during this session,
-            //: %6 is the ratio we want to reach before we stop uploading
-            //: %7 is our upload-to-download ratio,
+            //: %5 is the ratio we want to reach before we stop uploading
+            //: %6 is our upload-to-download ratio,
             str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)")
                       .arg(Formatter::storage_to_string(have_total))
                       .arg(Formatter::storage_to_string(tor.totalSize()))
                       .arg(Formatter::percent_to_string(tor.percentComplete() * 100.0))
                       .arg(Formatter::storage_to_string(tor.uploadedEver()))
-                      .arg(Formatter::storage_to_string(tor.uploadedThisSession()))
                       .arg(Formatter::ratio_to_string(tor.ratio()))
                       .arg(Formatter::ratio_to_string(*seed_ratio_limit));
         }
@@ -213,14 +211,12 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %2 is the torrent's total size,
             //: %3 is a percentage of the two,
             //: %4 is how much we've uploaded,
-            //: %5 is how much we've uploaded during this session,
-            //: %6 is our upload-to-download ratio
+            //: %5 is our upload-to-download ratio
             str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5)")
                       .arg(Formatter::storage_to_string(have_total))
                       .arg(Formatter::storage_to_string(tor.totalSize()))
                       .arg(Formatter::percent_to_string(tor.percentComplete() * 100.0))
                       .arg(Formatter::storage_to_string(tor.uploadedEver()))
-                      .arg(Formatter::storage_to_string(tor.uploadedThisSession()))
                       .arg(Formatter::ratio_to_string(tor.ratio()));
         }
     }
@@ -231,13 +227,11 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: First part of torrent progress string,
             //: %1 is the torrent's total size,
             //: %2 is how much we've uploaded,
-            //: %3 is how much we've uploaded during this session,
-            //: %4 is the ratio we want to reach before we stop uploading
-            //: %5 is our upload-to-download ratio,
+            //: %3 is the ratio we want to reach before we stop uploading
+            //: %4 is our upload-to-download ratio,
             str = tr("%1, uploaded %2 (Ratio: %3 Goal: %4)")
                       .arg(Formatter::storage_to_string(have_total))
                       .arg(Formatter::storage_to_string(tor.uploadedEver()))
-                      .arg(Formatter::storage_to_string(tor.uploadedThisSession()))
                       .arg(Formatter::ratio_to_string(tor.ratio()))
                       .arg(Formatter::ratio_to_string(*seed_ratio_limit));
         }
@@ -246,12 +240,10 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: First part of torrent progress string,
             //: %1 is the torrent's total size,
             //: %2 is how much we've uploaded,
-            //: %3 is how much we've uploaded during this session,
-            //: %4 is our upload-to-download ratio
+            //: %3 is our upload-to-download ratio
             str = tr("%1, uploaded %2 (Ratio: %3)")
                       .arg(Formatter::storage_to_string(have_total))
                       .arg(Formatter::storage_to_string(tor.uploadedEver()))
-                      .arg(Formatter::storage_to_string(tor.uploadedThisSession()))
                       .arg(Formatter::ratio_to_string(tor.ratio()));
         }
     }
