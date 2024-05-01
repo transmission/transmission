@@ -117,7 +117,7 @@ public:
     {
         mbedtls_sha1_init(&handle_);
 
-#if MBEDTLS_VERSION_NUMBER >= 0x02070000
+#if MBEDTLS_VERSION_NUMBER < 0x03000000 && MBEDTLS_VERSION_NUMBER >= 0x02070000
         mbedtls_sha1_starts_ret(&handle_);
 #else
         mbedtls_sha1_starts(&handle_);
@@ -128,7 +128,7 @@ public:
     {
         if (data_length > 0U)
         {
-#if MBEDTLS_VERSION_NUMBER >= 0x02070000
+#if MBEDTLS_VERSION_NUMBER < 0x03000000 && MBEDTLS_VERSION_NUMBER >= 0x02070000
             mbedtls_sha1_update_ret(&handle_, static_cast<unsigned char const*>(data), data_length);
 #else
             mbedtls_sha1_update(&handle_, static_cast<unsigned char const*>(data), data_length);
@@ -140,7 +140,7 @@ public:
     {
         auto digest = tr_sha1_digest_t{};
         auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-#if MBEDTLS_VERSION_NUMBER >= 0x02070000
+#if MBEDTLS_VERSION_NUMBER < 0x03000000 && MBEDTLS_VERSION_NUMBER >= 0x02070000
         mbedtls_sha1_finish_ret(&handle_, digest_as_uchar);
 #else
         mbedtls_sha1_finish(&handle_, digest_as_uchar);
@@ -168,10 +168,10 @@ public:
     {
         mbedtls_sha256_init(&handle_);
 
-#if MBEDTLS_VERSION_NUMBER >= 0x02070000
+#if MBEDTLS_VERSION_NUMBER < 0x03000000 && MBEDTLS_VERSION_NUMBER >= 0x02070000
         mbedtls_sha256_starts_ret(&handle_, 0);
 #else
-        mbedtls_sha256_starts(&handle_);
+        mbedtls_sha256_starts(&handle_, 0);
 #endif
     }
 
@@ -179,7 +179,7 @@ public:
     {
         if (data_length > 0U)
         {
-#if MBEDTLS_VERSION_NUMBER >= 0x02070000
+#if MBEDTLS_VERSION_NUMBER < 0x03000000 && MBEDTLS_VERSION_NUMBER >= 0x02070000
             mbedtls_sha256_update_ret(&handle_, static_cast<unsigned char const*>(data), data_length);
 #else
             mbedtls_sha256_update(&handle_, static_cast<unsigned char const*>(data), data_length);
@@ -191,7 +191,7 @@ public:
     {
         auto digest = tr_sha256_digest_t{};
         auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-#if MBEDTLS_VERSION_NUMBER >= 0x02070000
+#if MBEDTLS_VERSION_NUMBER < 0x03000000 && MBEDTLS_VERSION_NUMBER >= 0x02070000
         mbedtls_sha256_finish_ret(&handle_, digest_as_uchar);
 #else
         mbedtls_sha256_finish(&handle_, digest_as_uchar);
