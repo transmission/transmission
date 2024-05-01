@@ -10,7 +10,6 @@
 #include <cstdint> // uint64_t, uint32_t
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <thread>
 #include <utility> // for std::move()
 #include <vector>
@@ -26,15 +25,16 @@ using namespace std::chrono_literals;
 
 namespace
 {
-auto constexpr SleepPerSecondDuringVerify = 100ms;
-
 [[nodiscard]] auto current_time_secs()
 {
     return std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::steady_clock::now());
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(
+    Mediator& verify_mediator,
+    std::atomic<bool> const& abort_flag,
+    std::chrono::milliseconds const sleep_per_seconds_during_verify)
 {
     verify_mediator.on_verify_started();
 
@@ -45,7 +45,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
     tr_file_index_t prev_file_index = ~file_index;
     tr_piece_index_t piece = 0U;
     auto buffer = std::vector<std::byte>(1024U * 256U);
-    auto sha = tr_sha1::create();
+    auto sha = tr_sha1{};
     auto last_slept_at = current_time_secs();
 
     auto const& metainfo = verify_mediator.metainfo();
@@ -54,7 +54,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         auto const file_length = metainfo.file_size(file_index);
 
         /* if we're starting a new file... */
-        if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
+        if (file_pos == 0U && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
             auto const found = verify_mediator.find_file(file_index);
             fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
@@ -71,11 +71,10 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         if (fd != TR_BAD_SYS_FILE)
         {
             auto num_read = uint64_t{};
-            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
+            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0U)
             {
                 bytes_this_pass = num_read;
-                sha->add(std::data(buffer), bytes_this_pass);
-                tr_sys_file_advise(fd, file_pos, bytes_this_pass, TR_SYS_FILE_ADVICE_DONT_NEED);
+                sha.add(std::data(buffer), bytes_this_pass);
             }
         }
 
@@ -86,26 +85,29 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         file_pos += bytes_this_pass;
 
         /* if we're finishing a piece... */
-        if (left_in_piece == 0)
+        if (left_in_piece == 0U)
         {
-            auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
+            auto const has_piece = sha.finish() == metainfo.piece_hash(piece);
             verify_mediator.on_piece_checked(piece, has_piece);
 
-            /* sleeping even just a few msec per second goes a long
-             * way towards reducing IO load... */
-            if (auto const now = current_time_secs(); last_slept_at != now)
+            if (sleep_per_seconds_during_verify > std::chrono::milliseconds::zero())
             {
-                last_slept_at = now;
-                std::this_thread::sleep_for(SleepPerSecondDuringVerify);
+                /* sleeping even just a few msec per second goes a long
+                 * way towards reducing IO load... */
+                if (auto const now = current_time_secs(); last_slept_at != now)
+                {
+                    last_slept_at = now;
+                    std::this_thread::sleep_for(sleep_per_seconds_during_verify);
+                }
             }
 
-            sha->clear();
+            sha.clear();
             ++piece;
-            piece_pos = 0;
+            piece_pos = 0U;
         }
 
         /* if we're finishing a file... */
-        if (left_in_file == 0)
+        if (left_in_file == 0U)
         {
             if (fd != TR_BAD_SYS_FILE)
             {
@@ -114,7 +116,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
             }
 
             ++file_index;
-            file_pos = 0;
+            file_pos = 0U;
         }
     }
 
@@ -132,7 +134,7 @@ void tr_verify_worker::verify_thread_func()
     for (;;)
     {
         {
-            auto const lock = std::lock_guard{ verify_mutex_ };
+            auto const lock = std::scoped_lock{ verify_mutex_ };
 
             if (stop_current_)
             {
@@ -150,13 +152,13 @@ void tr_verify_worker::verify_thread_func()
             current_node_ = std::move(todo_.extract(std::begin(todo_)).value());
         }
 
-        verify_torrent(*current_node_->mediator_, stop_current_);
+        verify_torrent(*current_node_->mediator_, stop_current_, sleep_per_seconds_during_verify_);
     }
 }
 
 void tr_verify_worker::add(std::unique_ptr<Mediator> mediator, tr_priority_t priority)
 {
-    auto const lock = std::lock_guard{ verify_mutex_ };
+    auto const lock = std::scoped_lock{ verify_mutex_ };
 
     mediator->on_verify_queued();
     todo_.emplace(std::move(mediator), priority);
@@ -192,7 +194,7 @@ void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
 tr_verify_worker::~tr_verify_worker()
 {
     {
-        auto const lock = std::lock_guard{ verify_mutex_ };
+        auto const lock = std::scoped_lock{ verify_mutex_ };
         stop_current_ = true;
         todo_.clear();
     }
@@ -201,6 +203,11 @@ tr_verify_worker::~tr_verify_worker()
     {
         std::this_thread::sleep_for(20ms);
     }
+}
+
+void tr_verify_worker::set_sleep_per_seconds_during_verify(std::chrono::milliseconds const sleep_per_seconds_during_verify)
+{
+    sleep_per_seconds_during_verify_ = sleep_per_seconds_during_verify;
 }
 
 int tr_verify_worker::Node::compare(Node const& that) const noexcept

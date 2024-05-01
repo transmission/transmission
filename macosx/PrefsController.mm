@@ -178,8 +178,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
             [_fDefaults removeObjectForKey:@"CheckForUpdates"];
         }
 
-        [self setAutoUpdateToBeta:nil];
-
         _fDefaultAppHelper = [[DefaultAppHelper alloc] init];
     }
 
@@ -407,17 +405,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
     windowRect.size.width = [sizeString floatValue];
     [self.window setFrame:windowRect display:YES animate:NO];
-}
-
-//for a beta release, always use the beta appcast
-#if defined(TR_BETA_RELEASE)
-#define SPARKLE_TAG YES
-#else
-#define SPARKLE_TAG [fDefaults boolForKey:@"AutoUpdateBeta"]
-#endif
-- (void)setAutoUpdateToBeta:(id)sender
-{
-    // TODO: Support beta releases (if/when necessary)
 }
 
 - (void)setPort:(id)sender
@@ -791,7 +778,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     return static_cast<int>(components.hour * 60 + components.minute);
 }
 
-+ (NSDate*)timeSumToDate:(int)sum
++ (NSDate*)timeSumToDate:(NSInteger)sum
 {
     NSDateComponents* comps = [[NSDateComponents alloc] init];
     comps.hour = sum / 60;
@@ -1515,7 +1502,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         self.fQueueSeedField.integerValue = seedQueueNum;
 
         //check stalled handled by bindings
-        self.fStalledField.intValue = stalledMinutes;
+        self.fStalledField.integerValue = stalledMinutes;
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];

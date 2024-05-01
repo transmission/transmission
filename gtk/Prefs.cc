@@ -25,13 +25,9 @@ void gtr_pref_init(std::string_view config_dir)
     gl_confdir = config_dir;
 }
 
-/***
-****
-****  Preferences
-****
-***/
-
-[[nodiscard]] static std::string get_default_download_dir()
+namespace
+{
+[[nodiscard]] std::string get_default_download_dir()
 {
     if (auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD)); !std::empty(dir))
     {
@@ -50,7 +46,7 @@ void gtr_pref_init(std::string_view config_dir)
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-[[nodiscard]] static tr_variant get_default_app_settings()
+[[nodiscard]] tr_variant get_default_app_settings()
 {
     auto const dir = get_default_download_dir();
 
@@ -88,7 +84,7 @@ void gtr_pref_init(std::string_view config_dir)
     return tr_variant{ std::move(map) };
 }
 
-static void ensure_sound_cmd_is_a_list(tr_variant* dict)
+void ensure_sound_cmd_is_a_list(tr_variant* dict)
 {
     tr_quark const key = TR_KEY_torrent_complete_sound_command;
     tr_variant* list = nullptr;
@@ -106,23 +102,20 @@ static void ensure_sound_cmd_is_a_list(tr_variant* dict)
     tr_variantListAddStr(list, "transmission torrent downloaded"sv);
 }
 
-static tr_variant& getPrefs()
+tr_variant& getPrefs()
 {
     static auto settings = tr_variant{};
 
     if (!settings.has_value())
     {
-        settings = get_default_app_settings();
-        settings.merge(tr_sessionLoadSettings(gl_confdir.c_str(), nullptr));
+        auto const app_defaults = get_default_app_settings();
+        settings.merge(tr_sessionLoadSettings(&app_defaults, gl_confdir.c_str(), nullptr));
         ensure_sound_cmd_is_a_list(&settings);
     }
 
     return settings;
 }
-
-/***
-****
-***/
+} // namespace
 
 tr_variant& gtr_pref_get_all()
 {
@@ -153,9 +146,7 @@ void gtr_pref_double_set(tr_quark const key, double value)
     tr_variantDictAddReal(&getPrefs(), key, value);
 }
 
-/***
-****
-***/
+// ---
 
 bool gtr_pref_flag_get(tr_quark const key)
 {
@@ -169,9 +160,7 @@ void gtr_pref_flag_set(tr_quark const key, bool value)
     tr_variantDictAddBool(&getPrefs(), key, value);
 }
 
-/***
-****
-***/
+// ---
 
 std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
@@ -207,9 +196,7 @@ void gtr_pref_string_set(tr_quark const key, std::string_view value)
     tr_variantDictAddStr(&getPrefs(), key, value);
 }
 
-/***
-****
-***/
+// ---
 
 void gtr_pref_save(tr_session* session)
 {

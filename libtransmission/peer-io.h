@@ -14,6 +14,7 @@
 #include <cstdint> // uintX_t
 #include <deque>
 #include <memory>
+#include <optional>
 #include <utility> // std::pair
 
 #include <event2/util.h> // for evutil_socket_t
@@ -340,8 +341,10 @@ private:
         }
     }
 
+#ifdef WITH_UTP
     void on_utp_state_change(int new_state);
     void on_utp_error(int errcode);
+#endif
 
     void close();
 

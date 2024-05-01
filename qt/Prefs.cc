@@ -19,7 +19,6 @@
 #endif
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
@@ -30,9 +29,7 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::getValue;
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -204,6 +201,19 @@ bool isValidUtf8(QByteArray const& byteArray)
 #endif
 }
 
+[[nodiscard]] constexpr auto prefIsSavable(int pref)
+{
+    switch (pref)
+    {
+    // these are the prefs that don't get saved to settings.json
+    // when the application exits.
+    case Prefs::FILTER_TEXT:
+        return false;
+
+    default:
+        return true;
+    }
+}
 } // namespace
 
 /***
@@ -223,17 +233,13 @@ Prefs::Prefs(QString config_dir)
 
 #endif
 
-    // these are the prefs that don't get saved to settings.json
-    // when the application exits.
-    temporary_prefs_.insert(FILTER_TEXT);
-
-    auto top = get_default_app_settings();
-    top.merge(tr_sessionLoadSettings(config_dir_.toUtf8().constData(), nullptr));
-    ensureSoundCommandIsAList(&top);
+    auto const app_defaults = get_default_app_settings();
+    auto settings = tr_sessionLoadSettings(&app_defaults, config_dir_.toUtf8().constData(), nullptr);
+    ensureSoundCommandIsAList(&settings);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
+        tr_variant const* b = tr_variantDictFind(&settings, Items[i].key);
 
         switch (Items[i].type)
         {
@@ -326,7 +332,7 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (temporary_prefs_.count(i) != 0U)
+        if (!prefIsSavable(i))
         {
             continue;
         }
@@ -513,9 +519,7 @@ QDateTime Prefs::getDateTime(int key) const
     return values_[key].toDateTime();
 }
 
-/***
-****
-***/
+// ---
 
 void Prefs::toggleBool(int key)
 {

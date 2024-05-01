@@ -1,0 +1,399 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "23"; */
+"23.title" = "Hobespenak";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
+"53.title" = "Beste bat...";
+
+/* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
+"55.title" = "Torrent-fitxategiaren berdina";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
+"219.title" = "Beste bat...";
+
+/* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
+"253.label" = "Gehitzen";
+
+/* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
+"254.label" = "Kudeaketa";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
+"542.title" = "Beste bat...";
+
+/* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
+"1201.title" = "Amaitu aktiboak dauden transferentziak";
+
+/* Class = "NSButtonCell"; title = "Removal of active transfers"; ObjectID = "1202"; */
+"1202.title" = "Aktibo dauden transferentziak kentzea";
+
+/* Class = "NSTextFieldCell"; title = "Prompt user for:"; ObjectID = "1203"; */
+"1203.title" = "Eskatu erabiltzaileari:";
+
+/* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
+"1204.title" = "Badge Dock ikonoa honekin:";
+
+/* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
+"1205.title" = "Deskarga-ratioa guztira";
+
+/* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
+"1206.title" = "Igoera-ratioa guztira";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
+"1207.title" = "Soilik transferentziak deskargatzen ari direnean";
+
+/* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1208"; */
+"1208.title" = "Soilik transferentziak deskargatzen ari direnean";
+
+/* Class = "NSTextFieldCell"; title = "Auto resize:"; ObjectID = "1209"; */
+"1209.title" = "Tamaina aldatu automatikoki:";
+
+/* Class = "NSButtonCell"; title = "Automatically size window to fit all transfers"; ObjectID = "1210"; */
+"1210.title" = "Aldatu automatikoki leihoaren tamaina transferentzia guztietara egokitzeko";
+
+/* Class = "NSButtonCell"; title = "Reset"; ObjectID = "1211"; */
+"1211.title" = "Berrabiarazi";
+
+/* Class = "NSTextFieldCell"; title = "Reset all alerts:"; ObjectID = "1212"; */
+"1212.title" = "Berrabiarazi ohar guztiak:";
+
+/* Class = "NSButtonCell"; title = "Automatically check daily"; ObjectID = "1213"; */
+"1213.title" = "Egiaztatu automatikoki egunero";
+
+/* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
+"1214.title" = "Egiaztatu eguneraketen bila:";
+
+/* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
+"1216.title" = "Lehenetsitako kokapena:";
+
+/* Class = "NSTextFieldCell"; title = "Settings:"; ObjectID = "1217"; */
+"1217.title" = "Ezarpenak:";
+
+/* Class = "NSButtonCell"; title = "Trash original torrent files"; ObjectID = "1218"; */
+"1218.title" = "Bota zakarrontzira jatorrizko torrent fitxategiak";
+
+/* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
+"1219.title" = "Begiratu torrent fitxategien bila hemen:";
+
+/* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
+"1226.title" = "Gehitu automatikoki:";
+
+/* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
+"1227.title" = "Gorde osatu gabeko fitxategiak hemen:";
+
+/* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
+"1230.title" = "Ilarak:";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1231"; */
+"1231.title" = "transferentzia aktiboak";
+
+/* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
+"1232.title" = "Gelditu emaritza maila honetan:";
+
+/* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
+"1234.title" = "Mugak:";
+
+/* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
+"1235.title" = "Maila igotako eta deskargatutako bolumenaren arteko erlazioa da";
+
+/* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
+"1236.title" = "Deskargatu hurrengo mugarekin:";
+
+/* Class = "NSTextFieldCell"; title = "active transfers"; ObjectID = "1239"; */
+"1239.title" = "transferentzia aktiboak";
+
+/* Class = "NSButtonCell"; title = "Seeding with maximum of:"; ObjectID = "1240"; */
+"1240.title" = "Igortzen hurrengo mugarekin:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1242"; */
+"1242.title" = "minutu";
+
+/* Class = "NSButtonCell"; title = "Transfer is stalled when inactive for:"; ObjectID = "1243"; */
+"1243.title" = "Transferentzia trabatuta utziko da tarte honetaz inaktibo dagoenean:";
+
+/* Class = "NSButtonCell"; title = "Automatically map port"; ObjectID = "1247"; */
+"1247.title" = "Lotu ataka automatikoki";
+
+/* Class = "NSTextFieldCell"; title = "NAT traversal uses either NAT-PMP or UPnP"; ObjectID = "1248"; */
+"1248.title" = "NAT transbertsalak NAT-PMP ala UPnP erabiltzen du";
+
+/* Class = "NSTextFieldCell"; title = "Port is open"; ObjectID = "1250"; */
+"1250.title" = "Ataka zabalik dago";
+
+/* Class = "NSTextFieldCell"; title = "Peer communication:"; ObjectID = "1253"; */
+"1253.title" = "Kideen komunikazioa:";
+
+/* Class = "NSButtonCell"; title = "Prevent computer from sleeping with active transfers"; ObjectID = "1254"; */
+"1254.title" = "Saihestu ordenagailua lokartzea transferentzia aktiboak daudenean";
+
+/* Class = "NSTextFieldCell"; title = "System sleep:"; ObjectID = "1255"; */
+"1255.title" = "Sistemaren lokartzea:";
+
+/* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
+"1265.title" = "Igoera-ratioa:";
+
+/* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
+"1267.title" = "Deskarga-ratioa:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
+"1268.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
+"1269.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
+"1270.title" = "Transferentzia-muga orokorrak:";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
+"1273.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
+"1274.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
+"1275.title" = "Abiadura-muga modua:";
+
+/* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
+"1276.title" = "Igoera-ratioa";
+
+/* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
+"1277.title" = "Deskarga-ratioa:";
+
+/* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
+"1278.title" = "Abiadura Muga gaitzeak transferentzia muga orokorrak baliogabetzen ditu";
+
+/* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
+"1280.title" = "Programatu Abiadura Muga:";
+
+/* Class = "NSTextFieldCell"; title = "to"; ObjectID = "1281"; */
+"1281.title" = "hona:";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
+"1294.title" = "Erakutsi leiho bat torrent fitxategia irekitzerakoan";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
+"1302.title" = "Deskarga amaitzen denean:";
+
+/* Class = "NSButtonCell"; title = "When seeding completes:"; ObjectID = "1306"; */
+"1306.title" = "Igortzea osatzen denean:";
+
+/* Class = "NSTextFieldCell"; title = "Play sound:"; ObjectID = "1310"; */
+"1310.title" = "Erreproduzitu soinua:";
+
+/* Class = "NSButtonCell"; title = "Start transfers when added"; ObjectID = "1335"; */
+"1335.title" = "Abiarazi transferentziak gehitzerakoan";
+
+/* Class = "NSTextFieldCell"; title = "Add window:"; ObjectID = "1338"; */
+"1338.title" = "Gehitu leihoa:";
+
+/* Class = "NSButtonCell"; title = "Only when there are multiple files"; ObjectID = "1340"; */
+"1340.title" = "Soilik fitxategi anitz daudenean";
+
+/* Class = "NSButtonCell"; title = "Update"; ObjectID = "1437"; */
+"1437.title" = "Eguneratu";
+
+/* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
+"1438.title" = "blokeo-zerrenda kargatuta/ez kargatuta";
+
+/* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
+"1439.title" = "Blokeo-zerrenda:";
+
+/* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
+"1440.title" = "Saihestu blokeo-zerrendako kideak konektatzea";
+
+/* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
+"1441.title" = "Konexio-muga altuek sistemaren errendimenduan eragin nabarmena izan dezakete";
+
+/* Class = "NSButtonCell"; title = "Use peer exchange (PEX) for public torrents"; ObjectID = "1442"; */
+"1442.title" = "Erabili kide-trukaketa (PEX) torrent publikoetarako";
+
+/* Class = "NSTextFieldCell"; title = "Maximum connections for new transfers:"; ObjectID = "1443"; */
+"1443.title" = "Gehieneko konexioak transferentzia berrietarako:";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1446"; */
+"1446.title" = "kideak";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "1447"; */
+"1447.title" = "kideak";
+
+/* Class = "NSTextFieldCell"; title = "Global maximum connections:"; ObjectID = "1450"; */
+"1450.title" = "Gehieneko konexio kopuru orokorra:";
+
+/* Class = "NSTextFieldCell"; title = "Connections:"; ObjectID = "1451"; */
+"1451.title" = "Konexioak:";
+
+/* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
+"1452.title" = "Hobetsi zifratutako kideak";
+
+/* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
+"1453.title" = "Zifratzea:";
+
+/* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
+"1454.title" = "Ezikusiarena egin zifratu gabeko kideei";
+
+/* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
+"1477.title" = "Soilik eskuz gehitzerakoan";
+
+/* Class = "NSTextFieldCell"; title = "Listening port:"; ObjectID = "1493"; */
+"1493.title" = "Entzuten ari den ataka:";
+
+/* Class = "NSButtonCell"; title = "Enable remote access"; ObjectID = "1502"; */
+"1502.title" = "Gaitu urruneko sarbidea";
+
+/* Class = "NSButtonCell"; title = "Require authentication"; ObjectID = "1505"; */
+"1505.title" = "Behartu autentifikazioa";
+
+/* Class = "NSTableColumn"; headerCell.title = "IP Address"; ObjectID = "1523"; */
+"1523.headerCell.title" = "IP Helbidea";
+
+/* Class = "NSTextFieldCell"; title = "IP addresses may include * wildcard"; ObjectID = "1542"; */
+"1542.title" = "IP helbideak * komodina izan dezake";
+
+/* Class = "NSTextFieldCell"; title = "Password:"; ObjectID = "1555"; */
+"1555.title" = "Pasahitza:";
+
+/* Class = "NSTextFieldCell"; title = "Username:"; ObjectID = "1557"; */
+"1557.title" = "Erabiltzaile-izena";
+
+/* Class = "NSTextFieldCell"; title = "This enables the web interface and allows remote requests"; ObjectID = "1645"; */
+"1645.title" = "Aukera honek web interfazea gaitu eta urruneko eskaerak baimentzen ditu";
+
+/* Class = "NSButtonCell"; title = "Launch Web Interface"; ObjectID = "1718"; */
+"1718.title" = "Abiarazi Web Interfazea";
+
+/* Class = "NSTextFieldCell"; title = "Last updated: N/A"; ObjectID = "1739"; */
+"1739.title" = "Azkenengoz eguneratuta: E/A";
+
+/* Class = "NSButtonCell"; title = "Automatically update weekly"; ObjectID = "1742"; */
+"1742.title" = "Automatikoki eguneratu astero";
+
+/* Class = "NSButtonCell"; title = "Only allow the following IP addresses to connect:"; ObjectID = "1748"; */
+"1748.title" = "Baimendu soilik hurrengo IP helbidetik konektatzea:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Color"; ObjectID = "1777"; */
+"1777.headerCell.title" = "Kolorea";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "1779"; */
+"1779.headerCell.title" = "Izena";
+
+/* Class = "NSTextFieldCell"; title = "Group Name:"; ObjectID = "1796"; */
+"1796.title" = "Taldearen Izena:";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
+"1813.title" = "Beste bat...";
+
+/* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
+"1815.title" = "Kokapen pertsonalizatua:";
+
+/* Class = "NSTextFieldCell"; title = "The location will only be set when adding the transfer"; ObjectID = "1824"; */
+"1824.title" = "Kokapena transferentzia gehitzerakoan zehaztuko da soilik.";
+
+/* Class = "NSButtonCell"; title = "Display the web interface with Bonjour"; ObjectID = "1826"; */
+"1826.title" = "Erakutsi web interfazea Bonjour-ekin";
+
+/* Class = "NSButtonCell"; title = "Assign group to new transfers based on criteria"; ObjectID = "1831"; */
+"1831.title" = "Esleitu taldea transferentzia berriei irizpideetan oinarrituta";
+
+/* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
+"1833.title" = "Editatu...";
+
+/* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
+"1835.title" = "Transferentziak irizpide guztiak betetzen dituen lehen taldera esleituko dira";
+
+/* Class = "NSButtonCell"; title = "Randomize port on launch"; ObjectID = "1890"; */
+"1890.title" = "Ausaz aukeratu ataka abiaraztean";
+
+/* Class = "NSButtonCell"; title = "Randomize"; ObjectID = "1892"; */
+"1892.title" = "Ausaz aukeratu";
+
+/* Class = "NSButtonCell"; title = "Include beta releases"; ObjectID = "1896"; */
+"1896.title" = "Gehitu beta kaleratzeak";
+
+/* Class = "NSMenuItem"; title = "Every Day"; ObjectID = "1910"; */
+"1910.title" = "Egunero";
+
+/* Class = "NSMenuItem"; title = "Weekdays"; ObjectID = "1911"; */
+"1911.title" = "Lanegunetan";
+
+/* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
+"1912.title" = "Asteburuetan";
+
+/* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
+"1914.title" = "Astelehena";
+
+/* Class = "NSMenuItem"; title = "Tuesday"; ObjectID = "1915"; */
+"1915.title" = "Asteartea";
+
+/* Class = "NSMenuItem"; title = "Wednesday"; ObjectID = "1916"; */
+"1916.title" = "Asteazkena";
+
+/* Class = "NSMenuItem"; title = "Thursday"; ObjectID = "1917"; */
+"1917.title" = "Osteguna";
+
+/* Class = "NSMenuItem"; title = "Friday"; ObjectID = "1918"; */
+"1918.title" = "Ostirala";
+
+/* Class = "NSMenuItem"; title = "Saturday"; ObjectID = "1919"; */
+"1919.title" = "Larunbata";
+
+/* Class = "NSMenuItem"; title = "Sunday"; ObjectID = "1920"; */
+"1920.title" = "Igandea";
+
+/* Class = "NSButtonCell"; title = "Use distributed hash table (DHT) for public torrents"; ObjectID = "1926"; */
+"1926.title" = "Erabili banatutako hash-taula (DHT) torrent publikoetarako";
+
+/* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
+"1931.title" = "Onartu magnet estekak:";
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
+"1933.title" = "Zehaztu Aplikazio Lehenetsia";
+
+/* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
+"1940.title" = "Gehitu .part osatu gabeko fitxategietan";
+
+/* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
+"1948.title" = "Erakutsi leiho bat magnet esteka bat irekitzean";
+
+/* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
+"1952.title" = "Erabili kideen aurkikuntza lokala torrent publikoetarako";
+
+/* Class = "NSButtonCell"; title = "Stop seeding when inactive for:"; ObjectID = "1962"; */
+"1962.title" = "Geratu igortzea hurrengo tarteaz inaktibo badago:";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "1970"; */
+"1970.title" = "minutu";
+
+/* Class = "NSTextFieldCell"; title = "URL:"; ObjectID = "1988"; */
+"1988.title" = "URLa:";
+
+/* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "2044"; */
+"2044.title" = "Deskarga amaitzen denean:";
+
+/* Class = "NSTextFieldCell"; title = "Call script:"; ObjectID = "2047"; */
+"2047.title" = "Deitu script-a:";
+
+/* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
+"2053.title" = "Beste bat...";
+
+/* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
+"2078.title" = "Gaitu Micro Transport Protokoloa (µTP)";
+
+/* Class = "NSTextFieldCell"; title = "Peer listening port:"; ObjectID = "2082"; */
+"2082.title" = "Kideak entzuteko ataka:";
+
+/* Class = "NSTextFieldCell"; title = "Notifications:"; ObjectID = "2087"; */
+"2087.title" = "Jakinarazpenak:";
+
+/* Class = "NSButtonCell"; title = "Configure In System Preferences"; ObjectID = "2114"; */
+"2114.title" = "Konfiguratu Sistemaren Ezarpenetan";
+
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "2119"; */
+"2119.title" = "Kendu transferentzien zerrendatik igortzeak amaitzen direnean";
+
+/* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
+"2123.title" = "Gehitu berriak diren transferentzietara aplikatzen da";
+
+/* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
+/* "A9E-F4-a3c.title" = ""; */
+
+/* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
+"pgY-W3-HdI.title" = "Zehaztu Aplikazio Lehenetsia";

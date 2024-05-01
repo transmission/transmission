@@ -273,7 +273,7 @@ std::string_view tr_sys_path_dirname(std::string_view path)
 
     auto const has_root = path[0] == '/';
     auto end = std::string_view::npos;
-    auto matched_slash = bool{ true };
+    auto matched_slash = true;
 
     for (auto i = len - 1; i >= 1U; --i)
     {
@@ -545,37 +545,6 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error)
-{
-    tr_sys_file_t ret = TR_BAD_SYS_FILE;
-
-    switch (std_file)
-    {
-    case TR_STD_SYS_FILE_IN:
-        ret = STDIN_FILENO;
-        break;
-
-    case TR_STD_SYS_FILE_OUT:
-        ret = STDOUT_FILENO;
-        break;
-
-    case TR_STD_SYS_FILE_ERR:
-        ret = STDERR_FILENO;
-        break;
-
-    default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), static_cast<int>(std_file)));
-
-        if (error != nullptr)
-        {
-            error->set_from_errno(EINVAL);
-        }
-        break;
-    }
-
-    return ret;
-}
-
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
@@ -797,37 +766,6 @@ bool tr_sys_file_write_at(
     return ret;
 }
 
-bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    bool const ret = (fsync(handle) != -1);
-
-    if (error != nullptr && !ret)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return ret;
-}
-
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-
-    if (struct stat statbuf = {}; fstat(handle, &statbuf) == 0)
-    {
-        return S_ISREG(statbuf.st_mode);
-    }
-
-    if (error != nullptr)
-    {
-        error->set_from_errno(errno);
-    }
-
-    return false;
-}
-
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -838,58 +776,6 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
     {
         error->set_from_errno(errno);
     }
-
-    return ret;
-}
-
-bool tr_sys_file_advise(
-    [[maybe_unused]] tr_sys_file_t handle,
-    [[maybe_unused]] uint64_t offset,
-    [[maybe_unused]] uint64_t size,
-    [[maybe_unused]] tr_sys_file_advice_t advice,
-    [[maybe_unused]] tr_error* error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(size > 0);
-    TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
-
-    bool ret = true;
-
-#if defined(HAVE_POSIX_FADVISE)
-
-    int const native_advice = advice == TR_SYS_FILE_ADVICE_WILL_NEED ?
-        POSIX_FADV_WILLNEED :
-        (advice == TR_SYS_FILE_ADVICE_DONT_NEED ? POSIX_FADV_DONTNEED : POSIX_FADV_NORMAL);
-
-    TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
-
-    if (int const code = posix_fadvise(handle, offset, size, native_advice); code != 0)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(errno);
-        }
-
-        ret = false;
-    }
-
-#elif defined(__APPLE__)
-
-    if (advice == TR_SYS_FILE_ADVICE_WILL_NEED)
-    {
-        auto radv = radvisory{};
-        radv.ra_offset = offset;
-        radv.ra_count = size;
-
-        ret = fcntl(handle, F_RDADVISE, &radv) != -1;
-
-        if (error != nullptr && !ret)
-        {
-            error->set_from_errno(errno);
-        }
-    }
-
-#endif
 
     return ret;
 }
@@ -1029,8 +915,6 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     TR_ASSERT(
         !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
-    bool ret = false;
-
 #if defined(F_OFD_SETLK)
 
     struct flock fl = {};
@@ -1048,62 +932,68 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     case TR_SYS_FILE_LOCK_UN:
         fl.l_type = F_UNLCK;
         break;
+
+    default:
+        errno = EINVAL;
+        break;
     }
 
     fl.l_whence = SEEK_SET;
 
-    do
-    {
-        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
-    } while (!ret && errno == EINTR);
+    int const native_operation = (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW;
 
-    if (!ret && errno == EAGAIN)
+    auto result = std::optional<bool>{};
+    while (!result)
     {
-        errno = EWOULDBLOCK;
+        if (fcntl(handle, native_operation, &fl) != -1)
+        {
+            result = true;
+        }
+        else if (errno != EINTR)
+        {
+            result = false;
+        }
     }
 
 #elif defined(HAVE_FLOCK)
 
-    int native_operation = 0;
+    int const native_operation = //
+        (((operation & TR_SYS_FILE_LOCK_SH) != 0) ? LOCK_SH : 0) | //
+        (((operation & TR_SYS_FILE_LOCK_EX) != 0) ? LOCK_EX : 0) | //
+        (((operation & TR_SYS_FILE_LOCK_NB) != 0) ? LOCK_NB : 0) | //
+        (((operation & TR_SYS_FILE_LOCK_UN) != 0) ? LOCK_UN : 0);
 
-    if ((operation & TR_SYS_FILE_LOCK_SH) != 0)
+    auto result = std::optional<bool>{};
+    while (!result)
     {
-        native_operation |= LOCK_SH;
+        if (flock(handle, native_operation) != -1)
+        {
+            result = true;
+        }
+        else if (errno != EINTR)
+        {
+            result = false;
+        }
     }
-
-    if ((operation & TR_SYS_FILE_LOCK_EX) != 0)
-    {
-        native_operation |= LOCK_EX;
-    }
-
-    if ((operation & TR_SYS_FILE_LOCK_NB) != 0)
-    {
-        native_operation |= LOCK_NB;
-    }
-
-    if ((operation & TR_SYS_FILE_LOCK_UN) != 0)
-    {
-        native_operation |= LOCK_UN;
-    }
-
-    do
-    {
-        ret = flock(handle, native_operation) != -1;
-    } while (!ret && errno == EINTR);
 
 #else
 
     errno = ENOSYS;
-    ret = false;
+    auto const result = std::optional<bool>{ false };
 
 #endif
 
-    if (error != nullptr && !ret)
+    if (!*result && errno == EAGAIN)
+    {
+        errno = EWOULDBLOCK;
+    }
+
+    if (error != nullptr && !*result)
     {
         error->set_from_errno(errno);
     }
 
-    return ret;
+    return *result;
 }
 
 std::string tr_sys_dir_get_current(tr_error* error)
@@ -1150,7 +1040,7 @@ namespace
         {
             if (error != nullptr)
             {
-                error->set(ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
+                error->set(ENOTDIR, fmt::format("File is in the way: {:s}", path));
             }
 
             return false;
@@ -1180,7 +1070,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* e
 {
     TR_ASSERT(path != nullptr);
 
-    auto ret = bool{ false };
+    auto ret = false;
     auto local_error = tr_error{};
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)

@@ -20,7 +20,7 @@ class SorterBase : public IF_GTKMM4(Gtk::Sorter, Glib::Object)
 {
 public:
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    enum class Change{
+    enum class Change : uint8_t{
         DIFFERENT,
         INVERTED,
         LESS_STRICT,

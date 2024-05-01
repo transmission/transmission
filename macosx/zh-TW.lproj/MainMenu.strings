@@ -1,0 +1,444 @@
+
+/* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
+"21.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
+"56.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "Transmission"; ObjectID = "57"; */
+"57.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "About Transmission"; ObjectID = "58"; */
+"58.title" = "關於 Transmission";
+
+/* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "72"; */
+"72.title" = "開啟 Torrent 檔案…";
+
+/* Class = "NSMenuItem"; title = "Close Window"; ObjectID = "73"; */
+"73.title" = "關閉視窗";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "檔案";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "檔案";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
+"103.title" = "說明";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
+"106.title" = "說明";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "偏好設定…";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "服務";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "服務";
+
+/* Class = "NSMenuItem"; title = "Hide Transmission"; ObjectID = "134"; */
+"134.title" = "隱藏 Transmission";
+
+/* Class = "NSMenuItem"; title = "Quit Transmission"; ObjectID = "136"; */
+"136.title" = "結束 Transmission";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "隱藏其他";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "全部顯示";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "157"; */
+"157.title" = "複製";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "160"; */
+"160.title" = "剪下";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "163"; */
+"163.title" = "編輯";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "169"; */
+"169.title" = "編輯";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "171"; */
+"171.title" = "貼上";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "172"; */
+"172.title" = "全選";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "301"; */
+"301.title" = "檢視";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "302"; */
+"302.title" = "檢視";
+
+/* Class = "NSMenuItem"; title = "Forums"; ObjectID = "418"; */
+"418.title" = "討論區";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "456"; */
+"456.title" = "功能表";
+
+/* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "457"; */
+"457.title" = "暫停已選取項目";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "459"; */
+"459.title" = "顯示檢測器";
+
+/* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "516"; */
+"516.title" = "在 Finder 中顯示";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "545"; */
+"545.title" = "自訂工具列…";
+
+/* Class = "NSMenuItem"; title = "Hide Status Bar"; ObjectID = "547"; */
+"547.title" = "隱藏狀態列";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "589"; */
+"589.title" = "功能表";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "598"; */
+"598.title" = "顯示檢測器";
+
+/* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "611"; */
+"611.title" = "開啟 Torrent 檔案…";
+
+/* Class = "NSMenuItem"; title = "Check for Update…"; ObjectID = "975"; */
+"975.title" = "檢查更新…";
+
+/* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1028"; */
+"1028.title" = "繼續已選取項目";
+
+/* Class = "NSMenuItem"; title = "Hide Toolbar"; ObjectID = "1222"; */
+"1222.title" = "隱藏工具列";
+
+/* Class = "NSMenuItem"; title = "Transfers"; ObjectID = "1399"; */
+"1399.title" = "傳輸";
+
+/* Class = "NSMenu"; title = "Transfers"; ObjectID = "1400"; */
+"1400.title" = "傳輸";
+
+/* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "1403"; */
+"1403.title" = "暫停已選取項目";
+
+/* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1404"; */
+"1404.title" = "繼續已選取項目";
+
+/* Class = "NSMenuItem"; title = "Pause All"; ObjectID = "1413"; */
+"1413.title" = "全部暫停";
+
+/* Class = "NSMenuItem"; title = "Resume All"; ObjectID = "1414"; */
+"1414.title" = "全部繼續";
+
+/* Class = "NSMenuItem"; title = "Remove and Trash Data File"; ObjectID = "1514"; */
+"1514.title" = "移除並將資料檔案移動到垃圾桶";
+
+/* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1516"; */
+"1516.title" = "從清單移除";
+
+/* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "1533"; */
+"1533.title" = "另存 Torrent 檔案為…";
+
+/* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "1536"; */
+"1536.title" = "顯示檢測器";
+
+/* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "1539"; */
+"1539.title" = "在 Finder 中顯示";
+
+/* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1550"; */
+"1550.title" = "從清單移除";
+
+/* Class = "NSMenuItem"; title = "Remove and Trash Data File"; ObjectID = "1551"; */
+"1551.title" = "移除並將資料檔案移動到垃圾桶";
+
+/* Class = "NSMenuItem"; title = "Transmission Homepage"; ObjectID = "1558"; */
+"1558.title" = "Transmission 首頁";
+
+/* Class = "NSMenuItem"; title = "Transmission Help"; ObjectID = "1561"; */
+"1561.title" = "Transmission 說明";
+
+/* Class = "NSMenuItem"; title = "Speed Limit"; ObjectID = "1566"; */
+"1566.title" = "速度限制";
+
+/* Class = "NSMenuItem"; title = "Compact View"; ObjectID = "1578"; */
+"1578.title" = "精簡檢視";
+
+/* Class = "NSMenuItem"; title = "Hide Filter Bar"; ObjectID = "1620"; */
+"1620.title" = "隱藏篩選器";
+
+/* Class = "NSMenuItem"; title = "Select None"; ObjectID = "1675"; */
+"1675.title" = "取消全選";
+
+/* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1678"; */
+"1678.title" = "立即繼續已選取的傳輸";
+
+/* Class = "NSMenuItem"; title = "Open With Options Window…"; ObjectID = "1680"; */
+"1680.title" = "以選項視窗開啟…";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "1683"; */
+"1683.title" = "視窗";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "1684"; */
+"1684.title" = "視窗";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "1685"; */
+"1685.title" = "最小化";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "1687"; */
+"1687.title" = "全部置頂";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "1688"; */
+"1688.title" = "縮放";
+
+/* Class = "NSMenuItem"; title = "Next Inspector Tab"; ObjectID = "1693"; */
+"1693.title" = "下一個檢測器分頁";
+
+/* Class = "NSMenuItem"; title = "Previous Inspector Tab"; ObjectID = "1694"; */
+"1694.title" = "上一個檢測器分頁";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "1696"; */
+"1696.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "1766"; */
+"1766.title" = "刪除";
+
+/* Class = "NSMenuItem"; title = "Message Log"; ObjectID = "1795"; */
+"1795.title" = "訊息日誌";
+
+/* Class = "NSMenuItem"; title = "Next Filter Button"; ObjectID = "1797"; */
+"1797.title" = "下一個篩選按鈕";
+
+/* Class = "NSMenuItem"; title = "Previous Filter Button"; ObjectID = "1798"; */
+"1798.title" = "上一個篩選按鈕";
+
+/* Class = "NSMenuItem"; title = "Resume All Waiting"; ObjectID = "1804"; */
+"1804.title" = "繼續所有等待中的傳輸";
+
+/* Class = "NSMenuItem"; title = "Resume Selected Right Away"; ObjectID = "1808"; */
+"1808.title" = "立即繼續已選取的傳輸";
+
+/* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1846"; */
+"1846.title" = "開啟 Torrent 位址…";
+
+/* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1858"; */
+"1858.title" = "開啟 Torrent 位址…";
+
+/* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "1860"; */
+"1860.title" = "更新追蹤器";
+
+/* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "1877"; */
+"1877.title" = "驗證本機資料";
+
+/* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "1891"; */
+"1891.title" = "將資料檔案移動到…";
+
+/* Class = "NSMenuItem"; title = "Sort Transfers By"; ObjectID = "1894"; */
+"1894.title" = "依以下方式排序傳輸";
+
+/* Class = "NSMenu"; title = "Sort Transfers By"; ObjectID = "1895"; */
+"1895.title" = "依以下方式排序傳輸";
+
+/* Class = "NSMenuItem"; title = "Progress"; ObjectID = "1896"; */
+"1896.title" = "進度";
+
+/* Class = "NSMenuItem"; title = "State"; ObjectID = "1897"; */
+"1897.title" = "狀態";
+
+/* Class = "NSMenuItem"; title = "Ascending"; ObjectID = "1899"; */
+"1899.title" = "遞增";
+
+/* Class = "NSMenuItem"; title = "Date Added"; ObjectID = "1900"; */
+"1900.title" = "加入日期";
+
+/* Class = "NSMenuItem"; title = "Queue Order"; ObjectID = "1901"; */
+"1901.title" = "排程順序";
+
+/* Class = "NSMenuItem"; title = "Name"; ObjectID = "1902"; */
+"1902.title" = "檔名";
+
+/* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1921"; */
+"1921.title" = "建立 Torrent 檔案…";
+
+/* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1923"; */
+"1923.title" = "建立 Torrent 檔案…";
+
+/* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
+"1933.title" = "追蹤器";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
+"1936.title" = "功能表";
+
+/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
+"1944.title" = "下載頻寬限制";
+
+/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
+"1945.title" = "下載頻寬限制";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
+"1946.title" = "無限制";
+
+/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
+"1950.title" = "上傳頻寬限制";
+
+/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
+"1951.title" = "上傳頻寬限制";
+
+/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
+"1960.title" = "限制";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
+"1963.title" = "無限制";
+
+/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
+"1964.title" = "限制";
+
+/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
+"2017.title" = "達到以下分享率時，停止做種";
+
+/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
+"2018.title" = "達到以下分享率時，停止做種";
+
+/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
+"2024.title" = "永遠做種";
+
+/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
+"2025.title" = "停止分享率";
+
+/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
+"2031.title" = "全域";
+
+/* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
+"2122.title" = "更新追蹤器";
+
+/* Class = "NSMenuItem"; title = "Pieces Bar"; ObjectID = "2185"; */
+"2185.title" = "區塊列";
+
+/* Class = "NSMenuItem"; title = "Availability"; ObjectID = "2279"; */
+"2279.title" = "可用性";
+
+/* Class = "NSMenuItem"; title = "Statistics"; ObjectID = "2301"; */
+"2301.title" = "統計資料";
+
+/* Class = "NSMenuItem"; title = "Activity"; ObjectID = "2324"; */
+"2324.title" = "活動";
+
+/* Class = "NSMenuItem"; title = "Group"; ObjectID = "2839"; */
+"2839.title" = "群組";
+
+/* Class = "NSMenu"; title = "Group"; ObjectID = "2840"; */
+"2840.title" = "群組";
+
+/* Class = "NSMenuItem"; title = "Group"; ObjectID = "2849"; */
+"2849.title" = "群組";
+
+/* Class = "NSMenu"; title = "Group"; ObjectID = "2850"; */
+"2850.title" = "群組";
+
+/* Class = "NSMenuItem"; title = "Use Groups"; ObjectID = "3078"; */
+"3078.title" = "使用群組";
+
+/* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
+/* "3093.headerCell.title" = ""; */
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
+"3166.title" = "Quick Look";
+
+/* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
+"3170.title" = "支援與開發";
+
+/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
+"3190.title" = "控制在全域頻寬限制內";
+
+/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
+"3196.title" = "優先順序";
+
+/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
+"3197.title" = "優先順序";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
+"3198.title" = "高";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
+"3199.title" = "中";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
+"3200.title" = "低";
+
+/* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
+"3207.title" = "另存 Torrent 檔案為…";
+
+/* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "3209"; */
+"3209.title" = "將資料檔案移動到…";
+
+/* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "3212"; */
+"3212.title" = "捐助…";
+
+/* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3216"; */
+"3216.title" = "複製磁力連結到剪貼簿";
+
+/* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3218"; */
+"3218.title" = "複製磁力連結到剪貼簿";
+
+/* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
+"3221.title" = "驗證本機資料";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "3321"; */
+"3321.title" = "復原";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "3400"; */
+"3400.title" = "重做";
+
+/* Class = "NSMenuItem"; title = "Descending"; ObjectID = "3405"; */
+"3405.title" = "遞減";
+
+/* Class = "NSMenuItem"; title = "Remove All Completed From List"; ObjectID = "3407"; */
+"3407.title" = "從清單移除所有已完成的傳輸";
+
+/* Class = "NSMenuItem"; title = "Size"; ObjectID = "3430"; */
+"3430.title" = "大小";
+
+/* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3445"; */
+"3445.title" = "重新命名檔案…";
+
+/* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3448"; */
+"3448.title" = "重新命名檔案…";
+
+/* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "8t6-wh-5UW"; */
+"8t6-wh-5UW.title" = "分享 Torrent 檔案";
+
+/* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "Cay-iU-bH4"; */
+"Cay-iU-bH4.title" = "分享 Torrent 檔案";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
+/* "HmT-FI-amY.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
+/* "Zmj-A9-NPf.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
+/* "kbX-Av-eP4.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
+/* "lmp-Y3-ZQO.title" = ""; */
+
+/* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
+"lvU-Va-GzM.title" = "分享 Torrent 檔案";
+
+/* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
+"oSz-TE-8jj.title" = "進度";
+
+/* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
+"s5v-VO-G2y.title" = "分享 Torrent 檔案";
+
+/* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
+/* "x8g-Nv-jcD.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
+/* "y9O-gd-sXA.title" = ""; */
+
+/* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
+/* "zIM-6D-jsa.title" = ""; */
+
+/* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
+/* "zLF-YR-Oq6.title" = ""; */

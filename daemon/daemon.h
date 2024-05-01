@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include <string>
 
 #ifdef HAVE_SYS_SIGNALFD_H
@@ -13,8 +14,8 @@
 
 #include <libtransmission/variant.h>
 #include <libtransmission/quark.h>
-#include <libtransmission/file.h>
 
+struct event_base;
 struct tr_error;
 struct tr_session;
 
@@ -45,17 +46,13 @@ private:
 #ifdef HAVE_SYS_SIGNALFD_H
     int sigfd_ = -1;
 #endif /* signalfd API */
-    bool paused_ = false;
     bool seen_hup_ = false;
     std::string config_dir_;
     tr_variant settings_ = {};
-    bool logfile_flush_ = false;
     tr_session* my_session_ = nullptr;
     char const* log_file_name_ = nullptr;
     struct event_base* ev_base_ = nullptr;
-    tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
-    tr_quark key_pidfile_ = tr_quark_new("pidfile");
-    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic");
+    FILE* log_stream_ = nullptr;
 
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);

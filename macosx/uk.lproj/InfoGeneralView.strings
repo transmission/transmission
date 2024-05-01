@@ -1,0 +1,48 @@
+
+/* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
+"21.title" = "Частини:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
+"22.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
+"24.title" = "Безпечний:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
+"25.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
+"26.title" = "Файл даних:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
+"27.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
+"28.title" = "Де";
+
+/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
+"29.title" = "Виявити файл даних";
+
+/* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
+"30.title" = "Створювач:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
+"32.title" = "Створено:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
+"35.title" = "Коментар:";
+
+/* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
+"36.title" = "Геш:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "н/д";
+
+/* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
+"41.title" = "Інформація про торент";

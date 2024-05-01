@@ -46,7 +46,6 @@
 // - Callbacks are only on the main thread.
 // - Unmaintained as a standalone project.
 
-#warning Adopt an alternative to VDKQueue (UKFSEventsWatcher, EonilFSEvents, FileWatcher, DTFolderMonitor or SFSMonitor)
 // ALTERNATIVES (from archaic to modern)
 //
 //  - FreeBSD 4.1: Kernel Queue API (kevent and kqueue)
@@ -86,6 +85,8 @@
 //
 //  - macOS 10.10+: DispatchSource API (makeFileSystemObjectSource)
 //  (https://developer.apple.com/documentation/dispatch/dispatchsource/2300040-makefilesystemobjectsource)
+//  "DispatchSource is just the Swift version of gcd dispatch sources"
+//  (https://github.com/bdkjones/VDKQueue/pull/22#issuecomment-1871623127)
 //
 //  Example: SFSMonitor (https://github.com/ClassicalDude/SFSMonitor)
 
@@ -136,10 +137,12 @@ extern NSString const* VDKQueueAccessRevocationNotification;
 //        Just add it or remove it and this class will take action only if appropriate.
 //        (Add only if we're not already watching it, remove only if we are.)
 //
-//  Warning: You must pass full, root-relative paths. Do not pass tilde-abbreviated paths or file URLs.
+//  Warning: Only pass file paths ("/path"), not string representations of URLs ("file://path").
 - (void)addPath:(NSString*)aPath;
 - (void)addPath:(NSString*)aPath notifyingAbout:(u_int)flags; // See note above for values to pass in "flags"
 
+//  Either `removePath:` or `removeAllPaths` must be called if we want this object to ever be dealloc'd.
+//  This is because adding a path detaches a thread which retains self.
 - (void)removePath:(NSString*)aPath;
 - (void)removeAllPaths;
 

@@ -8,6 +8,17 @@ import { Torrent } from './torrent.js';
 import { setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
+  createIcon: (torrent) => {
+    const icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.dataset.iconMimeType = torrent
+      .getPrimaryMimeType()
+      .split('/', 1)
+      .pop();
+    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    return icon;
+  },
+
   formatDL: (t) => {
     return `▼ ${Formatter.speedBps(t.getDownloadSpeed())}`;
   },
@@ -220,17 +231,18 @@ export class TorrentRendererFull {
   render(controller, t, root) {
     const is_stopped = t.isStopped();
 
+    root.classList.toggle('paused', is_stopped);
+
     // name
     let e = root._name_container;
     setTextContent(e, t.getName());
-    e.classList.toggle('paused', is_stopped);
 
     // labels
     TorrentRendererHelper.formatLabels(t, root._labels_container);
 
     // progress details
     e = root._progress_details_container;
-    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
+    e.innerHTML = TorrentRendererFull.getProgressDetails(controller, t);
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
@@ -253,13 +265,7 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    const icon = TorrentRendererHelper.createIcon(torrent);
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
@@ -332,9 +338,10 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
+    root.classList.toggle('paused', t.isStopped());
+
     // name
     let e = root._name_container;
-    e.classList.toggle('paused', t.isStopped());
     setTextContent(e, t.getName());
 
     // labels
@@ -356,13 +363,7 @@ export class TorrentRendererCompact {
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'compact');
 
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    const icon = TorrentRendererHelper.createIcon(torrent);
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';

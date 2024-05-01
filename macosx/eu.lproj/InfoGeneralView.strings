@@ -1,0 +1,48 @@
+
+/* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
+"21.title" = "Zatiak:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
+"22.placeholderString" = "E/E";
+
+/* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
+"24.title" = "Segurua:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
+"25.placeholderString" = "E/E";
+
+/* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
+"26.title" = "Datu-fitxategia:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
+"27.placeholderString" = "E/E";
+
+/* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
+"28.title" = "Non";
+
+/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
+"29.title" = "ErakutsiFitxategiarenData";
+
+/* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
+"30.title" = "Sortzailea:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "E/E";
+
+/* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
+"32.title" = "Sortze-data:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "E/E";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
+"35.title" = "Iruzkina:";
+
+/* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
+"36.title" = "Hash-a:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "E/E";
+
+/* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
+"41.title" = "Torrent-aren Informazioa";

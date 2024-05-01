@@ -52,7 +52,7 @@ using namespace std::literals;
 namespace libtransmission::test
 {
 
-auto constexpr MaxWaitMsec = int{ 5000 };
+auto constexpr MaxWaitMsec = 5000;
 
 class HandshakeTest : public SessionTest
 {

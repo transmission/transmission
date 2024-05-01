@@ -17,13 +17,10 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/observable.h"
 #include "libtransmission/open-files.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // _()
-
-using namespace std::literals;
 
 namespace
 {
@@ -125,41 +122,36 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
 // ---
 
-std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_files::get(
-    tr_torrent_id_t tor_id,
-    tr_file_index_t file_num,
-    bool writable)
+std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
 {
-    if (auto found = pool_.get(make_key(tor_id, file_num)); found)
+    if (auto* const found = pool_.get(make_key(tor_id, file_num)); found != nullptr)
     {
-        auto& [entry, tag] = *found;
-        if (writable && !entry.writable_)
+        if (writable && !found->writable_)
         {
             return {};
         }
 
-        return std::pair{ entry.fd_, std::move(tag) };
+        return found->fd_;
     }
 
     return {};
 }
 
-std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_files::get(
+std::optional<tr_sys_file_t> tr_open_files::get(
     tr_torrent_id_t tor_id,
     tr_file_index_t file_num,
     bool writable,
     std::string_view filename_in,
-    tr_preallocation_mode allocation,
+    Preallocation allocation,
     uint64_t file_size)
 {
     // is there already an entry
     auto key = make_key(tor_id, file_num);
-    if (auto found = pool_.get(key); found)
+    if (auto* const found = pool_.get(key); found != nullptr)
     {
-        auto& [entry, tag] = *found;
-        if (!writable || entry.writable_)
+        if (!writable || found->writable_)
         {
-            return std::pair{ entry.fd_, std::move(tag) };
+            return found->fd_;
         }
 
         pool_.erase(key); // close so we can re-open as writable
@@ -204,23 +196,23 @@ std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_fi
         return {};
     }
 
-    if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
+    if (writable && !already_existed && allocation != Preallocation::None)
     {
         bool success = false;
-        auto type = std::string_view{};
+        char const* type = nullptr;
 
-        if (allocation == TR_PREALLOCATE_FULL)
+        if (allocation == Preallocation::Full)
         {
             success = preallocate_file_full(fd, file_size, &error);
-            type = "full"sv;
+            type = "full";
         }
-        else if (allocation == TR_PREALLOCATE_SPARSE)
+        else if (allocation == Preallocation::Sparse)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
-            type = "sparse"sv;
+            type = "sparse";
         }
 
-        TR_ASSERT(!std::empty(type));
+        TR_ASSERT(type != nullptr);
 
         if (!success)
         {
@@ -253,11 +245,11 @@ std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_fi
     }
 
     // cache it
-    auto [entry, tag] = pool_.add(std::move(key));
+    auto& entry = pool_.add(std::move(key));
     entry.fd_ = fd;
     entry.writable_ = writable;
 
-    return std::pair{ fd, std::move(tag) };
+    return fd;
 }
 
 void tr_open_files::close_all()
@@ -267,7 +259,7 @@ void tr_open_files::close_all()
 
 void tr_open_files::close_torrent(tr_torrent_id_t tor_id)
 {
-    return pool_.erase_if([&tor_id](Key const& key, Val const& /*unused*/) { return key.first == tor_id; });
+    pool_.erase_if([&tor_id](Key const& key, Val const& /*unused*/) { return key.first == tor_id; });
 }
 
 void tr_open_files::close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num)

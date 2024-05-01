@@ -12,7 +12,6 @@
 #include <cstddef> // for size_t
 #include <cstdint> // for intX_t, uintX_t
 #include <memory> // for std::unique_ptr
-#include <mutex>
 #include <utility> // for std::pair
 #include <vector>
 
@@ -39,10 +38,9 @@ public:
     // @return any error code from cacheTrim()
     int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
 
-    int read_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
-    int prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len);
-    int flush_torrent(tr_torrent const* torrent);
-    int flush_file(tr_torrent const* torrent, tr_file_index_t file);
+    int read_block(tr_torrent const& tor, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
+    int flush_torrent(tr_torrent_id_t tor_id);
+    int flush_file(tr_torrent const& tor, tr_file_index_t file);
 
 private:
     using Key = std::pair<tr_torrent_id_t, tr_block_index_t>;
@@ -56,7 +54,7 @@ private:
     using Blocks = std::vector<CacheBlock>;
     using CIter = Blocks::const_iterator;
 
-    [[nodiscard]] static Key make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
+    [[nodiscard]] static Key make_key(tr_torrent const& tor, tr_block_info::Location loc) noexcept;
 
     [[nodiscard]] static std::pair<CIter, CIter> find_biggest_span(CIter begin, CIter end) noexcept;
 
@@ -79,7 +77,7 @@ private:
         return max_size.base_quantity() / tr_block_info::BlockSize;
     }
 
-    [[nodiscard]] CIter get_block(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept;
+    [[nodiscard]] CIter get_block(tr_torrent const& tor, tr_block_info::Location const& loc) noexcept;
 
     tr_torrents const& torrents_;
 
@@ -91,15 +89,13 @@ private:
     mutable size_t cache_writes_ = 0;
     mutable size_t cache_write_bytes_ = 0;
 
-    mutable std::mutex mutex_;
-
     static constexpr struct
     {
-        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block)
+        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block) const
         {
             return key < block.key;
         }
-        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key)
+        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key) const
         {
             return block.key < key;
         }

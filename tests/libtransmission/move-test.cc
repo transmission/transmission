@@ -81,7 +81,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<Cache::BlockData> buf = {};
+        std::unique_ptr<Cache::BlockData> buf;
         bool done = {};
     };
 
@@ -106,7 +106,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
             std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
-            session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);
+            session_->run_in_session_thread(test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()
             {
@@ -165,7 +165,7 @@ TEST_F(MoveTest, setLocation)
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // now move it
-    auto state = int{ -1 };
+    auto state = -1;
     tr_torrentSetLocation(tor, target_dir, true, &state);
     auto test = [&state]()
     {

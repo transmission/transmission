@@ -25,6 +25,7 @@
 #include <QResizeEvent>
 #include <QRegularExpression>
 #include <QStringList>
+#include <QString>
 #include <QStyle>
 #include <QTreeWidgetItem>
 
@@ -52,9 +53,7 @@
 class Prefs;
 class Session;
 
-/****
-*****
-****/
+// ---
 
 namespace
 {
@@ -91,10 +90,20 @@ private:
     QTimer timer_;
 };
 
-} // namespace
-
-namespace
+constexpr tr_quark priorityKey(int priority)
 {
+    switch (priority)
+    {
+    case TR_PRI_LOW:
+        return TR_KEY_priority_low;
+
+    case TR_PRI_HIGH:
+        return TR_KEY_priority_high;
+
+    default:
+        return TR_KEY_priority_normal;
+    }
+}
 
 int constexpr DebounceIntervalMSec = 100;
 int constexpr RefreshIntervalMSec = 4000;
@@ -123,44 +132,9 @@ int measureViewItem(QTreeWidget const* view, int column, QString const& text)
     return std::max(item_width, header_width);
 }
 
-QString collateAddress(QString const& address)
-{
-    auto collated = QString{};
-
-    if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
-    {
-        if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
-        {
-            quint32 const ipv4_address = ip_address.toIPv4Address();
-            collated = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
-        }
-        else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
-        {
-            Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
-            QByteArray tmp(16, '\0');
-
-            for (int i = 0; i < 16; ++i)
-            {
-                tmp[i] = ipv6_address[i];
-            }
-
-            collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
-        }
-    }
-
-    if (collated.isEmpty())
-    {
-        collated = QStringLiteral("3-") + address.toLower();
-    }
-
-    return collated;
-}
-
 } // namespace
 
-/***
-****
-***/
+// ---
 
 class PeerItem : public QTreeWidgetItem
 {
@@ -232,11 +206,43 @@ private:
 
         return collated_address_;
     }
+
+    [[nodiscard]] static QString collateAddress(QString const& address)
+    {
+        auto collated = QString{};
+
+        if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
+        {
+            if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                quint32 const ipv4_address = ip_address.toIPv4Address();
+                collated = QStringLiteral("1-") +
+                    QString::fromUtf8(QByteArray::number(ipv4_address, 16).rightJustified(8, '0'));
+            }
+            else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                Q_IPV6ADDR const ipv6_address = ip_address.toIPv6Address();
+                QByteArray tmp(16, '\0');
+
+                for (int i = 0; i < 16; ++i)
+                {
+                    tmp[i] = ipv6_address[i];
+                }
+
+                collated = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
+            }
+        }
+
+        if (collated.isEmpty())
+        {
+            collated = QStringLiteral("3-") + address.toLower();
+        }
+
+        return collated;
+    }
 };
 
-/***
-****
-***/
+// ---
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 int DetailsDialog::prev_tab_index_ = 0;
@@ -256,7 +262,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     initOptionsTab();
 
     adjustSize();
-    ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui_.commentTextEdit->setMaximumHeight(QWIDGETSIZE_MAX);
     ui_.tabs->setCurrentIndex(prev_tab_index_);
 
     static std::array<int, 2> constexpr InitKeys = {
@@ -282,6 +288,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     // set up the debounce timer
     connect(&ui_debounce_timer_, &QTimer::timeout, this, &DetailsDialog::refreshUI);
     ui_debounce_timer_.setSingleShot(true);
+
+    // set labels
+    connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &DetailsDialog::onButtonBoxClicked);
 }
 
 DetailsDialog::~DetailsDialog()
@@ -299,6 +308,8 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
         ids_ = ids;
         session_.refreshDetailInfo(ids_);
         tracker_model_->refresh(model_, ids_);
+
+        labels_need_refresh_ = true;
 
         refreshModel();
         refreshUI();
@@ -322,9 +333,7 @@ void DetailsDialog::refreshPref(int key)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::refreshModel()
 {
@@ -383,6 +392,40 @@ void DetailsDialog::onSessionCalled(Session::Tag tag)
         pending_changes_connection_ = {};
 
         refreshModel();
+    }
+}
+
+void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
+{
+    if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Close)
+    {
+        if (ui_.labelsTextEdit->isReadOnly()) // no edits could have been made
+        {
+            return;
+        }
+
+        QString const labels_text = ui_.labelsTextEdit->toPlainText().trimmed();
+
+        if (labels_text == labels_baseline_) // no edits have been made
+        {
+            return;
+        }
+
+        QString const re = QStringLiteral("((,|;)\\s*)");
+
+//see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
+#else
+        QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
+#endif
+
+        torrentSet(TR_KEY_labels, labels_list);
+
+        if (!ids_.empty())
+        {
+            session_.refreshDetailInfo(ids_);
+        }
     }
 }
 
@@ -716,14 +759,9 @@ void DetailsDialog::refreshUI()
     {
         auto latest = torrents[0]->lastActivity();
 
-        for (Torrent const* const t : torrents)
+        for (Torrent const* const tor : torrents)
         {
-            auto const dt = t->lastActivity();
-
-            if (latest < dt)
-            {
-                latest = dt;
-            }
+            latest = std::max(latest, tor->lastActivity());
         }
 
         auto const seconds = static_cast<int>(std::difftime(now, latest));
@@ -849,6 +887,39 @@ void DetailsDialog::refreshUI()
 
     ui_.privacyValueLabel->setText(string);
 
+    // myLabelsTextEdit
+    if (labels_need_refresh_)
+    {
+        labels_need_refresh_ = false;
+
+        if (torrents.empty())
+        {
+            labels_baseline_.clear();
+            ui_.labelsTextEdit->setPlainText({});
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(true);
+            ui_.labelsTextEdit->setEnabled(true);
+        }
+        else if (auto const& baseline = torrents[0]->labels(); std::all_of(
+                     std::begin(torrents),
+                     std::end(torrents),
+                     [&baseline](auto const* tor) { return tor->labels() == baseline; }))
+        {
+            labels_baseline_ = baseline.join(QStringLiteral(", "));
+            ui_.labelsTextEdit->setPlainText(labels_baseline_);
+            ui_.labelsTextEdit->setPlaceholderText(none);
+            ui_.labelsTextEdit->setReadOnly(false);
+            ui_.labelsTextEdit->setEnabled(true);
+        }
+        else // mixed
+        {
+            labels_baseline_.clear();
+            ui_.labelsTextEdit->setPlainText({});
+            ui_.labelsTextEdit->setPlaceholderText(mixed);
+            ui_.labelsTextEdit->setEnabled(false);
+        }
+    }
+
     // myCommentBrowser
     string = none;
     bool is_comment_mixed = false;
@@ -868,12 +939,12 @@ void DetailsDialog::refreshUI()
         }
     }
 
-    if (ui_.commentBrowser->toPlainText() != string)
+    if (ui_.commentTextEdit->toPlainText() != string)
     {
-        ui_.commentBrowser->setText(string);
+        ui_.commentTextEdit->setPlainText(string);
     }
 
-    ui_.commentBrowser->setEnabled(!is_comment_mixed && !string.isEmpty());
+    ui_.commentTextEdit->setEnabled(!is_comment_mixed && !string.isEmpty());
 
     // myOriginLabel
     string = none;
@@ -968,7 +1039,7 @@ void DetailsDialog::refreshUI()
         }
     }
 
-    ui_.addedLabelValue->setText(string);
+    ui_.addedValueLabel->setText(string);
 
     ///
     ///  Options Tab
@@ -1244,14 +1315,16 @@ void DetailsDialog::setEnabled(bool enabled)
     ui_.tabs->setEnabled(enabled);
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initInfoTab()
 {
-    int const h = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
-    ui_.commentBrowser->setFixedHeight(h);
+    int const cbh = QFontMetrics{ ui_.commentTextEdit->font() }.lineSpacing() * 4;
+    ui_.commentTextEdit->setFixedHeight(cbh);
+
+    int const lteh = QFontMetrics{ ui_.labelsTextEdit->font() }.lineSpacing() * 2;
+    ui_.labelsTextEdit->setFixedHeight(lteh);
+    ui_.labelsTextEdit->setPlainText(QStringLiteral("Initializing..."));
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);
@@ -1259,9 +1332,7 @@ void DetailsDialog::initInfoTab()
     cr->update();
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::onShowTrackerScrapesToggled(bool val)
 {
@@ -1474,8 +1545,7 @@ void DetailsDialog::initOptionsTab()
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedSectionLayout);
-    cr->addLayout(ui_.seedingLimitsSectionRatioLayout);
-    cr->addLayout(ui_.seedingLimitsSectionIdleLayout);
+    cr->addLayout(ui_.seedingLimitsSectionLayout);
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 
@@ -1495,9 +1565,7 @@ void DetailsDialog::initOptionsTab()
     connect(ui_.singleUpSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initTrackerTab()
 {
@@ -1539,9 +1607,7 @@ void DetailsDialog::initTrackerTab()
     onTrackerSelectionChanged();
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initPeersTab()
 {
@@ -1558,9 +1624,7 @@ void DetailsDialog::initPeersTab()
     ui_.peersView->setColumnWidth(COL_ADDRESS, measureViewItem(ui_.peersView, COL_ADDRESS, QStringLiteral("888.888.888.888")));
 }
 
-/***
-****
-***/
+// ---
 
 void DetailsDialog::initFilesTab() const
 {
@@ -1568,21 +1632,6 @@ void DetailsDialog::initFilesTab() const
     connect(ui_.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
     connect(ui_.filesView, &FileTreeView::priorityChanged, this, &DetailsDialog::onFilePriorityChanged);
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
-}
-
-static constexpr tr_quark priorityKey(int priority)
-{
-    switch (priority)
-    {
-    case TR_PRI_LOW:
-        return TR_KEY_priority_low;
-
-    case TR_PRI_HIGH:
-        return TR_KEY_priority_high;
-
-    default:
-        return TR_KEY_priority_normal;
-    }
 }
 
 void DetailsDialog::onFilePriorityChanged(file_indices_t const& indices, int priority)

@@ -183,7 +183,7 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
     }
 
     // Save the contents. This might take >1 pass.
-    auto ok = bool{ true };
+    auto ok = true;
     while (!std::empty(contents))
     {
         auto n_written = uint64_t{};
@@ -265,26 +265,6 @@ std::string_view tr_strv_strip(std::string_view str)
 uint64_t tr_time_msec()
 {
     return std::chrono::system_clock::now().time_since_epoch() / 1ms;
-}
-
-// ---
-
-/*
- * Copy src to string dst of size siz. At most siz-1 characters
- * will be copied. Always NUL terminates (unless siz == 0).
- * Returns strlen (src); if retval >= siz, truncation occurred.
- */
-size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
-{
-    auto* dst = static_cast<char*>(vdst);
-    auto const* const src = static_cast<char const*>(vsrc);
-
-    TR_ASSERT(dst != nullptr);
-    TR_ASSERT(src != nullptr);
-
-    auto const res = fmt::format_to_n(dst, siz - 1, "{:s}", src);
-    *res.out = '\0';
-    return res.size;
 }
 
 // ---
@@ -513,18 +493,20 @@ std::vector<int> tr_num_parse_range(std::string_view str)
 {
     using namespace tr_num_parse_range_impl;
 
-    auto values = std::set<int>{};
+    auto values = std::vector<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
     while (tr_strv_sep(&str, &token, ',') && parseNumberSection(token, range))
     {
         for (auto i = range.low; i <= range.high; ++i)
         {
-            values.insert(i);
+            values.emplace_back(i);
         }
     }
 
-    return { std::begin(values), std::end(values) };
+    std::sort(std::begin(values), std::end(values));
+    values.erase(std::unique(std::begin(values), std::end(values)), std::end(values));
+    return values;
 }
 
 // ---
@@ -567,9 +549,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
     if ((int)ratio == TR_RATIO_INF)
     {
-        auto buf = std::array<char, 64>{};
-        tr_strlcpy(std::data(buf), infinity, std::size(buf));
-        return std::data(buf);
+        return infinity != nullptr ? infinity : "";
     }
 
     return tr_strpercent(ratio);

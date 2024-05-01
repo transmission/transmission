@@ -21,7 +21,9 @@
 #include <gtkmm/treemodel.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -29,11 +31,18 @@
 class Session : public Glib::Object
 {
 public:
-    enum ErrorCode
+    enum ErrorCode : uint16_t
     {
-        ERR_ADD_TORRENT_ERR = TR_PARSE_ERR,
-        ERR_ADD_TORRENT_DUP = TR_PARSE_DUPLICATE,
+        ERR_ADD_TORRENT_ERR = 1,
+        ERR_ADD_TORRENT_DUP = 2,
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
+    };
+
+    enum PortTestIpProtocol : uint8_t
+    {
+        PORT_TEST_IPV4,
+        PORT_TEST_IPV6,
+        NUM_PORT_TEST_IP_PROTOCOL // Must always be the last value
     };
 
     using Model = IF_GTKMM4(Gio::ListModel, Gtk::TreeModel);
@@ -127,11 +136,12 @@ public:
     ***
     **/
 
-    void port_test();
+    void port_test(PortTestIpProtocol ip_protocol);
+    bool port_test_pending(PortTestIpProtocol ip_protocol) const noexcept;
 
     void blocklist_update();
 
-    void exec(tr_variant const* request);
+    void exec(tr_variant const& request);
 
     void open_folder(tr_torrent_id_t torrent_id) const;
 
@@ -140,7 +150,7 @@ public:
     sigc::signal<void(bool)>& signal_blocklist_updated();
     sigc::signal<void(bool)>& signal_busy();
     sigc::signal<void(tr_quark)>& signal_prefs_changed();
-    sigc::signal<void(bool)>& signal_port_tested();
+    sigc::signal<void(std::optional<bool>, PortTestIpProtocol)>& signal_port_tested();
     sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)>& signal_torrents_changed();
 
 protected:

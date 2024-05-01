@@ -891,7 +891,11 @@ void MainWindow::refreshActionSensitivity()
     auto const now = time(nullptr);
     for (auto const& row : selection_model->selectedRows())
     {
-        auto const& tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
+        auto const* const tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
+        if (tor == nullptr)
+        {
+            continue;
+        }
 
         ++selected;
 

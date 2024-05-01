@@ -17,17 +17,10 @@
 #include "libtransmission/transmission.h" // for TR_SCHED_ALL
 
 #include "libtransmission/quark.h"
+#include "libtransmission/settings.h"
 #include "libtransmission/values.h"
 
 struct tr_variant;
-
-#define ALT_SPEEDS_FIELDS(V) \
-    V(TR_KEY_alt_speed_up, speed_up_kbyps_, size_t, 50U, "") \
-    V(TR_KEY_alt_speed_down, speed_down_kbyps_, size_t, 50U, "") \
-    V(TR_KEY_alt_speed_time_enabled, scheduler_enabled_, bool, false, "whether alt speeds toggle on and off on schedule") \
-    V(TR_KEY_alt_speed_time_day, use_on_these_weekdays_, size_t, TR_SCHED_ALL, "days of the week") \
-    V(TR_KEY_alt_speed_time_begin, minute_begin_, size_t, 540U, "minutes past midnight; 9AM") \
-    V(TR_KEY_alt_speed_time_end, minute_end_, size_t, 1020U, "minutes past midnight; 5PM")
 
 /** Manages alternate speed limits and a scheduler to auto-toggle them. */
 class tr_session_alt_speeds
@@ -35,6 +28,41 @@ class tr_session_alt_speeds
     using Speed = libtransmission::Values::Speed;
 
 public:
+    class Settings final : public libtransmission::Settings
+    {
+    public:
+        Settings() = default;
+
+        explicit Settings(tr_variant const& src)
+        {
+            load(src);
+        }
+
+        // NB: When adding a field here, you must also add it to
+        // fields() if you want it to be in session-settings.json
+        bool is_active = false;
+        bool scheduler_enabled = false; // whether alt speeds toggle on and off on schedule
+        size_t minute_begin = 540U; // minutes past midnight; 9AM
+        size_t minute_end = 1020U; // minutes past midnight; 5PM
+        size_t speed_down_kbyps = 50U;
+        size_t speed_up_kbyps = 50U;
+        size_t use_on_these_weekdays = TR_SCHED_ALL;
+
+    private:
+        [[nodiscard]] Fields fields() override
+        {
+            return {
+                { TR_KEY_alt_speed_enabled, &is_active },
+                { TR_KEY_alt_speed_up, &speed_up_kbyps },
+                { TR_KEY_alt_speed_down, &speed_down_kbyps },
+                { TR_KEY_alt_speed_time_enabled, &scheduler_enabled },
+                { TR_KEY_alt_speed_time_day, &use_on_these_weekdays },
+                { TR_KEY_alt_speed_time_begin, &minute_begin },
+                { TR_KEY_alt_speed_time_end, &minute_end },
+            };
+        }
+    };
+
     enum class ChangeReason
     {
         User,
@@ -52,70 +80,73 @@ public:
         [[nodiscard]] virtual time_t time() = 0;
     };
 
-    constexpr explicit tr_session_alt_speeds(Mediator& mediator) noexcept
+    explicit tr_session_alt_speeds(Mediator& mediator) noexcept
         : mediator_{ mediator }
     {
     }
 
-    void load(tr_variant const& src);
-    [[nodiscard]] tr_variant settings() const;
-    [[nodiscard]] static tr_variant default_settings();
+    void load(Settings&& settings);
+
+    [[nodiscard]] constexpr auto const& settings() const noexcept
+    {
+        return settings_;
+    }
 
     [[nodiscard]] constexpr bool is_active() const noexcept
     {
-        return is_active_;
+        return settings().is_active;
     }
 
     void check_scheduler();
 
     void set_scheduler_enabled(bool enabled)
     {
-        scheduler_enabled_ = enabled;
+        settings_.scheduler_enabled = enabled;
         update_scheduler();
     }
 
     // return true iff the scheduler will turn alt speeds on/off
     [[nodiscard]] constexpr auto is_scheduler_enabled() const noexcept
     {
-        return scheduler_enabled_;
+        return settings().scheduler_enabled;
     }
 
     void set_start_minute(size_t minute)
     {
-        minute_begin_ = minute;
+        settings_.minute_begin = minute;
         update_scheduler();
     }
 
     [[nodiscard]] constexpr auto start_minute() const noexcept
     {
-        return minute_begin_;
+        return settings().minute_begin;
     }
 
     void set_end_minute(size_t minute)
     {
-        minute_end_ = minute;
+        settings_.minute_end = minute;
         update_scheduler();
     }
 
     [[nodiscard]] constexpr auto end_minute() const noexcept
     {
-        return minute_end_;
+        return settings().minute_end;
     }
 
     void set_weekdays(tr_sched_day days)
     {
-        use_on_these_weekdays_ = days;
+        settings_.use_on_these_weekdays = days;
         update_scheduler();
     }
 
     [[nodiscard]] constexpr tr_sched_day weekdays() const noexcept
     {
-        return static_cast<tr_sched_day>(use_on_these_weekdays_);
+        return static_cast<tr_sched_day>(settings().use_on_these_weekdays);
     }
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        auto const kbyps = dir == TR_DOWN ? speed_down_kbyps_ : speed_up_kbyps_;
+        auto const kbyps = dir == TR_DOWN ? settings().speed_down_kbyps : settings().speed_up_kbyps;
         return Speed{ kbyps, Speed::Units::KByps };
     }
 
@@ -123,11 +154,11 @@ public:
     {
         if (dir == TR_DOWN)
         {
-            speed_down_kbyps_ = limit.count(Speed::Units::KByps);
+            settings_.speed_down_kbyps = limit.count(Speed::Units::KByps);
         }
         else
         {
-            speed_up_kbyps_ = limit.count(Speed::Units::KByps);
+            settings_.speed_up_kbyps = limit.count(Speed::Units::KByps);
         }
     }
 
@@ -135,6 +166,8 @@ public:
 
 private:
     Mediator& mediator_;
+
+    Settings settings_;
 
     void update_scheduler();
     void update_minutes();
@@ -146,9 +179,6 @@ private:
     static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
     static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
 
-    // are alt speeds active right now?
-    bool is_active_ = false;
-
     // bitfield of all the minutes in a week.
     // Each bit's value indicates whether the scheduler wants
     // alt speeds on or off at that given minute.
@@ -156,8 +186,4 @@ private:
 
     // recent change that was made by the scheduler
     std::optional<bool> scheduler_set_is_active_to_;
-
-#define V(key, name, type, default_value, comment) type name = type{ default_value };
-    ALT_SPEEDS_FIELDS(V)
-#undef V
 };

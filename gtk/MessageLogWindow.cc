@@ -12,7 +12,6 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 
 #include <giomm/simpleaction.h>
@@ -25,7 +24,7 @@
 #include <glibmm/variant.h>
 #include <gtkmm/cellrenderertext.h>
 #include <gtkmm/combobox.h>
-#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/filechoosernative.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/treemodel.h>
@@ -37,9 +36,10 @@
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
+#include <array>
 #include <fstream>
-#include <map>
 #include <memory>
+#include <utility>
 
 class MessageLogColumnsModel : public Gtk::TreeModelColumnRecord
 {
@@ -72,15 +72,15 @@ private:
     bool onRefresh();
 
     void onSaveRequest();
-    void onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response);
-    void doSave(Gtk::Window& parent, Glib::ustring const& filename);
+    void onSaveDialogResponse(Glib::RefPtr<Gtk::FileChooserNative>& d, int response);
+    void doSave(std::string const& filename);
 
     void onClearRequest();
     void onPauseToggled(Gio::SimpleAction& action);
 
     void scroll_to_bottom();
     void level_combo_changed_cb(Gtk::ComboBox* combo_box);
-    void level_combo_init(Gtk::ComboBox* level_combo) const;
+    static void level_combo_init(Gtk::ComboBox* level_combo);
 
     [[nodiscard]] bool is_pinned_to_new() const;
     [[nodiscard]] bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
@@ -96,7 +96,14 @@ private:
     tr_log_level maxLevel_ = TR_LOG_INFO;
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
-    std::map<tr_log_level, char const*> const level_names_;
+
+    static auto inline const level_names_ = std::array<std::pair<tr_log_level, char const*>, 5U>{ {
+        { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
+        { TR_LOG_ERROR, C_("Logging level", "Error") },
+        { TR_LOG_WARN, C_("Logging level", "Warning") },
+        { TR_LOG_INFO, C_("Logging level", "Information") },
+        { TR_LOG_DEBUG, C_("Logging level", "Debug") },
+    } };
 };
 
 namespace
@@ -157,13 +164,15 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 *****
 ****/
 
-void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo) const
+// static
+void MessageLogWindow::Impl::level_combo_init(Gtk::ComboBox* level_combo)
 {
     auto const pref_level = static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level));
     auto const default_level = TR_LOG_INFO;
 
     auto has_pref_level = false;
     auto items = std::vector<std::pair<Glib::ustring, int>>{};
+    items.reserve(std::size(level_names_));
     for (auto const& [level, name] : level_names_)
     {
         items.emplace_back(name, level);
@@ -201,21 +210,24 @@ Glib::ustring gtr_asctime(time_t t)
 
 } // namespace
 
-void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& filename)
+void MessageLogWindow::Impl::doSave(std::string const& filename)
 {
     try
     {
         auto stream = std::ofstream();
         stream.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-        stream.open(Glib::locale_from_utf8(filename), std::ios_base::trunc);
+        stream.open(filename, std::ios_base::trunc);
 
         for (auto const& row : store_->children())
         {
             auto const* const node = row.get_value(message_log_cols.tr_msg);
             auto const date = gtr_asctime(node->when);
 
-            auto const it = level_names_.find(node->level);
-            auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
+            auto const iter = std::find_if(
+                std::begin(level_names_),
+                std::end(level_names_),
+                [key = node->level](auto const& item) { return item.first == key; });
+            auto const* const level_str = iter != std::end(level_names_) ? iter->second : "???";
 
             fmt::print(stream, "{}\t{}\t{}\t{}\n", date, level_str, node->name, node->message);
         }
@@ -223,10 +235,10 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     catch (std::ios_base::failure const& e)
     {
         auto w = std::make_shared<Gtk::MessageDialog>(
-            parent,
+            window_,
             fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
+                fmt::arg("path", Glib::filename_to_utf8(filename)),
                 fmt::arg("error", e.code().message()),
                 fmt::arg("error_code", e.code().value())),
             false,
@@ -238,22 +250,21 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     }
 }
 
-void MessageLogWindow::Impl::onSaveDialogResponse(std::shared_ptr<Gtk::FileChooserDialog>& d, int response)
+void MessageLogWindow::Impl::onSaveDialogResponse(Glib::RefPtr<Gtk::FileChooserNative>& d, int response)
 {
-    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
-    {
-        doSave(*d, d->get_file()->get_path());
-    }
+    auto const filename = response == TR_GTK_RESPONSE_TYPE(ACCEPT) ? d->get_file()->get_path() : std::string();
 
     d.reset();
+
+    if (!filename.empty())
+    {
+        doSave(filename);
+    }
 }
 
 void MessageLogWindow::Impl::onSaveRequest()
 {
-    auto d = std::make_shared<Gtk::FileChooserDialog>(window_, _("Save Log"), TR_GTK_FILE_CHOOSER_ACTION(SAVE));
-    d->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
-    d->add_button(_("_Save"), TR_GTK_RESPONSE_TYPE(ACCEPT));
-
+    auto d = Gtk::FileChooserNative::create(_("Save Log"), window_, TR_GTK_FILE_CHOOSER_ACTION(SAVE), _("_Save"), _("_Cancel"));
     d->signal_response().connect([this, d](int response) mutable { onSaveDialogResponse(d, response); });
     d->show();
 }
@@ -479,13 +490,6 @@ MessageLogWindow::Impl::Impl(
     , refresh_tag_(Glib::signal_timeout().connect_seconds(
           sigc::mem_fun(*this, &Impl::onRefresh),
           SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
-    , level_names_{ {
-          { TR_LOG_CRITICAL, C_("Logging level", "Critical") },
-          { TR_LOG_ERROR, C_("Logging level", "Error") },
-          { TR_LOG_WARN, C_("Logging level", "Warning") },
-          { TR_LOG_INFO, C_("Logging level", "Information") },
-          { TR_LOG_DEBUG, C_("Logging level", "Debug") },
-      } }
 {
     /**
     ***  toolbar

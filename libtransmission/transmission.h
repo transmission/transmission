@@ -53,8 +53,6 @@ struct tr_torrent;
 struct tr_torrent_metainfo;
 struct tr_variant;
 
-using tr_priority_t = int8_t;
-
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 enum tr_verify_added_mode
@@ -67,18 +65,18 @@ enum tr_verify_added_mode
     TR_VERIFY_ADDED_FULL = 1
 };
 
-enum tr_preallocation_mode
-{
-    TR_PREALLOCATE_NONE = 0,
-    TR_PREALLOCATE_SPARSE = 1,
-    TR_PREALLOCATE_FULL = 2
-};
-
 enum tr_encryption_mode
 {
     TR_CLEAR_PREFERRED,
     TR_ENCRYPTION_PREFERRED,
     TR_ENCRYPTION_REQUIRED
+};
+
+enum tr_priority_t : int8_t
+{
+    TR_PRI_LOW = -1,
+    TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
+    TR_PRI_HIGH = 1
 };
 
 #define TR_RATIO_NA (-1)
@@ -177,6 +175,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
+ * @param app_defaults tr_variant containing the app defaults
  * @param config_dir the configuration directory to find settings.json
  * @param app_name if config_dir is empty, app_name is used to find the default dir.
  * @return the loaded settings
@@ -184,7 +183,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name);
+tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -589,9 +588,6 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
 
-/** @brief DEPRECATED. Equivalent to `tr_torrentStart()`. Use that instead. */
-void tr_torrentStartMagnet(tr_torrent* tor);
-
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
 size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
 
@@ -813,14 +809,6 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
            or nullptr if `tr_ctorSetMetainfoFromFile()` wasn't used */
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
 
-// TODO(ckerr) remove
-enum tr_parse_result
-{
-    TR_PARSE_OK,
-    TR_PARSE_ERR,
-    TR_PARSE_DUPLICATE
-};
-
 /**
  * Instantiate a single torrent.
  *
@@ -1019,13 +1007,6 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
 void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
-
-enum : tr_priority_t
-{
-    TR_PRI_LOW = -1,
-    TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
-    TR_PRI_HIGH = 1
-};
 
 /**
  * @brief Set a batch of files to a particular priority.
@@ -1247,13 +1228,13 @@ enum tr_tracker_state
 
 /*
  * Unlike other _view structs, it is safe to keep a tr_tracker_view copy.
- * The announce, scrape, and host strings are interned & never go out-of-scope.
+ * The announce and scrape strings are interned & never go out-of-scope.
  */
 struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host_and_port; // uniquely-identifying tracker name (`${host}:${port}`)
+    char host_and_port[72]; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.

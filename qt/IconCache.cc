@@ -30,8 +30,6 @@
 #endif
 #endif
 
-#include <libtransmission/transmission.h>
-
 #include <optional>
 #include <utility>
 

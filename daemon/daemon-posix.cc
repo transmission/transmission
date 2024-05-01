@@ -26,7 +26,7 @@
 
 static void set_system_error(tr_error& error, int code, std::string_view message)
 {
-    error.set(code, fmt::format(FMT_STRING("{:s}: {:s} ({:d}"), message, tr_strerror(code), code));
+    error.set(code, fmt::format("{:s}: {:s} ({:d}", message, tr_strerror(code), code));
 }
 
 #ifdef HAVE_SYS_SIGNALFD_H

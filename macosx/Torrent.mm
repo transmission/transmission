@@ -23,6 +23,8 @@ NSString* const kTorrentDidChangeGroupNotification = @"TorrentDidChangeGroup";
 
 static int const kETAIdleDisplaySec = 2 * 60;
 
+static dispatch_queue_t timeMachineExcludeQueue;
+
 @interface Torrent ()
 
 @property(nonatomic, readonly) tr_torrent* fHandle;
@@ -44,8 +46,6 @@ static int const kETAIdleDisplaySec = 2 * 60;
 @property(nonatomic) TorrentDeterminationType fDownloadFolderDetermination;
 
 @property(nonatomic) BOOL fResumeOnWake;
-
-@property(nonatomic) dispatch_queue_t timeMachineExcludeQueue;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
@@ -88,7 +88,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
         NSError* localError;
         if (![Torrent trashFile:@(filename) error:&localError])
         {
-            error->set(localError.code, localError.description.UTF8String);
+            error->set(static_cast<int>(localError.code), localError.description.UTF8String);
             return false;
         }
     }
@@ -97,6 +97,15 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 }
 
 @implementation Torrent
+
++ (void)initialize
+{
+    if (self != [Torrent self])
+        return;
+
+    // DISPATCH_QUEUE_SERIAL because DISPATCH_QUEUE_CONCURRENT is limited to 64 simultaneous torrent dispatch_async
+    timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_SERIAL);
+}
 
 - (instancetype)initWithPath:(NSString*)path
                     location:(NSString*)location
@@ -761,6 +770,25 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     {
         auto const location = tr_torrentFindFile(self.fHandle, 0);
         return std::empty(location) ? nil : @(location.c_str());
+    }
+}
+
+- (NSString*)lastKnownDataLocation
+{
+    if (self.magnet)
+    {
+        return nil;
+    }
+
+    if (self.folder)
+    {
+        NSString* lastDataLocation = [self.currentDirectory stringByAppendingPathComponent:self.name];
+        return lastDataLocation;
+    }
+    else
+    {
+        auto const lastFileName = @(tr_torrentFile(self.fHandle, 0).name);
+        return [self.currentDirectory stringByAppendingPathComponent:lastFileName];
     }
 }
 
@@ -1826,7 +1854,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    _timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_CONCURRENT);
     [self update];
     [self updateTimeMachineExclude];
 
@@ -2157,7 +2184,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     NSString* path;
     if ((path = self.dataLocation))
     {
-        dispatch_async(_timeMachineExcludeQueue, ^{
+        dispatch_async(timeMachineExcludeQueue, ^{
             CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:path];
             CSBackupSetItemExcluded(url, exclude, false);
         });

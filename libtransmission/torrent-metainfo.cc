@@ -32,7 +32,7 @@ using namespace std::literals;
 /**
  * @brief Ensure that the URLs for multfile torrents end in a slash.
  *
- * See http://bittorrent.org/beps/bep_0019.html#metadata-extension
+ * See https://www.bittorrent.org/beps/bep_0019.html#metadata-extension
  * for background on how the trailing slash is used for "url-list"
  * fields.
  *
@@ -62,7 +62,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
     tr_torrent_metainfo& tm_;
-    int64_t piece_size_ = 0;
+    uint32_t piece_size_ = {};
     int64_t length_ = 0;
     std::string encoding_ = "UTF-8";
     std::string_view info_dict_begin_;
@@ -71,7 +71,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     std::string_view pieces_root_;
     int64_t file_length_ = 0;
 
-    enum class State
+    enum class State : uint8_t
     {
         UsePath,
         FileTree,
@@ -194,7 +194,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool Int64(int64_t value, Context const& /*context*/) override
     {
-        auto unhandled = bool{ false };
+        auto unhandled = false;
 
         if (state_ == State::FilesIgnored)
         {
@@ -225,7 +225,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(PieceLengthKey) || pathIs(InfoKey, PieceLengthKey))
         {
-            piece_size_ = value;
+            piece_size_ = static_cast<uint32_t>(value);
         }
         else if (pathIs(InfoKey, LengthKey))
         {
@@ -272,7 +272,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     {
         auto const curdepth = depth();
         auto const current_key = currentKey();
-        auto unhandled = bool{ false };
+        auto unhandled = false;
 
         if (state_ == State::FilesIgnored)
         {
@@ -460,11 +460,6 @@ private:
     {
         bool ok = true;
 
-        if (file_length_ == 0)
-        {
-            return ok;
-        }
-
         // FIXME: Check to see if we already added this file. This is a safeguard
         // for hybrid torrents with duplicate info between "file tree" and "files"
         if (std::empty(file_subpath_))
@@ -518,7 +513,7 @@ private:
     bool finish(Context const& context)
     {
         // bittorrent 1.0 spec
-        // http://bittorrent.org/beps/bep_0003.html
+        // https://www.bittorrent.org/beps/bep_0003.html
         //
         // "There is also a key length or a key files, but not both or neither.
         //
@@ -542,7 +537,7 @@ private:
                 return false;
             }
 
-            if (piece_size_ == 0)
+            if (piece_size_ == 0U)
             {
                 if (!context.error)
                 {
@@ -551,7 +546,7 @@ private:
                 return false;
             }
 
-            tm_.block_info_.init_sizes(tm_.files_.totalSize(), piece_size_);
+            tm_.block_info_ = tr_block_info{ tm_.files_.totalSize(), piece_size_ };
             return true;
         }
 

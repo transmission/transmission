@@ -5,8 +5,9 @@
 
 #include <algorithm>
 #include <cassert>
-#include <set>
 #include <utility>
+
+#include <small/set.hpp>
 
 #include <QApplication>
 #include <QStyle>
@@ -164,6 +165,9 @@ QVariant FileTreeItem::data(int column, int role) const
             }
 
             break;
+
+        default:
+            break;
         }
 
         break;
@@ -183,39 +187,34 @@ QVariant FileTreeItem::data(int column, int role) const
         }
 
         break;
+
+    default:
+        break;
     }
 
     return value;
 }
 
-void FileTreeItem::getSubtreeWantedSize(uint64_t& have, uint64_t& total) const
+std::pair<uint64_t, uint64_t> FileTreeItem::get_subtree_wanted_size() const
 {
-    if (is_wanted_)
+    auto have = is_wanted_ ? have_size_ : 0U;
+    auto total = is_wanted_ ? total_size_ : 0U;
+
+    for (auto const* const child : children_)
     {
-        have += have_size_;
-        total += total_size_;
+        auto const [child_have, child_total] = child->get_subtree_wanted_size();
+        have += child_have;
+        total += child_total;
     }
 
-    for (FileTreeItem const* const i : children_)
-    {
-        i->getSubtreeWantedSize(have, total);
-    }
+    return { have, total };
 }
 
 double FileTreeItem::progress() const
 {
-    double d(0);
-    uint64_t have(0);
-    uint64_t total(0);
+    auto const [have, total] = get_subtree_wanted_size();
 
-    getSubtreeWantedSize(have, total);
-
-    if (total != 0)
-    {
-        d = static_cast<double>(have) / static_cast<double>(total);
-    }
-
-    return d;
+    return have >= total ? 1.0 : static_cast<double>(have) / static_cast<double>(total);
 }
 
 QString FileTreeItem::sizeString() const
@@ -225,20 +224,13 @@ QString FileTreeItem::sizeString() const
 
 uint64_t FileTreeItem::size() const
 {
-    if (std::empty(children_))
-    {
-        return total_size_;
-    }
-
-    uint64_t have = 0;
-    uint64_t total = 0;
-    getSubtreeWantedSize(have, total);
+    auto const [have, total] = get_subtree_wanted_size();
     return total;
 }
 
 std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
 {
-    auto changed_columns = std::set<int>{};
+    auto changed_columns = small::max_size_set<int, FileTreeModel::NUM_COLUMNS>{};
 
     if (name_ != name)
     {

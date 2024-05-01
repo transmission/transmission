@@ -55,6 +55,7 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "VersionComparator.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -345,6 +346,9 @@ static void removeKeRangerRansomware()
 
 + (void)initialize
 {
+    if (self != [Controller self])
+        return;
+
     removeKeRangerRansomware();
 
     //make sure another Transmission.app isn't running already
@@ -505,6 +509,17 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [_fDefaults integerForKey:@"PeersTotal"]);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [_fDefaults integerForKey:@"PeersTorrent"]);
+
+        NSInteger bindPort = [_fDefaults integerForKey:@"BindPort"];
+        if (bindPort <= 0 || bindPort > 65535)
+        {
+            // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
+            // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
+            // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152–65535
+            // https://datatracker.ietf.org/doc/html/rfc6335#section-6
+            uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
+            [_fDefaults setInteger:defaultPort forKey:@"BindPort"];
+        }
 
         BOOL const randomPort = [_fDefaults boolForKey:@"RandomPort"];
         tr_variantDictAddBool(&settings, TR_KEY_peer_port_random_on_start, randomPort);
@@ -899,7 +914,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //registering the Web UI to Bonjour
     if ([self.fDefaults boolForKey:@"RPC"] && [self.fDefaults boolForKey:@"RPCWebDiscovery"])
     {
-        [BonjourController.defaultController startWithPort:[self.fDefaults integerForKey:@"RPCPort"]];
+        [BonjourController.defaultController startWithPort:static_cast<int>([self.fDefaults integerForKey:@"RPCPort"])];
     }
 
     //shamelessly ask for donations
@@ -1677,6 +1692,55 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             }
             self.fUrlSheetController = nil;
         }];
+    }
+}
+
+- (void)openPasteboard
+{
+    // 1. If Pasteboard contains URL objects, we treat those and only those
+    NSArray<NSURL*>* arrayOfURLs = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSURL class] ] options:nil];
+
+    if (arrayOfURLs.count > 0)
+    {
+        for (NSURL* url in arrayOfURLs)
+        {
+            [self openURL:url.absoluteString];
+        }
+        return;
+    }
+
+    // 2. If Pasteboard contains String objects, we'll search for both links and magnets
+    NSArray<NSString*>* arrayOfStrings = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
+    if (arrayOfStrings.count == 0)
+    {
+        return;
+    }
+    // The link detector (can't detect magnets)
+    NSDataDetector* linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    // The magnet detector
+    // https://www.bittorrent.org/beps/bep_0009.html defines the magnet URI format as `magnet:?query` where query is non-empty.
+    // https://datatracker.ietf.org/doc/html/rfc3986 defines the query format rigorously as `([!$\&-;=?-Z_a-z~]|%[0-9A-F]{2})*`.
+    // But `tr_urlParse` acknowledges that magnet links can be malformed by "not escaping text in the display name".
+    // Those malformed magnets aren't URI anymore, and since a display name can potentially contain any Unicode except '/' (see `isUnixReservedChar`), we may want to be liberal on what we accept.
+    // In practice, copy-pasted magnets might most often be separated by Horizontal tab, Line feed, Carriage Return, Space, XML delimiters '<' '>', JSON delimiter '"' and Markdown delimiter '`'.
+    // But for now, we'll keep the historical separator choice from 8392476b30491ffe7d8d64210f5cf3c3dd1d69ca, whitespaceAndNewlineCharacterSet, which is `[\p{Z}\v]`.
+    NSRegularExpression* magnetDetector = [NSRegularExpression regularExpressionWithPattern:@"magnet:?([^\\p{Z}\\v])+" options:kNilOptions
+                                                                                      error:nil];
+    for (NSString* itemString in arrayOfStrings)
+    {
+        // We open all links
+        for (NSTextCheckingResult* result in [linkDetector matchesInString:itemString options:0
+                                                                     range:NSMakeRange(0, itemString.length)])
+        {
+            [self openURL:result.URL.absoluteString];
+        }
+
+        // We open all magnets
+        for (NSTextCheckingResult* result in [magnetDetector matchesInString:itemString options:0
+                                                                       range:NSMakeRange(0, itemString.length)])
+        {
+            [self openURL:[itemString substringWithRange:result.range]];
+        }
     }
 }
 
@@ -3351,7 +3415,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSView* senderView = sender;
     CGFloat width = NSWidth(senderView.frame);
 
-    if (NSMinX(self.fWindow.frame) < width || NSMaxX(self.fWindow.screen.frame) - NSMinX(self.fWindow.frame) < width * 2)
+    if (NSMinX(self.fWindow.frame) < width || NSMaxX(self.fWindow.screen.visibleFrame) - NSMinX(self.fWindow.frame) < width * 2)
     {
         // Ugly hack to hide NSPopover arrow.
         self.fPositioningView = [[NSView alloc] initWithFrame:senderView.bounds];
@@ -5288,12 +5352,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSScreen* screen = self.fWindow.screen;
     if (screen)
     {
-        NSSize maxSize = screen.frame.size;
+        NSSize maxSize = screen.visibleFrame.size;
         maxSize.height -= self.toolbarHeight;
         maxSize.height -= self.mainWindowComponentHeight;
-
-        //add a small buffer
-        maxSize.height -= 50;
 
         if (height > maxSize.height)
         {
@@ -5377,11 +5438,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (void)linkDonate:(id)sender
 {
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
-}
-
-- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
-{
-    self.fQuitRequested = YES;
 }
 
 - (void)rpcCallback:(tr_rpc_callback_type)type forTorrentStruct:(struct tr_torrent*)torrentStruct
@@ -5533,6 +5589,20 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fTorrents sortUsingDescriptors:descriptors];
 
     [self sortTorrentsAndIncludeQueueOrder:YES];
+}
+
+@end
+
+@implementation Controller (SUUpdaterDelegate)
+
+- (void)updaterWillRelaunchApplication:(SUUpdater*)updater
+{
+    self.fQuitRequested = YES;
+}
+
+- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater*)updater
+{
+    return [VersionComparator new];
 }
 
 @end

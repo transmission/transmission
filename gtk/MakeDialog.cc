@@ -542,7 +542,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
     file_radio_->signal_toggled().connect([this]() { onSourceToggled(file_radio_, file_chooser_); });
     file_chooser_->signal_selection_changed().connect([this]() { onChooserChosen(file_chooser_); });
 
-    pieces_lb_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("No source selected")));
+    pieces_lb_->set_markup(fmt::format("<i>{:s}</i>", _("No source selected")));
 
     piece_size_scale_->set_visible(false);
     piece_size_scale_->signal_value_changed().connect([this]() { onPieceSizeUpdated(); });

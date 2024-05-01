@@ -18,6 +18,10 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         FORCE)
 endif()
 
+if(VCPKG_TARGET_ANDROID)
+    include(cmake/VcpkgAndroid.cmake)
+endif()
+
 project(transmission)
 
 set(TR_THIRD_PARTY_DIR_NAME third-party)
@@ -104,6 +108,19 @@ elseif(NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
 else()
     set(TR_STABLE_RELEASE 1)
 endif()
+
+# derived from above: CFBundleVersion
+# note: CFBundleVersion only honors 3 numbers, so third number has to hold both patch and beta info.
+# 5.0.1-dev     -> 14719.0.100
+# 5.0.1-beta.1  -> 14719.0.101
+# 5.0.1         -> 14719.0.199
+math(EXPR CFBUNDLE_1 "${TR_VERSION_MAJOR} + 14714")
+math(EXPR CFBUNDLE_2 "${TR_VERSION_MINOR}")
+math(EXPR CFBUNDLE_3 "${TR_VERSION_PATCH} * 100 + 0${TR_STABLE_RELEASE} * 99 + 0${TR_VERSION_BETA_NUMBER}")
+set(CFBUNDLE_VERSION "${CFBUNDLE_1}.${CFBUNDLE_2}.${CFBUNDLE_3}")
+unset(CFBUNDLE_1)
+unset(CFBUNDLE_2)
+unset(CFBUNDLE_3)
 
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
@@ -493,7 +510,13 @@ if(NOT USE_SYSTEM_NATPMP)
             NATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+if(WIN32)
+    # https://github.com/miniupnp/miniupnp/pull/304
+    set(TR_MINIUPNPC_LIBNAME libminiupnpc)
+else()
+    set(TR_MINIUPNPC_LIBNAME miniupnpc)
+endif()
+tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
@@ -504,9 +527,10 @@ if(NOT USE_SYSTEM_MINIUPNPC)
         INTERFACE
             MINIUPNP_STATICLIB)
 
-    set(MINIUPNPC_VERSION 1.9)
-    set(MINIUPNPC_API_VERSION 12)
+    set(MINIUPNPC_VERSION 2.2)
+    set(MINIUPNPC_API_VERSION 17)
 endif()
+unset(TR_MINIUPNPC_LIBNAME)
 
 target_compile_definitions(miniupnpc::libminiupnpc
     INTERFACE
@@ -626,7 +650,6 @@ else()
         -Wextra
         -Wcast-align
         -Wduplicated-cond
-        -Wexit-time-destructors
         -Wextra-semi
         -Wextra-semi-stmt
         -Wextra-tokens

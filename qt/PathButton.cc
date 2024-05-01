@@ -63,11 +63,6 @@ void PathButton::setPath(QString const& path)
     emit pathChanged(path_);
 }
 
-QString const& PathButton::path() const
-{
-    return path_;
-}
-
 QSize PathButton::sizeHint() const
 {
     auto const sh = QToolButton::sizeHint();

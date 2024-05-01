@@ -51,17 +51,17 @@ using namespace std::literals;
 namespace
 {
 /* unless the tracker says otherwise, rescrape this frequently */
-auto constexpr DefaultScrapeIntervalSec = int{ 60 * 30 };
+auto constexpr DefaultScrapeIntervalSec = 60 * 30;
 
 /* the value of the 'numwant' argument passed in tracker requests. */
-auto constexpr Numwant = int{ 80 };
+auto constexpr Numwant = 80;
 
 /* how often to announce & scrape */
-auto constexpr MaxAnnouncesPerUpkeep = int{ 20 };
-auto constexpr MaxScrapesPerUpkeep = int{ 20 };
+auto constexpr MaxAnnouncesPerUpkeep = 20;
+auto constexpr MaxScrapesPerUpkeep = 20;
 
 /* how many infohashes to remove when we get a scrape-too-long error */
-auto constexpr TrMultiscrapeStep = int{ 5 };
+auto constexpr TrMultiscrapeStep = 5;
 
 struct StopsCompare
 {
@@ -240,9 +240,8 @@ std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_annou
 struct tr_tracker
 {
     explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
-        : host_and_port{ info.host_and_port }
-        , announce_url{ info.announce }
-        , sitename{ info.sitename }
+        : announce_url{ info.announce }
+        , announce_parsed{ info.announce_parsed }
         , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
         , id{ info.id }
     {
@@ -335,9 +334,8 @@ struct tr_tracker
         return false;
     }
 
-    tr_interned_string const host_and_port;
     tr_interned_string const announce_url;
-    std::string_view const sitename;
+    tr_url_parsed_t const announce_parsed;
     tr_scrape_info* const scrape_info;
 
     std::string tracker_id;
@@ -352,17 +350,6 @@ private:
     std::optional<int64_t> download_count_;
     std::optional<int64_t> downloader_count_;
 };
-
-// format: `${host}:${port}`
-tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
-{
-    auto buf = std::array<char, 1024>{};
-    auto* const begin = std::data(buf);
-    auto const* const end = fmt::format_to_n(begin, std::size(buf), "{:s}:{:d}", parsed.host, parsed.port).out;
-    auto const sv = std::string_view{ begin, static_cast<size_t>(end - begin) };
-
-    return tr_interned_string{ sv };
-}
 
 // ---
 
@@ -463,11 +450,12 @@ struct tr_tier
         return std::nullopt;
     }
 
-    [[nodiscard]] std::string buildLogName() const
+    [[nodiscard]] auto buildLogName() const
     {
-        auto const* const current_tracker = currentTracker();
-        auto const host_and_port_sv = current_tracker == nullptr ? "?"sv : current_tracker->host_and_port.sv();
-        return fmt::format("{:s} at {:s}", tor->name(), host_and_port_sv);
+        auto const* const tracker = currentTracker();
+        return tracker != nullptr ?
+            fmt::format("{:s} at {:s}:{:d}", tor->name(), tracker->announce_parsed.host, tracker->announce_parsed.port) :
+            fmt::format("{:s} at ?", tor->name());
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -536,10 +524,10 @@ struct tr_tier
 
 private:
     // unless the tracker says otherwise, this is the announce interval
-    static auto constexpr DefaultAnnounceIntervalSec = int{ 60 * 10 };
+    static auto constexpr DefaultAnnounceIntervalSec = 60 * 10;
 
     // unless the tracker says otherwise, this is the announce min_interval
-    static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
+    static auto constexpr DefaultAnnounceMinIntervalSec = 60 * 2;
 
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, time_t interval_secs)
     {
@@ -1243,27 +1231,29 @@ namespace on_scrape_done_helpers
 
 void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* errmsg)
 {
-    // increment the error count
-    auto* current_tracker = tier->currentTracker();
-    if (current_tracker != nullptr)
+    if (auto* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
     {
         ++current_tracker->consecutive_failures;
+
+        tr_logAddDebugTier(
+            tier,
+            fmt::format(
+                "Tracker '{}' scrape error: {} (Can retry in {} seconds)",
+                current_tracker->announce_parsed.authority,
+                errmsg,
+                current_tracker->getRetryInterval()));
     }
 
     // set the error message
     tier->last_scrape_str = errmsg != nullptr ? errmsg : "";
+    tier->lastScrapeSucceeded = false;
 
     // switch to the next tracker
-    current_tracker = tier->useNextTracker();
-
-    // schedule a rescrape
-    auto const interval = current_tracker->getRetryInterval();
-    auto const* const host_and_port_cstr = current_tracker->host_and_port.c_str();
-    tr_logAddDebugTier(
-        tier,
-        fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", host_and_port_cstr, errmsg, interval));
-    tier->lastScrapeSucceeded = false;
-    tier->scheduleNextScrape(interval);
+    if (auto* const current_tracker = tier->useNextTracker(); current_tracker != nullptr)
+    {
+        // schedule a rescrape
+        tier->scheduleNextScrape(current_tracker->getRetryInterval());
+    }
 }
 
 void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const& response)
@@ -1293,7 +1283,7 @@ void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const&
     if (multiscrape_max != n)
     {
         // don't log the full URL, since that might have a personal announce id
-        tr_logAddDebug(fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n), tr_urlTrackerLogName(url));
+        tr_logAddDebug(fmt::format("Reducing multiscrape max to {:d}", n), tr_urlTrackerLogName(url));
 
         multiscrape_max = n;
     }
@@ -1485,9 +1475,9 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might download */
-    if (auto const is_done_a = a->tor->is_done(), is_done_b = b->tor->is_done(); is_done_a != is_done_b)
+    if (auto const val = tr_compare_3way(a->tor->is_done(), b->tor->is_done()); val != 0)
     {
-        return is_done_a ? 1 : -1;
+        return val;
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */
@@ -1617,17 +1607,20 @@ namespace tracker_view_helpers
 {
 [[nodiscard]] auto trackerView(tr_torrent const& tor, size_t tier_index, tr_tier const& tier, tr_tracker const& tracker)
 {
+    auto const& announce = tracker.announce_parsed;
     auto const now = tr_time();
     auto view = tr_tracker_view{};
 
-    view.host_and_port = tracker.host_and_port.c_str();
+    *fmt::format_to_n(
+         std::data(view.host_and_port),
+         std::size(view.host_and_port) - 1U,
+         "{:s}:{:d}",
+         announce.host,
+         announce.port)
+         .out = '\0';
+    *fmt::format_to_n(std::data(view.sitename), std::size(view.sitename) - 1U, "{:s}", announce.sitename).out = '\0';
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
-    *std::copy_n(
-        std::begin(tracker.sitename),
-        std::min(std::size(tracker.sitename), sizeof(view.sitename) - 1),
-        view.sitename) = '\0';
-
     view.id = tracker.id;
     view.tier = tier_index;
     view.isBackup = &tracker != tier.currentTracker();
@@ -1651,7 +1644,8 @@ namespace tracker_view_helpers
             view.lastScrapeTime = tier.lastScrapeTime;
             view.lastScrapeSucceeded = tier.lastScrapeSucceeded;
             view.lastScrapeTimedOut = tier.lastScrapeTimedOut;
-            tr_strlcpy(view.lastScrapeResult, tier.last_scrape_str.c_str(), sizeof(view.lastScrapeResult));
+            auto& buf = view.lastScrapeResult;
+            *fmt::format_to_n(buf, sizeof(buf) - 1, "{:s}", tier.last_scrape_str).out = '\0';
         }
 
         if (tier.isScraping)
@@ -1681,7 +1675,8 @@ namespace tracker_view_helpers
             view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;
             view.lastAnnounceTimedOut = tier.lastAnnounceTimedOut;
             view.lastAnnouncePeerCount = tier.lastAnnouncePeerCount;
-            tr_strlcpy(view.lastAnnounceResult, tier.last_announce_str.c_str(), sizeof(view.lastAnnounceResult));
+            auto& buf = view.lastAnnounceResult;
+            *fmt::format_to_n(buf, sizeof(buf) - 1, "{:s}", tier.last_announce_str).out = '\0';
         }
 
         if (tier.isAnnouncing)

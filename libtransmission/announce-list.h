@@ -14,8 +14,9 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/interned-string.h"
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 #include "libtransmission/variant.h"
+#include "libtransmission/web-utils.h"
 
 struct tr_error;
 struct tr_url_parsed_t;
@@ -27,9 +28,7 @@ public:
     {
         tr_interned_string announce;
         tr_interned_string scrape;
-        tr_interned_string host_and_port; // 'example.org:80'
-        tr_interned_string sitename; // 'example'
-        tr_interned_string query; // 'name=ferret'
+        tr_url_parsed_t announce_parsed;
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
@@ -102,12 +101,12 @@ public:
 
     void add_to_map(tr_variant::Map& setme) const;
 
-    bool add(std::string_view announce_url_sv)
+    bool add(std::string_view announce_url)
     {
-        return add(announce_url_sv, this->nextTier());
+        return add(announce_url, this->nextTier());
     }
 
-    bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
+    bool add(std::string_view announce_url, tr_tracker_tier_t tier);
     void add(tr_announce_list const& src);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);

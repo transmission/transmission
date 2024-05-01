@@ -52,6 +52,9 @@ void TorrentFilter::onPrefChanged(int key)
     case Prefs::SORT_REVERSED:
         msec = FastMSec;
         break;
+
+    default:
+        break;
     }
 
     // if this pref change affects filtering, ensure that a refilter is queued
@@ -240,9 +243,15 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
 std::array<int, FilterMode::NUM_MODES> TorrentFilter::countTorrentsPerMode() const
 {
-    std::array<int, FilterMode::NUM_MODES> torrent_counts = {};
+    auto* const torrent_model = dynamic_cast<TorrentModel*>(sourceModel());
+    if (torrent_model == nullptr)
+    {
+        return {};
+    }
 
-    for (auto const& tor : dynamic_cast<TorrentModel*>(sourceModel())->torrents())
+    auto torrent_counts = std::array<int, FilterMode::NUM_MODES>{};
+
+    for (auto const& tor : torrent_model->torrents())
     {
         for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
         {

@@ -308,6 +308,27 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
         break;
     }
 
+    // add time when downloading
+    auto const seed_ratio_limit = tor.getSeedRatioLimit();
+    if ((seed_ratio_limit && tor.isSeeding()) || tor.isDownloading())
+    {
+        if (tor.hasETA())
+        {
+            //: Second (optional) part of torrent progress string,
+            //: %1 is duration,
+            //: notice that leading space (before the dash) is included here
+            str += QStringLiteral("    ");
+            str += tr("%1 left").arg(Formatter::time_to_string(tor.getETA()));
+        }
+        else
+        {
+            //: Second (optional) part of torrent progress string,
+            //: notice that leading space (before the dash) is included here
+            str += QStringLiteral("    ");
+            str += tr("Remaining time unknown");
+        }
+    }
+
     return str.trimmed();
 }
 
@@ -505,20 +526,15 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     }
 
     auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
+    auto const color_group = is_item_active ? QPalette::Normal : QPalette::Inactive;
+    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
-    auto color_group = QPalette::Normal;
-
+    auto text_color = (tor.hasError() && !is_item_selected) ? QColor{ Qt::GlobalColor::red } :
+                                                              option.palette.color(color_group, color_role);
     if (is_paused || !is_item_enabled)
     {
-        color_group = QPalette::Disabled;
+        text_color.setAlphaF(0.5);
     }
-
-    if (color_group == QPalette::Normal && !is_item_active)
-    {
-        color_group = QPalette::Inactive;
-    }
-
-    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
     QStyle::State progress_bar_state(option.state);
 
@@ -539,14 +555,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
                                     option.font, option.direction,    content_rect.topLeft(), content_rect.width() };
 
     // render
-    if (tor.hasError() && !is_item_selected)
-    {
-        painter->setPen(QColor{ "red" });
-    }
-    else
-    {
-        painter->setPen(option.palette.color(color_group, color_role));
-    }
+    painter->setPen(text_color);
 
     tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, icon_mode, icon_state);
 

@@ -21,7 +21,6 @@
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
 #include <libtransmission/file.h> // tr_sys_file_*()
-#include <libtransmission/platform.h> // TR_PATH_DELIMITER
 #include <libtransmission/quark.h>
 #include <libtransmission/torrent-ctor.h>
 #include <libtransmission/torrent.h>
@@ -141,6 +140,14 @@ public:
         return sandbox_dir_;
     }
 
+    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
+    {
+        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        tr_sys_dir_create_temp(std::data(path));
+        tr_sys_path_native_separators(std::data(path));
+        return path;
+    }
+
 protected:
     static std::string get_default_parent_dir()
     {
@@ -151,14 +158,6 @@ protected:
 
         auto error = tr_error{};
         return tr_sys_dir_get_current(&error);
-    }
-
-    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
-    {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
-        tr_sys_dir_create_temp(std::data(path));
-        tr_sys_path_native_separators(std::data(path));
-        return path;
     }
 
     static void rimraf(std::string const& path, bool verbose = false)
@@ -247,8 +246,6 @@ protected:
         auto error = tr_error{};
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
         blockingFileWrite(fd, payload, n, &error);
-        tr_sys_file_flush(fd, &error);
-        tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);
         if (error)
         {
@@ -275,8 +272,6 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
-        tr_sys_file_flush(fd);
-        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 
@@ -383,7 +378,7 @@ protected:
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
         //     512 files-filled-with-zeroes/512
-        char const* benc_base64 =
+        static auto constexpr BencBase64 =
             "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
             "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
             "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
@@ -404,7 +399,7 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto const benc = tr_base64_decode(benc_base64);
+        auto const benc = tr_base64_decode(BencBase64);
         EXPECT_LT(0U, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
         auto error = tr_error{};
@@ -438,12 +433,26 @@ protected:
                     tr_sys_file_write(fd, &ch, 1, nullptr);
                 }
 
-                tr_sys_file_flush(fd);
                 tr_sys_file_close(fd);
+                sync();
             }
         }
 
         auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
+        tr_ctorFree(ctor);
+        return tor;
+    }
+
+    [[nodiscard]] tr_torrent* zeroTorrentMagnetInit()
+    {
+        static auto constexpr V1Hash = "fa5794674a18241bec985ddc3390e3cb171345e4";
+
+        auto ctor = tr_ctorNew(session_);
+        ctor->set_metainfo_from_magnet_link(V1Hash);
+        tr_ctorSetPaused(ctor, TR_FORCE, true);
+
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+        EXPECT_NE(nullptr, tor);
         tr_ctorFree(ctor);
         return tor;
     }

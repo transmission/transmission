@@ -191,6 +191,10 @@ target_sources(${TR_NAME}-mac
         TrackerTableView.mm
         URLSheetWindowController.h
         URLSheetWindowController.mm
+        Utils.h
+        Utils.mm
+        VersionComparator.h
+        VersionComparator.mm
         WebSeedTableView.h
         WebSeedTableView.mm)
 
@@ -341,12 +345,22 @@ set(LINGUAS
     de
     en
     es
+    eu
     fr
+    he
+    hu
     it
+    ja
     nl
-    pt_PT
+    pl
+    pt-BR
+    pt-PT
     ru
-    tr)
+    sv
+    tr
+    uk
+    zh-CN
+    zh-TW)
 
 if(ENABLE_NLS)
     set(ENABLED_LINGUAS ${LINGUAS})

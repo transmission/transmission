@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <set>
 #include <string>
@@ -50,7 +51,7 @@ static_assert(ProcessEventsTimeout > GenericRescanInterval);
 namespace libtransmission::test
 {
 
-enum class WatchMode
+enum class WatchMode : uint8_t
 {
     NATIVE,
     GENERIC
@@ -105,12 +106,8 @@ protected:
 
     static std::string createDir(std::string_view dirname, std::string_view basename)
     {
-        auto path = std::string{ dirname };
-        path += TR_PATH_DELIMITER;
-        path += basename;
-
+        auto path = fmt::format("{:s}/{:s}", dirname, basename);
         tr_sys_dir_create(path, 0, 0700);
-
         return path;
     }
 
@@ -151,7 +148,7 @@ TEST_P(WatchDirTest, initialScan)
     // setup: start with an empty directory.
     // this block confirms that it's empty
     {
-        auto called = bool{ false };
+        auto called = false;
         auto callback = [&called](std::string_view /*dirname*/, std::string_view /*basename*/)
         {
             called = true;
@@ -229,6 +226,7 @@ TEST_P(WatchDirTest, watch)
     EXPECT_TRUE(std::empty(names));
 }
 
+// TODO(ckerr): flaky test should be fixed instead of disabled
 TEST_P(WatchDirTest, DISABLED_retry)
 {
     auto const path = sandboxDir();
