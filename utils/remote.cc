@@ -1459,7 +1459,7 @@ void printTorrentList(tr_variant* top)
         for (size_t i = 0; i < num_torrents; ++i)
         {
             tr_variant* d = tr_variantListChild(list, i);
-            if (auto torId = int64_t{}; tr_variantDictFindInt(d, TR_KEY_id, &torId))
+            if (tr_variantDictFindInt(d, TR_KEY_id, nullptr))
                 tptrs.push_back(d);
         }
 
