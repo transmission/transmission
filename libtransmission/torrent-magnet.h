@@ -39,7 +39,7 @@ public:
         return size > 0 && size <= std::numeric_limits<int>::max();
     }
 
-    [[nodiscard]] constexpr auto is_complete() const noexcept
+    [[nodiscard]] auto is_complete() const noexcept
     {
         return std::empty(pieces_needed_);
     }
