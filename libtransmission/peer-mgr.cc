@@ -2366,7 +2366,6 @@ void tr_peerMgr::bandwidth_pulse()
     for (auto* const tor : torrents_)
     {
         tor->do_idle_work();
-        tor->do_magnet_idle_work();
     }
 
     reconnect_pulse();
