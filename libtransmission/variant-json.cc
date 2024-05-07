@@ -233,7 +233,7 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
         error_.set(
             EILSEQ,
             fmt::format(
-                _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})")),
                 fmt::arg("position", err_offset),
                 fmt::arg("text", std::string_view{ begin + err_offset, std::min(size_t{ 16U }, size - err_offset) }),
                 fmt::arg("error", rapidjson::GetParseError_En(err_code)),
