@@ -158,5 +158,5 @@ protected:
 
 private:
     class Impl;
-    std::shared_ptr<Impl> const impl_;
+    std::unique_ptr<Impl> const impl_;
 };

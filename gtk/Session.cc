@@ -32,6 +32,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
+#include <glibmm/refptr.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/variant.h>
 
@@ -88,6 +89,8 @@ public:
     void add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
+
+    void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
     void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
 
@@ -907,29 +910,33 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
+    impl_->remove_torrent(id, delete_files);
+}
+
+void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
+{
     struct CallbackUserData
     {
-        std::weak_ptr<Impl> impl;
+        Glib::RefPtr<Session> session;
         tr_torrent_id_t id;
         bool succeeded = false;
     };
 
-    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
+    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
         // This is the callback called from the Gtk main thread. If successfull,
         // it removes the torrent entry from the GUI.
         auto callback_this_thread = [](gpointer user_data) -> gboolean
         {
+            // Take ownership of the raw pointer, so it gets deleted when done.
             auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data));
             if (ud->succeeded)
             {
-                if (auto const impl = ud->impl.lock(); impl)
+                auto const& impl = *ud->session->impl_;
+                if (auto const& [torrent_, position_] = impl.find_torrent_by_id(ud->id); torrent_)
                 {
-                    if (auto const& [torrent_, position_] = impl->find_torrent_by_id(ud->id); torrent_)
-                    {
-                        /* remove from the gui */
-                        impl->get_raw_model()->remove(position_);
-                    }
+                    /* remove from the gui */
+                    impl.get_raw_model()->remove(position_);
                 }
             }
 
@@ -962,7 +969,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr,
             callback_other_thread,
-            new CallbackUserData{ impl_, id });
+            new CallbackUserData{ get_core_ptr(), id });
     }
 }
 
