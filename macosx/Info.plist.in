@@ -61,7 +61,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>14714.@TR_VERSION_MAJOR@.@TR_VERSION_MINOR@.@TR_VERSION_PATCH@</string>
+	<string>@CFBUNDLE_VERSION@</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>

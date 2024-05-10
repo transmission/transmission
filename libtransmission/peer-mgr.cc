@@ -347,7 +347,6 @@ public:
               tor_in->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
           } }
     {
-
         rebuild_webseeds();
     }
 
@@ -616,7 +615,7 @@ public:
     ActiveRequests active_requests;
 
     // depends-on: active_requests
-    std::vector<std::unique_ptr<tr_peer>> webseeds;
+    std::vector<std::unique_ptr<tr_webseed>> webseeds;
 
     // depends-on: active_requests
     Peers peers;
@@ -646,7 +645,7 @@ private:
         webseeds.reserve(n);
         for (size_t i = 0; i < n; ++i)
         {
-            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
+            webseeds.emplace_back(tr_webseed::create(*tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
         }
         webseeds.shrink_to_fit();
 
@@ -681,11 +680,9 @@ private:
 
     static void maybe_send_cancel_request(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
     {
-        auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
-        if (msgs != nullptr && msgs != muted)
+        if (peer != nullptr && peer != muted)
         {
-            peer->cancels_sent_to_peer.add(tr_time(), 1);
-            msgs->cancel_block_request(block);
+            peer->cancel_block_request(block);
         }
     }
 
@@ -780,9 +777,9 @@ private:
         // didn't have the metadata before now... so refresh them all...
         for (auto* peer : peers)
         {
-            peer->onTorrentGotMetainfo();
+            peer->on_torrent_got_metainfo();
 
-            if (peer->isSeed())
+            if (peer->is_seed())
             {
                 mark_peer_as_seed(*peer->peer_info);
             }
@@ -1006,7 +1003,7 @@ size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piec
         std::begin(swarm_.peers),
         std::end(swarm_.peers),
         size_t{},
-        [piece](size_t acc, tr_peer* peer) { return acc + (peer->hasPiece(piece) ? 1U : 0U); });
+        [piece](size_t acc, tr_peer* peer) { return acc + (peer->has_piece(piece) ? 1U : 0U); });
 }
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
@@ -1195,10 +1192,10 @@ private:
 
 // --- tr_peer virtual functions
 
-tr_peer::tr_peer(tr_torrent const* tor)
-    : session{ tor->session }
-    , swarm{ tor->swarm }
-    , blame{ tor->block_count() }
+tr_peer::tr_peer(tr_torrent const& tor)
+    : session{ tor.session }
+    , swarm{ tor.swarm }
+    , blame{ tor.block_count() }
 {
 }
 
@@ -1263,7 +1260,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     swarm.update_endgame();
     return swarm.wishlist->next(
         numwant,
-        [peer](tr_piece_index_t p) { return peer->hasPiece(p); },
+        [peer](tr_piece_index_t p) { return peer->has_piece(p); },
         [peer, &swarm](tr_block_index_t b) { return swarm.active_requests.has(b, peer); });
 }
 
@@ -1294,15 +1291,14 @@ namespace
 {
 namespace handshake_helpers
 {
-void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_peer_info* peer_info, tr_interned_string client)
+void create_bit_torrent_peer(tr_torrent& tor, std::shared_ptr<tr_peerIo> io, tr_peer_info* peer_info, tr_interned_string client)
 {
     TR_ASSERT(peer_info != nullptr);
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->swarm != nullptr);
+    TR_ASSERT(tor.swarm != nullptr);
 
-    tr_swarm* swarm = tor->swarm;
+    tr_swarm* swarm = tor.swarm;
 
-    auto* peer = tr_peerMsgsNew(tor, peer_info, std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
+    auto* peer = tr_peerMsgs::create(tor, peer_info, std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
 
     swarm->peers.push_back(peer);
 
@@ -1399,7 +1395,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
 
     result.io->set_bandwidth(&swarm->tor->bandwidth());
-    create_bit_torrent_peer(swarm->tor, result.io, info, client);
+    create_bit_torrent_peer(*swarm->tor, result.io, info, client);
 
     return true;
 }
@@ -1443,7 +1439,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->blocklists_.contains(pex->socket_address.address()) && pex->is_valid_for_peers() &&
+            !s->manager->blocklists_.contains(pex->socket_address.address()) && pex->is_valid_for_peers(from) &&
             from != TR_PEER_FROM_INCOMING && (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
@@ -1635,7 +1631,7 @@ int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece
     }
 
     auto const& peers = tor->swarm->peers;
-    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->hasPiece(piece); });
+    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->has_piece(piece); });
 }
 
 void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs)
@@ -1723,7 +1719,7 @@ tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i)
     size_t const n = std::size(tor->swarm->webseeds);
     TR_ASSERT(i < n);
 
-    return i >= n ? tr_webseed_view{} : tr_webseedView(tor->swarm->webseeds[i].get());
+    return i >= n ? tr_webseed_view{} : tor->swarm->webseeds[i]->get_view();
 }
 
 namespace
@@ -1741,7 +1737,7 @@ namespace peer_stat_helpers
     stats.client = peer->user_agent().c_str();
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
-    stats.progress = peer->percentDone();
+    stats.progress = peer->percent_done();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
     stats.rateToPeer_KBps = peer->get_piece_speed(now_msec, TR_CLIENT_TO_PEER).count(Speed::Units::KByps);
@@ -1753,15 +1749,15 @@ namespace peer_stat_helpers
     stats.isIncoming = peer->is_incoming_connection();
     stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
     stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
-    stats.isSeed = peer->isSeed();
+    stats.isSeed = peer->is_seed();
 
     stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
     stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
     stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
     stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
-    stats.activeReqsToPeer = peer->activeReqCount(TR_CLIENT_TO_PEER);
-    stats.activeReqsToClient = peer->activeReqCount(TR_PEER_TO_CLIENT);
+    stats.activeReqsToPeer = peer->active_req_count(TR_CLIENT_TO_PEER);
+    stats.activeReqsToClient = peer->active_req_count(TR_PEER_TO_CLIENT);
 
     char* pch = stats.flagStr;
 
@@ -1832,8 +1828,6 @@ namespace peer_stat_helpers
 
 tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 {
-    using namespace peer_stat_helpers;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
@@ -1841,13 +1835,22 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
     auto const n = std::size(peers);
     auto* const ret = new tr_peer_stat[n];
 
-    auto const now = tr_time();
-    auto const now_msec = tr_time_msec();
-    std::transform(
-        std::begin(peers),
-        std::end(peers),
-        ret,
-        [&now, &now_msec](auto const* peer) { return get_peer_stats(peer, now, now_msec); });
+    // TODO: re-implement as a callback solution (similar to tr_sessionSetCompletenessCallback) in case present call to run_in_session_thread is causing hangs when the peers info window is displayed.
+    auto done_promise = std::promise<void>{};
+    auto done_future = done_promise.get_future();
+    tor->session->run_in_session_thread(
+        [&peers, &ret, &done_promise]()
+        {
+            auto const now = tr_time();
+            auto const now_msec = tr_time_msec();
+            std::transform(
+                std::begin(peers),
+                std::end(peers),
+                ret,
+                [&now, &now_msec](auto const* peer) { return peer_stat_helpers::get_peer_stats(peer, now, now_msec); });
+            done_promise.set_value();
+        });
+    done_future.wait();
 
     *setme_count = n;
     return ret;
@@ -1867,14 +1870,14 @@ namespace update_interest_helpers
     TR_ASSERT(!tor->is_done());
     TR_ASSERT(tor->client_can_download());
 
-    if (peer->isSeed())
+    if (peer->is_seed())
     {
         return true;
     }
 
     for (tr_piece_index_t i = 0; i < tor->piece_count(); ++i)
     {
-        if (piece_is_interesting[i] && peer->hasPiece(i))
+        if (piece_is_interesting[i] && peer->has_piece(i))
         {
             return true;
         }
@@ -1895,11 +1898,11 @@ void updateInterest(tr_swarm* swarm)
 
     if (auto const& peers = swarm->peers; !std::empty(peers))
     {
-        int const n = tor->piece_count();
+        auto const n = tor->piece_count();
 
         // build a bitfield of interesting pieces...
         auto piece_is_interesting = std::vector<bool>(n);
-        for (int i = 0; i < n; ++i)
+        for (tr_piece_index_t i = 0U; i < n; ++i)
         {
             piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
         }
@@ -2010,7 +2013,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     auto salter = tr_salt_shaker{};
     for (auto* const peer : peers)
     {
-        if (peer->isSeed())
+        if (peer->is_seed())
         {
             /* choke seeds and partial seeds */
             peer->set_choke(true);
@@ -2151,7 +2154,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     auto const* const info = peer->peer_info;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->is_done() && peer->isSeed())
+    if (tor->is_done() && peer->is_seed())
     {
         return !tor->allows_pex() || info->idle_secs(now).value_or(0U) >= 30U;
     }

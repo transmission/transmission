@@ -339,7 +339,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (pex_.is_valid_for_peers())
+            if (pex_.is_valid())
             {
                 response_.pex.push_back(pex_);
                 pex_ = {};

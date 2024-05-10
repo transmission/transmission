@@ -561,7 +561,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
     /* no piece data in handshake */
     *piece = 0;
 
-    tr_logAddTraceHand(handshake, fmt::format("handling canRead; state is [{}]", handshake->state_string()));
+    tr_logAddTraceHand(handshake, fmt::format("handling can_read; state is [{}]", handshake->state_string()));
 
     ReadState ret = READ_NOW;
     while (ret == READ_NOW)
@@ -626,6 +626,17 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 {
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
+    auto const retry = [&]()
+    {
+        handshake->send_handshake(io);
+        handshake->set_state(State::AwaitingHandshake);
+    };
+    auto const fail = [&]()
+    {
+        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message(), error.code()));
+        handshake->done(false);
+    };
+
     if (io->is_utp() && !io->is_incoming() && handshake->is_state(State::AwaitingYb))
     {
         // the peer probably doesn't speak µTP.
@@ -641,10 +652,12 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 
         if (handshake->mediator_->allows_tcp() && io->reconnect())
         {
-            handshake->send_handshake(io);
-            handshake->set_state(State::AwaitingHandshake);
+            retry();
             return;
         }
+
+        fail();
+        return;
     }
 
     /* if the error happened while we were sending a public key, we might
@@ -654,13 +667,11 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect())
     {
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
-        handshake->send_handshake(io);
-        handshake->set_state(State::AwaitingHandshake);
+        retry();
         return;
     }
 
-    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message(), error.code()));
-    handshake->done(false);
+    fail();
 }
 
 // ---

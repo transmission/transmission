@@ -101,29 +101,29 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto const* val = group_map->find_if<bool>(TR_KEY_uploadLimited); val != nullptr)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_uploadLimited))
         {
             limits.up_limited = *val;
         }
 
-        if (auto const* val = group_map->find_if<bool>(TR_KEY_downloadLimited); val != nullptr)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_downloadLimited))
         {
             limits.down_limited = *val;
         }
 
-        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_uploadLimit))
         {
             limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_downloadLimit))
         {
             limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
 
-        if (auto const* val = group_map->find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_honorsSessionLimits))
         {
             group.honor_parent_limits(TR_UP, *val);
             group.honor_parent_limits(TR_DOWN, *val);
@@ -565,7 +565,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     // if logging is desired, start it now before doing more work
     if (auto const* settings_map = settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
-        if (auto const* val = settings_map->find_if<bool>(TR_KEY_message_level); val != nullptr)
+        if (auto const val = settings_map->value_if<bool>(TR_KEY_message_level))
         {
             tr_logSetLevel(static_cast<tr_log_level>(*val));
         }
@@ -736,7 +736,7 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(settings, true);
 
-    tr_utpInit(this);
+    tr_utp_init(this);
 
     /* cleanup */
     data.done_cv.notify_one();
@@ -1406,7 +1406,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     stats().save();
     peer_mgr_.reset();
     openFiles().close_all();
-    tr_utpClose(this);
+    tr_utp_close(this);
     this->udp_core_.reset();
 
     // tada we are done!

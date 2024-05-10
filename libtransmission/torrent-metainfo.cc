@@ -32,7 +32,7 @@ using namespace std::literals;
 /**
  * @brief Ensure that the URLs for multfile torrents end in a slash.
  *
- * See http://bittorrent.org/beps/bep_0019.html#metadata-extension
+ * See https://www.bittorrent.org/beps/bep_0019.html#metadata-extension
  * for background on how the trailing slash is used for "url-list"
  * fields.
  *
@@ -513,7 +513,7 @@ private:
     bool finish(Context const& context)
     {
         // bittorrent 1.0 spec
-        // http://bittorrent.org/beps/bep_0003.html
+        // https://www.bittorrent.org/beps/bep_0003.html
         //
         // "There is also a key length or a key files, but not both or neither.
         //

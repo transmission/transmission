@@ -72,7 +72,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
                                                   timeoutInterval:15.0];
 
     _fTask = [_fSession dataTaskWithRequest:portProbeRequest
-                          completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable response, NSError* _Nullable error) {
+                          completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable, NSError* _Nullable error) {
                               if (error)
                               {
                                   NSLog(@"Unable to get port status: connection failed (%@)", error.localizedDescription);

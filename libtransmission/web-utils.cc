@@ -340,8 +340,13 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         auto remain = parsed.authority;
         if (tr_strv_starts_with(remain, '['))
         {
-            remain.remove_prefix(1); // '['
-            parsed.host = tr_strv_sep(&remain, ']');
+            pos = remain.find(']');
+            if (pos == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+            parsed.host = remain.substr(0, pos + 1);
+            remain.remove_prefix(pos + 1);
             if (tr_strv_starts_with(remain, ':'))
             {
                 remain.remove_prefix(1);
@@ -389,7 +394,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
 {
     auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? parsed : std::nullopt;
 }
 
 bool tr_urlIsValidTracker(std::string_view url)

@@ -23,13 +23,13 @@ using CompletionTest = ::testing::Test;
 namespace
 {
 
-struct TestTorrent : public tr_completion::torrent_view
+struct TestTorrent
 {
     std::set<tr_piece_index_t> dnd_pieces;
 
-    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
+    [[nodiscard]] tr_completion makeCompletion(tr_block_info const& block_info) const
     {
-        return dnd_pieces.count(piece) == 0;
+        return { [this](tr_piece_index_t const piece) { return dnd_pieces.count(piece) == 0; }, &block_info };
     }
 };
 
@@ -41,7 +41,7 @@ TEST_F(CompletionTest, MagnetLink)
 {
     auto torrent = TestTorrent{};
     auto block_info = tr_block_info{};
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
 
     EXPECT_FALSE(completion.has_all());
     EXPECT_TRUE(completion.has_none());
@@ -64,7 +64,7 @@ TEST_F(CompletionTest, setBlocks)
 
     auto torrent = TestTorrent{};
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_FALSE(completion.blocks().has_all());
     EXPECT_FALSE(completion.has_all());
     EXPECT_EQ(0, completion.has_total());
@@ -85,7 +85,7 @@ TEST_F(CompletionTest, hasBlock)
     auto constexpr TotalSize = uint64_t{ BlockSize * 4096 };
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
 
     EXPECT_FALSE(completion.has_block(0));
     EXPECT_FALSE(completion.has_block(1));
@@ -106,7 +106,7 @@ TEST_F(CompletionTest, hasBlocks)
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_FALSE(completion.has_blocks({ 0, 1 }));
     EXPECT_FALSE(completion.has_blocks({ 0, 2 }));
 
@@ -122,7 +122,7 @@ TEST_F(CompletionTest, hasNone)
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_TRUE(completion.has_none());
 
     completion.add_block(0);
@@ -137,7 +137,7 @@ TEST_F(CompletionTest, hasPiece)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     // check that the initial state does not have it
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_FALSE(completion.has_piece(0));
     EXPECT_FALSE(completion.has_piece(1));
     EXPECT_EQ(0, completion.has_valid());
@@ -174,7 +174,7 @@ TEST_F(CompletionTest, percentCompleteAndDone)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     // check that in blank-slate initial state, isDone() is false
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_DOUBLE_EQ(0.0, completion.percent_complete());
     EXPECT_DOUBLE_EQ(0.0, completion.percent_done());
 
@@ -187,7 +187,7 @@ TEST_F(CompletionTest, percentCompleteAndDone)
     EXPECT_DOUBLE_EQ(0.5, completion.percent_done());
 
     // but marking some of the pieces we have as unwanted
-    // should not change percentDone
+    // should not change percent_done
     for (size_t i = 0; i < 16; ++i)
     {
         torrent.dnd_pieces.insert(i);
@@ -197,7 +197,7 @@ TEST_F(CompletionTest, percentCompleteAndDone)
     EXPECT_DOUBLE_EQ(0.5, completion.percent_done());
 
     // but marking some of the pieces we DON'T have as unwanted
-    // SHOULD change percentDone
+    // SHOULD change percent_done
     for (size_t i = 32; i < 48; ++i)
     {
         torrent.dnd_pieces.insert(i);
@@ -215,7 +215,7 @@ TEST_F(CompletionTest, hasTotalAndValid)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     // check that the initial blank-slate state has nothing
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_EQ(0, completion.has_total());
     EXPECT_EQ(completion.has_valid(), completion.has_total());
 
@@ -253,7 +253,7 @@ TEST_F(CompletionTest, leftUntilDone)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     // check that the initial blank-slate state has nothing
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_EQ(block_info.total_size(), completion.left_until_done());
 
     // check that adding the final piece adjusts by block_info.final_piece_size
@@ -301,7 +301,7 @@ TEST_F(CompletionTest, sizeWhenDone)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     // check that adding or removing blocks or pieces does not affect sizeWhenDone
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     EXPECT_EQ(block_info.total_size(), completion.size_when_done());
     completion.add_block(0);
     EXPECT_EQ(block_info.total_size(), completion.size_when_done());
@@ -336,7 +336,7 @@ TEST_F(CompletionTest, createPieceBitfield)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
 
     // make a completion object that has a random assortment of pieces
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
     auto buf = tr_rand_obj<std::array<char, 65>>();
     ASSERT_EQ(std::size(buf), block_info.piece_count());
     for (uint64_t i = 0; i < block_info.piece_count(); ++i)
@@ -368,7 +368,7 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
     auto constexpr TotalSize = uint64_t{ BlockSize * 4096 } + 1;
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
 
     EXPECT_EQ(block_info.piece_size(0), completion.count_missing_bytes_in_piece(0));
     completion.add_block(0);
@@ -391,7 +391,7 @@ TEST_F(CompletionTest, amountDone)
     auto constexpr TotalSize = uint64_t{ BlockSize * 4096 } + 1;
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
 
     // make bins s.t. each bin is a single piece
     auto bins = std::array<float, TotalSize / PieceSize>{};
@@ -435,7 +435,7 @@ TEST_F(CompletionTest, countHasBytesInSpan)
     auto constexpr TotalSize = uint64_t{ BlockSize * 4096 } + 1;
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
 
     // torrent is complete
     auto blocks = tr_bitfield{ block_info.block_count() };
@@ -479,7 +479,7 @@ TEST_F(CompletionTest, wantNone)
     auto constexpr TotalSize = uint64_t{ BlockSize * 4096 };
     auto constexpr PieceSize = uint64_t{ BlockSize * 64 };
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto completion = tr_completion(&torrent, &block_info);
+    auto completion = torrent.makeCompletion(block_info);
 
     // we have some data
     completion.add_block(0);
