@@ -114,7 +114,7 @@
                   <object class="GtkLabel" id="piece_size_label">
                     <property name="label" translatable="1">Piece size:</property>
                     <property name="use-underline">1</property>
-                    <property name="mnemonic-widget">piece_size_scale</property>
+                    <property name="mnemonic-widget">piece_size_combo</property>
                     <property name="xalign">0</property>
                     <layout>
                       <property name="column">0</property>
@@ -123,11 +123,9 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkScale" id="piece_size_scale">
+                  <object class="GtkComboBox" id="piece_size_combo">
                     <property name="focusable">1</property>
                     <property name="hexpand">1</property>
-                    <property name="digits">0</property>
-                    <property name="value-pos">left</property>
                     <layout>
                       <property name="column">1</property>
                       <property name="row">4</property>

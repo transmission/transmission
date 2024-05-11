@@ -137,7 +137,7 @@ private:
 
     void setFilename(std::string_view filename);
 
-    void configurePieceSizeScale(uint32_t piece_size);
+    void configurePieceSizeComboBox(uint32_t piece_size);
     void onPieceSizeUpdated();
 
 private:
@@ -149,7 +149,7 @@ private:
     Gtk::CheckButton* folder_radio_ = nullptr;
     PathButton* folder_chooser_ = nullptr;
     Gtk::Label* pieces_lb_ = nullptr;
-    Gtk::Scale* piece_size_scale_ = nullptr;
+    Gtk::ComboBox* piece_size_combo_ = nullptr;
     PathButton* destination_chooser_ = nullptr;
     Gtk::CheckButton* comment_check_ = nullptr;
     Gtk::Entry* comment_entry_ = nullptr;
@@ -380,7 +380,7 @@ void MakeDialog::Impl::updatePiecesLabel()
     if (!builder_.has_value() || std::empty(builder_->top()))
     {
         gstr += _("No source selected");
-        piece_size_scale_->set_visible(false);
+        piece_size_combo_->set_sensitive(false);
     }
     else
     {
@@ -401,12 +401,27 @@ void MakeDialog::Impl::updatePiecesLabel()
     pieces_lb_->set_text(gstr);
 }
 
-void MakeDialog::Impl::configurePieceSizeScale(uint32_t piece_size)
+void MakeDialog::Impl::configurePieceSizeComboBox(uint32_t piece_size)
 {
-    // the below lower & upper bounds would allow piece size selection between approx 1KiB - 64MiB
-    auto adjustment = Gtk::Adjustment::create(log2(piece_size), 10, 26, 1.0, 1.0);
-    piece_size_scale_->set_adjustment(adjustment);
-    piece_size_scale_->set_visible(true);
+    auto constexpr PieceSizeStart = 14; // 16 KiB
+    auto constexpr PieceSizeEnd = 28; // 256 MiB
+
+    auto active_index = PieceSizeStart;
+    auto options = std::vector<std::pair<Glib::ustring, int>>();
+
+    for (std::size_t i = PieceSizeStart; i <= PieceSizeEnd; i++)
+    {
+        std::size_t size = std::pow(2, i);
+        options.emplace_back(Memory{ size, MemoryUnits::Bytes }.to_string(), i);
+        if (size == piece_size)
+        {
+            active_index = i;
+        }
+    }
+
+    gtr_combo_box_set_enum(*piece_size_combo_, options);
+    gtr_combo_box_set_active_enum(*piece_size_combo_, active_index);
+    piece_size_combo_->set_sensitive(true);
 }
 
 void MakeDialog::Impl::setFilename(std::string_view filename)
@@ -416,7 +431,7 @@ void MakeDialog::Impl::setFilename(std::string_view filename)
     if (!filename.empty())
     {
         builder_.emplace(filename);
-        configurePieceSizeScale(builder_->piece_size());
+        configurePieceSizeComboBox(builder_->piece_size());
     }
 
     updatePiecesLabel();
@@ -523,7 +538,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
     , folder_radio_(gtr_get_widget<Gtk::CheckButton>(builder, "source_folder_radio"))
     , folder_chooser_(gtr_get_widget_derived<PathButton>(builder, "source_folder_button"))
     , pieces_lb_(gtr_get_widget<Gtk::Label>(builder, "source_size_label"))
-    , piece_size_scale_(gtr_get_widget<Gtk::Scale>(builder, "piece_size_scale"))
+    , piece_size_combo_(gtr_get_widget<Gtk::ComboBox>(builder, "piece_size_combo"))
     , destination_chooser_(gtr_get_widget_derived<PathButton>(builder, "destination_button"))
     , comment_check_(gtr_get_widget<Gtk::CheckButton>(builder, "comment_check"))
     , comment_entry_(gtr_get_widget<Gtk::Entry>(builder, "comment_entry"))
@@ -544,8 +559,8 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& bui
 
     pieces_lb_->set_markup(fmt::format("<i>{:s}</i>", _("No source selected")));
 
-    piece_size_scale_->set_visible(false);
-    piece_size_scale_->signal_value_changed().connect([this]() { onPieceSizeUpdated(); });
+    piece_size_combo_->set_sensitive(false);
+    piece_size_combo_->signal_changed().connect([this]() { onPieceSizeUpdated(); });
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     auto drop_controller = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
@@ -562,7 +577,8 @@ void MakeDialog::Impl::onPieceSizeUpdated()
 {
     if (builder_)
     {
-        builder_->set_piece_size(static_cast<uint32_t>(std::pow(2, piece_size_scale_->get_value())));
+        auto index = gtr_combo_box_get_active_enum(*piece_size_combo_);
+        builder_->set_piece_size(static_cast<uint32_t>(std::pow(2, index)));
         updatePiecesLabel();
     }
 }
