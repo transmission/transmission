@@ -23,6 +23,10 @@
 #include <sys/stat.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
+#ifdef HAVE_FLOCK
+#include <sys/file.h> /* flock() */
+#endif
+
 #ifdef HAVE_XFS_XFS_H
 #include <sys/file.h> /* flock() */
 #include <xfs/xfs.h>
