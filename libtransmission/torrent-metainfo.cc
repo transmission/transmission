@@ -522,7 +522,7 @@ private:
         // In the single file case, length maps to the length of the file in bytes.
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
-            tm_.files_.add(tm_.name_, length_);
+            tm_.files_.add(tr_torrent_files::makeSubpathPortable(tm_.name_), length_);
         }
 
         if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)
