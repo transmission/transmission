@@ -861,8 +861,8 @@ void torrentStop(tr_torrent* const tor)
     auto const lock = tor->unique_lock();
 
     auto const now = tr_time();
-    tor->seconds_downloading_before_current_start_ = seconds_downloading(now);
-    tor->seconds_seeding_before_current_start_ = seconds_seeding(now);
+    tor->seconds_downloading_before_current_start_ = tor->secondsDownloading(now);
+    tor->seconds_seeding_before_current_start_ = tor->secondsSeeding(now);
 
     tor->isRunning = false;
     tor->isStopping = false;
