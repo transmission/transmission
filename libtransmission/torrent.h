@@ -70,7 +70,7 @@ struct tr_torrent
     class ResumeHelper
     {
     public:
-        void load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
+        void load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*file_count()*/);
         void load_blocks(tr_bitfield blocks);
         void load_date_added(time_t when) noexcept;
         void load_date_done(time_t when) noexcept;

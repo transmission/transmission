@@ -1212,7 +1212,7 @@ bool tr_torrent::has_any_local_data() const
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return files().hasAnyLocalData(std::data(paths), n_paths);
+    return files().has_any_local_data(std::data(paths), n_paths);
 }
 
 void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
@@ -2548,7 +2548,7 @@ tr_bitfield const& tr_torrent::ResumeHelper::checked_pieces() const noexcept
     return tor_.checked_pieces_;
 }
 
-void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
+void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*file_count()*/)
 {
     TR_ASSERT(std::size(checked) == tor_.piece_count());
     tor_.checked_pieces_ = checked;
