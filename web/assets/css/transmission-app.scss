@@ -271,7 +271,6 @@ $toolbar-height: $toolbar-height-number * 1px;
 /// FILTERBAR
 
 .mainwin-filterbar {
-  white-space: nowrap;
   align-items: center;
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-default-border);
@@ -279,6 +278,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   flex-direction: row;
   height: 30px;
   padding-left: 5px;
+  white-space: nowrap;
 
   @include for-phone-only {
     :not(select):not(input):not(option):not(.flexible-space) {
@@ -287,8 +287,8 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 
   #torrent-search {
-    width: 100%;
     max-width: 160px;
+    width: 100%;
   }
 
   select {
