@@ -756,6 +756,10 @@ void tr_torrent::stop_now()
     TR_ASSERT(session->am_in_session_thread());
     auto const lock = unique_lock();
 
+    auto const now = tr_time();
+    seconds_downloading_before_current_start_ = seconds_downloading(now);
+    seconds_seeding_before_current_start_ = seconds_seeding(now);
+
     is_running_ = false;
     is_stopping_ = false;
     mark_changed();
