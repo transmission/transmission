@@ -887,6 +887,8 @@ struct tr_torrent
 
     void do_idle_work()
     {
+        do_magnet_idle_work();
+
         if (needs_completeness_check_)
         {
             needs_completeness_check_ = false;
@@ -1244,6 +1246,7 @@ private:
     void create_empty_files() const;
     void recheck_completeness();
 
+    void do_magnet_idle_work();
     [[nodiscard]] bool use_new_metainfo(tr_error* error);
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);

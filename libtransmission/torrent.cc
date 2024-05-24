@@ -899,7 +899,7 @@ void tr_torrent::on_metainfo_completed()
         // Potentially, we are in `tr_torrent::init`,
         // and we don't want any file created before `tr_torrent::start`
         // so we Verify but we don't Create files.
-        session->queue_session_thread(tr_torrentVerify, this);
+        tr_torrentVerify(this);
     }
     else
     {
