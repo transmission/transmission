@@ -267,7 +267,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     progress_bar_style_.state = progress_bar_state;
     progress_bar_style_.text = QStringLiteral("%1%").arg(
-        static_cast<int>(tr_truncd(100.0 * (tor.isSeeding() ? tor.ratio() / *tor.getSeedRatioLimit() : tor.percentDone()), 0)));
+        static_cast<int>(tr_truncd(100.0 * (tor.isDone() ? tor.ratio() / *tor.getSeedRatioLimit() : tor.percentDone()), 0)));
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
