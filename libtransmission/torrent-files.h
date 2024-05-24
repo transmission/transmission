@@ -155,18 +155,18 @@ public:
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
     [[nodiscard]] bool has_any_local_data(std::string_view const* paths, size_t n_paths) const;
 
-    static void make_subpath_portable(std::string_view path, tr_pathbuf& append_me);
+    static void sanitize_subpath(std::string_view path, tr_pathbuf& append_me, bool os_specific = true);
 
-    [[nodiscard]] static auto make_subpath_portable(std::string_view path)
+    [[nodiscard]] static auto sanitize_subpath(std::string_view path, bool os_specific = true)
     {
         auto tmp = tr_pathbuf{};
-        make_subpath_portable(path, tmp);
+        sanitize_subpath(path, tmp, os_specific);
         return std::string{ tmp.sv() };
     }
 
-    [[nodiscard]] static bool is_subpath_portable(std::string_view path)
+    [[nodiscard]] static bool is_subpath_sanitized(std::string_view path, bool os_specific = true)
     {
-        return make_subpath_portable(path) == path;
+        return sanitize_subpath(path, os_specific) == path;
     }
 
     static constexpr std::string_view PartialFileSuffix = ".part";

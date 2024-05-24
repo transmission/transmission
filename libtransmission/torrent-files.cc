@@ -365,8 +365,12 @@ namespace
         [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
 }
 
-[[nodiscard]] bool is_reserved_file(std::string_view in) noexcept
+[[nodiscard]] bool is_reserved_file(std::string_view in, bool os_specific) noexcept
 {
+    if (!os_specific)
+    {
+        return is_unix_reserved_file(in) || is_win32_reserved_file(in);
+    }
 #ifdef _WIN32
     return is_win32_reserved_file(in);
 #else
@@ -404,8 +408,12 @@ namespace
     }
 }
 
-[[nodiscard]] auto constexpr is_reserved_char(unsigned char ch) noexcept
+[[nodiscard]] auto constexpr is_reserved_char(unsigned char ch, bool os_specific) noexcept
 {
+    if (!os_specific)
+    {
+        return is_unix_reserved_char(ch) || is_win32_reserved_char(ch);
+    }
 #ifdef _WIN32
     return is_win32_reserved_char(ch);
 #else
@@ -414,7 +422,7 @@ namespace
 }
 
 // https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
-void append_sanitized_component(std::string_view in, tr_pathbuf& out)
+void append_sanitized_component(std::string_view in, tr_pathbuf& out, bool os_specific)
 {
 #ifdef _WIN32
     // remove leading and trailing spaces
@@ -428,27 +436,27 @@ void append_sanitized_component(std::string_view in, tr_pathbuf& out)
 #endif
 
     // replace reserved filenames with an underscore
-    if (is_reserved_file(in))
+    if (is_reserved_file(in, os_specific))
     {
         out.append('_');
     }
 
     // replace reserved characters with an underscore
-    static auto constexpr AddChar = [](auto ch)
+    auto const add_char = [os_specific](auto ch)
     {
-        return is_reserved_char(ch) ? '_' : ch;
+        return is_reserved_char(ch, os_specific) ? '_' : ch;
     };
-    std::transform(std::begin(in), std::end(in), std::back_inserter(out), AddChar);
+    std::transform(std::begin(in), std::end(in), std::back_inserter(out), add_char);
 }
 
 } // namespace
 
-void tr_torrent_files::make_subpath_portable(std::string_view path, tr_pathbuf& append_me)
+void tr_torrent_files::sanitize_subpath(std::string_view path, tr_pathbuf& append_me, bool os_specific)
 {
     auto segment = std::string_view{};
     while (tr_strv_sep(&path, &segment, '/'))
     {
-        append_sanitized_component(segment, append_me);
+        append_sanitized_component(segment, append_me, os_specific);
         append_me.append('/');
     }
 

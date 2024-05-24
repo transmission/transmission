@@ -179,6 +179,6 @@ TEST_F(TorrentFilesTest, isSubpathPortable)
 
     for (auto const& [subpath, expected] : Tests)
     {
-        EXPECT_EQ(expected, tr_torrent_files::is_subpath_portable(subpath)) << " subpath " << subpath;
+        EXPECT_EQ(expected, tr_torrent_files::is_subpath_sanitized(subpath)) << " subpath " << subpath;
     }
 }

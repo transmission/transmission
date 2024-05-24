@@ -99,7 +99,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_subpath_ += '/';
             }
-            tr_torrent_files::make_subpath_portable(currentKey(), file_subpath_);
+            tr_torrent_files::sanitize_subpath(currentKey(), file_subpath_);
         }
         else if (pathIs(InfoKey))
         {
@@ -298,7 +298,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     file_subpath_ += '/';
                 }
-                tr_torrent_files::make_subpath_portable(value, file_subpath_);
+                tr_torrent_files::sanitize_subpath(value, file_subpath_);
             }
             else if (current_key == AttrKey)
             {
@@ -488,7 +488,7 @@ private:
         }
 
         auto root = tr_pathbuf{};
-        tr_torrent_files::make_subpath_portable(tm_.name_, root);
+        tr_torrent_files::sanitize_subpath(tm_.name_, root);
         if (!std::empty(root))
         {
             tm_.files_.insert_subpath_prefix(root);
@@ -522,7 +522,7 @@ private:
         // In the single file case, length maps to the length of the file in bytes.
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
-            tm_.files_.add(tr_torrent_files::make_subpath_portable(tm_.name_), length_);
+            tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
         }
 
         if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)
