@@ -320,19 +320,11 @@ public:
         return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
-    [[nodiscard]] constexpr double seedRatioPercentDone() const noexcept
-    {
-        auto const r = ratio();
-        auto const g = getSeedRatioLimit();
-        return static_cast<double>(r) / static_cast<double>(g.value_or(r));
-    }
+    double seedRatioPercentDone() const;
 
     [[nodiscard]] constexpr double activityPercentDone() const noexcept
     {
-        if (isDone())
-            return seedRatioPercentDone();
-        else
-            return percentDone();
+        return isDone() ? seedRatioPercentDone() : percentDone();
     }
 
     [[nodiscard]] constexpr auto failedEver() const noexcept
