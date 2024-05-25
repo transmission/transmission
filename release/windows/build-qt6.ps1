@@ -62,6 +62,8 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-nomake'; 'tests'
         '-I'; (Join-Path $DepsPrefixDir include).Replace('\', '/')
         '-L'; (Join-Path $DepsPrefixDir lib).Replace('\', '/')
+        '--'
+        "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
     )
 
     if ($env:LDFLAGS) {
