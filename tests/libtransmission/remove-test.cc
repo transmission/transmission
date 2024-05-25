@@ -176,7 +176,7 @@ protected:
     {
         auto paths = std::set<std::string>{};
 
-        for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
+        for (tr_file_index_t i = 0, n = files.file_count(); i < n; ++i)
         {
             auto walk = tr_pathbuf{ parent, '/', files.path(i) };
             createFileWithContents(walk, std::data(Content), std::size(Content));
@@ -332,7 +332,7 @@ TEST_F(RemoveTest, PreservesDirectoryHierarchyIfPossible)
 
     // after remove, the subtree should be:
     expected_tree = { parent, recycle_bin.c_str() };
-    for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = files.file_count(); i < n; ++i)
     {
         expected_tree.emplace(tr_pathbuf{ recycle_bin, '/', files.path(i) });
     }
