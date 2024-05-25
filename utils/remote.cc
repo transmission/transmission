@@ -988,12 +988,12 @@ void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
             {
-                fmt::print("  Download Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
+                fmt::print("  Download Speed: {:s}\n", Speed{ i, Speed::Units::Byps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateUpload, &i))
             {
-                fmt::print("  Upload Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
+                fmt::print("  Upload Speed: {:s}\n", Speed{ i, Speed::Units::Byps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
