@@ -298,24 +298,30 @@ $toolbar-height: $toolbar-height-number * 1px;
   > * {
     margin-right: 5px;
   }
-}
 
-$speed-icon-size: 20px;
+  .speed-container {
+    align-items: inherit;
+    display: inherit;
+    flex-direction: inherit;
 
-.speed-up-icon,
-.speed-dn-icon {
-  fill: var(--color-fg-primary);
-
-  svg {
-    width: $speed-icon-size;
+    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
+      width: 100px;
+    }
   }
-}
 
-#speed-dn-label,
-#speed-up-label {
-  text-align: right;
-  white-space: nowrap;
-  width: 100px;
+  #speed-up-icon,
+  #speed-dn-icon {
+    fill: var(--color-fg-primary);
+
+    svg {
+      width: 20px;
+    }
+  }
+
+  #speed-dn-label,
+  #speed-up-label {
+    text-align: right;
+  }
 }
 
 /// TORRENT CONTAINER
