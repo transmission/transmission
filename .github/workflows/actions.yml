@@ -334,7 +334,7 @@ jobs:
   macos-11:
     runs-on: macos-11
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    if: false  # ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
       - name: Show Configuration
         run: |
