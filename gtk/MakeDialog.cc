@@ -409,7 +409,7 @@ void MakeDialog::Impl::configurePieceSizeComboBox(uint32_t piece_size)
     auto active_index = PieceSizeStart;
     auto options = std::vector<std::pair<Glib::ustring, int>>();
 
-    for (std::size_t i = PieceSizeStart; i <= PieceSizeEnd; i++)
+    for (int i = PieceSizeStart; i <= PieceSizeEnd; i++)
     {
         std::size_t size = std::pow(2, i);
         options.emplace_back(Memory{ size, MemoryUnits::Bytes }.to_string(), i);
