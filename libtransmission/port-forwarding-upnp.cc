@@ -39,7 +39,6 @@ namespace
 enum class UpnpState : uint8_t
 {
     Idle,
-    Failed,
     WillDiscover, // next action is upnpDiscover()
     Discovering, // currently making blocking upnpDiscover() call in a worker thread
     WillMap, // next action is UPNP_AddPortMapping()
@@ -58,9 +57,7 @@ struct tr_upnp
     ~tr_upnp()
     {
         TR_ASSERT(!isMapped);
-        TR_ASSERT(
-            state == UpnpState::Idle || state == UpnpState::Failed || state == UpnpState::WillDiscover ||
-            state == UpnpState::Discovering);
+        TR_ASSERT(state == UpnpState::Idle || state == UpnpState::WillDiscover || state == UpnpState::Discovering);
 
         FreeUPNPUrls(&urls);
     }
@@ -298,7 +295,7 @@ tr_port_forwarding_state tr_upnpPulse(
         }
         else
         {
-            handle->state = UpnpState::Failed;
+            handle->state = UpnpState::WillDiscover;
             tr_logAddDebug(fmt::format("UPNP_GetValidIGD failed: {} ({})", tr_strerror(errno), errno));
             tr_logAddDebug("If your router supports UPnP, please make sure UPnP is enabled!");
         }
@@ -306,15 +303,15 @@ tr_port_forwarding_state tr_upnpPulse(
         freeUPNPDevlist(devlist);
     }
 
-    if ((handle->state == UpnpState::Idle) && (handle->isMapped) &&
+    if (handle->state == UpnpState::Idle && handle->isMapped &&
         (!is_enabled || handle->advertised_port != advertised_port || handle->local_port != local_port))
     {
         handle->state = UpnpState::WillUnmap;
     }
 
     if (is_enabled && handle->isMapped && do_port_check &&
-        ((get_specific_port_mapping_entry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
-         (get_specific_port_mapping_entry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
+        (get_specific_port_mapping_entry(handle, "TCP") != UPNPCOMMAND_SUCCESS ||
+         get_specific_port_mapping_entry(handle, "UDP") != UPNPCOMMAND_SUCCESS))
     {
         tr_logAddInfo(fmt::format(
             _("Local port {local_port} is not forwarded to {advertised_port}"),
@@ -339,7 +336,7 @@ tr_port_forwarding_state tr_upnpPulse(
         handle->local_port = {};
     }
 
-    if ((handle->state == UpnpState::Idle) && is_enabled && !handle->isMapped)
+    if (handle->state == UpnpState::Idle && is_enabled && !handle->isMapped)
     {
         handle->state = UpnpState::WillMap;
     }
@@ -376,15 +373,14 @@ tr_port_forwarding_state tr_upnpPulse(
                 fmt::arg("advertised_port", advertised_port.host())));
             handle->advertised_port = advertised_port;
             handle->local_port = local_port;
-            handle->state = UpnpState::Idle;
         }
         else
         {
             tr_logAddInfo(_("If your router supports UPnP, please make sure UPnP is enabled!"));
             handle->advertised_port = {};
             handle->local_port = {};
-            handle->state = UpnpState::Failed;
         }
+        handle->state = UpnpState::Idle;
     }
 
     return port_fwd_state(handle->state, handle->isMapped);
