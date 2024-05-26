@@ -575,7 +575,7 @@ tr_resume::fields_t loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::
         }
         else
         {
-            err = "Couldn't find 'pieces' or 'bitfield'";
+            err = "Couldn't find 'blocks' or 'bitfield'";
         }
 
         if (err != nullptr)
