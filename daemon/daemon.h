@@ -46,7 +46,6 @@ private:
 #ifdef HAVE_SYS_SIGNALFD_H
     int sigfd_ = -1;
 #endif /* signalfd API */
-    bool paused_ = false;
     bool seen_hup_ = false;
     std::string config_dir_;
     tr_variant settings_ = {};

@@ -65,6 +65,16 @@ if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
   exitcode=1
 fi
 
+# format Xcodeproj
+if ! grep -q 'objectVersion = 51' Transmission.xcodeproj/project.pbxproj; then
+  echo 'project.pbxproj needs objectVersion = 51 for compatibility with Xcode 11'
+  exitcode=1
+fi
+if ! grep -q 'BuildIndependentTargetsInParallel = YES' Transmission.xcodeproj/project.pbxproj; then
+  echo 'please keep BuildIndependentTargetsInParallel in project.pbxproj'
+  exitcode=1
+fi
+
 # format JS
 # but only if js has changed
 git diff --cached --quiet -- "web/**" && exit $exitcode

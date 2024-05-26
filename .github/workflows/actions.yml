@@ -116,67 +116,67 @@ jobs:
           echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           exit 1
 
-#  sanitizer-tests-ubuntu:
-#    runs-on: ubuntu-22.04
-#    needs: [ what-to-make ]
-#    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-#    env:
-#      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
-#    steps:
-#      - name: Show Configuration
-#        run: |
-#          echo '${{ toJSON(needs) }}'
-#          echo '${{ toJSON(runner) }}'
-#          cat /etc/os-release
-#      - name: Get Dependencies
-#        run: |
-#          set -ex
-#          sudo apt-get update
-#          sudo apt-get install -y --no-install-recommends \
-#            ca-certificates \
-#            clang \
-#            cmake \
-#            gettext \
-#            libcurl4-openssl-dev \
-#            libdeflate-dev \
-#            libevent-dev \
-#            libfmt-dev \
-#            libminiupnpc-dev \
-#            libnatpmp-dev \
-#            libpsl-dev \
-#            libssl-dev \
-#            ninja-build \
-#            npm
-#      - name: Get Source
-#        uses: actions/checkout@v4
-#        with:
-#          submodules: recursive
-#          path: src
-#      - name: Configure
-#        run: |
-#          cmake \
-#            -S src \
-#            -B obj \
-#            -G Ninja \
-#            -DCMAKE_BUILD_TYPE=Debug \
-#            -DCMAKE_CXX_COMPILER='clang++' \
-#            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
-#            -DCMAKE_C_COMPILER='clang' \
-#            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
-#            -DCMAKE_INSTALL_PREFIX=pfx \
-#            -DENABLE_CLI=OFF \
-#            -DENABLE_DAEMON=OFF \
-#            -DENABLE_GTK=OFF \
-#            -DENABLE_MAC=OFF \
-#            -DENABLE_QT=OFF \
-#            -DENABLE_TESTS=ON \
-#            -DENABLE_UTILS=ON \
-#            -DREBUILD_WEB=OFF \
-#            -DRUN_CLANG_TIDY=OFF
-#      - name: Make
-#        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
-#      - name: Test with sanitizers
-#        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
+  sanitizer-tests-ubuntu:
+    runs-on: ubuntu-22.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            clang \
+            cmake \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            npm
+      - name: Get Source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: src
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=OFF \
+            -DENABLE_TESTS=ON \
+            -DENABLE_UTILS=ON \
+            -DREBUILD_WEB=OFF \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+      - name: Test with sanitizers
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   sanitizer-tests-macos:
     runs-on: macos-14
@@ -272,8 +272,8 @@ jobs:
         run: |
           if grep 'warning:' makelog; then exit 1; fi
 
-  macos-12:
-    runs-on: macos-12
+  macos-14-arm64:
+    runs-on: macos-14
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
@@ -304,14 +304,14 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
+            -DCMAKE_OSX_ARCHITECTURES='arm64' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=ON \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
@@ -329,6 +329,42 @@ jobs:
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
+
+  # Only verify build support on old macOS
+  macos-11:
+    runs-on: macos-11
+    needs: [ what-to-make ]
+    if: false  # ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          sw_vers
+      - name: Get Dependencies
+        run: |
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+      - name: Get Source
+        uses: actions/checkout@v4
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
+            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
 
   alpine-musl:
     needs: [ what-to-make ]
@@ -478,7 +514,7 @@ jobs:
             -DENABLE_GTK=OFF `
             -DENABLE_MAC=OFF `
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_TESTS=ON `
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_UTILS=ON `
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
@@ -544,7 +580,68 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-12-from-tarball:
+  macos-14-universal-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    runs-on: macos-14
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          sw_vers
+      - name: Get Dependencies
+        run: |
+          brew install cmake gettext ninja node pkg-config
+      - name: Get Source
+        uses: actions/download-artifact@v4
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64' \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=OFF \
+            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_QT=OFF \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_DEFLATE=OFF \
+            -DUSE_SYSTEM_DHT=OFF \
+            -DUSE_SYSTEM_MINIUPNPC=OFF \
+            -DUSE_SYSTEM_NATPMP=OFF \
+            -DUSE_SYSTEM_UTP=OFF \
+            -DUSE_SYSTEM_B64=OFF \
+            -DUSE_SYSTEM_PSL=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
+  macos-12-x86_64-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: macos-12

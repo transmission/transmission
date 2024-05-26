@@ -150,7 +150,7 @@ Get a file list for the current torrent(s)
 .It Fl g Fl -get Ar all | file-index | files
 Mark file(s) for download.
 .Ar all
-marks all all of the torrent's files for downloading,
+marks all of the torrent's files for downloading,
 .Ar file-index
 adds a single file to the download list, and
 .Ar files
@@ -371,12 +371,12 @@ Rename torrent root folder from "test1/examplefile.txt" to "test2/examplefile.tx
 .Bd -literal -offset indent
 $ transmission-remote -t1 --path test1 --rename test2
 .Ed
-Set download and upload limits to 400 kB/sec and 60 kB/sec:
+Set download and upload limits to 400 kB/s and 60 kB/s:
 .Bd -literal -offset indent
 $ transmission-remote \-d400 \-u60
 $ transmission-remote \-\-downlimit=400 \-\-uplimit=60
 .Ed
-Set alternate download and upload limits to 100 kB/sec and 20 kB/sec:
+Set alternate download and upload limits to 100 kB/s and 20 kB/s:
 .Bd -literal -offset indent
 $ transmission-remote \-asd100 \-asu20
 $ transmission-remote \-\-alt-speed-downlimit=100 \-\-alt-speed-uplimit=20

@@ -367,6 +367,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "start-added-torrents"sv,
     "start-minimized"sv,
     "startDate"sv,
+    "start_paused"sv,
     "status"sv,
     "statusbar-stats"sv,
     "tag"sv,

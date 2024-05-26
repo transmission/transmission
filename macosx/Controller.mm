@@ -381,14 +381,14 @@ static void removeKeRangerRansomware()
     [NSValueTransformer setValueTransformer:iconTransformer forName:@"ExpandedPathToIconTransformer"];
 }
 
-void onStartQueue(tr_session* /*session*/, tr_torrent* tor, void* vself)
+void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
 {
-    auto* controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
     dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent startQueue];
+        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                                 postingStyle:NSPostASAP
+                                                 coalesceMask:NSNotificationCoalescingOnName
+                                                     forModes:nil];
     });
 }
 
@@ -509,6 +509,17 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [_fDefaults integerForKey:@"PeersTotal"]);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [_fDefaults integerForKey:@"PeersTorrent"]);
+
+        NSInteger bindPort = [_fDefaults integerForKey:@"BindPort"];
+        if (bindPort <= 0 || bindPort > 65535)
+        {
+            // First launch, we avoid a default port to be less likely blocked on such port and to have more chances of success when connecting to swarms.
+            // Ideally, we should be setting port 0, then reading the port number assigned by the system and save that value. But that would be best handled by libtransmission itself.
+            // For now, we randomize the port as a Dynamic/Private/Ephemeral Port from 49152–65535
+            // https://datatracker.ietf.org/doc/html/rfc6335#section-6
+            uint16_t defaultPort = 49152 + arc4random_uniform(65536 - 49152);
+            [_fDefaults setInteger:defaultPort forKey:@"BindPort"];
+        }
 
         BOOL const randomPort = [_fDefaults boolForKey:@"RandomPort"];
         tr_variantDictAddBool(&settings, TR_KEY_peer_port_random_on_start, randomPort);
@@ -801,8 +812,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     [nc addObserver:self.fWindow selector:@selector(makeKeyWindow) name:@"MakeWindowKey" object:nil];
 
-#warning rename
-    [nc addObserver:self selector:@selector(fullUpdateUI) name:@"UpdateQueue" object:nil];
+    [nc addObserver:self selector:@selector(fullUpdateUI) name:@"UpdateTorrentsState" object:nil];
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"ApplyFilter" object:nil];
 

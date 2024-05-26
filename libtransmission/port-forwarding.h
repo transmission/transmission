@@ -28,6 +28,7 @@ public:
     public:
         virtual ~Mediator() = default;
 
+        [[nodiscard]] virtual tr_port advertised_peer_port() const = 0;
         [[nodiscard]] virtual tr_port local_peer_port() const = 0;
         [[nodiscard]] virtual tr_address incoming_peer_address() const = 0;
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;

@@ -489,7 +489,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
  * pieces cleared from the bitset.
  *
  * Second approach (2.20 - 3.00): the 'progress' dict had a
- * 'time_checked' entry which was a list with fileCount items.
+ * 'time_checked' entry which was a list with file_count items.
  * Each item was either a list of per-piece timestamps, or a
  * single timestamp if either all or none of the pieces had been
  * tested more recently than the file's mtime.
@@ -733,6 +733,13 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
     {
         tr_torrentSetPriority(tor, static_cast<tr_priority_t>(i));
         fields_loaded |= tr_resume::BandwidthPriority;
+    }
+
+    if (auto val = bool{};
+        (fields_to_load & tr_resume::SequentialDownload) != 0 && tr_variantDictFindBool(&top, TR_KEY_sequentialDownload, &val))
+    {
+        tor->set_sequential_download(val);
+        fields_loaded |= tr_resume::SequentialDownload;
     }
 
     if ((fields_to_load & tr_resume::Peers) != 0)
