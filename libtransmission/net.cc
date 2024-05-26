@@ -433,16 +433,6 @@ namespace
 namespace is_valid_for_peers_helpers
 {
 
-[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const& addr)
-{
-    return addr.is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr.addr6);
-}
-
-[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const& addr)
-{
-    return addr.is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr.addr6);
-}
-
 /* isMartianAddr was written by Juliusz Chroboczek,
    and is covered under the same license as third-party/dht/dht.c. */
 [[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
@@ -811,7 +801,7 @@ bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
     using namespace is_valid_for_peers_helpers;
 
-    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
+    return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local_address() && !address_.is_ipv4_mapped_address() &&
         !is_martian_addr(address_, from);
 }
 

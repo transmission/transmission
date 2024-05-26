@@ -146,9 +146,10 @@ private:
 
 enum tr_address_type : uint8_t
 {
-    TR_AF_INET,
+    TR_AF_INET = 0,
     TR_AF_INET6,
-    NUM_TR_AF_INET_TYPES
+    NUM_TR_AF_INET_TYPES,
+    TR_AF_UNSPEC = NUM_TR_AF_INET_TYPES
 };
 
 std::string_view tr_ip_protocol_to_sv(tr_address_type type);
@@ -239,6 +240,16 @@ struct tr_address
     // ---
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
+
+    [[nodiscard]] constexpr bool is_ipv4_mapped_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_link_local_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
+    }
 
     tr_address_type type = NUM_TR_AF_INET_TYPES;
     union

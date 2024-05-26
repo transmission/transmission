@@ -31,6 +31,7 @@ struct tr_url_parsed_t
     std::string_view scheme; // "http"
     std::string_view authority; // "example.com:80"
     std::string_view host; // "example.com"
+    std::string_view host_wo_brackets; // "example.com" ("[::1]" -> "::1")
     std::string_view sitename; // "example"
     std::string_view path; // /"over/there"
     std::string_view query; // "name=ferret"
