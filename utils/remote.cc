@@ -938,12 +938,12 @@ void print_details(tr_variant::Map const& map)
 
         if (auto oi = t->value_if<int64_t>(TR_KEY_rateDownload))
         {
-            fmt::print("  Download Speed: {:s}\n", Speed{ *oi, Speed::Units::KByps }.to_string());
+            fmt::print("  Download Speed: {:s}\n", Speed{ *oi, Speed::Units::Byps }.to_string());
         }
 
         if (auto oi = t->value_if<int64_t>(TR_KEY_rateUpload))
         {
-            fmt::print("  Upload Speed: {:s}\n", Speed{ *oi, Speed::Units::KByps }.to_string());
+            fmt::print("  Upload Speed: {:s}\n", Speed{ *oi, Speed::Units::Byps }.to_string());
         }
 
         if (auto oi = t->value_if<int64_t>(TR_KEY_haveUnchecked), oj = t->value_if<int64_t>(TR_KEY_haveValid); oi && oj)

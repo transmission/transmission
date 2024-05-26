@@ -489,7 +489,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor, tr_torrent::ResumeHel
  * pieces cleared from the bitset.
  *
  * Second approach (2.20 - 3.00): the 'progress' dict had a
- * 'time_checked' entry which was a list with fileCount items.
+ * 'time_checked' entry which was a list with file_count items.
  * Each item was either a list of per-piece timestamps, or a
  * single timestamp if either all or none of the pieces had been
  * tested more recently than the file's mtime.
