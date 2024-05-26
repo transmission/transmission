@@ -162,11 +162,11 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
-    // write the text form of the address, e.g. inet_ntop()
+    // --- write the text form of the address, e.g. inet_ntop()
     std::string_view display_name(char* out, size_t outlen) const;
     [[nodiscard]] std::string display_name() const;
 
-    ///
+    // ---
 
     [[nodiscard]] constexpr auto is_ipv4() const noexcept
     {
@@ -178,7 +178,7 @@ struct tr_address
         return type == TR_AF_INET6;
     }
 
-    /// bt protocol compact form
+    // --- bt protocol compact form
 
     // compact addr only -- used e.g. as `yourip` value in extension protocol handshake
 
@@ -209,7 +209,11 @@ struct tr_address
         }
     }
 
-    // comparisons
+    // ---
+
+    [[nodiscard]] std::optional<unsigned> to_interface_index() const noexcept;
+
+    // --- comparisons
 
     [[nodiscard]] int compare(tr_address const& that) const noexcept;
 
@@ -233,7 +237,7 @@ struct tr_address
         return this->compare(that) > 0;
     }
 
-    //
+    // ---
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
 
@@ -385,6 +389,7 @@ struct tr_socket_address
 
     // --- sockaddr helpers
 
+    [[nodiscard]] static std::optional<tr_socket_address> from_string(std::string_view sockaddr_sv);
     [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
     [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 
@@ -415,7 +420,7 @@ struct tr_socket_address
 };
 
 template<>
-class std::hash<tr_socket_address>
+struct std::hash<tr_socket_address>
 {
 public:
     std::size_t operator()(tr_socket_address const& socket_address) const noexcept

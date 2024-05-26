@@ -32,13 +32,13 @@ TEST_F(TorrentFilesTest, add)
     auto constexpr Size = size_t{ 1024 };
 
     auto files = tr_torrent_files{};
-    EXPECT_EQ(size_t{ 0U }, files.fileCount());
+    EXPECT_EQ(size_t{ 0U }, files.file_count());
     EXPECT_TRUE(std::empty(files));
 
     auto const file_index = files.add(Path, Size);
     EXPECT_EQ(tr_file_index_t{ 0U }, file_index);
-    EXPECT_EQ(size_t{ 1U }, files.fileCount());
-    EXPECT_EQ(Size, files.fileSize(file_index));
+    EXPECT_EQ(size_t{ 1U }, files.file_count());
+    EXPECT_EQ(Size, files.file_size(file_index));
     EXPECT_EQ(Path, files.path(file_index));
     EXPECT_FALSE(std::empty(files));
 }
@@ -52,11 +52,11 @@ TEST_F(TorrentFilesTest, setPath)
     auto files = tr_torrent_files{};
     auto const file_index = files.add(Path1, Size);
     EXPECT_EQ(Path1, files.path(file_index));
-    EXPECT_EQ(Size, files.fileSize(file_index));
+    EXPECT_EQ(Size, files.file_size(file_index));
 
-    files.setPath(file_index, Path2);
+    files.set_path(file_index, Path2);
     EXPECT_EQ(Path2, files.path(file_index));
-    EXPECT_EQ(Size, files.fileSize(file_index));
+    EXPECT_EQ(Size, files.file_size(file_index));
 }
 
 TEST_F(TorrentFilesTest, clear)
@@ -67,13 +67,13 @@ TEST_F(TorrentFilesTest, clear)
 
     auto files = tr_torrent_files{};
     files.add(Path1, Size);
-    EXPECT_EQ(size_t{ 1U }, files.fileCount());
+    EXPECT_EQ(size_t{ 1U }, files.file_count());
     files.add(Path2, Size);
-    EXPECT_EQ(size_t{ 2U }, files.fileCount());
+    EXPECT_EQ(size_t{ 2U }, files.file_count());
 
     files.clear();
     EXPECT_TRUE(std::empty(files));
-    EXPECT_EQ(size_t{ 0U }, files.fileCount());
+    EXPECT_EQ(size_t{ 0U }, files.file_count());
 }
 
 TEST_F(TorrentFilesTest, find)
@@ -135,10 +135,10 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
     auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
 
     auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 2U));
-    EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 1U));
-    EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path) + 1, 1U));
-    EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path), 0U));
+    EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 2U));
+    EXPECT_TRUE(files.has_any_local_data(std::data(search_path), 1U));
+    EXPECT_FALSE(files.has_any_local_data(std::data(search_path) + 1, 1U));
+    EXPECT_FALSE(files.has_any_local_data(std::data(search_path), 0U));
 }
 
 TEST_F(TorrentFilesTest, isSubpathPortable)
@@ -179,6 +179,6 @@ TEST_F(TorrentFilesTest, isSubpathPortable)
 
     for (auto const& [subpath, expected] : Tests)
     {
-        EXPECT_EQ(expected, tr_torrent_files::isSubpathPortable(subpath)) << " subpath " << subpath;
+        EXPECT_EQ(expected, tr_torrent_files::is_subpath_sanitized(subpath)) << " subpath " << subpath;
     }
 }
