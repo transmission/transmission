@@ -38,6 +38,7 @@
 
 #include <algorithm> // std::transform()
 #include <array>
+#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
