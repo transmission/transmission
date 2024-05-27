@@ -11,7 +11,6 @@
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <ctime> // time_t
-#include <functional>
 #include <iterator> // std::back_inserter
 #include <memory>
 #include <optional>
