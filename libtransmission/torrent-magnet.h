@@ -14,7 +14,6 @@
 #include <ctime> // time_t
 #include <deque>
 #include <limits>
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
