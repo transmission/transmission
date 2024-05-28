@@ -211,7 +211,7 @@ enum
 
 // --- Command-Line Arguments
 
-static auto constexpr Options = std::array<tr_option, 108>{
+auto constexpr Options = std::array<tr_option, 103>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -686,7 +686,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_wanted,
 };
 
-static auto constexpr DetailsKeys = std::array<tr_quark, 56>{
+auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -726,11 +726,11 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_recheckProgress,
     TR_KEY_secondsDownloading,
     TR_KEY_secondsSeeding,
+    TR_KEY_seedIdleMode,
+    TR_KEY_seedIdleLimit,
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
     TR_KEY_sequentialDownload,
-    TR_KEY_seedIdleMode,
-    TR_KEY_seedIdleLimit,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
