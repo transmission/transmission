@@ -211,7 +211,7 @@ enum
 
 // --- Command-Line Arguments
 
-auto constexpr Options = std::array<tr_option, 98>{
+static auto constexpr Options = std::array<tr_option, 108>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -304,6 +304,31 @@ auto constexpr Options = std::array<tr_option, 98>{
         "no-global-seedratio",
         "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
         "GSR",
+        false,
+        nullptr },
+      { 955,
+        "idle-seeding-limit",
+        "Let the current torrent(s) seed until a specific amount idle time",
+        "isl",
+        true,
+        "<minutes>" },
+      { 956,
+        "default-idle-seeding-limit",
+        "Let the current torrent(s) use the default idle seeding settings",
+        "isld",
+        false,
+        nullptr },
+      { 957, "no-idle-seeding-limit", "Let the current torrent(s) seed regardless of idle time", "ISL", false, nullptr },
+      { 958,
+        "global-idle-seeding-limit",
+        "All torrents, unless overridden by a per-torrent setting, should seed until a specific amount of idle time",
+        "gisl",
+        true,
+        "<minutes>" },
+      { 959,
+        "no-global-idle-seeding-limit",
+        "All torrents, unless overridden by a per-torrent setting, should seed regardless of idle time",
+        "GISL",
         false,
         nullptr },
       { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
@@ -426,6 +451,8 @@ enum
     case 912: /* encryption-tolerated */
     case 953: /* global-seedratio */
     case 954: /* no-global-seedratio */
+    case 958: /* global-idle-seeding-limit */
+    case 959: /* no-global-idle-seeding-limit */
     case 990: /* start-paused */
     case 991: /* no-start-paused */
     case 992: /* trash-torrent */
@@ -436,6 +463,9 @@ enum
     case 950: /* seedratio */
     case 951: /* seedratio-default */
     case 952: /* no-seedratio */
+    case 955: /* idle-seeding-limit */
+    case 956: /* default-idle-seeding-limit */
+    case 957: /* no-idle-seeding-limit*/
     case 984: /* honor-session */
     case 985: /* no-honor-session */
         return MODE_TORRENT_SET;
@@ -656,7 +686,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_wanted,
 };
 
-auto constexpr DetailsKeys = std::array<tr_quark, 53>{
+static auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -699,6 +729,8 @@ auto constexpr DetailsKeys = std::array<tr_quark, 53>{
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
     TR_KEY_sequentialDownload,
+    TR_KEY_seedIdleMode,
+    TR_KEY_seedIdleLimit,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -1163,6 +1195,31 @@ void print_details(tr_variant::Map const& map)
 
             case TR_RATIOLIMIT_UNLIMITED:
                 fmt::print("  Ratio Limit: Unlimited\n");
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        if (auto oi = t->value_if<int64_t>(TR_KEY_seedIdleMode))
+        {
+            switch (*oi)
+            {
+            case TR_IDLELIMIT_GLOBAL:
+                fmt::print("  Idle Limit: Default\n");
+                break;
+
+            case TR_IDLELIMIT_SINGLE:
+                if (auto oj = t->value_if<int64_t>(TR_KEY_seedIdleLimit))
+                {
+                    fmt::print("  Idle Limit: {} minutes\n", *oj);
+                }
+
+                break;
+
+            case TR_IDLELIMIT_UNLIMITED:
+                fmt::print("  Idle Limit: Unlimited\n");
                 break;
 
             default:
@@ -1782,6 +1839,7 @@ void print_session(tr_variant::Map const& map)
     auto const o_up_enabled = args->value_if<bool>(TR_KEY_speed_limit_up_enabled);
     auto const o_down_enabled = args->value_if<bool>(TR_KEY_speed_limit_down_enabled);
     auto const o_speed_ratio_limited = args->value_if<bool>(TR_KEY_seedRatioLimited);
+    auto const o_idle_seeding_limited = args->value_if<bool>(TR_KEY_idle_seeding_limit_enabled);
     auto const o_alt_down = args->value_if<int64_t>(TR_KEY_alt_speed_down);
     auto const o_alt_up = args->value_if<int64_t>(TR_KEY_alt_speed_up);
     auto const o_alt_begin = args->value_if<int64_t>(TR_KEY_alt_speed_time_begin);
@@ -1790,11 +1848,12 @@ void print_session(tr_variant::Map const& map)
     auto const o_up_limit = args->value_if<int64_t>(TR_KEY_speed_limit_up);
     auto const o_down_limit = args->value_if<int64_t>(TR_KEY_speed_limit_down);
     auto const o_peer_limit = args->value_if<int64_t>(TR_KEY_peer_limit_global);
+    auto const o_idle_seeding_limit = args->value_if<int64_t>(TR_KEY_idle_seeding_limit);
     auto const o_seed_ratio_limit = args->value_if<double>(TR_KEY_seedRatioLimit);
 
     if (o_alt_down && o_alt_enabled && o_alt_begin && o_alt_time_enabled && o_alt_end && o_alt_day && o_alt_up &&
         o_peer_limit && o_down_limit && o_down_enabled && o_up_limit && o_up_enabled && o_seed_ratio_limit &&
-        o_speed_ratio_limited)
+        o_speed_ratio_limited && o_idle_seeding_limited && o_idle_seeding_limit)
     {
         fmt::print("LIMITS\n");
         fmt::print("  Peer limit: {:d}\n", *o_peer_limit);
@@ -1802,6 +1861,10 @@ void print_session(tr_variant::Map const& map)
         fmt::print(
             "  Default seed ratio limit: {:s}\n",
             *o_speed_ratio_limited ? strlratio2(*o_seed_ratio_limit) : "Unlimited");
+
+        fmt::print(
+            "  Default idle seeding time limit: {:s}\n",
+            *o_idle_seeding_limited ? std::to_string(*o_idle_seeding_limit) + " minutes" : "Unlimited");
 
         std::string effective_up_limit;
 
@@ -2812,6 +2875,15 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 args.insert_or_assign(TR_KEY_seedRatioLimited, false);
                 break;
 
+            case 958:
+                args.insert_or_assign(TR_KEY_idle_seeding_limit, tr_num_parse<int64_t>(optarg_sv).value());
+                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, true);
+                break;
+
+            case 959:
+                args.insert_or_assign(TR_KEY_idle_seeding_limit_enabled, false);
+                break;
+
             case 990:
                 args.insert_or_assign(TR_KEY_start_added_torrents, false);
                 break;
@@ -2947,6 +3019,19 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 952:
                 args.insert_or_assign(TR_KEY_seedRatioMode, TR_RATIOLIMIT_UNLIMITED);
+                break;
+
+            case 955:
+                args.insert_or_assign(TR_KEY_seedIdleLimit, tr_num_parse<int64_t>(optarg_sv));
+                args.insert_or_assign(TR_KEY_seedIdleMode, TR_IDLELIMIT_SINGLE);
+                break;
+
+            case 956:
+                args.insert_or_assign(TR_KEY_seedIdleMode, TR_IDLELIMIT_GLOBAL);
+                break;
+
+            case 957:
+                args.insert_or_assign(TR_KEY_seedIdleMode, TR_IDLELIMIT_UNLIMITED);
                 break;
 
             case 984:
