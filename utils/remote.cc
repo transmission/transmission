@@ -212,7 +212,7 @@ enum
 
 // --- Command-Line Arguments
 
-auto constexpr Options = std::array<tr_option, 98>{
+static auto constexpr Options = std::array<tr_option, 108>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -305,6 +305,31 @@ auto constexpr Options = std::array<tr_option, 98>{
         "no-global-seedratio",
         "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
         "GSR",
+        false,
+        nullptr },
+      { 955,
+        "idle-seeding-limit",
+        "Let the current torrent(s) seed until a specific amount idle time",
+        "isl",
+        true,
+        "<minutes>" },
+      { 956,
+        "default-idle-seeding-limit",
+        "Let the current torrent(s) use the default idle seeding settings",
+        "isld",
+        false,
+        nullptr },
+      { 957, "no-idle-seeding-limit", "Let the current torrent(s) seed regardless of idle time", "ISL", false, nullptr },
+      { 958,
+        "global-idle-seeding-limit",
+        "All torrents, unless overridden by a per-torrent setting, should seed until a specific amount of idle time",
+        "gisl",
+        true,
+        "<minutes>" },
+      { 959,
+        "no-global-idle-seeding-limit",
+        "All torrents, unless overridden by a per-torrent setting, should seed regardless of idle time",
+        "GISL",
         false,
         nullptr },
       { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
@@ -436,6 +461,8 @@ enum
     case 912: /* encryption-tolerated */
     case 953: /* global-seedratio */
     case 954: /* no-global-seedratio */
+    case 958: /* global-idle-seeding-limit */
+    case 959: /* no-global-idle-seeding-limit */
     case 990: /* start-paused */
     case 991: /* no-start-paused */
     case 992: /* trash-torrent */
@@ -446,6 +473,9 @@ enum
     case 950: /* seedratio */
     case 951: /* seedratio-default */
     case 952: /* no-seedratio */
+    case 955: /* idle-seeding-limit */
+    case 956: /* default-idle-seeding-limit */
+    case 957: /* no-idle-seeding-limit*/
     case 984: /* honor-session */
     case 985: /* no-honor-session */
         return MODE_TORRENT_SET;
@@ -697,14 +727,14 @@ void setGroup(tr_variant* args, std::string_view group)
     return files;
 }
 
-auto constexpr FilesKeys = std::array<tr_quark, 4>{
+auto constexpr FilesKeys = std::array<tr_quark, 4U>{
     TR_KEY_files,
     TR_KEY_name,
     TR_KEY_priorities,
     TR_KEY_wanted,
 };
 
-auto constexpr DetailsKeys = std::array<tr_quark, 56>{
+auto constexpr DetailsKeys = std::array<tr_quark, 58U>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -749,6 +779,8 @@ auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
     TR_KEY_sequentialDownload,
+    TR_KEY_seedIdleMode,
+    TR_KEY_seedIdleLimit,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -763,7 +795,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_webseedsSendingToUs,
 };
 
-auto constexpr ListKeys = std::array<tr_quark, 15>{
+auto constexpr ListKeys = std::array<tr_quark, 15U>{
     TR_KEY_addedDate,
     TR_KEY_error,
     TR_KEY_errorString,
@@ -1228,6 +1260,31 @@ void printDetails(tr_variant* top)
 
                 case TR_RATIOLIMIT_UNLIMITED:
                     fmt::print("  Ratio Limit: Unlimited\n");
+                    break;
+
+                default:
+                    break;
+                }
+            }
+
+            if (tr_variantDictFindInt(t, TR_KEY_seedIdleMode, &i))
+            {
+                switch (i)
+                {
+                case TR_IDLELIMIT_GLOBAL:
+                    fmt::print("  Idle Limit: Default\n");
+                    break;
+
+                case TR_IDLELIMIT_SINGLE:
+                    if (tr_variantDictFindInt(t, TR_KEY_seedIdleLimit, &j))
+                    {
+                        fmt::print("  Idle Limit: {} minutes\n", j);
+                    }
+
+                    break;
+
+                case TR_IDLELIMIT_UNLIMITED:
+                    fmt::print("  Idle Limit: Unlimited\n");
                     break;
 
                 default:
@@ -1815,6 +1872,7 @@ void printSession(tr_variant* top)
             bool upEnabled;
             bool downEnabled;
             bool seedRatioLimited;
+            bool seedIdleLimited;
             int64_t altDown;
             int64_t altUp;
             int64_t altBegin;
@@ -1823,6 +1881,7 @@ void printSession(tr_variant* top)
             int64_t upLimit;
             int64_t downLimit;
             int64_t peerLimit;
+            int64_t seedIdleLimit;
             double seedRatioLimit;
 
             if (tr_variantDictFindInt(args, TR_KEY_alt_speed_down, &altDown) &&
@@ -1838,12 +1897,18 @@ void printSession(tr_variant* top)
                 tr_variantDictFindInt(args, TR_KEY_speed_limit_up, &upLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_speed_limit_up_enabled, &upEnabled) &&
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
-                tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
+                tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited) &&
+                tr_variantDictFindInt(args, TR_KEY_idle_seeding_limit, &seedIdleLimit) &&
+                tr_variantDictFindBool(args, TR_KEY_idle_seeding_limit_enabled, &seedIdleLimited))
             {
                 fmt::print("LIMITS\n");
                 fmt::print("  Peer limit: {:d}\n", peerLimit);
 
                 fmt::print("  Default seed ratio limit: {:s}\n", seedRatioLimited ? strlratio2(seedRatioLimit) : "Unlimited");
+
+                fmt::print(
+                    "  Default idle seeding time limit: {:s}\n",
+                    seedIdleLimited ? (std::to_string(seedIdleLimit) + " minutes").c_str() : "Unlimited");
 
                 std::string effective_up_limit;
 
@@ -2790,6 +2855,15 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
                 tr_variantDictAddBool(args, TR_KEY_seedRatioLimited, false);
                 break;
 
+            case 958:
+                tr_variantDictAddInt(args, TR_KEY_idle_seeding_limit, atoi(optarg));
+                tr_variantDictAddBool(args, TR_KEY_idle_seeding_limit_enabled, true);
+                break;
+
+            case 959:
+                tr_variantDictAddBool(args, TR_KEY_idle_seeding_limit_enabled, false);
+                break;
+
             case 990:
                 tr_variantDictAddBool(args, TR_KEY_start_added_torrents, false);
                 break;
@@ -2924,6 +2998,19 @@ int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteCon
 
             case 952:
                 tr_variantDictAddInt(args, TR_KEY_seedRatioMode, TR_RATIOLIMIT_UNLIMITED);
+                break;
+
+            case 955:
+                tr_variantDictAddInt(args, TR_KEY_seedIdleLimit, atoi(optarg));
+                tr_variantDictAddInt(args, TR_KEY_seedIdleMode, TR_IDLELIMIT_SINGLE);
+                break;
+
+            case 956:
+                tr_variantDictAddInt(args, TR_KEY_seedIdleMode, TR_IDLELIMIT_GLOBAL);
+                break;
+
+            case 957:
+                tr_variantDictAddInt(args, TR_KEY_seedIdleMode, TR_IDLELIMIT_UNLIMITED);
                 break;
 
             case 984:

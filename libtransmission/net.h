@@ -12,7 +12,6 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uint16_t, uint32_t, uint8_t
-#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
