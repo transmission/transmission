@@ -686,7 +686,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_wanted,
 };
 
-auto constexpr DetailsKeys = std::array<tr_quark, 56>{
+auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
