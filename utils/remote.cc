@@ -3022,7 +3022,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 955:
-                args.insert_or_assign(TR_KEY_seedIdleLimit, tr_num_parse<int64_t>(optarg_sv));
+                args.insert_or_assign(TR_KEY_seedIdleLimit, tr_num_parse<int64_t>(optarg_sv).value());
                 args.insert_or_assign(TR_KEY_seedIdleMode, TR_IDLELIMIT_SINGLE);
                 break;
 
