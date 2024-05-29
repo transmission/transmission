@@ -325,6 +325,11 @@ struct tr_torrent
         return completion_.has_none();
     }
 
+    [[nodiscard]] auto has_file(tr_file_index_t file) const
+    {
+        return completion_.has_blocks(block_span_for_file(file));
+    }
+
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
     {
         return completion_.has_piece(piece);

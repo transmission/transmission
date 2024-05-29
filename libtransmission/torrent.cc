@@ -2165,7 +2165,7 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
     // if this piece completes any file, invoke the fileCompleted func for it
     for (auto [file, file_end] = fpm_.file_span_for_piece(piece); file < file_end; ++file)
     {
-        if (completion_.has_blocks(block_span_for_file(file)))
+        if (has_file(file))
         {
             on_file_completed(file);
         }
