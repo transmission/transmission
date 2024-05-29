@@ -1254,6 +1254,8 @@ private:
     void do_magnet_idle_work();
     [[nodiscard]] bool use_new_metainfo(tr_error* error);
 
+    void update_file_path(tr_file_index_t file, std::optional<bool> has_file) const;
+
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 
     void rename_path_in_session_thread(

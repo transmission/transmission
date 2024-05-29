@@ -1608,6 +1608,39 @@ std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t
     return {};
 }
 
+void tr_torrent::update_file_path(tr_file_index_t file, std::optional<bool> has_file) const
+{
+    auto const found = find_file(file);
+    if (!found)
+    {
+        return;
+    }
+
+    auto const has = has_file ? *has_file : this->has_file(file);
+    auto const needs_suffix = session->isIncompleteFileNamingEnabled() && !has;
+    auto const oldpath = found->filename();
+    auto const newpath = needs_suffix ?
+        tr_pathbuf{ found->base(), '/', file_subpath(file), tr_torrent_files::PartialFileSuffix } :
+        tr_pathbuf{ found->base(), '/', file_subpath(file) };
+
+    if (tr_sys_path_is_same(oldpath, newpath))
+    {
+        return;
+    }
+
+    if (auto error = tr_error{}; !tr_sys_path_rename(oldpath, newpath, &error))
+    {
+        tr_logAddErrorTor(
+            this,
+            fmt::format(
+                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", oldpath),
+                fmt::arg("path", newpath),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
+    }
+}
+
 void tr_torrent::VerifyMediator::on_verify_queued()
 {
     tr_logAddTraceTor(tor_, "Queued for verification");
@@ -1662,6 +1695,11 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
                 if (tor->is_deleting_)
                 {
                     return;
+                }
+
+                for (tr_file_index_t file = 0, n_files = tor->file_count(); file < n_files; ++file)
+                {
+                    tor->update_file_path(file, {});
                 }
 
                 tor->recheck_completeness();
@@ -2132,27 +2170,7 @@ void tr_torrent::on_file_completed(tr_file_index_t const file)
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
-    if (auto found = find_file(file); found)
-    {
-        if (auto const& file_subpath = this->file_subpath(file); file_subpath != found->subpath())
-        {
-            auto const& oldpath = found->filename();
-            auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
-            auto error = tr_error{};
-
-            if (!tr_sys_path_rename(oldpath, newpath, &error))
-            {
-                tr_logAddErrorTor(
-                    this,
-                    fmt::format(
-                        _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
-                        fmt::arg("old_path", oldpath),
-                        fmt::arg("path", newpath),
-                        fmt::arg("error", error.message()),
-                        fmt::arg("error_code", error.code())));
-            }
-        }
-    }
+    update_file_path(file, true);
 }
 
 void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
