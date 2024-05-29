@@ -1625,7 +1625,7 @@ void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t const piece, 
 {
     auto const had_piece = tor_->has_piece(piece);
 
-    if (has_piece || had_piece)
+    if (has_piece != had_piece)
     {
         tor_->set_has_piece(piece, has_piece);
         tor_->set_dirty();
