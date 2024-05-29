@@ -5,7 +5,6 @@
 
 #include <cerrno> // for errno
 #include <memory>
-#include <string>
 #include <utility>
 
 #include <fcntl.h> // for open()

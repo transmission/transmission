@@ -125,7 +125,9 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
         case 'show-inspector':
-          if (!this.popup || this.popup.name !== 'inspector') {
+          if (this.popup instanceof Inspector) {
+            this.setCurrentPopup(null);
+          } else {
             this.setCurrentPopup(new Inspector(this));
           }
           break;

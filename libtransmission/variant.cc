@@ -57,7 +57,10 @@ template<typename T>
     {
         if (auto val = var->value_if<T>())
         {
-            *setme = *val;
+            if (setme)
+            {
+                *setme = *val;
+            }
             return true;
         }
     }

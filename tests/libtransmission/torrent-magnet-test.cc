@@ -85,6 +85,7 @@ TEST_F(TorrentMagnetTest, setMetadataPiece)
 
             tor->maybe_start_metadata_transfer(metainfo_size);
             tor->set_metadata_piece(0, std::data(metainfo_benc), metainfo_size);
+            tor->do_idle_work();
             EXPECT_TRUE(tor->has_metainfo());
             EXPECT_EQ(tor->info_dict_size(), metainfo_size);
             EXPECT_EQ(tor->get_metadata_percent(), 1.0);

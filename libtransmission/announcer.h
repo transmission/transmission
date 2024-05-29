@@ -156,7 +156,7 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    virtual bool handle_message(uint8_t const* msg, size_t msglen) = 0;
+    virtual bool handle_message(uint8_t const* msg, size_t msglen, struct sockaddr const* from, socklen_t fromlen) = 0;
 
     [[nodiscard]] virtual bool is_idle() const noexcept = 0;
 };

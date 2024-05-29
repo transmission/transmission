@@ -122,12 +122,12 @@ public:
 
     [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
-        return files_.fileCount();
+        return files_.file_count();
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const noexcept
     {
-        return files_.fileSize(i);
+        return files_.file_size(i);
     }
 
     [[nodiscard]] constexpr auto is_private() const noexcept
@@ -167,7 +167,7 @@ public:
 
     [[nodiscard]] constexpr auto total_size() const noexcept
     {
-        return files_.totalSize();
+        return files_.total_size();
     }
 
     [[nodiscard]] constexpr auto const& webseeds() const noexcept

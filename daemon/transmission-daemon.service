@@ -2,6 +2,7 @@
 Description=Transmission BitTorrent Daemon
 Wants=network-online.target
 After=network-online.target
+Documentation=man:transmission-daemon(1)
 
 [Service]
 User=transmission

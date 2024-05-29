@@ -160,7 +160,7 @@ public:
             return nullptr;
         }
 
-        auto const [it, is_new] = scrape_info_.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+        auto const [it, is_new] = scrape_info_.try_emplace(url, url, TrMultiscrapeMax);
         return &it->second;
     }
 

@@ -36,6 +36,16 @@ cmake --build build -t transmission-gtk
 ./build/gtk/transmission-gtk
 ```
 
+### Building the QT app with CMake ###
+Install QT and build the app:
+```bash
+brew install qt
+brew services start dbus
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_QT=ON -DENABLE_MAC=OFF
+cmake --build build -t transmission-qt
+./build/qt/transmission-qt
+```
+
 ## On Unix ##
 ### Prerequisites ###
 

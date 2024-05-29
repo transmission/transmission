@@ -756,6 +756,10 @@ void tr_torrent::stop_now()
     TR_ASSERT(session->am_in_session_thread());
     auto const lock = unique_lock();
 
+    auto const now = tr_time();
+    seconds_downloading_before_current_start_ = seconds_downloading(now);
+    seconds_seeding_before_current_start_ = seconds_seeding(now);
+
     is_running_ = false;
     is_stopping_ = false;
     mark_changed();
@@ -895,7 +899,7 @@ void tr_torrent::on_metainfo_completed()
         // Potentially, we are in `tr_torrent::init`,
         // and we don't want any file created before `tr_torrent::start`
         // so we Verify but we don't Create files.
-        session->queue_session_thread(tr_torrentVerify, this);
+        tr_torrentVerify(this);
     }
     else
     {
@@ -1208,7 +1212,7 @@ bool tr_torrent::has_any_local_data() const
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return files().hasAnyLocalData(std::data(paths), n_paths);
+    return files().has_any_local_data(std::data(paths), n_paths);
 }
 
 void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
@@ -2544,7 +2548,7 @@ tr_bitfield const& tr_torrent::ResumeHelper::checked_pieces() const noexcept
     return tor_.checked_pieces_;
 }
 
-void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
+void tr_torrent::ResumeHelper::load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*file_count()*/)
 {
     TR_ASSERT(std::size(checked) == tor_.piece_count());
     tor_.checked_pieces_ = checked;

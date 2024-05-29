@@ -22,7 +22,7 @@ Note: NAT-PMP is only for Apple Airport routers.
 ### Double NAT
 Another possible reason your port remains closed could be because your router is not the only device on the network which needs to be configured.
 
-For example, your network might resemble the following: ADSL modem/router &rarr; Netgear router &rarr; laptop.
+For example, your network might resemble the following: ADSL modem/router → Netgear router → laptop.
 
 If you have multiple routers in your home network (such as in the example above), you have two options. The easiest way is to turn one of the routers into 'Bridge mode' which means you then only have to configure one device rather than all of them. So, in our above example, we would set the Netgear router to 'Bridge'. See your router's help documentation for instructions.
 

@@ -35,7 +35,6 @@
 #include <fmt/core.h>
 
 #include <algorithm>
-#include <list>
 #include <memory>
 #include <optional>
 #include <queue>

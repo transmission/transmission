@@ -75,8 +75,8 @@
 		A20162C913DE48BF00E15488 /* receivedata.c in Sources */ = {isa = PBXBuildFile; fileRef = A20162C713DE48BF00E15488 /* receivedata.c */; };
 		A20162CA13DE48BF00E15488 /* receivedata.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162C813DE48BF00E15488 /* receivedata.h */; };
 		A20162CD13DE497000E15488 /* portlistingparse.c in Sources */ = {isa = PBXBuildFile; fileRef = A20162CB13DE497000E15488 /* portlistingparse.c */; };
-		A20162CE13DE497000E15488 /* portlistingparse.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CC13DE497000E15488 /* portlistingparse.h */; };
-		A20162D013DE49E500E15488 /* miniupnpctypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CF13DE49E500E15488 /* miniupnpctypes.h */; };
+		A20162CE13DE497000E15488 /* portlistingparse.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CC13DE497000E15488 /* portlistingparse.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		A20162D013DE49E500E15488 /* miniupnpctypes.h in Headers */ = {isa = PBXBuildFile; fileRef = A20162CF13DE49E500E15488 /* miniupnpctypes.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A2074F4C12BEA8CE00F70985 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F4B12BEA8CE00F70985 /* buffer.c */; };
 		A2074F5912BEA8E000F70985 /* bufferevent_filter.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5012BEA8E000F70985 /* bufferevent_filter.c */; };
 		A2074F5B12BEA8E000F70985 /* bufferevent_pair.c in Sources */ = {isa = PBXBuildFile; fileRef = A2074F5212BEA8E000F70985 /* bufferevent_pair.c */; };
@@ -264,14 +264,14 @@
 		A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.mm */; };
 		A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */; };
 		A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D413 /* torrent-files.h */; };
-		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
-		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; };
+		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BE11835A0CE160C50002D0F3 /* minixml.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183500CE160C50002D0F3 /* minixml.h */; };
-		BE11835B0CE160C50002D0F3 /* miniwget.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183510CE160C50002D0F3 /* miniwget.h */; };
+		BE11835B0CE160C50002D0F3 /* miniwget.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183510CE160C50002D0F3 /* miniwget.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BE11835C0CE160C50002D0F3 /* minisoap.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183520CE160C50002D0F3 /* minisoap.h */; };
-		BE11835D0CE160C50002D0F3 /* upnpreplyparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183530CE160C50002D0F3 /* upnpreplyparse.h */; };
-		BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183540CE160C50002D0F3 /* upnpcommands.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183550CE160C50002D0F3 /* miniupnpc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BE11835D0CE160C50002D0F3 /* upnpreplyparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183530CE160C50002D0F3 /* upnpreplyparse.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183540CE160C50002D0F3 /* upnpcommands.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183550CE160C50002D0F3 /* miniupnpc.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183560CE160C50002D0F3 /* minissdpc.h */; };
 		BE1183690CE160D50002D0F3 /* igd_desc_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = BE1183610CE160D50002D0F3 /* igd_desc_parse.c */; };
 		BE11836A0CE160D50002D0F3 /* minixml.c in Sources */ = {isa = PBXBuildFile; fileRef = BE1183620CE160D50002D0F3 /* minixml.c */; };
@@ -325,7 +325,7 @@
 		C11DEA161FCD31C0009E22B9 /* subprocess-posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = C11DEA141FCD31C0009E22B9 /* subprocess-posix.cc */; };
 		C11DEA171FCD31C0009E22B9 /* subprocess.h in Headers */ = {isa = PBXBuildFile; fileRef = C11DEA151FCD31C0009E22B9 /* subprocess.h */; };
 		C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19771E1AE3C30005E93F /* upnperrors.c */; };
-		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; };
+		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C1305EBE186A13B100F03351 /* file.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.cc */; };
 		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
 		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
@@ -353,7 +353,7 @@
 		C1846BA3294F7A6800A98F30 /* wildmat.h in Headers */ = {isa = PBXBuildFile; fileRef = C1846B87294F781800A98F30 /* wildmat.h */; };
 		C1846BA9294F7B5A00A98F30 /* libwildmat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1846B9E294F7A3400A98F30 /* libwildmat.a */; };
 		C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */; };
-		C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */ = {isa = PBXBuildFile; fileRef = C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */; };
+		C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */ = {isa = PBXBuildFile; fileRef = C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C1F690FD1AD0627500D95CF0 /* daemon-posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1F690FC1AD0627500D95CF0 /* daemon-posix.cc */; };
 		C1FEE5781C3223CC00D62832 /* watchdir-generic.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5731C3223CC00D62832 /* watchdir-generic.cc */; };
 		C1FEE5791C3223CC00D62832 /* watchdir-kqueue.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5741C3223CC00D62832 /* watchdir-kqueue.cc */; };
@@ -1367,7 +1367,7 @@
 		ED20B87D285892C5005FA6BE /* crc32_multipliers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_multipliers.h; path = lib/crc32_multipliers.h; sourceTree = "<group>"; };
 		ED20B87E285892C5005FA6BE /* crc32_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_tables.h; path = lib/crc32_tables.h; sourceTree = "<group>"; };
 		ED67FB402B70FCE400D8A037 /* settings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = settings.cc; sourceTree = "<group>"; };
-		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = settings.h; sourceTree = "<group>"; };
 		ED86936D2ADAE34D00342B1A /* DefaultAppHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAppHelper.h; sourceTree = "<group>"; };
 		ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DefaultAppHelper.mm; sourceTree = "<group>"; };
 		ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "peer-mgr-active-requests.h"; sourceTree = "<group>"; };
@@ -2909,7 +2909,8 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1420;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
@@ -3040,10 +3041,13 @@
 			files = (
 			);
 			inputPaths = (
+				"update-version-h.sh",
+				CMakeLists.txt,
 			);
 			name = "Generate version file";
 			outputPaths = (
 				"$(SRCROOT)/libtransmission/version.h",
+				"$(SRCROOT)/libtransmission/version.h.new",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3077,7 +3081,7 @@
 			);
 			name = "Copy libevent headers";
 			outputPaths = (
-				"$(SRCROOT)/third-party/libevent/evconfig-private.h",
+				"$(SRCROOT)/third-party/libevent/include/evconfig-private.h",
 				"$(SRCROOT)/third-party/libevent/include/event2/event-config.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3092,7 +3096,7 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"third-party/miniupnpc/miniupnp",
+				"third-party/miniupnp/miniupnp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3952,7 +3956,6 @@
 		0053D3D30C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
@@ -3967,6 +3970,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4022,9 +4026,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
-				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				HEADER_SEARCH_PATHS = (
@@ -4051,8 +4053,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4071,8 +4071,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4095,8 +4093,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4143,6 +4139,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_PASCAL_STRINGS = NO;
@@ -4181,14 +4178,12 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
-				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
 		};
 		3C7A118E0D0B2EB800B5701F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
@@ -4199,7 +4194,6 @@
 		3C7A118F0D0B2EB800B5701F /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
@@ -4210,7 +4204,6 @@
 		3C7A11900D0B2EB800B5701F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
@@ -4222,6 +4215,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4276,8 +4270,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4297,9 +4289,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
-				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				HEADER_SEARCH_PATHS = (
@@ -4353,6 +4343,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_PASCAL_STRINGS = NO;
@@ -4397,7 +4388,6 @@
 		A22CFCBB0FC24F720009BD3E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4408,7 +4398,6 @@
 		A22CFCBC0FC24F720009BD3E /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4419,7 +4408,6 @@
 		A22CFCBD0FC24F720009BD3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4460,6 +4448,7 @@
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_PASCAL_STRINGS = NO;
@@ -4497,7 +4486,6 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
-				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = "Release - Debug";
 		};
@@ -4506,9 +4494,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
-				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				HEADER_SEARCH_PATHS = (
@@ -4535,8 +4521,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4555,6 +4539,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4609,8 +4594,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4633,8 +4616,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4652,7 +4633,6 @@
 		A250CFF20CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
@@ -4666,7 +4646,6 @@
 		A2E384CF130DFB1D001F501B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4677,7 +4656,6 @@
 		A2E384D0130DFB1D001F501B /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4688,7 +4666,6 @@
 		A2E384D1130DFB1D001F501B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					POSIX,
 					NS_BLOCK_ASSERTIONS,
@@ -4703,7 +4680,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4731,7 +4707,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4759,7 +4734,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4786,7 +4760,6 @@
 		BE1183490CE160960002D0F3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
@@ -4796,7 +4769,6 @@
 		BE11834A0CE160960002D0F3 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
@@ -4806,7 +4778,6 @@
 		BE11834B0CE160960002D0F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
@@ -4816,7 +4787,6 @@
 		BE75C34B0C729EB600DBEFE0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
@@ -4831,8 +4801,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4855,8 +4823,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4874,7 +4840,6 @@
 		C1639A701A55F4D600E42033 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4884,7 +4849,6 @@
 		C1639A711A55F4D600E42033 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4894,7 +4858,6 @@
 		C1639A721A55F4D600E42033 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4904,7 +4867,6 @@
 		C1846B9B294F7A3400A98F30 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = wildmat;
@@ -4914,7 +4876,6 @@
 		C1846B9C294F7A3400A98F30 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = wildmat;
@@ -4924,7 +4885,6 @@
 		C1846B9D294F7A3400A98F30 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = wildmat;
@@ -4934,7 +4894,6 @@
 		C3CEBBA627949CA000683BE0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4946,7 +4905,6 @@
 		C3CEBBA727949CA000683BE0 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -4958,7 +4916,6 @@
 		C3CEBBA827949CA000683BE0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -5016,8 +4973,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5036,8 +4991,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5056,8 +5009,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5076,8 +5027,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5096,8 +5045,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5116,8 +5063,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5136,8 +5081,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5156,8 +5099,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -5176,8 +5117,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,

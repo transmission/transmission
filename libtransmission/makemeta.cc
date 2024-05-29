@@ -134,7 +134,7 @@ tr_metainfo_builder::tr_metainfo_builder(std::string_view single_file_or_parent_
     : top_{ single_file_or_parent_directory }
 {
     files_ = findFiles(tr_sys_path_dirname(top_), tr_sys_path_basename(top_));
-    block_info_ = tr_block_info{ files_.totalSize(), default_piece_size(files_.totalSize()) };
+    block_info_ = tr_block_info{ files_.total_size(), default_piece_size(files_.total_size()) };
 }
 
 bool tr_metainfo_builder::set_piece_size(uint32_t piece_size) noexcept
@@ -144,7 +144,7 @@ bool tr_metainfo_builder::set_piece_size(uint32_t piece_size) noexcept
         return false;
     }
 
-    block_info_ = tr_block_info{ files_.totalSize(), piece_size };
+    block_info_ = tr_block_info{ files_.total_size(), piece_size };
     return true;
 }
 

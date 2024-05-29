@@ -68,6 +68,15 @@ tr_metadata_download::tr_metadata_download(std::string_view log_name, int64_t co
     create_all_needed(n);
 }
 
+void tr_torrent::do_magnet_idle_work()
+{
+    if (auto& m = metadata_download_; m && m->is_complete())
+    {
+        tr_logAddDebugTor(this, fmt::format("we now have all the metainfo!"));
+        on_have_all_metainfo();
+    }
+}
+
 void tr_torrent::maybe_start_metadata_transfer(int64_t const size) noexcept
 {
     if (has_metainfo() || metadata_download_)
@@ -262,20 +271,20 @@ void tr_torrent::on_have_all_metainfo()
     m.reset();
 }
 
-bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* const data, size_t const len)
+void tr_metadata_download::set_metadata_piece(int64_t const piece, void const* const data, size_t const len)
 {
     TR_ASSERT(data != nullptr);
 
     // sanity test: is `piece` in range?
     if (piece < 0 || piece >= piece_count_)
     {
-        return false;
+        return;
     }
 
     // sanity test: is `len` the right size?
     if (get_piece_length(piece) != len)
     {
-        return false;
+        return;
     }
 
     // do we need this piece?
@@ -286,7 +295,7 @@ bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* c
         [piece](auto const& item) { return item.piece == piece; });
     if (iter == std::end(needed))
     {
-        return false;
+        return;
     }
 
     auto const offset = piece * MetadataPieceSize;
@@ -294,8 +303,6 @@ bool tr_metadata_download::set_metadata_piece(int64_t const piece, void const* c
 
     needed.erase(iter);
     tr_logAddDebugMagnet(this, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
-
-    return std::empty(needed);
 }
 
 void tr_torrent::set_metadata_piece(int64_t const piece, void const* const data, size_t const len)
@@ -304,10 +311,9 @@ void tr_torrent::set_metadata_piece(int64_t const piece, void const* const data,
 
     tr_logAddDebugTor(this, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
-    if (auto& m = metadata_download_; m && m->set_metadata_piece(piece, data, len))
+    if (auto& m = metadata_download_)
     {
-        tr_logAddDebugTor(this, fmt::format("we now have all the metainfo!"));
-        on_have_all_metainfo();
+        m->set_metadata_piece(piece, data, len);
     }
 }
 

@@ -10,7 +10,6 @@
 #include <cstddef> // size_t
 #include <cstdint>
 #include <limits>
-#include <memory>
 #include <optional>
 #include <random> // for std::uniform_int_distribution<T>
 #include <string>

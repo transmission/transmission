@@ -44,11 +44,11 @@ public:
     }
     [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
-        return files().fileCount();
+        return files().file_count();
     }
     [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const
     {
-        return files().fileSize(i);
+        return files().file_size(i);
     }
     [[nodiscard]] TR_CONSTEXPR20 auto const& file_subpath(tr_file_index_t i) const
     {
@@ -57,7 +57,7 @@ public:
 
     void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
-        files_.setPath(i, subpath);
+        files_.set_path(i, subpath);
     }
 
     /// BLOCK INFO

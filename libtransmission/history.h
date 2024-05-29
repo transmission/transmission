@@ -26,7 +26,7 @@ class tr_recentHistory
 public:
     /**
      * @brief add a counter to the recent history object.
-     * @param when the current time in sec, such as from tr_time()
+     * @param now the current time in seconds, such as from tr_time()
      * @param n how many items to add to the history's counter
      */
     constexpr void add(time_t now, SizeType n)
@@ -43,8 +43,8 @@ public:
 
     /**
      * @brief count how many events have occurred in the last N seconds.
-     * @param when the current time in sec, such as from tr_time()
-     * @param seconds how many seconds to count back through.
+     * @param now the current time in seconds, such as from tr_time()
+     * @param age_sec how many seconds to count back through.
      */
     [[nodiscard]] constexpr SizeType count(time_t now, unsigned int age_sec) const
     {

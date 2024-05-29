@@ -291,6 +291,19 @@ std::string_view getSiteName(std::string_view host)
 
     return host;
 }
+
+// Not part of the RFC3986 standard, but included for convenience
+// when using the result with API that does not accept IPv6 address
+// strings that are wrapped in square brackets (e.g. inet_pton())
+std::string_view getHostWoBrackets(std::string_view host)
+{
+    if (tr_strv_starts_with(host, '['))
+    {
+        host.remove_prefix(1);
+        host.remove_suffix(1);
+    }
+    return host;
+}
 } // namespace
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
@@ -363,6 +376,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         {
             parsed.host = tr_strv_sep(&remain, ':');
         }
+        parsed.host_wo_brackets = getHostWoBrackets(parsed.host);
         parsed.sitename = getSiteName(parsed.host);
         parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }

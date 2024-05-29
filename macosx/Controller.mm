@@ -381,14 +381,14 @@ static void removeKeRangerRansomware()
     [NSValueTransformer setValueTransformer:iconTransformer forName:@"ExpandedPathToIconTransformer"];
 }
 
-void onStartQueue(tr_session* /*session*/, tr_torrent* tor, void* vself)
+void onStartQueue(tr_session* /*session*/, tr_torrent* /*tor*/, void* /*vself*/)
 {
-    auto* controller = (__bridge Controller*)(vself);
-    auto const hashstr = @(tr_torrentView(tor).hash_string);
-
     dispatch_async(dispatch_get_main_queue(), ^{
-        auto* const torrent = [controller torrentForHash:hashstr];
-        [torrent startQueue];
+        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
+                                                 postingStyle:NSPostASAP
+                                                 coalesceMask:NSNotificationCoalescingOnName
+                                                     forModes:nil];
     });
 }
 
@@ -812,8 +812,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     [nc addObserver:self.fWindow selector:@selector(makeKeyWindow) name:@"MakeWindowKey" object:nil];
 
-#warning rename
-    [nc addObserver:self selector:@selector(fullUpdateUI) name:@"UpdateQueue" object:nil];
+    [nc addObserver:self selector:@selector(fullUpdateUI) name:@"UpdateTorrentsState" object:nil];
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"ApplyFilter" object:nil];
 

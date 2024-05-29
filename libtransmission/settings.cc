@@ -7,7 +7,6 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t, uint32_t
-#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>

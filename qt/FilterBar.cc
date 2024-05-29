@@ -6,7 +6,6 @@
 #include "FilterBar.h"
 
 #include <cstdint> // uint64_t
-#include <map>
 #include <unordered_map>
 #include <utility>
 

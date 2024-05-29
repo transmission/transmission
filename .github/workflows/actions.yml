@@ -147,11 +147,6 @@ jobs:
             libssl-dev \
             ninja-build \
             npm
-      - name: Temporary workaround for sanitizer crashes
-        # https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/2048768
-        # https://github.com/actions/runner-images/issues/9491
-        # https://github.com/actions/runner-images/pull/9513
-        run: sudo sysctl vm.mmap_rnd_bits=28
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -339,7 +334,7 @@ jobs:
   macos-11:
     runs-on: macos-11
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    if: false  # ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
       - name: Show Configuration
         run: |

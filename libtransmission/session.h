@@ -17,7 +17,6 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime> // time_t
-#include <functional>
 #include <future>
 #include <memory>
 #include <mutex>

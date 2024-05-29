@@ -96,5 +96,5 @@ private:
     std::atomic<bool> stop_current_ = false;
     std::condition_variable stop_current_cv_;
 
-    std::chrono::milliseconds sleep_per_seconds_during_verify_;
+    std::chrono::milliseconds sleep_per_seconds_during_verify_ = {};
 };

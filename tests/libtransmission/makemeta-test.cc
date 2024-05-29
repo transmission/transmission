@@ -84,7 +84,7 @@ protected:
         EXPECT_EQ(builder.total_size(), metainfo.total_size());
         for (size_t i = 0, n = std::min(builder.file_count(), metainfo.file_count()); i < n; ++i)
         {
-            EXPECT_EQ(builder.file_size(i), metainfo.files().fileSize(i));
+            EXPECT_EQ(builder.file_size(i), metainfo.files().file_size(i));
             EXPECT_EQ(builder.path(i), metainfo.files().path(i));
         }
         EXPECT_EQ(builder.name(), metainfo.name());

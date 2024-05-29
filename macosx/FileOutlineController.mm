@@ -463,7 +463,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
         [FileRenameSheetController presentSheetForTorrent:torrent modalForWindow:self.fOutline.window completionHandler:^(BOOL didRename) {
             if (didRename)
             {
-                [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateQueue" object:self];
+                [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateTorrentsState" object:nil];
                 [NSNotificationCenter.defaultCenter postNotificationName:@"ResetInspector" object:self
                                                                 userInfo:@{ @"Torrent" : torrent }];
             }
