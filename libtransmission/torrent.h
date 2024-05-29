@@ -372,7 +372,7 @@ struct tr_torrent
 
     void amount_done_bins(float* tab, int n_tabs) const
     {
-        return completion_.amount_done(tab, n_tabs);
+        completion_.amount_done(tab, n_tabs);
     }
 
     /// FILE <-> PIECE
