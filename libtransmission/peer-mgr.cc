@@ -639,6 +639,7 @@ private:
 
         is_running = false;
         remove_all_peers();
+        wishlist.reset();
         for (auto& [sockaddr, peer_info] : connectable_pool)
         {
             peer_info->destroy_handshake();
