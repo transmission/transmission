@@ -385,7 +385,7 @@ export class Transmission extends EventTarget {
             then = now - (elapsed % msec);
             callback();
           }
-        }
+        };
 
         refreshTorrentsInterval();
         break;
