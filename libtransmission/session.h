@@ -394,10 +394,10 @@ public:
         double ratio_limit = 2.0;
         size_t cache_size_mbytes = 4U;
         size_t download_queue_size = 5U;
-        size_t idle_seeding_limit_minutes = 30U;
+        time_t idle_seeding_limit_minutes = 30U;
         size_t peer_limit_global = TR_DEFAULT_PEER_LIMIT_GLOBAL;
         size_t peer_limit_per_torrent = TR_DEFAULT_PEER_LIMIT_TORRENT;
-        size_t queue_stalled_minutes = 30U;
+        time_t queue_stalled_minutes = 30U;
         size_t seed_queue_size = 10U;
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
