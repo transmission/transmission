@@ -1152,7 +1152,7 @@ private:
 tr_peer::tr_peer(tr_torrent const& tor)
     : session{ tor.session }
     , swarm{ tor.swarm }
-    , blame{ tor.block_count() }
+    , blame{ tor.piece_count() }
 {
 }
 
