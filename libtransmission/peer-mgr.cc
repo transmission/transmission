@@ -619,7 +619,7 @@ private:
         stats.active_webseed_count = 0;
     }
 
-    void add_strike(tr_peerMsgs* peer) const
+    void add_strike(tr_peer* peer) const
     {
         tr_logAddTraceSwarm(
             this,
@@ -627,7 +627,7 @@ private:
 
         if (++peer->strikes >= MaxBadPiecesPerPeer)
         {
-            peer->peer_info->ban();
+            peer->ban();
             peer->do_purge = true;
             tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
         }

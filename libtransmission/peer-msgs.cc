@@ -397,6 +397,11 @@ public:
 
     // ---
 
+    void ban() override
+    {
+        peer_info->ban();
+    }
+
     void on_torrent_got_metainfo() noexcept override
     {
         update_active();
