@@ -560,6 +560,26 @@ public:
             // not currently supported
             break;
 
+        case tr_peer_event::Type::Error:
+            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
+            {
+                // some protocol error from the peer
+                msgs->disconnect_soon();
+                tr_logAddDebugSwarm(
+                    s,
+                    fmt::format(
+                        "setting {} is_disconnecting_ flag because we got [({}) {}]",
+                        msgs->display_name(),
+                        event.err,
+                        tr_strerror(event.err)));
+            }
+            else
+            {
+                tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
+            }
+
+            break;
+
         default:
             peer_callback_common(msgs, event, s);
             break;
@@ -628,7 +648,6 @@ private:
         if (++peer->strikes >= MaxBadPiecesPerPeer)
         {
             peer->ban();
-            peer->do_purge = true;
             tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
         }
     }
@@ -798,26 +817,6 @@ private:
 
             break;
 
-        case tr_peer_event::Type::Error:
-            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
-            {
-                /* some protocol error from the peer */
-                peer->do_purge = true;
-                tr_logAddDebugSwarm(
-                    s,
-                    fmt::format(
-                        "setting {} do_purge flag because we got [({}) {}]",
-                        peer->display_name(),
-                        event.err,
-                        tr_strerror(event.err)));
-            }
-            else
-            {
-                tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
-            }
-
-            break;
-
         default:
             TR_ASSERT_MSG(false, "This should be unreachable code");
             break;
@@ -891,13 +890,13 @@ EXIT:
                 std::end(peers),
                 [&info_that](tr_peerMsgs const* const peer) { return peer->peer_info == info_that; });
             TR_ASSERT(it != std::end(peers));
-            (*it)->do_purge = true;
+            (*it)->disconnect_soon();
 
             return false;
         }
 
         info_that->merge(*info_this);
-        msgs->do_purge = true;
+        msgs->disconnect_soon();
         stats.known_peer_from_count[info_this->from_first()] -= connectable_pool.erase(info_this->listen_socket_address());
 
         return true;
@@ -2105,9 +2104,9 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
 [[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, size_t peer_count, time_t const now)
 {
     /* if it's marked for purging, close it */
-    if (peer->do_purge)
+    if (peer->is_disconnecting())
     {
-        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its do_purge flag is set", peer->display_name()));
+        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its is_disconnecting_ flag is set", peer->display_name()));
         return true;
     }
 
@@ -2158,9 +2157,9 @@ constexpr struct
 {
     [[nodiscard]] static int compare(tr_peerMsgs const* a, tr_peerMsgs const* b) // <=>
     {
-        if (a->do_purge != b->do_purge)
+        if (a->is_disconnecting() != b->is_disconnecting())
         {
-            return a->do_purge ? 1 : -1;
+            return a->is_disconnecting() ? 1 : -1;
         }
 
         return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
