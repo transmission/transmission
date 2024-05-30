@@ -400,6 +400,7 @@ public:
     void ban() override
     {
         peer_info->ban();
+        disconnect_soon();
     }
 
     void on_torrent_got_metainfo() noexcept override
