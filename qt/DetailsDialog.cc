@@ -766,7 +766,7 @@ void DetailsDialog::refreshUI()
 
         auto const seconds = static_cast<int>(std::difftime(now, latest));
 
-        if (seconds < 0 || static_cast<int>(std::difftime(seconds, std::time(0))) == 0)
+        if (latest == 0)
         {
             string = none;
         }
