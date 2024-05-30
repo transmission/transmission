@@ -818,7 +818,7 @@ struct tr_torrent
         return idle_limit_minutes_;
     }
 
-    [[nodiscard]] constexpr std::optional<time_t> idle_seconds(time_t now) const noexcept
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
     {
         auto const activity = this->activity();
 
@@ -827,7 +827,7 @@ struct tr_torrent
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
                 TR_ASSERT(now >= latest);
-                return std::max(now - latest, time_t{ 0 });
+                return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
             }
         }
 
@@ -1128,7 +1128,7 @@ private:
         return {};
     }
 
-    [[nodiscard]] constexpr std::optional<time_t> idle_seconds_left(time_t now) const noexcept
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
     {
         auto const idle_limit_minutes = effective_idle_limit_minutes();
         if (!idle_limit_minutes)
@@ -1142,7 +1142,7 @@ private:
             return {};
         }
 
-        auto const idle_limit_seconds = time_t{ *idle_limit_minutes } * 60U;
+        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
         return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
     }
 

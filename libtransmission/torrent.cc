@@ -1285,7 +1285,7 @@ bool tr_torrentCanManualUpdate(tr_torrent const* tor)
 
 tr_stat tr_torrent::stats() const
 {
-    static auto constexpr IsStalled = [](tr_torrent const* const tor, std::optional<time_t> idle_secs)
+    static auto constexpr IsStalled = [](tr_torrent const* const tor, std::optional<size_t> idle_secs)
     {
         return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
     };
@@ -1303,7 +1303,7 @@ tr_stat tr_torrent::stats() const
     stats.activity = activity;
     stats.error = this->error().error_type();
     stats.queuePosition = queue_position();
-    stats.idleSecs = idle_seconds ? *idle_seconds : -1;
+    stats.idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
     stats.isStalled = IsStalled(this, idle_seconds);
     stats.errorString = this->error().errmsg().c_str();
 
