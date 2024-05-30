@@ -1682,7 +1682,6 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
         return err;
     }
 
-    blame.set(loc.piece);
     publish(tr_peer_event::GotBlock(tor_.block_info(), block));
 
     return 0;
