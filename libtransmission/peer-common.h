@@ -215,6 +215,8 @@ struct tr_peer
     {
     }
 
+    virtual void ban() = 0;
+
     tr_session* const session;
 
     tr_swarm* const swarm;
