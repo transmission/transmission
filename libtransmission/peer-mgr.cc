@@ -735,9 +735,7 @@ private:
 
     void on_got_bad_piece(tr_piece_index_t piece)
     {
-        auto const byte_count = tor->piece_size(piece);
-
-        for (auto* const peer : peers)
+        auto const maybe_add_strike = [this, piece](tr_peer* const peer)
         {
             if (peer->blame.test(piece))
             {
@@ -750,6 +748,18 @@ private:
                         peer->strikes + 1));
                 add_strike(peer);
             }
+        };
+
+        auto const byte_count = tor->piece_size(piece);
+
+        for (auto* const peer : peers)
+        {
+            maybe_add_strike(peer);
+        }
+
+        for (auto& webseed : webseeds)
+        {
+            maybe_add_strike(webseed.get());
         }
 
         tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
