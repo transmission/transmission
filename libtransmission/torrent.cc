@@ -446,7 +446,7 @@ void tr_torrent::stop_if_seed_limit_reached()
         session->onRatioLimitHit(this);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
-    else if (auto const secs_left = idle_seconds_left(tr_time()); secs_left && *secs_left == 0U)
+    else if (auto const secs_left = idle_seconds_left(tr_time()); secs_left && *secs_left <= 0U)
     {
         tr_logAddInfoTor(this, _("Seeding idle limit reached; pausing torrent"));
 
