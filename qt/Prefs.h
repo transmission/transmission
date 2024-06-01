@@ -6,7 +6,6 @@
 #pragma once
 
 #include <array>
-#include <set>
 
 #include <QObject>
 #include <QString>

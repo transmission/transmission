@@ -12,7 +12,6 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uint16_t, uint32_t, uint8_t
-#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -146,9 +145,10 @@ private:
 
 enum tr_address_type : uint8_t
 {
-    TR_AF_INET,
+    TR_AF_INET = 0,
     TR_AF_INET6,
-    NUM_TR_AF_INET_TYPES
+    NUM_TR_AF_INET_TYPES,
+    TR_AF_UNSPEC = NUM_TR_AF_INET_TYPES
 };
 
 std::string_view tr_ip_protocol_to_sv(tr_address_type type);
@@ -161,11 +161,11 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
-    // write the text form of the address, e.g. inet_ntop()
+    // --- write the text form of the address, e.g. inet_ntop()
     std::string_view display_name(char* out, size_t outlen) const;
     [[nodiscard]] std::string display_name() const;
 
-    ///
+    // ---
 
     [[nodiscard]] constexpr auto is_ipv4() const noexcept
     {
@@ -177,7 +177,7 @@ struct tr_address
         return type == TR_AF_INET6;
     }
 
-    /// bt protocol compact form
+    // --- bt protocol compact form
 
     // compact addr only -- used e.g. as `yourip` value in extension protocol handshake
 
@@ -208,7 +208,11 @@ struct tr_address
         }
     }
 
-    // comparisons
+    // ---
+
+    [[nodiscard]] std::optional<unsigned> to_interface_index() const noexcept;
+
+    // --- comparisons
 
     [[nodiscard]] int compare(tr_address const& that) const noexcept;
 
@@ -232,9 +236,19 @@ struct tr_address
         return this->compare(that) > 0;
     }
 
-    //
+    // ---
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
+
+    [[nodiscard]] constexpr bool is_ipv4_mapped_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_link_local_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
+    }
 
     tr_address_type type = NUM_TR_AF_INET_TYPES;
     union
@@ -374,6 +388,7 @@ struct tr_socket_address
 
     // --- sockaddr helpers
 
+    [[nodiscard]] static std::optional<tr_socket_address> from_string(std::string_view sockaddr_sv);
     [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
     [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 
@@ -404,7 +419,7 @@ struct tr_socket_address
 };
 
 template<>
-class std::hash<tr_socket_address>
+struct std::hash<tr_socket_address>
 {
 public:
     std::size_t operator()(tr_socket_address const& socket_address) const noexcept

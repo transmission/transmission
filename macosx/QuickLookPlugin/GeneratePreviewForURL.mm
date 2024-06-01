@@ -219,7 +219,7 @@ OSStatus GeneratePreviewForURL(void* /*thisInterface*/, QLPreviewRequestRef prev
 
         FileTreeNode root{};
 
-        for (auto const& [path, size] : metainfo.files().sortedByPath())
+        for (auto const& [path, size] : metainfo.files().sorted_by_path())
         {
             FileTreeNode* curNode = &root;
             size_t level = 0;
