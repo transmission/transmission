@@ -525,7 +525,7 @@ std::string_view tr_address::display_name(char* out, size_t outlen) const
 
 [[nodiscard]] std::string tr_address::display_name() const
 {
-    auto buf = std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN) /* just in case */>{};
+    auto buf = std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN)>{};
     return std::string{ display_name(std::data(buf), std::size(buf)) };
 }
 
