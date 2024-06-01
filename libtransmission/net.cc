@@ -516,6 +516,10 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
     TR_ASSERT(is_valid());
+    if (!is_valid())
+    {
+        return "Invalid address"sv;
+    }
     return evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen);
 }
 
