@@ -20,6 +20,12 @@ namespace libtransmission
 class Settings
 {
 public:
+    virtual ~Settings() = default;
+    Settings(Settings const& settings) = default;
+    Settings& operator=(Settings const& other) = default;
+    Settings(Settings&& settings) noexcept = default;
+    Settings& operator=(Settings&& other) noexcept = default;
+
     void load(tr_variant const& src);
 
     [[nodiscard]] tr_variant save() const;

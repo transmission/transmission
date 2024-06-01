@@ -157,10 +157,10 @@ struct tr_announce_response
  * This is only an upper bound: if the tracker complains about
  * length, announcer will incrementally lower the batch size.
  */
-auto inline constexpr TR_MULTISCRAPE_MAX = 60;
+auto inline constexpr TrMultiscrapeMax = 60;
 
-auto inline constexpr TR_ANNOUNCE_TIMEOUT_SEC = std::chrono::seconds{ 45 };
-auto inline constexpr TR_SCRAPE_TIMEOUT_SEC = std::chrono::seconds{ 30 };
+auto inline constexpr TrAnnounceTimeoutSec = std::chrono::seconds{ 45 };
+auto inline constexpr TrScrapeTimeoutSec = std::chrono::seconds{ 30 };
 
 struct tr_scrape_request
 {
@@ -171,7 +171,7 @@ struct tr_scrape_request
     std::string log_name;
 
     /* info hashes of the torrents to scrape */
-    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
+    std::array<tr_sha1_digest_t, TrMultiscrapeMax> info_hash;
 
     /* how many hashes to use in the info_hash field */
     int info_hash_count = 0;
@@ -209,7 +209,7 @@ struct tr_scrape_response
     int row_count;
 
     /* the individual torrents' scrape results */
-    std::array<tr_scrape_response_row, TR_MULTISCRAPE_MAX> rows;
+    std::array<tr_scrape_response_row, TrMultiscrapeMax> rows;
 
     /* the raw scrape url */
     tr_interned_string scrape_url;
