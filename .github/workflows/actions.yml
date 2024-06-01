@@ -334,7 +334,7 @@ jobs:
   macos-11:
     runs-on: macos-11
     needs: [ what-to-make ]
-    if: false  # ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -343,6 +343,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
+          # we don't include `miniupnpc` because on macOS-11 it attempts to download 2.2.6 which isn't downloadable anymore
+          # https://github.com/homebrew/homebrew-core/blob/master/Formula/m/miniupnpc.rb
           brew install cmake gettext libdeflate libevent libpsl ninja node pkg-config
       - name: Get Source
         uses: actions/checkout@v4
