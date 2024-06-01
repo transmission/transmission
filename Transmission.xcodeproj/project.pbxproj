@@ -2716,8 +2716,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BE11834C0CE160A80002D0F3 /* Build configuration list for PBXNativeTarget "miniupnp" */;
 			buildPhases = (
-				A2305097100C0293003FDB0C /* ShellScript */,
-				C12F197C1E1AE55A0005E93F /* ShellScript */,
+				A2305097100C0293003FDB0C /* updateminiupnpcstrings */,
+				C12F197C1E1AE55A0005E93F /* symlinks */,
 				BE1183440CE160960002D0F3 /* Headers */,
 				BE1183450CE160960002D0F3 /* Sources */,
 				BE1183460CE160960002D0F3 /* Frameworks */,
@@ -3053,7 +3053,7 @@
 			shellPath = /bin/sh;
 			shellScript = "sh update-version-h.sh\n";
 		};
-		A2305097100C0293003FDB0C /* ShellScript */ = {
+		A2305097100C0293003FDB0C /* updateminiupnpcstrings */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3063,6 +3063,7 @@
 				"third-party/miniupnp/miniupnpc/miniupnpcstrings.h.in",
 				"third-party/miniupnp/miniupnpc/updateminiupnpcstrings.sh",
 			);
+			name = updateminiupnpcstrings;
 			outputPaths = (
 				"third-party/miniupnp/miniupnpc/miniupnpcstrings.h",
 			);
@@ -3088,19 +3089,20 @@
 			shellPath = /bin/bash;
 			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n\nif [ ! -e ../evconfig-private.h -a ! ../../macosx-libevent-evconfig-private.h -ef ../evconfig-private.h ]; then\n    ln -s ../../macosx-libevent-evconfig-private.h ../evconfig-private.h;\nfi\n";
 		};
-		C12F197C1E1AE55A0005E93F /* ShellScript */ = {
+		C12F197C1E1AE55A0005E93F /* symlinks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = symlinks;
 			outputPaths = (
-				"third-party/miniupnp/miniupnp",
+				"third-party/miniupnp/miniupnpc/include/miniupnpc",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnp && rm -f miniupnp && ln -s . miniupnp\n";
+			shellScript = "cd third-party/miniupnp/miniupnpc\nln -sf . include/miniupnpc\n";
 		};
 		C12F197E1E1AE6D50005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4009,7 +4011,7 @@
 					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/miniupnpc/*.h",
+					"third-party/miniupnp/miniupnpc/include",
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
@@ -4254,7 +4256,7 @@
 					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/miniupnpc/*.h",
+					"third-party/miniupnp/miniupnpc/include",
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
@@ -4578,7 +4580,7 @@
 					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/miniupnpc/*.h",
+					"third-party/miniupnp/miniupnpc/include",
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
