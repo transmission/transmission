@@ -9,7 +9,6 @@
 #include <cstdint> // uint16_t
 #include <cstring>
 #include <ctime> // time_t
-#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
