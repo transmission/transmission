@@ -29,6 +29,10 @@
 #include "libtransmission/tr-macros.h" // TR_ADDRSTRLEN
 #include "libtransmission/utils.h" // for _(), tr_strerror()
 
+#ifndef MINIUPNPC_API_VERSION
+#error miniupnpc >= 1.7 is required
+#endif
+
 namespace
 {
 enum class UpnpState : uint8_t
@@ -100,20 +104,16 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
     UPNPDev* ret = nullptr;
     auto have_err = bool{};
 
-#if (MINIUPNPC_API_VERSION >= 8) /* adds ipv6 and error args */
+    // MINIUPNPC_API_VERSION >= 8 (adds ipv6 and error args)
     int err = UPNPDISCOVER_SUCCESS;
 
-#if (MINIUPNPC_API_VERSION >= 14) /* adds ttl */
+#if (MINIUPNPC_API_VERSION >= 14) // adds ttl
     ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, 2, &err);
 #else
     ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, &err);
 #endif
 
     have_err = err != UPNPDISCOVER_SUCCESS;
-#else
-    ret = upnpDiscover(msec, bindaddr, nullptr, 0);
-    have_err = ret == nullptr;
-#endif
 
     if (have_err)
     {
@@ -142,7 +142,7 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
         nullptr /*desc*/,
         nullptr /*enabled*/,
         nullptr /*duration*/);
-#elif (MINIUPNPC_API_VERSION >= 8) /* adds desc, enabled and leaseDuration args */
+#else // MINIUPNPC_API_VERSION >= 8 (adds desc, enabled and leaseDuration args)
     int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
@@ -153,14 +153,6 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
         nullptr /*desc*/,
         nullptr /*enabled*/,
         nullptr /*duration*/);
-#else
-    int const err = UPNP_GetSpecificPortMappingEntry(
-        handle->urls.controlURL,
-        handle->data.first.servicetype,
-        port_str.c_str(),
-        proto,
-        std::data(int_client),
-        std::data(int_port));
 #endif
 
     return err;
@@ -179,7 +171,7 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
     auto const advertised_port_str = std::to_string(advertised_port.host());
     auto const local_port_str = std::to_string(local_port.host());
 
-#if (MINIUPNPC_API_VERSION >= 8)
+    // MINIUPNPC_API_VERSION >= 8
     int const err = UPNP_AddPortMapping(
         handle->urls.controlURL,
         handle->data.first.servicetype,
@@ -190,17 +182,6 @@ constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
         proto,
         nullptr,
         nullptr);
-#else
-    int const err = UPNP_AddPortMapping(
-        handle->urls.controlURL,
-        handle->data.first.servicetype,
-        advertised_port_str.c_str(),
-        local_port_str.c_str(),
-        handle->lanaddr.c_str(),
-        desc,
-        proto,
-        nullptr);
-#endif
 
     if (err != 0)
     {
