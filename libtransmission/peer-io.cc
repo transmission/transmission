@@ -100,7 +100,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 
     auto io = std::make_shared<tr_peerIo>(session, info_hash, is_incoming, is_seed, parent);
     io->bandwidth().set_peer(io);
-    tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
     return io;
 }
 
@@ -110,6 +109,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(tr_session* session, tr_bandw
 
     auto peer_io = tr_peerIo::create(session, parent, nullptr, true, false);
     peer_io->set_socket(std::move(socket));
+    tr_logAddTraceIo(
+        peer_io,
+        fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&peer_io->bandwidth()), fmt::ptr(parent)));
     return peer_io;
 }
 
@@ -140,6 +142,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
                   auto* const sock = utp_create_socket(session->utp_context);
                   utp_set_userdata(sock, peer_io.get());
                   peer_io->set_socket(tr_peer_socket{ socket_address, sock });
+                  tr_logAddTraceIo(
+                      peer_io,
+                      fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&peer_io->bandwidth()), fmt::ptr(parent)));
 
                   auto const [ss, sslen] = socket_address.to_sockaddr();
                   if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
@@ -158,6 +163,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
                   if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
                   {
                       peer_io->set_socket(std::move(sock));
+                      tr_logAddTraceIo(
+                          peer_io,
+                          fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&peer_io->bandwidth()), fmt::ptr(parent)));
                       return true;
                   }
               }
