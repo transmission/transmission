@@ -766,13 +766,11 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     if (auto const& val = new_settings.log_level; force || val != old_settings.log_level)
     {
-        std::printf("Going with message level %ld", val);
         tr_logSetLevel(val);
     }
 
     if (auto const& val = new_settings.max_repeated_logs; force || val != old_settings.max_repeated_logs)
     {
-        std::printf("starting with number %ld\n", val);
         tr_logSetMaxLogMessages(val);
     }
 
