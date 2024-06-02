@@ -330,9 +330,9 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  # Only verify build support on old macOS
-  macos-11:
-    runs-on: macos-11
+  # Only verify build support on older macOS and SDK
+  macos-12:
+    runs-on: macos-12
     needs: [ what-to-make ]
     if: false  # ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
@@ -349,6 +349,9 @@ jobs:
         with:
           path: src
           submodules: recursive
+      - name: Set Xcode to 13.2.1
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_13.2.1.app
       - name: Configure
         run: |
           cmake \
