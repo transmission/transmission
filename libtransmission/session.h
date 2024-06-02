@@ -402,6 +402,7 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
+        size_t max_repeated_logs = 0U;
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::string announce_ip;
         std::string bind_address_ipv4;
@@ -447,6 +448,7 @@ public:
                 { TR_KEY_incomplete_dir, &incomplete_dir },
                 { TR_KEY_incomplete_dir_enabled, &incomplete_dir_enabled },
                 { TR_KEY_lpd_enabled, &lpd_enabled },
+                { TR_KEY_max_repeated_logs, &max_repeated_logs },
                 { TR_KEY_message_level, &log_level },
                 { TR_KEY_peer_congestion_algorithm, &peer_congestion_algorithm },
                 { TR_KEY_peer_limit_global, &peer_limit_global },

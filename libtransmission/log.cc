@@ -46,6 +46,8 @@ public:
 
     bool queue_enabled_ = false;
 
+    size_t max_repeated_logs = 0;
+
     tr_log_message* queue_ = nullptr;
 
     tr_log_message** queue_tail_ = &queue_;
@@ -165,6 +167,16 @@ void tr_logSetLevel(tr_log_level level)
     log_state.level = level;
 }
 
+size_t tr_logGetMaxMessages()
+{
+    return log_state.max_repeated_logs;
+}
+
+void tr_logSetMaxLogMessages(size_t max_repeated_logs)
+{
+    log_state.max_repeated_logs = max_repeated_logs;
+}
+
 void tr_logSetQueueEnabled(bool is_enabled)
 {
     log_state.queue_enabled_ = is_enabled;
@@ -242,13 +254,12 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     bool last_one = false;
     if (level == TR_LOG_CRITICAL || level == TR_LOG_ERROR || level == TR_LOG_WARN)
     {
-        static auto constexpr MaxRepeat = size_t{ 30 };
         static auto* const counts = new small::map<std::pair<std::string_view, long>, size_t>{};
 
         auto& count = (*counts)[std::make_pair(filename, line)];
         ++count;
-        last_one = count == MaxRepeat;
-        if (count > MaxRepeat)
+        last_one = (count == log_state.max_repeated_logs && log_state.max_repeated_logs != 0);
+        if (count > log_state.max_repeated_logs && log_state.max_repeated_logs != 0)
         {
             errno = err;
             return;

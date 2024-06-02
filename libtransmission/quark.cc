@@ -197,6 +197,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "main-window-y"sv,
     "manualAnnounceTime"sv,
     "max-peers"sv,
+    "max-repeated-logs"sv,
     "maxConnectedPeers"sv,
     "memory-bytes"sv,
     "memory-units"sv,
