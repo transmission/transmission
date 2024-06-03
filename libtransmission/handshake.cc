@@ -415,8 +415,8 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
-    auto obfuscated_hash = tr_sha1_digest_t{};
-    static auto constexpr Needlen = std::size(obfuscated_hash) + /* HASH('req2', SKEY) xor HASH('req3', S) */
+    auto x_or = tr_sha1_digest_t{};
+    static auto constexpr Needlen = std::size(x_or) + /* HASH('req2', SKEY) xor HASH('req3', S) */
         std::size(VC) + sizeof(crypto_provide_) + sizeof(pad_c_len_);
 
     if (peer_io->read_buffer_size() < Needlen)
@@ -428,9 +428,9 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
      * we can get the first half of that (the obfuscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
     tr_logAddTraceHand(this, "reading obfuscated torrent hash...");
-    auto x_or = tr_sha1_digest_t{};
     peer_io->read_bytes(std::data(x_or), std::size(x_or));
 
+    auto obfuscated_hash = tr_sha1_digest_t{};
     auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
     {
