@@ -449,6 +449,8 @@ TEST_F(RenameTest, partialFile)
     ****  create our test torrent with an incomplete .part file
     ***/
 
+    tr_sessionSetIncompleteFileNamingEnabled(session_, true);
+
     auto* tor = zeroTorrentInit(ZeroTorrentState::Partial);
     EXPECT_EQ(TotalSize, tor->total_size());
     EXPECT_EQ(PieceSize, tor->piece_size());
