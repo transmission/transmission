@@ -536,10 +536,12 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
      * standard practice at this time is for it to be zero-length */
     outbuf.add_uint16(0U);
 
+    // send it
+    peer_io->write(outbuf, false);
+
     /* maybe de-encrypt our connection */
     if (crypto_select_ == CryptoProvidePlaintext)
     {
-        peer_io->write(outbuf, false);
         TR_ASSERT(std::empty(outbuf));
 
         // All future communications will use ENCRYPT2()
