@@ -531,7 +531,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
 
     tr_logAddTraceHand(this, "sending pad d");
 
-    /* ENCRYPT(VC, crypto_provide, len(PadD), PadD
+    /* ENCRYPT(VC, crypto_select, len(PadD), PadD
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     outbuf.add_uint16(0U);
