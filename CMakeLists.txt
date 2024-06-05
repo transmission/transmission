@@ -72,7 +72,7 @@ option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
 tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
 tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" OFF)
-tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" OFF)
+tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
@@ -493,7 +493,6 @@ tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
 if(CRYPTO_PKG STREQUAL "openssl")
-    add_compile_definitions(WITH_LIBEVENT_OPENSSL)
     tr_add_external_auto_library(EVENT2 libevent event
         TARGET libevent::event
         EXTRA_LIBS event_openssl
@@ -519,6 +518,13 @@ else()
             -DEVENT__DISABLE_SAMPLES:BOOL=ON
             -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 endif()
+
+foreach(LIB_PATH ${EVENT2_LIBRARY})
+    if (${LIB_PATH} MATCHES ".*event_openssl.*")
+        add_compile_definitions(WITH_LIBEVENT_OPENSSL)
+        message(STATUS "Compile with libevent_openssl")
+    endif()
+endforeach()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
     TARGET natpmp::natpmp)
