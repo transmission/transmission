@@ -1458,6 +1458,60 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
     return pex;
 }
 
+tr_variant::Map tr_pex::to_variant() const
+{
+    auto pex = tr_variant::Map{ 2 };
+
+    auto buf = std::array<char, tr_socket_address::CompactSockAddrMaxBytes>{};
+    auto* const buf_data = std::data(buf);
+    auto* const begin = reinterpret_cast<std::byte*>(buf_data);
+    auto* const end = to_compact(begin);
+
+    pex.try_emplace(TR_KEY_socket_address, std::string_view{ buf_data, static_cast<size_t>(end - begin) });
+    pex.try_emplace(TR_KEY_flags, flags);
+
+    return pex;
+}
+
+std::vector<tr_pex> tr_pex::from_variant(tr_variant const* const var, size_t n_var)
+{
+    auto pex = std::vector<tr_pex>(n_var);
+    for (size_t i = 0; i < n_var; ++i)
+    {
+        auto* const map = var[i].get_if<tr_variant::Map>();
+        if (map == nullptr)
+        {
+            continue;
+        }
+
+        auto sockaddr = map->value_if<std::string_view>(TR_KEY_socket_address);
+        if (!sockaddr)
+        {
+            continue;
+        }
+
+        auto* const compact = reinterpret_cast<std::byte const*>(std::data(*sockaddr));
+        switch (std::size(*sockaddr))
+        {
+        case tr_socket_address::CompactSockAddrBytes[TR_AF_INET]:
+            pex[i].socket_address = tr_socket_address::from_compact_ipv4(compact).first;
+            break;
+
+        case tr_socket_address::CompactSockAddrBytes[TR_AF_INET6]:
+            pex[i].socket_address = tr_socket_address::from_compact_ipv6(compact).first;
+            break;
+
+        default:
+            TR_ASSERT(false);
+            continue;
+        }
+
+        pex[i].flags = static_cast<uint8_t>(map->value_if<int64_t>(TR_KEY_flags).value_or(0));
+    }
+
+    return pex;
+}
+
 // ---
 
 namespace
