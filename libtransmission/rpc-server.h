@@ -15,6 +15,12 @@
 #include <string_view>
 #include <vector>
 
+#ifdef WITH_LIBEVENT_OPENSSL
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <event2/bufferevent_ssl.h>
+#endif
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/net.h"
@@ -223,4 +229,7 @@ public:
 
     size_t login_attempts_ = 0U;
     int start_retry_counter = 0;
+#ifdef WITH_LIBEVENT_OPENSSL
+    SSL_CTX* ctx = nullptr;
+#endif
 };
