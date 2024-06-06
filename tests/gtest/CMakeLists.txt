@@ -1,4 +1,9 @@
-set(GTEST_ROOT_DIR ${TR_THIRD_PARTY_SOURCE_DIR}/googletest/googletest)
+find_path(GTEST_ROOT_DIR
+    NAMES
+        src/gtest-all.cc
+    HINTS
+        ${TR_THIRD_PARTY_SOURCE_DIR}/googletest/googletest
+        /usr/src/googletest/googletest)
 
 add_library(gtestall STATIC)
 
