@@ -523,16 +523,27 @@ tr_resume::fields_t loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::
                 }
                 else if (b != nullptr && b->holds_alternative<tr_variant::Vector>())
                 {
+                    // The first element (idx 0) stores a base value for all piece timestamps,
+                    // which would be the value of the smallest piece timestamp minus 1.
+                    //
+                    // The rest of the elements are the timestamp of each piece, stored as
+                    // an offset to the base value.
+                    // i.e. idx 1 <-> piece 0, idx 2 <-> piece 1, ...
+                    //      timestamp of piece n = idx 0 + idx n+1
+                    //
+                    // Pieces that haven't been checked will have a timestamp offset of 0.
+                    // They can be differentiated from the oldest checked piece(s) since the
+                    // offset for any checked pieces will be at least 1.
+
                     auto offset = int64_t{};
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
 
-                    time_checked = tr_time();
                     auto const [piece_begin, piece_end] = tor->piece_span_for_file(fi);
-                    for (size_t i = 0, n = piece_end - piece_begin; i < n; ++i)
+                    for (tr_piece_index_t i = 1, n = piece_end - piece_begin; i <= n; ++i)
                     {
-                        int64_t piece_time = 0;
-                        tr_variantGetInt(tr_variantListChild(b, i + 1), &piece_time);
-                        time_checked = std::min(time_checked, time_t(piece_time));
+                        auto t = int64_t{};
+                        tr_variantGetInt(tr_variantListChild(b, i), &t);
+                        time_checked = std::min(time_checked, time_t(t != 0 ? t + offset : 0));
                     }
                 }
 
