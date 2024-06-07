@@ -83,10 +83,6 @@ void tr_logSetLevel(tr_log_level);
 
 [[nodiscard]] bool tr_logLevelIsActive(tr_log_level level);
 
-void tr_logSetMaxLogMessages(size_t);
-
-[[nodiscard]] size_t tr_logGetMaxMessages();
-
 // ---
 
 void tr_logAddMessage(

@@ -769,11 +769,6 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         tr_logSetLevel(val);
     }
 
-    if (auto const& val = new_settings.max_repeated_logs; force || val != old_settings.max_repeated_logs)
-    {
-        tr_logSetMaxLogMessages(val);
-    }
-
 #ifndef _WIN32
     if (auto const& val = new_settings.umask; force || val != old_settings.umask)
     {

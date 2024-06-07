@@ -92,7 +92,6 @@ public:
         IDLE_LIMIT_ENABLED,
         INCOMPLETE_DIR,
         INCOMPLETE_DIR_ENABLED,
-        MAX_LOG_MESSAGES,
         MSGLEVEL,
         PEER_LIMIT_GLOBAL,
         PEER_LIMIT_TORRENT,

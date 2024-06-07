@@ -120,7 +120,6 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { IDLE_LIMIT_ENABLED, TR_KEY_idle_seeding_limit_enabled, QMetaType::Bool },
     { INCOMPLETE_DIR, TR_KEY_incomplete_dir, QMetaType::QString },
     { INCOMPLETE_DIR_ENABLED, TR_KEY_incomplete_dir_enabled, QMetaType::Bool },
-    { MAX_LOG_MESSAGES, TR_KEY_max_repeated_logs, QMetaType::Int },
     { MSGLEVEL, TR_KEY_message_level, QMetaType::Int },
     { PEER_LIMIT_GLOBAL, TR_KEY_peer_limit_global, QMetaType::Int },
     { PEER_LIMIT_TORRENT, TR_KEY_peer_limit_per_torrent, QMetaType::Int },
