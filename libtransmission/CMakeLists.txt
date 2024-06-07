@@ -1,3 +1,4 @@
+include(CheckAtomic)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
@@ -298,6 +299,7 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
+        $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
         transmission::crypto_impl
         fmt::fmt-header-only
