@@ -218,6 +218,8 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
     auto reader = rapidjson::GenericReader<rapidjson::AutoUTF<unsigned>, rapidjson::UTF8<char>>{};
     reader.Parse(eis, handler);
 
+    end_ = begin + eis.Tell();
+
     if (!reader.HasParseError())
     {
         return std::optional<tr_variant>{ std::move(top) };
