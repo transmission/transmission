@@ -331,6 +331,8 @@ public:
 
     [[nodiscard]] constexpr auto getETA() const noexcept
     {
+        if (eta_ < 0)
+            return INT_MAX;
         return eta_;
     }
 

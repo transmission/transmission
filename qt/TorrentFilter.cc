@@ -190,6 +190,16 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
             val = a->compareETA(*b);
         }
 
+        if (val == 0)
+        {
+            val = a->compareSeedProgress(*b);
+        }
+
+        if (val == 0)
+        {
+            val = a->compareRatio(*b);
+        }
+
         break;
 
     default:
