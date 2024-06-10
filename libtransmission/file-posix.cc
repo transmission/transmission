@@ -28,8 +28,6 @@
 #endif
 
 #ifdef HAVE_XFS_XFS_H
-#error temp checking which pipelines have XFS
-#include <sys/file.h> /* flock() */
 #include <xfs/xfs.h>
 #endif
 
