@@ -187,9 +187,9 @@ public:
 
     // ---
 
-    [[nodiscard]] constexpr auto compare_by_failure_count(tr_peer_info const& that) const noexcept
+    [[nodiscard]] constexpr auto compare_by_fruitless_count(tr_peer_info const& that) const noexcept
     {
-        return tr_compare_3way(num_consecutive_fails_, that.num_consecutive_fails_);
+        return tr_compare_3way(num_consecutive_fruitless_, that.num_consecutive_fruitless_);
     }
 
     [[nodiscard]] constexpr auto compare_by_piece_data_time(tr_peer_info const& that) const noexcept
@@ -201,14 +201,26 @@ public:
 
     constexpr auto set_connected(time_t now, bool is_connected = true) noexcept
     {
+        if (is_connected_ == is_connected)
+        {
+            return;
+        }
+
         connection_changed_at_ = now;
 
         is_connected_ = is_connected;
 
         if (is_connected_)
         {
-            num_consecutive_fails_ = {};
             piece_data_at_ = {};
+        }
+        else if (has_transferred_piece_data())
+        {
+            num_consecutive_fruitless_ = {};
+        }
+        else
+        {
+            on_fruitless_connection();
         }
     }
 
@@ -316,17 +328,17 @@ public:
 
     // ---
 
-    constexpr void on_connection_failed() noexcept
+    constexpr void on_fruitless_connection() noexcept
     {
-        if (num_consecutive_fails_ != std::numeric_limits<decltype(num_consecutive_fails_)>::max())
+        if (num_consecutive_fruitless_ != std::numeric_limits<decltype(num_consecutive_fruitless_)>::max())
         {
-            ++num_consecutive_fails_;
+            ++num_consecutive_fruitless_;
         }
     }
 
-    [[nodiscard]] constexpr auto connection_failure_count() const noexcept
+    [[nodiscard]] constexpr auto fruitless_connection_count() const noexcept
     {
-        return num_consecutive_fails_;
+        return num_consecutive_fruitless_;
     }
 
     // ---
@@ -404,7 +416,7 @@ private:
         // otherwise, the interval depends on how many times we've tried
         // and failed to connect to the peer. Penalize peers that were
         // unreachable the last time we tried
-        auto step = this->num_consecutive_fails_;
+        auto step = num_consecutive_fruitless_;
         if (unreachable)
         {
             step += 2;
@@ -449,7 +461,7 @@ private:
     tr_peer_from from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
 
-    uint8_t num_consecutive_fails_ = {};
+    uint8_t num_consecutive_fruitless_ = {};
     uint8_t pex_flags_ = {};
 
     bool is_banned_ = false;

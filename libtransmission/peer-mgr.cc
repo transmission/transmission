@@ -219,7 +219,7 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
     /* from_first_ should never be modified */
     found_at(that.from_best());
 
-    /* num_consecutive_fails_ is already the latest */
+    /* num_consecutive_fruitless_ is already the latest */
     pex_flags_ |= that.pex_flags_;
 
     if (that.is_banned())
@@ -263,7 +263,7 @@ constexpr struct
             return val;
         }
 
-        return a.compare_by_failure_count(b);
+        return a.compare_by_fruitless_count(b);
     }
 
     [[nodiscard]] constexpr bool operator()(tr_peer_info const& a, tr_peer_info const& b) const noexcept
@@ -1281,16 +1281,16 @@ void create_bit_torrent_peer(
     {
         if (info && !info->is_connected())
         {
-            info->on_connection_failed();
+            info->on_fruitless_connection();
 
             if (!result.read_anything_from_peer)
             {
                 tr_logAddTraceSwarm(
                     swarm,
                     fmt::format(
-                        "marking peer {} as unreachable... num_fails is {}",
+                        "marking peer {} as unreachable... num_fruitless is {}",
                         info->display_name(),
-                        info->connection_failure_count()));
+                        info->fruitless_connection_count()));
                 info->set_connectable(false);
             }
         }
@@ -2468,8 +2468,8 @@ namespace connect_helpers
     auto i = uint64_t{};
     auto score = uint64_t{};
 
-    /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
-    i = peer_info.connection_failure_count() != 0U ? 1U : 0U;
+    /* prefer peers we've exchanged piece data with, or never tried, over other peers. */
+    i = peer_info.fruitless_connection_count() != 0U ? 1U : 0U;
     score = addValToKey(score, 1U, i);
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
@@ -2643,7 +2643,7 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     {
         tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", peer_info.display_name()));
         peer_info.set_connectable(false);
-        peer_info.on_connection_failed();
+        peer_info.on_fruitless_connection();
     }
     else
     {
