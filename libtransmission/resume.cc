@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <limits>
 #include <string_view>
 #include <vector>
 
@@ -539,6 +540,7 @@ tr_resume::fields_t loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
 
                     auto const [piece_begin, piece_end] = tor->piece_span_for_file(fi);
+                    time_checked = std::numeric_limits<time_t>::max();
                     for (tr_piece_index_t i = 1, n = piece_end - piece_begin; i <= n; ++i)
                     {
                         auto t = int64_t{};
