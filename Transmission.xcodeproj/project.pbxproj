@@ -3102,7 +3102,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnp/miniupnpc\nrm -f include/miniupnpc\nln -sf . include/miniupnpc\n";
+			shellScript = "cd third-party/miniupnp/miniupnpc\nln -snf . include/miniupnpc\n";
 		};
 		C12F197E1E1AE6D50005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
