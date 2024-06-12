@@ -263,7 +263,7 @@ tr_port_forwarding_state tr_upnpPulse(
         auto lanaddr = std::array<char, TR_ADDRSTRLEN>{};
         if (
 #if (MINIUPNPC_API_VERSION >= 18)
-            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, NULL, 0)
+            UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, nullptr, 0)
 #else
             UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1)
 #endif
