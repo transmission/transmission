@@ -65,13 +65,11 @@ private:
     std::shared_ptr<struct event_base> ev_base_;
     std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
 
-    std::unique_ptr<tr_net_init_mgr> init_mgr_;
-
 protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
-        init_mgr_ = tr_lib_init();
+        tr_lib_init();
         ev_base_.reset(event_base_new(), event_base_free);
         timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
         Watchdir::set_generic_rescan_interval(GenericRescanInterval);
