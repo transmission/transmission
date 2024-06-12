@@ -127,7 +127,10 @@ private:
     ReadState done(bool is_connected)
     {
         peer_io_->clear_callbacks();
-        return fire_done(is_connected) ? READ_LATER : READ_ERR;
+
+        // The responding client of a handshake can immediately start sending BT messages after
+        // the handshake, so we need to return READ_NOW to ensure those messages are processed.
+        return fire_done(is_connected) ? READ_NOW : READ_ERR;
     }
 
     [[nodiscard]] auto is_incoming() const noexcept
