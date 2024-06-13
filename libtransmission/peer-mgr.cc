@@ -737,16 +737,9 @@ private:
         // the webseed list may have changed...
         rebuild_webseeds();
 
-        // some peer_msgs' progress fields may not be accurate if we
-        // didn't have the metadata before now... so refresh them all...
         for (auto* peer : peers)
         {
             peer->on_torrent_got_metainfo();
-
-            if (peer->is_seed())
-            {
-                mark_peer_as_seed(*peer->peer_info);
-            }
         }
     }
 
