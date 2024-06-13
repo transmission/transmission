@@ -597,13 +597,6 @@ public:
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
 private:
-    void mark_peer_as_seed(tr_peer_info& peer_info)
-    {
-        tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", peer_info.display_name()));
-        peer_info.set_seed();
-        mark_all_seeds_flag_dirty();
-    }
-
     void rebuild_webseeds()
     {
         auto const n = tor->webseed_count();
@@ -687,7 +680,7 @@ private:
 
         for (auto const& [socket_address, peer_info] : connectable_pool)
         {
-            mark_peer_as_seed(*peer_info);
+            peer_info->set_seed();
         }
 
         mark_all_seeds_flag_dirty();
