@@ -2433,8 +2433,8 @@ namespace connect_helpers
         return false;
     }
 
-    // not if we're both seeds
-    if (tor->is_done() && peer_info.is_seed())
+    // not if we're both seeds and pex is disabled
+    if (tor->is_done() && peer_info.is_seed() && !tor->allows_pex())
     {
         return false;
     }
