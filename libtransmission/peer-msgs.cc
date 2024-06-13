@@ -399,6 +399,8 @@ public:
 
     void on_torrent_got_metainfo() noexcept override
     {
+        // A peer may not be interesting to us anymore after
+        // sending us metadata, so do a status update
         update_active();
     }
 
@@ -490,8 +492,8 @@ public:
 
     void update_active()
     {
-        update_active(TR_UP);
-        update_active(TR_DOWN);
+        update_active(TR_CLIENT_TO_PEER);
+        update_active(TR_PEER_TO_CLIENT);
     }
 
     void update_active(tr_direction direction)
