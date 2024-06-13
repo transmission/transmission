@@ -525,18 +525,21 @@ public:
 
         case tr_peer_event::Type::ClientGotHave:
             s->got_have.emit(s->tor, event.pieceIndex);
+            s->mark_all_seeds_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotHaveAll:
             s->got_have_all.emit(s->tor);
+            s->mark_all_seeds_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotHaveNone:
-            // no-op
+            s->mark_all_seeds_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotBitfield:
             s->got_bitfield.emit(s->tor, msgs->has());
+            s->mark_all_seeds_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
