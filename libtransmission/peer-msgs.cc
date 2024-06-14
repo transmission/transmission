@@ -1231,6 +1231,9 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
             // But its presence does indicate µTP supports,
             // which we do care about...
             peer_info->set_utp_supported(true);
+            // Even though we don't support it, no reason not to
+            // help pass this flag to other peers who do.
+            peer_info->add_pex_flags(ADDED_F_HOLEPUNCH);
         }
     }
 
