@@ -1201,7 +1201,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
         if (encryption_preference_ == EncryptionPreference::Yes)
         {
-            peer_info->set_pex_flags(peer_info->pex_flags() | ADDED_F_ENCRYPTION_FLAG);
+            peer_info->add_pex_flags(ADDED_F_ENCRYPTION_FLAG);
         }
     }
 

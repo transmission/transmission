@@ -475,7 +475,14 @@ public:
         if (peer_info)
         {
             peer_info->found_at(from);
-            peer_info->set_pex_flags(flags);
+            if (from == TR_PEER_FROM_PEX || from == TR_PEER_FROM_RESUME)
+            {
+                peer_info->set_pex_flags(flags);
+            }
+            else
+            {
+                peer_info->add_pex_flags(flags);
+            }
         }
         else
         {
