@@ -853,11 +853,6 @@ private:
             // info_that will be replaced by info_this later, so decrement stat
             --stats.known_peer_from_count[info_that->from_first()];
         }
-        // we are going to insert a brand-new peer info object to the pool
-        else if (std::empty(info_this->listen_port()))
-        {
-            info_this->set_connectable();
-        }
 
         // erase the old peer info entry
         stats.known_peer_from_count[info_this->from_first()] -= connectable_pool.erase(info_this->listen_socket_address());
