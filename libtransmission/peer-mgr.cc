@@ -1477,11 +1477,6 @@ namespace get_peers_helpers
         return false;
     }
 
-    if (info.is_in_use())
-    {
-        return true;
-    }
-
     if (info.is_blocklisted(tor->session->blocklist()))
     {
         return false;
