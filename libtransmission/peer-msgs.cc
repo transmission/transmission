@@ -1195,15 +1195,13 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     logtrace(this, fmt::format("here is the base64-encoded handshake: [{:s}]", tr_base64_encode(handshake_sv)));
 
     // does the peer prefer encrypted connections?
-    auto pex = tr_pex{};
-    auto& [addr, port] = pex.socket_address;
     if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
     {
         encryption_preference_ = e != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
 
         if (encryption_preference_ == EncryptionPreference::Yes)
         {
-            pex.flags |= ADDED_F_ENCRYPTION_FLAG;
+            peer_info->set_pex_flags(peer_info->pex_flags() | ADDED_F_ENCRYPTION_FLAG);
         }
     }
 
@@ -1252,7 +1250,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // look for upload_only (BEP 21)
     if (auto upload_only = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_upload_only, &upload_only))
     {
-        pex.flags |= ADDED_F_SEED_FLAG;
+        peer_info->set_seed();
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html
@@ -1267,8 +1265,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     /* get peer's listening port */
     if (auto p = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_p, &p) && p > 0)
     {
-        port.set_host(p);
-        publish(tr_peer_event::GotPort(port));
+        publish(tr_peer_event::GotPort(tr_port::from_host(p)));
         logtrace(this, fmt::format("peer's port is now {:d}", p));
     }
 
@@ -1277,14 +1274,16 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     if (io_->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv4, &addr_compact, &addr_len) &&
         addr_len == tr_address::CompactAddrBytes[TR_AF_INET])
     {
-        std::tie(addr, std::ignore) = tr_address::from_compact_ipv4(addr_compact);
+        auto pex = tr_pex{ peer_info->listen_socket_address(), peer_info->pex_flags() };
+        pex.socket_address.address_ = tr_address::from_compact_ipv4(addr_compact).first;
         tr_peerMgrAddPex(&tor_, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
     if (io_->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv6, &addr_compact, &addr_len) &&
         addr_len == tr_address::CompactAddrBytes[TR_AF_INET6])
     {
-        std::tie(addr, std::ignore) = tr_address::from_compact_ipv6(addr_compact);
+        auto pex = tr_pex{ peer_info->listen_socket_address(), peer_info->pex_flags() };
+        pex.socket_address.address_ = tr_address::from_compact_ipv6(addr_compact).first;
         tr_peerMgrAddPex(&tor_, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
