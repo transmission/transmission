@@ -221,7 +221,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   clang-tidy-libtransmission:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     steps:
