@@ -343,7 +343,7 @@ struct tau_tracker
             return;
         }
 
-        auto const& [ss, sslen] = *addr_[ip_protocol];
+        auto const& [ss, sslen] = *addr_[ip_protocol]; // NOLINT(bugprone-unchecked-optional-access)
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
@@ -388,12 +388,14 @@ struct tau_tracker
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             // do we have a DNS request that's ready?
+            // NOLINTBEGIN(bugprone-unchecked-optional-access)
             if (addr_pending_dns_[ipp] && addr_pending_dns_[ipp]->wait_for(0ms) == std::future_status::ready)
             {
                 addr_[ipp] = addr_pending_dns_[ipp]->get();
                 addr_pending_dns_[ipp].reset();
                 addr_expires_at_[ipp] = now + DnsRetryIntervalSecs;
             }
+            // NOLINTEND(bugprone-unchecked-optional-access)
         }
 
         // are there any tracker requests pending?
@@ -437,6 +439,7 @@ struct tau_tracker
             // also need a valid connection ID...
             if (addr_[ipp] && !is_connected(ipp_enum, now) && connecting_at[ipp] == 0)
             {
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 TR_ASSERT(addr_[ipp]->first.ss_family == tr_ip_protocol_to_af(ipp_enum));
 
                 connecting_at[ipp] = now;
