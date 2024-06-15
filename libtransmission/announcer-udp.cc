@@ -160,7 +160,7 @@ struct tau_scrape_request
 
     tr_scrape_response response = {};
 
-    static auto constexpr ip_protocol = TR_AF_UNSPEC; // NOLINT readability-identifier-naming
+    static auto constexpr ip_protocol = TR_AF_UNSPEC; // NOLINT(readability-identifier-naming)
 
 private:
     time_t const created_at_ = tr_time();
