@@ -98,8 +98,8 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **bind-address-ipv4:** String (default = "") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".
  * **bind-address-ipv6:** String (default = "") Where to listen for peer connections. When no valid IPv6 address is provided, Transmission will try to bind to your default global IPv6 address. If that didn't work, then Transmission will bind to "::".
  * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
- * **peer-limit-global:** Number (default = 240)
- * **peer-limit-per-torrent:** Number (default =  60)
+ * **peer-limit-global:** Number (default = 200)
+ * **peer-limit-per-torrent:** Number (default = 50)
  * **peer-socket-tos:** String (default = "default") Set the [Type-Of-Service (TOS)](https://en.wikipedia.org/wiki/Type_of_Service) parameter for outgoing TCP packets. Possible values are "default", "lowcost", "throughput", "lowdelay" and "reliability". The value "lowcost" is recommended if you're using a smart router, and shouldn't harm in any case.
 
 #### Peer Port
