@@ -1473,9 +1473,10 @@ tr_variant::Map tr_pex::to_variant() const
     return pex;
 }
 
-std::vector<tr_pex> tr_pex::from_variant(tr_variant const* const var, size_t n_var)
+std::vector<tr_pex> tr_pex::from_variant(tr_variant const* const var, size_t const n_var)
 {
-    auto pex = std::vector<tr_pex>(n_var);
+    auto pex_vec = std::vector<tr_pex>{};
+    pex_vec.reserve(n_var);
     for (size_t i = 0; i < n_var; ++i)
     {
         auto* const map = var[i].get_if<tr_variant::Map>();
@@ -1490,15 +1491,16 @@ std::vector<tr_pex> tr_pex::from_variant(tr_variant const* const var, size_t n_v
             continue;
         }
 
+        auto pex = tr_pex{};
         auto* const compact = reinterpret_cast<std::byte const*>(std::data(*sockaddr));
         switch (std::size(*sockaddr))
         {
         case tr_socket_address::CompactSockAddrBytes[TR_AF_INET]:
-            pex[i].socket_address = tr_socket_address::from_compact_ipv4(compact).first;
+            pex.socket_address = tr_socket_address::from_compact_ipv4(compact).first;
             break;
 
         case tr_socket_address::CompactSockAddrBytes[TR_AF_INET6]:
-            pex[i].socket_address = tr_socket_address::from_compact_ipv6(compact).first;
+            pex.socket_address = tr_socket_address::from_compact_ipv6(compact).first;
             break;
 
         default:
@@ -1506,10 +1508,12 @@ std::vector<tr_pex> tr_pex::from_variant(tr_variant const* const var, size_t n_v
             continue;
         }
 
-        pex[i].flags = static_cast<uint8_t>(map->value_if<int64_t>(TR_KEY_flags).value_or(0));
+        pex.flags = static_cast<uint8_t>(map->value_if<int64_t>(TR_KEY_flags).value_or(0));
+
+        pex_vec.emplace_back(std::move(pex));
     }
 
-    return pex;
+    return pex_vec;
 }
 
 // ---
