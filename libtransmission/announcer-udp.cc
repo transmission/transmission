@@ -160,7 +160,7 @@ struct tau_scrape_request
 
     tr_scrape_response response = {};
 
-    static auto constexpr ip_protocol = TR_AF_UNSPEC; // NOLINT readability-identifier-naming
+    static auto constexpr ip_protocol = TR_AF_UNSPEC; // NOLINT(readability-identifier-naming)
 
 private:
     time_t const created_at_ = tr_time();
@@ -337,13 +337,14 @@ struct tau_tracker
             return;
         }
 
-        TR_ASSERT(addr_[ip_protocol]);
-        if (!addr_[ip_protocol])
+        auto const& addr = addr_[ip_protocol];
+        TR_ASSERT(addr);
+        if (!addr)
         {
             return;
         }
 
-        auto const& [ss, sslen] = *addr_[ip_protocol];
+        auto const& [ss, sslen] = *addr;
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
@@ -388,10 +389,10 @@ struct tau_tracker
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             // do we have a DNS request that's ready?
-            if (addr_pending_dns_[ipp] && addr_pending_dns_[ipp]->wait_for(0ms) == std::future_status::ready)
+            if (auto& dns = addr_pending_dns_[ipp]; dns && dns->wait_for(0ms) == std::future_status::ready)
             {
-                addr_[ipp] = addr_pending_dns_[ipp]->get();
-                addr_pending_dns_[ipp].reset();
+                addr_[ipp] = dns->get();
+                dns.reset();
                 addr_expires_at_[ipp] = now + DnsRetryIntervalSecs;
             }
         }
@@ -435,9 +436,9 @@ struct tau_tracker
                     connecting_at[ipp]));
 
             // also need a valid connection ID...
-            if (addr_[ipp] && !is_connected(ipp_enum, now) && connecting_at[ipp] == 0)
+            if (auto const& addr = addr_[ipp]; addr && !is_connected(ipp_enum, now) && connecting_at[ipp] == 0)
             {
-                TR_ASSERT(addr_[ipp]->first.ss_family == tr_ip_protocol_to_af(ipp_enum));
+                TR_ASSERT(addr->first.ss_family == tr_ip_protocol_to_af(ipp_enum));
 
                 connecting_at[ipp] = now;
                 connection_transaction_id[ipp] = tau_transaction_new();
