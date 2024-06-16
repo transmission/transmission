@@ -1,12 +1,12 @@
 /// MIXINS
 
-@mixin for-phone-only {
+@mixin viewport-small {
   @media (width < 600px) {
     @content;
   }
 }
 
-@mixin for-tablet-portrait-up {
+@mixin viewport-medium {
   @media (width >= 600px) {
     @content;
   }
@@ -365,7 +365,7 @@ a {
   height: 30px;
   padding-left: 5px;
 
-  @include for-phone-only {
+  @include viewport-small {
     :not(select):not(input):not(option):not(.flexible-space) {
       display: none;
     }
@@ -757,7 +757,7 @@ a {
 
 /// PREFERENCES DIALOG
 
-@include for-phone-only {
+@include viewport-small {
   input[type='checkbox'] {
     height: 20px;
     width: 20px;
@@ -766,10 +766,10 @@ a {
 
 #inspector,
 #prefs-dialog {
-  @include for-phone-only {
+  @include viewport-small {
     left: 0;
   }
-  @include for-tablet-portrait-up {
+  @include viewport-medium {
     border-left: 1px solid var(--color-border-default);
     width: 570px;
   }
@@ -895,10 +895,10 @@ a {
   top: var(--popup-top);
   z-index: var(--z-index-popup);
 
-  @include for-phone-only {
+  @include viewport-small {
     left: 0;
   }
-  @include for-tablet-portrait-up {
+  @include viewport-medium {
     width: 550px;
   }
 }
@@ -936,10 +936,10 @@ a {
   overflow-x: hidden;
   overflow-y: auto;
 
-  @include for-phone-only {
+  @include viewport-small {
     padding: 0 8px 20px;
   }
-  @include for-tablet-portrait-up {
+  @include viewport-medium {
     padding: 0 20px 20px;
   }
 }
@@ -1192,7 +1192,7 @@ a {
   .percent-done {
     width: 10%;
 
-    @include for-phone-only {
+    @include viewport-small {
       width: 12%;
     }
   }
@@ -1207,7 +1207,7 @@ a {
     overflow-x: hidden;
     text-overflow: ellipsis;
 
-    @include for-phone-only {
+    @include viewport-small {
       text-align: left;
       width: 20%;
     }
@@ -1217,7 +1217,7 @@ a {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @include for-tablet-portrait-up {
+    @include viewport-medium {
       width: 20%;
     }
   }
@@ -1324,7 +1324,7 @@ a {
   top: 50px;
   z-index: var(--z-index-popup);
 
-  @include for-phone-only {
+  @include viewport-small {
     height: 80vh;
   }
 
@@ -1453,7 +1453,7 @@ a {
 
 /// DIALOGS
 
-@include for-phone-only {
+@include viewport-small {
   .dialog-buttons {
     padding-top: var(--dialog-logo-padding);
   }
@@ -1476,7 +1476,7 @@ a {
   }
 }
 
-@include for-tablet-portrait-up {
+@include viewport-medium {
   .dialog-container {
     min-width: 500px;
     position: absolute;
@@ -1544,7 +1544,7 @@ dialog {
   padding: 0;
   z-index: var(--z-index-popup);
 
-  @include for-tablet-portrait-up {
+  @include viewport-medium {
     border: 0;
     border-radius: 8px;
     max-width: 50%;
@@ -1663,10 +1663,10 @@ dialog {
     grid-template-columns: auto 1fr;
     margin-top: 4px;
 
-    @include for-phone-only {
+    @include viewport-small {
       margin: 4px 0 16px;
     }
-    @include for-tablet-portrait-up {
+    @include viewport-medium {
       margin: 4px 16px 16px;
     }
 
