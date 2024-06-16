@@ -89,7 +89,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
     {
-        *get_leaf() = copy ? tr_variant{ std::string{ str, len } } : tr_variant::unmanaged_string({ str, len });
+        *get_leaf() = copy ? tr_variant{ std::string_view{ str, len } } : tr_variant::unmanaged_string({ str, len });
         return true;
     }
 
@@ -217,6 +217,8 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
     auto eis = rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream>{ ms };
     auto reader = rapidjson::GenericReader<rapidjson::AutoUTF<unsigned>, rapidjson::UTF8<char>>{};
     reader.Parse(eis, handler);
+
+    end_ = begin + eis.Tell();
 
     if (!reader.HasParseError())
     {
