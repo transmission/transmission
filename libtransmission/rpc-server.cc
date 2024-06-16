@@ -649,7 +649,15 @@ bufferevent* SSL_bufferevent_cb(event_base* base, void* arg)
 {
     bufferevent* ret = nullptr;
     SSL_CTX* ctx = static_cast<SSL_CTX*>(arg);
-    ret = bufferevent_openssl_socket_new(base, -1, SSL_new(ctx), BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
+    SSL* ssl = SSL_new(ctx);
+    if (ssl != nullptr)
+    {
+        ret = bufferevent_openssl_socket_new(base, -1, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
+    }
+    if (ret == nullptr)
+    {
+        tr_logAddWarn(fmt::format("Couldn't create SSL buffer"));
+    }
     return ret;
 }
 
