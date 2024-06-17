@@ -33,7 +33,6 @@
  * The idea is, if this class successfully cached a source address, that means
  * you have connectivity to the public internet. And if the global address is
  * the same as the source address, then you are not behind a NAT.
- *
  */
 class tr_global_ip_cache
 {
@@ -120,7 +119,7 @@ private:
 
     Mediator& mediator_;
 
-    enum class is_updating_t
+    enum class is_updating_t : uint8_t
     {
         NO = 0,
         YES,
