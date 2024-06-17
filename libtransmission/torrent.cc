@@ -1690,9 +1690,12 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
     if (!aborted && !tor_->is_deleting_)
     {
         tor_->session->run_in_session_thread(
-            [tor = tor_]()
+            // Do not capture the torrent pointer directly, or else we will crash if program
+            // execution reaches this point while the session thread is about to free this torrent.
+            [tor_id = tor_->id(), session = tor_->session]()
             {
-                if (tor->is_deleting_)
+                auto* const tor = session->torrents().get(tor_id);
+                if (tor == nullptr || tor->is_deleting_)
                 {
                     return;
                 }
