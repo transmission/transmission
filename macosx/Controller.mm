@@ -632,11 +632,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     toolbar.displayMode = NSToolbarDisplayModeIconOnly;
     self.fWindow.toolbar = toolbar;
 
-    if (@available(macOS 11.0, *))
-    {
-        self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
-        self.fWindow.titleVisibility = NSWindowTitleHidden;
-    }
+    self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
+    self.fWindow.titleVisibility = NSWindowTitleHidden;
 
     self.fWindow.delegate = self; //do manually to avoid placement issue
 
@@ -4207,17 +4204,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     item.view = button;
 
-    if (@available(macOS 11.0, *))
-    {
-        //standard button sizes
-    }
-    else
-    {
-        NSSize const buttonSize = NSMakeSize(36.0, 25.0);
-        item.minSize = buttonSize;
-        item.maxSize = buttonSize;
-    }
-
     return item;
 }
 
@@ -4230,7 +4216,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Create", "Create toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"doc.badge.plus" withFallback:@"ToolbarCreateTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"doc.badge.plus" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(createFile:);
         item.autovalidates = NO;
@@ -4244,7 +4230,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Open", "Open toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"folder" withFallback:@"ToolbarOpenTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"folder" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(openShowSheet:);
         item.autovalidates = NO;
@@ -4258,7 +4244,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Open Address", "Open address toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"globe" withFallback:@"ToolbarOpenWebTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(openURLShowSheet:);
         item.autovalidates = NO;
@@ -4272,7 +4258,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Remove", "Remove toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"nosign" withFallback:@"ToolbarRemoveTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"nosign" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(removeNoDelete:);
         item.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
@@ -4287,7 +4273,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Inspector", "Inspector toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"info.circle" withFallback:@"ToolbarInfoTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(showInfo:);
 
@@ -4306,13 +4292,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         segmentedControl.segmentCount = 2;
 
         [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"pause.circle.fill" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagPause];
         [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagPause];
 
         [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise.circle.fill" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagResume];
@@ -4330,17 +4316,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         groupItem.view = segmentedControl;
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
-
-        if (@available(macOS 11.0, *))
-        {
-            //standard segment size
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
 
         [groupItem createMenu:@[
             NSLocalizedString(@"Pause All", "All toolbar item -> label"),
@@ -4362,13 +4337,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         segmentedControl.segmentCount = 2;
 
         [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"pause" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagPause];
         [segmentedControl setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagPause];
 
         [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagResume];
@@ -4387,17 +4362,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         groupItem.target = self;
         groupItem.action = @selector(selectedToolbarClicked:);
 
-        if (@available(macOS 11.0, *))
-        {
-            //standard segment size
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
-
         [groupItem createMenu:@[
             NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
             NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label")
@@ -4413,7 +4377,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Filter", "Filter toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"magnifyingglass" withFallback:@"ToolbarFilterTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"magnifyingglass" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(toggleFilterBar:);
 
@@ -5263,16 +5227,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //Hacky way of fixing an issue with showing the Toolbar
     if (!self.isFullScreen)
     {
-        //macOS Big Sur shows the unified toolbar by default
+        //macOS shows the unified toolbar by default
         //and we only need to "fix" the layout when showing the toolbar
-        if (@available(macOS 11.0, *))
-        {
-            if (!self.fWindow.toolbar.isVisible)
-            {
-                [self removeStackViewHeightConstraints];
-            }
-        }
-        else
+        if (!self.fWindow.toolbar.isVisible)
         {
             [self removeStackViewHeightConstraints];
         }
@@ -5289,12 +5246,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)hideToolBarBezels:(BOOL)hide
 {
-    if (@available(macOS 11.0, *))
+    for (NSToolbarItem* item in self.fWindow.toolbar.items)
     {
-        for (NSToolbarItem* item in self.fWindow.toolbar.items)
-        {
-            item.view.hidden = hide;
-        }
+        item.view.hidden = hide;
     }
 }
 
