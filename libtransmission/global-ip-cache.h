@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <atomic>
 #include <chrono> // std::chrono::milliseconds
 #include <condition_variable>
 #include <memory> // std::unique_ptr
@@ -144,5 +143,5 @@ private:
     // Whether this machine supports this IP protocol
     array_ip_t<bool> has_ip_protocol_ = { true, true };
 
-    array_ip_t<std::atomic_size_t> ix_service_ = {};
+    array_ip_t<size_t> ix_service_ = {};
 };
