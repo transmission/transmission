@@ -212,6 +212,11 @@ private:
             return session_.localPeerPort();
         }
 
+        [[nodiscard]] std::optional<tr_address> pinhole_address() const override
+        {
+            return session_.global_source_address(TR_AF_INET6);
+        }
+
         [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();

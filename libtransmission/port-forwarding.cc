@@ -209,7 +209,8 @@ private:
             mediator_.local_peer_port(),
             is_enabled,
             do_check,
-            mediator_.incoming_peer_address().display_name());
+            mediator_.incoming_peer_address().display_name(),
+            mediator_.pinhole_address());
 
         if (auto const new_state = state(); new_state != old_state)
         {
