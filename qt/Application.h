@@ -10,6 +10,8 @@
 #include <unordered_set>
 
 #include <QApplication>
+#include <QPixmap>
+#include <QPointer>
 #include <QRegularExpression>
 #include <QTimer>
 #include <QTranslator>
@@ -20,7 +22,6 @@
 
 #include "AddData.h"
 #include "Typedefs.h"
-#include "Utils.h" // std::hash<QString>
 
 class AddData;
 class MainWindow;
@@ -36,7 +37,7 @@ class Application : public QApplication
     TR_DISABLE_COPY_MOVE(Application)
 
 public:
-    Application(int& argc, char** argv);
+    Application(int argc, char** argv, int& exit_code);
 
     void raise() const;
     bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
@@ -92,9 +93,7 @@ private slots:
 private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
-    void initUnits();
     QStringList getNames(torrent_ids_t const& ids) const;
-    void quitLater() const;
     void notifyTorrentAdded(Torrent const*) const;
 
     std::unordered_set<QString> interned_strings_;
@@ -112,17 +111,6 @@ private:
     QTranslator app_translator_;
 
     FaviconCache<QPixmap> favicon_cache_;
-
-    QString const config_name_ = QStringLiteral("transmission");
-    QString const display_name_ = QStringLiteral("transmission-qt");
-
-#ifdef QT_DBUS_LIB
-    QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
-    QString const fdo_notifications_path_ = QStringLiteral("/org/freedesktop/Notifications");
-    QString const fdo_notifications_interface_name_ = QStringLiteral("org.freedesktop.Notifications");
-#endif
-
-    QRegularExpression const start_now_regex_{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())
