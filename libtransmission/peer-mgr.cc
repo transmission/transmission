@@ -240,7 +240,7 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
         ban();
     }
     /* is_connected_ should already be set */
-    set_seed(is_seed() || that.is_seed());
+    /* keep is_seed_ as-is */
     /* keep upload_only_ as-is */
 
     if (that.outgoing_handshake_)
