@@ -161,6 +161,16 @@ public:
         return is_seed_;
     }
 
+    constexpr void set_upload_only(bool value = true) noexcept
+    {
+        is_upload_only_ = value;
+    }
+
+    [[nodiscard]] constexpr auto is_upload_only() const noexcept
+    {
+        return is_upload_only_ || is_seed();
+    }
+
     // ---
 
     void set_connectable(bool value = true) noexcept
@@ -391,7 +401,7 @@ public:
             set_holepunch_supported();
         }
 
-        is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
+        set_upload_only((pex_flags & ADDED_F_SEED_FLAG) != 0U);
     }
 
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
@@ -446,9 +456,13 @@ public:
             }
         }
 
-        if (is_seed_)
+        if (is_upload_only())
         {
             ret |= ADDED_F_SEED_FLAG;
+        }
+        else
+        {
+            ret &= ~ADDED_F_SEED_FLAG;
         }
 
         return ret;
@@ -527,6 +541,7 @@ private:
     bool is_banned_ = false;
     bool is_connected_ = false;
     bool is_seed_ = false;
+    bool is_upload_only_ = false;
 
     std::unique_ptr<tr_handshake> outgoing_handshake_;
 };

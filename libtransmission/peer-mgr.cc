@@ -241,6 +241,7 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
     }
     /* is_connected_ should already be set */
     set_seed(is_seed() || that.is_seed());
+    /* keep upload_only_ as-is */
 
     if (that.outgoing_handshake_)
     {
@@ -360,7 +361,7 @@ public:
               tor_in->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }),
               tor_in->started_.observe([this](tr_torrent*) { on_torrent_started(); }),
               tor_in->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }),
-              tor_in->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
+              tor_in->swarm_is_all_upload_only_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_upload_only(); }),
           } }
     {
         rebuild_webseeds();
@@ -453,17 +454,17 @@ public:
         return is_endgame_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto is_all_seeds() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto is_all_upload_only() const noexcept
     {
-        if (!pool_is_all_seeds_)
+        if (!pool_is_all_upload_only_)
         {
-            pool_is_all_seeds_ = std::all_of(
+            pool_is_all_upload_only_ = std::all_of(
                 std::begin(connectable_pool),
                 std::end(connectable_pool),
-                [](auto const& key_val) { return key_val.second->is_seed(); });
+                [](auto const& key_val) { return key_val.second->is_upload_only(); });
         }
 
-        return *pool_is_all_seeds_;
+        return *pool_is_all_upload_only_;
     }
 
     [[nodiscard]] std::shared_ptr<tr_peer_info> get_existing_peer_info(tr_socket_address const& socket_address) const noexcept
@@ -498,7 +499,7 @@ public:
             ++stats.known_peer_from_count[from];
         }
 
-        mark_all_seeds_flag_dirty();
+        mark_all_upload_only_flag_dirty();
 
         return peer_info;
     }
@@ -538,21 +539,21 @@ public:
 
         case tr_peer_event::Type::ClientGotHave:
             s->got_have.emit(s->tor, event.pieceIndex);
-            s->mark_all_seeds_flag_dirty();
+            s->mark_all_upload_only_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotHaveAll:
             s->got_have_all.emit(s->tor);
-            s->mark_all_seeds_flag_dirty();
+            s->mark_all_upload_only_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotHaveNone:
-            s->mark_all_seeds_flag_dirty();
+            s->mark_all_upload_only_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotBitfield:
             s->got_bitfield.emit(s->tor, msgs->has());
-            s->mark_all_seeds_flag_dirty();
+            s->mark_all_upload_only_flag_dirty();
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
@@ -671,9 +672,9 @@ private:
         }
     }
 
-    void mark_all_seeds_flag_dirty() noexcept
+    void mark_all_upload_only_flag_dirty() noexcept
     {
-        pool_is_all_seeds_.reset();
+        pool_is_all_upload_only_.reset();
     }
 
     void on_torrent_doomed()
@@ -690,16 +691,16 @@ private:
         wishlist.reset();
     }
 
-    void on_swarm_is_all_seeds()
+    void on_swarm_is_all_upload_only()
     {
         auto const lock = unique_lock();
 
         for (auto const& [socket_address, peer_info] : connectable_pool)
         {
-            peer_info->set_seed();
+            peer_info->set_upload_only();
         }
 
-        mark_all_seeds_flag_dirty();
+        mark_all_upload_only_flag_dirty();
     }
 
     void on_piece_completed(tr_piece_index_t piece)
@@ -871,7 +872,7 @@ private:
         connectable_pool.insert_or_assign(info_this->listen_socket_address(), std::move(info_this));
 
 EXIT:
-        mark_all_seeds_flag_dirty();
+        mark_all_upload_only_flag_dirty();
     }
 
     bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, std::shared_ptr<tr_peer_info> info_that)
@@ -909,7 +910,7 @@ EXIT:
 
     std::array<libtransmission::ObserverTag, 8> const tags_;
 
-    mutable std::optional<bool> pool_is_all_seeds_;
+    mutable std::optional<bool> pool_is_all_upload_only_;
 
     bool is_endgame_ = false;
 };
@@ -1464,7 +1465,7 @@ namespace get_peers_helpers
 
 [[nodiscard]] bool is_peer_interesting(tr_torrent const* tor, tr_peer_info const& info)
 {
-    if (tor->is_done() && info.is_seed())
+    if (tor->is_done() && info.is_upload_only())
     {
         return false;
     }
@@ -2430,8 +2431,8 @@ namespace connect_helpers
         return false;
     }
 
-    // not if we're both seeds and pex is disabled
-    if (tor->is_done() && peer_info.is_seed() && !tor->allows_pex())
+    // not if we're both upload only and pex is disabled
+    if (tor->is_done() && peer_info.is_upload_only() && !tor->allows_pex())
     {
         return false;
     }
@@ -2519,7 +2520,7 @@ namespace connect_helpers
     score = addValToKey(score, 1U, i);
 
     /* prefer peers that we might be able to upload to */
-    i = peer_info.is_seed() ? 0 : 1;
+    i = peer_info.is_upload_only() ? 0 : 1;
     score = addValToKey(score, 1U, i);
 
     /* Prefer peers that we got from more trusted sources.
@@ -2575,10 +2576,10 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
             continue;
         }
 
-        /* if everyone in the swarm is seeds and pex is disabled,
+        /* if everyone in the swarm is upload only and pex is disabled,
          * then don't initiate connections */
         bool const seeding = tor->is_done();
-        if (seeding && swarm->is_all_seeds() && !tor->allows_pex())
+        if (seeding && swarm->is_all_upload_only() && !tor->allows_pex())
         {
             continue;
         }
