@@ -2525,7 +2525,7 @@ namespace connect_helpers
 
     /* Prefer peers that we got from more trusted sources.
      * lower `fromBest` values indicate more trusted sources */
-    score = addValToKey(score, 4U, peer_info.from_best());
+    score = addValToKey(score, 4U, peer_info.from_best()); // TODO(tearfur): use std::bit_width(TR_PEER_FROM__MAX - 1)
 
     /* salt */
     score = addValToKey(score, 8U, salt);
