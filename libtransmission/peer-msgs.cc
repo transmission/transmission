@@ -191,15 +191,6 @@ auto constexpr MaxPexPeerCount = size_t{ 50U };
 
 // ---
 
-enum class EncryptionPreference : uint8_t
-{
-    Unknown,
-    Yes,
-    No
-};
-
-// ---
-
 struct peer_request
 {
     uint32_t index = 0;
@@ -683,8 +674,6 @@ private:
     uint8_t ut_metadata_id_ = 0;
 
     tr_port dht_port_;
-
-    EncryptionPreference encryption_preference_ = EncryptionPreference::Unknown;
 
     tr_torrent& tor_;
 
@@ -1197,12 +1186,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // does the peer prefer encrypted connections?
     if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
     {
-        encryption_preference_ = e != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
-
-        if (encryption_preference_ == EncryptionPreference::Yes)
-        {
-            peer_info->add_pex_flags(ADDED_F_ENCRYPTION_FLAG);
-        }
+        peer_info->set_encryption_preferred(e != 0);
     }
 
     // check supported messages for utorrent pex
