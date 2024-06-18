@@ -493,7 +493,7 @@ private:
     std::optional<bool> is_utp_supported_;
     std::optional<bool> is_encryption_preferred_;
 
-    tr_peer_from from_first_; // where the peer was first found
+    tr_peer_from const from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
 
     uint8_t num_consecutive_fruitless_ = {};
