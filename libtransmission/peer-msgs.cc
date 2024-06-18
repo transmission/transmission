@@ -1211,13 +1211,17 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
         if (auto ut_holepunch = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &ut_holepunch))
         {
+            auto const supported = ut_holepunch != 0;
             // Transmission doesn't support this extension yet.
-            // But its presence does indicate µTP supports,
+            // But its presence does indicate µTP support,
             // which we do care about...
-            peer_info->set_utp_supported(true);
+            if (supported)
+            {
+                peer_info->set_utp_supported();
+            }
             // Even though we don't support it, no reason not to
             // help pass this flag to other peers who do.
-            peer_info->add_pex_flags(ADDED_F_HOLEPUNCH);
+            peer_info->set_holepunch_supported(supported);
         }
     }
 

@@ -224,6 +224,11 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
         set_encryption_preferred(*other);
     }
 
+    if (auto const& other = that.supports_holepunch(); !supports_holepunch().has_value() && other)
+    {
+        set_holepunch_supported(*other);
+    }
+
     /* from_first_ should never be modified */
     found_at(that.from_best());
 
