@@ -216,6 +216,11 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
 
     set_utp_supported(supports_utp() || that.supports_utp());
 
+    if (auto const& other = that.prefers_encryption(); !prefers_encryption().has_value() && other)
+    {
+        set_encryption_preferred(*other);
+    }
+
     /* from_first_ should never be modified */
     found_at(that.from_best());
 

@@ -187,6 +187,18 @@ public:
 
     // ---
 
+    void set_encryption_preferred(bool value = true) noexcept
+    {
+        is_encryption_preferred_ = value;
+    }
+
+    [[nodiscard]] constexpr auto const& prefers_encryption() const noexcept
+    {
+        return is_encryption_preferred_;
+    }
+
+    // ---
+
     [[nodiscard]] constexpr auto compare_by_fruitless_count(tr_peer_info const& that) const noexcept
     {
         return tr_compare_3way(num_consecutive_fruitless_, that.num_consecutive_fruitless_);
@@ -362,6 +374,11 @@ public:
             set_utp_supported();
         }
 
+        if ((pex_flags & ADDED_F_ENCRYPTION_FLAG) != 0U)
+        {
+            set_encryption_preferred();
+        }
+
         is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
     }
 
@@ -390,6 +407,18 @@ public:
             else
             {
                 ret &= ~ADDED_F_UTP_FLAGS;
+            }
+        }
+
+        if (is_encryption_preferred_)
+        {
+            if (*is_encryption_preferred_)
+            {
+                ret |= ADDED_F_ENCRYPTION_FLAG;
+            }
+            else
+            {
+                ret &= ~ADDED_F_ENCRYPTION_FLAG;
             }
         }
 
@@ -462,6 +491,7 @@ private:
     mutable std::optional<bool> blocklisted_;
     std::optional<bool> is_connectable_;
     std::optional<bool> is_utp_supported_;
+    std::optional<bool> is_encryption_preferred_;
 
     tr_peer_from from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
