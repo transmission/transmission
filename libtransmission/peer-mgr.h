@@ -199,6 +199,18 @@ public:
 
     // ---
 
+    void set_holepunch_supported(bool value = true) noexcept
+    {
+        is_holepunch_supported_ = value;
+    }
+
+    [[nodiscard]] constexpr auto const& supports_holepunch() const noexcept
+    {
+        return is_holepunch_supported_;
+    }
+
+    // ---
+
     [[nodiscard]] constexpr auto compare_by_fruitless_count(tr_peer_info const& that) const noexcept
     {
         return tr_compare_3way(num_consecutive_fruitless_, that.num_consecutive_fruitless_);
@@ -379,6 +391,11 @@ public:
             set_encryption_preferred();
         }
 
+        if ((pex_flags & ADDED_F_HOLEPUNCH) != 0U)
+        {
+            set_holepunch_supported();
+        }
+
         is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
     }
 
@@ -419,6 +436,18 @@ public:
             else
             {
                 ret &= ~ADDED_F_ENCRYPTION_FLAG;
+            }
+        }
+
+        if (is_holepunch_supported_)
+        {
+            if (*is_holepunch_supported_)
+            {
+                ret |= ADDED_F_HOLEPUNCH;
+            }
+            else
+            {
+                ret &= ~ADDED_F_HOLEPUNCH;
             }
         }
 
@@ -492,6 +521,7 @@ private:
     std::optional<bool> is_connectable_;
     std::optional<bool> is_utp_supported_;
     std::optional<bool> is_encryption_preferred_;
+    std::optional<bool> is_holepunch_supported_;
 
     tr_peer_from const from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
