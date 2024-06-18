@@ -214,7 +214,10 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
         }
     }
 
-    set_utp_supported(supports_utp() || that.supports_utp());
+    if (auto const& other = that.supports_utp(); !supports_utp().has_value() && other)
+    {
+        set_utp_supported(*other);
+    }
 
     if (auto const& other = that.prefers_encryption(); !prefers_encryption().has_value() && other)
     {
