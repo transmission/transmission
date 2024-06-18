@@ -2520,7 +2520,7 @@ namespace connect_helpers
     score = addValToKey(score, 1U, i);
 
     /* prefer peers that we might be able to upload to */
-    i = peer_info.is_upload_only() ? 0 : 1;
+    i = peer_info.is_upload_only() ? 1 : 0;
     score = addValToKey(score, 1U, i);
 
     /* Prefer peers that we got from more trusted sources.
