@@ -367,11 +367,6 @@ public:
 
     // ---
 
-    constexpr void add_pex_flags(uint8_t pex_flags) noexcept
-    {
-        set_pex_flags(this->pex_flags() | pex_flags);
-    }
-
     constexpr void set_pex_flags(uint8_t pex_flags) noexcept
     {
         pex_flags_ = pex_flags;
