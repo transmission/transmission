@@ -2505,7 +2505,7 @@ namespace connect_helpers
         break;
     }
 
-    score = addValToKey(score, 4U, i);
+    score = addValToKey(score, 2U, i);
 
     // prefer recently-started torrents
     i = tor->started_recently(tr_time()) ? 0 : 1;
