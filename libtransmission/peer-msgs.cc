@@ -1244,7 +1244,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // look for upload_only (BEP 21)
     if (auto upload_only = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_upload_only, &upload_only))
     {
-        peer_info->set_seed();
+        peer_info->set_upload_only(upload_only != 0);
     }
 
     // https://www.bittorrent.org/beps/bep_0010.html

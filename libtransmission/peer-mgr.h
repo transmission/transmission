@@ -43,7 +43,7 @@ enum
     /* true if the peer supports encryption */
     ADDED_F_ENCRYPTION_FLAG = 1,
     /* true if the peer is a seed or partial seed */
-    ADDED_F_SEED_FLAG = 2,
+    ADDED_F_UPLOAD_ONLY_FLAG = 2,
     /* true if the peer supports µTP */
     ADDED_F_UTP_FLAGS = 4,
     /* true if the peer has holepunch support */
@@ -159,6 +159,16 @@ public:
     [[nodiscard]] constexpr auto is_seed() const noexcept
     {
         return is_seed_;
+    }
+
+    constexpr void set_upload_only(bool value = true) noexcept
+    {
+        is_upload_only_ = value;
+    }
+
+    [[nodiscard]] constexpr auto is_upload_only() const noexcept
+    {
+        return is_upload_only_ || is_seed();
     }
 
     // ---
@@ -391,7 +401,10 @@ public:
             set_holepunch_supported();
         }
 
-        is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
+        if ((pex_flags & ADDED_F_UPLOAD_ONLY_FLAG) != 0U)
+        {
+            set_upload_only();
+        }
     }
 
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
@@ -446,9 +459,13 @@ public:
             }
         }
 
-        if (is_seed_)
+        if (is_upload_only())
         {
-            ret |= ADDED_F_SEED_FLAG;
+            ret |= ADDED_F_UPLOAD_ONLY_FLAG;
+        }
+        else
+        {
+            ret &= ~ADDED_F_UPLOAD_ONLY_FLAG;
         }
 
         return ret;
@@ -527,6 +544,7 @@ private:
     bool is_banned_ = false;
     bool is_connected_ = false;
     bool is_seed_ = false;
+    bool is_upload_only_ = false;
 
     std::unique_ptr<tr_handshake> outgoing_handshake_;
 };
