@@ -1192,6 +1192,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // check supported messages for utorrent pex
     peer_supports_pex_ = false;
     peer_supports_metadata_xfer_ = false;
+    auto holepunch_supported = false;
 
     if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
     {
@@ -1211,19 +1212,20 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
         if (auto ut_holepunch = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &ut_holepunch))
         {
-            auto const supported = ut_holepunch != 0;
-            // Transmission doesn't support this extension yet.
-            // But its presence does indicate µTP support,
-            // which we do care about...
-            if (supported)
-            {
-                peer_info->set_utp_supported();
-            }
-            // Even though we don't support it, no reason not to
-            // help pass this flag to other peers who do.
-            peer_info->set_holepunch_supported(supported);
+            holepunch_supported = ut_holepunch != 0;
         }
     }
+
+    // Transmission doesn't support this extension yet.
+    // But its presence does indicate µTP support,
+    // which we do care about...
+    if (holepunch_supported)
+    {
+        peer_info->set_utp_supported();
+    }
+    // Even though we don't support it, no reason not to
+    // help pass this flag to other peers who do.
+    peer_info->set_holepunch_supported(holepunch_supported);
 
     // look for metainfo size (BEP 9)
     if (auto metadata_size = int64_t{};
