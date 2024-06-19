@@ -1465,6 +1465,7 @@ namespace get_peers_helpers
 
 [[nodiscard]] bool is_peer_interesting(tr_torrent const* tor, tr_peer_info const& info)
 {
+    TR_ASSERT(!std::empty(info.listen_port()));
     if (std::empty(info.listen_port()))
     {
         return false;
