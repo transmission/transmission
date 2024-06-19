@@ -539,7 +539,7 @@ std::string tr_strpercent(double x)
     return fmt::format("{:.0Lf}", x);
 }
 
-std::string tr_strratio(double ratio, char const* infinity)
+std::string tr_strratio(double ratio, std::string_view infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
     {
@@ -548,7 +548,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
     if ((int)ratio == TR_RATIO_INF)
     {
-        return infinity != nullptr ? infinity : "";
+        return std::string{ infinity };
     }
 
     return tr_strpercent(ratio);
