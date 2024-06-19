@@ -109,6 +109,8 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             return;
         }
 
+        auto const from_str = tr_socket_address::from_sockaddr(from_sa).value_or(tr_socket_address{}).display_name();
+
         // Since most packets we receive here are µTP, make quick inline
         // checks for the other protocols. The logic is as follows:
         // - all DHT packets start with 'd' (100)
@@ -128,7 +130,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
         {
             if (!session->announcer_udp_->handle_message(std::data(buf), n_read, from_sa, fromlen))
             {
-                tr_logAddTrace("Couldn't parse UDP tracker packet.");
+                tr_logAddTrace(fmt::format("{} Couldn't parse UDP tracker packet.", from_str));
             }
         }
         else if (session->allowsUTP() && session->utp_context != nullptr)
@@ -139,7 +141,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             }
             else
             {
-                tr_logAddTrace("Unexpected UDP packet");
+                tr_logAddTrace(fmt::format("{} Unexpected UDP packet", from_str));
             }
         }
     }
