@@ -141,7 +141,11 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             }
             else
             {
-                tr_logAddTrace(fmt::format("{} Unexpected UDP packet", from_str));
+                tr_logAddTrace(fmt::format(
+                    "{} Unexpected UDP packet... len {} [{}]",
+                    from_str,
+                    n_read,
+                    tr_base64_encode({ reinterpret_cast<char const*>(std::data(buf)), static_cast<size_t>(n_read) })));
             }
         }
     }
