@@ -15,6 +15,7 @@
 #include <time.h> // time_t
 
 #ifdef __cplusplus
+#include <functional>
 #include <string>
 #include <string_view>
 #else
@@ -1368,6 +1369,26 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
  * Queue a torrent for verification.
  */
 void tr_torrentVerify(tr_torrent* torrent);
+
+#ifdef __cplusplus
+/**
+ * Verify a torrent in the current thread.
+ * file_status_cb parameters:
+ *   tr_file_index_t   file  - File index
+ *   bool              ok    - true if file ok
+ *   std::string_view  error - if ok is false, the error message
+ *
+ * For each valid file, file_status_cb is called once with ok = true and error = "".
+ * For each invalid file, file_status_cb is called one or more times (once for each
+ * error encountered) with ok = false and error set to a specific error message in each call.
+ *
+ * tr_torrentSynchronousVerify returns true if all files are valid.
+ */
+[[nodiscard]] bool tr_torrentSynchronousVerify(
+    tr_torrent_metainfo const& metainfo,
+    std::string_view const data_dir,
+    std::function<void(tr_file_index_t, bool, std::string_view)> file_status_cb);
+#endif
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 
