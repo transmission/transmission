@@ -122,7 +122,7 @@ uint64 utp_callback(utp_callback_arguments* args)
     {
 #ifdef TR_UTP_TRACE
     case UTP_LOG:
-        fmt::print(stderr, "[µTP] {}\n", args->buf);
+        tr_logAddTrace(fmt::format("[µTP] {}", reinterpret_cast<char const*>(args->buf)));
         break;
 #endif
 
