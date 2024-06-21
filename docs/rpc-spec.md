@@ -374,6 +374,7 @@ The 'source' column here corresponds to the data structure there.
 | `announceState`           | number     | tr_tracker_view
 | `announce`                | string     | tr_tracker_view
 | `downloadCount`           | number     | tr_tracker_view
+| `downloaderCount`         | number     | tr_tracker_view
 | `hasAnnounced`            | boolean    | tr_tracker_view
 | `hasScraped`              | boolean    | tr_tracker_view
 | `host`                    | string     | tr_tracker_view
@@ -1027,3 +1028,4 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-get` | new arg `files.beginPiece`
 | `torrent-get` | new arg `files.endPiece`
 | `port-test` | new arg `ipProtocol`
+| `torrent-get` | new arg `trackerStats.downloaderCount`
