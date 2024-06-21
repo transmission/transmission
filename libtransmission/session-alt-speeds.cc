@@ -22,6 +22,7 @@ void tr_session_alt_speeds::load(Settings&& settings)
 {
     settings_ = std::move(settings);
     update_scheduler();
+    mediator_.is_active_changed(settings_.is_active, ChangeReason::LoadSettings);
 }
 
 void tr_session_alt_speeds::update_minutes()

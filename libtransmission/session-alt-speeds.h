@@ -63,10 +63,11 @@ public:
         }
     };
 
-    enum class ChangeReason
+    enum class ChangeReason : uint8_t
     {
         User,
-        Scheduler
+        Scheduler,
+        LoadSettings
     };
 
     class Mediator
