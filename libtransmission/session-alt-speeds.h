@@ -163,7 +163,10 @@ public:
         }
     }
 
-    void set_active(bool active, ChangeReason reason);
+    void set_active(bool active, ChangeReason reason)
+    {
+        set_active(active, reason, false);
+    }
 
 private:
     Mediator& mediator_;
@@ -172,6 +175,7 @@ private:
 
     void update_scheduler();
     void update_minutes();
+    void set_active(bool active, ChangeReason reason, bool force);
 
     // whether `time` hits in one of the `minutes_` that is true
     [[nodiscard]] bool is_active_minute(time_t time) const noexcept;
