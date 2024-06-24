@@ -148,9 +148,9 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     // icons
     QIcon const icon_play = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
     QIcon const icon_pause = icons.getThemeIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
-    QIcon const icon_open = icons.getThemeIcon(QStringLiteral(":/icons/document-open"), QStyle::SP_DialogOpenButton);
-    ui_.action_OpenFile->setIcon(icons.getThemeIcon(QStringLiteral(":/icons/document-open"), QStyle::SP_DialogOpenButton);
-    ui_.action_AddURL->setIcon(icons.getThemeIcon(QStringLiteral(":/icons/insert-link")));
+    QIcon const icon_open = icons.getThemeIcon(QStringLiteral(":icons/document-open"), QStyle::SP_DialogOpenButton);
+    ui_.action_OpenFile->setIcon(icons.getThemeIcon(QStringLiteral(":icons/document-open"), QStyle::SP_DialogOpenButton);
+    ui_.action_AddURL->setIcon(icons.getThemeIcon(QStringLiteral(":icons/insert-link"), QStyle::SP_DialogOpenButton));
     ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
     ui_.action_Start->setIcon(icon_play);
