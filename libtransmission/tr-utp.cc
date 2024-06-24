@@ -227,7 +227,6 @@ void tr_utp_close(tr_session* session)
 
     if (session->utp_context != nullptr)
     {
-        utp_context_set_userdata(session->utp_context, nullptr);
         utp_destroy(session->utp_context);
         session->utp_context = nullptr;
     }
