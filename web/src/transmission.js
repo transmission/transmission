@@ -124,6 +124,19 @@ export class Transmission extends EventTarget {
         case 'show-about-dialog':
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
+        case 'show-context-menu':
+          if (this.popup instanceof ContextMenu) {
+            this.setCurrentPopup(null);
+          } else {
+            if (this._getSelectedRows().length) {
+              // open context menu
+              const popup = new ContextMenu(this.action_manager);
+              this.setCurrentPopup(popup);
+
+              this.popup.root.style.pointerEvents = 'auto';
+            }
+          }
+          break;
         case 'show-inspector':
           if (this.popup instanceof Inspector) {
             this.setCurrentPopup(null);
@@ -240,13 +253,15 @@ export class Transmission extends EventTarget {
       const x = Math.min(
         this.isTouch ? event_.touches[0].clientX : event_.x,
         bounds.x + bounds.width - popup.root.clientWidth,
-      );
+      ) + (this.isTouch ? window.visualViewport.offsetLeft : 0);
       const y = Math.min(
         this.isTouch ? event_.touches[0].clientY : event_.y,
         bounds.y + bounds.height - popup.root.clientHeight,
-      );
+      ) + (this.isTouch ? window.visualViewport.offsetTop : 0);
       popup.root.style.left = `${x > 0 ? x : 0}px`;
       popup.root.style.top = `${y > 0 ? y : 0}px`;
+      popup.root.style.right = 'initial';
+      popup.root.style.margin = 'initial';
       event_.preventDefault();
     };
 
