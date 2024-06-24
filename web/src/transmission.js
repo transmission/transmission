@@ -253,11 +253,11 @@ export class Transmission extends EventTarget {
       const x = Math.min(
         this.isTouch ? event_.touches[0].clientX : event_.x,
         bounds.x + bounds.width - popup.root.clientWidth,
-      )
+      );
       const y = Math.min(
         this.isTouch ? event_.touches[0].clientY : event_.y,
         bounds.y + bounds.height - popup.root.clientHeight,
-      )
+      );
       popup.root.style.left = `${x > 0 ? x : 0}px`;
       popup.root.style.top = `${y > 0 ? y : 0}px`;
       popup.root.style.right = 'initial';
