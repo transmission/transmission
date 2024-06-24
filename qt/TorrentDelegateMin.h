@@ -15,8 +15,8 @@ class TorrentDelegateMin : public TorrentDelegate
     TR_DISABLE_COPY_MOVE(TorrentDelegateMin)
 
 public:
-    explicit TorrentDelegateMin(QObject* parent = nullptr)
-        : TorrentDelegate{ parent }
+    explicit TorrentDelegateMin(Prefs& prefs, QObject* parent = nullptr)
+        : TorrentDelegate{ prefs, parent }
     {
     }
 
