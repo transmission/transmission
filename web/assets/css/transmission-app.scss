@@ -1273,7 +1273,10 @@ a {
   background-color: var(--color-bg-primary);
   border-radius: 5px;
   color: var(--color-fg-on-popup);
+  margin: 6px;
   padding: 10px 5px;
+  right: 0;
+  top: 50px;
   z-index: 9999;
   user-select: none;
   -webkit-user-select: none;
