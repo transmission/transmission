@@ -371,8 +371,8 @@ The 'source' column here corresponds to the data structure there.
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `announceState`           | number     | tr_tracker_view
 | `announce`                | string     | tr_tracker_view
+| `announceState`           | number     | tr_tracker_view
 | `downloadCount`           | number     | tr_tracker_view
 | `hasAnnounced`            | boolean    | tr_tracker_view
 | `hasScraped`              | boolean    | tr_tracker_view
@@ -393,8 +393,8 @@ The 'source' column here corresponds to the data structure there.
 | `leecherCount`            | number     | tr_tracker_view
 | `nextAnnounceTime`        | number     | tr_tracker_view
 | `nextScrapeTime`          | number     | tr_tracker_view
-| `scrapeState`             | number     | tr_tracker_view
 | `scrape`                  | string     | tr_tracker_view
+| `scrapeState`             | number     | tr_tracker_view
 | `seederCount`             | number     | tr_tracker_view
 | `sitename`                | string     | tr_tracker_view
 | `tier`                    | number     | tr_tracker_view
