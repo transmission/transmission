@@ -290,14 +290,14 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
     auto hash = tr_sha1_digest_t{};
     peer_io->read_bytes(std::data(hash), std::size(hash));
 
+    if (auto const& info = mediator_->torrent(hash); !info || !info->is_running)
+    {
+        tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent we aren't running.");
+        return done(false);
+    }
+
     if (is_incoming() && peer_io->torrent_hash() == tr_sha1_digest_t{}) // incoming plain handshake
     {
-        if (auto const& info = mediator_->torrent(hash); !info || !info->is_running)
-        {
-            tr_logAddTraceHand(this, "peer is trying to connect to us for a torrent we aren't running.");
-            return done(false);
-        }
-
         peer_io->set_torrent_hash(hash);
     }
     else // outgoing, or incoming MSE handshake
