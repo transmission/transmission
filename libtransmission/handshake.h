@@ -128,7 +128,7 @@ private:
     {
         peer_io_->clear_callbacks();
 
-        // The responding client of a handshake can immediately start sending BT messages after
+        // The responding client of a handshake usually starts sending BT messages immediately after
         // the handshake, so we need to return READ_NOW to ensure those messages are processed.
         return fire_done(is_connected) ? READ_NOW : READ_ERR;
     }
