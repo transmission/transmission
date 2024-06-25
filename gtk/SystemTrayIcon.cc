@@ -55,7 +55,7 @@ namespace
 {
 
 #if !defined(TR_SYS_TRAY_IMPL_NONE)
-char const* const TrayIconName = "transmission-tray-icon";
+char const* const TrayIconName = "transmission-symbolic";
 char const* const AppIconName = "transmission";
 #endif
 
