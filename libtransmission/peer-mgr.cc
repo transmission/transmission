@@ -1289,7 +1289,12 @@ void create_bit_torrent_peer(
         info->destroy_handshake();
     }
 
-    if (!result.is_connected || swarm == nullptr || !swarm->is_running)
+    if (swarm == nullptr || !swarm->is_running)
+    {
+        return false;
+    }
+
+    if (!result.is_connected)
     {
         if (info && !info->is_connected())
         {
