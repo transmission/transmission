@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <iterator> // for std::distance()
 #include <optional>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -148,6 +147,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "honorsSessionLimits"sv,
     "host"sv,
     "id"sv,
+    "id_timestamp"sv,
     "idle-limit"sv,
     "idle-mode"sv,
     "idle-seeding-limit"sv,
@@ -366,6 +366,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "start-added-torrents"sv,
     "start-minimized"sv,
     "startDate"sv,
+    "start_paused"sv,
     "status"sv,
     "statusbar-stats"sv,
     "tag"sv,

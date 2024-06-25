@@ -251,7 +251,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     if (wasTransmitting != self.transmitting)
     {
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateQueue" object:self]
+        [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateTorrentsState" object:nil]
                                                  postingStyle:NSPostASAP
                                                  coalesceMask:NSNotificationCoalescingOnName
                                                      forModes:nil];
@@ -770,6 +770,25 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     {
         auto const location = tr_torrentFindFile(self.fHandle, 0);
         return std::empty(location) ? nil : @(location.c_str());
+    }
+}
+
+- (NSString*)lastKnownDataLocation
+{
+    if (self.magnet)
+    {
+        return nil;
+    }
+
+    if (self.folder)
+    {
+        NSString* lastDataLocation = [self.currentDirectory stringByAppendingPathComponent:self.name];
+        return lastDataLocation;
+    }
+    else
+    {
+        auto const lastFileName = @(tr_torrentFile(self.fHandle, 0).name);
+        return [self.currentDirectory stringByAppendingPathComponent:lastFileName];
     }
 }
 
@@ -1961,11 +1980,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
             [self sortFileList:node.children];
         }
     }];
-}
-
-- (void)startQueue
-{
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateQueue" object:self];
 }
 
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning

@@ -17,7 +17,6 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime> // time_t
-#include <functional>
 #include <future>
 #include <memory>
 #include <mutex>
@@ -201,6 +200,11 @@ private:
         [[nodiscard]] tr_address incoming_peer_address() const override
         {
             return session_.bind_address(TR_AF_INET);
+        }
+
+        [[nodiscard]] tr_port advertised_peer_port() const override
+        {
+            return session_.advertisedPeerPort();
         }
 
         [[nodiscard]] tr_port local_peer_port() const override

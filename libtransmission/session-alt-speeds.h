@@ -80,7 +80,7 @@ public:
         [[nodiscard]] virtual time_t time() = 0;
     };
 
-    constexpr explicit tr_session_alt_speeds(Mediator& mediator) noexcept
+    explicit tr_session_alt_speeds(Mediator& mediator) noexcept
         : mediator_{ mediator }
     {
     }

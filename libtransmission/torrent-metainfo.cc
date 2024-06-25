@@ -32,7 +32,7 @@ using namespace std::literals;
 /**
  * @brief Ensure that the URLs for multfile torrents end in a slash.
  *
- * See http://bittorrent.org/beps/bep_0019.html#metadata-extension
+ * See https://www.bittorrent.org/beps/bep_0019.html#metadata-extension
  * for background on how the trailing slash is used for "url-list"
  * fields.
  *
@@ -99,7 +99,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_subpath_ += '/';
             }
-            tr_torrent_files::makeSubpathPortable(currentKey(), file_subpath_);
+            tr_torrent_files::sanitize_subpath(currentKey(), file_subpath_);
         }
         else if (pathIs(InfoKey))
         {
@@ -298,7 +298,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     file_subpath_ += '/';
                 }
-                tr_torrent_files::makeSubpathPortable(value, file_subpath_);
+                tr_torrent_files::sanitize_subpath(value, file_subpath_);
             }
             else if (current_key == AttrKey)
             {
@@ -488,10 +488,10 @@ private:
         }
 
         auto root = tr_pathbuf{};
-        tr_torrent_files::makeSubpathPortable(tm_.name_, root);
+        tr_torrent_files::sanitize_subpath(tm_.name_, root);
         if (!std::empty(root))
         {
-            tm_.files_.insertSubpathPrefix(root);
+            tm_.files_.insert_subpath_prefix(root);
         }
 
         TR_ASSERT(info_dict_begin_[0] == 'd');
@@ -513,7 +513,7 @@ private:
     bool finish(Context const& context)
     {
         // bittorrent 1.0 spec
-        // http://bittorrent.org/beps/bep_0003.html
+        // https://www.bittorrent.org/beps/bep_0003.html
         //
         // "There is also a key length or a key files, but not both or neither.
         //
@@ -522,7 +522,7 @@ private:
         // In the single file case, length maps to the length of the file in bytes.
         if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
         {
-            tm_.files_.add(tm_.name_, length_);
+            tm_.files_.add(tr_torrent_files::sanitize_subpath(tm_.name_), length_);
         }
 
         if (auto const has_metainfo = tm_.info_dict_size() != 0U; has_metainfo)
@@ -546,7 +546,7 @@ private:
                 return false;
             }
 
-            tm_.block_info_ = tr_block_info{ tm_.files_.totalSize(), piece_size_ };
+            tm_.block_info_ = tr_block_info{ tm_.files_.total_size(), piece_size_ };
             return true;
         }
 

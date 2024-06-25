@@ -30,8 +30,8 @@
  * @{
  */
 
-class tr_peer;
 class tr_peer_socket;
+struct tr_peer;
 struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_session;
@@ -431,7 +431,7 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
-    static auto constexpr InactiveThresSecs = time_t{ 24 * 60 * 60 };
+    static auto constexpr InactiveThresSecs = time_t{ 60 * 60 };
 
     static auto inline n_known_connectable = size_t{};
 
@@ -517,9 +517,14 @@ struct tr_pex
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
-        return socket_address.is_valid_for_peers();
+        return socket_address.is_valid();
+    }
+
+    [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept
+    {
+        return socket_address.is_valid_for_peers(from);
     }
 
     tr_socket_address socket_address;

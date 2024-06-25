@@ -323,7 +323,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     }
 }
 
-#warning don't cut off end
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
     NSString* message = self.fDisplayedMessages[row][@"Message"];

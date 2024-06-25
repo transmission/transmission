@@ -1,3 +1,4 @@
+include(CheckAtomic)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
@@ -222,10 +223,13 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
         $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
-        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
+        $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
+        $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
+        $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
+        $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_headers(${TR_NAME}
@@ -275,7 +279,6 @@ target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
         deflate::deflate
-        transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
@@ -296,7 +299,9 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
+        $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
+        transmission::crypto_impl
         fmt::fmt-header-only
         small::small
         libevent::event)

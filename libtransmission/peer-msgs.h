@@ -36,8 +36,8 @@ class tr_peerMsgs : public tr_peer
 {
 public:
     tr_peerMsgs(
-        tr_torrent const* tor,
-        tr_peer_info* peer_info_in,
+        tr_torrent const& tor,
+        std::shared_ptr<tr_peer_info> peer_info_in,
         tr_interned_string user_agent,
         bool connection_is_encrypted,
         bool connection_is_incoming,
@@ -97,16 +97,22 @@ public:
 
     [[nodiscard]] virtual tr_socket_address socket_address() const = 0;
 
-    virtual void cancel_block_request(tr_block_index_t block) = 0;
-
     virtual void set_choke(bool peer_is_choked) = 0;
     virtual void set_interested(bool client_is_interested) = 0;
 
     virtual void pulse() = 0;
 
-    virtual void onTorrentGotMetainfo() = 0;
+    virtual void on_torrent_got_metainfo() noexcept = 0;
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
+
+    static tr_peerMsgs* create(
+        tr_torrent& torrent,
+        std::shared_ptr<tr_peer_info> peer_info,
+        std::shared_ptr<tr_peerIo> io,
+        tr_interned_string user_agent,
+        tr_peer_callback_bt callback,
+        void* callback_data);
 
 protected:
     constexpr void set_client_choked(bool val) noexcept
@@ -140,8 +146,7 @@ protected:
     }
 
 public:
-    // TODO(tearfur): change this to reference
-    tr_peer_info* const peer_info;
+    std::shared_ptr<tr_peer_info> const peer_info;
 
 private:
     static inline auto n_peers = std::atomic<size_t>{};
@@ -168,13 +173,5 @@ private:
     // whether or not the peer has indicated it will download from us
     bool peer_is_interested_ = false;
 };
-
-tr_peerMsgs* tr_peerMsgsNew(
-    tr_torrent* torrent,
-    tr_peer_info* peer_info,
-    std::shared_ptr<tr_peerIo> io,
-    tr_interned_string user_agent,
-    tr_peer_callback_bt callback,
-    void* callback_data);
 
 /* @} */

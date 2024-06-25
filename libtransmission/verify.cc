@@ -45,7 +45,7 @@ void tr_verify_worker::verify_torrent(
     tr_file_index_t prev_file_index = ~file_index;
     tr_piece_index_t piece = 0U;
     auto buffer = std::vector<std::byte>(1024U * 256U);
-    auto sha = tr_sha1::create();
+    auto sha = tr_sha1{};
     auto last_slept_at = current_time_secs();
 
     auto const& metainfo = verify_mediator.metainfo();
@@ -74,7 +74,7 @@ void tr_verify_worker::verify_torrent(
             if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0U)
             {
                 bytes_this_pass = num_read;
-                sha->add(std::data(buffer), bytes_this_pass);
+                sha.add(std::data(buffer), bytes_this_pass);
             }
         }
 
@@ -87,7 +87,7 @@ void tr_verify_worker::verify_torrent(
         /* if we're finishing a piece... */
         if (left_in_piece == 0U)
         {
-            auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
+            auto const has_piece = sha.finish() == metainfo.piece_hash(piece);
             verify_mediator.on_piece_checked(piece, has_piece);
 
             if (sleep_per_seconds_during_verify > std::chrono::milliseconds::zero())
@@ -101,7 +101,7 @@ void tr_verify_worker::verify_torrent(
                 }
             }
 
-            sha->clear();
+            sha.clear();
             ++piece;
             piece_pos = 0U;
         }

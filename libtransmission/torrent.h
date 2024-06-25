@@ -63,14 +63,14 @@ class RenameTest_singleFilenameTorrent_Test;
 } // namespace libtransmission::test
 
 /** @brief Torrent object */
-struct tr_torrent final : public tr_completion::torrent_view
+struct tr_torrent
 {
     using Speed = libtransmission::Values::Speed;
 
     class ResumeHelper
     {
     public:
-        void load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
+        void load_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*file_count()*/);
         void load_blocks(tr_bitfield blocks);
         void load_date_added(time_t when) noexcept;
         void load_date_done(time_t when) noexcept;
@@ -174,7 +174,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
-        , completion_{ this, &this->metainfo_.block_info() }
+        , completion_{ this, &metainfo_.block_info() }
     {
     }
 
@@ -325,6 +325,11 @@ struct tr_torrent final : public tr_completion::torrent_view
         return completion_.has_none();
     }
 
+    [[nodiscard]] auto has_file(tr_file_index_t file) const
+    {
+        return completion_.has_blocks(block_span_for_file(file));
+    }
+
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
     {
         return completion_.has_piece(piece);
@@ -372,7 +377,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     void amount_done_bins(float* tab, int n_tabs) const
     {
-        return completion_.amount_done(tab, n_tabs);
+        completion_.amount_done(tab, n_tabs);
     }
 
     /// FILE <-> PIECE
@@ -389,7 +394,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     /// WANTED
 
-    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
+    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const
     {
         return files_wanted_.piece_wanted(piece);
     }
@@ -729,6 +734,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         {
             sequential_download_ = is_sequential;
             sequential_download_changed_.emit(this, is_sequential);
+            set_dirty();
         }
     }
 
@@ -826,7 +832,7 @@ struct tr_torrent final : public tr_completion::torrent_view
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
                 TR_ASSERT(now >= latest);
-                return now - latest;
+                return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
             }
         }
 
@@ -886,6 +892,8 @@ struct tr_torrent final : public tr_completion::torrent_view
 
     void do_idle_work()
     {
+        do_magnet_idle_work();
+
         if (needs_completeness_check_)
         {
             needs_completeness_check_ = false;
@@ -1243,7 +1251,10 @@ private:
     void create_empty_files() const;
     void recheck_completeness();
 
+    void do_magnet_idle_work();
     [[nodiscard]] bool use_new_metainfo(tr_error* error);
+
+    void update_file_path(tr_file_index_t file, std::optional<bool> has_file) const;
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 

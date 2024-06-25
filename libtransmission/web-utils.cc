@@ -291,6 +291,19 @@ std::string_view getSiteName(std::string_view host)
 
     return host;
 }
+
+// Not part of the RFC3986 standard, but included for convenience
+// when using the result with API that does not accept IPv6 address
+// strings that are wrapped in square brackets (e.g. inet_pton())
+std::string_view getHostWoBrackets(std::string_view host)
+{
+    if (tr_strv_starts_with(host, '['))
+    {
+        host.remove_prefix(1);
+        host.remove_suffix(1);
+    }
+    return host;
+}
 } // namespace
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
@@ -340,8 +353,13 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         auto remain = parsed.authority;
         if (tr_strv_starts_with(remain, '['))
         {
-            remain.remove_prefix(1); // '['
-            parsed.host = tr_strv_sep(&remain, ']');
+            pos = remain.find(']');
+            if (pos == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+            parsed.host = remain.substr(0, pos + 1);
+            remain.remove_prefix(pos + 1);
             if (tr_strv_starts_with(remain, ':'))
             {
                 remain.remove_prefix(1);
@@ -358,6 +376,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         {
             parsed.host = tr_strv_sep(&remain, ':');
         }
+        parsed.host_wo_brackets = getHostWoBrackets(parsed.host);
         parsed.sitename = getSiteName(parsed.host);
         parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }
@@ -389,7 +408,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
 {
     auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? parsed : std::nullopt;
 }
 
 bool tr_urlIsValidTracker(std::string_view url)
