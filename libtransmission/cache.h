@@ -91,11 +91,11 @@ private:
 
     static constexpr struct
     {
-        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block)
+        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block) const
         {
             return key < block.key;
         }
-        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key)
+        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key) const
         {
             return block.key < key;
         }

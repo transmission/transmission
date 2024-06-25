@@ -44,11 +44,11 @@ public:
     }
     [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
-        return files().fileCount();
+        return files().file_count();
     }
     [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const
     {
-        return files().fileSize(i);
+        return files().file_size(i);
     }
     [[nodiscard]] TR_CONSTEXPR20 auto const& file_subpath(tr_file_index_t i) const
     {
@@ -57,7 +57,7 @@ public:
 
     void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
-        files_.setPath(i, subpath);
+        files_.set_path(i, subpath);
     }
 
     /// BLOCK INFO
@@ -231,7 +231,7 @@ private:
 
     // Offset + size of the bencoded info dict subset of the bencoded data.
     // Used when loading pieces of it to sent to magnet peers.
-    // See http://bittorrent.org/beps/bep_0009.html
+    // See https://www.bittorrent.org/beps/bep_0009.html
     uint64_t info_dict_size_ = 0;
     uint64_t info_dict_offset_ = 0;
 

@@ -56,6 +56,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     // init an incomplete torrent.
     // the test zero_torrent will be missing its first piece.
+    tr_sessionSetIncompleteFileNamingEnabled(session_, true);
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
     auto path = tr_pathbuf{};
 
@@ -81,7 +82,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<Cache::BlockData> buf = {};
+        std::unique_ptr<Cache::BlockData> buf;
         bool done = {};
     };
 
@@ -165,7 +166,7 @@ TEST_F(MoveTest, setLocation)
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // now move it
-    auto state = int{ -1 };
+    auto state = -1;
     tr_torrentSetLocation(tor, target_dir, true, &state);
     auto test = [&state]()
     {

@@ -6,7 +6,6 @@
 #include "FilterBar.h"
 
 #include <cstdint> // uint64_t
-#include <map>
 #include <unordered_map>
 #include <utility>
 
@@ -155,7 +154,7 @@ void FilterBar::refreshTrackers()
         return i;
     };
 
-    auto new_trackers = std::map<QString, int>(torrents_per_sitename.begin(), torrents_per_sitename.end());
+    auto new_trackers = small::map<QString, int>{ torrents_per_sitename.begin(), torrents_per_sitename.end() };
     auto old_it = sitename_counts_.cbegin();
     auto new_it = new_trackers.cbegin();
     auto const old_end = sitename_counts_.cend();
@@ -223,25 +222,21 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     , prefs_{ prefs }
     , torrents_{ torrents }
     , filter_{ filter }
+    , count_label_{ new QLabel{ tr("Show:"), this } }
     , is_bootstrapping_{ true }
 {
     auto* h = new QHBoxLayout{ this };
     h->setContentsMargins(3, 3, 3, 3);
 
-    count_label_ = new QLabel{ tr("Show:"), this };
     h->addWidget(count_label_);
-
     h->addWidget(activity_combo_);
-
-    tracker_combo_ = createTrackerCombo(tracker_model_);
     h->addWidget(tracker_combo_);
-
     h->addStretch();
+    h->addWidget(line_edit_, 1);
 
     line_edit_->setClearButtonEnabled(true);
     line_edit_->setPlaceholderText(tr("Search…"));
     line_edit_->setMaximumWidth(250);
-    h->addWidget(line_edit_, 1);
     connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
     // listen for changes from the other players
@@ -313,6 +308,9 @@ void FilterBar::refreshPref(int key)
 
             break;
         }
+
+    default:
+        break;
     }
 }
 

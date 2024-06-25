@@ -268,7 +268,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 }
 
 void printMessage(
-    tr_sys_file_t file,
+    FILE* ostream,
     tr_log_level level,
     std::string_view name,
     std::string_view message,
@@ -286,11 +286,11 @@ void printMessage(
         fmt::format_to(std::back_inserter(out), "{:s} {:s} ({:s}:{:d})", name, message, filename, line);
     }
 
-    if (file != TR_BAD_SYS_FILE)
+    if (ostream != nullptr)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, fmt::format("[{:s}] {:s} {:s}", std::data(timestr), levelName(level), std::data(out)));
+        fmt::print(ostream, "[{:s}] {:s} {:s}\n", std::data(timestr), levelName(level), out.c_str());
     }
 
 #ifdef HAVE_SYSLOG
@@ -329,18 +329,21 @@ void printMessage(
 #endif
 }
 
-void pumpLogMessages(tr_sys_file_t file, bool flush)
+void pumpLogMessages(FILE* log_stream)
 {
     tr_log_message* list = tr_logGetQueue();
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        printMessage(file, l->level, l->name, l->message, l->file, l->line);
+        printMessage(log_stream, l->level, l->name, l->message, l->file, l->line);
     }
 
-    if (flush && file != TR_BAD_SYS_FILE)
+    // two reasons to not flush stderr:
+    // 1. it's usually redundant, since stderr flushes itself
+    // 2. when running as a systemd unit, it's redirected to a socket
+    if (log_stream != stderr)
     {
-        tr_sys_file_flush(file);
+        fflush(log_stream);
     }
 
     tr_logFreeQueue(list);
@@ -363,7 +366,11 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
 tr_variant load_settings(char const* config_dir)
 {
     auto app_defaults = tr_variant::make_map();
+    tr_variantDictAddStr(&app_defaults, TR_KEY_watch_dir, ""sv);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
+    tr_variantDictAddBool(&app_defaults, TR_KEY_start_paused, false);
     return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
 }
 
@@ -371,31 +378,26 @@ tr_variant load_settings(char const* config_dir)
 
 bool tr_daemon::reopen_log_file(char const* filename)
 {
-    auto error = tr_error{};
-    tr_sys_file_t const old_log_file = logfile_;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(
-        filename,
-        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
-        0666,
-        &error);
+    auto* const old_stream = log_stream_;
 
-    if (new_log_file == TR_BAD_SYS_FILE)
+    auto* new_stream = std::fopen(filename, "a");
+    if (new_stream == nullptr)
     {
+        auto const err = errno;
         auto const errmsg = fmt::format(
             "Couldn't open '{path}': {error} ({error_code})",
             fmt::arg("path", filename),
-            fmt::arg("error", error.message()),
-            fmt::arg("error_code", error.code()));
+            fmt::arg("error", tr_strerror(err)),
+            fmt::arg("error_code", err));
         fmt::print(stderr, "{:s}\n", errmsg);
         return false;
     }
 
-    logfile_ = new_log_file;
-    logfile_flush_ = tr_sys_file_flush_possible(logfile_);
+    log_stream_ = new_stream;
 
-    if (old_log_file != TR_BAD_SYS_FILE)
+    if (old_stream != nullptr && old_stream != stderr)
     {
-        tr_sys_file_close(old_log_file);
+        fclose(old_stream);
     }
 
     return true;
@@ -418,7 +420,7 @@ void tr_daemon::report_status()
 
 void tr_daemon::periodic_update()
 {
-    pumpLogMessages(logfile_, logfile_flush_);
+    pumpLogMessages(log_stream_);
     report_status();
 }
 
@@ -427,7 +429,6 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
     int c;
     char const* optstr;
 
-    paused_ = false;
     *dump_settings = false;
     *foreground = false;
 
@@ -561,7 +562,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 800:
-            paused_ = true;
+            tr_variantDictAddBool(&settings_, TR_KEY_start_paused, true);
             break;
 
         case 910:
@@ -601,7 +602,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'x':
-            tr_variantDictAddStr(&settings_, key_pidfile_, optstr);
+            tr_variantDictAddStr(&settings_, TR_KEY_pidfile, optstr);
             break;
 
         case 'y':
@@ -707,7 +708,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             _("Couldn't initialize daemon: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code));
-        printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+        printMessage(log_stream_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         cleanup_signals(sig_ev);
         return 1;
     }
@@ -720,7 +721,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     tr_sessionSaveSettings(session, cdir, settings_);
 
     auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
+    (void)tr_variantDictFindStrView(&settings_, TR_KEY_pidfile, &sv);
     auto const sz_pid_filename = std::string{ sv };
     auto pidfile_created = false;
     if (!std::empty(sz_pid_filename))
@@ -767,8 +768,8 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     auto watchdir = std::unique_ptr<Watchdir>{};
     if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &tmp_bool) && tmp_bool)
     {
-        auto force_generic = bool{ false };
-        (void)tr_variantDictFindBool(&settings_, key_watch_dir_force_generic_, &force_generic);
+        auto force_generic = false;
+        (void)tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_force_generic, &force_generic);
 
         auto dir = std::string_view{};
         (void)tr_variantDictFindStrView(&settings_, TR_KEY_watch_dir, &dir);
@@ -791,7 +792,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     {
         tr_ctor* ctor = tr_ctorNew(my_session_);
 
-        if (paused_)
+        if (auto paused = false; tr_variantDictFindBool(&settings_, TR_KEY_start_paused, &paused) && paused)
         {
             tr_ctorSetPaused(ctor, TR_FORCE, true);
         }
@@ -867,7 +868,7 @@ CLEANUP:
 
     tr_sessionSaveSettings(my_session_, cdir, settings_);
     tr_sessionClose(my_session_);
-    pumpLogMessages(logfile_, logfile_flush_);
+    pumpLogMessages(log_stream_);
     printf(" done.\n");
 
     /* shutdown */
@@ -909,10 +910,9 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
         return false;
     }
 
-    if (*foreground && logfile_ == TR_BAD_SYS_FILE)
+    if (*foreground && log_stream_ == nullptr)
     {
-        logfile_ = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
-        logfile_flush_ = tr_sys_file_flush_possible(logfile_);
+        log_stream_ = stderr;
     }
 
     if (dumpSettings)
@@ -927,7 +927,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
 void tr_daemon::handle_error(tr_error const& error) const
 {
     auto const errmsg = fmt::format("Couldn't daemonize: {:s} ({:d})", error.message(), error.code());
-    printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+    printMessage(log_stream_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
 }
 
 int tr_main(int argc, char* argv[])

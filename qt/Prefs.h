@@ -6,7 +6,6 @@
 #pragma once
 
 #include <array>
-#include <set>
 
 #include <QObject>
 #include <QString>
@@ -204,7 +203,6 @@ private:
 
     QString const config_dir_;
 
-    std::set<int> temporary_prefs_;
     std::array<QVariant, PREFS_COUNT> mutable values_;
 
     static std::array<PrefItem, PREFS_COUNT> const Items;

@@ -47,6 +47,13 @@ public:
 
     void remove(tr_sha1_digest_t const& info_hash);
 
+    void set_sleep_per_seconds_during_verify(std::chrono::milliseconds sleep_per_seconds_during_verify);
+
+    [[nodiscard]] constexpr auto sleep_per_seconds_during_verify() const noexcept
+    {
+        return sleep_per_seconds_during_verify_;
+    }
+
 private:
     struct Node
     {
@@ -72,7 +79,10 @@ private:
         tr_priority_t priority_;
     };
 
-    static void verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag);
+    static void verify_torrent(
+        Mediator& verify_mediator,
+        std::atomic<bool> const& abort_flag,
+        std::chrono::milliseconds sleep_per_seconds_during_verify);
 
     void verify_thread_func();
 
@@ -85,4 +95,6 @@ private:
 
     std::atomic<bool> stop_current_ = false;
     std::condition_variable stop_current_cv_;
+
+    std::chrono::milliseconds sleep_per_seconds_during_verify_ = {};
 };

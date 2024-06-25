@@ -52,6 +52,8 @@
 #include <gtkmm/stylecontext.h>
 #include <gtkmm/window.h>
 
+#include <small/set.hpp>
+
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/droptarget.h>
 #include <gtkmm/eventcontrollerfocus.h>
@@ -70,11 +72,9 @@
 #include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
-#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -479,11 +479,13 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
             auto const newvals = tr_sessionGetSettings(session);
 
             // determine which settings changed
-            auto changed_keys = std::set<tr_quark>{};
+            auto changed_keys = small::set<tr_quark>{};
             auto& oldvals = gtr_pref_get_all();
             auto const serde = tr_variant_serde::benc();
             if (auto const* const newvals_map = newvals.get_if<tr_variant::Map>(); newvals_map != nullptr)
             {
+                changed_keys.reserve(std::size(*newvals_map));
+
                 for (auto const& [key, newval] : *newvals_map)
                 {
                     bool changed = true;
@@ -1517,7 +1519,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
     else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
-        gtr_window_on_close(*w, [w]() mutable { w.reset(); });
+        w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
         w->show();
     }
     else if (action_name == "show-stats")

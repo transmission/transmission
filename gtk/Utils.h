@@ -30,6 +30,7 @@
 #include <fmt/core.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <ctime>
 #include <functional>
 #include <list>
@@ -52,7 +53,7 @@ void gtr_error(std::string const& message);
 ****
 ***/
 
-enum class GtrUnicode
+enum class GtrUnicode : uint8_t
 {
     Up,
     Down,
@@ -260,7 +261,7 @@ T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustri
 template<typename F>
 void gtr_window_on_close(Gtk::Window& widget, F&& callback)
 {
-    auto bool_callback = [callback = std::move(callback)]() mutable -> bool
+    auto bool_callback = [callback = std::forward<F>(callback)]() mutable -> bool
     {
         if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(callback)>>)
         {

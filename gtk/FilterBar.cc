@@ -32,25 +32,29 @@
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/filterlistmodel.h>
-#else
-#include <gtkmm/treemodelfilter.h>
 #endif
 
 #include <fmt/core.h>
 
 #include <algorithm> // std::transform()
 #include <array>
+#include <map>
 #include <memory>
-#include <set>
 #include <string>
 #include <unordered_map>
+
+namespace
+{
+using ActivityType = TorrentFilter::Activity;
+using TrackerType = TorrentFilter::Tracker;
+
+constexpr auto ActivitySeparator = static_cast<ActivityType>(-1);
+constexpr auto TrackerSeparator = static_cast<TrackerType>(-1);
+} // namespace
 
 class FilterBar::Impl
 {
     using FilterModel = IF_GTKMM4(Gtk::FilterListModel, Gtk::TreeModelFilter);
-
-    using TrackerType = TorrentFilter::Tracker;
-    using ActivityType = TorrentFilter::Activity;
 
 public:
     Impl(FilterBar& widget, Glib::RefPtr<Session> const& core);
@@ -118,15 +122,10 @@ private:
     sigc::connection update_filter_models_on_change_tag_;
 };
 
-/***
-****
-****  TRACKERS
-****
-***/
+// --- TRACKERS
 
 namespace
 {
-
 class TrackerFilterModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
@@ -141,7 +140,7 @@ public:
 
     Gtk::TreeModelColumn<Glib::ustring> displayname; /* human-readable name; ie, Legaltorrents */
     Gtk::TreeModelColumn<int> count; /* how many matches there are */
-    Gtk::TreeModelColumn<int> type;
+    Gtk::TreeModelColumn<TrackerType> type;
     Gtk::TreeModelColumn<Glib::ustring> sitename; // pattern-matching text; see tr_parsed_url.sitename
     Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> pixbuf;
 };
@@ -202,7 +201,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
     /* Walk through all the torrents, tallying how many matches there are
      * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
-    auto n_torrents = int{ 0 };
+    auto n_torrents = 0;
     auto site_infos = std::unordered_map<std::string /*site*/, site_info>{};
     for (auto i = 0U, count = torrents_model->get_n_items(); i < count; ++i)
     {
@@ -298,7 +297,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
             add->set_value(tracker_filter_cols.sitename, Glib::ustring{ site.sitename });
             add->set_value(tracker_filter_cols.displayname, get_name_from_host(site.sitename));
             add->set_value(tracker_filter_cols.count, site.count);
-            add->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::HOST));
+            add->set_value(tracker_filter_cols.type, TrackerType::HOST);
             auto path = tracker_model_->get_path(add);
             core_->favicon_cache().load(
                 site.announce_url,
@@ -322,17 +321,17 @@ Glib::RefPtr<Gtk::TreeStore> FilterBar::Impl::tracker_filter_model_new()
 
     auto iter = store->append();
     iter->set_value(tracker_filter_cols.displayname, Glib::ustring(_("All")));
-    iter->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::ALL));
+    iter->set_value(tracker_filter_cols.type, TrackerType::ALL);
 
     iter = store->append();
-    iter->set_value(tracker_filter_cols.type, -1);
+    iter->set_value(tracker_filter_cols.type, TrackerSeparator);
 
     return store;
 }
 
 bool FilterBar::Impl::is_it_a_separator(Gtk::TreeModel::const_iterator const& iter)
 {
-    return iter->get_value(tracker_filter_cols.type) == -1;
+    return iter->get_value(tracker_filter_cols.type) == TrackerSeparator;
 }
 
 void FilterBar::Impl::render_pixbuf_func(Gtk::CellRendererPixbuf& cell_renderer, Gtk::TreeModel::const_iterator const& iter)
@@ -406,7 +405,7 @@ public:
 
     Gtk::TreeModelColumn<Glib::ustring> name;
     Gtk::TreeModelColumn<int> count;
-    Gtk::TreeModelColumn<int> type;
+    Gtk::TreeModelColumn<ActivityType> type;
     Gtk::TreeModelColumn<Glib::ustring> icon_name;
 };
 
@@ -416,7 +415,7 @@ ActivityFilterModelColumns const activity_filter_cols;
 
 bool FilterBar::Impl::activity_is_it_a_separator(Gtk::TreeModel::const_iterator const& iter)
 {
-    return iter->get_value(activity_filter_cols.type) == -1;
+    return iter->get_value(activity_filter_cols.type) == ActivitySeparator;
 }
 
 void FilterBar::Impl::status_model_update_count(Gtk::TreeModel::iterator const& iter, int n)
@@ -434,7 +433,7 @@ bool FilterBar::Impl::activity_filter_model_update()
     for (auto& row : activity_model_->children())
     {
         auto const type = row.get_value(activity_filter_cols.type);
-        if (type == -1)
+        if (type == ActivitySeparator)
         {
             continue;
         }
@@ -487,7 +486,7 @@ Glib::RefPtr<Gtk::ListStore> FilterBar::Impl::activity_filter_model_new()
             Glib::ustring();
         auto const iter = store->append();
         iter->set_value(activity_filter_cols.name, name);
-        iter->set_value(activity_filter_cols.type, static_cast<int>(type.type));
+        iter->set_value(activity_filter_cols.type, type.type);
         iter->set_value(activity_filter_cols.icon_name, Glib::ustring(type.icon_name != nullptr ? type.icon_name : ""));
     }
 

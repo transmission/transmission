@@ -29,15 +29,18 @@ namespace
 {
 void handle_sigchld(int /*i*/)
 {
-    int rc = 0;
-
-    do
+    for (;;)
     {
-        /* FIXME: Only check for our own PIDs */
-        rc = waitpid(-1, nullptr, WNOHANG);
-    } while (rc > 0 || (rc == -1 && errno == EINTR));
+        // FIXME: only check for our own PIDs
+        auto const res = waitpid(-1, nullptr, WNOHANG);
 
-    /* FIXME: Call old handler, if any */
+        if ((res == 0) || (res == -1 && errno != EINTR))
+        {
+            break;
+        }
+    }
+
+    // FIXME: Call old handler, if any
 }
 
 void set_system_error(tr_error* error, int code, std::string_view what)
@@ -82,34 +85,29 @@ void set_system_error(tr_error* error, int code, std::string_view what)
 
 [[nodiscard]] bool tr_spawn_async_in_parent(int pipe_fd, tr_error* error)
 {
-    int child_errno = 0;
-    ssize_t count = 0;
-
-    static_assert(sizeof(child_errno) == sizeof(errno));
-
-    do
+    auto child_errno = int{};
+    auto n_read = ssize_t{};
+    for (auto done = false; !done;)
     {
-        count = read(pipe_fd, &child_errno, sizeof(child_errno));
-    } while (count == -1 && errno == EINTR);
+        n_read = read(pipe_fd, &child_errno, sizeof(child_errno));
+        done = n_read != -1 || errno != EINTR;
+    }
 
     close(pipe_fd);
 
-    if (count == -1)
+    if (n_read == 0) // child successfully exec'ed
     {
-        /* Read failed (what to do?) */
+        return true;
     }
-    else if (count == 0)
-    {
-        /* Child successfully exec-ed */
-    }
-    else
-    {
-        TR_ASSERT((size_t)count == sizeof(child_errno));
 
+    if (n_read > 0) // child errno was set
+    {
+        TR_ASSERT(static_cast<size_t>(n_read) == sizeof(child_errno));
         set_system_error(error, child_errno, "Child process setup");
         return false;
     }
 
+    // read failed (what to do?)
     return true;
 }
 } // namespace

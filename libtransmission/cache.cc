@@ -9,7 +9,6 @@
 #include <cstdint> // uint8_t
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <memory>
-#include <mutex>
 #include <numeric> // std::accumulate()
 #include <utility> // std::make_pair()
 #include <vector>

@@ -9,7 +9,6 @@
 #include <cstddef>
 #include <optional>
 #include <string_view>
-#include <utility> // std::move
 
 #include <fmt/core.h>
 
@@ -208,7 +207,7 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
 {
     TR_ASSERT(piece < tor.piece_count());
 
-    auto sha = tr_sha1::create();
+    auto sha = tr_sha1{};
     auto buffer = std::array<uint8_t, tr_block_info::BlockSize>{};
 
     auto& cache = tor.session->cache;
@@ -237,12 +236,12 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
             end -= (block_loc.byte + block_len - end_byte);
         }
 
-        sha->add(begin, end - begin);
+        sha.add(begin, end - begin);
         n_bytes_checked += (end - begin);
     }
 
     TR_ASSERT(tor.piece_size(piece) == n_bytes_checked);
-    return sha->finish();
+    return sha.finish();
 }
 
 } // namespace

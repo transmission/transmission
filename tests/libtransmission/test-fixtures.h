@@ -21,7 +21,6 @@
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
 #include <libtransmission/file.h> // tr_sys_file_*()
-#include <libtransmission/platform.h> // TR_PATH_DELIMITER
 #include <libtransmission/quark.h>
 #include <libtransmission/torrent-ctor.h>
 #include <libtransmission/torrent.h>
@@ -141,6 +140,14 @@ public:
         return sandbox_dir_;
     }
 
+    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
+    {
+        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        tr_sys_dir_create_temp(std::data(path));
+        tr_sys_path_native_separators(std::data(path));
+        return path;
+    }
+
 protected:
     static std::string get_default_parent_dir()
     {
@@ -151,14 +158,6 @@ protected:
 
         auto error = tr_error{};
         return tr_sys_dir_get_current(&error);
-    }
-
-    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
-    {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
-        tr_sys_dir_create_temp(std::data(path));
-        tr_sys_path_native_separators(std::data(path));
-        return path;
     }
 
     static void rimraf(std::string const& path, bool verbose = false)
@@ -247,8 +246,6 @@ protected:
         auto error = tr_error{};
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
         blockingFileWrite(fd, payload, n, &error);
-        tr_sys_file_flush(fd, &error);
-        tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);
         if (error)
         {
@@ -275,8 +272,6 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
-        tr_sys_file_flush(fd);
-        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 
@@ -438,8 +433,8 @@ protected:
                     tr_sys_file_write(fd, &ch, 1, nullptr);
                 }
 
-                tr_sys_file_flush(fd);
                 tr_sys_file_close(fd);
+                sync();
             }
         }
 

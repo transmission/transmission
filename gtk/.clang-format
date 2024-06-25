@@ -11,7 +11,7 @@ IncludeCategories:
     SortPriority: 4
   - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)mm([-./]|config)'
     Priority: 5
-  - Regex: '^<(fmt)/'
+  - Regex: '^<(fmt|small)/'
     Priority: 6
   - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)[-./]'
     Priority: 8

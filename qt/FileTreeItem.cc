@@ -5,8 +5,9 @@
 
 #include <algorithm>
 #include <cassert>
-#include <set>
 #include <utility>
+
+#include <small/set.hpp>
 
 #include <QApplication>
 #include <QStyle>
@@ -164,6 +165,9 @@ QVariant FileTreeItem::data(int column, int role) const
             }
 
             break;
+
+        default:
+            break;
         }
 
         break;
@@ -183,6 +187,9 @@ QVariant FileTreeItem::data(int column, int role) const
         }
 
         break;
+
+    default:
+        break;
     }
 
     return value;
@@ -190,8 +197,8 @@ QVariant FileTreeItem::data(int column, int role) const
 
 std::pair<uint64_t, uint64_t> FileTreeItem::get_subtree_wanted_size() const
 {
-    auto have = uint64_t{ is_wanted_ ? have_size_ : 0U };
-    auto total = uint64_t{ is_wanted_ ? total_size_ : 0U };
+    auto have = is_wanted_ ? have_size_ : 0U;
+    auto total = is_wanted_ ? total_size_ : 0U;
 
     for (auto const* const child : children_)
     {
@@ -223,7 +230,7 @@ uint64_t FileTreeItem::size() const
 
 std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
 {
-    auto changed_columns = std::set<int>{};
+    auto changed_columns = small::max_size_set<int, FileTreeModel::NUM_COLUMNS>{};
 
     if (name_ != name)
     {

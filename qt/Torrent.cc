@@ -283,6 +283,9 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
                     sitenames_ = std::vector<QString>{ std::begin(tmp), std::end(tmp) };
                     break;
                 }
+
+            default:
+                break;
             }
         }
     }

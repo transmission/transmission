@@ -259,7 +259,7 @@ void tr_open_files::close_all()
 
 void tr_open_files::close_torrent(tr_torrent_id_t tor_id)
 {
-    return pool_.erase_if([&tor_id](Key const& key, Val const& /*unused*/) { return key.first == tor_id; });
+    pool_.erase_if([&tor_id](Key const& key, Val const& /*unused*/) { return key.first == tor_id; });
 }
 
 void tr_open_files::close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num)
