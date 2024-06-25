@@ -61,7 +61,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>14714.@TR_VERSION_MAJOR@.@TR_VERSION_MINOR@.@TR_VERSION_PATCH@</string>
+	<string>@CFBUNDLE_VERSION@</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -74,23 +74,11 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2005-2022 The Transmission Project</string>
+	<string>Copyright © 2005-2024 The Transmission Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>NSServices</key>
-	<array>
-		<dict>
-			<key>NSPortName</key>
-			<string>Transmission</string>
-			<key>NSSendTypes</key>
-			<array>
-				<string>NSStringPboardType</string>
-				<string>NSURLPboardType</string>
-			</array>
-		</dict>
-	</array>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
 	<key>SUAllowsAutomaticUpdates</key>

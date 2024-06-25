@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,8 +8,12 @@
 #include <array>
 #endif
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
-#include <cstdint> // uint64_t
+#include <cstddef>
+#include <cstdint> // for uint64_t
+#include <ctime>
+#include <functional> // for std::less()
 #include <list>
 #include <map>
 #include <memory>
@@ -102,10 +106,9 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
-} // namespace
 
 #ifdef _WIN32
-static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
+CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
     auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
@@ -158,6 +161,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     return CURLE_OK;
 }
 #endif
+} // namespace
 
 // ---
 
@@ -225,6 +229,11 @@ public:
         auto const lock = std::unique_lock{ tasks_mutex_ };
         queued_tasks_.emplace_back(*this, std::move(options));
         queued_tasks_cv_.notify_one();
+    }
+
+    [[nodiscard]] bool is_idle() const noexcept
+    {
+        return std::empty(queued_tasks_) && std::empty(running_tasks_);
     }
 
     class Task
@@ -621,11 +630,6 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_idle() const noexcept
-    {
-        return std::empty(queued_tasks_) && std::empty(running_tasks_);
-    }
-
     void remove_task(Task const& task)
     {
         auto const lock = std::unique_lock{ tasks_mutex_ };
@@ -732,16 +736,19 @@ public:
                     auto* const e = msg->easy_handle;
 
                     Task* task = nullptr;
-                    curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
+                    curl_easy_getinfo(e, CURLINFO_PRIVATE, &task);
 
                     auto req_bytes_sent = long{};
                     auto total_time = double{};
+                    char* primary_ip = nullptr;
                     curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                     curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                     curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response.status);
+                    curl_easy_getinfo(e, CURLINFO_PRIMARY_IP, &primary_ip);
                     task->response.did_connect = task->response.status > 0 || req_bytes_sent > 0;
                     task->response.did_timeout = task->response.status == 0 &&
                         std::chrono::duration<double>(total_time) >= task->timeoutSecs();
+                    task->response.primary_ip = primary_ip;
                     curl_multi_remove_handle(multi.get(), e);
                     remove_task(*task);
                 }
@@ -808,4 +815,9 @@ void tr_web::fetch(FetchOptions&& options)
 void tr_web::startShutdown(std::chrono::milliseconds deadline)
 {
     impl_->startShutdown(deadline);
+}
+
+bool tr_web::is_idle() const noexcept
+{
+    return impl_->is_idle();
 }

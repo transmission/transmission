@@ -1,24 +1,23 @@
-// This file Copyright © 2010-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <cstdint>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 
 #include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
 
 #include <libutp/utp.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 
@@ -123,7 +122,7 @@ uint64 utp_callback(utp_callback_arguments* args)
     {
 #ifdef TR_UTP_TRACE
     case UTP_LOG:
-        fmt::print(stderr, FMT_STRING("[µTP] {}\n"), args->buf);
+        fmt::print(stderr, "[µTP] {}\n", args->buf);
         break;
 #endif
 
@@ -133,6 +132,9 @@ uint64 utp_callback(utp_callback_arguments* args)
 
     case UTP_SENDTO:
         utp_send_to(session, args->buf, args->len, args->address, args->address_len);
+        break;
+
+    default:
         break;
     }
 
@@ -153,11 +155,11 @@ void restart_timer(tr_session* session)
     }
     else
     {
-        /* If somebody has disabled µTP, then we still want to run
-           utp_check_timeouts, in order to let closed sockets finish
-           gracefully and so on.  However, since we're not particularly
-           interested in that happening in a timely manner, we might as
-           well use a large timeout. */
+        // If somebody has disabled µTP, then we still want to run
+        // utp_check_timeouts, in order to let closed sockets finish
+        // gracefully and so on.  However, since we're not particularly
+        // interested in that happening in a timely manner, we might as
+        // well use a large timeout.
         static auto constexpr MinInterval = 2s;
         static auto constexpr MaxInterval = 3s;
         auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);
@@ -171,15 +173,12 @@ void timer_callback(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(session->utp_context);
-
     utp_check_timeouts(session->utp_context);
     restart_timer(session);
 }
 } // namespace
 
-void tr_utpInit(tr_session* session)
+void tr_utp_init(tr_session* session)
 {
     if (session->utp_context != nullptr)
     {
@@ -210,17 +209,19 @@ void tr_utpInit(tr_session* session)
     restart_timer(session);
 }
 
-bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+bool tr_utp_packet(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
-
-    /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(ss->utp_context);
 
     return ret != 0;
 }
 
-void tr_utpClose(tr_session* session)
+void tr_utp_issue_deferred_acks(tr_session* ss)
+{
+    utp_issue_deferred_acks(ss->utp_context);
+}
+
+void tr_utp_close(tr_session* session)
 {
     session->utp_timer.reset();
 

@@ -112,14 +112,13 @@ username and password (respectively), separated by a colon.
 
 ## 3 Torrent requests
 ### 3.1 Torrent action requests
-| Method name            | libtransmission function
-|:--|:--
-| `torrent-start`        | tr_torrentStart
-| `torrent-start-now`    | tr_torrentStartNow
-| `torrent-stop`         | tr_torrentStop
-| `torrent-verify`       | tr_torrentVerify
-| `torrent-verify-force` | tr_torrentVerifyForce
-| `torrent-reannounce`   | tr_torrentManualUpdate ("ask tracker for more peers")
+| Method name          | libtransmission function | Description
+|:--|:--|:--
+| `torrent-start`      | tr_torrentStart          | start torrent
+| `torrent-start-now`  | tr_torrentStartNow       | start torrent disregarding queue position
+| `torrent-stop`       | tr_torrentStop           | stop torrent
+| `torrent-verify`     | tr_torrentVerify         | verify torrent
+| `torrent-reannounce` | tr_torrentManualUpdate   | re-announce to trackers now
 
 Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
@@ -260,8 +259,8 @@ The 'source' column here corresponds to the data structure there.
 | `priorities`| array (see below)| n/a
 | `primary-mime-type`| string| tr_torrent
 | `queuePosition`| number| tr_stat
-| `rateDownload (B/s)`| number| tr_stat
-| `rateUpload (B/s)`| number| tr_stat
+| `rateDownload` (B/s)| number| tr_stat
+| `rateUpload` (B/s)| number| tr_stat
 | `recheckProgress`| double| tr_stat
 | `secondsDownloading`| number| tr_stat
 | `secondsSeeding`| number| tr_stat
@@ -304,7 +303,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | number | tr_file_view (**Note:** For backwards compatibility, this is serialized as an array of `0` or `1` that should be treated as booleans)
+| `wanted` | boolean | tr_file_view (**Note:** Not to be confused with `torrent-get.wanted`, which is an array of 0/1 instead of boolean)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -401,8 +400,10 @@ The 'source' column here corresponds to the data structure there.
 | `tier`                    | number     | tr_tracker_view
 
 
-`wanted`: An array of `tr_torrentFileCount()` Booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
+`wanted`: An array of `tr_torrentFileCount()` 0/1, 1 (true) if the corresponding file is to be downloaded. (Source: `tr_file_view`)
 
+**Note:** For backwards compatibility, in `4.x.x`, `wanted` is serialized as an array of `0` or `1` that should be treated as booleans.
+This will be fixed in `5.0.0` to return an array of booleans.
 
 Example:
 
@@ -664,16 +665,17 @@ Method name: `port-test`
 
 Request arguments: an optional argument `ipProtocol`.
 `ipProtocol` is a string specifying the IP protocol version to be used for the port test.
-Set to `ipv4` to *only* check IPv4, set to `ipv6` to *only* check IPv6,
-or set to `any` to check if the port is open on *any* of the IP protocol versions.
-Omitting `ipProtocol` is the same as setting it to `any`.
+Set to `ipv4` to check IPv4, or set to `ipv6` to check IPv6.
+For backwards compatibility, it is allowed to omit this argument to get the behaviour before Transmission `4.1.0`,
+which is to check whichever IP protocol the OS happened to use to connect to our port test service,
+frankly not very useful.
 
 Response arguments:
 
 | Key | Value Type | Description
 | :-- | :-- | :--
 | `port-is-open` | boolean | true if port is open, false if port is closed
-| `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
+| `ipProtocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if it cannot be determined
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
@@ -1025,4 +1027,3 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-get` | new arg `files.beginPiece`
 | `torrent-get` | new arg `files.endPiece`
 | `port-test` | new arg `ipProtocol`
-| `torrent-verify-force` | new method

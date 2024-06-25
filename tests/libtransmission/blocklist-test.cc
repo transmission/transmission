@@ -41,7 +41,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         auto const addr = tr_address::from_string(address_str);
-        return !addr || session_->addressIsBlocked(*addr);
+        return !addr || session_->blocklist().contains(*addr);
     }
 };
 

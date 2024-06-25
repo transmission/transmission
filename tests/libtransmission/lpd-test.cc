@@ -16,6 +16,7 @@
 #include <libtransmission/crypto-utils.h> // tr_rand_obj()
 #include <libtransmission/net.h>
 #include <libtransmission/session.h>
+#include <libtransmission/timer.h>
 #include <libtransmission/tr-lpd.h>
 #include <libtransmission/utils.h>
 
@@ -40,9 +41,11 @@ public:
     {
     }
 
-    [[nodiscard]] tr_address bind_address(tr_address_type /* type */) const override
+    [[nodiscard]] tr_address bind_address(tr_address_type type) const override
     {
-        return {};
+        auto ret = tr_address{};
+        ret.type = type;
+        return ret;
     }
 
     [[nodiscard]] tr_port port() const override
@@ -111,6 +114,7 @@ TEST_F(LpdTest, HelloWorld)
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
 
+// TODO(anyone): flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -133,6 +137,7 @@ TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
     EXPECT_EQ(0U, mediator_b.found_.count(info_hash_str));
 }
 
+// TODO(anyone): flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_canMultiAnnounce)
 {
     auto mediator_a = MyMediator{ *session_ };
@@ -169,6 +174,7 @@ TEST_F(LpdTest, DISABLED_canMultiAnnounce)
     }
 }
 
+// TODO(anyone): flaky test should be fixed instead of disabled
 TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
 {
     auto mediator_a = MyMediator{ *session_ };

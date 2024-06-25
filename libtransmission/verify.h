@@ -1,4 +1,4 @@
-// This file Copyright 2007-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,16 +11,18 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <cstdint>
-#include <functional>
-#include <list>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <set>
+#include <string>
 #include <thread>
+#include <utility> // std::move
+
+#include "libtransmission/transmission.h"
 
 #include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 class tr_verify_worker
 {
@@ -44,6 +46,13 @@ public:
     void add(std::unique_ptr<Mediator> mediator, tr_priority_t priority);
 
     void remove(tr_sha1_digest_t const& info_hash);
+
+    void set_sleep_per_seconds_during_verify(std::chrono::milliseconds sleep_per_seconds_during_verify);
+
+    [[nodiscard]] constexpr auto sleep_per_seconds_during_verify() const noexcept
+    {
+        return sleep_per_seconds_during_verify_;
+    }
 
 private:
     struct Node
@@ -70,7 +79,10 @@ private:
         tr_priority_t priority_;
     };
 
-    static void verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag);
+    static void verify_torrent(
+        Mediator& verify_mediator,
+        std::atomic<bool> const& abort_flag,
+        std::chrono::milliseconds sleep_per_seconds_during_verify);
 
     void verify_thread_func();
 
@@ -83,4 +95,6 @@ private:
 
     std::atomic<bool> stop_current_ = false;
     std::condition_variable stop_current_cv_;
+
+    std::chrono::milliseconds sleep_per_seconds_during_verify_ = {};
 };

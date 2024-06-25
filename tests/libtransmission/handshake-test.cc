@@ -52,7 +52,7 @@ using namespace std::literals;
 namespace libtransmission::test
 {
 
-auto constexpr MaxWaitMsec = int{ 5000 };
+auto constexpr MaxWaitMsec = 5000;
 
 class HandshakeTest : public SessionTest
 {
@@ -262,7 +262,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     EXPECT_EQ(peer_id, res->peer_id);
     EXPECT_EQ(TorrentWeAreSeeding.info_hash, io->torrent_hash());
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 // The datastream is identical to HandshakeTest.incomingPlaintext,
@@ -289,7 +289,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     EXPECT_FALSE(res->peer_id);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 TEST_F(HandshakeTest, outgoingPlaintext)
@@ -317,7 +317,7 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
     EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 TEST_F(HandshakeTest, incomingEncrypted)
@@ -356,7 +356,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
     EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
     EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 // The datastream is identical to HandshakeTest.incomingEncrypted,
@@ -390,7 +390,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 TEST_F(HandshakeTest, outgoingEncrypted)
@@ -434,7 +434,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     EXPECT_EQ(UbuntuTorrent.info_hash, io->torrent_hash());
     EXPECT_EQ(tr_sha1_to_string(UbuntuTorrent.info_hash), tr_sha1_to_string(io->torrent_hash()));
 
-    evutil_closesocket(sock);
+    tr_net_close_socket(sock);
 }
 
 } // namespace libtransmission::test

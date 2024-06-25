@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -27,11 +27,12 @@
 #include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/version.h>
 
-#include "units.h"
-
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -132,19 +133,6 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
 
     return 0;
 }
-
-std::string tr_getcwd()
-{
-    tr_error* error = nullptr;
-    auto cur = tr_sys_dir_get_current(&error);
-    if (error != nullptr)
-    {
-        fprintf(stderr, "getcwd error: \"%s\"", error->message);
-        tr_error_free(error);
-    }
-    return cur;
-}
-
 } // namespace
 
 int tr_main(int argc, char* argv[])
@@ -152,9 +140,6 @@ int tr_main(int argc, char* argv[])
     tr_locale_set_global("");
 
     tr_logSetLevel(TR_LOG_ERROR);
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     auto options = app_options{};
     if (parseCommandLine(options, argc, (char const* const*)argv) != 0)
@@ -178,16 +163,32 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(options.outfile))
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         auto const base = tr_sys_path_basename(options.infile, &error);
-
-        if (std::empty(base))
+        if (error)
         {
-            fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
+            auto const errmsg = fmt::format(
+                "Couldn't use '{path}': {error} ({error_code})",
+                fmt::arg("path", options.infile),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
+            fmt::print(stderr, "{:s}\n", errmsg);
             return EXIT_FAILURE;
         }
 
-        options.outfile = fmt::format("{:s}/{:s}.torrent"sv, tr_getcwd(), base);
+        auto const cur = tr_sys_dir_get_current(&error);
+        if (error)
+        {
+            auto const errmsg = fmt::format(
+                "Couldn't create '{path}': {error} ({error_code})",
+                fmt::arg("path", base),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
+            fmt::print(stderr, "{:s}\n", errmsg);
+            return EXIT_FAILURE;
+        }
+
+        options.outfile = fmt::format("{:s}/{:s}.torrent"sv, cur, base);
     }
 
     if (std::empty(options.trackers))
@@ -216,11 +217,11 @@ int tr_main(int argc, char* argv[])
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         auto const& path = builder.path(i);
-        if (!tr_torrent_files::isSubpathPortable(path))
+        if (!tr_torrent_files::is_subpath_sanitized(path, false))
         {
             fmt::print(stderr, "WARNING\n");
             fmt::print(stderr, "filename \"{:s}\" may not be portable on all systems.\n", path);
-            fmt::print(stderr, "consider \"{:s}\" instead.\n", tr_torrent_files::makeSubpathPortable(path));
+            fmt::print(stderr, "consider \"{:s}\" instead.\n", tr_torrent_files::sanitize_subpath(path, false));
         }
     }
 
@@ -233,7 +234,7 @@ int tr_main(int argc, char* argv[])
     fmt::print(
         tr_ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.file_count()),
         fmt::arg("file_count", builder.file_count()),
-        fmt::arg("total_size", tr_formatter_size_B(builder.total_size())));
+        fmt::arg("total_size", Storage{ builder.total_size(), Storage::Units::Bytes }.to_string()));
 
     fmt::print(
         tr_ngettext(
@@ -241,7 +242,7 @@ int tr_main(int argc, char* argv[])
             "{piece_count:L} pieces, {piece_size} each\n",
             builder.piece_count()),
         fmt::arg("piece_count", builder.piece_count()),
-        fmt::arg("piece_size", tr_formatter_size_B(builder.piece_size())));
+        fmt::arg("piece_size", Memory{ builder.piece_size(), Memory::Units::Bytes }.to_string()));
 
     if (!std::empty(options.comment))
     {
@@ -274,17 +275,20 @@ int tr_main(int argc, char* argv[])
 
     fmt::print(" ");
 
-    if (tr_error* error = future.get(); error != nullptr)
+    if (auto error = future.get(); error)
     {
-        fmt::print("ERROR: {:s} {:d}\n", error->message, error->code);
-        tr_error_free(error);
+        fmt::print("ERROR: {:s} {:d}\n", error.message(), error.code());
         return EXIT_FAILURE;
     }
 
-    if (tr_error* error = nullptr; !builder.save(options.outfile, &error))
+    if (auto error = tr_error{}; !builder.save(options.outfile, &error))
     {
-        fmt::print("ERROR: could not save \"{:s}\": {:s} {:d}\n", options.outfile, error->message, error->code);
-        tr_error_free(error);
+        auto const errmsg = fmt::format(
+            "Couldn't save '{path}': {error} ({error_code})",
+            fmt::arg("path", options.outfile),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code()));
+        fmt::print(stderr, "{:s}\n", errmsg);
         return EXIT_FAILURE;
     }
 

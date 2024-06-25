@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,6 +9,9 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+
+#include <array>
+#include <utility>
 
 TorrentFilter::TorrentFilter()
     : Glib::ObjectBase(typeid(TorrentFilter))
@@ -127,7 +130,7 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
 
     if (activity_type_ != Activity::ALL)
     {
-        static auto const activity_flags = std::map<Activity, Torrent::ChangeFlags>({
+        static constexpr auto ActivityFlags = std::array<std::pair<Activity, Torrent::ChangeFlags>, 7U>{ {
             { Activity::DOWNLOADING, Flag::ACTIVITY },
             { Activity::SEEDING, Flag::ACTIVITY },
             { Activity::ACTIVE, Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY },
@@ -135,10 +138,13 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
             { Activity::FINISHED, Flag::FINISHED },
             { Activity::VERIFYING, Flag::ACTIVITY },
             { Activity::ERROR, Flag::ERROR_CODE },
-        });
+        } };
 
-        auto const activity_flags_it = activity_flags.find(activity_type_);
-        refilter_needed = activity_flags_it != activity_flags.end() && changes.test(activity_flags_it->second);
+        auto const iter = std::find_if(
+            std::begin(ActivityFlags),
+            std::end(ActivityFlags),
+            [key = activity_type_](auto const& row) { return row.first == key; });
+        refilter_needed = iter != std::end(ActivityFlags) && changes.test(iter->second);
     }
 
     if (!refilter_needed)

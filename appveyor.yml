@@ -61,8 +61,8 @@ for:
       choco install python3 --pre
       choco install nasm
       choco install jom
-      choco install wixtoolset --version 3.11.2
-      choco install ccache
+      choco install wixtoolset --version 3.14.0
+      choco install ccache --version 4.8.3
 
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -Recurse
@@ -74,7 +74,7 @@ for:
       $Env:PATH = @(
           (Join-Path $Env:SystemDrive Strawberry perl bin)
           (Join-Path $Env:ProgramFiles NASM)
-          (Join-Path ${Env:ProgramFiles(x86)} 'WiX Toolset v3.11' bin)
+          (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin)
           $Env:PATH
       ) -join [System.IO.Path]::PathSeparator
 

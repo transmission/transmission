@@ -61,23 +61,94 @@
         <source>I &amp;Agree</source>
         <translation>我同意(&amp;A)</translation>
     </message>
+    <message>
+        <location line="+74"/>
+        <source>B/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>kB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+3"/>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>KiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>kB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TB</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+110"/>
+        <location line="+43"/>
         <source>Torrent(s) Completed</source>
         <translation>
-            <numerusform>Torrent 已完成</numerusform>
+            <numerusform>种子已完成</numerusform>
         </translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation>Torrent 已添加</translation>
+        <translation>种子已添加</translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+432"/>
+        <location filename="../DetailsDialog.cc" line="+469"/>
         <source>None</source>
         <translation>无</translation>
     </message>
@@ -88,7 +159,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+267"/>
+        <location line="+268"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
@@ -125,7 +196,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+6"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (%Ln 个区块)</numerusform>
@@ -139,25 +210,25 @@
     <message>
         <location line="+0"/>
         <source>Public torrent</source>
-        <translation>公开的 Torrent</translation>
+        <translation>公共种子</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+102"/>
         <source>Created by %1</source>
-        <translation>由 %1 制作</translation>
+        <translation>通过 %1 创建</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>制作于 %1</translation>
+        <translation>创建于 %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created by %1 on %2</source>
-        <translation>由 %1 制作于 %2</translation>
+        <translation>通过 %1 创建于 %2</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+207"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>加密连接</translation>
@@ -165,7 +236,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation>乐观解锁</translation>
+        <translation>开放式unchoke</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -190,12 +261,12 @@
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>节点已对我们解锁，但我们不感兴趣</translation>
+        <translation>节点已对我们开放，但我们不感兴趣</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>我们已解锁该节点，但对方不感兴趣</translation>
+        <translation>我们已对此节点开放，但对方不感兴趣</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -210,23 +281,15 @@
     <message>
         <location line="+4"/>
         <source>Peer is an incoming connection</source>
-        <translation>节点是一个入站的连接</translation>
+        <translation>节点是一个传入连接</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
         <translation>通过 µTP 连接的节点</translation>
     </message>
-    <message numerus="yes">
-        <location line="+130"/>
-        <source> minute(s)</source>
-        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform> 分钟</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+35"/>
+        <location line="+165"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>添加 Tracker 公告网址，每个一行：</translation>
     </message>
@@ -241,7 +304,7 @@
         <translation>没有找到新的网址。</translation>
     </message>
     <message>
-        <location line="-843"/>
+        <location line="-881"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -264,25 +327,33 @@
         <translation>%1 (分享率: %2)</translation>
     </message>
     <message>
-        <location line="+273"/>
+        <location line="+308"/>
         <location line="+55"/>
         <source>N/A</source>
-        <translation>N/A</translation>
+        <translation>不可用</translation>
+    </message>
+    <message numerus="yes">
+        <location line="+362"/>
+        <source>%1 minute(s)</source>
+        <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+390"/>
+        <location line="+31"/>
         <source>Add URL(s)</source>
         <translation>添加网址</translation>
     </message>
     <message>
-        <location line="+114"/>
+        <location line="+116"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Normal</source>
-        <translation>普通</translation>
+        <translation>中</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -298,25 +369,25 @@
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>不管分享率多少都做种</translation>
+        <translation>无视分享率做种</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>停止做种当分享率达到:</translation>
+        <translation>停止做种分享率:</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Seed regardless of activity</source>
-        <translation>忽略活跃情况做种</translation>
+        <translation>无视活跃度做种</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>停止做种当空闲达到:</translation>
+        <translation>停止做种闲置时间:</translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+77"/>
         <source>Up</source>
         <translation>上传</translation>
     </message>
@@ -348,7 +419,7 @@
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Torrent 属性</translation>
+        <translation>种子属性</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -398,7 +469,7 @@
     <message>
         <location line="+26"/>
         <source>Last activity:</source>
-        <translation>上次活动时间：</translation>
+        <translation>最后活动：</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -421,19 +492,24 @@
         <translation>位置:</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+40"/>
+        <source>Labels:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+101"/>
         <source>Edit Trackers</source>
         <translation>编辑 Tracker</translation>
     </message>
     <message>
-        <location line="-190"/>
+        <location line="-207"/>
         <source>Hash:</source>
         <translation>哈希值：</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Privacy:</source>
-        <translation>隐私：</translation>
+        <translation>隐私性：</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -446,7 +522,7 @@
         <translation>添加:</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+31"/>
         <source>Comment:</source>
         <translation>备注：</translation>
     </message>
@@ -473,7 +549,7 @@
     <message>
         <location line="+23"/>
         <source>Show &amp;more details</source>
-        <translation>显示更多详细信息（&amp;M）</translation>
+        <translation>显示更多详情（&amp;M）</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -503,17 +579,17 @@
     <message>
         <location line="+27"/>
         <source>Limit &amp;download speed:</source>
-        <translation>限制下载速度（&amp;D）：</translation>
+        <translation>下载限速（&amp;D）：</translation>
     </message>
     <message>
         <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>限制上传速度（&amp;U）：</translation>
+        <translation>上传限速（&amp;U）：</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Torrent &amp;priority:</source>
-        <translation>Torrent 优先级（&amp;P）：</translation>
+        <translation>种子优先级（&amp;P）：</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -528,7 +604,7 @@
     <message>
         <location line="+30"/>
         <source>&amp;Idle:</source>
-        <translation>空闲（&amp;L）：</translation>
+        <translation>闲置（&amp;I）：</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -538,35 +614,35 @@
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>最大节点数量（&amp;M）：</translation>
+        <translation>最大节点数（&amp;M）：</translation>
     </message>
 </context>
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+297"/>
-        <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location filename="../FileTreeItem.cc" line="+281"/>
+        <location filename="../FileTreeView.cc" line="+110"/>
+        <location line="+255"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+253"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-253"/>
+        <location line="+254"/>
         <source>Normal</source>
-        <translation>普通</translation>
+        <translation>中</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-253"/>
         <source>Mixed</source>
         <translation>混合</translation>
     </message>
@@ -574,7 +650,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+195"/>
+        <location filename="../FileTreeModel.cc" line="+202"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
@@ -602,7 +678,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+245"/>
         <source>Check Selected</source>
         <translation>勾选</translation>
     </message>
@@ -635,13 +711,13 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+48"/>
-        <location line="+145"/>
+        <location filename="../FilterBar.cc" line="+47"/>
+        <location line="+156"/>
         <source>All</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location line="-136"/>
+        <location line="-147"/>
         <source>Active</source>
         <translation>活动</translation>
     </message>
@@ -676,7 +752,7 @@
         <translation>错误</translation>
     </message>
     <message>
-        <location line="+140"/>
+        <location line="+151"/>
         <source>Show:</source>
         <translation>显示：</translation>
     </message>
@@ -689,78 +765,7 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+24"/>
-        <source>B/s</source>
-        <translation>B/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>kB/s</source>
-        <translation>kB/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MB/s</source>
-        <translation>MB/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GB/s</source>
-        <translation>GB/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TB/s</source>
-        <translation>TB/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+1"/>
-        <source>B</source>
-        <translation>B</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>kB</source>
-        <translation>kB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MB</source>
-        <translation>MB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GB</source>
-        <translation>GB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TB</source>
-        <translation>TB</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>KiB</source>
-        <translation>KiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MiB</source>
-        <translation>MiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GiB</source>
-        <translation>GiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TiB</source>
-        <translation>TiB</translation>
-    </message>
-    <message>
-        <location line="+37"/>
+        <location filename="../Formatter.cc" line="+21"/>
         <location line="+25"/>
         <source>Unknown</source>
         <translation>未知</translation>
@@ -771,14 +776,8 @@
         <source>None</source>
         <translation>无</translation>
     </message>
-    <message>
-        <location filename="../Formatter.h" line="+64"/>
-        <location line="+7"/>
-        <source>%1 %2</source>
-        <translation>%1 %2</translation>
-    </message>
     <message numerus="yes">
-        <location filename="../Formatter.cc" line="+41"/>
+        <location line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln 天</numerusform>
@@ -788,14 +787,14 @@
         <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
-            <numerusform>%Ln 小时</numerusform>
+            <numerusform>%Ln 时</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
-            <numerusform>%Ln 分钟</numerusform>
+            <numerusform>%Ln 分</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -809,9 +808,9 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+52"/>
+        <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;正在计算剩余空间…&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;正在计算可用空间…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -837,7 +836,7 @@
     <message>
         <location line="+181"/>
         <source>&amp;Torrent</source>
-        <translation>Torrent（&amp;T）</translation>
+        <translation>种子（&amp;T）</translation>
     </message>
     <message>
         <location line="+30"/>
@@ -852,7 +851,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>查看（&amp;V）</translation>
+        <translation>视图（&amp;V）</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -862,7 +861,7 @@
     <message>
         <location line="+69"/>
         <source>Create a new torrent</source>
-        <translation>制作一个新的 Torrent</translation>
+        <translation>创建一个新种子</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -872,12 +871,12 @@
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>显示 Torrent 属性</translation>
+        <translation>显示种子属性</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
-        <translation>打开 Torrent 的文件夹</translation>
+        <translation>打开种子文件夹</translation>
     </message>
     <message>
         <location line="-161"/>
@@ -907,7 +906,7 @@
     <message>
         <location line="+3"/>
         <source>Open a torrent</source>
-        <translation>打开一个 Torrent</translation>
+        <translation>打开种子</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -927,7 +926,7 @@
     <message>
         <location line="+3"/>
         <source>Start torrent</source>
-        <translation>开始 Torrent</translation>
+        <translation>开始种子</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -947,7 +946,7 @@
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>暂停 Torrent</translation>
+        <translation>暂停种子</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -967,7 +966,7 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>移除 Torrent</translation>
+        <translation>移除种子</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -977,7 +976,7 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>移除 Torrent 并删除它的文件</translation>
+        <translation>移除种子并删除文件</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1002,7 +1001,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Deselect All</source>
-        <translation>取消全选（&amp;D）</translation>
+        <translation>全消（&amp;D）</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1012,13 +1011,13 @@
     <message>
         <location line="+11"/>
         <source>&amp;Compact View</source>
-        <translation>紧凑型视图（&amp;C）</translation>
+        <translation>紧凑视图（&amp;C）</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+3"/>
         <source>Compact View</source>
-        <translation>紧凑型视图</translation>
+        <translation>紧凑视图</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1083,7 +1082,7 @@
     <message>
         <location line="+8"/>
         <source>Message &amp;Log</source>
-        <translation>消息记录（&amp;L）</translation>
+        <translation>消息日志（&amp;L）</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1194,7 +1193,7 @@
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>移到顶部（&amp;T）</translation>
+        <translation>置顶（&amp;T）</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1209,7 +1208,7 @@
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>移到底部（&amp;B）</translation>
+        <translation>置底（&amp;B）</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1219,29 +1218,29 @@
     <message>
         <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
-        <translation>限制下载速度</translation>
+        <translation>下载限速</translation>
     </message>
     <message>
         <location line="-55"/>
         <source>Unlimited</source>
-        <translation>不限制</translation>
+        <translation>无限制</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location line="+752"/>
+        <location line="+762"/>
         <location line="+9"/>
         <source>Limited at %1</source>
-        <translation>限制在 %1</translation>
+        <translation>限制于 %1</translation>
     </message>
     <message>
-        <location line="-706"/>
+        <location line="-716"/>
         <source>Limit Upload Speed</source>
-        <translation>限制上传速度</translation>
+        <translation>上传限速</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>停止做种当分享率达到</translation>
+        <translation>停止做种分享率</translation>
     </message>
     <message>
         <location line="-40"/>
@@ -1250,12 +1249,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+739"/>
+        <location line="+749"/>
         <source>Stop at Ratio (%1)</source>
-        <translation>停止当分享率达到 (%1)</translation>
+        <translation>停止分享率 (%1)</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-403"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session) notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
@@ -1263,24 +1262,24 @@
     <message>
         <location line="+16"/>
         <source>Idle</source>
-        <translation>空闲</translation>
+        <translation>闲置</translation>
     </message>
     <message>
-        <location line="+30"/>
-        <location line="+15"/>
+        <location line="+28"/>
+        <location line="+19"/>
         <source>Ratio: %1</source>
         <translation>分享率: %1</translation>
     </message>
     <message>
-        <location line="-10"/>
-        <location line="+5"/>
+        <location line="-14"/>
+        <location line="+7"/>
         <source>Down: %1, Up: %2</source>
         <translation>下载: %1, 上传: %2</translation>
     </message>
     <message>
-        <location line="+424"/>
+        <location line="+433"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Torrent 文件 (*.torrent);;全部文件 (*.*)</translation>
+        <translation>种子文件 (*.torrent);;全部文件 (*.*)</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -1290,12 +1289,12 @@
     <message>
         <location line="-8"/>
         <source>Open Torrent</source>
-        <translation>打开 Torrent</translation>
+        <translation>打开种子</translation>
     </message>
     <message>
-        <location line="-1003"/>
+        <location line="-1012"/>
         <source>Speed Limits</source>
-        <translation>速度限制</translation>
+        <translation>限速</translation>
     </message>
     <message>
         <location line="+537"/>
@@ -1303,104 +1302,104 @@
         <translation>网络错误</translation>
     </message>
     <message>
-        <location line="+434"/>
+        <location line="+444"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>点击禁用临时速度限制
+        <translation>关闭临时限速
  (%1 下载, %2 上传)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>点击启用临时速度限制
+        <translation>开启临时限速
  (%1 下载, %2 上传)</translation>
     </message>
     <message>
-        <location line="+136"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
-        <translation>移除 Torrent？</translation>
+        <translation>移除种子？</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>删除此 Torrent 已下载的文件？</translation>
+        <translation>删除该种子已下载文件？</translation>
     </message>
     <message numerus="yes">
         <location line="-4"/>
         <source>Remove %Ln torrent(s)?</source>
         <translation>
-            <numerusform>移除 %Ln 个 Torrent？</numerusform>
+            <numerusform>移除 %Ln 个种子？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-505"/>
+        <location line="-510"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>显示 %L1 / %Ln 个 Torrent</numerusform>
+            <numerusform>显示 %L1 / %Ln 个种子</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+510"/>
+        <location line="+515"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>删除这些 %Ln 个 Torrent 已下载的文件？</numerusform>
+            <numerusform>删除这 %Ln 个种子已下载文件？</numerusform>
         </translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>一旦移除，继续该传输将会要求 Torrent 文件或者磁力链接。</translation>
+        <translation>移除后，继续传输需要种子文件或磁力链接。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>一旦移除，继续这些传输将会要求 Torrent 文件或者磁力链接。</translation>
+        <translation>移除后，继续传输需要种子文件或磁力链接。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>This torrent has not finished downloading.</source>
-        <translation>该 Torrent 还没有完成下载。</translation>
+        <translation>该种子未完成下载。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
-        <translation>这些 Torrent 还没有完成下载。</translation>
+        <translation>这些种子未完成下载。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>This torrent is connected to peers.</source>
-        <translation>该 Torrent 已连接到节点。</translation>
+        <translation>该种子已连接节点。</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>These torrents are connected to peers.</source>
-        <translation>这些 Torrent 已连接到节点。</translation>
+        <translation>这些种子已连接节点。</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>其中有个 Torrent 已连接到节点。</translation>
+        <translation>一个种子已连接节点。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>其中有些 Torrent 已连接到节点。</translation>
+        <translation>一些种子已连接节点。</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>One of these torrents has not finished downloading.</source>
-        <translation>其中有个 Torrent 还没有完成下载。</translation>
+        <translation>有一个种子未完成下载。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
-        <translation>其中有些 Torrent 还没有完成下载。</translation>
+        <translation>一些种子未完成下载。</translation>
     </message>
     <message>
         <location line="+69"/>
         <source>%1 has not responded yet</source>
-        <translation>%1 还没有响应</translation>
+        <translation>%1 尚未响应</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1410,12 +1409,12 @@
     <message>
         <location line="+4"/>
         <source>%1 last responded %2 ago</source>
-        <translation>%1 上次响应在 %2 之前</translation>
+        <translation>%1 最后响应在 %2 之前</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 is not responding</source>
-        <translation>%1 没有响应</translation>
+        <translation>%1 未响应</translation>
     </message>
 </context>
 <context>
@@ -1423,12 +1422,12 @@
     <message>
         <location filename="../MakeDialog.ui" line="+17"/>
         <source>New Torrent</source>
-        <translation>新的 Torrent</translation>
+        <translation>新种子</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+304"/>
+        <location filename="../MakeDialog.cc" line="+307"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
-        <translation>&lt;i&gt;没有选择来源&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;未选择来源&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+5"/>
@@ -1512,20 +1511,20 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../MakeProgressDialog.ui" line="+14"/>
         <source>New Torrent</source>
-        <translation>新的 Torrent</translation>
+        <translation>新种子</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>正在制作 &quot;%1&quot;</translation>
+        <translation>正在创建 &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>已制作 &quot;%1&quot;!</translation>
+        <translation>已创建 &quot;%1&quot;!</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
         <translation>无法创建 &quot;%1&quot;: %2 (%3)</translation>
     </message>
@@ -1533,19 +1532,19 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+53"/>
         <source>Open Torrent</source>
-        <translation>打开 Torrent</translation>
+        <translation>打开种子</translation>
     </message>
     <message>
         <location line="-10"/>
         <source>Open Torrent from File</source>
-        <translation>从文件打开 Torrent</translation>
+        <translation>从文件打开种子</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>从网址或磁力链接打开 Torrent</translation>
+        <translation>从网址或磁力链接打开种子</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1565,7 +1564,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+1"/>
         <source>Normal</source>
-        <translation>普通</translation>
+        <translation>中</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1652,7 +1651,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+99"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;手动或者定时覆盖普通速度限制&lt;/small&gt;</translation>
+        <translation>&lt;small&gt;手动或定时覆盖普通速度限制&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+47"/>
@@ -1665,7 +1664,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>天数（&amp;O）：</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+380"/>
         <source>Every Day</source>
         <translation>每天</translation>
     </message>
@@ -1729,8 +1728,24 @@ To add another primary URL, add it after a blank line.</source>
         <source>Testing TCP Port…</source>
         <translation>正在测试 TCP 端口…</translation>
     </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>%1 minute(s)</source>
+        <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+26"/>
+        <source>%1 minute(s) ago</source>
+        <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+154"/>
+        <location line="+16"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>选择 &quot;Torrent 下载完成&quot; 脚本</translation>
     </message>
@@ -1760,26 +1775,10 @@ To add another primary URL, add it after a blank line.</source>
         <source>Options</source>
         <translation>选项</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-255"/>
-        <source> minute(s)</source>
-        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform> 分钟</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+10"/>
+        <location filename="../PrefsDialog.cc" line="-242"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
         <translation>选择 &quot;Torrent 做种完成&quot; 脚本</translation>
-    </message>
-    <message numerus="yes">
-        <location line="+19"/>
-        <source> minute(s) ago</source>
-        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform> 分钟之前</numerusform>
-        </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-651"/>
@@ -1827,7 +1826,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>远程</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+168"/>
+        <location filename="../PrefsDialog.cc" line="+184"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;屏蔽列表包含 %Ln 条规则&lt;/i&gt;</numerusform>
@@ -1864,7 +1863,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>启用自动更新（&amp;A）</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-227"/>
+        <location filename="../PrefsDialog.cc" line="-221"/>
         <source>Allow encryption</source>
         <translation>允许加密</translation>
     </message>
@@ -2070,7 +2069,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>加密</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+75"/>
+        <location filename="../PrefsDialog.cc" line="+69"/>
         <source>Select Incomplete Directory</source>
         <translation>选择未完成目录</translation>
     </message>
@@ -2080,19 +2079,19 @@ To add another primary URL, add it after a blank line.</source>
         <translation>选择监视目录</translation>
     </message>
     <message numerus="yes">
-        <location line="-101"/>
+        <location line="-94"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
         <translation>
             <numerusform>&lt;b&gt;更新成功！&lt;/b&gt;&lt;p&gt;现在屏蔽列表拥有 %Ln 条规则。&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
         <translation>&lt;b&gt;更新屏蔽列表&lt;/b&gt;&lt;p&gt;正在获取新的屏蔽列表…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+87"/>
         <source>Select Destination</source>
         <translation>选择目标</translation>
     </message>
@@ -2161,12 +2160,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-313"/>
+        <location filename="../Application.cc" line="-326"/>
         <source>Invalid option</source>
         <translation>无效选项</translation>
     </message>
     <message>
-        <location line="+312"/>
+        <location line="+325"/>
         <source>Start Now</source>
         <translation>现在开始</translation>
     </message>
@@ -2207,7 +2206,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+505"/>
+        <location filename="../Session.cc" line="+503"/>
         <source>Error Renaming Path</source>
         <translation>重命名路径错误</translation>
     </message>
@@ -2217,12 +2216,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;无法重命名 &quot;%1&quot; 为 &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;请纠正错误后重试。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+528"/>
+        <location line="+530"/>
         <source>Error Adding Torrent</source>
         <translation>添加 Torrent 时错误</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+38"/>
         <source>%1 (copy of %2)</source>
         <translation>%1 (%2 的副本)</translation>
     </message>
@@ -2290,6 +2289,15 @@ To add another primary URL, add it after a blank line.</source>
     </message>
 </context>
 <context>
+    <name>Speed</name>
+    <message>
+        <location filename="../Speed.h" line="+40"/>
+        <location line="+6"/>
+        <source>%1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StatsDialog</name>
     <message>
         <location filename="../StatsDialog.ui" line="+14"/>
@@ -2341,7 +2349,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+323"/>
+        <location filename="../Torrent.cc" line="+304"/>
         <source>Verifying local data</source>
         <translation>正在检查本地数据</translation>
     </message>
@@ -2447,12 +2455,22 @@ To add another primary URL, add it after a blank line.</source>
         <translation> - 剩余时间未知</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+38"/>
         <source>Ratio: %1</source>
         <translation>分享率: %1</translation>
     </message>
+    <message>
+        <location line="+18"/>
+        <source>%1 left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Remaining time unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+44"/>
+        <location line="+40"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
@@ -2502,7 +2520,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="-76"/>
+        <location line="-96"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>正在检查本地数据 (%1% 已测试)</translation>
     </message>
@@ -2510,7 +2528,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+216"/>
+        <location filename="../TrackerDelegate.cc" line="+213"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -23,6 +23,7 @@
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // tr_pex
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 
 struct tr_url_parsed_t;
 
@@ -33,8 +34,6 @@ void tr_tracker_http_announce(tr_session const* session, tr_announce_request con
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, std::string_view log_name);
 
 void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, std::string_view log_name);
-
-tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);
 
 [[nodiscard]] constexpr std::string_view tr_announce_event_get_string(tr_announce_event e)
 {
@@ -158,10 +157,10 @@ struct tr_announce_response
  * This is only an upper bound: if the tracker complains about
  * length, announcer will incrementally lower the batch size.
  */
-auto inline constexpr TR_MULTISCRAPE_MAX = 60;
+auto inline constexpr TrMultiscrapeMax = 60;
 
-auto inline constexpr TR_ANNOUNCE_TIMEOUT_SEC = std::chrono::seconds{ 45 };
-auto inline constexpr TR_SCRAPE_TIMEOUT_SEC = std::chrono::seconds{ 30 };
+auto inline constexpr TrAnnounceTimeoutSec = std::chrono::seconds{ 45 };
+auto inline constexpr TrScrapeTimeoutSec = std::chrono::seconds{ 30 };
 
 struct tr_scrape_request
 {
@@ -172,7 +171,7 @@ struct tr_scrape_request
     std::string log_name;
 
     /* info hashes of the torrents to scrape */
-    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
+    std::array<tr_sha1_digest_t, TrMultiscrapeMax> info_hash;
 
     /* how many hashes to use in the info_hash field */
     int info_hash_count = 0;
@@ -210,7 +209,7 @@ struct tr_scrape_response
     int row_count;
 
     /* the individual torrents' scrape results */
-    std::array<tr_scrape_response_row, TR_MULTISCRAPE_MAX> rows;
+    std::array<tr_scrape_response_row, TrMultiscrapeMax> rows;
 
     /* the raw scrape url */
     tr_interned_string scrape_url;

@@ -3,16 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cerrno>
 #include <cmath> // lrint()
-#include <cctype> // isspace()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
+#include <vector>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -42,7 +41,7 @@ TEST_F(VariantTest, getType)
     auto sv = std::string_view{};
     auto v = tr_variant{};
 
-    tr_variantInitInt(&v, 30);
+    v = 30;
     EXPECT_TRUE(tr_variantGetInt(&v, &i));
     EXPECT_EQ(30, i);
     EXPECT_TRUE(tr_variantGetReal(&v, &d));
@@ -51,28 +50,28 @@ TEST_F(VariantTest, getType)
     EXPECT_FALSE(tr_variantGetStrView(&v, &sv));
 
     auto strkey = "foo"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_FALSE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_NE(std::data(strkey), std::data(sv));
 
     strkey = "anything"sv;
-    tr_variantInitStrView(&v, strkey);
+    v = tr_variant::unmanaged_string(strkey);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_EQ(std::data(strkey), std::data(sv)); // literally the same memory
     EXPECT_EQ(std::size(strkey), std::size(sv));
 
     strkey = "true"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
 
     strkey = "false"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
@@ -420,8 +419,8 @@ TEST_F(VariantTest, stackSmash)
     auto serde = tr_variant_serde::benc();
     auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
-    EXPECT_NE(nullptr, serde.error_);
-    EXPECT_EQ(E2BIG, serde.error_ != nullptr ? serde.error_->code : 0);
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
 }
 
 TEST_F(VariantTest, boolAndIntRecast)
@@ -464,9 +463,9 @@ TEST_F(VariantTest, boolAndIntRecast)
 TEST_F(VariantTest, dictFindType)
 {
     auto constexpr ExpectedStr = "this-is-a-string"sv;
-    auto constexpr ExpectedBool = bool{ true };
-    auto constexpr ExpectedInt = int{ 1234 };
-    auto constexpr ExpectedReal = double{ 0.3 };
+    auto constexpr ExpectedBool = true;
+    auto constexpr ExpectedInt = 1234;
+    auto constexpr ExpectedReal = 0.3;
 
     auto const key_bool = tr_quark_new("this-is-a-bool"sv);
     auto const key_real = tr_quark_new("this-is-a-real"sv);

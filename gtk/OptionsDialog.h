@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,7 +11,7 @@
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/filechoosernative.h>
 #include <gtkmm/window.h>
 
 #include <memory>
@@ -38,7 +38,7 @@ private:
     void onOpenURLResponse(int response, Gtk::Entry const& entry, Glib::RefPtr<Session> const& core);
 };
 
-class TorrentFileChooserDialog : public Gtk::FileChooserDialog
+class TorrentFileChooserDialog : public Gtk::FileChooserNative
 {
 public:
     ~TorrentFileChooserDialog() override = default;

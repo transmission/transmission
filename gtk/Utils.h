@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,6 +9,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/values.h>
 
 #include <glibmm/objectbase.h>
 #include <glibmm/refptr.h>
@@ -29,6 +30,7 @@
 #include <fmt/core.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <ctime>
 #include <functional>
 #include <list>
@@ -43,28 +45,6 @@
 ****
 ***/
 
-extern int const mem_K;
-extern char const* const mem_K_str;
-extern char const* const mem_M_str;
-extern char const* const mem_G_str;
-extern char const* const mem_T_str;
-
-extern int const disk_K;
-extern char const* const disk_K_str;
-extern char const* const disk_M_str;
-extern char const* const disk_G_str;
-extern char const* const disk_T_str;
-
-extern int const speed_K;
-extern char const* const speed_K_str;
-extern char const* const speed_M_str;
-extern char const* const speed_G_str;
-extern char const* const speed_T_str;
-
-/***
-****
-***/
-
 void gtr_message(std::string const& message);
 void gtr_warning(std::string const& message);
 void gtr_error(std::string const& message);
@@ -73,7 +53,7 @@ void gtr_error(std::string const& message);
 ****
 ***/
 
-enum class GtrUnicode
+enum class GtrUnicode : uint8_t
 {
     Up,
     Down,
@@ -85,6 +65,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
@@ -185,7 +166,7 @@ void setup_item_view_button_event_handling(
 #endif
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 
@@ -280,7 +261,7 @@ T* gtr_get_widget_derived(Glib::RefPtr<Gtk::Builder> const& builder, Glib::ustri
 template<typename F>
 void gtr_window_on_close(Gtk::Window& widget, F&& callback)
 {
-    auto bool_callback = [callback = std::move(callback)]() mutable -> bool
+    auto bool_callback = [callback = std::forward<F>(callback)]() mutable -> bool
     {
         if constexpr (std::is_same_v<void, std::invoke_result_t<decltype(callback)>>)
         {

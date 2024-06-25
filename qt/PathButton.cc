@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -63,11 +63,6 @@ void PathButton::setPath(QString const& path)
     emit pathChanged(path_);
 }
 
-QString const& PathButton::path() const
-{
-    return path_;
-}
-
 QSize PathButton::sizeHint() const
 {
     auto const sh = QToolButton::sizeHint();
@@ -112,7 +107,7 @@ void PathButton::onClicked() const
         dialog->setNameFilter(name_filter_);
     }
 
-    if (auto const path_info = QFileInfo(path_); !path_.isEmpty() && path_info.exists())
+    if (auto const path_info = QFileInfo{ path_ }; !path_.isEmpty() && path_info.exists())
     {
         if (path_info.isDir())
         {
@@ -150,7 +145,7 @@ void PathButton::updateAppearance()
 
     if (!path_.isEmpty() && path_info.exists())
     {
-        icon = icon_provider.icon(QFileInfo(path_));
+        icon = icon_provider.icon(QFileInfo{ path_ });
     }
 
     if (icon.isNull())

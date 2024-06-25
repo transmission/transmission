@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,6 +19,7 @@
 
 #include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
+#include "libtransmission/blocklist.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
@@ -29,8 +30,8 @@
  * @{
  */
 
-class tr_peer;
 class tr_peer_socket;
+struct tr_peer;
 struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_session;
@@ -243,7 +244,15 @@ public:
 
     // ---
 
-    [[nodiscard]] bool is_blocklisted(tr_session const* session) const;
+    [[nodiscard]] bool is_blocklisted(libtransmission::Blocklists const& blocklist) const
+    {
+        if (!blocklisted_.has_value())
+        {
+            blocklisted_ = blocklist.contains(listen_address());
+        }
+
+        return *blocklisted_;
+    }
 
     void set_blocklisted_dirty()
     {
@@ -302,7 +311,7 @@ public:
 
     [[nodiscard]] auto is_inactive(time_t const now) const noexcept
     {
-        return !is_in_use() && now - connection_changed_at_ >= UselessThresSecs;
+        return !is_in_use() && now > 0 && connection_changed_at_ > 0 && now - connection_changed_at_ >= InactiveThresSecs;
     }
 
     // ---
@@ -422,7 +431,7 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
-    static auto constexpr UselessThresSecs = time_t{ 24 * 60 * 60 };
+    static auto constexpr InactiveThresSecs = time_t{ 60 * 60 };
 
     static auto inline n_known_connectable = size_t{};
 
@@ -508,9 +517,14 @@ struct tr_pex
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
-        return socket_address.is_valid_for_peers();
+        return socket_address.is_valid();
+    }
+
+    [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept
+    {
+        return socket_address.is_valid_for_peers(from);
     }
 
     tr_socket_address socket_address;

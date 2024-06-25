@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,8 +10,9 @@
 #endif
 
 #include <algorithm>
-#include <cstdint>
 #include <cstddef> // size_t
+#include <cstdint>
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -26,20 +27,17 @@
  */
 struct tr_completion
 {
-    struct torrent_view
-    {
-        virtual bool piece_is_wanted(tr_piece_index_t piece) const = 0;
+    using PieceIsWantedFunc = std::function<bool(tr_piece_index_t piece)>;
 
-        virtual ~torrent_view() = default;
-    };
-
-    explicit tr_completion(torrent_view const* tor, tr_block_info const* block_info)
-        : tor_{ tor }
+    tr_completion(PieceIsWantedFunc&& piece_is_wanted, tr_block_info const* block_info)
+        : piece_is_wanted_{ std::move(piece_is_wanted) }
         , block_info_{ block_info }
         , blocks_{ block_info_->block_count() }
     {
         blocks_.set_has_none();
     }
+
+    tr_completion(tr_torrent const* tor, tr_block_info const* block_info);
 
     [[nodiscard]] constexpr tr_bitfield const& blocks() const noexcept
     {
@@ -175,7 +173,7 @@ private:
 
     void remove_block(tr_block_index_t block);
 
-    torrent_view const* tor_;
+    PieceIsWantedFunc piece_is_wanted_;
     tr_block_info const* block_info_;
 
     tr_bitfield blocks_{ 0 };

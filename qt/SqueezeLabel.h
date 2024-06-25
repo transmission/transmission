@@ -57,4 +57,15 @@ public:
 protected:
     // QWidget
     void paintEvent(QPaintEvent* paint_event) override;
+
+private:
+#if QT_CONFIG(accessibility)
+    void updateAccessibilityIfNeeded();
+#endif
+
+private:
+#if QT_CONFIG(accessibility)
+    QString old_text_;
+    int old_position_ = -1;
+#endif
 };

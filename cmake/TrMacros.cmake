@@ -88,10 +88,10 @@ macro(tr_eval SCRIPT)
 
         string(SHA1 _TR_EVAL_TMP_FILE "${_TR_EVAL_SCRIPT}")
         string(SUBSTRING "${_TR_EVAL_TMP_FILE}" 0 10 _TR_EVAL_TMP_FILE)
-        set(_TR_EVAL_TMP_FILE "${CMAKE_BINARY_DIR}/.tr-cache/tr_eval.${_TR_EVAL_TMP_FILE}.cmake")
+        set(_TR_EVAL_TMP_FILE "${PROJECT_BINARY_DIR}/.tr-cache/tr_eval.${_TR_EVAL_TMP_FILE}.cmake")
 
         if(NOT EXISTS "${_TR_EVAL_TMP_FILE}")
-            file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/.tr-cache")
+            file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/.tr-cache")
             file(WRITE "${_TR_EVAL_TMP_FILE}" "${_TR_EVAL_SCRIPT}")
         endif()
 
@@ -145,10 +145,10 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3} CACHE INTERNAL "")
             endif()
         endforeach()
-        add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}" "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}.bld")
+        add_subdirectory("${TR_THIRD_PARTY_SOURCE_DIR}/${DIRNAME}" "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld")
     else()
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
-        set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}.bld/pfx")
+        set(${ID}_PREFIX "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld/pfx")
 
         set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include"
             CACHE INTERNAL "")
@@ -159,6 +159,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         set(${ID}_LIBRARIES ${${ID}_LIBRARY})
 
         set(${ID}_EXT_PROJ_CMAKE_ARGS)
+
         if(APPLE)
             string(REPLACE ";" "$<SEMICOLON>" ${ID}_CMAKE_OSX_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
             list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
@@ -167,10 +168,25 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}")
         endif()
 
+        if(ANDROID)
+            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
+                "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
+                "-DANDROID_NDK=${ANDROID_NDK}"
+                "-DANDROID_ABI=${ANDROID_ABI}"
+                "-DANDROID_STL=${ANDROID_STL}"
+                "-DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}"
+                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}")
+        endif()
+
+        if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
+                "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+        endif()
+
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
-            PREFIX "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}.bld"
-            SOURCE_DIR "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
+            PREFIX "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld"
+            SOURCE_DIR "${TR_THIRD_PARTY_SOURCE_DIR}/${DIRNAME}"
             INSTALL_DIR "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
@@ -188,7 +204,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 ${_TAEAL_ARG_CMAKE_ARGS}
             BUILD_BYPRODUCTS "${${ID}_LIBRARY}")
 
-        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "third-party")
+        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
         # Imported target (below) requires include directories to be present at configuration time
         file(MAKE_DIRECTORY ${${ID}_INCLUDE_DIRS})
@@ -275,7 +291,7 @@ function(tr_win32_app_info TGT DESCR INTNAME ORIGFNAME)
         set(TR_MAIN_ICON "${ARGN}")
     endif()
 
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}-app-info.rc")
+    configure_file("${PROJECT_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}-app-info.rc")
 
     target_sources(${TGT}
         PRIVATE
@@ -437,7 +453,7 @@ function(tr_gettext_msgfmt TGT OUTPUT_FILE INPUT_FILE)
 
     add_custom_command(
         OUTPUT ${OUTPUT_FILE}
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} ${MODE_ARG} -d ${CMAKE_SOURCE_DIR}/po --template ${INPUT_FILE} -o ${OUTPUT_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} ${MODE_ARG} -d ${PROJECT_SOURCE_DIR}/po --template ${INPUT_FILE} -o ${OUTPUT_FILE}
         DEPENDS ${INPUT_FILE}
         VERBATIM)
 
@@ -471,7 +487,7 @@ function(tr_wrap_idl TGT INPUT_FILE OUTPUT_FILE_BASE)
         DEPENDS ${INPUT_FILE}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.tlb.rc.in" ${OUTPUT_FILE_BASE}.tlb.rc)
+    configure_file("${PROJECT_SOURCE_DIR}/cmake/Transmission.tlb.rc.in" ${OUTPUT_FILE_BASE}.tlb.rc)
 
     target_sources(${TGT}
         PRIVATE

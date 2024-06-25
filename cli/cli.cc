@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -19,57 +19,36 @@
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> // _()
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 
 using namespace std::chrono_literals;
+using namespace libtransmission::Values;
 
-/***
-****
-***/
-
-static auto constexpr MemK = size_t{ 1024 };
-static char constexpr MemKStr[] = "KiB";
-static char constexpr MemMStr[] = "MiB";
-static char constexpr MemGStr[] = "GiB";
-static char constexpr MemTStr[] = "TiB";
-
-static auto constexpr DiskK = size_t{ 1000 };
-static char constexpr DiskKStr[] = "kB";
-static char constexpr DiskMStr[] = "MB";
-static char constexpr DiskGStr[] = "GB";
-static char constexpr DiskTStr[] = "TB";
-
-static auto constexpr SpeedK = size_t{ 1000 };
 #define SPEED_K_STR "kB/s"
-static char constexpr SpeedKStr[] = SPEED_K_STR;
-static char constexpr SpeedMStr[] = "MB/s";
-static char constexpr SpeedGStr[] = "GB/s";
-static char constexpr SpeedTStr[] = "TB/s";
 
-/***
-****
-***/
+namespace
+{
+auto constexpr LineWidth = int{ 80 };
 
-static auto constexpr LineWidth = int{ 80 };
-
-static char constexpr MyConfigName[] = "transmission";
-static char constexpr MyReadableName[] = "transmission-cli";
-static char constexpr Usage
+char constexpr MyConfigName[] = "transmission";
+char constexpr MyReadableName[] = "transmission-cli";
+char constexpr Usage
     [] = "A fast and easy BitTorrent client\n"
          "\n"
          "Usage: transmission-cli [options] <file|url|magnet>";
 
-static bool showVersion = false;
-static bool verify = false;
-static sig_atomic_t gotsig = false;
-static sig_atomic_t manualUpdate = false;
+bool showVersion = false;
+bool verify = false;
+sig_atomic_t gotsig = false;
+sig_atomic_t manualUpdate = false;
 
-static char const* torrentPath = nullptr;
+char const* torrentPath = nullptr;
 
-static auto constexpr Options = std::array<tr_option, 20>{
+auto constexpr Options = std::array<tr_option, 20>{
     { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
       { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
@@ -99,11 +78,11 @@ static auto constexpr Options = std::array<tr_option, 20>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-static int parseCommandLine(tr_variant*, int argc, char const** argv);
+int parseCommandLine(tr_variant*, int argc, char const** argv);
 
-static void sigHandler(int signal);
+void sigHandler(int signal);
 
-static std::string tr_strlratio(double ratio)
+[[nodiscard]] std::string tr_strlratio(double ratio)
 {
     if (static_cast<int>(ratio) == TR_RATIO_NA)
     {
@@ -117,27 +96,27 @@ static std::string tr_strlratio(double ratio)
 
     if (ratio < 10.0)
     {
-        return fmt::format(FMT_STRING("{:.2f}"), ratio);
+        return fmt::format("{:.2f}", ratio);
     }
 
     if (ratio < 100.0)
     {
-        return fmt::format(FMT_STRING("{:.1f}"), ratio);
+        return fmt::format("{:.1f}", ratio);
     }
 
-    return fmt::format(FMT_STRING("{:.0f}"), ratio);
+    return fmt::format("{:.0f}", ratio);
 }
 
-static bool waitingOnWeb;
+bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
+void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
 {
     auto* ctor = static_cast<tr_ctor*>(response.user_data);
     tr_ctorSetMetainfo(ctor, std::data(response.body), std::size(response.body), nullptr);
     waitingOnWeb = false;
 }
 
-static std::string getStatusStr(tr_stat const* st)
+[[nodiscard]] std::string getStatusStr(tr_stat const* st)
 {
     if (st->activity == TR_STATUS_CHECK_WAIT)
     {
@@ -147,7 +126,7 @@ static std::string getStatusStr(tr_stat const* st)
     if (st->activity == TR_STATUS_CHECK)
     {
         return fmt::format(
-            FMT_STRING("Verifying local files ({:.2f}%, {:.2f}% valid)"),
+            "Verifying local files ({:.2f}%, {:.2f}% valid)",
             tr_truncd(100 * st->recheckProgress, 2),
             tr_truncd(100 * st->percentDone, 2));
     }
@@ -155,30 +134,30 @@ static std::string getStatusStr(tr_stat const* st)
     if (st->activity == TR_STATUS_DOWNLOAD)
     {
         return fmt::format(
-            FMT_STRING("Progress: {:.1f}%, dl from {:d} of {:d} peers ({:s}), ul to {:d} ({:s}) [{:s}]"),
+            "Progress: {:.1f}%, dl from {:d} of {:d} peers ({:s}), ul to {:d} ({:s}) [{:s}]",
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps),
+            Speed{ st->pieceDownloadSpeed_KBps, Speed::Units::KByps }.to_string(),
             st->peersGettingFromUs,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
             tr_strlratio(st->ratio));
     }
 
     if (st->activity == TR_STATUS_SEED)
     {
         return fmt::format(
-            FMT_STRING("Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]"),
+            "Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]",
             st->peersGettingFromUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
             tr_strlratio(st->ratio));
     }
 
     return "";
 }
 
-static std::string getConfigDir(int argc, char const** argv)
+[[nodiscard]] std::string getConfigDir(int argc, char const** argv)
 {
     int c;
     char const* my_optarg;
@@ -188,8 +167,8 @@ static std::string getConfigDir(int argc, char const** argv)
     {
         if (c == 'g')
         {
+            tr_optind = ind;
             return my_optarg;
-            break;
         }
     }
 
@@ -198,15 +177,138 @@ static std::string getConfigDir(int argc, char const** argv)
     return tr_getDefaultConfigDir(MyConfigName);
 }
 
+// ---
+
+int parseCommandLine(tr_variant* d, int argc, char const** argv)
+{
+    int c;
+    char const* my_optarg;
+
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
+    {
+        switch (c)
+        {
+        case 'b':
+            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, true);
+            break;
+
+        case 'B':
+            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
+            break;
+
+        case 'd':
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
+            break;
+
+        case 'D':
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
+            break;
+
+        case 'f':
+            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
+            tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
+            break;
+
+        case 'g': /* handled above */
+            break;
+
+        case 'm':
+            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
+            break;
+
+        case 'M':
+            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, false);
+            break;
+
+        case 'p':
+            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
+            break;
+
+        case 't':
+            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
+            break;
+
+        case 'u':
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
+            break;
+
+        case 'U':
+            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
+            break;
+
+        case 'v':
+            verify = true;
+            break;
+
+        case 'V':
+            showVersion = true;
+            break;
+
+        case 'w':
+            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
+            break;
+
+        case 910:
+            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+            break;
+
+        case 911:
+            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+            break;
+
+        case 912:
+            tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            break;
+
+        case 500:
+            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
+            break;
+
+        case TR_OPT_UNK:
+            if (torrentPath == nullptr)
+            {
+                torrentPath = my_optarg;
+            }
+
+            break;
+
+        default:
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void sigHandler(int signal)
+{
+    switch (signal)
+    {
+    case SIGINT:
+        gotsig = true;
+        break;
+
+#ifndef _WIN32
+
+    case SIGHUP:
+        manualUpdate = true;
+        break;
+
+#endif
+
+    default:
+        break;
+    }
+}
+} // namespace
+
 int tr_main(int argc, char* argv[])
 {
     auto const init_mgr = tr_lib_init();
 
     tr_locale_set_global("");
-
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     printf("%s %s\n", MyReadableName, LONG_VERSION_STRING);
 
@@ -219,7 +321,7 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     auto const config_dir = getConfigDir(argc, (char const**)argv);
-    auto settings = tr_sessionLoadSettings(config_dir.c_str(), MyConfigName);
+    auto settings = tr_sessionLoadSettings(nullptr, config_dir.c_str(), MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -245,12 +347,14 @@ int tr_main(int argc, char* argv[])
 
         if (!tr_sys_path_exists(sz_download_dir))
         {
-            tr_error* error = nullptr;
-
-            if (!tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+            if (auto error = tr_error{}; !tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error) && error)
             {
-                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", sz_download_dir.c_str(), error->message);
-                tr_error_free(error);
+                auto const errmsg = fmt::format(
+                    "Couldn't create '{path}': {error} ({error_code})",
+                    fmt::arg("path", sz_download_dir),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code()));
+                fmt::print(stderr, "{:s}\n", errmsg);
                 return EXIT_FAILURE;
             }
         }
@@ -359,133 +463,4 @@ int tr_main(int argc, char* argv[])
     printf("\n");
     tr_sessionClose(h);
     return EXIT_SUCCESS;
-}
-
-/***
-****
-****
-***/
-
-static int parseCommandLine(tr_variant* d, int argc, char const** argv)
-{
-    int c;
-    char const* my_optarg;
-
-    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
-    {
-        switch (c)
-        {
-        case 'b':
-            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, true);
-            break;
-
-        case 'B':
-            tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
-            break;
-
-        case 'd':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
-            break;
-
-        case 'D':
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
-            break;
-
-        case 'f':
-            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
-            tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
-            break;
-
-        case 'g': /* handled above */
-            break;
-
-        case 'm':
-            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
-            break;
-
-        case 'M':
-            tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, false);
-            break;
-
-        case 'p':
-            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
-            break;
-
-        case 't':
-            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
-            break;
-
-        case 'u':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
-            break;
-
-        case 'U':
-            tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
-            break;
-
-        case 'v':
-            verify = true;
-            break;
-
-        case 'V':
-            showVersion = true;
-            break;
-
-        case 'w':
-            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
-            break;
-
-        case 910:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
-            break;
-
-        case 911:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
-            break;
-
-        case 912:
-            tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
-            break;
-
-        case 500:
-            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
-            break;
-
-        case TR_OPT_UNK:
-            if (torrentPath == nullptr)
-            {
-                torrentPath = my_optarg;
-            }
-
-            break;
-
-        default:
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-static void sigHandler(int signal)
-{
-    switch (signal)
-    {
-    case SIGINT:
-        gotsig = true;
-        break;
-
-#ifndef _WIN32
-
-    case SIGHUP:
-        manualUpdate = true;
-        break;
-
-#endif
-
-    default:
-        break;
-    }
 }

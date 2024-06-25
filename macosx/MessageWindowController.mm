@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -50,6 +50,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     NSWindow* window = self.window;
     window.frameAutosaveName = @"MessageWindowFrame";
     [window setFrameUsingName:@"MessageWindowFrame"];
@@ -141,7 +142,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
     [_fTimer invalidate];
 }
 
@@ -323,7 +323,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     }
 }
 
-#warning don't cut off end
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
     NSString* message = self.fDisplayedMessages[row][@"Message"];

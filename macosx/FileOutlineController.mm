@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -38,6 +38,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fFileList = [[NSMutableArray alloc] init];
 
     //set table header tool tips
@@ -462,7 +463,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
         [FileRenameSheetController presentSheetForTorrent:torrent modalForWindow:self.fOutline.window completionHandler:^(BOOL didRename) {
             if (didRename)
             {
-                [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateQueue" object:self];
+                [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateTorrentsState" object:nil];
                 [NSNotificationCenter.defaultCenter postNotificationName:@"ResetInspector" object:self
                                                                 userInfo:@{ @"Torrent" : torrent }];
             }

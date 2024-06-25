@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -70,6 +70,7 @@ typedef NS_ENUM(NSUInteger, TabTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fNoneSelectedField.stringValue = NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents");
 
     //window location and size
@@ -171,8 +172,6 @@ typedef NS_ENUM(NSUInteger, TabTag) {
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     if ([_fViewController respondsToSelector:@selector(saveViewSize)])
     {
         [_fViewController saveViewSize];
@@ -352,9 +351,9 @@ typedef NS_ENUM(NSUInteger, TabTag) {
         viewRect = [self.fOptionsViewController viewRect];
     }
 
-    CGFloat const difference = NSHeight(viewRect) - oldHeight;
-    windowRect.origin.y -= difference;
-    windowRect.size.height += difference;
+    CGFloat const viewHeightDifference = NSHeight(viewRect) - oldHeight;
+    windowRect.origin.y -= viewHeightDifference;
+    windowRect.size.height += viewHeightDifference;
     windowRect.size.width = MAX(NSWidth(windowRect), minWindowWidth);
 
     if ([self.fViewController respondsToSelector:@selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method
@@ -364,11 +363,11 @@ typedef NS_ENUM(NSUInteger, TabTag) {
             CGFloat const screenHeight = NSHeight(window.screen.visibleFrame);
             if (NSHeight(windowRect) > screenHeight)
             {
-                CGFloat const difference = screenHeight - NSHeight(windowRect);
-                windowRect.origin.y -= difference;
-                windowRect.size.height += difference;
+                CGFloat const windowHeightDifference = screenHeight - NSHeight(windowRect);
+                windowRect.origin.y -= windowHeightDifference;
+                windowRect.size.height += windowHeightDifference;
 
-                viewRect.size.height += difference;
+                viewRect.size.height += windowHeightDifference;
             }
         }
 

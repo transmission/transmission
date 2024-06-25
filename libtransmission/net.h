@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -11,7 +11,7 @@
 #include <algorithm> // for std::copy_n
 #include <array>
 #include <cstddef> // size_t
-#include <functional>
+#include <cstdint> // uint16_t, uint32_t, uint8_t
 #include <optional>
 #include <string>
 #include <string_view>
@@ -59,8 +59,10 @@ using tr_socket_t = int;
 #define sockerrno errno
 #endif
 
+#include "libtransmission/transmission.h" // tr_peer_from
+
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h"
+#include "libtransmission/utils.h" // for tr_compare_3way()
 
 /**
  * Literally just a port number.
@@ -143,9 +145,10 @@ private:
 
 enum tr_address_type : uint8_t
 {
-    TR_AF_INET,
+    TR_AF_INET = 0,
     TR_AF_INET6,
-    NUM_TR_AF_INET_TYPES
+    NUM_TR_AF_INET_TYPES,
+    TR_AF_UNSPEC = NUM_TR_AF_INET_TYPES
 };
 
 std::string_view tr_ip_protocol_to_sv(tr_address_type type);
@@ -158,11 +161,11 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
-    // write the text form of the address, e.g. inet_ntop()
+    // --- write the text form of the address, e.g. inet_ntop()
     std::string_view display_name(char* out, size_t outlen) const;
     [[nodiscard]] std::string display_name() const;
 
-    ///
+    // ---
 
     [[nodiscard]] constexpr auto is_ipv4() const noexcept
     {
@@ -174,7 +177,7 @@ struct tr_address
         return type == TR_AF_INET6;
     }
 
-    /// bt protocol compact form
+    // --- bt protocol compact form
 
     // compact addr only -- used e.g. as `yourip` value in extension protocol handshake
 
@@ -205,7 +208,11 @@ struct tr_address
         }
     }
 
-    // comparisons
+    // ---
+
+    [[nodiscard]] std::optional<unsigned> to_interface_index() const noexcept;
+
+    // --- comparisons
 
     [[nodiscard]] int compare(tr_address const& that) const noexcept;
 
@@ -229,11 +236,21 @@ struct tr_address
         return this->compare(that) > 0;
     }
 
-    //
+    // ---
 
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
 
-    tr_address_type type;
+    [[nodiscard]] constexpr bool is_ipv4_mapped_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_link_local_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
+    }
+
+    tr_address_type type = NUM_TR_AF_INET_TYPES;
     union
     {
         struct in6_addr addr6;
@@ -241,9 +258,10 @@ struct tr_address
     } addr;
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
+    static auto constexpr CompactAddrMaxBytes = *std::max_element(std::begin(CompactAddrBytes), std::end(CompactAddrBytes));
     static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
-    [[nodiscard]] static auto constexpr any(tr_address_type type) noexcept
+    [[nodiscard]] static auto any(tr_address_type type) noexcept
     {
         switch (type)
         {
@@ -252,18 +270,24 @@ struct tr_address
         case TR_AF_INET6:
             return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
         default:
+            TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};
         }
     }
 
-    [[nodiscard]] constexpr auto is_valid() const noexcept
+    [[nodiscard]] static constexpr auto is_valid(tr_address_type type) noexcept
     {
         return type == TR_AF_INET || type == TR_AF_INET6;
     }
 
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+        return is_valid(type);
+    }
+
     [[nodiscard]] auto is_any() const noexcept
     {
-        return *this == any(type);
+        return is_valid() && *this == any(type);
     }
 };
 
@@ -298,7 +322,7 @@ struct tr_socket_address
         return address_.is_valid();
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept;
+    [[nodiscard]] bool is_valid_for_peers(tr_peer_from from) const noexcept;
 
     [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
     {
@@ -364,6 +388,7 @@ struct tr_socket_address
 
     // --- sockaddr helpers
 
+    [[nodiscard]] static std::optional<tr_socket_address> from_string(std::string_view sockaddr_sv);
     [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
     [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 
@@ -389,11 +414,12 @@ struct tr_socket_address
 
     static auto constexpr CompactSockAddrBytes = std::array{ tr_address::CompactAddrBytes[0] + tr_port::CompactPortBytes,
                                                              tr_address::CompactAddrBytes[1] + tr_port::CompactPortBytes };
+    static auto constexpr CompactSockAddrMaxBytes = tr_address::CompactAddrMaxBytes + tr_port::CompactPortBytes;
     static_assert(std::size(CompactSockAddrBytes) == NUM_TR_AF_INET_TYPES);
 };
 
 template<>
-class std::hash<tr_socket_address>
+struct std::hash<tr_socket_address>
 {
 public:
     std::size_t operator()(tr_socket_address const& socket_address) const noexcept

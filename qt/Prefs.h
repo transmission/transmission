@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,6 @@
 #pragma once
 
 #include <array>
-#include <set>
 
 #include <QObject>
 #include <QString>
@@ -204,7 +203,6 @@ private:
 
     QString const config_dir_;
 
-    std::set<int> temporary_prefs_;
     std::array<QVariant, PREFS_COUNT> mutable values_;
 
     static std::array<PrefItem, PREFS_COUNT> const Items;

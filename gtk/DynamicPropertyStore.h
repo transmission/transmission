@@ -1,4 +1,4 @@
-// This file Copyright © 2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    PropertyInfo const& get_property(PropertyType index) const noexcept
+    [[nodiscard]] PropertyInfo const& get_property(PropertyType index) const noexcept
     {
         auto const id = static_cast<PropertyIdType>(index);
         g_assert(id > 0);

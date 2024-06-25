@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,7 +16,7 @@
 #include "Utils.h"
 
 TorrentFilter::TorrentFilter(Prefs const& prefs)
-    : prefs_(prefs)
+    : prefs_{ prefs }
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
@@ -51,6 +51,9 @@ void TorrentFilter::onPrefChanged(int key)
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
         msec = FastMSec;
+        break;
+
+    default:
         break;
     }
 
@@ -240,9 +243,15 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
 std::array<int, FilterMode::NUM_MODES> TorrentFilter::countTorrentsPerMode() const
 {
-    std::array<int, FilterMode::NUM_MODES> torrent_counts = {};
+    auto* const torrent_model = dynamic_cast<TorrentModel*>(sourceModel());
+    if (torrent_model == nullptr)
+    {
+        return {};
+    }
 
-    for (auto const& tor : dynamic_cast<TorrentModel*>(sourceModel())->torrents())
+    auto torrent_counts = std::array<int, FilterMode::NUM_MODES>{};
+
+    for (auto const& tor : torrent_model->torrents())
     {
         for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
         {

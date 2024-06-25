@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -47,7 +47,7 @@ static CGFloat const kImageOverlap = 1.0;
     [super setSelected:flag forSegment:segment];
 
     //only for when clicking manually
-    NSInteger priority;
+    tr_priority_t priority;
     switch (segment)
     {
     case 0:

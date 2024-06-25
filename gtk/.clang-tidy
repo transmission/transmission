@@ -7,11 +7,13 @@ Checks: >
   -bugprone-narrowing-conversions,
   cert-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
   hicpp-*,
   misc-*,
+  -misc-include-cleaner,
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
@@ -19,8 +21,10 @@ Checks: >
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-magic-numbers,
+  -readability-qualified-auto,
   -readability-redundant-access-specifiers
 
 CheckOptions:
-  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
-  modernize-pass-by-value.ValuesOnly: true
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros, value: true }
+  - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
+  - { key: modernize-pass-by-value.ValuesOnly, value: true }

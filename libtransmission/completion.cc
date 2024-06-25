@@ -1,8 +1,11 @@
-// This file Copyright 2021-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -13,6 +16,12 @@
 #include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/torrent.h"
+
+tr_completion::tr_completion(tr_torrent const* tor, tr_block_info const* block_info)
+    : tr_completion{ [tor](tr_piece_index_t const piece) { return tor->piece_is_wanted(piece); }, block_info }
+{
+}
 
 uint64_t tr_completion::compute_has_valid() const
 {
@@ -52,7 +61,7 @@ uint64_t tr_completion::compute_size_when_done() const
     auto size = uint64_t{ 0 };
     for (tr_piece_index_t piece = 0, n_pieces = block_info_->piece_count(); piece < n_pieces; ++piece)
     {
-        if (tor_->piece_is_wanted(piece))
+        if (piece_is_wanted_(piece))
         {
             size += block_info_->piece_size(piece);
         }
@@ -184,6 +193,7 @@ uint64_t tr_completion::count_has_bytes_in_span(tr_byte_span_t span) const
     span.begin = std::clamp(span.begin, uint64_t{ 0 }, block_info_->total_size());
     span.end = std::clamp(span.end, uint64_t{ 0 }, block_info_->total_size());
     auto const [begin_byte, end_byte] = span;
+    TR_ASSERT(end_byte >= begin_byte);
     if (begin_byte >= end_byte)
     {
         return 0;

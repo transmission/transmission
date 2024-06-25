@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -11,6 +11,7 @@
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
 #import "Controller.h"
+#import "DefaultAppHelper.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
@@ -103,6 +104,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
+@property(nonatomic, readonly) DefaultAppHelper* fDefaultAppHelper;
 
 @end
 
@@ -176,7 +178,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
             [_fDefaults removeObjectForKey:@"CheckForUpdates"];
         }
 
-        [self setAutoUpdateToBeta:nil];
+        _fDefaultAppHelper = [[DefaultAppHelper alloc] init];
     }
 
     return self;
@@ -184,8 +186,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     [_fPortStatusTimer invalidate];
     if (_fPortChecker)
     {
@@ -195,6 +195,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fHasLoaded = YES;
 
     self.window.restorationClass = [self class];
@@ -215,7 +216,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
     [self setPrefView:nil];
 
-    [self updateDefaultsStatus];
+    [self updateDefaultsStates];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -404,17 +405,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
     windowRect.size.width = [sizeString floatValue];
     [self.window setFrame:windowRect display:YES animate:NO];
-}
-
-//for a beta release, always use the beta appcast
-#if defined(TR_BETA_RELEASE)
-#define SPARKLE_TAG YES
-#else
-#define SPARKLE_TAG [fDefaults boolForKey:@"AutoUpdateBeta"]
-#endif
-- (void)setAutoUpdateToBeta:(id)sender
-{
-    // TODO: Support beta releases (if/when necessary)
 }
 
 - (void)setPort:(id)sender
@@ -788,7 +778,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     return static_cast<int>(components.hour * 60 + components.minute);
 }
 
-+ (NSDate*)timeSumToDate:(int)sum
++ (NSDate*)timeSumToDate:(NSInteger)sum
 {
     NSDateComponents* comps = [[NSDateComponents alloc] init];
     comps.hour = sum / 60;
@@ -859,55 +849,27 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)setDefaultForMagnets:(id)sender
 {
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-    OSStatus const result = LSSetDefaultHandlerForURLScheme((CFStringRef) @"magnet", (__bridge CFStringRef)bundleID);
-    if (result != noErr)
-    {
-        NSLog(@"Failed setting default magnet link handler");
-    }
-    [self updateDefaultsStatus];
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForMagnetURLs:^{
+        [weakSelf updateDefaultsStates];
+    }];
 }
 
 - (IBAction)setDefaultForTorrentFiles:(id)sender
 {
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-    OSStatus const result = LSSetDefaultRoleHandlerForContentType((CFStringRef) @"org.bittorrent.torrent", kLSRolesViewer, (__bridge CFStringRef)bundleID);
-    if (result != noErr)
-    {
-        NSLog(@"Failed setting default torrent file handler");
-    }
-    [self updateDefaultsStatus];
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForTorrentFiles:^{
+        [weakSelf updateDefaultsStates];
+    }];
 }
 
-- (void)updateDefaultsStatus
+- (void)updateDefaultsStates
 {
-    BOOL isDefaultForMagnetSet = NO;
-    BOOL isDefaultForTorrentSet = NO;
+    BOOL const isDefaultForMagnetURLs = [self.fDefaultAppHelper isDefaultForMagnetURLs];
+    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetURLs;
 
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-
-    NSString* const defaultBundleIdForMagnet = (__bridge NSString*)LSCopyDefaultHandlerForURLScheme((CFStringRef) @"magnet");
-    if (defaultBundleIdForMagnet)
-    {
-        if ([bundleID isEqualToString:defaultBundleIdForMagnet])
-        {
-            isDefaultForMagnetSet = YES;
-        }
-    }
-
-    NSString* const defaultBundleIdForTorrent = (__bridge NSString*)LSCopyDefaultRoleHandlerForContentType(
-        (CFStringRef) @"org.bittorrent.torrent",
-        kLSRolesViewer);
-    if (defaultBundleIdForTorrent)
-    {
-        if ([bundleID isEqualToString:defaultBundleIdForTorrent])
-        {
-            isDefaultForTorrentSet = YES;
-        }
-    }
-
-    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetSet;
-    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentSet;
+    BOOL const isDefaultForTorrentFiles = [self.fDefaultAppHelper isDefaultForTorrentFiles];
+    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentFiles;
 }
 
 - (void)setQueue:(id)sender
@@ -917,7 +879,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     tr_sessionSetQueueEnabled(self.fHandle, TR_UP, [self.fDefaults boolForKey:@"QueueSeed"]);
 
     //handle if any transfers switch from queued to paused
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateQueue" object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateTorrentsState" object:nil];
 }
 
 - (void)setQueueNumber:(id)sender
@@ -1540,7 +1502,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         self.fQueueSeedField.integerValue = seedQueueNum;
 
         //check stalled handled by bindings
-        self.fStalledField.intValue = stalledMinutes;
+        self.fStalledField.integerValue = stalledMinutes;
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];

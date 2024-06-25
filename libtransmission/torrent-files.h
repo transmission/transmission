@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -35,17 +35,17 @@ public:
         return std::empty(files_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 size_t file_count() const noexcept
     {
         return std::size(files_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 uint64_t fileSize(tr_file_index_t file_index) const
+    [[nodiscard]] TR_CONSTEXPR20 uint64_t file_size(tr_file_index_t file_index) const
     {
         return files_.at(file_index).size_;
     }
 
-    [[nodiscard]] constexpr auto totalSize() const noexcept
+    [[nodiscard]] constexpr auto total_size() const noexcept
     {
         return total_size_;
     }
@@ -55,12 +55,12 @@ public:
         return files_.at(file_index).path_;
     }
 
-    void setPath(tr_file_index_t file_index, std::string_view path)
+    void set_path(tr_file_index_t file_index, std::string_view path)
     {
-        files_.at(file_index).setPath(path);
+        files_.at(file_index).set_path(path);
     }
 
-    void insertSubpathPrefix(std::string_view path)
+    void insert_subpath_prefix(std::string_view path)
     {
         auto const buf = tr_pathbuf{ path, '/' };
 
@@ -76,7 +76,7 @@ public:
         files_.reserve(n_files);
     }
 
-    void shrinkToFit()
+    void shrink_to_fit()
     {
         files_.shrink_to_fit();
     }
@@ -87,7 +87,7 @@ public:
         total_size_ = uint64_t{};
     }
 
-    [[nodiscard]] auto sortedByPath() const
+    [[nodiscard]] auto sorted_by_path() const
     {
         auto ret = std::vector<std::pair<std::string /*path*/, uint64_t /*size*/>>{};
         ret.reserve(std::size(files_));
@@ -114,7 +114,7 @@ public:
         std::string_view old_parent_in,
         std::string_view parent_in,
         std::string_view parent_name = "",
-        tr_error** error = nullptr) const;
+        tr_error* error = nullptr) const;
 
     using FileFunc = std::function<void(char const* filename)>;
     void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
@@ -153,20 +153,20 @@ public:
     };
 
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
-    [[nodiscard]] bool hasAnyLocalData(std::string_view const* paths, size_t n_paths) const;
+    [[nodiscard]] bool has_any_local_data(std::string_view const* paths, size_t n_paths) const;
 
-    static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
+    static void sanitize_subpath(std::string_view path, tr_pathbuf& append_me, bool os_specific = true);
 
-    [[nodiscard]] static auto makeSubpathPortable(std::string_view path)
+    [[nodiscard]] static auto sanitize_subpath(std::string_view path, bool os_specific = true)
     {
         auto tmp = tr_pathbuf{};
-        makeSubpathPortable(path, tmp);
+        sanitize_subpath(path, tmp, os_specific);
         return std::string{ tmp.sv() };
     }
 
-    [[nodiscard]] static bool isSubpathPortable(std::string_view path)
+    [[nodiscard]] static bool is_subpath_sanitized(std::string_view path, bool os_specific = true)
     {
-        return makeSubpathPortable(path) == path;
+        return sanitize_subpath(path, os_specific) == path;
     }
 
     static constexpr std::string_view PartialFileSuffix = ".part";
@@ -175,7 +175,7 @@ private:
     struct file_t
     {
     public:
-        void setPath(std::string_view subpath)
+        void set_path(std::string_view subpath)
         {
             if (path_ != subpath)
             {

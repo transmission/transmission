@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -82,45 +82,6 @@ export function createTextualTabsContainer(id, tabs, callback) {
   };
 }
 
-export function createTabsContainer(id, tabs, callback) {
-  const root = document.createElement('div');
-  root.id = id;
-  root.classList.add('tabs-container');
-
-  const buttons = document.createElement('div');
-  buttons.classList.add('tabs-buttons');
-  root.append(buttons);
-
-  const pages = document.createElement('div');
-  pages.classList.add('tabs-pages');
-  root.append(pages);
-
-  const button_array = [];
-  for (const [button_id, page] of tabs) {
-    const button = document.createElement('button');
-    button.id = button_id;
-    button.classList.add('tabs-button');
-    button.setAttribute('type', 'button');
-    buttons.append(button);
-    button_array.push(button);
-
-    page.classList.add('hidden', 'tabs-page');
-    pages.append(page);
-
-    button.addEventListener('click', () =>
-      toggleClass(buttons, button, pages, page, callback),
-    );
-  }
-
-  button_array[0].classList.add('selected');
-  pages.children[0].classList.remove('hidden');
-
-  return {
-    buttons: button_array,
-    root,
-  };
-}
-
 export function createDialogContainer(id) {
   const root = document.createElement('dialog');
   root.classList.add('dialog-container', 'popup', id);
@@ -179,6 +140,10 @@ export function createDialogContainer(id) {
 }
 
 export function makeUUID() {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
   // source: https://stackoverflow.com/a/2117523/6568470
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replaceAll(/[018]/g, (c) =>
     (
@@ -248,9 +213,6 @@ function setOrDeleteAttribute(element, attribute, b) {
 }
 export function setEnabled(element, b) {
   setOrDeleteAttribute(element, 'disabled', !b);
-}
-export function setChecked(element, b) {
-  setOrDeleteAttribute(element, 'checked', b);
 }
 
 export function addCheckedClass(element, b) {

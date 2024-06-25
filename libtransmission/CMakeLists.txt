@@ -1,3 +1,4 @@
+include(CheckAtomic)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
@@ -12,7 +13,7 @@ check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
 add_compile_options(
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
-    $<$<AND:$<BOOL:${APPLE}>,$<CXX_COMPILER_ID:AppleClang,Clang>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
+    $<$<AND:$<BOOL:${APPLE}>,$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>,$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>>:-fobjc-arc>)
 
 add_library(${TR_NAME} STATIC)
 
@@ -113,11 +114,12 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
-        session-settings.cc
         session-thread.cc
         session-thread.h
         session.cc
         session.h
+        settings.cc
+        settings.h
         stats.cc
         stats.h
         subprocess-posix.cc
@@ -127,6 +129,7 @@ target_sources(${TR_NAME}
         timer-ev.h
         timer.h
         torrent-ctor.cc
+        torrent-ctor.h
         torrent-files.cc
         torrent-files.h
         torrent-magnet.cc
@@ -139,7 +142,6 @@ target_sources(${TR_NAME}
         torrents.h
         tr-assert.cc
         tr-assert.h
-        tr-assert.mm
         tr-buffer.h
         tr-dht.cc
         tr-dht.h
@@ -159,7 +161,6 @@ target_sources(${TR_NAME}
         utils.h
         utils.mm
         variant-benc.cc
-        variant-converters.cc
         variant-json.cc
         variant.cc
         variant.h
@@ -204,10 +205,7 @@ tr_allow_compile_if(
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
     [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
-        tr-assert.mm
         utils.mm
-    [=[[NOT (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")]]=]
-        tr-assert.cc
     [=[[WIN32]]=]
         file-win32.cc
         subprocess-win32.cc
@@ -225,10 +223,13 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${WITH_INOTIFY}>:WITH_INOTIFY>
         $<$<BOOL:${WITH_KQUEUE}>:WITH_KQUEUE>
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>
-        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
+        $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
+        $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
+        $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
+        $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
         $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_headers(${TR_NAME}
@@ -270,11 +271,14 @@ target_include_directories(${TR_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}/..)
 
+if(ANDROID)
+    find_library(log-lib log)
+endif()
+
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
         deflate::deflate
-        transmission::crypto_impl
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
@@ -294,7 +298,10 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
+        "$<$<BOOL:${ANDROID}>:${log-lib}>"
+        $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
+        transmission::crypto_impl
         fmt::fmt-header-only
         small::small
         libevent::event)
@@ -323,6 +330,7 @@ if(INSTALL_LIB)
             tr-strbuf.h
             transmission.h
             utils.h
+            values.h
             variant.h
             watchdir.h
             web-utils.h

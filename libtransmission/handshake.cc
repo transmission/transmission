@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,7 +6,10 @@
 #include <algorithm>
 #include <array>
 #include <cerrno> // ECONNREFUSED, ETIMEDOUT
+#include <cstddef>
+#include <cstdint>
 #include <string_view>
+#include <tuple>
 #include <utility>
 
 #include <fmt/core.h>
@@ -24,12 +27,13 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 
 #define tr_logAddTraceHand(handshake, msg) \
     tr_logAddTrace(msg, fmt::format("handshake {}", (handshake)->peer_io_->display_name()))
 
 using namespace std::literals;
-using DH = tr_message_stream_encryption::DH;
+using key_bigend_t = tr_message_stream_encryption::DH::key_bigend_t;
 
 // --- Outgoing Connections
 
@@ -56,7 +60,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
         return READ_NOW;
     }
 
-    auto peer_public_key = DH::key_bigend_t{};
+    auto peer_public_key = key_bigend_t{};
     tr_logAddTraceHand(
         this,
         fmt::format("in read_yb... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
@@ -350,7 +354,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
         return READ_NOW;
     }
 
-    auto peer_public_key = DH::key_bigend_t{};
+    auto peer_public_key = key_bigend_t{};
     tr_logAddTraceHand(
         this,
         fmt::format("in read_ya... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
@@ -557,7 +561,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
     /* no piece data in handshake */
     *piece = 0;
 
-    tr_logAddTraceHand(handshake, fmt::format("handling canRead; state is [{}]", handshake->state_string()));
+    tr_logAddTraceHand(handshake, fmt::format("handling can_read; state is [{}]", handshake->state_string()));
 
     ReadState ret = READ_NOW;
     while (ret == READ_NOW)
@@ -609,9 +613,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
             break;
 
         default:
-            TR_ASSERT_MSG(
-                false,
-                fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state())));
+            TR_ASSERT_MSG(false, fmt::format("unhandled handshake state {:d}", static_cast<int>(handshake->state())));
             ret = READ_ERR;
             break;
         }
@@ -624,6 +626,17 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 {
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
+    auto const retry = [&]()
+    {
+        handshake->send_handshake(io);
+        handshake->set_state(State::AwaitingHandshake);
+    };
+    auto const fail = [&]()
+    {
+        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message(), error.code()));
+        handshake->done(false);
+    };
+
     if (io->is_utp() && !io->is_incoming() && handshake->is_state(State::AwaitingYb))
     {
         // the peer probably doesn't speak µTP.
@@ -632,17 +645,19 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         auto const info = handshake->mediator_->torrent(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
-        if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
+        if ((error.code() == ETIMEDOUT || error.code() == ECONNREFUSED) && info)
         {
             handshake->mediator_->set_utp_failed(info_hash, io->socket_address());
         }
 
         if (handshake->mediator_->allows_tcp() && io->reconnect())
         {
-            handshake->send_handshake(io);
-            handshake->set_state(State::AwaitingHandshake);
+            retry();
             return;
         }
+
+        fail();
+        return;
     }
 
     /* if the error happened while we were sending a public key, we might
@@ -652,13 +667,11 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect())
     {
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
-        handshake->send_handshake(io);
-        handshake->set_state(State::AwaitingHandshake);
+        retry();
         return;
     }
 
-    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
-    handshake->done(false);
+    fail();
 }
 
 // ---

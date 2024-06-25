@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,8 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <string_view>
-
-#include <fmt/core.h>
+#include <utility>
 
 #include <small/map.hpp>
 
@@ -17,7 +16,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
@@ -78,23 +76,31 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
     return add(announce_url_sv, tier);
 }
 
-bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
+bool tr_announce_list::add(std::string_view announce_url, tr_tracker_tier_t tier)
 {
-    auto const announce = tr_urlParseTracker(announce_url_sv);
-    if (!announce || !can_add(*announce))
+    // Make sure the announce URL is usable before we intern it.
+    if (auto const announce = tr_urlParseTracker(announce_url); !announce || !can_add(*announce))
+    {
+        return false;
+    }
+
+    // Parse again with the interned string so that `parsed` fields all
+    // point to the interned addresses. This second call should never
+    // fail, but check anyway to make the linter happy.
+    auto const announce_interned = tr_interned_string{ announce_url };
+    auto const parsed = tr_urlParseTracker(announce_interned.sv());
+    if (!parsed)
     {
         return false;
     }
 
     auto tracker = tracker_info{};
-    tracker.announce = announce_url_sv;
-    tracker.tier = get_tier(tier, *announce);
+    tracker.announce = announce_interned;
+    tracker.announce_parsed = *parsed;
+    tracker.tier = get_tier(tier, *parsed);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format("{:s}:{:d}", announce->host, announce->port);
-    tracker.sitename = announce->sitename;
-    tracker.query = announce->query;
 
-    if (auto const scrape_str = announce_to_scrape(announce_url_sv); scrape_str)
+    if (auto const scrape_str = announce_to_scrape(tracker.announce.sv()); scrape_str)
     {
         tracker.scrape = *scrape_str;
     }
@@ -264,14 +270,19 @@ void tr_announce_list::add_to_map(tr_variant::Map& setme) const
     }
 }
 
-bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
+bool tr_announce_list::save(std::string_view torrent_file, tr_error* error) const
 {
     // load the torrent file
     auto serde = tr_variant_serde::benc();
     auto ometainfo = serde.parse_file(torrent_file);
     if (!ometainfo)
     {
-        tr_error_propagate(error, &serde.error_);
+        if (error != nullptr)
+        {
+            *error = std::move(serde.error_);
+            serde.error_ = {};
+        }
+
         return false;
     }
     auto& metainfo = *ometainfo;

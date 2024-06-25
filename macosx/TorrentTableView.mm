@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,19 +26,6 @@ CGFloat const kGroupSeparatorHeight = 18.0;
 static NSInteger const kMaxGroup = 999999;
 static CGFloat const kErrorImageSize = 20.0;
 
-//eliminate when Lion-only
-typedef NS_ENUM(NSUInteger, ActionMenuTag) {
-    ActionMenuTagGlobal = 101,
-    ActionMenuTagUnlimited = 102,
-    ActionMenuTagLimit = 103,
-};
-
-typedef NS_ENUM(NSUInteger, ActionMenuPriorityTag) {
-    ActionMenuPriorityTagHigh = 101,
-    ActionMenuPriorityTagNormal = 102,
-    ActionMenuPriorityTagLow = 103,
-};
-
 static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 @interface TorrentTableView ()
@@ -53,14 +40,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) IBOutlet NSMenu* fContextNoRow;
 
 @property(nonatomic) NSIndexSet* fSelectedRowIndexes;
-
-@property(nonatomic) IBOutlet NSMenu* fActionMenu;
-@property(nonatomic) IBOutlet NSMenu* fUploadMenu;
-@property(nonatomic) IBOutlet NSMenu* fDownloadMenu;
-@property(nonatomic) IBOutlet NSMenu* fRatioMenu;
-@property(nonatomic) IBOutlet NSMenu* fPriorityMenu;
-@property(nonatomic) IBOutlet NSMenuItem* fGlobalLimitItem;
-@property(nonatomic, readonly) Torrent* fMenuTorrent;
 
 @property(nonatomic) CGFloat piecesBarPercent;
 @property(nonatomic) NSAnimation* fPiecesBarAnimation;
@@ -112,13 +91,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
                                              object:nil];
 }
@@ -150,7 +125,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSIndexSet* fullIndexSet = [NSIndexSet indexSetWithIndexesInRange:fullRange];
         NSMutableIndexSet* visibleIndexSet = [[NSMutableIndexSet alloc] init];
 
-        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
+        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
             id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
             if ([rowView isGroupRowStyle])
             {
@@ -176,7 +151,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     //redraw fControlButton
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
-    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
         id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
         if (![rowView isGroupRowStyle])
         {
@@ -352,8 +327,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
 
         // redraw buttons
-        [torrentCell.fControlButton display];
-        [torrentCell.fRevealButton display];
+        torrentCell.fControlButton.needsDisplay = YES;
+        torrentCell.fRevealButton.needsDisplay = YES;
 
         return torrentCell;
     }
@@ -659,45 +634,13 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
     NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
-    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
-    [pasteBoard setString:links forType:NSStringPboardType];
+    [pasteBoard declareTypes:@[ NSPasteboardTypeString ] owner:nil];
+    [pasteBoard setString:links forType:NSPasteboardTypeString];
 }
 
 - (void)paste:(id)sender
 {
-    NSURL* url;
-    if ((url = [NSURL URLFromPasteboard:NSPasteboard.generalPasteboard]))
-    {
-        [self.fController openURL:url.absoluteString];
-    }
-    else
-    {
-        NSArray<NSString*>* items = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
-        if (!items)
-        {
-            return;
-        }
-        NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-        for (NSString* itemString in items)
-        {
-            NSArray<NSString*>* itemLines = [itemString componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet];
-            for (__strong NSString* pbItem in itemLines)
-            {
-                pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-                if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-                {
-                    [self.fController openURL:pbItem];
-                }
-                else
-                {
-#warning only accept full text?
-                    for (NSTextCheckingResult* result in [detector matchesInString:pbItem options:0
-                                                                             range:NSMakeRange(0, pbItem.length)])
-                        [self.fController openURL:result.URL.absoluteString];
-                }
-            }
-        }
-    }
+    [self.fController openPasteboard];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
@@ -706,7 +649,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     if (action == @selector(paste:))
     {
-        if ([NSPasteboard.generalPasteboard.types containsObject:NSURLPboardType])
+        if ([NSPasteboard.generalPasteboard.types containsObject:NSPasteboardTypeURL])
         {
             return YES;
         }
@@ -881,7 +824,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     CGFloat width = NSWidth(rect);
 
-    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.frame) - NSMinX(self.window.frame) < 72)
+    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.visibleFrame) - NSMinX(self.window.frame) < 72)
     {
         // Ugly hack to hide NSPopover arrow.
         self.fPositioningView = [[NSView alloc] initWithFrame:rect];
@@ -907,172 +850,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     [self.fPositioningView removeFromSuperview];
     self.fPositioningView = nil;
     self.fActionPopoverShown = NO;
-}
-
-//eliminate when Lion-only, along with all the menu item instance variables
-- (void)menuNeedsUpdate:(NSMenu*)menu
-{
-    //this method seems to be called when it shouldn't be
-    if (!self.fMenuTorrent || !menu.supermenu)
-    {
-        return;
-    }
-
-    if (menu == self.fUploadMenu || menu == self.fDownloadMenu)
-    {
-        NSMenuItem* item;
-        if (menu.numberOfItems == 3)
-        {
-            static NSArray<NSNumber*>* const speedLimitActionValues = @[ @50, @100, @250, @500, @1000, @2500, @5000, @10000 ];
-
-            for (NSNumber* i in speedLimitActionValues)
-            {
-                item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
-                                                                      i.integerValue]
-                           action:@selector(setQuickLimit:)
-                    keyEquivalent:@""];
-                item.target = self;
-                item.representedObject = i;
-                [menu addItem:item];
-            }
-        }
-
-        BOOL const upload = menu == self.fUploadMenu;
-        BOOL const limit = [self.fMenuTorrent usesSpeedLimit:upload];
-
-        item = [menu itemWithTag:ActionMenuTagLimit];
-        item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
-                                                         [self.fMenuTorrent speedLimit:upload]];
-
-        item = [menu itemWithTag:ActionMenuTagUnlimited];
-        item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
-    }
-    else if (menu == self.fRatioMenu)
-    {
-        NSMenuItem* item;
-        if (menu.numberOfItems == 4)
-        {
-            static NSArray<NSNumber*>* const ratioLimitActionValue = @[ @0.25, @0.5, @0.75, @1.0, @1.5, @2.0, @3.0 ];
-
-            for (NSNumber* i in ratioLimitActionValue)
-            {
-                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", i.floatValue]
-                                                  action:@selector(setQuickRatio:)
-                                           keyEquivalent:@""];
-                item.target = self;
-                item.representedObject = i;
-                [menu addItem:item];
-            }
-        }
-
-        tr_ratiolimit const mode = self.fMenuTorrent.ratioSetting;
-
-        item = [menu itemWithTag:ActionMenuTagLimit];
-        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
-                                                         self.fMenuTorrent.ratioLimit];
-
-        item = [menu itemWithTag:ActionMenuTagUnlimited];
-        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
-
-        item = [menu itemWithTag:ActionMenuTagGlobal];
-        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
-    }
-    else if (menu == self.fPriorityMenu)
-    {
-        tr_priority_t const priority = self.fMenuTorrent.priority;
-
-        NSMenuItem* item = [menu itemWithTag:ActionMenuPriorityTagHigh];
-        item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
-
-        item = [menu itemWithTag:ActionMenuPriorityTagNormal];
-        item.state = priority == TR_PRI_NORMAL ? NSControlStateValueOn : NSControlStateValueOff;
-
-        item = [menu itemWithTag:ActionMenuPriorityTagLow];
-        item.state = priority == TR_PRI_LOW ? NSControlStateValueOn : NSControlStateValueOff;
-    }
-}
-
-//the following methods might not be needed when Lion-only
-- (void)setQuickLimitMode:(id)sender
-{
-    BOOL const limit = [sender tag] == ActionMenuTagLimit;
-    [self.fMenuTorrent setUseSpeedLimit:limit upload:[sender menu] == self.fUploadMenu];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setQuickLimit:(id)sender
-{
-    BOOL const upload = [sender menu] == self.fUploadMenu;
-    [self.fMenuTorrent setUseSpeedLimit:YES upload:upload];
-    [self.fMenuTorrent setSpeedLimit:[[sender representedObject] intValue] upload:upload];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setGlobalLimit:(id)sender
-{
-    self.fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSControlStateValueOn;
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setQuickRatioMode:(id)sender
-{
-    tr_ratiolimit mode;
-    switch ([sender tag])
-    {
-    case ActionMenuTagUnlimited:
-        mode = TR_RATIOLIMIT_UNLIMITED;
-        break;
-    case ActionMenuTagLimit:
-        mode = TR_RATIOLIMIT_SINGLE;
-        break;
-    case ActionMenuTagGlobal:
-        mode = TR_RATIOLIMIT_GLOBAL;
-        break;
-    default:
-        return;
-    }
-
-    self.fMenuTorrent.ratioSetting = mode;
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setQuickRatio:(id)sender
-{
-    self.fMenuTorrent.ratioSetting = TR_RATIOLIMIT_SINGLE;
-    self.fMenuTorrent.ratioLimit = [[sender representedObject] floatValue];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-}
-
-- (void)setPriority:(id)sender
-{
-    tr_priority_t priority;
-    switch ([sender tag])
-    {
-    case ActionMenuPriorityTagHigh:
-        priority = TR_PRI_HIGH;
-        break;
-    case ActionMenuPriorityTagNormal:
-        priority = TR_PRI_NORMAL;
-        break;
-    case ActionMenuPriorityTagLow:
-        priority = TR_PRI_LOW;
-        break;
-    default:
-        NSAssert1(NO, @"Unknown priority: %ld", [sender tag]);
-        priority = TR_PRI_NORMAL;
-    }
-
-    self.fMenuTorrent.priority = priority;
-
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
 }
 
 - (void)togglePiecesBar

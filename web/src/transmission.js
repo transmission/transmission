@@ -1,10 +1,9 @@
-/* @license This file Copyright © 2020-2023 Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
 import { ContextMenu } from './context-menu.js';
-import { ForceVerifyDialog } from './force-verify-dialog';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
 import { MoveDialog } from './move-dialog.js';
@@ -126,7 +125,9 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
         case 'show-inspector':
-          if (!this.popup || this.popup.name !== 'inspector') {
+          if (this.popup instanceof Inspector) {
+            this.setCurrentPopup(null);
+          } else {
             this.setCurrentPopup(new Inspector(this));
           }
           break;
@@ -175,10 +176,7 @@ export class Transmission extends EventTarget {
           this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
-          this._verifyTorrents(this.getSelectedTorrents(), false);
-          break;
-        case 'verify-selected-torrents-force':
-          this._verifyTorrents(this.getSelectedTorrents(), true);
+          this._verifyTorrents(this.getSelectedTorrents());
           break;
         default:
           console.warn(`unhandled action: ${event_.action}`);
@@ -857,24 +855,12 @@ TODO: fix this when notifications get fixed
       this,
     );
   }
-  _verifyTorrents(torrents, force) {
-    if (force) {
-      this.setCurrentPopup(
-        new ForceVerifyDialog({
-          callback: this.refreshTorrents,
-          controller: this,
-          remote: this.remote,
-          torrents,
-        }),
-      );
-    } else {
-      this.remote.verifyTorrents(
-        Transmission._getTorrentIds(torrents),
-        force,
-        this.refreshTorrents,
-        this,
-      );
-    }
+  _verifyTorrents(torrents) {
+    this.remote.verifyTorrents(
+      Transmission._getTorrentIds(torrents),
+      this.refreshTorrents,
+      this,
+    );
   }
 
   _reannounceTorrents(torrents) {

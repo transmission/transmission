@@ -18,9 +18,19 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         FORCE)
 endif()
 
+if(VCPKG_TARGET_ANDROID)
+    include(cmake/VcpkgAndroid.cmake)
+endif()
+
 project(transmission)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(TR_THIRD_PARTY_DIR_NAME third-party)
+set(TR_THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+set(TR_THIRD_PARTY_BINARY_DIR ${PROJECT_BINARY_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+
+list(APPEND CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/cmake"
+    "${TR_THIRD_PARTY_SOURCE_DIR}/rpavlik-cmake-modules")
 
 set(CMAKE_MACOSX_RPATH ON)
 
@@ -99,6 +109,19 @@ else()
     set(TR_STABLE_RELEASE 1)
 endif()
 
+# derived from above: CFBundleVersion
+# note: CFBundleVersion only honors 3 numbers, so third number has to hold both patch and beta info.
+# 5.0.1-dev     -> 14719.0.100
+# 5.0.1-beta.1  -> 14719.0.101
+# 5.0.1         -> 14719.0.199
+math(EXPR CFBUNDLE_1 "${TR_VERSION_MAJOR} + 14714")
+math(EXPR CFBUNDLE_2 "${TR_VERSION_MINOR}")
+math(EXPR CFBUNDLE_3 "${TR_VERSION_PATCH} * 100 + 0${TR_STABLE_RELEASE} * 99 + 0${TR_VERSION_BETA_NUMBER}")
+set(CFBUNDLE_VERSION "${CFBUNDLE_1}.${CFBUNDLE_2}.${CFBUNDLE_3}")
+unset(CFBUNDLE_1)
+unset(CFBUNDLE_2)
+unset(CFBUNDLE_3)
+
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
 # '4.0.0-beta.1.dev' (a dev release between beta 1 and 2)
@@ -142,9 +165,16 @@ else()
 endif()
 string(APPEND TR_PEER_ID_PREFIX "-")
 
-set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
+set(TR_VCS_REVISION_FILE "${PROJECT_SOURCE_DIR}/REVISION")
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+## Compiler standard version
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
 
@@ -153,11 +183,9 @@ if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
 elseif(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE TR_VCS_REVISION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    include(GetGitRevisionDescription)
+    get_git_head_revision(TR_REFSPEC TR_VCS_REVISION)
+    unset(TR_REFSPEC)
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -204,7 +232,8 @@ if(WIN32)
     endforeach()
 endif()
 
-set(CMAKE_FOLDER "third-party")
+set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
+
 find_package(FastFloat)
 find_package(Fmt)
 find_package(RapidJSON)
@@ -216,11 +245,6 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-if(NOT TARGET CURL::libcurl)
-    add_library(CURL::libcurl INTERFACE IMPORTED)
-    target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
-    target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
-endif()
 
 if(ENABLE_DEPRECATED STREQUAL "AUTO")
     if(DEFINED ENV{CI})
@@ -457,8 +481,6 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
-set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
-
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
@@ -488,7 +510,13 @@ if(NOT USE_SYSTEM_NATPMP)
             NATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+if(WIN32)
+    # https://github.com/miniupnp/miniupnp/pull/304
+    set(TR_MINIUPNPC_LIBNAME libminiupnpc)
+else()
+    set(TR_MINIUPNPC_LIBNAME miniupnpc)
+endif()
+tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
@@ -498,17 +526,10 @@ if(NOT USE_SYSTEM_MINIUPNPC)
     target_compile_definitions(miniupnpc::libminiupnpc
         INTERFACE
             MINIUPNP_STATICLIB)
-
-    set(MINIUPNPC_VERSION 1.9)
-    set(MINIUPNPC_API_VERSION 12)
 endif()
+unset(TR_MINIUPNPC_LIBNAME)
 
-target_compile_definitions(miniupnpc::libminiupnpc
-    INTERFACE
-        SYSTEM_MINIUPNP
-        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
-
-add_subdirectory(third-party/wildmat)
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht dht
     TARGET dht::dht)
@@ -530,7 +551,7 @@ tr_add_external_auto_library(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-set(TR_WEB_ASSETS ${CMAKE_SOURCE_DIR}/web/public_html)
+set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
@@ -599,13 +620,6 @@ endif()
 
 unset(CMAKE_FOLDER)
 
-## Compiler standard version
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 ### Compiler Warnings
 
 set(C_WARNING_FLAGS)
@@ -628,7 +642,6 @@ else()
         -Wextra
         -Wcast-align
         -Wduplicated-cond
-        -Wexit-time-destructors
         -Wextra-semi
         -Wextra-semi-stmt
         -Wextra-tokens
@@ -830,7 +843,7 @@ if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
     string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "+r${TR_VCS_REVISION}")
 endif()
 list(APPEND CPACK_SOURCE_IGNORE_FILES
-    "${CMAKE_BINARY_DIR}"
+    "${PROJECT_BINARY_DIR}"
     "[.]git"
     "node_modules")
 
@@ -839,17 +852,17 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
 if(GIT_FOUND)
     execute_process(
         COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE TR_GIT_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
-        configure_file("${CMAKE_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
+        configure_file("${PROJECT_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh" --check
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         set_property(
             TARGET check-format format
             PROPERTY FOLDER "utility")

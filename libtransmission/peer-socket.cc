@@ -1,17 +1,22 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
+
+#include <algorithm> // std::min
+#include <cerrno>
+#include <cstddef> // std::byte
 
 #include <fmt/core.h>
 
 #include <libutp/utp.h>
 
-#include "libtransmission/transmission.h"
-
-#include "libtransmission/peer-socket.h"
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
@@ -68,7 +73,7 @@ void tr_peer_socket::close()
     handle = {};
 }
 
-size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) const
+size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error* error) const
 {
     if (max == size_t{})
     {
@@ -95,9 +100,9 @@ size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) cons
             return static_cast<size_t>(n_written);
         }
 
-        if (n_written < 0 && error_code != 0)
+        if (error != nullptr && n_written < 0 && error_code != 0)
         {
-            tr_error_set_from_errno(error, error_code);
+            error->set_from_errno(error_code);
         }
     }
 #endif
@@ -105,7 +110,7 @@ size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) cons
     return {};
 }
 
-size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool buf_is_empty, tr_error** error) const
+size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool buf_is_empty, tr_error* error) const
 {
     if (max == size_t{})
     {
@@ -117,15 +122,9 @@ size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool bu
         return buf.add_socket(handle.tcp, max, error);
     }
 
-#ifdef WITH_UTP
-    // utp_read_drained() notifies libutp that this read buffer is empty.
-    // It opens up the congestion window by sending an ACK (soonish) if
-    // one was not going to be sent.
-    if (is_utp() && buf_is_empty)
-    {
-        utp_read_drained(handle.utp);
-    }
-#endif
+    // Unlike conventional BSD-style socket API, libutp pushes incoming data to the
+    // caller via a callback, instead of allowing the caller to pull data from
+    // its buffers. Therefore, reading data from a uTP socket is not handled here.
 
     return {};
 }

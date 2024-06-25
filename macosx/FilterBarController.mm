@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -50,6 +50,7 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     //localizations
     self.fNoFilterButton.title = NSLocalizedString(@"All", "Filter Bar -> filter button");
     self.fActiveFilterButton.title = NSLocalizedString(@"Active", "Filter Bar -> filter button");
@@ -138,11 +139,6 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
 
     // update when filter change
     self.fSearchField.delegate = self;
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)setFilter:(id)sender

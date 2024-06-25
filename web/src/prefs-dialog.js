@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -48,20 +48,27 @@ export class PrefsDialog extends EventTarget {
     )) {
       delete element.dataset.open;
       setTextContent(element, 'Checking...');
-      this.remote.checkPort(key, this._onPortChecked, this);
+      this.remote.checkPort(
+        key,
+        (response) => this._onPortChecked(key, response),
+        this,
+      );
     }
   }
 
-  _onPortChecked(response) {
+  _onPortChecked(ipProtocol, response) {
     if (this.closed) {
       return;
     }
 
-    const element =
-      this.elements.network.port_status_label[response.arguments['ipProtocol']];
+    const element = this.elements.network.port_status_label[ipProtocol];
     const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
-    setTextContent(element, is_open ? 'Open' : 'Closed');
+    if ('port-is-open' in response.arguments) {
+      setTextContent(element, is_open ? 'Open' : 'Closed');
+    } else {
+      setTextContent(element, 'Error');
+    }
   }
 
   _setBlocklistButtonEnabled(b) {

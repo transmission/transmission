@@ -5,6 +5,7 @@ Checks: >
   bugprone-*,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
+  -bugprone-unchecked-optional-access,
   cert-*,
   clang-analyzer-optin*,
   cppcoreguidelines-*,
@@ -21,6 +22,7 @@ Checks: >
   hicpp-*,
   -hicpp-signed-bitwise,
   misc-*,
+  -misc-include-cleaner,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
   -modernize-use-trailing-return-type,
@@ -32,6 +34,7 @@ Checks: >
   -readability-qualified-auto,
 
 CheckOptions:
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,          value: true       }
   - { key: readability-identifier-naming.ClassCase,                value: CamelCase  }
   - { key: readability-identifier-naming.ClassMethodCase,          value: camelBack  }
   - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -140,16 +140,10 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
         }
     }
 
-    if (state_ == State::Idle)
+    if ((state_ == State::Idle || state_ == State::Err) &&
+        (is_mapped_ ? tr_time() >= renew_time_ : is_enabled && has_discovered_))
     {
-        if (is_enabled && !is_mapped_ && has_discovered_)
-        {
-            state_ = State::SendMap;
-        }
-        else if (is_mapped_ && tr_time() >= renew_time_)
-        {
-            state_ = State::SendMap;
-        }
+        state_ = State::SendMap;
     }
 
     if (state_ == State::SendMap && canSendCommand())

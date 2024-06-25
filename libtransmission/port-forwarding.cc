@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -205,6 +205,7 @@ private:
 
         upnp_state_ = tr_upnpPulse(
             upnp_,
+            mediator_.advertised_peer_port(),
             mediator_.local_peer_port(),
             is_enabled,
             do_check,

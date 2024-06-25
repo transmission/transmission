@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -24,8 +24,7 @@
 
 namespace
 {
-
-auto constexpr Spacing = int{ 6 };
+auto constexpr Spacing = 6;
 
 auto constexpr Margin = QSize{ 10, 10 };
 
@@ -91,7 +90,7 @@ ItemLayout::ItemLayout(
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout{ getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - Margin.width() * 2 };
+    ItemLayout const layout{ getText(info), true, option.direction, QPoint{ 0, 0 }, option.rect.width() - Margin.width() * 2 };
     return layout.size() + Margin * 2;
 }
 
@@ -158,17 +157,15 @@ void TrackerDelegate::setShowMore(bool b)
 
 namespace
 {
-
-QString timeToStringRounded(int seconds)
+QString timeToRoundedString(int seconds)
 {
     if (seconds > 60)
     {
         seconds -= seconds % 60;
     }
 
-    return Formatter::get().timeToString(seconds);
+    return Formatter::time_to_string(seconds);
 }
-
 } // namespace
 
 QString TrackerDelegate::getText(TrackerInfo const& inf) const
@@ -184,11 +181,11 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     auto const now = time(nullptr);
     auto const time_until = [&now](auto t)
     {
-        return timeToStringRounded(static_cast<int>(t - now));
+        return timeToRoundedString(static_cast<int>(t - now));
     };
     auto const time_since = [&now](auto t)
     {
-        return timeToStringRounded(static_cast<int>(now - t));
+        return timeToRoundedString(static_cast<int>(now - t));
     };
 
     // hostname
@@ -260,6 +257,9 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             //: %1 is duration
             str += tr("Asking for more peers now… <small>%1</small>").arg(time_since(inf.st.last_announce_start_time));
             break;
+
+        default:
+            break;
         }
 
         if (!show_more_)
@@ -308,9 +308,6 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
         switch (inf.st.scrape_state)
         {
-        case TR_TRACKER_INACTIVE:
-            break;
-
         case TR_TRACKER_WAITING:
             str += QStringLiteral("<br/>\n");
             //: %1 is duration
@@ -326,6 +323,9 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             str += QStringLiteral("<br/>\n");
             //: %1 is duration
             str += tr("Asking for peer counts now… <small>%1</small>").arg(time_since(inf.st.last_scrape_start_time));
+            break;
+
+        default: // TR_TRACKER_INACTIVE
             break;
         }
     }

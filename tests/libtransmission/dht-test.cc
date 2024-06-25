@@ -10,6 +10,7 @@
 #include <cstddef> // size_t, std::byte
 #include <ctime> // time(), time_t
 #include <fstream>
+#include <functional>
 #include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
@@ -35,6 +36,7 @@
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/net.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session-thread.h> // for tr_evthread_init();
@@ -61,7 +63,7 @@ namespace libtransmission::test
 
 bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
 {
-    return waitFor(
+    return waitFor( //
         event_base,
         []() { return false; },
         msec);
@@ -83,6 +85,7 @@ protected:
         // Fake data to be written to the test state file
 
         std::array<char, IdLength> const id_ = tr_rand_obj<std::array<char, IdLength>>();
+        int64_t id_timestamp_ = std::time(nullptr);
 
         std::vector<tr_socket_address> ipv4_nodes_ = { { *tr_address::from_string("10.10.10.1"), tr_port::from_host(128) },
                                                        { *tr_address::from_string("10.10.10.2"), tr_port::from_host(129) },
@@ -126,6 +129,7 @@ protected:
             auto dict = tr_variant{};
             tr_variantInitDict(&dict, 3U);
             tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(id_), std::size(id_));
+            tr_variantDictAddInt(&dict, TR_KEY_id_timestamp, id_timestamp_);
             auto compact = std::vector<std::byte>{};
             for (auto const& socket_address : ipv4_nodes_)
             {
@@ -260,6 +264,7 @@ protected:
         std::vector<Pinged> pinged_;
         std::vector<Searched> searched_;
         std::array<char, IdLength> id_ = {};
+        int64_t id_timestamp_ = {};
         tr_socket_t dht_socket_ = TR_BAD_SOCKET;
         tr_socket_t dht_socket6_ = TR_BAD_SOCKET;
     };
@@ -474,6 +479,8 @@ TEST_F(DhtTest, loadsStateFromStateFile)
     auto const state_file = MockStateFile{};
     state_file.save(sandboxDir());
 
+    tr_timeUpdate(time(nullptr));
+
     // Make the DHT
     auto mediator = MockMediator{ event_base_ };
     mediator.config_dir_ = sandboxDir();
@@ -494,6 +501,41 @@ TEST_F(DhtTest, loadsStateFromStateFile)
 
     // dht_init() should have been called with the state file's id
     EXPECT_EQ(state_file.id_, mediator.mock_dht_.id_);
+
+    // dht_ping_nodedht_init() should have been called with state file's nodes
+    EXPECT_EQ(state_file.nodesString(), actual_nodes_str);
+}
+
+TEST_F(DhtTest, loadsStateFromStateFileExpiredId)
+{
+    auto state_file = MockStateFile{};
+    state_file.id_timestamp_ = 0;
+    state_file.save(sandboxDir());
+
+    tr_timeUpdate(time(nullptr));
+
+    // Make the DHT
+    auto mediator = MockMediator{ event_base_ };
+    mediator.config_dir_ = sandboxDir();
+    auto dht = tr_dht::create(mediator, ArbitraryPeerPort, ArbitrarySock4, ArbitrarySock6);
+
+    // Wait for all the state nodes to be pinged
+    auto& pinged = mediator.mock_dht_.pinged_;
+    auto const n_expected_nodes = std::size(state_file.ipv4_nodes_) + std::size(state_file.ipv6_nodes_);
+    waitFor(event_base_, [&pinged, n_expected_nodes]() { return std::size(pinged) >= n_expected_nodes; });
+    auto actual_nodes_str = std::string{};
+    for (auto const& [addrport, timestamp] : pinged)
+    {
+        actual_nodes_str += addrport.display_name();
+        actual_nodes_str += ',';
+    }
+
+    /// Confirm that the state was loaded
+
+    // dht_init() should have been called with the state file's id
+    // N.B. There is a minuscule chance for this to fail, this is
+    // normal because id generation is random
+    EXPECT_NE(state_file.id_, mediator.mock_dht_.id_);
 
     // dht_ping_nodedht_init() should have been called with state file's nodes
     EXPECT_EQ(state_file.nodesString(), actual_nodes_str);
@@ -580,7 +622,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     static auto constexpr BootstrapNodePort = tr_port::from_host(8080);
     if (auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } }; ofs)
     {
-        ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << std::endl;
+        ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << '\n';
         ofs.close();
     }
 
@@ -594,7 +636,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     // Confirm that BootstrapNodeName gets pinged first.
     auto const expected = getSockaddr(BootstrapNodeName, BootstrapNodePort);
     auto& pinged = mediator.mock_dht_.pinged_;
-    waitFor(
+    waitFor( //
         event_base_,
         [&pinged]() { return !std::empty(pinged); },
         5s);
@@ -617,7 +659,7 @@ TEST_F(DhtTest, pingsAddedNodes)
     EXPECT_TRUE(addr.has_value());
     assert(addr.has_value());
     auto constexpr Port = tr_port::from_host(128);
-    dht->add_node(*addr, Port);
+    dht->maybe_add_node(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
     EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().addrport.address());
