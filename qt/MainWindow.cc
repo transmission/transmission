@@ -151,7 +151,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     QIcon const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
     ui_.action_OpenFile->setIcon(icon_open);
     ui_.action_AddURL->setIcon(icons.getThemeIcon(QStringLiteral("insert-link"), QStyle::SP_DialogOpenButton));
-    ui_.action_New->setIcon(icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
     ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
     ui_.action_Start->setIcon(icon_play);
