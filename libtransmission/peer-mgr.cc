@@ -80,6 +80,7 @@ private:
         info.client_peer_id = tor->peer_id();
         info.id = tor->id();
         info.is_done = tor->is_done();
+        info.is_running = tor->is_running();
         return info;
     }
 
