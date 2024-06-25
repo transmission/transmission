@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    PropertyInfo const& get_property(PropertyType index) const noexcept
+    [[nodiscard]] PropertyInfo const& get_property(PropertyType index) const noexcept
     {
         auto const id = static_cast<PropertyIdType>(index);
         g_assert(id > 0);

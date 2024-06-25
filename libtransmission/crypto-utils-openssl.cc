@@ -10,7 +10,6 @@
 
 #include <array>
 #include <cstddef> // size_t
-#include <memory>
 
 #include <openssl/crypto.h>
 #include <openssl/err.h>
@@ -29,37 +28,43 @@
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha25...
 #include "libtransmission/utils.h"
 
+#if !defined(WITH_OPENSSL)
+#error OPENSSL module
+#endif
+
 namespace
 {
 void log_openssl_error(char const* file, int line)
 {
-    unsigned long const error_code = ERR_get_error();
-
-    if (tr_logLevelIsActive(TR_LOG_ERROR))
+    if (!tr_logLevelIsActive(TR_LOG_ERROR))
     {
-        if (static bool strings_loaded = false; !strings_loaded)
-        {
+        return;
+    }
+
+    auto const error_code = ERR_get_error();
+
+    if (static bool strings_loaded = false; !strings_loaded)
+    {
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
-            ERR_load_crypto_strings();
+        ERR_load_crypto_strings();
 #else
-            OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
+        OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
 #endif
 
-            strings_loaded = true;
-        }
-
-        auto buf = std::array<char, 512>{};
-        ERR_error_string_n(error_code, std::data(buf), std::size(buf));
-        tr_logAddMessage(
-            file,
-            line,
-            TR_LOG_ERROR,
-            fmt::format(
-                _("{crypto_library} error: {error} ({error_code})"),
-                fmt::arg("crypto_library", "OpenSSL"),
-                fmt::arg("error", std::data(buf)),
-                fmt::arg("error_code", error_code)));
+        strings_loaded = true;
     }
+
+    auto buf = std::array<char, 512>{};
+    ERR_error_string_n(error_code, std::data(buf), std::size(buf));
+    tr_logAddMessage(
+        file,
+        line,
+        TR_LOG_ERROR,
+        fmt::format(
+            _("{crypto_library} error: {error} ({error_code})"),
+            fmt::arg("crypto_library", "OpenSSL"),
+            fmt::arg("error", std::data(buf)),
+            fmt::arg("error_code", error_code)));
 }
 
 #define log_error() log_openssl_error(__FILE__, __LINE__)
@@ -78,136 +83,84 @@ bool check_openssl_result(int result, int expected_result, bool expected_equal, 
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
 
-namespace sha_helpers
+void digest_add_bytes(EVP_MD_CTX* ctx, void const* data, size_t data_length)
 {
-
-class ShaHelper
-{
-public:
-    using EvpFunc = decltype((EVP_sha1));
-
-    explicit ShaHelper(EvpFunc evp_func)
-        : evp_func_{ evp_func }
+    if (data_length != 0U)
     {
-        clear();
+        EVP_DigestUpdate(ctx, data, data_length);
     }
-
-    void clear() const
-    {
-        EVP_DigestInit_ex(handle_.get(), evp_func_(), nullptr);
-    }
-
-    void update(void const* data, size_t data_length) const
-    {
-        if (data_length != 0U)
-        {
-            EVP_DigestUpdate(handle_.get(), data, data_length);
-        }
-    }
-
-    template<typename DigestType>
-    [[nodiscard]] DigestType digest()
-    {
-        TR_ASSERT(handle_ != nullptr);
-
-        unsigned int hash_length = 0;
-        auto digest = DigestType{};
-        auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
-        [[maybe_unused]] bool const ok = check_result(EVP_DigestFinal_ex(handle_.get(), digest_as_uchar, &hash_length));
-        TR_ASSERT(!ok || hash_length == std::size(digest));
-
-        clear();
-        return digest;
-    }
-
-private:
-    struct MessageDigestDeleter
-    {
-        void operator()(EVP_MD_CTX* ctx) const noexcept
-        {
-            EVP_MD_CTX_destroy(ctx);
-        }
-    };
-
-    EvpFunc evp_func_;
-    std::unique_ptr<EVP_MD_CTX, MessageDigestDeleter> const handle_{ EVP_MD_CTX_create() };
-};
-
-class Sha1Impl final : public tr_sha1
-{
-public:
-    Sha1Impl() = default;
-    Sha1Impl(Sha1Impl&&) = delete;
-    Sha1Impl(Sha1Impl const&) = delete;
-    ~Sha1Impl() override = default;
-    Sha1Impl& operator=(Sha1Impl&&) = delete;
-    Sha1Impl& operator=(Sha1Impl const&) = delete;
-
-    void clear() override
-    {
-        helper_.clear();
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        helper_.update(data, data_length);
-    }
-
-    [[nodiscard]] tr_sha1_digest_t finish() override
-    {
-        return helper_.digest<tr_sha1_digest_t>();
-    }
-
-private:
-    ShaHelper helper_{ EVP_sha1 };
-};
-
-class Sha256Impl final : public tr_sha256
-{
-public:
-    Sha256Impl() = default;
-    Sha256Impl(Sha256Impl&&) = delete;
-    Sha256Impl(Sha256Impl const&) = delete;
-    ~Sha256Impl() override = default;
-    Sha256Impl& operator=(Sha256Impl&&) = delete;
-    Sha256Impl& operator=(Sha256Impl const&) = delete;
-
-    void clear() override
-    {
-        helper_.clear();
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        helper_.update(data, data_length);
-    }
-
-    [[nodiscard]] tr_sha256_digest_t finish() override
-    {
-        return helper_.digest<tr_sha256_digest_t>();
-    }
-
-private:
-    ShaHelper helper_{ EVP_sha256 };
-};
-
-} // namespace sha_helpers
-} // namespace
-
-// --- sha
-
-std::unique_ptr<tr_sha1> tr_sha1::create()
-{
-    using namespace sha_helpers;
-
-    return std::make_unique<Sha1Impl>();
 }
 
-std::unique_ptr<tr_sha256> tr_sha256::create()
+template<typename DigestType>
+DigestType digest_finish(EVP_MD_CTX* ctx)
 {
-    using namespace sha_helpers;
+    unsigned int hash_length = 0;
+    auto digest = DigestType{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    [[maybe_unused]] bool const ok = check_result(EVP_DigestFinal_ex(ctx, digest_as_uchar, &hash_length));
+    TR_ASSERT(!ok || hash_length == std::size(digest));
+    return digest;
+}
+} // namespace
 
-    return std::make_unique<Sha256Impl>();
+// --- sha1
+
+tr_sha1::tr_sha1()
+    : handle_{ EVP_MD_CTX_create() }
+{
+    clear();
+}
+
+tr_sha1::~tr_sha1()
+{
+    EVP_MD_CTX_destroy(handle_);
+}
+
+void tr_sha1::clear()
+{
+    EVP_DigestInit_ex(handle_, EVP_sha1(), nullptr);
+}
+
+void tr_sha1::add(void const* data, size_t data_length)
+{
+    digest_add_bytes(handle_, data, data_length);
+}
+
+tr_sha1_digest_t tr_sha1::finish()
+{
+    auto digest = digest_finish<tr_sha1_digest_t>(handle_);
+    clear();
+    return digest;
+}
+
+// --- sha256
+
+tr_sha256::tr_sha256()
+    : handle_{ EVP_MD_CTX_create() }
+{
+    clear();
+}
+
+tr_sha256::~tr_sha256()
+{
+    EVP_MD_CTX_destroy(handle_);
+}
+
+void tr_sha256::clear()
+{
+    EVP_DigestInit_ex(handle_, EVP_sha256(), nullptr);
+}
+
+void tr_sha256::add(void const* data, size_t data_length)
+{
+    digest_add_bytes(handle_, data, data_length);
+}
+
+tr_sha256_digest_t tr_sha256::finish()
+{
+    auto digest = digest_finish<tr_sha256_digest_t>(handle_);
+    clear();
+    return digest;
 }
 
 // --- x509

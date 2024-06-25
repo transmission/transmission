@@ -173,9 +173,9 @@ TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
 
     // confirm that each has a unique id
     auto ids = std::set<tr_tracker_id_t>{};
-    for (size_t i = 0, n = std::size(announce_list); i < n; ++i)
+    for (auto const& tracker : announce_list)
     {
-        ids.insert(announce_list.at(i).id);
+        ids.insert(tracker.id);
     }
     EXPECT_EQ(std::size(announce_list), std::size(ids));
 }
@@ -363,7 +363,8 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
+    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const test_file = tr_pathbuf{ sandbox, "transmission-announce-list-test.torrent"sv };
     auto error = tr_error{};
     EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
     EXPECT_FALSE(error) << error;

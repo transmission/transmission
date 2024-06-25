@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
@@ -263,7 +262,8 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    filename.assign(::testing::TempDir(), "filename.txt"sv);
+    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
     auto error = tr_error{};
     EXPECT_TRUE(tr_file_save(filename.sv(), contents, &error));

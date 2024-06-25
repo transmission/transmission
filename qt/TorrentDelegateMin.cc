@@ -17,8 +17,6 @@
 #include <QPixmapCache>
 #include <QStyleOptionProgressBar>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/utils.h>
 
 #include "StyleHelper.h"
@@ -199,20 +197,15 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     }
 
     auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
+    auto const color_group = is_item_active ? QPalette::Normal : QPalette::Inactive;
+    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
-    QPalette::ColorGroup color_group = QPalette::Normal;
-
+    auto text_color = (tor.hasError() && !is_item_selected) ? QColor{ Qt::GlobalColor::red } :
+                                                              option.palette.color(color_group, color_role);
     if (is_paused || !is_item_enabled)
     {
-        color_group = QPalette::Disabled;
+        text_color.setAlphaF(0.5);
     }
-
-    if (color_group == QPalette::Normal && !is_item_active)
-    {
-        color_group = QPalette::Inactive;
-    }
-
-    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
     QStyle::State progress_bar_state(option.state);
 
@@ -238,14 +231,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
                                     content_rect.width() };
 
     // render
-    if (tor.hasError() && !is_item_selected)
-    {
-        painter->setPen(QColor{ "red" });
-    }
-    else
-    {
-        painter->setPen(option.palette.color(color_group, color_role));
-    }
+    painter->setPen(text_color);
 
     tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, icon_mode, icon_state);
 

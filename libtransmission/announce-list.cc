@@ -8,8 +8,6 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
-
 #include <small/map.hpp>
 
 #include "libtransmission/transmission.h"

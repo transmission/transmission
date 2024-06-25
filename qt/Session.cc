@@ -37,8 +37,9 @@
 #include "RpcQueue.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
-#include "Utils.h"
 #include "VariantHelpers.h"
+
+using namespace std::literals;
 
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
@@ -82,30 +83,41 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
     exec("session-set", &args);
 }
 
-void Session::portTest()
+void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
 {
+    static auto constexpr IpStr = std::array{ "ipv4"sv, "ipv6"sv };
+
+    if (portTestPending(ip_protocol))
+    {
+        return;
+    }
+    port_test_pending_[ip_protocol] = true;
+
+    auto args = tr_variant::make_map(1U);
+    tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, IpStr[ip_protocol]);
+
+    auto const response_func = [this, ip_protocol](RpcResponse const& r)
+    {
+        port_test_pending_[ip_protocol] = false;
+
+        // If for whatever reason the status optional is empty here,
+        // then something must have gone wrong with the port test,
+        // so the UI should show the "error" state
+        emit portTested(dictFind<bool>(r.args.get(), TR_KEY_port_is_open), ip_protocol);
+    };
+
     auto* q = new RpcQueue{};
 
-    q->add([this]() { return exec("port-test", nullptr); });
+    q->add([this, &args]() { return exec("port-test", &args); }, response_func);
 
-    q->add(
-        [this](RpcResponse const& r)
-        {
-            bool is_open = false;
-
-            if (r.success)
-            {
-                auto const value = dictFind<bool>(r.args.get(), TR_KEY_port_is_open);
-                if (value)
-                {
-                    is_open = *value;
-                }
-            }
-
-            emit portTested(is_open);
-        });
+    q->add(response_func);
 
     q->run();
+}
+
+bool Session::portTestPending(Session::PortTestIpProtocol const ip_protocol) const noexcept
+{
+    return ip_protocol < NUM_PORT_TEST_IP_PROTOCOL && port_test_pending_[ip_protocol];
 }
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)
@@ -219,6 +231,9 @@ void Session::updatePref(int key)
 
             case 2:
                 sessionSet(prefs_.getKey(key), QStringLiteral("required"));
+                break;
+
+            default:
                 break;
             }
 
@@ -370,24 +385,7 @@ void Session::start()
     emit sourceChanged();
 }
 
-bool Session::isServer() const
-{
-    return session_ != nullptr;
-}
-
-bool Session::isLocal() const
-{
-    if (!session_id_.isEmpty())
-    {
-        return is_definitely_local_session_;
-    }
-
-    return rpc_.isLocal();
-}
-
-/***
-****
-***/
+// ---
 
 void Session::addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const
 {
@@ -517,9 +515,9 @@ void Session::torrentRenamePath(torrent_ids_t const& torrent_ids, QString const&
     q->run();
 }
 
-std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties props)
+std::set<std::string_view> const& Session::getKeyNames(TorrentProperties props)
 {
-    std::vector<std::string_view>& names = names_[props];
+    std::set<std::string_view>& names = names_[props];
 
     if (names.empty())
     {
@@ -610,7 +608,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         auto const append = [&names](tr_quark key)
         {
-            names.emplace_back(tr_quark_get_string_view(key));
+            names.emplace(tr_quark_get_string_view(key));
         };
 
         switch (props)
@@ -643,10 +641,6 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
         // must be in every torrent req
         append(TR_KEY_id);
-
-        // sort and remove dupes
-        std::sort(names.begin(), names.end());
-        names.erase(std::unique(names.begin(), names.end()), names.end());
     }
 
     return names;

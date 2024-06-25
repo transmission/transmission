@@ -16,8 +16,12 @@
 #include <utility> // std::pair
 
 #ifdef _WIN32
+#include <winsock2.h> // must come before iphlpapi.h
+#include <iphlpapi.h>
 #include <ws2tcpip.h>
 #else
+#include <ifaddrs.h>
+#include <net/if.h>
 #include <netinet/tcp.h> /* TCP_CONGESTION */
 #endif
 
@@ -231,7 +235,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid_for_peers())
+    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
     {
         return {};
     }
@@ -271,7 +275,6 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         return {};
     }
 
-    auto ret = tr_peer_socket{};
     if (connect(s, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1 &&
 #ifdef _WIN32
         sockerrno != WSAEWOULDBLOCK &&
@@ -291,15 +294,12 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         }
 
         tr_net_close_socket(s);
-    }
-    else
-    {
-        ret = tr_peer_socket{ session, socket_address, s };
+        return {};
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
-    return ret;
+    return { session, socket_address, s };
 }
 
 namespace
@@ -324,20 +324,15 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
 
     int optval = 1;
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
-    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+    (void)evutil_make_listen_socket_reuseable(fd);
 
-#ifdef IPV6_V6ONLY
-
-    if (addr.is_ipv6() &&
-        (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1) &&
-        (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
+    if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
+        sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
-
-#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
@@ -438,35 +433,31 @@ namespace
 namespace is_valid_for_peers_helpers
 {
 
-[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const& addr)
-{
-    return addr.is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr.addr6);
-}
-
-[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const& addr)
-{
-    return addr.is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr.addr6);
-}
-
 /* isMartianAddr was written by Juliusz Chroboczek,
    and is covered under the same license as third-party/dht/dht.c. */
-[[nodiscard]] auto is_martian_addr(tr_address const& addr)
+[[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
 {
     static auto constexpr Zeroes = std::array<unsigned char, 16>{};
+    auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
 
     switch (addr.type)
     {
     case TR_AF_INET:
         {
             auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr4);
-            return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
+            return address[0] == 0 || // 0.x.x.x
+                (!loopback_allowed && address[0] == 127) || // 127.x.x.x
+                (address[0] & 0xE0) == 0xE0; // multicast address
         }
 
     case TR_AF_INET6:
         {
             auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
-            return address[0] == 0xFF ||
-                (memcmp(address, std::data(Zeroes), 15) == 0 && (address[15] == 0 || address[15] == 1));
+            return address[0] == 0xFF || // multicast address
+                (std::memcmp(address, std::data(Zeroes), 15) == 0 &&
+                 (address[15] == 0 || // ::
+                  (!loopback_allowed && address[15] == 1)) // ::1
+                );
         }
 
     default:
@@ -497,34 +488,44 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
     auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
 
-    auto addr = tr_address{};
-
-    addr.addr.addr4 = {};
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
+    auto ss = sockaddr_storage{};
+    auto sslen = int{ sizeof(ss) };
+    if (evutil_parse_sockaddr_port(address_sz, reinterpret_cast<sockaddr*>(&ss), &sslen) != 0)
     {
+        return {};
+    }
+
+    auto addr = tr_address{};
+    switch (ss.ss_family)
+    {
+    case AF_INET:
+        addr.addr.addr4 = reinterpret_cast<sockaddr_in*>(&ss)->sin_addr;
         addr.type = TR_AF_INET;
         return addr;
-    }
 
-    addr.addr.addr6 = {};
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
-    {
+    case AF_INET6:
+        addr.addr.addr6 = reinterpret_cast<sockaddr_in6*>(&ss)->sin6_addr;
         addr.type = TR_AF_INET6;
         return addr;
-    }
 
-    return {};
+    default:
+        return {};
+    }
 }
 
 std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
     TR_ASSERT(is_valid());
-    return evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen);
+    if (auto* name = evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen))
+    {
+        return name;
+    }
+    return "Invalid address"sv;
 }
 
 [[nodiscard]] std::string tr_address::display_name() const
 {
-    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+    auto buf = std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN)>{};
     return std::string{ display_name(std::data(buf), std::size(buf)) };
 }
 
@@ -551,6 +552,99 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte 
     compact += Addr6Len;
 
     return { address, compact };
+}
+
+std::optional<unsigned> tr_address::to_interface_index() const noexcept
+{
+    if (!is_valid())
+    {
+        tr_logAddDebug("Invalid target address to find interface index");
+        return {};
+    }
+
+    tr_logAddDebug(fmt::format("Find interface index for {}", display_name()));
+
+#ifdef _WIN32
+    auto p_addresses = std::unique_ptr<void, void (*)(void*)>{ nullptr, operator delete };
+
+    // The recommended method of calling the GetAdaptersAddresses function is to
+    // pre-allocate a 15KB working buffer pointed to by the AdapterAddresses parameter.
+    // On typical computers, this dramatically reduces the chances that the
+    // GetAdaptersAddresses function returns ERROR_BUFFER_OVERFLOW, which would require
+    // calling GetAdaptersAddresses function multiple times.
+    // https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
+    for (auto p_addresses_size = ULONG{ 15000 } /* 15KB */;;)
+    {
+        p_addresses.reset(operator new(p_addresses_size, std::nothrow));
+        if (!p_addresses)
+        {
+            tr_logAddDebug("Could not allocate memory for interface list");
+            return {};
+        }
+
+        if (auto ret = GetAdaptersAddresses(
+                AF_UNSPEC,
+                GAA_FLAG_SKIP_FRIENDLY_NAME,
+                nullptr,
+                reinterpret_cast<PIP_ADAPTER_ADDRESSES>(p_addresses.get()),
+                &p_addresses_size);
+            ret != ERROR_BUFFER_OVERFLOW)
+        {
+            if (ret != ERROR_SUCCESS)
+            {
+                tr_logAddDebug(fmt::format("Failed to retrieve interface list: {} ({})", ret, tr_win32_format_message(ret)));
+                return {};
+            }
+            break;
+        }
+    }
+
+    for (auto const* cur = reinterpret_cast<PIP_ADAPTER_ADDRESSES>(p_addresses.get()); cur != nullptr; cur = cur->Next)
+    {
+        if (cur->OperStatus != IfOperStatusUp)
+        {
+            continue;
+        }
+
+        for (auto const* sa_p = cur->FirstUnicastAddress; sa_p != nullptr; sa_p = sa_p->Next)
+        {
+            if (auto if_addr = tr_socket_address::from_sockaddr(sa_p->Address.lpSockaddr);
+                if_addr && if_addr->address() == *this)
+            {
+                auto const ret = type == TR_AF_INET ? cur->IfIndex : cur->Ipv6IfIndex;
+                tr_logAddDebug(fmt::format("Found interface index for {}: {}", display_name(), ret));
+                return ret;
+            }
+        }
+    }
+#else
+    struct ifaddrs* ifa = nullptr;
+    if (getifaddrs(&ifa) != 0)
+    {
+        auto err = errno;
+        tr_logAddDebug(fmt::format("Failed to retrieve interface list: {} ({})", err, tr_strerror(err)));
+        return {};
+    }
+    auto const ifa_uniq = std::unique_ptr<ifaddrs, void (*)(struct ifaddrs*)>{ ifa, freeifaddrs };
+
+    for (; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == nullptr || (ifa->ifa_flags & IFF_UP) == 0U)
+        {
+            continue;
+        }
+
+        if (auto if_addr = tr_socket_address::from_sockaddr(ifa->ifa_addr); if_addr && if_addr->address() == *this)
+        {
+            auto const ret = if_nametoindex(ifa->ifa_name);
+            tr_logAddDebug(fmt::format("Found interface index for {}: {}", display_name(), ret));
+            return ret;
+        }
+    }
+#endif
+
+    tr_logAddDebug(fmt::format("Could not find interface index for {}", display_name()));
+    return {};
 }
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
@@ -704,15 +798,28 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
 std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
 {
-    return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
+    return fmt::format(address.is_ipv6() ? "[{:s}]:{:d}" : "{:s}:{:d}", address.display_name(), port.host());
 }
 
-bool tr_socket_address::is_valid_for_peers() const noexcept
+bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
     using namespace is_valid_for_peers_helpers;
 
-    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
-        !is_martian_addr(address_);
+    return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local_address() && !address_.is_ipv4_mapped_address() &&
+        !is_martian_addr(address_, from);
+}
+
+std::optional<tr_socket_address> tr_socket_address::from_string(std::string_view sockaddr_sv)
+{
+    auto ss = sockaddr_storage{};
+    auto sslen = int{ sizeof(ss) };
+    if (evutil_parse_sockaddr_port(tr_strbuf<char, TR_ADDRSTRLEN>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) !=
+        0)
+    {
+        return {};
+    }
+
+    return from_sockaddr(reinterpret_cast<struct sockaddr const*>(&ss));
 }
 
 std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
@@ -740,7 +847,7 @@ std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockadd
         return tr_socket_address{ addr, tr_port::from_network(sin6->sin6_port) };
     }
 
-    TR_ASSERT_MSG(false, "invalid address family");
+    tr_logAddDebug(fmt::format("Unsupported address family {:d}", from->sa_family));
     return {};
 }
 

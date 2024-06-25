@@ -46,14 +46,13 @@ namespace
 {
 void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
-    auto& out = std::cerr;
-    static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE");
-    if (!verbose)
+    if (static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE"); !verbose)
     {
         return;
     }
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
+    auto& out = std::cerr;
     out << description << '\n' << "[raw]"sv << direction_sv;
     for (unsigned char const ch : message)
     {
@@ -266,7 +265,7 @@ void tr_tracker_http_announce(
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
-    options.timeout_secs = TR_ANNOUNCE_TIMEOUT_SEC;
+    options.timeout_secs = TrAnnounceTimeoutSec;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
 
@@ -319,7 +318,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         tr_announce_response& response_;
         std::string_view const log_name_;
         std::optional<size_t> row_;
-        tr_pex pex_ = {};
+        tr_pex pex_;
 
         explicit AnnounceHandler(tr_announce_response& response, std::string_view log_name)
             : response_{ response }
@@ -340,7 +339,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (pex_.is_valid_for_peers())
+            if (pex_.is_valid())
             {
                 response_.pex.push_back(pex_);
                 pex_ = {};
@@ -480,7 +479,7 @@ public:
 
 private:
     tr_scrape_response response_ = {};
-    tr_scrape_response_func response_func_ = {};
+    tr_scrape_response_func response_func_;
     std::string log_name_;
 };
 
@@ -543,7 +542,7 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     scrape_url_new(scrape_url, request);
     tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", scrape_url), request.log_name);
     auto options = tr_web::FetchOptions{ scrape_url, onScrapeDone, d };
-    options.timeout_secs = TR_SCRAPE_TIMEOUT_SEC;
+    options.timeout_secs = TrScrapeTimeoutSec;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
     session->fetch(std::move(options));

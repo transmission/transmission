@@ -134,8 +134,9 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
+    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
-    auto const tgt_filename = tr_pathbuf{ ::testing::TempDir(), "save-contents-test.torrent" };
+    auto const tgt_filename = tr_pathbuf{ sandbox, "save-contents-test.torrent" };
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);

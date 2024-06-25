@@ -18,8 +18,6 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
-#include "crypto-test-ref.h"
-
 #include "gtest/gtest.h"
 
 using namespace std::literals;
@@ -150,19 +148,11 @@ TEST(Crypto, ssha1)
         hashes.reserve(HashCount);
 
         EXPECT_TRUE(tr_ssha1_matches(ssha1, plain_text));
-        EXPECT_TRUE(tr_ssha1_matches_(ssha1, plain_text));
-
-        using ssha1_func = std::string (*)(std::string_view plain_text);
-        static auto constexpr Ssha1Funcs = std::array<ssha1_func, 2>{ tr_ssha1, tr_ssha1_ };
 
         for (size_t j = 0; j < HashCount; ++j)
         {
-            auto const hash = Ssha1Funcs[j % 2](plain_text);
-
-            // phrase matches each of generated hashes
+            auto const hash = tr_ssha1(plain_text);
             EXPECT_TRUE(tr_ssha1_matches(hash, plain_text));
-            EXPECT_TRUE(tr_ssha1_matches_(hash, plain_text));
-
             hashes.insert(hash);
         }
 
@@ -171,15 +161,12 @@ TEST(Crypto, ssha1)
 
         /* exchange two first chars */
         auto phrase = std::string{ plain_text };
-        phrase[0] ^= phrase[1];
-        phrase[1] ^= phrase[0];
-        phrase[0] ^= phrase[1];
+        std::swap(phrase[0], phrase[1]);
 
         for (auto const& hash : hashes)
         {
             /* changed phrase doesn't match the hashes */
             EXPECT_FALSE(tr_ssha1_matches(hash, phrase));
-            EXPECT_FALSE(tr_ssha1_matches_(hash, phrase));
         }
     }
 

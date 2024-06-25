@@ -21,13 +21,10 @@
 #include <QStyle>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter
 
 #include "Utils.h"
 
-/***
-****
-***/
+// ---
 
 namespace
 {

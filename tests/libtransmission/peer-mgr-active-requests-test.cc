@@ -15,7 +15,7 @@
 
 #include "gtest/gtest.h"
 
-class tr_peer;
+struct tr_peer;
 
 class PeerMgrActiveRequestsTest : public ::testing::Test
 {

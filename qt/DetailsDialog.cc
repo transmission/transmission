@@ -262,7 +262,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     initOptionsTab();
 
     adjustSize();
-    ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui_.commentTextEdit->setMaximumHeight(QWIDGETSIZE_MAX);
     ui_.tabs->setCurrentIndex(prev_tab_index_);
 
     static std::array<int, 2> constexpr InitKeys = {
@@ -759,14 +759,9 @@ void DetailsDialog::refreshUI()
     {
         auto latest = torrents[0]->lastActivity();
 
-        for (Torrent const* const t : torrents)
+        for (Torrent const* const tor : torrents)
         {
-            auto const dt = t->lastActivity();
-
-            if (latest < dt)
-            {
-                latest = dt;
-            }
+            latest = std::max(latest, tor->lastActivity());
         }
 
         auto const seconds = static_cast<int>(std::difftime(now, latest));
@@ -900,7 +895,7 @@ void DetailsDialog::refreshUI()
         if (torrents.empty())
         {
             labels_baseline_.clear();
-            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlainText({});
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(true);
             ui_.labelsTextEdit->setEnabled(true);
@@ -911,7 +906,7 @@ void DetailsDialog::refreshUI()
                      [&baseline](auto const* tor) { return tor->labels() == baseline; }))
         {
             labels_baseline_ = baseline.join(QStringLiteral(", "));
-            ui_.labelsTextEdit->setText(labels_baseline_);
+            ui_.labelsTextEdit->setPlainText(labels_baseline_);
             ui_.labelsTextEdit->setPlaceholderText(none);
             ui_.labelsTextEdit->setReadOnly(false);
             ui_.labelsTextEdit->setEnabled(true);
@@ -919,7 +914,7 @@ void DetailsDialog::refreshUI()
         else // mixed
         {
             labels_baseline_.clear();
-            ui_.labelsTextEdit->setText({});
+            ui_.labelsTextEdit->setPlainText({});
             ui_.labelsTextEdit->setPlaceholderText(mixed);
             ui_.labelsTextEdit->setEnabled(false);
         }
@@ -944,12 +939,12 @@ void DetailsDialog::refreshUI()
         }
     }
 
-    if (ui_.commentBrowser->toPlainText() != string)
+    if (ui_.commentTextEdit->toPlainText() != string)
     {
-        ui_.commentBrowser->setText(string);
+        ui_.commentTextEdit->setPlainText(string);
     }
 
-    ui_.commentBrowser->setEnabled(!is_comment_mixed && !string.isEmpty());
+    ui_.commentTextEdit->setEnabled(!is_comment_mixed && !string.isEmpty());
 
     // myOriginLabel
     string = none;
@@ -1044,7 +1039,7 @@ void DetailsDialog::refreshUI()
         }
     }
 
-    ui_.addedLabelValue->setText(string);
+    ui_.addedValueLabel->setText(string);
 
     ///
     ///  Options Tab
@@ -1324,12 +1319,12 @@ void DetailsDialog::setEnabled(bool enabled)
 
 void DetailsDialog::initInfoTab()
 {
-    int const cbh = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
-    ui_.commentBrowser->setFixedHeight(cbh);
+    int const cbh = QFontMetrics{ ui_.commentTextEdit->font() }.lineSpacing() * 4;
+    ui_.commentTextEdit->setFixedHeight(cbh);
 
     int const lteh = QFontMetrics{ ui_.labelsTextEdit->font() }.lineSpacing() * 2;
     ui_.labelsTextEdit->setFixedHeight(lteh);
-    ui_.labelsTextEdit->setText(QStringLiteral("Initializing..."));
+    ui_.labelsTextEdit->setPlainText(QStringLiteral("Initializing..."));
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);
@@ -1550,8 +1545,7 @@ void DetailsDialog::initOptionsTab()
 
     auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedSectionLayout);
-    cr->addLayout(ui_.seedingLimitsSectionRatioLayout);
-    cr->addLayout(ui_.seedingLimitsSectionIdleLayout);
+    cr->addLayout(ui_.seedingLimitsSectionLayout);
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 

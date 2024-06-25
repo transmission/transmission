@@ -27,7 +27,7 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     auto benc = std::string{
         "d8:announce31:http://www.example.com/announce10:created by25:Transmission/2.61 (13407)13:creation datei1358704075e8:encoding5:UTF-84:info"
     };
-    auto piece = int{ 0 };
+    auto piece = 0;
     auto info_dict_size = size_t{ 0U };
     for (;;)
     {
@@ -85,6 +85,7 @@ TEST_F(TorrentMagnetTest, setMetadataPiece)
 
             tor->maybe_start_metadata_transfer(metainfo_size);
             tor->set_metadata_piece(0, std::data(metainfo_benc), metainfo_size);
+            tor->do_idle_work();
             EXPECT_TRUE(tor->has_metainfo());
             EXPECT_EQ(tor->info_dict_size(), metainfo_size);
             EXPECT_EQ(tor->get_metadata_percent(), 1.0);

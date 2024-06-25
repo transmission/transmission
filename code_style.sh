@@ -40,10 +40,10 @@ find_cfiles() {
        ! \( $(get_find_path_args $(trim_comments .clang-format-ignore)) \) "$@"
 }
 
-# We're targeting clang-format version 15 and other versions give slightly
-# different results, so prefer `clang-format-15` if it's installed.
+# We're targeting clang-format version 17 and other versions give slightly
+# different results, so prefer `clang-format-17` if it's installed.
 clang_format_exe_names=(
-  'clang-format-15'
+  'clang-format-17'
   'clang-format'
 )
 for name in ${clang_format_exe_names[@]}; do
@@ -62,6 +62,16 @@ fi
 clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
 if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
   [ -n "$fix" ] || echo 'C/C++ code needs formatting'
+  exitcode=1
+fi
+
+# format Xcodeproj
+if ! grep -q 'objectVersion = 51' Transmission.xcodeproj/project.pbxproj; then
+  echo 'project.pbxproj needs objectVersion = 51 for compatibility with Xcode 11'
+  exitcode=1
+fi
+if ! grep -q 'BuildIndependentTargetsInParallel = YES' Transmission.xcodeproj/project.pbxproj; then
+  echo 'please keep BuildIndependentTargetsInParallel in project.pbxproj'
   exitcode=1
 fi
 
