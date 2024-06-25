@@ -110,7 +110,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
             layoutDirection(),
             Qt::AlignBottom | Qt::AlignRight,
             emblem_size,
-            QRect(QPoint(0, 0), size));
+            QRect{ QPoint{ 0, 0 }, size });
 
         auto pixmap = base_icon.pixmap(size);
         auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
@@ -149,16 +149,17 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     QIcon const icon_play = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
     QIcon const icon_pause = icons.getThemeIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
     QIcon const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
-    ui_.action_OpenFile->setIcon(icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton));
+    ui_.action_OpenFile->setIcon(icon_open);
     ui_.action_AddURL->setIcon(icons.getThemeIcon(QStringLiteral("insert-link"), QStyle::SP_DialogOpenButton));
+    ui_.action_New->setIcon(icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
     ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
     ui_.action_Start->setIcon(icon_play);
     ui_.action_StartNow->setIcon(icon_play);
     ui_.action_Announce->setIcon(icons.getThemeIcon(QStringLiteral("network-transmit-receive")));
     ui_.action_Pause->setIcon(icon_pause);
-    ui_.action_Remove->setIcon(icons.getThemeIcon(QStringLiteral(":/icons/list-remove")));
-    ui_.action_Delete->setIcon(icons.getThemeIcon(QStringLiteral("edit-delete")));
+    ui_.action_Remove->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
+    ui_.action_Delete->setIcon(icons.getThemeIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon));
     ui_.action_StartAll->setIcon(icon_play);
     ui_.action_PauseAll->setIcon(icon_pause);
     ui_.action_Quit->setIcon(icons.getThemeIcon(QStringLiteral("application-exit")));
