@@ -21,6 +21,8 @@
 #include <string_view>
 #include <utility>
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
@@ -255,19 +257,17 @@ private:
     ///
 
     static constexpr auto DhPoolMaxSize = size_t{ 32 };
-    static inline auto dh_pool_size = size_t{};
-    static inline auto dh_pool = std::array<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
+    static inline auto dh_pool = small::max_size_vector<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
     static inline auto dh_pool_mutex = std::mutex{};
 
     [[nodiscard]] static DH get_dh(Mediator* mediator)
     {
         auto lock = std::unique_lock(dh_pool_mutex);
 
-        if (dh_pool_size > 0U)
+        if (!std::empty(dh_pool))
         {
-            auto dh = DH{};
-            std::swap(dh, dh_pool[dh_pool_size - 1U]);
-            --dh_pool_size;
+            auto const dh = dh_pool.back();
+            dh_pool.pop_back();
             return dh;
         }
 
@@ -278,10 +278,9 @@ private:
     {
         auto lock = std::unique_lock(dh_pool_mutex);
 
-        if (dh_pool_size < std::size(dh_pool))
+        if (std::size(dh_pool) < DhPoolMaxSize)
         {
-            dh_pool[dh_pool_size] = dh;
-            ++dh_pool_size;
+            dh_pool.emplace_back(std::move(dh));
         }
     }
 
