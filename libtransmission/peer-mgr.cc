@@ -506,7 +506,10 @@ public:
 
                 tor->bytes_uploaded_ += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
-                tor->set_date_active(now);
+                if (tor->is_done())
+                {
+                    tor->set_date_active(now);
+                }
                 tor->session->add_uploaded(event.length);
 
                 msgs->peer_info->set_latest_piece_data_time(now);
