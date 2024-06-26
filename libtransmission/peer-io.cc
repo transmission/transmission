@@ -229,6 +229,7 @@ void tr_peerIo::close()
     socket_.close();
     event_write_.reset();
     event_read_.reset();
+    inbuf_.clear();
 }
 
 void tr_peerIo::clear()
