@@ -232,6 +232,8 @@ void tr_peerIo::close()
     inbuf_.clear();
     outbuf_.clear();
     outbuf_info_.clear();
+    encrypt_disable();
+    decrypt_disable();
 }
 
 void tr_peerIo::clear()
