@@ -290,14 +290,14 @@ public:
 
     void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        decrypt_remain_len_.reset();
+        n_decrypt_remain_.reset();
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
 
     TR_CONSTEXPR20 void decrypt_disable(size_t decrypt_len = 0U) noexcept
     {
         // optionally decrypt decrypt_len more bytes before disabling decryption
-        decrypt_remain_len_ = decrypt_len;
+        n_decrypt_remain_ = decrypt_len;
     }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
@@ -371,7 +371,7 @@ private:
         bool is_seed);
 
     Filter filter_;
-    std::optional<size_t> decrypt_remain_len_;
+    std::optional<size_t> n_decrypt_remain_;
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 

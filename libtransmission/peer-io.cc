@@ -246,10 +246,10 @@ void tr_peerIo::clear()
 
 bool tr_peerIo::reconnect()
 {
-    TR_ASSERT(!this->is_incoming());
-    TR_ASSERT(this->session_->allowsTCP());
+    TR_ASSERT(!is_incoming());
+    TR_ASSERT(session_->allowsTCP());
 
-    short int const pending_events = this->pending_events_;
+    auto const pending_events = pending_events_;
     event_disable(EV_READ | EV_WRITE);
 
     close();
@@ -606,23 +606,23 @@ void tr_peerIo::read_bytes(void* bytes, size_t n_bytes)
 {
     auto walk = reinterpret_cast<std::byte*>(bytes);
     n_bytes = std::min(n_bytes, std::size(inbuf_));
-    if (decrypt_remain_len_)
+    if (n_decrypt_remain_)
     {
-        if (*decrypt_remain_len_ <= n_bytes)
+        if (auto& n_remain = *n_decrypt_remain_; n_remain <= n_bytes)
         {
-            filter_.decrypt(std::data(inbuf_), *decrypt_remain_len_, walk);
-            inbuf_.drain(*decrypt_remain_len_);
+            filter_.decrypt(std::data(inbuf_), n_remain, walk);
+            inbuf_.drain(n_remain);
             if (walk != nullptr)
             {
-                walk += *decrypt_remain_len_;
+                walk += n_remain;
             }
-            n_bytes -= *decrypt_remain_len_;
+            n_bytes -= n_remain;
             filter_.decrypt_disable();
-            decrypt_remain_len_.reset();
+            n_decrypt_remain_.reset();
         }
         else
         {
-            *decrypt_remain_len_ -= n_bytes;
+            n_remain -= n_bytes;
         }
     }
     filter_.decrypt(std::data(inbuf_), n_bytes, walk);
