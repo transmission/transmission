@@ -230,6 +230,8 @@ void tr_peerIo::close()
     event_write_.reset();
     event_read_.reset();
     inbuf_.clear();
+    outbuf_.clear();
+    outbuf_info_.clear();
 }
 
 void tr_peerIo::clear()
