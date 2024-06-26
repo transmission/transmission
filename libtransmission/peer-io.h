@@ -256,11 +256,6 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr auto supports_utp() const noexcept
-    {
-        return utp_supported_;
-    }
-
     [[nodiscard]] constexpr auto is_incoming() const noexcept
     {
         return is_incoming_;
@@ -401,7 +396,6 @@ private:
     bool const client_is_seed_;
     bool const is_incoming_;
 
-    bool utp_supported_ = false;
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;

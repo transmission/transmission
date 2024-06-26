@@ -652,7 +652,6 @@ void tr_peerIo::on_utp_state_change(int state)
     if (state == UTP_STATE_CONNECT)
     {
         tr_logAddTraceIo(this, "utp_on_state_change -- changed to connected");
-        utp_supported_ = true;
     }
     else if (state == UTP_STATE_WRITABLE)
     {
