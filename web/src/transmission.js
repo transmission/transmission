@@ -53,6 +53,7 @@ export class Transmission extends EventTarget {
 
     this.isTouch = 'ontouchstart' in window ? true : false;
     this.busyclick = false;
+    this.busytyping = false;
 
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
@@ -190,6 +191,20 @@ export class Transmission extends EventTarget {
       this.prefs.filter_mode = event_.target.value;
       this.refilterAllSoon();
     });
+
+    const s = document.querySelector('#torrent-search');
+    e = document.querySelector('#reset');
+    e.addEventListener('click', () => {
+      s.value = '';
+      this._setFilterText(s.value);
+      this.refilterAllSoon();
+    });
+
+    if (s.value) {
+      this.filterText = s.value;
+      e.style.display = 'block';
+      this.refilterAllSoon();
+    }
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -344,7 +359,11 @@ export class Transmission extends EventTarget {
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
     e.addEventListener('focus', () => e.classList.remove(blur_token));
-    e.addEventListener('keyup', () => this._setFilterText(e.value));
+    e.addEventListener('input', () => {
+      if (e.value.trim() !== this.filterText) {
+        this._setFilterText(e.value);
+      }
+    });
   }
 
   _onPrefChanged(key, value) {
@@ -678,8 +697,15 @@ export class Transmission extends EventTarget {
   }
 
   _setFilterText(search) {
-    this.filterText = search ? search.trim() : null;
-    this.refilterAllSoon();
+    clearTimeout(this.busytyping);
+    this.busytyping = setTimeout(
+      () => {
+        this.busytyping = false;
+        this.filterText = search ? search.trim() : '';
+        this.refilterAllSoon();
+      },
+      search ? 250 : 0,
+    );
   }
 
   _onTorrentChanged(event_) {
@@ -1004,15 +1030,20 @@ TODO: fix this when notifications get fixed
     const renderer = this.torrentRenderer;
     const list = this.elements.torrent_list;
 
-    let filter_text = null;
-    let labels = null;
-    const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
-    if (m) {
-      filter_text = m[2].trim();
-      labels = m[1].split(',');
+    let filter_text = '';
+    let labels = [];
+    const reset_button = document.querySelector('#reset');
+    if (this.filterText.length > 0) {
+      reset_button.style.display = 'block';
+      const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
+      if (m) {
+        filter_text = m[2].trim();
+        labels = m[1].split(',');
+      } else {
+        filter_text = this.filterText;
+      }
     } else {
-      filter_text = this.filterText;
-      labels = [];
+      reset_button.style.display = 'none';
     }
 
     const countRows = () => [...list.children].length;
