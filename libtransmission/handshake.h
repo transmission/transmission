@@ -293,9 +293,12 @@ private:
             return;
         }
 
-        auto dh = DH{};
-        std::swap(dh_, dh);
-        add_dh(dh);
+        if (!dh_.is_dummy())
+        {
+            auto dh = DH{};
+            std::swap(dh_, dh);
+            add_dh(std::move(dh));
+        }
     }
 
     ///

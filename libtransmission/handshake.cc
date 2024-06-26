@@ -41,6 +41,7 @@ using key_bigend_t = tr_message_stream_encryption::DH::key_bigend_t;
 void tr_handshake::send_ya(tr_peerIo* io)
 {
     tr_logAddTraceHand(this, "sending MSE handshake (Ya)");
+    dh_ = get_dh(mediator_);
     send_public_key_and_pad<PadaMaxlen>(io);
     set_state(tr_handshake::State::AwaitingYb);
 }
@@ -363,6 +364,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
+    dh_ = get_dh(mediator_);
     have_read_anything_from_peer_ = true;
 
     /* read the incoming peer's public key */
@@ -821,8 +823,7 @@ std::string_view tr_handshake::state_string(State state) noexcept
 }
 
 tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode, DoneFunc on_done)
-    : dh_{ tr_handshake::get_dh(mediator) }
-    , on_done_{ std::move(on_done) }
+    : on_done_{ std::move(on_done) }
     , peer_io_{ std::move(peer_io) }
     , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
     , mediator_{ mediator }

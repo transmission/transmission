@@ -55,6 +55,12 @@ public:
     {
     }
 
+    // Check if this object is a dummy object
+    [[nodiscard]] bool is_dummy() const noexcept
+    {
+        return private_key_ == private_key_bigend_t{};
+    }
+
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] key_bigend_t publicKey() noexcept;
 
