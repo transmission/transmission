@@ -254,20 +254,12 @@ bool tr_peerIo::reconnect()
 
     close();
 
-    if (tr_peer_socket::limit_reached(session_))
-    {
-        return false;
-    }
-
     auto sock = tr_netOpenPeerSocket(session_, socket_address(), client_is_seed());
     if (!sock.is_tcp())
     {
         return false;
     }
-    socket_ = std::move(sock);
-
-    this->event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, event_read_cb, this));
-    this->event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
+    set_socket(std::move(sock));
 
     event_enable(pending_events);
 
