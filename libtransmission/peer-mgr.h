@@ -401,7 +401,10 @@ public:
             set_holepunch_supported();
         }
 
-        set_upload_only((pex_flags & ADDED_F_SEED_FLAG) != 0U);
+        if ((pex_flags & ADDED_F_SEED_FLAG) != 0U)
+        {
+            set_upload_only();
+        }
     }
 
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
