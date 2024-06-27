@@ -261,7 +261,7 @@ private:
     static inline auto dh_pool = std::vector<tr_message_stream_encryption::DH>{};
     static inline auto dh_pool_mutex = std::mutex{};
 
-    static std::optional<DH> pop_dh_pool()
+    [[nodiscard]] static std::optional<DH> pop_dh_pool()
     {
         auto lock = std::unique_lock(dh_pool_mutex);
 
