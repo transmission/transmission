@@ -297,7 +297,7 @@ private:
         {
             auto dh = DH{};
             std::swap(dh_, dh);
-            add_dh(dh);
+            add_dh(std::move(dh));
         }
     }
 
