@@ -233,8 +233,6 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    have_read_anything_from_peer_ = true;
-
     if (ia_len_ > 0U)
     {
         // do nothing, the check below won't work correctly
@@ -257,6 +255,8 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
         tr_logAddTraceHand(this, "peer is encrypted, and that does not agree with our handshake");
         return done(false);
     }
+
+    have_read_anything_from_peer_ = true;
 
     auto name = decltype(HandshakeName){};
     peer_io->read_bytes(std::data(name), std::size(name));
