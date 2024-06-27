@@ -170,7 +170,7 @@ private:
     template<size_t PadMax>
     void send_public_key_and_pad(tr_peerIo* io)
     {
-        auto const public_key = dh_.publicKey();
+        auto const public_key = get_dh().publicKey();
         auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
         auto const data = std::data(outbuf);
         auto walk = data;
@@ -257,24 +257,25 @@ private:
     ///
 
     static constexpr auto DhPoolMaxSize = size_t{ 32 };
-    static inline auto dh_pool = small::max_size_vector<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
+    // TODO(tearfur): use small::max_size_vector when https://github.com/alandefreitas/small/pull/46 is merged and synced
+    static inline auto dh_pool = std::vector<tr_message_stream_encryption::DH>{};
     static inline auto dh_pool_mutex = std::mutex{};
 
-    [[nodiscard]] static DH get_dh(Mediator* mediator)
+    static std::optional<DH> pop_dh_pool()
     {
         auto lock = std::unique_lock(dh_pool_mutex);
 
-        if (!std::empty(dh_pool))
+        if (std::empty(dh_pool))
         {
-            auto const dh = dh_pool.back();
-            dh_pool.pop_back();
-            return dh;
+            return {};
         }
 
-        return DH{ mediator->private_key() };
+        auto dh = std::move(dh_pool.back());
+        dh_pool.pop_back();
+        return dh;
     }
 
-    static void add_dh(DH dh)
+    static void push_dh_pool(DH dh)
     {
         auto lock = std::unique_lock(dh_pool_mutex);
 
@@ -282,6 +283,16 @@ private:
         {
             dh_pool.emplace_back(std::move(dh));
         }
+    }
+
+    [[nodiscard]] DH& get_dh()
+    {
+        if (!dh_)
+        {
+            dh_.emplace(pop_dh_pool().value_or(DH{ mediator_->private_key() }));
+        }
+
+        return *dh_;
     }
 
     void maybe_recycle_dh()
@@ -293,17 +304,16 @@ private:
             return;
         }
 
-        if (!dh_.is_dummy())
+        if (dh_)
         {
-            auto dh = DH{};
-            std::swap(dh_, dh);
-            add_dh(std::move(dh));
+            push_dh_pool(std::move(*dh_));
+            dh_.reset();
         }
     }
 
     ///
 
-    DH dh_{};
+    std::optional<DH> dh_{};
 
     DoneFunc on_done_;
 

@@ -45,20 +45,11 @@ public:
     using private_key_bigend_t = std::array<std::byte, PrivateKeySize>;
     using key_bigend_t = std::array<std::byte, KeySize>;
 
-    // This produces dummy objects that shouldn't be used for key exchange
-    constexpr DH() = default;
-
     // In actual code, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
     constexpr explicit DH(private_key_bigend_t const& private_key) noexcept
         : private_key_{ private_key }
     {
-    }
-
-    // Check if this object is a dummy object
-    [[nodiscard]] bool is_dummy() const noexcept
-    {
-        return private_key_ == private_key_bigend_t{};
     }
 
     // Returns our own public key to be shared with a peer.
