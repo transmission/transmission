@@ -229,7 +229,7 @@ private:
     // > As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
     // > The remaining bits are reserved for future use.
     static auto constexpr CryptoProvidePlaintext = uint32_t{ 0x01 };
-    static auto constexpr CryptoProvideRC4 = uint32_t{ 0x02 };
+    static auto constexpr CryptoProvideCrypto = uint32_t{ 0x02 };
 
     // MSE constants.
     // http://wiki.vuze.com/w/Message_Stream_Encryption

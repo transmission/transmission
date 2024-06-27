@@ -246,7 +246,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
             tr_logAddTraceHand(this, "peer is unencrypted, and we're disallowing that");
             return done(false);
         }
-        if (crypto_select_ == CryptoProvideRC4)
+        if (crypto_select_ == CryptoProvideCrypto)
         {
             tr_logAddTraceHand(this, "peer is unencrypted, and that does not agree with our handshake");
             return done(false);
@@ -725,11 +725,11 @@ uint32_t tr_handshake::crypto_provide() const noexcept
     {
     case TR_ENCRYPTION_REQUIRED:
     case TR_ENCRYPTION_PREFERRED:
-        provide |= CryptoProvideRC4;
+        provide |= CryptoProvideCrypto;
         break;
 
     case TR_CLEAR_PREFERRED:
-        provide |= CryptoProvideRC4 | CryptoProvidePlaintext;
+        provide |= CryptoProvideCrypto | CryptoProvidePlaintext;
         break;
     }
 
@@ -744,17 +744,17 @@ uint32_t tr_handshake::crypto_provide() const noexcept
     switch (encryption_mode)
     {
     case TR_ENCRYPTION_REQUIRED:
-        choices[n_choices++] = CryptoProvideRC4;
+        choices[n_choices++] = CryptoProvideCrypto;
         break;
 
     case TR_ENCRYPTION_PREFERRED:
-        choices[n_choices++] = CryptoProvideRC4;
+        choices[n_choices++] = CryptoProvideCrypto;
         choices[n_choices++] = CryptoProvidePlaintext;
         break;
 
     case TR_CLEAR_PREFERRED:
         choices[n_choices++] = CryptoProvidePlaintext;
-        choices[n_choices++] = CryptoProvideRC4;
+        choices[n_choices++] = CryptoProvideCrypto;
         break;
     }
 
