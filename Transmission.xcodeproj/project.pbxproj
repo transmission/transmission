@@ -459,6 +459,18 @@
 		EDBAAC8C29E486BC00D9495F /* global-ip-cache.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBAAC8B29E486BC00D9495F /* global-ip-cache.h */; };
 		EDBAAC8E29E486C200D9495F /* global-ip-cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDBAAC8D29E486C200D9495F /* global-ip-cache.cc */; };
 		EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */; };
+		EDEB42822873B94700A2DD92 /* PreviewViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = EDEB42812873B94700A2DD92 /* PreviewViewController.mm */; };
+		EDEB42882873B94700A2DD92 /* PreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EDEB42862873B94700A2DD92 /* PreviewViewController.xib */; };
+		EDEB428D2873B94700A2DD92 /* QuickLookExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = EDEB427C2873B94700A2DD92 /* QuickLookExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EDEB42952873C8F600A2DD92 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
+		EDEB42962873C90600A2DD92 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
+		EDEB42972873C90E00A2DD92 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771AB2803EE53005C7523 /* libiconv.tbd */; };
+		EDEB42982873C92200A2DD92 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */; };
+		EDEB42992873C92E00A2DD92 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE215C5A7F900EBF632 /* Foundation.framework */; };
+		EDEB429A2873C95F00A2DD92 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
+		EDEB429C2873CF4400A2DD92 /* QuickLookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDEB429B2873CF4400A2DD92 /* QuickLookUI.framework */; };
+		EDEB429D2873D3A000A2DD92 /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
+		EDEB429F2873DED100A2DD92 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 		F11545ACA7C4D7A464F703AB /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A044CBD8C049AFCBD4DB411 /* block-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 /* End PBXBuildFile section */
@@ -590,6 +602,20 @@
 			remoteGlobalIDString = 4D18389609DEC0030047D688;
 			remoteInfo = libtransmission;
 		};
+		EDEB428B2873B94700A2DD92 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EDEB427B2873B94700A2DD92;
+			remoteInfo = QuickLookExtension;
+		};
+		EDEB42932873C54800A2DD92 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D18389609DEC0030047D688;
+			remoteInfo = libtransmission;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -613,6 +639,17 @@
 				A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in Copy Files to Wrapper */,
 			);
 			name = "Copy Files to Wrapper";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EDEB428E2873B94700A2DD92 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				EDEB428D2873B94700A2DD92 /* QuickLookExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -1379,6 +1416,14 @@
 		EDBAAC8B29E486BC00D9495F /* global-ip-cache.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "global-ip-cache.h"; sourceTree = "<group>"; };
 		EDBAAC8D29E486C200D9495F /* global-ip-cache.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "global-ip-cache.cc"; sourceTree = "<group>"; };
 		EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
+		EDEB427C2873B94700A2DD92 /* QuickLookExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QuickLookExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EDEB427D2873B94700A2DD92 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		EDEB42802873B94700A2DD92 /* PreviewViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreviewViewController.h; sourceTree = "<group>"; };
+		EDEB42812873B94700A2DD92 /* PreviewViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PreviewViewController.mm; sourceTree = "<group>"; };
+		EDEB42872873B94700A2DD92 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreviewViewController.xib; sourceTree = "<group>"; };
+		EDEB42892873B94700A2DD92 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EDEB428A2873B94700A2DD92 /* QuickLookExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuickLookExtension.entitlements; sourceTree = "<group>"; };
+		EDEB429B2873CF4400A2DD92 /* QuickLookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookUI.framework; path = System/Library/Frameworks/QuickLookUI.framework; sourceTree = SDKROOT; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1566,6 +1611,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EDEB42792873B94700A2DD92 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EDEB429C2873CF4400A2DD92 /* QuickLookUI.framework in Frameworks */,
+				EDEB42982873C92200A2DD92 /* QuickLook.framework in Frameworks */,
+				EDEB429A2873C95F00A2DD92 /* Cocoa.framework in Frameworks */,
+				EDEB42992873C92E00A2DD92 /* Foundation.framework in Frameworks */,
+				EDEB42972873C90E00A2DD92 /* libiconv.tbd in Frameworks */,
+				EDEB42962873C90600A2DD92 /* libcurl.tbd in Frameworks */,
+				EDEB42952873C8F600A2DD92 /* libtransmission.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1704,6 +1763,7 @@
 				C3CEBBA927949CA000683BE0 /* libdeflate.a */,
 				C3D9062127B7E3C900EF2386 /* libpsl.a */,
 				C1846B9E294F7A3400A98F30 /* libwildmat.a */,
+				EDEB427C2873B94700A2DD92 /* QuickLookExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1714,6 +1774,7 @@
 				A22CEF9E21CDC44400C5C1BA /* Transmission.entitlements */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */,
+				EDEB427F2873B94700A2DD92 /* QuickLookExtension */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
@@ -2064,12 +2125,14 @@
 			isa = PBXGroup;
 			children = (
 				C87369642809984200573C90 /* UserNotifications.framework */,
+				EDEB429B2873CF4400A2DD92 /* QuickLookUI.framework */,
 				55869925257074EC00F77A43 /* libcurl.tbd */,
 				C88771AB2803EE53005C7523 /* libiconv.tbd */,
 				C88771A92803EE42005C7523 /* libz.tbd */,
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
 				A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */,
+				EDEB427D2873B94700A2DD92 /* Quartz.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2368,6 +2431,19 @@
 			name = "Overlay Window";
 			sourceTree = "<group>";
 		};
+		EDEB427F2873B94700A2DD92 /* QuickLookExtension */ = {
+			isa = PBXGroup;
+			children = (
+				EDEB42802873B94700A2DD92 /* PreviewViewController.h */,
+				EDEB42812873B94700A2DD92 /* PreviewViewController.mm */,
+				EDEB42862873B94700A2DD92 /* PreviewViewController.xib */,
+				EDEB42892873B94700A2DD92 /* Info.plist */,
+				EDEB428A2873B94700A2DD92 /* QuickLookExtension.entitlements */,
+			);
+			name = QuickLookExtension;
+			path = macosx/QuickLookExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2646,12 +2722,14 @@
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				A24F191B0A3A792300C9C145 /* Copy Files to Frameworks */,
 				A2EB2E7615C8CF1C00FBD5B4 /* Copy Files to Wrapper */,
+				EDEB428E2873B94700A2DD92 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				A2EB2E7515C8CCE900FBD5B4 /* PBXTargetDependency */,
 				4D1838E609DEC1170047D688 /* PBXTargetDependency */,
+				EDEB428C2873B94700A2DD92 /* PBXTargetDependency */,
 			);
 			name = Transmission;
 			productInstallPath = "$(HOME)/Applications";
@@ -2903,6 +2981,24 @@
 			productReference = C8B27BA128153F3400A22B5D /* transmission-show */;
 			productType = "com.apple.product-type.tool";
 		};
+		EDEB427B2873B94700A2DD92 /* QuickLookExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EDEB42922873B94700A2DD92 /* Build configuration list for PBXNativeTarget "QuickLookExtension" */;
+			buildPhases = (
+				EDEB42782873B94700A2DD92 /* Sources */,
+				EDEB42792873B94700A2DD92 /* Frameworks */,
+				EDEB427A2873B94700A2DD92 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EDEB42942873C54800A2DD92 /* PBXTargetDependency */,
+			);
+			name = QuickLookExtension;
+			productName = QuickLookExtension;
+			productReference = EDEB427C2873B94700A2DD92 /* QuickLookExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2925,6 +3021,9 @@
 					};
 					C3D9062027B7E3C900EF2386 = {
 						CreatedOnToolsVersion = 13.0;
+					};
+					EDEB427B2873B94700A2DD92 = {
+						CreatedOnToolsVersion = 13.4.1;
 					};
 				};
 			};
@@ -2961,6 +3060,7 @@
 			targets = (
 				8D1107260486CEB800E47090 /* Transmission */,
 				A2F35BB815C5A0A100EBF632 /* QuickLookPlugin */,
+				EDEB427B2873B94700A2DD92 /* QuickLookExtension */,
 				4D18389609DEC0030047D688 /* libtransmission */,
 				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
@@ -2977,6 +3077,7 @@
 				C3CEBB9F27949CA000683BE0 /* deflate */,
 				C3D9062027B7E3C900EF2386 /* psl */,
 				C1846B96294F7A3400A98F30 /* wildmat */,
+				EDEB427B2873B94700A2DD92 /* QuickLookExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -3028,6 +3129,15 @@
 				A2F35BC815C5A0A100EBF632 /* InfoPlist.strings in Resources */,
 				A29304ED15D7465100B1F726 /* style.css in Resources */,
 				A242AD9315F05D23002B3A6C /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EDEB427A2873B94700A2DD92 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EDEB429F2873DED100A2DD92 /* Images.xcassets in Resources */,
+				EDEB42882873B94700A2DD92 /* PreviewViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3497,6 +3607,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EDEB42782873B94700A2DD92 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EDEB429D2873D3A000A2DD92 /* NSStringAdditions.mm in Sources */,
+				EDEB42822873B94700A2DD92 /* PreviewViewController.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3589,6 +3708,16 @@
 			isa = PBXTargetDependency;
 			target = 4D18389609DEC0030047D688 /* libtransmission */;
 			targetProxy = C8B27B9428153F3400A22B5D /* PBXContainerItemProxy */;
+		};
+		EDEB428C2873B94700A2DD92 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EDEB427B2873B94700A2DD92 /* QuickLookExtension */;
+			targetProxy = EDEB428B2873B94700A2DD92 /* PBXContainerItemProxy */;
+		};
+		EDEB42942873C54800A2DD92 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D18389609DEC0030047D688 /* libtransmission */;
+			targetProxy = EDEB42932873C54800A2DD92 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3950,6 +4079,14 @@
 				A2F35BC715C5A0A100EBF632 /* en */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		EDEB42862873B94700A2DD92 /* PreviewViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EDEB42872873B94700A2DD92 /* Base */,
+			);
+			name = PreviewViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -5133,6 +5270,172 @@
 			};
 			name = Release;
 		};
+		EDEB428F2873B94700A2DD92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = macosx/QuickLookExtension/QuickLookExtension.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = macosx/QuickLookExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = QuickLookExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 The Transmission Project. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission.QuickLookExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
+			};
+			name = Debug;
+		};
+		EDEB42902873B94700A2DD92 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = macosx/QuickLookExtension/QuickLookExtension.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = macosx/QuickLookExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = QuickLookExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 The Transmission Project. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission.QuickLookExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
+			};
+			name = "Release - Debug";
+		};
+		EDEB42912873B94700A2DD92 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = macosx/QuickLookExtension/QuickLookExtension.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = macosx/QuickLookExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = QuickLookExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 The Transmission Project. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission.QuickLookExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -5322,6 +5625,16 @@
 				C8B27B9E28153F3400A22B5D /* Debug */,
 				C8B27B9F28153F3400A22B5D /* Release - Debug */,
 				C8B27BA028153F3400A22B5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EDEB42922873B94700A2DD92 /* Build configuration list for PBXNativeTarget "QuickLookExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EDEB428F2873B94700A2DD92 /* Debug */,
+				EDEB42902873B94700A2DD92 /* Release - Debug */,
+				EDEB42912873B94700A2DD92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
