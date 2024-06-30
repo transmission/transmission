@@ -81,7 +81,7 @@ auto constexpr Piece = uint8_t{ 7 };
 auto constexpr Cancel = uint8_t{ 8 };
 
 // https://www.bittorrent.org/beps/bep_0005.html#bittorrent-protocol-extension
-auto constexpr Port = uint8_t{ 9 };
+auto constexpr DhtPort = uint8_t{ 9 };
 
 // https://www.bittorrent.org/beps/bep_0006.html
 auto constexpr FextSuggest = uint8_t{ 13 };
@@ -124,8 +124,8 @@ auto constexpr Ltep = uint8_t{ 20 };
         return "not-interested"sv;
     case Piece:
         return "piece"sv;
-    case Port:
-        return "port"sv;
+    case DhtPort:
+        return "dht-port"sv;
     case Request:
         return "request"sv;
     case Unchoke:
@@ -632,7 +632,7 @@ private:
 
     size_t protocol_send_port(tr_port const port) const
     {
-        return protocol_send_message(BtPeerMsgs::Port, port.host());
+        return protocol_send_message(BtPeerMsgs::DhtPort, port.host());
     }
 
     size_t protocol_send_have(tr_piece_index_t const index) const
@@ -746,7 +746,7 @@ private:
         len -= sizeof(id) + sizeof(uint32_t /*piece*/) + sizeof(uint32_t /*offset*/);
         return len <= tr_block_info::BlockSize;
 
-    case BtPeerMsgs::Port:
+    case BtPeerMsgs::DhtPort:
         return len == 3U;
 
     case BtPeerMsgs::Ltep:
@@ -1468,7 +1468,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
     case BtPeerMsgs::Piece:
         return read_piece_data(payload);
 
-    case BtPeerMsgs::Port:
+    case BtPeerMsgs::DhtPort:
         // https://www.bittorrent.org/beps/bep_0005.html
         // Peers supporting the DHT set the last bit of the 8-byte reserved flags
         // exchanged in the BitTorrent protocol handshake. Peer receiving a handshake
@@ -1476,7 +1476,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         // It begins with byte 0x09 and has a two byte payload containing the UDP
         // port of the DHT node in network byte order.
         {
-            logtrace(this, "Got a BtPeerMsgs::Port");
+            logtrace(this, "Got a BtPeerMsgs::DhtPort");
 
             auto const hport = payload.to_uint16();
             if (auto const dht_port = tr_port::from_host(hport); !std::empty(dht_port))
