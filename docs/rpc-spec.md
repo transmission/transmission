@@ -362,7 +362,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `announce` | string | tr_tracker_view
-| `id` | number | tr_tracker_view
+| `id` | number | tr_tracker_view | **DEPRECATED** use trackerList instead
 | `scrape` | string | tr_tracker_view
 | `sitename` | string | tr_tracker_view
 | `tier` | number | tr_tracker_view
@@ -377,7 +377,7 @@ The 'source' column here corresponds to the data structure there.
 | `hasAnnounced`            | boolean    | tr_tracker_view
 | `hasScraped`              | boolean    | tr_tracker_view
 | `host`                    | string     | tr_tracker_view
-| `id`                      | number     | tr_tracker_view
+| `id`                      | number     | tr_tracker_view | **DEPRECATED** use trackerList instead
 | `isBackup`                | boolean    | tr_tracker_view
 | `lastAnnouncePeerCount`   | number     | tr_tracker_view
 | `lastAnnounceResult`      | string     | tr_tracker_view
