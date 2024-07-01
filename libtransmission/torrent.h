@@ -961,7 +961,7 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*> got_metainfo_;
     libtransmission::SimpleObservable<tr_torrent*> started_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
-    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
+    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
 
