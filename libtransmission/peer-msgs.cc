@@ -332,7 +332,7 @@ public:
 
         if (session->allowsDHT() && io_->supports_dht())
         {
-            protocol_send_port(session->udpPort());
+            protocol_send_dht_port(session->udpPort());
         }
 
         io_->set_callbacks(can_read, did_write, got_error, this);
@@ -630,7 +630,7 @@ private:
         return protocol_send_message(BtPeerMsgs::Request, req.index, req.offset, req.length);
     }
 
-    size_t protocol_send_port(tr_port const port) const
+    size_t protocol_send_dht_port(tr_port const port) const
     {
         return protocol_send_message(BtPeerMsgs::DhtPort, port.host());
     }
