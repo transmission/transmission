@@ -182,6 +182,7 @@ private:
     [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
 
     bool fire_done(bool is_connected);
+    bool fire_timer(bool is_connected);
 
     ///
 
