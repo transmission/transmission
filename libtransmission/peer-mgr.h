@@ -43,7 +43,7 @@ enum
     /* true if the peer supports encryption */
     ADDED_F_ENCRYPTION_FLAG = 1,
     /* true if the peer is a seed or partial seed */
-    ADDED_F_SEED_FLAG = 2,
+    ADDED_F_UPLOAD_ONLY_FLAG = 2,
     /* true if the peer supports µTP */
     ADDED_F_UTP_FLAGS = 4,
     /* true if the peer has holepunch support */
@@ -401,7 +401,7 @@ public:
             set_holepunch_supported();
         }
 
-        if ((pex_flags & ADDED_F_SEED_FLAG) != 0U)
+        if ((pex_flags & ADDED_F_UPLOAD_ONLY_FLAG) != 0U)
         {
             set_upload_only();
         }
@@ -461,11 +461,11 @@ public:
 
         if (is_upload_only())
         {
-            ret |= ADDED_F_SEED_FLAG;
+            ret |= ADDED_F_UPLOAD_ONLY_FLAG;
         }
         else
         {
-            ret &= ~ADDED_F_SEED_FLAG;
+            ret &= ~ADDED_F_UPLOAD_ONLY_FLAG;
         }
 
         return ret;
