@@ -654,6 +654,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 
         if (handshake->mediator_->allows_tcp() && io->reconnect())
         {
+            tr_logAddTraceHand(handshake, "uTP connection failed, trying TCP...");
             if (handshake->encryption_mode_ != TR_CLEAR_PREFERRED)
             {
                 handshake->send_ya(io);
@@ -675,7 +676,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
     if ((handshake->is_state(State::AwaitingYb) || handshake->is_state(State::AwaitingVc)) &&
         handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect())
     {
-        tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
+        tr_logAddTraceHand(handshake, "MSE handshake failed, trying plaintext...");
         retry_plain();
         return;
     }
