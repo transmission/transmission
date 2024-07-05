@@ -110,6 +110,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     outbuf.add_uint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
+    ia_len_ = HandshakeSize;
     outbuf.add_uint16(HandshakeSize);
     if (build_handshake_message(peer_io, outbuf))
     {
@@ -235,7 +236,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 
     have_read_anything_from_peer_ = true;
 
-    if (ia_len_ > 0U)
+    if (is_incoming() && ia_len_ > 0U)
     {
         // do nothing, the check below won't work correctly
     }
