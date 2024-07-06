@@ -353,6 +353,14 @@ export class Torrent extends EventTarget {
     const s = this.getStatus();
 
     switch (state) {
+      case 'error':
+        return this.getError();
+      case 'noterror':
+        return !this.getError();
+      case 'private':
+        return this.getPrivateFlag();
+      case 'public':
+        return !this.getPrivateFlag();
       case Prefs.FilterActive:
         return (
           this.getPeersGettingFromUs() > 0 ||
@@ -384,18 +392,7 @@ export class Torrent extends EventTarget {
    */
   test(state, tracker, search, labels) {
     // filter by state...
-    const tStatus = (s) => {
-      if (['error', 'noterror'].includes(s)) {
-        const e = this.getError();
-        return (s === 'error' && e) || (s === 'noterror' && !e);
-      } else if (['private', 'public'].includes(s)) {
-        const p = this.getPrivateFlag();
-        return (s === 'private' && p) || (s === 'public' && !p);
-      }
-      return this.testState(s);
-    };
-
-    let pass = tStatus(state);
+    let pass = this.testState(state);
 
     // maybe filter by text...
     if (pass && search) {
