@@ -191,7 +191,7 @@ export class Transmission extends EventTarget {
     this._newOpt(Prefs.FilterSeeding, 'Seeding');
     this._newOpt(Prefs.FilterPaused, 'Paused');
     this._newOpt(Prefs.FilterFinished, 'Finished');
-    this._newOpt(false, '-- show --');
+    this._newOpt(false, '-- list --');
     this._newOpt('public', 'Public torrents');
     this._newOpt('private', 'Private torrents');
     this._newOpt('error', 'Error torrents');
