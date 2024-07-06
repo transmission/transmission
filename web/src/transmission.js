@@ -40,6 +40,7 @@ export class Transmission extends EventTarget {
     );
 
     // Initialize the implementation fields
+    this.filterOpts = [];
     this.filterText = '';
     this.oldTrackers = [];
     this._torrents = {};
@@ -183,21 +184,23 @@ export class Transmission extends EventTarget {
     });
 
     // Initialize filter options
-    let e = document.querySelector('#filter-mode');
-    e.append(...this._newOpt(false, [['All', Prefs.FilterAll]]));
-    e.append(this._newOpt('status', [
+    this._newOpt(false, [['All', Prefs.FilterAll]]);
+    this._newOpt('status', [
       ['Active', Prefs.FilterActive],
       ['Downloading', Prefs.FilterDownloading],
       ['Seeding', Prefs.FilterSeeding],
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
-    ]));
-    e.append(this._newOpt('list', [
+    ]);
+    this._newOpt('list', [
       ['Public torrents', 'public'],
       ['Private torrents', 'private'],
       ['Errored torrents', 'error'],
       ['Non-error torrents', 'noterror'],
-    ]));
+    ]);
+
+    let e = document.querySelector('#filter-mode');
+    e.append(...this.filterOpts);
 
     // listen to filter changes
     e.value = this.prefs.filter_mode;
@@ -325,10 +328,10 @@ export class Transmission extends EventTarget {
       const e = document.createElement('OPTGROUP');
       e.label = l;
       e.append(...opts);
-      return e; 
+      this.filterOpts.push(e); 
+    } else {
+      this.filterOpts.push(...opts);
     }
-
-    return opts;
   }
 
   _openTorrentFromUrl() {
@@ -1006,7 +1009,9 @@ TODO: fix this when notifications get fixed
           sitename === this.filterTracker,
         ]);
       }
-      e.append(...this._newOpt(false, a));
+      this.filterOpts = [];
+      this._newOpt(false, a);
+      e.append(...this.filterOpts);
     }
   }
 
