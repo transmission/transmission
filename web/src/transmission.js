@@ -184,15 +184,15 @@ export class Transmission extends EventTarget {
 
     // Initialize filter options
     let e = document.querySelector('#filter-mode');
-    e.append(...this._options(false, [['All', Prefs.FilterAll]]));
-    e.append(this._options('status', [
+    e.append(...this._newOpt(false, [['All', Prefs.FilterAll]]));
+    e.append(this._newOpt('status', [
       ['Active', Prefs.FilterActive],
       ['Downloading', Prefs.FilterDownloading],
       ['Seeding', Prefs.FilterSeeding],
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
     ]));
-    e.append(this._options('list', [
+    e.append(this._newOpt('list', [
       ['Public torrents', 'public'],
       ['Private torrents', 'private'],
       ['Errored torrents', 'error'],
@@ -315,17 +315,17 @@ export class Transmission extends EventTarget {
     }
   }
 
-  _options(l, a) {
+  _newOpt(l, a) {
     const opts = [];
     a.forEach((t) => {
       opts.push(new Option(...t));
     });
 
     if (l) {
-      const o = document.createElement('OPTGROUP');
-      o.label = l;
-      o.append(...opts);
-      return o; 
+      const e = document.createElement('OPTGROUP');
+      e.label = l;
+      e.append(...opts);
+      return e; 
     }
 
     return opts;
@@ -1006,7 +1006,7 @@ TODO: fix this when notifications get fixed
           sitename === this.filterTracker,
         ]);
       }
-      e.append(...this._options(false, a));
+      e.append(...this._newOpt(false, a));
     }
   }
 
