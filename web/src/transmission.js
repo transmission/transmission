@@ -203,7 +203,6 @@ export class Transmission extends EventTarget {
     }
 
     // listen to filter changes
-    e = document.querySelector('#filter-mode');
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', (event_) => {
       this.prefs.filter_mode = event_.target.value;
@@ -327,7 +326,7 @@ export class Transmission extends EventTarget {
       e.value = v;
     }
     if (s) {
-      e.selected = true;
+      e.selected = 'selected';
     }
     e.innerHTML = i;
     this.filterOpts.push(e);
