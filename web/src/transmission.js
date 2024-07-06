@@ -320,15 +320,15 @@ export class Transmission extends EventTarget {
 
   _newOpt(l, a) {
     const opts = [];
-    a.forEach((t) => {
+    for (const t of a) {
       opts.push(new Option(...t));
-    });
+    }
 
     if (l) {
       const e = document.createElement('OPTGROUP');
       e.label = l;
       e.append(...opts);
-      this.filterOpts.push(e); 
+      this.filterOpts.push(e);
     } else {
       this.filterOpts.push(...opts);
     }
