@@ -366,7 +366,7 @@ a {
   padding-left: 5px;
 
   @include for-phone-only {
-    :not(select):not(input):not(option):not(.flexible-space) {
+    :not(select):not(input):not(option):not(optgroup):not(.flexible-space) {
       display: none;
     }
   }
