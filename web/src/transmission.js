@@ -40,7 +40,9 @@ export class Transmission extends EventTarget {
     );
 
     // Initialize the implementation fields
+    this.filterOpts = [];
     this.filterText = '';
+    this.oldTrackers = [];
     this._torrents = {};
     this._rows = [];
     this.dirtyTorrents = new Set();
@@ -67,9 +69,7 @@ export class Transmission extends EventTarget {
     document
       .querySelector('#filter-tracker')
       .addEventListener('change', (event_) => {
-        this.setFilterTracker(
-          event_.target.value === 'all' ? null : event_.target.value,
-        );
+        this.setFilterTracker(event_.target.value);
       });
 
     this.action_manager.addEventListener('change', (event_) => {
@@ -183,8 +183,27 @@ export class Transmission extends EventTarget {
       }
     });
 
-    // listen to filter changes
+    // Initialize filter options
+    this._newOpt(Prefs.FilterAll, "All");
+    this._newOpt(false, "-- status --");
+    this._newOpt(Prefs.FilterActive, "Active");
+    this._newOpt(Prefs.FilterDownloading, "Downloading");
+    this._newOpt(Prefs.FilterSeeding, "Seeding");
+    this._newOpt(Prefs.FilterPaused, "Paused");
+    this._newOpt(Prefs.FilterFinished, "Finished");
+    this._newOpt(false, "-- show --");
+    this._newOpt("public", "Public torrents");
+    this._newOpt("private", "Private torrents");
+    this._newOpt("error", "Error torrents");
+    this._newOpt("noterror", "Non-error torrents");
+
     let e = document.querySelector('#filter-mode');
+    for (const opt of this.filterOpts) {
+      e.append(opt);
+    }
+
+    // listen to filter changes
+    e = document.querySelector('#filter-mode');
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', (event_) => {
       this.prefs.filter_mode = event_.target.value;
@@ -298,6 +317,20 @@ export class Transmission extends EventTarget {
     for (const [key, value] of this.prefs.entries()) {
       this._onPrefChanged(key, value);
     }
+  }
+
+  _newOpt(v, i, s) {
+    const e = document.createElement("OPTION");
+    if (v === false) {
+      e.disabled = true;
+    } else {
+      e.value = v;
+    }
+    if (s) {
+      e.selected = true;
+    }
+    e.innerHTML = i;
+    this.filterOpts.push(e);
   }
 
   _openTorrentFromUrl() {
@@ -961,22 +994,21 @@ TODO: fix this when notifications get fixed
     const trackers = this._getTrackerCounts();
     const sitenames = Object.keys(trackers).sort();
 
-    // build the new html
-    let string = '';
-    string += this.filterTracker
-      ? '<option value="all">All</option>'
-      : '<option value="all" selected="selected">All</option>';
-    for (const sitename of sitenames) {
-      string += `<option value="${sitename}"`;
-      if (sitename === this.filterTracker) {
-        string += ' selected="selected"';
-      }
-      string += `>${Transmission._displayName(sitename)}</option>`;
-    }
+    // Update select box if list of trackers has changed
+    if (sitenames.filter(x => !this.oldTrackers.includes(x)).length > 0) {
+      this.oldTrackers = Array.from(sitenames);
 
-    if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
-      this.filterTrackersStr = string;
-      document.querySelector('#filter-tracker').innerHTML = string;
+      this.filterOpts = [];
+      this._newOpt(Prefs.FilterAll, 'All', !this.filterTracker);
+      for (const sitename of sitenames) {
+        this._newOpt(sitename, Transmission._displayName(sitename), sitename === this.filterTracker);
+      }
+
+      const e = document.querySelector('#filter-tracker');
+      e.innerHTML = '';
+      for (const opt of this.filterOpts) {
+        e.append(opt);
+      }
     }
   }
 
@@ -1147,7 +1179,7 @@ TODO: fix this when notifications get fixed
     const e = document.querySelector('#filter-tracker');
     e.value = sitename;
 
-    this.filterTracker = sitename;
+    this.filterTracker = sitename === Prefs.FilterAll ? '' : sitename;
     this.refilterAllSoon();
   }
 
