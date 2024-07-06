@@ -106,9 +106,9 @@
     --color-fg-selected: var(--dark-mode-white);
     --color-fg-tertiary: var(--grey-500);
     --color-fg-warn: var(--dark-mode-black);
+    --color-progressbar-fg-1: #edefff;
+    --color-progressbar-fg-2: #edefff;
     --color-progressbar-paused: var(--grey-500);
-    --color-progressbar-paused-fg: #edefff;
-    --color-progressbar-paused-fg-2: #edefff;
     --color-progressbar-seed-1: var(--green-100);
     --color-progressbar-seed-2: var(--green-400);
     --color-progressbar-seed-paused: var(--grey-500);
@@ -135,11 +135,11 @@
       --color-fg-tabs: var(--white);
       --color-fg-tertiary: var(--white);
       --color-fg-warn: var(--black);
+      --color-progressbar-fg-1: #fff;
+      --color-progressbar-fg-2: #fff;
       --color-progressbar-background-2: var(--white);
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
-      --color-progressbar-paused-fg: #fff;
-      --color-progressbar-paused-fg-2: #fff;
       --color-progressbar-queued: var(--blue-400);
       --color-progressbar-seed-2: var(--black);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -168,11 +168,11 @@
     --color-fg-selected: var(--nice-grey);
     --color-fg-tertiary: var(--grey-500);
     --color-fg-warn: #cf212e;
+    --color-progressbar-fg-1: #303030;
+    --color-progressbar-fg-2: #edefff;
     --color-progressbar-leech: var(--blue-100);
     --color-progressbar-magnet: var(--yellow-300);
     --color-progressbar-paused: var(--grey-200);
-    --color-progressbar-paused-fg: #303030;
-    --color-progressbar-paused-fg-2: #edefff;
     --color-progressbar-queued: var(--blue-400);
     --color-progressbar-seed-1: var(--green-500);
     --color-progressbar-seed-2: var(--green-300);
@@ -202,11 +202,11 @@
       --color-fg-tertiary: var(--black);
       --color-fg-warn: var(--white);
       --color-progressbar-background-2: var(--white);
+      --color-progressbar-fg: #fff;
+      --color-progressbar-fg-2: #fff;
       --color-progressbar-leech: var(--blue-200);
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
-      --color-progressbar-paused-fg: #fff;
-      --color-progressbar-paused-fg-2: #fff;
       --color-progressbar-queued: var(--blue-400);
       --color-progressbar-seed-2: var(--black);
       --color-progressbar-seed-paused: var(--grey-500);
@@ -699,12 +699,12 @@ a {
       &.queued::before {
         background: var(--color-progressbar-queued);
       }
-    }
 
-    &.leech::before {
-      background: var(--color-progressbar-leech);
-      color: var(--color-progressbar-paused-fg-2);
-      text-shadow: var(--progress-bar-shadow-2);
+      &::before {
+        background: var(--color-progressbar-leech);
+        color: var(--color-progressbar-fg-2);
+        text-shadow: var(--progress-bar-shadow-2);
+      }
     }
 
     &.magnet::before {
@@ -715,31 +715,33 @@ a {
     &.seed {
       &.paused::before {
         background: var(--color-progressbar-seed-paused);
-        color: var(--color-progressbar-paused-fg);
+        color: var(--color-progressbar-fg-1);
         text-shadow: var(--progress-bar-shadow);
       }
 
-      &:not(.paused)::before {
-        background: var(--color-progressbar-seed-1);
-        color: var(--color-progressbar-paused-fg-2);
-        text-shadow: var(--progress-bar-shadow-2);
-      }
+      &:not(.paused) {
+        &::before {
+          background: var(--color-progressbar-seed-1);
+          color: var(--color-progressbar-fg-2);
+          text-shadow: var(--progress-bar-shadow-2);
+        }
 
-      &:not(.paused)::after {
-        background: var(--color-progressbar-seed-2);
-        color: var(--color-progressbar-paused-fg-2);
-        text-shadow: var(--progress-bar-shadow-2);
+        &::after {
+          background: var(--color-progressbar-seed-2);
+          color: var(--color-progressbar-fg-2);
+          text-shadow: var(--progress-bar-shadow-2);
+        }
       }
 
       &.queued::before {
         background-color: var(--color-progressbar-seed-1);
       }
-    }
 
-    &.seed::before {
-      background-color: var(--color-progressbar-seed-1);
-      color: var(--color-progressbar-paused-fg-2);
-      text-shadow: var(--progress-bar-shadow-2);
+      &::before {
+        background-color: var(--color-progressbar-seed-1);
+        color: var(--color-progressbar-fg-2);
+        text-shadow: var(--progress-bar-shadow-2);
+      }
     }
 
     &.verify::before {
@@ -749,37 +751,39 @@ a {
 
     &.paused::before {
       background: var(--color-progressbar-paused);
-      color: var(--color-progressbar-paused-fg);
+      color: var(--color-progressbar-fg-1);
       text-shadow: var(--progress-bar-shadow);
     }
   }
 
-  .torrent-progress-bar::before,
-  .torrent-progress-bar::after {
-    content: attr(data-progress);
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    border-radius: 2px;
-    text-align: center;
-  }
+  .torrent-progress-bar {
+    &::before,
+    &::after {
+      content: attr(data-progress);
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      border-radius: 2px;
+      text-align: center;
+    }
 
-  .torrent-progress-bar::before {
-    clip-path: polygon(
-      0 0,
-      var(--progress, 30%) 0,
-      var(--progress, 30%) 100%,
-      0 100%
-    );
-  }
+    &::before {
+      clip-path: polygon(
+        0 0,
+        var(--progress, 30%) 0,
+        var(--progress, 30%) 100%,
+        0 100%
+      );
+    }
 
-  .torrent-progress-bar::after {
-    clip-path: polygon(
-      var(--progress, 30%) 0,
-      100% 0,
-      100% 100%,
-      var(--progress, 30%) 100%
-    );
+    &::after {
+      clip-path: polygon(
+        var(--progress, 30%) 0,
+        100% 0,
+        100% 100%,
+        var(--progress, 30%) 100%
+      );
+    }
   }
 }
 
