@@ -184,18 +184,18 @@ export class Transmission extends EventTarget {
     });
 
     // Initialize filter options
-    this._newOpt(Prefs.FilterAll, "All");
-    this._newOpt(false, "-- status --");
-    this._newOpt(Prefs.FilterActive, "Active");
-    this._newOpt(Prefs.FilterDownloading, "Downloading");
-    this._newOpt(Prefs.FilterSeeding, "Seeding");
-    this._newOpt(Prefs.FilterPaused, "Paused");
-    this._newOpt(Prefs.FilterFinished, "Finished");
-    this._newOpt(false, "-- show --");
-    this._newOpt("public", "Public torrents");
-    this._newOpt("private", "Private torrents");
-    this._newOpt("error", "Error torrents");
-    this._newOpt("noterror", "Non-error torrents");
+    this._newOpt(Prefs.FilterAll, 'All');
+    this._newOpt(false, '-- status --');
+    this._newOpt(Prefs.FilterActive, 'Active');
+    this._newOpt(Prefs.FilterDownloading, 'Downloading');
+    this._newOpt(Prefs.FilterSeeding, 'Seeding');
+    this._newOpt(Prefs.FilterPaused, 'Paused');
+    this._newOpt(Prefs.FilterFinished, 'Finished');
+    this._newOpt(false, '-- show --');
+    this._newOpt('public', 'Public torrents');
+    this._newOpt('private', 'Private torrents');
+    this._newOpt('error', 'Error torrents');
+    this._newOpt('noterror', 'Non-error torrents');
 
     let e = document.querySelector('#filter-mode');
     for (const opt of this.filterOpts) {
@@ -320,7 +320,7 @@ export class Transmission extends EventTarget {
   }
 
   _newOpt(v, i, s) {
-    const e = document.createElement("OPTION");
+    const e = document.createElement('OPTION');
     if (v === false) {
       e.disabled = true;
     } else {
@@ -995,13 +995,17 @@ TODO: fix this when notifications get fixed
     const sitenames = Object.keys(trackers).sort();
 
     // Update select box if list of trackers has changed
-    if (sitenames.filter(x => !this.oldTrackers.includes(x)).length > 0) {
-      this.oldTrackers = Array.from(sitenames);
+    if (sitenames.some((x) => !this.oldTrackers.includes(x))) {
+      this.oldTrackers = [...sitenames];
 
       this.filterOpts = [];
       this._newOpt(Prefs.FilterAll, 'All', !this.filterTracker);
       for (const sitename of sitenames) {
-        this._newOpt(sitename, Transmission._displayName(sitename), sitename === this.filterTracker);
+        this._newOpt(
+          sitename,
+          Transmission._displayName(sitename),
+          sitename === this.filterTracker,
+        );
       }
 
       const e = document.querySelector('#filter-tracker');
