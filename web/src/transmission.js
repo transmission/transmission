@@ -194,7 +194,7 @@ export class Transmission extends EventTarget {
     this._newOpt(false, '-- list --');
     this._newOpt('public', 'Public torrents');
     this._newOpt('private', 'Private torrents');
-    this._newOpt('error', 'Error torrents');
+    this._newOpt('error', 'Errored torrents');
     this._newOpt('noterror', 'Non-error torrents');
 
     let e = document.querySelector('#filter-mode');
