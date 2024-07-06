@@ -384,7 +384,18 @@ export class Torrent extends EventTarget {
    */
   test(state, tracker, search, labels) {
     // filter by state...
-    let pass = this.testState(state);
+    const tStatus = (state) => {
+      if (["error", "noterror"].includes(state)) {
+        const e = this.getError();
+        return state === "error" && e || state === "noterror" && !e;
+      } else if (["private", "public"].includes(state)) {
+        const p = this.getPrivateFlag();
+        return state === "private" && p || state === "public" && !p;
+      }
+      return this.testState(state);
+    };
+
+    let pass = tStatus(state);
 
     // maybe filter by text...
     if (pass && search) {
