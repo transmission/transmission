@@ -387,10 +387,10 @@ export class Torrent extends EventTarget {
     const tStatus = (s) => {
       if (['error', 'noterror'].includes(s)) {
         const e = this.getError();
-        return s === 'error' && e || s === 'noterror' && !e;
+        return (s === 'error' && e) || (s === 'noterror' && !e);
       } else if (['private', 'public'].includes(s)) {
         const p = this.getPrivateFlag();
-        return s === 'private' && p || s === 'public' && !p;
+        return (s === 'private' && p) || (s === 'public' && !p);
       }
       return this.testState(s);
     };
