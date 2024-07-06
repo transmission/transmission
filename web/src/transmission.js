@@ -994,7 +994,7 @@ TODO: fix this when notifications get fixed
     const trackers = this._getTrackerCounts();
     const sitenames = Object.keys(trackers).sort();
 
-    // Update select box if list of trackers has changed
+    // Update select box only when list of trackers has changed
     if (sitenames.some((x) => !this.oldTrackers.includes(x))) {
       this.oldTrackers = [...sitenames];
 
