@@ -196,7 +196,6 @@ export class Transmission extends EventTarget {
       ['Public torrents', 'public'],
       ['Private torrents', 'private'],
       ['Errored torrents', 'error'],
-      ['Non-error torrents', 'noterror'],
     ]);
 
     let e = document.querySelector('#filter-mode');
@@ -208,6 +207,11 @@ export class Transmission extends EventTarget {
       this.prefs.filter_mode = event_.target.value;
       this.refilterAllSoon();
     });
+
+    this.filterOpts = [];
+    this._newOpt(false, [['All', Prefs.FilterAll]]);
+    e = document.querySelector('#filter-tracker');
+    e.append(...this.filterOpts);
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
