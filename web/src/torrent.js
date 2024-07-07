@@ -355,8 +355,6 @@ export class Torrent extends EventTarget {
     switch (state) {
       case 'error':
         return this.getError();
-      case 'noterror':
-        return !this.getError();
       case 'private':
         return this.getPrivateFlag();
       case 'public':
