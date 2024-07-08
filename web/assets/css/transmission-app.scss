@@ -108,12 +108,14 @@
     --color-fg-warn: var(--dark-mode-black);
     --color-progressbar-fg-1: #edefff;
     --color-progressbar-fg-2: #edefff;
+    --color-progressbar-fg-3: #edefff;
     --color-progressbar-paused: var(--grey-500);
     --color-progressbar-seed-1: var(--green-100);
     --color-progressbar-seed-2: var(--green-400);
     --color-progressbar-seed-paused: var(--grey-500);
-    --progress-bar-shadow: 1px 1px #000;
+    --progress-bar-shadow-1: 1px 1px #000;
     --progress-bar-shadow-2: 1px 1px #000;
+    --progress-bar-shadow-3: 1px 1px #000;
 
     .contrast-more {
       --color-bg-even: var(--black);
@@ -137,14 +139,17 @@
       --color-fg-warn: var(--black);
       --color-progressbar-fg-1: #fff;
       --color-progressbar-fg-2: #fff;
+      --color-progressbar-fg-3: #000;
       --color-progressbar-background-2: var(--white);
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
       --color-progressbar-queued: var(--blue-400);
-      --color-progressbar-seed-2: var(--black);
+      --color-progressbar-seed-1: var(--black);
+      --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
       --color-progressbar-verify: var(--yellow-300);
       --color-toolbar-background: var(--black);
+      --progress-bar-shadow-3: 0;
     }
   }
   @media (prefers-color-scheme: light) {
@@ -170,6 +175,7 @@
     --color-fg-warn: #cf212e;
     --color-progressbar-fg-1: #303030;
     --color-progressbar-fg-2: #edefff;
+    --color-progressbar-fg-3: #edefff;
     --color-progressbar-leech: var(--blue-100);
     --color-progressbar-magnet: var(--yellow-300);
     --color-progressbar-paused: var(--grey-200);
@@ -178,8 +184,9 @@
     --color-progressbar-seed-2: var(--green-300);
     --color-progressbar-seed-paused: var(--grey-200);
     --color-progressbar-verify: var(--yellow-300);
-    --progress-bar-shadow: 0;
+    --progress-bar-shadow-1: 0;
     --progress-bar-shadow-2: 1px 1px #000;
+    --progress-bar-shadow-3: 1px 1px #000;
 
     .contrast-more {
       --color-bg-even: var(--white);
@@ -202,17 +209,20 @@
       --color-fg-tertiary: var(--black);
       --color-fg-warn: var(--white);
       --color-progressbar-background-2: var(--white);
-      --color-progressbar-fg: #fff;
+      --color-progressbar-fg-1: #fff;
       --color-progressbar-fg-2: #fff;
+      --color-progressbar-fg-3: #000;
       --color-progressbar-leech: var(--blue-200);
       --color-progressbar-magnet: var(--yellow-300);
       --color-progressbar-paused: var(--grey-500);
       --color-progressbar-queued: var(--blue-400);
-      --color-progressbar-seed-2: var(--black);
+      --color-progressbar-seed-1: var(--black);
+      --color-progressbar-seed-2: var(--white);
       --color-progressbar-seed-paused: var(--grey-500);
       --color-progressbar-verify: var(--yellow-300);
       --color-toolbar-background: var(--white);
-      --progress-bar-shadow: 1px 1px #000;
+      --progress-bar-shadow-1: 1px 1px #000;
+      --progress-bar-shadow-3: 0;
     }
   }
 }
@@ -716,7 +726,7 @@ a {
       &.paused::before {
         background: var(--color-progressbar-seed-paused);
         color: var(--color-progressbar-fg-1);
-        text-shadow: var(--progress-bar-shadow);
+        text-shadow: var(--progress-bar-shadow-1);
       }
 
       &:not(.paused) {
@@ -728,8 +738,8 @@ a {
 
         &::after {
           background: var(--color-progressbar-seed-2);
-          color: var(--color-progressbar-fg-2);
-          text-shadow: var(--progress-bar-shadow-2);
+          color: var(--color-progressbar-fg-3);
+          text-shadow: var(--progress-bar-shadow-3);
         }
       }
 
@@ -752,7 +762,7 @@ a {
     &.paused::before {
       background: var(--color-progressbar-paused);
       color: var(--color-progressbar-fg-1);
-      text-shadow: var(--progress-bar-shadow);
+      text-shadow: var(--progress-bar-shadow-1);
     }
   }
 
