@@ -56,6 +56,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     // init an incomplete torrent.
     // the test zero_torrent will be missing its first piece.
+    tr_sessionSetIncompleteFileNamingEnabled(session_, true);
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
     auto path = tr_pathbuf{};
 

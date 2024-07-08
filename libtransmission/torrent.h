@@ -325,6 +325,11 @@ struct tr_torrent
         return completion_.has_none();
     }
 
+    [[nodiscard]] auto has_file(tr_file_index_t file) const
+    {
+        return completion_.has_blocks(block_span_for_file(file));
+    }
+
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
     {
         return completion_.has_piece(piece);
@@ -372,7 +377,7 @@ struct tr_torrent
 
     void amount_done_bins(float* tab, int n_tabs) const
     {
-        return completion_.amount_done(tab, n_tabs);
+        completion_.amount_done(tab, n_tabs);
     }
 
     /// FILE <-> PIECE
@@ -827,7 +832,7 @@ struct tr_torrent
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
                 TR_ASSERT(now >= latest);
-                return now - latest;
+                return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
             }
         }
 
@@ -1248,6 +1253,8 @@ private:
 
     void do_magnet_idle_work();
     [[nodiscard]] bool use_new_metainfo(tr_error* error);
+
+    void update_file_path(tr_file_index_t file, std::optional<bool> has_file) const;
 
     void set_location_in_session_thread(std::string_view path, bool move_from_old_path, int volatile* setme_state);
 
