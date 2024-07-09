@@ -328,6 +328,12 @@ constexpr struct
             return -val;
         }
 
+        // According to libtorrent, larger values has higher priority. Not specified in BEP-40.
+        if (auto const val = tr_compare_3way(a.get_canonical_priority(), b.get_canonical_priority()); val != 0)
+        {
+            return -val;
+        }
+
         if (auto const val = tr_compare_3way(a.from_best(), b.from_best()); val != 0)
         {
             return val;
