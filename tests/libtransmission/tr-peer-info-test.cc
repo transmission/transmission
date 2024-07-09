@@ -6,6 +6,7 @@
 #include <array>
 #include <ctime>
 #include <optional>
+#include <string_view>
 #include <tuple>
 #include <utility>
 
@@ -15,6 +16,8 @@
 #include <libtransmission/peer-mgr.h>
 
 #include "gtest/gtest.h"
+
+using namespace std::literals;
 
 using PeerInfoTest = ::testing::Test;
 
@@ -54,8 +57,8 @@ TEST_F(PeerInfoTest, mergeConnectable)
     {
         auto const& [this_connectable, this_connected, that_connectable, that_connected] = condition;
 
-        auto info_this = tr_peer_info{ tr_address{}, 0, TR_PEER_FROM_PEX };
-        auto info_that = tr_peer_info{ tr_address{}, 0, TR_PEER_FROM_PEX };
+        auto info_this = tr_peer_info{ tr_address{}, 0, TR_PEER_FROM_PEX, {} };
+        auto info_that = tr_peer_info{ tr_address{}, 0, TR_PEER_FROM_PEX, {} };
 
         if (this_connectable)
         {
@@ -72,5 +75,34 @@ TEST_F(PeerInfoTest, mergeConnectable)
         info_this.merge(info_that);
 
         EXPECT_EQ(info_this.is_connectable(), result);
+    }
+}
+
+TEST_F(PeerInfoTest, updateCanonicalPriority)
+{
+    static auto constexpr Tests = std::array{
+        std::tuple{ "123.213.32.10:51413"sv, "98.76.54.32:6881"sv, uint32_t{ 0xEC2D7224 } },
+        std::tuple{ "123.213.32.10:51413"sv, "123.213.32.234:6881"sv, uint32_t{ 0x99568189 } }
+    };
+
+    for (auto [client_sockaddr_str, peer_sockaddr_str, expected] : Tests)
+    {
+        auto client_sockaddr = tr_socket_address::from_string(client_sockaddr_str);
+        auto peer_sockaddr = tr_socket_address::from_string(peer_sockaddr_str);
+        EXPECT_TRUE(client_sockaddr && peer_sockaddr) << "Test case is bugged";
+        if (!client_sockaddr || !peer_sockaddr)
+        {
+            continue;
+        }
+
+        auto const info = tr_peer_info{ *peer_sockaddr,
+                                        0,
+                                        TR_PEER_FROM_PEX,
+                                        client_sockaddr->address(),
+                                        [&client_sockaddr]
+                                        {
+                                            return client_sockaddr->port();
+                                        } };
+        EXPECT_EQ(info.get_canonical_priority(), expected);
     }
 }
