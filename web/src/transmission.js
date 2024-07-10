@@ -192,11 +192,8 @@ export class Transmission extends EventTarget {
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
     ]);
-    this._newOpt('list', [
-      ['Public torrents', 'public'],
-      ['Private torrents', 'private'],
-      ['Errored torrents', 'error'],
-    ]);
+    this._newOpt('private', [['Yes', 'private'], ['No', 'public']]);
+    this._newOpt(false, [['Errored torrents', 'error']]);
 
     let e = document.querySelector('#filter-mode');
     e.append(...this.filterOpts);
@@ -211,7 +208,7 @@ export class Transmission extends EventTarget {
     this.filterOpts = [];
     this._newOpt(false, [['All', Prefs.FilterAll]]);
     e = document.querySelector('#filter-tracker');
-    e.append(...this.filterOpts);
+    e.append(this.filterOpts[0]);
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
