@@ -192,7 +192,10 @@ export class Transmission extends EventTarget {
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
     ]);
-    this._newOpt('private', [['Yes', 'private'], ['No', 'public']]);
+    this._newOpt('private', [
+      ['Yes', 'private'],
+      ['No', 'public'],
+    ]);
     this._newOpt(false, [['Errored torrents', 'error']]);
 
     let e = document.querySelector('#filter-mode');
