@@ -791,7 +791,7 @@ bool tr_handshake::fire_done(bool is_connected)
 void tr_handshake::fire_timer()
 {
     tr_logAddTraceHand(this, "timer expired");
-    return (fire_done(is_connected));
+    fire_done(false);
 }
 
 std::string_view tr_handshake::state_string(State state) noexcept
