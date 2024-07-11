@@ -369,7 +369,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
     dh_.setPeerPublicKey(peer_public_key);
 
-    // everything received so far is Ya+PadA; haven't sent Yb and peer has not yet sent VC.
+    // everything received so far is Ya+PadA; haven't sent Yb and peer has not yet sent HASH('req1').
     // so throw away buffer, and do early exit check: we know it's not legit MSE if > max PadA
     pad_a_recv_len_ = peer_io->read_buffer_size();
     if (pad_a_recv_len_ > PadaMaxlen)
