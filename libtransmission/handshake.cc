@@ -75,6 +75,15 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
     dh_.setPeerPublicKey(peer_public_key);
 
+    // everything received so far is Yb+PadB; peer has not yet sent VC for resync.
+    // so throw away buffer, and do early exit check: we know it's not legit MSE if > max PadB
+    pad_b_recv_len_ = peer_io->read_buffer_size();
+    if (pad_b_recv_len_ > PadbMaxlen)
+    {
+        return done(false);
+    }
+    peer_io->read_buffer_discard(pad_b_recv_len_);
+
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
     static auto constexpr BufSize = std::tuple_size_v<tr_sha1_digest_t> * 2 + std::size(VC) + sizeof(crypto_provide_) +
@@ -374,7 +383,6 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     pad_a_recv_len_ = peer_io->read_buffer_size();
     if (pad_a_recv_len_ > PadaMaxlen)
     {
-        errorMsg_ = fmt::format("MSE failure invalid PadA({})", pad_a_recv_len_);
         return done(false);
     }
     peer_io->read_buffer_discard(pad_a_recv_len_);
