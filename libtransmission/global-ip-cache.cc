@@ -84,7 +84,7 @@ namespace global_source_ip_helpers
                 auto src_sslen = socklen_t{ sizeof(src_ss) };
                 if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
                 {
-                    if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)))
+                    if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                     {
                         tr_net_close_socket(sock);
                         errno = save;
@@ -148,7 +148,7 @@ tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
 
 std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cache::Mediator& mediator_in)
 {
-    return std::unique_ptr<tr_global_ip_cache>{ new tr_global_ip_cache(mediator_in) };
+    return std::unique_ptr<tr_global_ip_cache>{ new tr_global_ip_cache{ mediator_in } };
 }
 
 tr_global_ip_cache::~tr_global_ip_cache()
