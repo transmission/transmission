@@ -53,11 +53,7 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
     };
 
-private:
     explicit tr_global_ip_cache(Mediator& mediator_in);
-
-public:
-    [[nodiscard]] static std::unique_ptr<tr_global_ip_cache> create(Mediator& mediator_in);
 
     tr_global_ip_cache() = delete;
     ~tr_global_ip_cache();

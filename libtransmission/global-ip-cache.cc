@@ -146,11 +146,6 @@ tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
     ++cache_exists;
 }
 
-std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cache::Mediator& mediator_in)
-{
-    return std::unique_ptr<tr_global_ip_cache>{ new tr_global_ip_cache{ mediator_in } };
-}
-
 tr_global_ip_cache::~tr_global_ip_cache()
 {
     // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first

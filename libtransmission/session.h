@@ -960,7 +960,7 @@ public:
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
-        return global_ip_cache_->has_ip_protocol(type);
+        return global_ip_cache_.has_ip_protocol(type);
     }
 
     [[nodiscard]] tr_address bind_address(tr_address_type type) const noexcept;
@@ -968,18 +968,18 @@ public:
     [[nodiscard]] std::optional<tr_address> global_address(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
-        return global_ip_cache_->global_addr(type);
+        return global_ip_cache_.global_addr(type);
     }
 
     bool set_global_address(tr_address const& addr) noexcept
     {
-        return global_ip_cache_->set_global_addr(addr.type, addr);
+        return global_ip_cache_.set_global_addr(addr.type, addr);
     }
 
     [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
-        return global_ip_cache_->global_source_addr(type);
+        return global_ip_cache_.global_source_addr(type);
     }
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
@@ -1291,7 +1291,7 @@ private:
 
     // depends-on: settings_, session_thread_, timer_maker_, web_
     GlobalIPCacheMediator global_ip_cache_mediator_{ *this };
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = tr_global_ip_cache::create(global_ip_cache_mediator_);
+    tr_global_ip_cache global_ip_cache_{ global_ip_cache_mediator_ };
 
     // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::bind_address())
     WebMediator web_mediator_{ this };
