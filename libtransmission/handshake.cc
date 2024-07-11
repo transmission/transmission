@@ -123,7 +123,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     /* send it */
     set_state(State::AwaitingVc);
     peer_io->write(outbuf, false);
-    return READ_NOW;
+    return READ_LATER;
 }
 
 // MSE spec: "Since the length of [PadB is] unknown,
@@ -369,12 +369,22 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
     dh_.setPeerPublicKey(peer_public_key);
 
+    // everything received so far is Ya+PadA; haven't sent Yb and peer has not yet sent VC.
+    // so throw away buffer, and do early exit check: we know it's not legit MSE if > max PadA
+    pad_a_recv_len_ = peer_io->read_buffer_size();
+    if (pad_a_recv_len_ > PadaMaxlen)
+    {
+        errorMsg_ = fmt::format("MSE failure invalid PadA({})", pad_a_recv_len_);
+        return done(false);
+    }
+    peer_io->read_buffer_discard(pad_a_recv_len_);
+
     // send our public key to the peer
     tr_logAddTraceHand(this, "sending B->A: Diffie Hellman Yb, PadB");
     send_public_key_and_pad<PadbMaxlen>(peer_io);
 
     set_state(State::AwaitingPadA);
-    return READ_NOW;
+    return READ_LATER;
 }
 
 ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
