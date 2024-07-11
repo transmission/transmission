@@ -23,7 +23,7 @@
 #endif
 
 /**
- * Cache global IP addresses.
+ * Cache IP addresses.
  *
  * This class caches 3 useful info:
  * 1. Whether your machine supports the IP protocol
@@ -34,7 +34,7 @@
  * you have connectivity to the public internet. And if the global address is
  * the same as the source address, then you are not behind a NAT.
  */
-class tr_global_ip_cache
+class tr_ip_cache
 {
 public:
     struct Mediator
@@ -53,14 +53,14 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
     };
 
-    explicit tr_global_ip_cache(Mediator& mediator_in);
+    explicit tr_ip_cache(Mediator& mediator_in);
 
-    tr_global_ip_cache() = delete;
-    ~tr_global_ip_cache();
-    tr_global_ip_cache(tr_global_ip_cache const&) = delete;
-    tr_global_ip_cache(tr_global_ip_cache&&) = delete;
-    tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
-    tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
+    tr_ip_cache() = delete;
+    ~tr_ip_cache();
+    tr_ip_cache(tr_ip_cache const&) = delete;
+    tr_ip_cache(tr_ip_cache&&) = delete;
+    tr_ip_cache& operator=(tr_ip_cache const&) = delete;
+    tr_ip_cache& operator=(tr_ip_cache&&) = delete;
 
     bool try_shutdown() noexcept;
 

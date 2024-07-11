@@ -21,8 +21,8 @@
 
 #include <fmt/core.h>
 
+#include "libtransmission/ip-cache.h"
 #include "libtransmission/log.h"
-#include "libtransmission/global-ip-cache.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
@@ -124,7 +124,7 @@ namespace global_source_ip_helpers
 } // namespace global_source_ip_helpers
 } // namespace
 
-tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
+tr_ip_cache::tr_ip_cache(Mediator& mediator_in)
     : mediator_{ mediator_in }
     , upkeep_timers_{ mediator_in.timer_maker().create(), mediator_in.timer_maker().create() }
 {
@@ -146,7 +146,7 @@ tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
     ++cache_exists;
 }
 
-tr_global_ip_cache::~tr_global_ip_cache()
+tr_ip_cache::~tr_ip_cache()
 {
     // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
     auto const locks = std::scoped_lock{ global_addr_mutex_[TR_AF_INET],
@@ -165,7 +165,7 @@ tr_global_ip_cache::~tr_global_ip_cache()
     --cache_exists;
 }
 
-bool tr_global_ip_cache::try_shutdown() noexcept
+bool tr_ip_cache::try_shutdown() noexcept
 {
     for (auto& timer : upkeep_timers_)
     {
@@ -183,7 +183,7 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
-tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
+tr_address tr_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
     if (tr_address::is_valid(type))
     {
@@ -198,7 +198,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
     return {};
 }
 
-bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
+bool tr_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
 {
     if (type == addr.type && addr.is_global_unicast_address())
     {
@@ -210,7 +210,7 @@ bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const&
     return false;
 }
 
-void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
+void tr_ip_cache::update_addr(tr_address_type type) noexcept
 {
     update_source_addr(type);
     if (global_source_addr(type))
@@ -219,7 +219,7 @@ void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
     }
 }
 
-void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
+void tr_ip_cache::update_global_addr(tr_address_type type) noexcept
 {
     auto const ix_service = ix_service_[type];
     TR_ASSERT(has_ip_protocol_[type]);
@@ -250,7 +250,7 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     mediator_.fetch(std::move(options));
 }
 
-void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
+void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
 {
     using namespace global_source_ip_helpers;
 
@@ -292,7 +292,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     unset_is_updating(type);
 }
 
-void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
+void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
 {
     auto& ix_service = ix_service_[type];
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
@@ -335,21 +335,21 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     unset_is_updating(type);
 }
 
-void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
+void tr_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
     auto const lock = std::scoped_lock{ global_addr_mutex_[type] };
     global_addr_[type].reset();
     tr_logAddTrace(fmt::format("Unset {} global address cache", tr_ip_protocol_to_sv(type)));
 }
 
-void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
+void tr_ip_cache::set_source_addr(tr_address const& addr) noexcept
 {
     auto const lock = std::scoped_lock{ source_addr_mutex_[addr.type] };
     source_addr_[addr.type] = addr;
     tr_logAddTrace(fmt::format("Cached source address {}", addr.display_name()));
 }
 
-void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
+void tr_ip_cache::unset_addr(tr_address_type type) noexcept
 {
     auto const lock = std::scoped_lock{ source_addr_mutex_[type] };
     source_addr_[type].reset();
@@ -359,7 +359,7 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
     unset_global_addr(type);
 }
 
-bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
+bool tr_ip_cache::set_is_updating(tr_address_type type) noexcept
 {
     if (is_updating_[type] != is_updating_t::NO)
     {
@@ -369,7 +369,7 @@ bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
     return true;
 }
 
-void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
+void tr_ip_cache::unset_is_updating(tr_address_type type) noexcept
 {
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
     is_updating_[type] = is_updating_t::NO;
