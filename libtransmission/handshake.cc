@@ -444,7 +444,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     }
     else
     {
-        tr_logAddTraceHand(this, "can't find that torrent...");
+        tr_logAddTraceHand(this, "we are not running that torrent...");
         return done(false);
     }
 
