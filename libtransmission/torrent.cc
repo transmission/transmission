@@ -1866,6 +1866,9 @@ void tr_torrent::recheck_completeness()
         {
             if (recent_change)
             {
+                // https://www.bittorrent.org/beps/bep_0003.html
+                // ...and one using completed is sent when the download is complete.
+                // No completed is sent if the file was complete when started.
                 tr_announcerTorrentCompleted(this);
             }
             date_done_ = tr_time();
