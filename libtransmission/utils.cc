@@ -731,14 +731,14 @@ public:
 
     static void create()
     {
-        if (!instance_)
+        if (!instance)
         {
-            instance_ = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+            instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
         }
     }
 
 private:
-    static inline std::unique_ptr<tr_net_init_mgr> instance_{};
+    static inline std::unique_ptr<tr_net_init_mgr> instance;
 };
 } // namespace tr_net_init_impl
 } // namespace
