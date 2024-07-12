@@ -395,6 +395,8 @@ Application::Application(int& argc, char** argv)
 #endif
 }
 
+Application::~Application() = default;
+
 void Application::loadTranslations()
 {
     auto const qt_qm_dirs = QStringList{} <<
