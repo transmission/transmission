@@ -947,8 +947,8 @@ void tr_torrent::on_metainfo_completed()
     else
     {
         completion_.set_has_all();
-        date_done_ = date_added_;
         recheck_completeness();
+        date_done_ = date_added_; // Must be after recheck_completeness()
 
         if (start_when_stable_)
         {
@@ -1872,8 +1872,8 @@ void tr_torrent::recheck_completeness()
             {
                 tr_announcerTorrentCompleted(this);
                 mark_changed();
-                date_done_ = tr_time();
             }
+            date_done_ = tr_time();
 
             if (current_dir() == incomplete_dir())
             {
@@ -2314,8 +2314,8 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
         else
         {
             completion_.set_has_all();
-            date_done_ = date_added_;
             recheck_completeness();
+            date_done_ = date_added_; // Must be after recheck_completeness()
         }
     }
     else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !set_local_error_if_files_disappeared(this))
