@@ -130,8 +130,10 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     }
 
     /* send it */
-    set_state(State::AwaitingVc);
     peer_io->write(outbuf, false);
+
+    set_state(State::AwaitingVc);
+    // LATER, not NOW: recv buffer was just drained and peer was blocking
     return READ_LATER;
 }
 
@@ -392,6 +394,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     send_public_key_and_pad<PadbMaxlen>(peer_io);
 
     set_state(State::AwaitingPadA);
+    // LATER, not NOW: recv buffer was just drained and peer was blocking
     return READ_LATER;
 }
 
