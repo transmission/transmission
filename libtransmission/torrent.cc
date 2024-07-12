@@ -1830,7 +1830,6 @@ void tr_torrent::recheck_completeness()
             if (recent_change)
             {
                 tr_announcerTorrentCompleted(this);
-                mark_changed();
             }
             date_done_ = tr_time();
 
@@ -1845,6 +1844,7 @@ void tr_torrent::recheck_completeness()
         session->onTorrentCompletenessChanged(this, completeness_, was_running);
 
         set_dirty();
+        mark_changed();
 
         if (is_done())
         {
