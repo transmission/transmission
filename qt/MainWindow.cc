@@ -285,7 +285,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     menu->addSeparator();
     menu->addAction(ui_.action_Quit);
     tray_icon_.setContextMenu(menu);
-    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), QApplication::windowIcon()));
+    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-symbolic"), QApplication::windowIcon()));
 
     connect(&prefs_, &Prefs::changed, this, &MainWindow::refreshPref);
     connect(ui_.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggleWindows);
