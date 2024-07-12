@@ -1852,15 +1852,12 @@ void tr_torrent::recheck_completeness()
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
 
-        if (recent_change)
-        {
-            tr_logAddTraceTor(
-                this,
-                fmt::format(
-                    "State changed from {} to {}",
-                    get_completion_string(completeness_),
-                    get_completion_string(new_completeness)));
-        }
+        tr_logAddTraceTor(
+            this,
+            fmt::format(
+                "State changed from {} to {}",
+                get_completion_string(completeness_),
+                get_completion_string(new_completeness)));
 
         completeness_ = new_completeness;
         session->close_torrent_files(id());
