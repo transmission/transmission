@@ -95,6 +95,11 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
     auto* const session = static_cast<tr_session*>(vsession);
     auto got_utp_packet = false;
 
+    auto const from_str = [from_sa]
+    {
+        return tr_socket_address::from_sockaddr(from_sa).value_or(tr_socket_address{}).display_name();
+    };
+
     for (;;)
     {
         auto const n_read = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, from_sa, &fromlen);
@@ -108,11 +113,6 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             }
             return;
         }
-
-        auto const from_str = [from_sa]
-        {
-            return tr_socket_address::from_sockaddr(from_sa).value_or(tr_socket_address{}).display_name();
-        };
 
         // Since most packets we receive here are µTP, make quick inline
         // checks for the other protocols. The logic is as follows:
