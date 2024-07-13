@@ -216,7 +216,7 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
     auto ms = rapidjson::MemoryStream{ begin, size };
     auto eis = rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream>{ ms };
     auto reader = rapidjson::GenericReader<rapidjson::AutoUTF<unsigned>, rapidjson::UTF8<char>>{};
-    reader.Parse(eis, handler);
+    reader.Parse<rapidjson::kParseStopWhenDoneFlag>(eis, handler);
 
     // Due to the nature of how AutoUTFInputStream works, when AutoUTFInputStream
     // is used with MemoryStream, the read cursor position is always 1 ahead of
