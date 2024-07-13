@@ -543,8 +543,8 @@ TEST_F(VariantTest, serdeEnd)
         std::tuple{ R"({ "json1": 1 })"sv, '\0', 14U },
     };
     static auto constexpr TestsBenc = std::array{
-        std::tuple{ "d5:json1i1eed5:json2i2ee"sv, 'd', 12U },
-        std::tuple{ "d5:json1i1ee"sv, '\0', 12U },
+        std::tuple{ "d5:benc1i1eed5:benc2i2ee"sv, 'd', 12U },
+        std::tuple{ "d5:benc1i1ee"sv, '\0', 12U },
     };
 
     for (auto [in, c, pos] : TestsJson)
