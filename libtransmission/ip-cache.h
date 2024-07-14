@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <atomic>
 #include <chrono> // std::chrono::milliseconds
 #include <condition_variable>
 #include <memory> // std::unique_ptr
@@ -24,7 +23,7 @@
 #endif
 
 /**
- * Cache global IP addresses.
+ * Cache IP addresses.
  *
  * This class caches 3 useful info:
  * 1. Whether your machine supports the IP protocol
@@ -34,9 +33,8 @@
  * The idea is, if this class successfully cached a source address, that means
  * you have connectivity to the public internet. And if the global address is
  * the same as the source address, then you are not behind a NAT.
- *
  */
-class tr_global_ip_cache
+class tr_ip_cache
 {
 public:
     struct Mediator
@@ -55,18 +53,14 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
     };
 
-private:
-    explicit tr_global_ip_cache(Mediator& mediator_in);
+    explicit tr_ip_cache(Mediator& mediator_in);
 
-public:
-    [[nodiscard]] static std::unique_ptr<tr_global_ip_cache> create(Mediator& mediator_in);
-
-    tr_global_ip_cache() = delete;
-    ~tr_global_ip_cache();
-    tr_global_ip_cache(tr_global_ip_cache const&) = delete;
-    tr_global_ip_cache(tr_global_ip_cache&&) = delete;
-    tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
-    tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
+    tr_ip_cache() = delete;
+    ~tr_ip_cache();
+    tr_ip_cache(tr_ip_cache const&) = delete;
+    tr_ip_cache(tr_ip_cache&&) = delete;
+    tr_ip_cache& operator=(tr_ip_cache const&) = delete;
+    tr_ip_cache& operator=(tr_ip_cache&&) = delete;
 
     bool try_shutdown() noexcept;
 
@@ -121,7 +115,7 @@ private:
 
     Mediator& mediator_;
 
-    enum class is_updating_t
+    enum class is_updating_t : uint8_t
     {
         NO = 0,
         YES,
@@ -144,5 +138,5 @@ private:
     // Whether this machine supports this IP protocol
     array_ip_t<bool> has_ip_protocol_ = { true, true };
 
-    array_ip_t<std::atomic_size_t> ix_service_ = {};
+    array_ip_t<size_t> ix_service_ = {};
 };
