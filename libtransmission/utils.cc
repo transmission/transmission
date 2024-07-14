@@ -336,7 +336,7 @@ std::string tr_win32_format_message(uint32_t code)
         nullptr,
         code,
         0,
-        (LPWSTR)&wide_text,
+        reinterpret_cast<LPWSTR>(&wide_text),
         0,
         nullptr);
 
@@ -355,7 +355,7 @@ std::string tr_win32_format_message(uint32_t code)
     LocalFree(wide_text);
 
     // Most (all?) messages contain "\r\n" in the end, chop it
-    while (!std::empty(text) && isspace(text.back()))
+    while (!std::empty(text) && isspace(text.back()) != 0)
     {
         text.resize(text.size() - 1);
     }
@@ -370,7 +370,7 @@ namespace tr_main_win32_impl
 
 std::optional<std::vector<std::string>> win32MakeUtf8Argv()
 {
-    int argc;
+    int argc = 0;
     auto argv = std::vector<std::string>{};
     if (wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc); wargv != nullptr)
     {
@@ -390,7 +390,7 @@ std::optional<std::vector<std::string>> win32MakeUtf8Argv()
             argv.emplace_back(std::move(str));
         }
 
-        LocalFree(wargv);
+        LocalFree(reinterpret_cast<HLOCAL>(wargv));
     }
 
     if (static_cast<int>(std::size(argv)) == argc)
