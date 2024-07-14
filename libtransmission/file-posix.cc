@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
@@ -987,7 +986,7 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
 
 #endif
 
-    assert(result);
+    TR_ASSERT(result);
     if (!*result && errno == EAGAIN)
     {
         errno = EWOULDBLOCK;
