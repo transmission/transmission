@@ -309,6 +309,28 @@ jobs:
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
 
+  macos-14-project:
+     runs-on: macos-14
+     needs: [ what-to-make ]
+     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+     steps:
+       - name: Show Configuration
+         run: |
+           echo '${{ toJSON(needs) }}'
+           echo '${{ toJSON(runner) }}'
+           sw_vers
+       - name: Get Source
+         uses: actions/checkout@v4
+         with:
+           path: src
+           submodules: recursive
+       - name: Build
+         run: xcodebuild -project src/Transmission.xcodeproj
+       - uses: actions/upload-artifact@v4
+         with:
+           name: binaries-${{ github.job }}
+           path: pfx/**/*
+
   macos-14-arm64:
     runs-on: macos-14
     needs: [ what-to-make ]
