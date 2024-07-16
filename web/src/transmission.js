@@ -23,7 +23,13 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { createOptions, debounce, deepEqual, setEnabled, setTextContent } from './utils.js';
+import {
+  newOpts,
+  debounce,
+  deepEqual,
+  setEnabled,
+  setTextContent
+} from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -184,15 +190,15 @@ export class Transmission extends EventTarget {
 
     let e = document.querySelector('#filter-mode');
     // Initialize filter options
-    createOptions(e, false, [['All', Prefs.FilterAll]]);
-    createOptions(e, 'status', [
+    newOpts(e, false, [['All', Prefs.FilterAll]]);
+    newOpts(e, 'status', [
       ['Active', Prefs.FilterActive],
       ['Downloading', Prefs.FilterDownloading],
       ['Seeding', Prefs.FilterSeeding],
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
     ]);
-    createOptions(e, 'list', [
+    newOpts(e, 'list', [
       ['Private torrents', Prefs.FilterPrivate],
       ['Public torrents', Prefs.FilterPublic],
       ['Errored torrents', Prefs.FilterError],
@@ -206,7 +212,7 @@ export class Transmission extends EventTarget {
     });
 
     e = document.querySelector('#filter-tracker');
-    createOptions(e, false, [['All', Prefs.FilterAll]]);
+    newOpts(e, false, [['All', Prefs.FilterAll]]);
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -996,7 +1002,7 @@ TODO: fix this when notifications get fixed
 
       const e = document.querySelector('#filter-tracker');
       e.innerHTML = '';
-      createOptions(e, false, a);
+      newOpts(e, false, a);
     }
   }
 
