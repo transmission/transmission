@@ -27,10 +27,6 @@
 
 using namespace std::literals;
 
-#ifndef MAXSIZE_T
-#define MAXSIZE_T ((SIZE_T) ~((SIZE_T)0))
-#endif
-
 struct tr_sys_dir_win32
 {
     std::wstring pattern;
@@ -888,7 +884,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     bool ret = false;
     DWORD my_bytes_read = 0;
 
-    if (to_bool(ReadFile(handle, buffer, (DWORD)size, &my_bytes_read, nullptr)))
+    if (to_bool(ReadFile(handle, buffer, static_cast<DWORD>(size), &my_bytes_read, nullptr)))
     {
         if (bytes_read != nullptr)
         {
@@ -926,12 +922,11 @@ bool tr_sys_file_read_at(
     auto overlapped = OVERLAPPED{};
     DWORD my_bytes_read = 0;
 
-    overlapped.Offset = (DWORD)offset;
-    offset >>= 32;
-    overlapped.OffsetHigh = (DWORD)offset;
+    overlapped.Offset = static_cast<DWORD>(offset);
+    overlapped.OffsetHigh = static_cast<DWORD>(offset >> 32);
     overlapped.hEvent = nullptr;
 
-    if (to_bool(ReadFile(handle, buffer, (DWORD)size, &my_bytes_read, &overlapped)))
+    if (to_bool(ReadFile(handle, buffer, static_cast<DWORD>(size), &my_bytes_read, &overlapped)))
     {
         if (bytes_read != nullptr)
         {
@@ -962,7 +957,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     bool ret = false;
     DWORD my_bytes_written = 0;
 
-    if (to_bool(WriteFile(handle, buffer, (DWORD)size, &my_bytes_written, nullptr)))
+    if (to_bool(WriteFile(handle, buffer, static_cast<DWORD>(size), &my_bytes_written, nullptr)))
     {
         if (bytes_written != nullptr)
         {
@@ -1000,12 +995,11 @@ bool tr_sys_file_write_at(
     auto overlapped = OVERLAPPED{};
     DWORD my_bytes_written = 0;
 
-    overlapped.Offset = (DWORD)offset;
-    offset >>= 32;
-    overlapped.OffsetHigh = (DWORD)offset;
+    overlapped.Offset = static_cast<DWORD>(offset);
+    overlapped.OffsetHigh = static_cast<DWORD>(offset >> 32);
     overlapped.hEvent = nullptr;
 
-    if (to_bool(WriteFile(handle, buffer, (DWORD)size, &my_bytes_written, &overlapped)))
+    if (to_bool(WriteFile(handle, buffer, static_cast<DWORD>(size), &my_bytes_written, &overlapped)))
     {
         if (bytes_written != nullptr)
         {
