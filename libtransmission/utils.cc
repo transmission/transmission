@@ -75,21 +75,32 @@ Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, 
 
 // ---
 
+#if defined(_WIN32) && defined(__clang_analyzer__)
+// See https://github.com/llvm/llvm-project/issues/44701
+#define WORKAROUND_CLANG_TIDY_GH44701
+#endif
+
 std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept
 {
+#ifndef WORKAROUND_CLANG_TIDY_GH44701
     try
+#endif
     {
         return tr_locale_set_global(std::locale{ locale_name });
     }
+#ifndef WORKAROUND_CLANG_TIDY_GH44701
     catch (std::runtime_error const&)
     {
         return {};
     }
+#endif
 }
 
 std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexcept
 {
+#ifndef WORKAROUND_CLANG_TIDY_GH44701
     try
+#endif
     {
         auto old_locale = std::locale::global(locale);
 
@@ -98,10 +109,12 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
         return old_locale;
     }
+#ifndef WORKAROUND_CLANG_TIDY_GH44701
     catch (std::exception const&)
     {
         return {};
     }
+#endif
 }
 
 // ---
@@ -336,7 +349,7 @@ std::string tr_win32_format_message(uint32_t code)
         nullptr,
         code,
         0,
-        (LPWSTR)&wide_text,
+        reinterpret_cast<LPWSTR>(&wide_text),
         0,
         nullptr);
 
@@ -355,7 +368,7 @@ std::string tr_win32_format_message(uint32_t code)
     LocalFree(wide_text);
 
     // Most (all?) messages contain "\r\n" in the end, chop it
-    while (!std::empty(text) && isspace(text.back()))
+    while (!std::empty(text) && isspace(text.back()) != 0)
     {
         text.resize(text.size() - 1);
     }
@@ -370,7 +383,7 @@ namespace tr_main_win32_impl
 
 std::optional<std::vector<std::string>> win32MakeUtf8Argv()
 {
-    int argc;
+    int argc = 0;
     auto argv = std::vector<std::string>{};
     if (wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc); wargv != nullptr)
     {
@@ -390,7 +403,7 @@ std::optional<std::vector<std::string>> win32MakeUtf8Argv()
             argv.emplace_back(std::move(str));
         }
 
-        LocalFree(wargv);
+        LocalFree(reinterpret_cast<HLOCAL>(wargv));
     }
 
     if (static_cast<int>(std::size(argv)) == argc)
