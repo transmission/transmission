@@ -28,7 +28,7 @@ import {
   debounce,
   deepEqual,
   setEnabled,
-  setTextContent
+  setTextContent,
 } from './utils.js';
 
 export class Transmission extends EventTarget {
