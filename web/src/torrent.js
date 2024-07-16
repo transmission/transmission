@@ -353,11 +353,11 @@ export class Torrent extends EventTarget {
     const s = this.getStatus();
 
     switch (state) {
-      case 'error':
+      case Prefs.FilterError:
         return this.getError();
-      case 'private':
+      case Prefs.FilterPrivate:
         return this.getPrivateFlag();
-      case 'public':
+      case Prefs.FilterPublic:
         return !this.getPrivateFlag();
       case Prefs.FilterActive:
         return (
