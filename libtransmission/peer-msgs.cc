@@ -608,40 +608,40 @@ private:
 
     // ---
 
-    size_t protocol_send_keepalive() const;
+    size_t protocol_send_keepalive() const; // NOLINT(modernize-use-nodiscard)
 
     template<typename... Args>
     size_t protocol_send_message(uint8_t type, Args const&... args) const;
 
-    size_t protocol_send_reject(peer_request const& req) const
+    size_t protocol_send_reject(peer_request const& req) const // NOLINT(modernize-use-nodiscard)
     {
         TR_ASSERT(io_->supports_fext());
         return protocol_send_message(BtPeerMsgs::FextReject, req.index, req.offset, req.length);
     }
 
-    size_t protocol_send_cancel(peer_request const& req) const
+    size_t protocol_send_cancel(peer_request const& req) const // NOLINT(modernize-use-nodiscard)
     {
         return protocol_send_message(BtPeerMsgs::Cancel, req.index, req.offset, req.length);
     }
 
-    size_t protocol_send_request(peer_request const& req) const
+    size_t protocol_send_request(peer_request const& req) const // NOLINT(modernize-use-nodiscard)
     {
         TR_ASSERT(is_valid_request(req));
         return protocol_send_message(BtPeerMsgs::Request, req.index, req.offset, req.length);
     }
 
-    size_t protocol_send_dht_port(tr_port const port) const
+    size_t protocol_send_dht_port(tr_port const port) const // NOLINT(modernize-use-nodiscard)
     {
         return protocol_send_message(BtPeerMsgs::DhtPort, port.host());
     }
 
-    size_t protocol_send_have(tr_piece_index_t const index) const
+    size_t protocol_send_have(tr_piece_index_t const index) const // NOLINT(modernize-use-nodiscard)
     {
         static_assert(sizeof(tr_piece_index_t) == sizeof(uint32_t));
         return protocol_send_message(BtPeerMsgs::Have, index);
     }
 
-    size_t protocol_send_choke(bool const choke) const
+    size_t protocol_send_choke(bool const choke) const // NOLINT(modernize-use-nodiscard)
     {
         return protocol_send_message(choke ? BtPeerMsgs::Choke : BtPeerMsgs::Unchoke);
     }
