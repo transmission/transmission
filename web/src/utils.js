@@ -153,8 +153,8 @@ export function makeUUID() {
   );
 }
 
-export function createOptions(element, l, a) {
-  const opts = a.map(t => new Option(...t));
+export function newOpts(element, l, a) {
+  const opts = a.map((t) => new Option(...t));
 
   if (l) {
     const e = document.createElement('OPTGROUP');
