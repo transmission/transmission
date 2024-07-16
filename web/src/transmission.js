@@ -40,7 +40,6 @@ export class Transmission extends EventTarget {
     );
 
     // Initialize the implementation fields
-    this.filterOpts = [];
     this.filterText = '';
     this.oldTrackers = [];
     this._torrents = {};
@@ -183,23 +182,21 @@ export class Transmission extends EventTarget {
       }
     });
 
+    let e = document.querySelector('#filter-mode');
     // Initialize filter options
-    this._newOpt(false, [['All', Prefs.FilterAll]]);
-    this._newOpt('status', [
+    this._newOpt(e, false, [['All', Prefs.FilterAll]]);
+    this._newOpt(e, 'status', [
       ['Active', Prefs.FilterActive],
       ['Downloading', Prefs.FilterDownloading],
       ['Seeding', Prefs.FilterSeeding],
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
     ]);
-    this._newOpt('list', [
-      ['Private torrents', 'private'],
-      ['Public torrents', 'public'],
-      ['Errored torrents', 'error'],
+    this._newOpt(e, 'list', [
+      ['Private torrents', Prefs.FilterPrivate],
+      ['Public torrents', Prefs.FilterPublic],
+      ['Errored torrents', Prefs.FilterError],
     ]);
-
-    let e = document.querySelector('#filter-mode');
-    e.append(...this.filterOpts);
 
     // listen to filter changes
     e.value = this.prefs.filter_mode;
@@ -208,10 +205,8 @@ export class Transmission extends EventTarget {
       this.refilterAllSoon();
     });
 
-    this.filterOpts = [];
-    this._newOpt(false, [['All', Prefs.FilterAll]]);
     e = document.querySelector('#filter-tracker');
-    e.append(this.filterOpts[0]);
+    this._newOpt(e, false, [['All', Prefs.FilterAll]]);
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -322,19 +317,16 @@ export class Transmission extends EventTarget {
     }
   }
 
-  _newOpt(l, a) {
-    const opts = [];
-    for (const t of a) {
-      opts.push(new Option(...t));
-    }
+  _newOpt(ele, l, a) {
+    const opts = a.map(t => new Option(...t));
 
     if (l) {
       const e = document.createElement('OPTGROUP');
       e.label = l;
       e.append(...opts);
-      this.filterOpts.push(e);
+      ele.append(e);
     } else {
-      this.filterOpts.push(...opts);
+      ele.append(...opts);
     }
   }
 
@@ -1002,12 +994,10 @@ TODO: fix this when notifications get fixed
     // Update select box only when list of trackers has changed
     if (
       sitenames.length !== this.oldTrackers.length ||
-      sitenames.some((x) => !this.oldTrackers.includes(x))
+      sitenames.some((ele, idx) => ele !== this.oldTrackers[idx])
     ) {
-      this.oldTrackers = [...sitenames];
+      this.oldTrackers = sitenames;
 
-      const e = document.querySelector('#filter-tracker');
-      e.innerHTML = '';
       const a = [['All', Prefs.FilterAll, !this.filterTracker]];
       for (const sitename of sitenames) {
         a.push([
@@ -1016,9 +1006,10 @@ TODO: fix this when notifications get fixed
           sitename === this.filterTracker,
         ]);
       }
-      this.filterOpts = [];
-      this._newOpt(false, a);
-      e.append(...this.filterOpts);
+
+      const e = document.querySelector('#filter-tracker');
+      e.innerHTML = '';
+      this._newOpt(e, false, a);
     }
   }
 
