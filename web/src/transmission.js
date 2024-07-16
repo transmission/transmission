@@ -190,7 +190,7 @@ export class Transmission extends EventTarget {
 
     let e = document.querySelector('#filter-mode');
     // Initialize filter options
-    newOpts(e, false, [['All', Prefs.FilterAll]]);
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
     newOpts(e, 'status', [
       ['Active', Prefs.FilterActive],
       ['Downloading', Prefs.FilterDownloading],
@@ -212,7 +212,7 @@ export class Transmission extends EventTarget {
     });
 
     e = document.querySelector('#filter-tracker');
-    newOpts(e, false, [['All', Prefs.FilterAll]]);
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -991,18 +991,18 @@ TODO: fix this when notifications get fixed
     ) {
       this.oldTrackers = sitenames;
 
-      const a = [['All', Prefs.FilterAll, !this.filterTracker]];
-      for (const sitename of sitenames) {
-        a.push([
+      const a = [
+        ['All', Prefs.FilterAll, !this.filterTracker],
+        ...sitenames.map((sitename) => [
           Transmission._displayName(sitename),
           sitename,
           sitename === this.filterTracker,
-        ]);
-      }
+        ]),
+      ];
 
       const e = document.querySelector('#filter-tracker');
       e.innerHTML = '';
-      newOpts(e, false, a);
+      newOpts(e, null, a);
     }
   }
 
