@@ -646,8 +646,8 @@ void rpc_server_start_retry_cancel(tr_rpc_server* server)
 int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t port)
 {
 #ifdef _WIN32
-    struct addrinfo* result = NULL;
-    struct addrinfo hints;
+    struct addrinfo* result = nullptr;
+    struct addrinfo hints = {};
     ZeroMemory(&hints, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -656,13 +656,14 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
 
     if (getaddrinfo(address, std::to_string(port).c_str(), &hints, &result) != 0)
     {
-        goto FALLBACK;
+        return evhttp_bind_socket(httpd, address, port);
     }
 
-    int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    const int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (fd == INVALID_SOCKET)
     {
-        goto CLEANUP_ADDRINFO;
+        freeaddrinfo(result);
+        return evhttp_bind_socket(httpd, address, port);
     }
     evutil_make_socket_nonblocking(fd);
     evutil_make_listen_socket_reuseable(fd);
@@ -676,25 +677,20 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     // Set keep alive
     int on = 1;
     setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&on), sizeof(on));
-    if (bind(fd, result->ai_addr, result->ai_addrlen) != 0)
+    if (bind(fd, result->ai_addr, result->ai_addrlen) != 0 || listen(fd, 128) == -1)
     {
-        goto CLEANUP_SOCKET;
-    }
-    if (listen(fd, 128) == -1)
-    {
-        goto CLEANUP_SOCKET;
+        closesocket(fd);
+        freeaddrinfo(result);
+        return evhttp_bind_socket(httpd, address, port); return evhttp_bind_socket(httpd, address, port);
     }
     if (evhttp_accept_socket(httpd, fd) == 0)
     {
         freeaddrinfo(result);
         return 0;
     }
-
-CLEANUP_SOCKET:
+    // Fallback
     closesocket(fd);
-CLEANUP_ADDRINFO:
     freeaddrinfo(result);
-FALLBACK:
 #endif
     return evhttp_bind_socket(httpd, address, port);
 }
