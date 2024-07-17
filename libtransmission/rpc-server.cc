@@ -659,7 +659,7 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
         return evhttp_bind_socket(httpd, address, port);
     }
 
-    const int fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    int const fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (fd == INVALID_SOCKET)
     {
         freeaddrinfo(result);
@@ -681,7 +681,7 @@ int tr_evhttp_bind_socket(struct evhttp* httpd, char const* address, ev_uint16_t
     {
         closesocket(fd);
         freeaddrinfo(result);
-        return evhttp_bind_socket(httpd, address, port); return evhttp_bind_socket(httpd, address, port);
+        return evhttp_bind_socket(httpd, address, port);
     }
     if (evhttp_accept_socket(httpd, fd) == 0)
     {
