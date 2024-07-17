@@ -142,7 +142,7 @@ target_sources(${TR_NAME}-qt
 if(WIN32 OR APPLE)
     target_sources(${TR_NAME}-qt
         PRIVATE
-            ${SOURCE_ICONS_DIR}/Faenza/Faenza.qrc)
+            icons/Faenza/Faenza.qrc)
 endif()
 
 source_group(Resources
