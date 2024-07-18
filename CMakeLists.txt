@@ -234,6 +234,8 @@ endif()
 
 set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
+set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
+
 find_package(FastFloat)
 find_package(Fmt)
 find_package(RapidJSON)
