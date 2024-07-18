@@ -346,11 +346,11 @@ a {
     border-left: 1px solid var(--color-border-default);
     height: 25px;
     margin: 0 6px 0 0;
-  }
 
-  :nth-last-child(2) {
-    border: 0;
-    flex-grow: 1;
+    &:last-of-type {
+      border: 0;
+      flex-grow: 1;
+    }
   }
 }
 
