@@ -735,7 +735,6 @@ void tr_torrent::start_in_session_thread()
     time_t const now = tr_time();
 
     is_running_ = true;
-    completeness_ = completion_.status();
     date_started_ = now;
     mark_changed();
     error().clear();
@@ -904,8 +903,8 @@ void tr_torrent::on_metainfo_completed()
     else
     {
         completion_.set_has_all();
-        date_done_ = date_added_;
         recheck_completeness();
+        date_done_ = date_added_; // Must be after recheck_completeness()
 
         if (start_when_stable_)
         {
@@ -1812,15 +1811,12 @@ void tr_torrent::recheck_completeness()
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
 
-        if (recent_change)
-        {
-            tr_logAddTraceTor(
-                this,
-                fmt::format(
-                    "State changed from {} to {}",
-                    get_completion_string(completeness_),
-                    get_completion_string(new_completeness)));
-        }
+        tr_logAddTraceTor(
+            this,
+            fmt::format(
+                "State changed from {} to {}",
+                get_completion_string(completeness_),
+                get_completion_string(new_completeness)));
 
         completeness_ = new_completeness;
         session->close_torrent_files(id());
@@ -1829,10 +1825,12 @@ void tr_torrent::recheck_completeness()
         {
             if (recent_change)
             {
+                // https://www.bittorrent.org/beps/bep_0003.html
+                // ...and one using completed is sent when the download is complete.
+                // No completed is sent if the file was complete when started.
                 tr_announcerTorrentCompleted(this);
-                mark_changed();
-                date_done_ = tr_time();
             }
+            date_done_ = tr_time();
 
             if (current_dir() == incomplete_dir())
             {
@@ -1845,6 +1843,7 @@ void tr_torrent::recheck_completeness()
         session->onTorrentCompletenessChanged(this, completeness_, was_running);
 
         set_dirty();
+        mark_changed();
 
         if (is_done())
         {
@@ -2270,8 +2269,8 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
         else
         {
             completion_.set_has_all();
-            date_done_ = date_added_;
             recheck_completeness();
+            date_done_ = date_added_; // Must be after recheck_completeness()
         }
     }
     else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !set_local_error_if_files_disappeared(this))
