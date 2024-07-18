@@ -77,9 +77,6 @@ export class Prefs extends EventTarget {
     if (value === 'false') {
       return false;
     }
-    if (/^\d+$/.test(value)) {
-      return Number.parseInt(value, 10);
-    }
     return value;
   }
 
