@@ -560,6 +560,26 @@ public:
             // not currently supported
             break;
 
+        case tr_peer_event::Type::Error:
+            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
+            {
+                // some protocol error from the peer
+                msgs->disconnect_soon();
+                tr_logAddDebugSwarm(
+                    s,
+                    fmt::format(
+                        "setting {} is_disconnecting_ flag because we got [({}) {}]",
+                        msgs->display_name(),
+                        event.err,
+                        tr_strerror(event.err)));
+            }
+            else
+            {
+                tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
+            }
+
+            break;
+
         default:
             peer_callback_common(msgs, event, s);
             break;
@@ -619,7 +639,7 @@ private:
         stats.active_webseed_count = 0;
     }
 
-    void add_strike(tr_peerMsgs* peer) const
+    void add_strike(tr_peer* peer) const
     {
         tr_logAddTraceSwarm(
             this,
@@ -627,8 +647,7 @@ private:
 
         if (++peer->strikes >= MaxBadPiecesPerPeer)
         {
-            peer->peer_info->ban();
-            peer->do_purge = true;
+            peer->ban();
             tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
         }
     }
@@ -716,9 +735,7 @@ private:
 
     void on_got_bad_piece(tr_piece_index_t piece)
     {
-        auto const byte_count = tor->piece_size(piece);
-
-        for (auto* const peer : peers)
+        auto const maybe_add_strike = [this, piece](tr_peer* const peer)
         {
             if (peer->blame.test(piece))
             {
@@ -731,6 +748,18 @@ private:
                         peer->strikes + 1));
                 add_strike(peer);
             }
+        };
+
+        auto const byte_count = tor->piece_size(piece);
+
+        for (auto* const peer : peers)
+        {
+            maybe_add_strike(peer);
+        }
+
+        for (auto& webseed : webseeds)
+        {
+            maybe_add_strike(webseed.get());
         }
 
         tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
@@ -791,28 +820,9 @@ private:
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
+                peer->blame.set(loc.piece);
                 tor->on_block_received(loc.block);
                 s->got_block.emit(tor, event.pieceIndex, loc.block);
-            }
-
-            break;
-
-        case tr_peer_event::Type::Error:
-            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
-            {
-                /* some protocol error from the peer */
-                peer->do_purge = true;
-                tr_logAddDebugSwarm(
-                    s,
-                    fmt::format(
-                        "setting {} do_purge flag because we got [({}) {}]",
-                        peer->display_name(),
-                        event.err,
-                        tr_strerror(event.err)));
-            }
-            else
-            {
-                tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
             }
 
             break;
@@ -890,13 +900,13 @@ EXIT:
                 std::end(peers),
                 [&info_that](tr_peerMsgs const* const peer) { return peer->peer_info == info_that; });
             TR_ASSERT(it != std::end(peers));
-            (*it)->do_purge = true;
+            (*it)->disconnect_soon();
 
             return false;
         }
 
         info_that->merge(*info_this);
-        msgs->do_purge = true;
+        msgs->disconnect_soon();
         stats.known_peer_from_count[info_this->from_first()] -= connectable_pool.erase(info_this->listen_socket_address());
 
         return true;
@@ -1152,7 +1162,7 @@ private:
 tr_peer::tr_peer(tr_torrent const& tor)
     : session{ tor.session }
     , swarm{ tor.swarm }
-    , blame{ tor.block_count() }
+    , blame{ tor.piece_count() }
 {
 }
 
@@ -2104,9 +2114,9 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
 [[nodiscard]] bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, size_t peer_count, time_t const now)
 {
     /* if it's marked for purging, close it */
-    if (peer->do_purge)
+    if (peer->is_disconnecting())
     {
-        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its do_purge flag is set", peer->display_name()));
+        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its is_disconnecting_ flag is set", peer->display_name()));
         return true;
     }
 
@@ -2157,9 +2167,9 @@ constexpr struct
 {
     [[nodiscard]] static int compare(tr_peerMsgs const* a, tr_peerMsgs const* b) // <=>
     {
-        if (a->do_purge != b->do_purge)
+        if (a->is_disconnecting() != b->is_disconnecting())
         {
-            return a->do_purge ? 1 : -1;
+            return a->is_disconnecting() ? 1 : -1;
         }
 
         return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
