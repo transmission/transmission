@@ -375,16 +375,12 @@ export class Transmission extends EventTarget {
       case Prefs.RefreshRate: {
         const callback = this.refreshTorrents.bind(this);
         const msec = Math.max(2, this.prefs.refresh_rate_sec) * 1000;
-        let then = Date.now();
 
         const refreshTorrentsInterval = () => {
-          requestAnimationFrame(refreshTorrentsInterval);
-          const now = Date.now();
-          const elapsed = now - then;
-          if (elapsed > msec) {
-            then = now - (elapsed % msec);
-            callback();
-          }
+          setTimeout(() => {
+            requestAnimationFrame(refreshTorrentsInterval);
+          }, msec);
+          callback();
         };
 
         refreshTorrentsInterval();
