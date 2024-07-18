@@ -26,9 +26,9 @@
  * @{
  */
 
-class tr_peer;
 class tr_swarm;
 struct tr_bandwidth;
+struct tr_peer;
 
 // --- Peer Publish / Subscribe
 
@@ -178,27 +178,26 @@ using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& ev
  * @see tr_peer_info
  * @see tr_peerMsgs
  */
-class tr_peer
+struct tr_peer
 {
-public:
     using Speed = libtransmission::Values::Speed;
 
-    explicit tr_peer(tr_torrent const* tor);
+    explicit tr_peer(tr_torrent const& tor);
     virtual ~tr_peer();
 
     [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] bool has_piece(tr_piece_index_t piece) const noexcept
     {
         return has().test(piece);
     }
 
-    [[nodiscard]] float percentDone() const noexcept
+    [[nodiscard]] float percent_done() const noexcept
     {
         return has().percent();
     }
 
-    [[nodiscard]] bool isSeed() const noexcept
+    [[nodiscard]] bool is_seed() const noexcept
     {
         return has().has_all();
     }
@@ -208,22 +207,13 @@ public:
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
 
     // requests that have been made but haven't been fulfilled yet
-    [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
+    [[nodiscard]] virtual size_t active_req_count(tr_direction) const noexcept = 0;
 
-    virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
+    virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    struct RequestLimit
+    virtual void cancel_block_request(tr_block_index_t /*block*/)
     {
-        // How many blocks we could request.
-        size_t max_spans = 0;
-
-        // How many spans those blocks could be in.
-        // This is for webseeds, which make parallel requests.
-        size_t max_blocks = 0;
-    };
-
-    // how many blocks could we request from this peer right now?
-    [[nodiscard]] virtual RequestLimit canRequest() const noexcept = 0;
+    }
 
     tr_session* const session;
 

@@ -8,7 +8,6 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <iterator> // back_insert_iterator, empty
-#include <memory>
 #include <mutex>
 #include <optional>
 #include <string>

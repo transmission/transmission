@@ -35,7 +35,7 @@
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
-#include "libtransmission/global-ip-cache.h"
+#include "libtransmission/ip-cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -101,29 +101,29 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto const* val = group_map->find_if<bool>(TR_KEY_uploadLimited); val != nullptr)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_uploadLimited))
         {
             limits.up_limited = *val;
         }
 
-        if (auto const* val = group_map->find_if<bool>(TR_KEY_downloadLimited); val != nullptr)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_downloadLimited))
         {
             limits.down_limited = *val;
         }
 
-        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_uploadLimit))
         {
             limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
+        if (auto const val = group_map->value_if<int64_t>(TR_KEY_downloadLimit))
         {
             limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
 
-        if (auto const* val = group_map->find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
+        if (auto const val = group_map->value_if<bool>(TR_KEY_honorsSessionLimits))
         {
             group.honor_parent_limits(TR_UP, *val);
             group.honor_parent_limits(TR_DOWN, *val);
@@ -436,7 +436,7 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
     {
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
-        return global_ip_cache_->bind_addr(type);
+        return ip_cache_.bind_addr(type);
     }
 
     if (type == TR_AF_INET6)
@@ -565,7 +565,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     // if logging is desired, start it now before doing more work
     if (auto const* settings_map = settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
-        if (auto const* val = settings_map->find_if<bool>(TR_KEY_message_level); val != nullptr)
+        if (auto const val = settings_map->value_if<bool>(TR_KEY_message_level))
         {
             tr_logSetLevel(static_cast<tr_log_level>(*val));
         }
@@ -736,7 +736,7 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(settings, true);
 
-    tr_utpInit(this);
+    tr_utp_init(this);
 
     /* cleanup */
     data.done_cv.notify_one();
@@ -783,11 +783,11 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
-        global_ip_cache_->update_addr(TR_AF_INET);
+        ip_cache_.update_addr(TR_AF_INET);
     }
     if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
     {
-        global_ip_cache_->update_addr(TR_AF_INET6);
+        ip_cache_.update_addr(TR_AF_INET6);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
@@ -1372,7 +1372,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // ...since global_ip_cache_ relies on web_ to update global addresses,
     // we tell it to stop updating before web_ starts to refuse new requests.
     // But we keep it intact for now, so that udp_core_ can continue.
-    this->global_ip_cache_->try_shutdown();
+    this->ip_cache_.try_shutdown();
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
@@ -1391,7 +1391,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     // all the &event=stopped tracker announces.
     // also wait for all ip cache updates to finish so that web_ can
     // safely destruct.
-    if ((!web_->is_idle() || !announcer_udp_->is_idle() || !global_ip_cache_->try_shutdown()) &&
+    if ((!web_->is_idle() || !announcer_udp_->is_idle() || !ip_cache_.try_shutdown()) &&
         std::chrono::steady_clock::now() < deadline)
     {
         announcer_->upkeep();
@@ -1406,7 +1406,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     stats().save();
     peer_mgr_.reset();
     openFiles().close_all();
-    tr_utpClose(this);
+    tr_utp_close(this);
     this->udp_core_.reset();
 
     // tada we are done!

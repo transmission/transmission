@@ -61,4 +61,5 @@ Copyright 2017 Endless Mobile, Inc.
     <release date="2020-05-03" version="3.00" />
   </releases>
   <translation type="gettext">transmission-gtk</translation>
+  <launchable type="desktop-id">transmission-gtk.desktop</launchable>
 </component>

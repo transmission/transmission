@@ -122,7 +122,7 @@ uint64 utp_callback(utp_callback_arguments* args)
     {
 #ifdef TR_UTP_TRACE
     case UTP_LOG:
-        fmt::print(stderr, "[µTP] {}\n", args->buf);
+        tr_logAddTrace(fmt::format("[µTP] {}", reinterpret_cast<char const*>(args->buf)));
         break;
 #endif
 
@@ -155,11 +155,11 @@ void restart_timer(tr_session* session)
     }
     else
     {
-        /* If somebody has disabled µTP, then we still want to run
-           utp_check_timeouts, in order to let closed sockets finish
-           gracefully and so on.  However, since we're not particularly
-           interested in that happening in a timely manner, we might as
-           well use a large timeout. */
+        // If somebody has disabled µTP, then we still want to run
+        // utp_check_timeouts, in order to let closed sockets finish
+        // gracefully and so on.  However, since we're not particularly
+        // interested in that happening in a timely manner, we might as
+        // well use a large timeout.
         static auto constexpr MinInterval = 2s;
         static auto constexpr MaxInterval = 3s;
         auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);
@@ -173,15 +173,12 @@ void timer_callback(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(session->utp_context);
-
     utp_check_timeouts(session->utp_context);
     restart_timer(session);
 }
 } // namespace
 
-void tr_utpInit(tr_session* session)
+void tr_utp_init(tr_session* session)
 {
     if (session->utp_context != nullptr)
     {
@@ -212,23 +209,24 @@ void tr_utpInit(tr_session* session)
     restart_timer(session);
 }
 
-bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+bool tr_utp_packet(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
-
-    /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
-    utp_issue_deferred_acks(ss->utp_context);
 
     return ret != 0;
 }
 
-void tr_utpClose(tr_session* session)
+void tr_utp_issue_deferred_acks(tr_session* ss)
+{
+    utp_issue_deferred_acks(ss->utp_context);
+}
+
+void tr_utp_close(tr_session* session)
 {
     session->utp_timer.reset();
 
     if (session->utp_context != nullptr)
     {
-        utp_context_set_userdata(session->utp_context, nullptr);
         utp_destroy(session->utp_context);
         session->utp_context = nullptr;
     }

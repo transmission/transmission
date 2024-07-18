@@ -42,7 +42,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)startTransfer;
 - (void)startMagnetTransferAfterMetaDownload;
 - (void)stopTransfer;
-- (void)startQueue;
 - (void)sleep;
 - (void)wakeUp;
 - (void)idleLimitHit;
@@ -111,6 +110,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* torrentLocation;
 @property(nonatomic, readonly) NSString* dataLocation;
+@property(nonatomic, readonly) NSString* lastKnownDataLocation;
 - (NSString*)fileLocation:(FileListNode*)node;
 
 - (void)renameTorrent:(NSString*)newName completionHandler:(void (^)(BOOL didRename))completionHandler;

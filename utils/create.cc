@@ -217,11 +217,11 @@ int tr_main(int argc, char* argv[])
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         auto const& path = builder.path(i);
-        if (!tr_torrent_files::isSubpathPortable(path))
+        if (!tr_torrent_files::is_subpath_sanitized(path, false))
         {
             fmt::print(stderr, "WARNING\n");
             fmt::print(stderr, "filename \"{:s}\" may not be portable on all systems.\n", path);
-            fmt::print(stderr, "consider \"{:s}\" instead.\n", tr_torrent_files::makeSubpathPortable(path));
+            fmt::print(stderr, "consider \"{:s}\" instead.\n", tr_torrent_files::sanitize_subpath(path, false));
         }
     }
 

@@ -265,7 +265,7 @@ void tr_tracker_http_announce(
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
-    options.timeout_secs = TR_ANNOUNCE_TIMEOUT_SEC;
+    options.timeout_secs = TrAnnounceTimeoutSec;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
 
@@ -339,7 +339,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (pex_.is_valid_for_peers())
+            if (pex_.is_valid())
             {
                 response_.pex.push_back(pex_);
                 pex_ = {};
@@ -542,7 +542,7 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     scrape_url_new(scrape_url, request);
     tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", scrape_url), request.log_name);
     auto options = tr_web::FetchOptions{ scrape_url, onScrapeDone, d };
-    options.timeout_secs = TR_SCRAPE_TIMEOUT_SEC;
+    options.timeout_secs = TrScrapeTimeoutSec;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
     session->fetch(std::move(options));
