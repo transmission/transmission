@@ -2427,12 +2427,6 @@ namespace connect_helpers
 /* is this atom someone that we'd want to initiate a connection to? */
 [[nodiscard]] bool is_peer_candidate(tr_torrent const* tor, tr_peer_info const& peer_info, time_t const now)
 {
-    // have we already tried and failed to connect?
-    if (auto const conn = peer_info.is_connectable(); conn && !*conn)
-    {
-        return false;
-    }
-
     // not if we're both seeds
     if (tor->is_done() && peer_info.is_seed())
     {
