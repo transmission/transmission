@@ -71,14 +71,21 @@ export class Prefs extends EventTarget {
     if (value === null) {
       return fallback;
     }
-    if (value === 'true') {
-      return true;
+
+    const type = typeof fallback;
+    if (type === 'boolean') {
+      if (value === 'true') {
+        return true;
+      }
+      if (value === 'false') {
+        return false;
+      }
+      return fallback;
+    } else if (type === 'number') {
+      const f = Number.parseFloat(value);
+      return Number.isNaN(f) ? fallback : f;
     }
-    if (value === 'false') {
-      return false;
-    }
-    const f = Number.parseFloat(value);
-    return Number.isNaN(f) ? value : f;
+    return value;
   }
 
   static _readCookie(key) {

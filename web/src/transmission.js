@@ -376,7 +376,7 @@ export class Transmission extends EventTarget {
         clearInterval(this.refreshTorrentsInterval);
         const callback = this.refreshTorrents.bind(this);
         const pref = this.prefs.refresh_rate_sec;
-        const msec = typeof pref === 'number' && pref > 0 ? pref * 1000 : 1000;
+        const msec = pref > 0 ? pref * 1000 : 1000;
         this.refreshTorrentsInterval = setInterval(callback, msec);
         break;
       }
