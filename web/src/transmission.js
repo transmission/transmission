@@ -382,10 +382,9 @@ export class Transmission extends EventTarget {
           this.refreshTimeoutId = setTimeout(() => {
             this.refreshTimeoutId = null;
             requestAnimationFrame(() => {
-              if (this.refreshTimeoutId) {
-                return;
+              if (!this.refreshTimeoutId) {
+                refreshTorrentsInterval();
               }
-              refreshTorrentsInterval();
             });
           }, msec);
         };
