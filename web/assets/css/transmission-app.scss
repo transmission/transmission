@@ -764,9 +764,7 @@ a {
       color: var(--color-progressbar-fg-1);
       text-shadow: var(--progress-bar-shadow-1);
     }
-  }
 
-  .torrent-progress-bar {
     &::before,
     &::after {
       content: attr(data-progress);
