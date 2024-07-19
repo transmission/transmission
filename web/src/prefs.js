@@ -81,7 +81,8 @@ export class Prefs extends EventTarget {
         return false;
       }
       return fallback;
-    } else if (type === 'number') {
+    }
+    if (type === 'number') {
       const f = Number.parseFloat(value);
       return Number.isNaN(f) ? fallback : f;
     }
