@@ -14,7 +14,6 @@
 #include <ctime> // time_t
 #include <deque>
 #include <limits>
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -39,7 +38,12 @@ public:
         return size > 0 && size <= std::numeric_limits<int>::max();
     }
 
-    bool set_metadata_piece(int64_t piece, void const* data, size_t len);
+    [[nodiscard]] auto is_complete() const noexcept
+    {
+        return std::empty(pieces_needed_);
+    }
+
+    void set_metadata_piece(int64_t piece, void const* data, size_t len);
 
     [[nodiscard]] std::optional<int64_t> get_next_metadata_request(time_t now) noexcept;
 
