@@ -36,8 +36,6 @@
 #include <glibmm/stringutils.h>
 #include <glibmm/variant.h>
 
-#include <mutex>
-
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/sortlistmodel.h>
 #else
@@ -54,6 +52,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
