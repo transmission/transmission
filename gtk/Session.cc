@@ -36,7 +36,7 @@
 #include <glibmm/stringutils.h>
 #include <glibmm/variant.h>
 
-#include <glib.h>
+#include <mutex>
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/sortlistmodel.h>
@@ -915,50 +915,45 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 
 void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    struct CallbackUserData
-    {
-        Glib::RefPtr<Session> session;
-        tr_torrent_id_t id;
-        bool succeeded = false;
-    };
-
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
-        // This is the callback called from the Gtk main thread. If successfull,
-        // it removes the torrent entry from the GUI.
-        auto callback_this_thread = [](gpointer user_data) -> gboolean
+        struct CallbackUserData
         {
-            // Take ownership of the raw pointer, so it gets deleted when done.
-            auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data));
-            if (ud->succeeded)
-            {
-                auto const& impl = *ud->session->impl_;
-                if (auto const& [torrent_, position_] = impl.find_torrent_by_id(ud->id); torrent_)
-                {
-                    /* remove from the gui */
-                    impl.get_raw_model()->remove(position_);
-                }
-            }
-
-            return G_SOURCE_REMOVE;
+            Glib::RefPtr<Session> session;
+            tr_torrent_id_t id;
         };
-        // Convert it explicitly to a constexpr C function pointer so it can be
-        // used from inside the next lambda without capturing (so that itself
-        // can be used as a C function pointer).
-        constexpr GSourceFunc CALLBACK_THIS_THREAD_PTR = callback_this_thread;
 
-        // This is the callback called from the libtransmission thread, it
-        // stores the result and schedules the callback to be called from the
-        // main thread.
-        auto callback_other_thread = [](bool succeeded, void* user_data)
+        // Callback to remove the torrent entry from the GUI if it was
+        // successfuly removed. This is called from the libtransmission thread.
+        auto handle_result = [](bool succeeded, void* user_data)
         {
-            // Store the result for the Gtk thread callback to use:
-            auto* ud = static_cast<CallbackUserData*>(user_data);
-            ud->succeeded = succeeded;
+            std::mutex wait_cb_thread;
+            wait_cb_thread.lock();
 
-            // Unfortunatelly, there is no thread-safe C++ binding to
-            // this function, so we have to use the C API directly.
-            g_idle_add(CALLBACK_THIS_THREAD_PTR, user_data);
+            // Schedule the actual handler in the main thread:
+            Glib::signal_idle().connect_once(
+                [=, &wait_cb_thread]()
+                {
+                    // Take ownership of the raw pointer, so it gets deleted when done.
+                    auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data));
+
+                    if (succeeded)
+                    {
+                        auto const& impl = *ud->session->impl_;
+                        if (auto const& [torrent_, position_] = impl.find_torrent_by_id(ud->id); torrent_)
+                        {
+                            /* remove from the gui */
+                            impl.get_raw_model()->remove(position_);
+                        }
+                    }
+
+                    wait_cb_thread.unlock();
+                });
+
+            // It is better to wait for the idle signal to be processed before
+            // returning, just to avoid the extremely improbable case of the
+            // tr_torrent_id_t being reused before the idle signal is processed.
+            std::lock_guard waiter{ wait_cb_thread };
         };
 
         /* remove the torrent */
@@ -968,7 +963,7 @@ void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr,
-            callback_other_thread,
+            handle_result,
             new CallbackUserData{ get_core_ptr(), id });
     }
 }

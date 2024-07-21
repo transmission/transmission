@@ -829,7 +829,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 
 using tr_fileFunc = bool (*)(char const* filename, void* user_data, tr_error* error);
 
-using tr_successNotifyFunc = void (*)(bool succeeded, void* user_data);
+using tr_result_notify_func = void (*)(bool succeeded, void* user_data);
 
 /** @brief Removes our torrent and .resume files for this torrent */
 void tr_torrentRemove(
@@ -837,7 +837,7 @@ void tr_torrentRemove(
     bool delete_flag,
     tr_fileFunc delete_func,
     void* delete_user_data,
-    tr_successNotifyFunc notify_func,
+    tr_result_notify_func notify_func,
     void* notify_user_data);
 
 /** @brief Start a torrent */

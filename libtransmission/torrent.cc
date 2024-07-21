@@ -763,7 +763,7 @@ void tr_torrentRemoveInSessionThread(
     bool delete_flag,
     tr_fileFunc delete_func,
     void* delete_user_data,
-    tr_successNotifyFunc notify_func,
+    tr_result_notify_func notify_func,
     void* notify_user_data)
 {
     auto const lock = tor->unique_lock();
@@ -830,7 +830,7 @@ void tr_torrentRemove(
     bool delete_flag,
     tr_fileFunc delete_func,
     void* delete_user_data,
-    tr_successNotifyFunc notify_func,
+    tr_result_notify_func notify_func,
     void* notify_user_data)
 {
     using namespace start_stop_helpers;
