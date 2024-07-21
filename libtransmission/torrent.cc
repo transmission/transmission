@@ -800,14 +800,14 @@ void tr_torrentRemoveInSessionThread(
         }
     }
 
-    if (ok)
-    {
-        tr_torrentFreeInSessionThread(tor);
-    }
-
     if (notify_func != nullptr)
     {
         notify_func(ok, notify_user_data);
+    }
+
+    if (ok)
+    {
+        tr_torrentFreeInSessionThread(tor);
     }
 }
 
