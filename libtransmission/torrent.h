@@ -984,7 +984,20 @@ private:
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
-    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+    friend void tr_torrentRemoveInSessionThread(
+        tr_torrent* tor,
+        bool delete_flag,
+        tr_fileFunc delete_func,
+        void* delete_user_data,
+        tr_result_notify_func notify_func,
+        void* notify_user_data);
+    friend void tr_torrentRemove(
+        tr_torrent* tor,
+        bool delete_flag,
+        tr_fileFunc delete_func,
+        void* delete_user_data,
+        tr_result_notify_func notify_func,
+        void* notify_user_data);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);

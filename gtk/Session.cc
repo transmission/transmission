@@ -32,6 +32,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
+#include <glibmm/refptr.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/variant.h>
 
@@ -51,6 +52,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -86,6 +88,8 @@ public:
     void add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
+
+    void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
     void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
 
@@ -905,10 +909,51 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
+    impl_->remove_torrent(id, delete_files);
+}
+
+void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
+{
+    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
-        /* remove from the gui */
-        impl_->get_raw_model()->remove(position);
+        struct CallbackUserData
+        {
+            Glib::RefPtr<Session> session;
+            tr_torrent_id_t id;
+        };
+
+        // Callback to remove the torrent entry from the GUI if it was
+        // successfuly removed. This is called from the libtransmission thread.
+        auto handle_result = [](bool succeeded, void* user_data)
+        {
+            std::mutex wait_cb_thread;
+            wait_cb_thread.lock();
+
+            // Schedule the actual handler in the main thread:
+            Glib::signal_idle().connect_once(
+                [=, &wait_cb_thread]()
+                {
+                    // Take ownership of the raw pointer, so it gets deleted when done.
+                    auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data));
+
+                    if (succeeded)
+                    {
+                        auto const& impl = *ud->session->impl_;
+                        if (auto const& [torrent_, position_] = impl.find_torrent_by_id(ud->id); torrent_)
+                        {
+                            /* remove from the gui */
+                            impl.get_raw_model()->remove(position_);
+                        }
+                    }
+
+                    wait_cb_thread.unlock();
+                });
+
+            // It is better to wait for the idle signal to be processed before
+            // returning, just to avoid the extremely improbable case of the
+            // tr_torrent_id_t being reused before the idle signal is processed.
+            std::lock_guard waiter{ wait_cb_thread };
+        };
 
         /* remove the torrent */
         tr_torrentRemove(
@@ -916,7 +961,9 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
             delete_files,
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
-            nullptr);
+            nullptr,
+            handle_result,
+            new CallbackUserData{ get_core_ptr(), id });
     }
 }
 
