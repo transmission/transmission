@@ -178,7 +178,6 @@ auto constexpr KeepaliveIntervalSecs = time_t{ 100 };
 
 auto constexpr MetadataReqQ = size_t{ 64U };
 
-auto constexpr ReqQ = 2000U;
 auto constexpr ReqQDefault = 500U;
 
 // when we're making requests from another peer,
@@ -572,6 +571,11 @@ private:
 
     void update_block_requests();
 
+    [[nodiscard]] constexpr auto client_reqq() const noexcept
+    {
+        return session->reqq();
+    }
+
     // ---
 
     [[nodiscard]] std::optional<int64_t> pop_next_metadata_request()
@@ -703,7 +707,7 @@ private:
 
     // if the peer supports the Extension Protocol in BEP 10 and
     // supplied a reqq argument, it's stored here.
-    std::optional<size_t> reqq_;
+    std::optional<size_t> peer_reqq_;
 
     std::unique_ptr<libtransmission::Timer> pex_timer_;
 
@@ -1133,7 +1137,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // https://www.bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
     // client supports without dropping any.
-    tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
+    tr_variantDictAddInt(&val, TR_KEY_reqq, client_reqq());
 
     // https://www.bittorrent.org/beps/bep_0010.html
     // A string containing the compact representation of the ip address this peer sees
@@ -1289,7 +1293,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     /* get peer's maximum request queue size */
     if (auto reqq_in = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_reqq, &reqq_in))
     {
-        reqq_ = reqq_in;
+        peer_reqq_ = reqq_in;
     }
 }
 
@@ -1994,7 +1998,7 @@ bool tr_peerMsgsImpl::is_valid_request(peer_request const& req) const
         return false;
     }
 
-    if (std::size(peer_requested_) >= ReqQ)
+    if (std::size(peer_requested_) >= client_reqq())
     {
         logtrace(this, "rejecting request ... reqq is full");
         return false;
@@ -2045,7 +2049,7 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
     static auto constexpr Floor = size_t{ 32 };
     static size_t constexpr Seconds = RequestBufSecs;
     size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
-    auto const ceil = reqq_.value_or(ReqQDefault);
+    auto const ceil = peer_reqq_.value_or(ReqQDefault);
 
     return std::clamp(estimated_blocks_in_period, Floor, ceil);
 }
