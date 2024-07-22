@@ -178,7 +178,8 @@ auto constexpr KeepaliveIntervalSecs = time_t{ 100 };
 
 auto constexpr MetadataReqQ = size_t{ 64U };
 
-auto constexpr ReqQ = 512;
+auto constexpr ReqQ = 2000U;
+auto constexpr ReqQDefault = 500U;
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
@@ -1131,8 +1132,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
 
     // https://www.bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
-    // client supports without dropping any. The default in in
-    // libtorrent is 250.
+    // client supports without dropping any.
     tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
 
     // https://www.bittorrent.org/beps/bep_0010.html
@@ -2045,7 +2045,7 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
     static auto constexpr Floor = size_t{ 32 };
     static size_t constexpr Seconds = RequestBufSecs;
     size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
-    auto const ceil = reqq_.value_or(250);
+    auto const ceil = reqq_.value_or(ReqQDefault);
 
     return std::clamp(estimated_blocks_in_period, Floor, ceil);
 }
