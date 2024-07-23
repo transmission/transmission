@@ -700,6 +700,11 @@ public:
         return settings().reqq;
     }
 
+    constexpr void set_reqq(size_t reqq) noexcept
+    {
+        settings_.reqq = reqq;
+    }
+
     // bandwidth
 
     [[nodiscard]] tr_bandwidth& getBandwidthGroup(std::string_view name);
