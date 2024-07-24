@@ -47,9 +47,9 @@ export class Transmission extends EventTarget {
 
     // Initialize the implementation fields
     this.filterText = '';
-    this.oldTrackers = [];
     this._torrents = {};
     this._rows = [];
+    this.oldTrackers = [];
     this.dirtyTorrents = new Set();
 
     this.changeStatus = false;
