@@ -111,7 +111,7 @@ void logAddImpl(
     {
         auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
-        newmsg->when = tr_time();
+        newmsg->when = std::chrono::system_clock::now();
         newmsg->message = std::move(msg);
         newmsg->file = file;
         newmsg->line = line;
@@ -133,16 +133,16 @@ void logAddImpl(
     }
     else
     {
-        auto timestr = std::array<char, 64U>{};
-        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
+        auto buf = std::array<char, 64U>{};
+        auto const timestr = tr_logGetTimeStr(std::data(buf), std::size(buf));
 
         if (std::empty(name))
         {
-            fmt::print(stderr, "[{:s}] {:s}\n", std::data(timestr), msg);
+            fmt::print(stderr, "[{:s}] {:s}\n", timestr, msg);
         }
         else
         {
-            fmt::print("[{:s}] {:s}: {:s}\n", std::data(timestr), name, msg);
+            fmt::print("[{:s}] {:s}: {:s}\n", timestr, name, msg);
         }
     }
 #endif
@@ -194,17 +194,22 @@ void tr_logFreeQueue(tr_log_message* freeme)
 
 // ---
 
-char* tr_logGetTimeStr(char* buf, size_t buflen)
+std::string_view tr_logGetTimeStr(std::chrono::time_point<std::chrono::system_clock> now, char* buf, size_t buflen)
 {
-    auto const a = std::chrono::system_clock::now();
     auto const [out, len] = fmt::format_to_n(
         buf,
         buflen - 1,
         "{0:%F %H:%M:}{1:%S}",
-        a,
-        std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
+        now,
+        std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()));
     *out = '\0';
-    return buf;
+    return { buf, len };
+}
+
+std::string_view tr_logGetTimeStr(char* buf, size_t buflen)
+{
+    auto const a = std::chrono::system_clock::now();
+    return tr_logGetTimeStr(a, buf, buflen);
 }
 
 void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string&& msg, std::string_view name)
