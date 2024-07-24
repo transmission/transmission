@@ -1644,13 +1644,19 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 
     if (loc.block_offset + len > block_size)
     {
-        logwarn(this, fmt::format("got unaligned piece {:d}:{:d}->{:d}", piece, offset, len));
+        logwarn(this, fmt::format("got unaligned block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
         return { ReadState::Err, len };
     }
 
     if (!active_requests.test(block))
     {
-        logwarn(this, fmt::format("got unrequested piece {:d}:{:d}->{:d}", piece, offset, len));
+        logwarn(this, fmt::format("got unrequested block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
+        return { ReadState::Err, len };
+    }
+
+    if (tor_.has_block(block))
+    {
+        logtrace(this, fmt::format("got completed block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
         return { ReadState::Err, len };
     }
 
@@ -1707,13 +1713,6 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
     if (!active_requests.test(block))
     {
         logdbg(this, "we didn't ask for this message...");
-        return 0;
-    }
-
-    auto const loc = tor_.block_loc(block);
-    if (tor_.has_piece(loc.piece))
-    {
-        logtrace(this, "we did ask for this message, but the piece is already complete...");
         return 0;
     }
 
