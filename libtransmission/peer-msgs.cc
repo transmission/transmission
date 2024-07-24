@@ -1710,12 +1710,6 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
 
     logtrace(this, fmt::format("got block {:d}", block));
 
-    if (!active_requests.test(block))
-    {
-        logdbg(this, "we didn't ask for this message...");
-        return 0;
-    }
-
     // NB: if writeBlock() fails the torrent may be paused.
     // If this happens, this object will be destructed and must no longer be used.
     if (auto const err = session->cache->write_block(tor_.id(), block, std::move(block_data)); err != 0)
