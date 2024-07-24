@@ -1694,17 +1694,10 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 // returns 0 on success, or an errno on failure
 int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t const block)
 {
-    auto const n_expected = tor_.block_size(block);
-
-    if (!block_data)
+    if (auto const n_bytes = block_data ? std::size(*block_data) : 0U; n_bytes != tor_.block_size(block))
     {
-        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, 0));
-        return EMSGSIZE;
-    }
-
-    if (std::size(*block_data) != tor_.block_size(block))
-    {
-        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, std::size(*block_data)));
+        auto const n_expected = tor_.block_size(block);
+        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, n_bytes));
         return EMSGSIZE;
     }
 
