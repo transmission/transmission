@@ -1001,7 +1001,9 @@ TODO: fix this when notifications get fixed
       ];
 
       const e = document.querySelector('#filter-tracker');
-      e.innerHTML = '';
+      while (e.firstChild) {
+        e.lastChild.remove();
+      }
       newOpts(e, null, a);
     }
   }
