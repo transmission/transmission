@@ -456,6 +456,10 @@ public:
             set_client_interested(interested);
             protocol_send_interest(interested);
             update_active(TR_PEER_TO_CLIENT);
+
+            // make sure this is after we send the "interested" msg
+            update_desired_request_count();
+            maybe_send_block_requests();
         }
     }
 
@@ -580,7 +584,7 @@ private:
         desired_request_count_ = max_available_reqs();
     }
 
-    void update_block_requests();
+    void maybe_send_block_requests();
 
     void check_request_timeout(time_t now);
 
@@ -1401,6 +1405,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         }
 
         update_active(TR_PEER_TO_CLIENT);
+        update_desired_request_count(); // set desired request count to 0
         break;
 
     case BtPeerMsgs::Unchoke:
@@ -1408,6 +1413,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         set_client_choked(false);
         update_active(TR_PEER_TO_CLIENT);
         update_desired_request_count();
+        maybe_send_block_requests();
         break;
 
     case BtPeerMsgs::Interested:
@@ -1437,6 +1443,10 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         {
             have_.set(ui32);
             publish(tr_peer_event::GotHave(ui32));
+
+            // make sure this is after publishing event, so that the wishlist
+            // will have the latest info when choosing blocks to request
+            maybe_send_block_requests();
         }
 
         break;
@@ -1446,6 +1456,11 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         have_ = tr_bitfield{ tor_.has_metainfo() ? tor_.piece_count() : std::size(payload) * 8 };
         have_.set_raw(reinterpret_cast<uint8_t const*>(std::data(payload)), std::size(payload));
         publish(tr_peer_event::GotBitfield(&have_));
+
+        // make sure these are after publishing event, so that the wishlist
+        // will have the latest info when choosing blocks to request
+        update_desired_request_count();
+        maybe_send_block_requests();
         break;
 
     case BtPeerMsgs::Request:
@@ -1545,6 +1560,11 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         {
             have_.set_has_all();
             publish(tr_peer_event::GotHaveAll());
+
+            // make sure these are after publishing event, so that the wishlist
+            // will have the latest info when choosing blocks to request
+            update_desired_request_count();
+            maybe_send_block_requests();
         }
         else
         {
@@ -1579,6 +1599,10 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
 
             if (fext)
             {
+                // Make sure maybe_send_block_requests() is called before removing the request,
+                // so that it will choose a block other than the rejected block.
+                maybe_send_block_requests();
+
                 auto const block = tor_.piece_loc(r.index, r.offset).block;
                 active_requests.unset(block);
                 publish(tr_peer_event::GotRejected(tor_.block_info(), block));
@@ -1689,6 +1713,7 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
     active_requests.unset(block);
     request_timeout_base_ = tr_time();
     publish(tr_peer_event::GotBlock(tor_.block_info(), block));
+    maybe_send_block_requests();
 
     return 0;
 }
@@ -1803,7 +1828,7 @@ void tr_peerMsgsImpl::pulse()
 
     check_request_timeout(now_sec);
     update_desired_request_count();
-    update_block_requests();
+    maybe_send_block_requests();
     update_metadata_requests(now_sec);
 
     for (;;)
@@ -1832,7 +1857,7 @@ void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
     }
 }
 
-void tr_peerMsgsImpl::update_block_requests()
+void tr_peerMsgsImpl::maybe_send_block_requests()
 {
     if (!tor_.client_can_download())
     {
