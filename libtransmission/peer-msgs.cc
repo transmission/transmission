@@ -604,7 +604,7 @@ private:
         return next;
     }
 
-    void update_metadata_requests(time_t now) const;
+    void maybe_send_metadata_requests(time_t now) const;
     [[nodiscard]] size_t add_next_metadata_piece();
     [[nodiscard]] size_t add_next_block(time_t now_sec, uint64_t now_msec);
     [[nodiscard]] size_t fill_output_buffer(time_t now_sec, uint64_t now_msec);
@@ -1829,7 +1829,7 @@ void tr_peerMsgsImpl::pulse()
     check_request_timeout(now_sec);
     update_desired_request_count();
     maybe_send_block_requests();
-    update_metadata_requests(now_sec);
+    maybe_send_metadata_requests(now_sec);
 
     for (;;)
     {
@@ -1840,7 +1840,7 @@ void tr_peerMsgsImpl::pulse()
     }
 }
 
-void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
+void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 {
     if (!peer_supports_metadata_xfer_)
     {
