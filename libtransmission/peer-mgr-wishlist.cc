@@ -342,7 +342,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // if the peer doesn't have this piece that we want...
-        if (!peer_has_piece(candidate.piece))
+        if (candidate.replication == 0 || !peer_has_piece(candidate.piece))
         {
             continue;
         }
