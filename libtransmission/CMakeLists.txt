@@ -82,8 +82,6 @@ target_sources(${TR_NAME}
         peer-common.h
         peer-io.cc
         peer-io.h
-        peer-mgr-active-requests.cc
-        peer-mgr-active-requests.h
         peer-mgr-wishlist.cc
         peer-mgr-wishlist.h
         peer-mgr.cc

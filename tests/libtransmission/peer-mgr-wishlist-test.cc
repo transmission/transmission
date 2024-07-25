@@ -30,7 +30,6 @@ protected:
         mutable std::set<tr_block_index_t> client_has_block_;
         mutable std::set<tr_piece_index_t> client_wants_piece_;
         tr_piece_index_t piece_count_ = 0;
-        bool is_endgame_ = false;
         bool is_sequential_download_ = false;
 
         PeerMgrWishlistTest& parent_;
@@ -48,11 +47,6 @@ protected:
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override
         {
             return client_wants_piece_.count(piece) != 0;
-        }
-
-        [[nodiscard]] bool is_endgame() const override
-        {
-            return is_endgame_;
         }
 
         [[nodiscard]] bool is_sequential_download() const override
@@ -219,9 +213,9 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
         return p == 1U;
     };
 
-    // even if we ask wishlist for more blocks than exist,
+    // even if we ask wishlist for more blocks than what the peer has,
     // it should only return blocks [100..200)
-    auto const spans = Wishlist{ std::move(mediator) }.next(1000, IsPieceOne, ClientHasNoActiveRequests);
+    auto const spans = Wishlist{ std::move(mediator) }.next(250, IsPieceOne, ClientHasNoActiveRequests);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
@@ -263,9 +257,9 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
         return b < 10U;
     };
 
-    // even if we ask wishlist for more blocks than exist,
+    // even if we ask wishlist for all the blocks,
     // it should omit blocks [0..10) from the return set
-    auto const spans = Wishlist{ std::move(mediator) }.next(1000, PeerHasAllPieces, IsBetweenZeroToTen);
+    auto const spans = Wishlist{ std::move(mediator) }.next(250, PeerHasAllPieces, IsBetweenZeroToTen);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
@@ -306,9 +300,9 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
         mediator->active_request_count_[block] = 1;
     }
 
-    // even if we ask wishlist for more blocks than exist,
+    // even if we ask wishlist for all the blocks,
     // it should omit blocks [0..10) from the return set
-    auto const spans = Wishlist{ std::move(mediator) }.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
+    auto const spans = Wishlist{ std::move(mediator) }.next(250, PeerHasAllPieces, ClientHasNoActiveRequests);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
@@ -345,7 +339,6 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     // we've already requested blocks [0..10) from someone else,
     // but it is endgame, so we can request each block twice.
     // blocks [5..10) are already requested twice
-    mediator->is_endgame_ = true;
     for (tr_block_index_t block = 0; block < 5; ++block)
     {
         mediator->active_request_count_[block] = 1;
@@ -475,7 +468,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 
 TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 {
-    auto const get_ranges = [this](size_t n_wanted)
+    auto const get_spans = [this](size_t n_wanted)
     {
         auto mediator = std::make_unique<MockMediator>(*this);
 
@@ -513,7 +506,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
     static auto constexpr NumRuns = 1000;
     for (int run = 0; run < NumRuns; ++run)
     {
-        auto const spans = get_ranges(10);
+        auto const spans = get_spans(10);
         auto requested = tr_bitfield{ 300 };
         for (auto const& span : spans)
         {
@@ -528,7 +521,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 
 TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
 {
-    auto const get_ranges = [this](size_t n_wanted)
+    auto const get_spans = [this](size_t n_wanted)
     {
         auto mediator = std::make_unique<MockMediator>(*this);
 
@@ -575,7 +568,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     static auto constexpr NumRuns = 1000;
     for (int run = 0; run < NumRuns; ++run)
     {
-        auto const ranges = get_ranges(10);
+        auto const ranges = get_spans(10);
         auto requested = tr_bitfield{ 300 };
         for (auto const& range : ranges)
         {
@@ -591,7 +584,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     // those blocks should be next in line.
     for (int run = 0; run < NumRuns; ++run)
     {
-        auto const ranges = get_ranges(20);
+        auto const ranges = get_spans(20);
         auto requested = tr_bitfield{ 300 };
         for (auto const& range : ranges)
         {
