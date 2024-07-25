@@ -1851,7 +1851,7 @@ void tr_peerMsgsImpl::update_block_requests()
         return;
     }
 
-    auto const n_active = tr_peerMgrCountActiveRequestsToPeer(&tor_, this);
+    auto const n_active = active_req_count(TR_CLIENT_TO_PEER);
     if (n_active >= desired_request_count_)
     {
         return;

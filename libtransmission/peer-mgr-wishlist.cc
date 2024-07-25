@@ -101,7 +101,7 @@ public:
     std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
         std::function<bool(tr_piece_index_t)> const& peer_has_piece,
-        std::function<bool(tr_block_index_t)> const& has_active_pending_to_peer);
+        std::function<bool(tr_block_index_t)> const& has_active_request_to_peer);
 
 private:
     constexpr void set_candidates_dirty() noexcept
@@ -322,7 +322,7 @@ Wishlist::Impl::Impl(std::unique_ptr<Mediator> mediator_in)
 std::vector<tr_block_span_t> Wishlist::Impl::next(
     size_t n_wanted_blocks,
     std::function<bool(tr_piece_index_t)> const& peer_has_piece,
-    std::function<bool(tr_block_index_t)> const& has_active_pending_to_peer)
+    std::function<bool(tr_block_index_t)> const& has_active_request_to_peer)
 {
     if (n_wanted_blocks == 0U)
     {
@@ -354,7 +354,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             // don't request blocks that:
             // 1. we've already got, or
             // 2. already has an active request to that peer
-            if (mediator_->client_has_block(block) || has_active_pending_to_peer(block))
+            if (mediator_->client_has_block(block) || has_active_request_to_peer(block))
             {
                 continue;
             }
