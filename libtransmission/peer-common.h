@@ -183,7 +183,7 @@ struct tr_peer
     using Speed = libtransmission::Values::Speed;
 
     explicit tr_peer(tr_torrent const& tor);
-    virtual ~tr_peer();
+    virtual ~tr_peer() = default;
 
     [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
@@ -211,7 +211,7 @@ struct tr_peer
 
     virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    virtual void cancel_block_request(tr_block_index_t /*block*/)
+    virtual void maybe_cancel_block_request(tr_block_index_t /*block*/)
     {
     }
 
@@ -224,6 +224,8 @@ struct tr_peer
     tr_recentHistory<uint16_t> blocks_sent_to_peer;
 
     tr_recentHistory<uint16_t> cancels_sent_to_client;
+
+    tr_bitfield outgoing_requests;
 
     /// The following fields are only to be used in peer-mgr.cc.
     /// TODO(ckerr): refactor them out of `tr_peer`
