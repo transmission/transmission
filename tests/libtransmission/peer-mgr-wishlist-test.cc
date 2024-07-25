@@ -173,6 +173,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
 
+    // peer has all pieces
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
+
     // but we only want the first piece
     mediator.client_wants_piece_.insert(0);
 
@@ -196,6 +201,11 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
     mediator->block_span_[0] = { 0, 100 };
     mediator->block_span_[1] = { 100, 200 };
     mediator->block_span_[2] = { 200, 250 };
+
+    // peer has piece 1
+    mediator->piece_replication_[0] = 0;
+    mediator->piece_replication_[1] = 1;
+    mediator->piece_replication_[2] = 0;
 
     // and we want all three pieces
     mediator->client_wants_piece_.insert(0);
@@ -236,6 +246,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
     mediator->block_span_[1] = { 100, 200 };
     mediator->block_span_[2] = { 200, 250 };
 
+    // peer has all pieces
+    mediator->piece_replication_[0] = 1;
+    mediator->piece_replication_[1] = 1;
+    mediator->piece_replication_[2] = 1;
+
     // and we want all three pieces
     mediator->client_wants_piece_.insert(0);
     mediator->client_wants_piece_.insert(1);
@@ -274,6 +289,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
     mediator->block_span_[1] = { 100, 200 };
     mediator->block_span_[2] = { 200, 250 };
 
+    // peer has all pieces
+    mediator->piece_replication_[0] = 1;
+    mediator->piece_replication_[1] = 1;
+    mediator->piece_replication_[2] = 1;
+
     // and we want all three pieces
     mediator->client_wants_piece_.insert(0);
     mediator->client_wants_piece_.insert(1);
@@ -311,6 +331,11 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     mediator->block_span_[0] = { 0, 100 };
     mediator->block_span_[1] = { 100, 200 };
     mediator->block_span_[2] = { 200, 250 };
+
+    // peer has all pieces
+    mediator->piece_replication_[0] = 1;
+    mediator->piece_replication_[1] = 1;
+    mediator->piece_replication_[2] = 1;
 
     // and we want all three pieces
     mediator->client_wants_piece_.insert(0);
@@ -358,6 +383,11 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
         mediator->block_span_[0] = { 0, 100 };
         mediator->block_span_[1] = { 100, 200 };
         mediator->block_span_[2] = { 200, 250 };
+
+        // peer has all pieces
+        mediator->piece_replication_[0] = 1;
+        mediator->piece_replication_[1] = 1;
+        mediator->piece_replication_[2] = 1;
 
         // and we want all three pieces
         mediator->client_wants_piece_.insert(0);
@@ -420,6 +450,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     mediator->block_span_[1] = { 100, 200 };
     mediator->block_span_[2] = { 200, 250 };
 
+    // peer has all pieces
+    mediator->piece_replication_[0] = 1;
+    mediator->piece_replication_[1] = 1;
+    mediator->piece_replication_[2] = 1;
+
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
     {
@@ -452,6 +487,11 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
         mediator->block_span_[0] = { 0, 100 };
         mediator->block_span_[1] = { 100, 200 };
         mediator->block_span_[2] = { 200, 300 };
+
+        // peer has all pieces
+        mediator->piece_replication_[0] = 1;
+        mediator->piece_replication_[1] = 1;
+        mediator->piece_replication_[2] = 1;
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -497,6 +537,11 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         mediator->block_span_[0] = { 0, 100 };
         mediator->block_span_[1] = { 100, 200 };
         mediator->block_span_[2] = { 200, 300 };
+
+        // peer has all pieces
+        mediator->piece_replication_[0] = 1;
+        mediator->piece_replication_[1] = 1;
+        mediator->piece_replication_[2] = 1;
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -800,6 +845,11 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
         {
@@ -947,6 +997,11 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
         {
@@ -1022,6 +1077,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 300 };
 
+    // peer has all pieces
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
+
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
     {
@@ -1065,6 +1125,11 @@ TEST_F(PeerMgrWishlistTest, settingPriorityRebuildsWishlist)
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
@@ -1120,6 +1185,11 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
