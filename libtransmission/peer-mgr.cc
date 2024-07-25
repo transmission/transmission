@@ -39,7 +39,6 @@
 #include "libtransmission/observable.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mgr-active-requests.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
@@ -313,7 +312,6 @@ public:
 
         [[nodiscard]] bool client_has_block(tr_block_index_t block) const override;
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override;
-        [[nodiscard]] bool is_endgame() const override;
         [[nodiscard]] bool is_sequential_download() const override;
         [[nodiscard]] size_t count_active_requests(tr_block_index_t block) const override;
         [[nodiscard]] size_t count_missing_blocks(tr_piece_index_t piece) const override;
@@ -379,18 +377,6 @@ public:
         TR_ASSERT(std::empty(peers));
     }
 
-    void cancel_old_requests()
-    {
-        auto const now = tr_time();
-        auto const oldest = now - RequestTtlSecs;
-
-        for (auto const& [block, peer] : active_requests.sentBefore(oldest))
-        {
-            maybe_send_cancel_request(peer, block, nullptr);
-            active_requests.remove(block, peer);
-        }
-    }
-
     [[nodiscard]] uint16_t count_active_webseeds(uint64_t now) const noexcept
     {
         if (!tor->is_running() || tor->is_done())
@@ -440,18 +426,6 @@ public:
         }
 
         TR_ASSERT(stats.peer_count == 0);
-    }
-
-    void update_endgame()
-    {
-        /* we consider ourselves to be in endgame if the number of bytes
-           we've got requested is >= the number of bytes left to download */
-        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->left_until_done();
-    }
-
-    [[nodiscard]] constexpr auto is_endgame() const noexcept
-    {
-        return is_endgame_;
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto is_all_upload_only() const noexcept
@@ -549,7 +523,7 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
-            s->active_requests.remove(msgs);
+            // no-op
             break;
 
         case tr_peer_event::Type::ClientGotPort:
@@ -611,8 +585,6 @@ public:
 
     tr_torrent* const tor;
 
-    ActiveRequests active_requests;
-
     // depends-on: active_requests
     std::vector<std::unique_ptr<tr_webseed>> webseeds;
 
@@ -671,13 +643,13 @@ private:
     {
         if (peer != nullptr && peer != muted)
         {
-            peer->cancel_block_request(block);
+            peer->maybe_cancel_block_request(block);
         }
     }
 
     void cancel_all_requests_for_block(tr_block_index_t block, tr_peer const* no_notify)
     {
-        for (auto* peer : active_requests.remove(block))
+        for (auto* peer : peers)
         {
             maybe_send_cancel_request(peer, block, no_notify);
         }
@@ -806,7 +778,7 @@ private:
         switch (event.type)
         {
         case tr_peer_event::Type::ClientGotRej:
-            s->active_requests.remove(s->tor->piece_loc(event.pieceIndex, event.offset).block, peer);
+            // no-op
             break;
 
         case tr_peer_event::Type::ClientGotBlock:
@@ -907,14 +879,9 @@ EXIT:
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = 5U;
 
-    // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = 90;
-
     std::array<libtransmission::ObserverTag, 8> const tags_;
 
     mutable std::optional<bool> pool_is_all_upload_only_;
-
-    bool is_endgame_ = false;
 };
 
 bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
@@ -927,11 +894,6 @@ bool tr_swarm::WishlistMediator::client_wants_piece(tr_piece_index_t piece) cons
     return tor_.piece_is_wanted(piece);
 }
 
-bool tr_swarm::WishlistMediator::is_endgame() const
-{
-    return swarm_.is_endgame();
-}
-
 bool tr_swarm::WishlistMediator::is_sequential_download() const
 {
     return tor_.is_sequential_download();
@@ -939,7 +901,11 @@ bool tr_swarm::WishlistMediator::is_sequential_download() const
 
 size_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block) const
 {
-    return swarm_.active_requests.count(block);
+    return std::accumulate(
+        std::begin(swarm_.peers),
+        std::end(swarm_.peers),
+        size_t{},
+        [block](size_t acc, tr_peer const* peer) { return acc + (peer->outgoing_requests.test(block) ? 1 : 0); });
 }
 
 size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) const
@@ -1028,7 +994,6 @@ private:
     static auto constexpr BandwidthTimerPeriod = 500ms;
     static auto constexpr PeerInfoPeriod = 1min;
     static auto constexpr RechokePeriod = 10s;
-    static auto constexpr RefillUpkeepPeriod = 10s;
 
     // Max number of outbound peer connections to initiate.
     // This throttle is an arbitrary number to avoid overloading routers.
@@ -1063,13 +1028,11 @@ public:
         , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
         , peer_info_timer_{ timer_maker.create([this]() { peer_info_pulse(); }) }
         , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
-        , refill_upkeep_timer_{ timer_maker.create([this]() { refill_upkeep(); }) }
         , blocklists_tag_{ blocklist.observe_changes([this]() { on_blocklists_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
         peer_info_timer_->start_repeating(PeerInfoPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
-        refill_upkeep_timer_->start_repeating(RefillUpkeepPeriod);
     }
 
     tr_peerMgr(tr_peerMgr&&) = delete;
@@ -1112,7 +1075,6 @@ private:
     void peer_info_pulse();
     void rechoke_pulse() const;
     void reconnect_pulse();
-    void refill_upkeep() const;
 
     void rechoke_pulse_marshall()
     {
@@ -1143,7 +1105,6 @@ private:
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
     std::unique_ptr<libtransmission::Timer> const peer_info_timer_;
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
-    std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
 
     libtransmission::ObserverTag const blocklists_tag_;
 };
@@ -1153,16 +1114,9 @@ private:
 tr_peer::tr_peer(tr_torrent const& tor)
     : session{ tor.session }
     , swarm{ tor.swarm }
+    , outgoing_requests{ tor.block_count() }
     , blame{ tor.piece_count() }
 {
-}
-
-tr_peer::~tr_peer()
-{
-    if (swarm != nullptr)
-    {
-        swarm->active_requests.remove(this);
-    }
 }
 
 // ---
@@ -1194,19 +1148,6 @@ void tr_peerMgrFree(tr_peerMgr* manager)
  *    tr_peerMgrGetNextRequests() is called.
  */
 
-// --- struct block_request
-
-// TODO: if we keep this, add equivalent API to ActiveRequest
-void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
-{
-    auto const now = tr_time();
-
-    for (tr_block_index_t block = span.begin; block < span.end; ++block)
-    {
-        torrent->swarm->active_requests.add(block, peer, now);
-    }
-}
-
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
     TR_ASSERT(!torrent->is_done());
@@ -1215,33 +1156,10 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     {
         swarm.wishlist = std::make_unique<Wishlist>(std::make_unique<tr_swarm::WishlistMediator>(swarm));
     }
-    swarm.update_endgame();
     return swarm.wishlist->next(
         numwant,
         [peer](tr_piece_index_t p) { return peer->has_piece(p); },
-        [peer, &swarm](tr_block_index_t b) { return swarm.active_requests.has(b, peer); });
-}
-
-// --- Piece List Manipulation / Accessors
-
-bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_block_index_t block)
-{
-    return tor->swarm->active_requests.has(block, peer);
-}
-
-size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* tor, tr_peer const* peer)
-{
-    return tor->swarm->active_requests.count(peer);
-}
-
-void tr_peerMgr::refill_upkeep() const
-{
-    auto const lock = unique_lock();
-
-    for (auto* const tor : torrents_)
-    {
-        tor->swarm->cancel_old_requests();
-    }
+        [peer](tr_block_index_t b) { return peer->outgoing_requests.test(b); });
 }
 
 namespace

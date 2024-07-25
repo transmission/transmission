@@ -580,7 +580,7 @@ private:
 
     void update_block_requests();
 
-    void check_request_timeout();
+    void check_request_timeout(time_t now);
 
     [[nodiscard]] constexpr auto client_reqq() const noexcept
     {
@@ -730,8 +730,8 @@ private:
     // seconds between periodic send_ut_pex() calls
     static auto constexpr SendPexInterval = 90s;
 
-    // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = time_t{ 90 };
+    // how many seconds we expect the next piece block to arrive
+    static auto constexpr RequestTimeoutSecs = time_t{ 90 };
 };
 
 // ---
@@ -1836,6 +1836,7 @@ void tr_peerMsgsImpl::pulse()
     auto const now_sec = tr_time();
     auto const now_msec = tr_time_msec();
 
+    check_request_timeout(now_sec);
     update_desired_request_count();
     update_block_requests();
     update_metadata_requests(now_sec);
@@ -1889,12 +1890,20 @@ void tr_peerMsgsImpl::update_block_requests()
     }
 }
 
-void tr_peerMsgsImpl::check_request_timeout()
+void tr_peerMsgsImpl::check_request_timeout(time_t now)
 {
-    if (!outgoing_requests.has_none() && tr_time() - request_timeout_base_ > RequestTtlSecs)
+    if (outgoing_requests.has_none() || now - request_timeout_base_ <= RequestTimeoutSecs)
     {
-        // TODO(tearfur): come up with something better
-        do_purge = true;
+        return;
+    }
+
+    // If we didn't receive any piece data from this peer for a while,
+    // cancel all active requests so that we will send a new batch.
+    // If the peer still doesn't send anything to us, then it will
+    // naturally get weeded out by the peer mgr.
+    for (size_t block = 0; block < std::size(outgoing_requests); ++block)
+    {
+        maybe_cancel_block_request(block);
     }
 }
 
