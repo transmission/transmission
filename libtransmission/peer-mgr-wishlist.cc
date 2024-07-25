@@ -297,6 +297,7 @@ private:
 
     CandidateVec candidates_;
     bool candidates_dirty_ = true;
+    bool is_endgame_ = false;
 
     std::array<libtransmission::ObserverTag, 8U> const tags_;
 
@@ -331,6 +332,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     maybe_rebuild_candidate_list();
 
+    auto const max_peers = is_endgame_ ? EndgameMaxPeers : NormalMaxPeers;
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
@@ -360,8 +362,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             }
 
             // don't request from too many peers
-            auto const n_peers = mediator_->count_active_requests(block);
-            if (auto const max_peers = mediator_->is_endgame() ? EndgameMaxPeers : NormalMaxPeers; n_peers >= max_peers)
+            if (auto const n_peers = mediator_->count_active_requests(block); n_peers >= max_peers)
             {
                 continue;
             }
@@ -369,6 +370,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             blocks.emplace_back(block);
         }
     }
+
+    is_endgame_ = std::size(blocks) < n_wanted_blocks;
 
     // Ensure the list of blocks are sorted
     // The list needs to be unique as well, but that should come naturally
