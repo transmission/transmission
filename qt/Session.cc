@@ -536,31 +536,31 @@ std::set<std::string_view> const& Session::getKeyNames(TorrentProperties props)
 
         // changing fields needed by the main window
         static auto constexpr MainStatKeys = std::array<tr_quark, 25>{
-            TR_KEY_downloadedEver,
-            TR_KEY_editDate,
-            TR_KEY_error,
-            TR_KEY_errorString,
-            TR_KEY_eta,
-            TR_KEY_haveUnchecked,
-            TR_KEY_haveValid,
-            TR_KEY_isFinished,
-            TR_KEY_leftUntilDone,
-            TR_KEY_manualAnnounceTime,
-            TR_KEY_metadataPercentComplete,
-            TR_KEY_peersConnected,
-            TR_KEY_peersGettingFromUs,
-            TR_KEY_peersSendingToUs,
-            TR_KEY_percentDone,
-            TR_KEY_queuePosition,
-            TR_KEY_rateDownload,
-            TR_KEY_rateUpload,
-            TR_KEY_recheckProgress,
-            TR_KEY_seedRatioLimit,
-            TR_KEY_seedRatioMode,
-            TR_KEY_sizeWhenDone,
-            TR_KEY_status,
-            TR_KEY_uploadedEver,
-            TR_KEY_webseedsSendingToUs,
+            TR_KEY_downloadedEver, //
+            TR_KEY_editDate, //
+            TR_KEY_error, //
+            TR_KEY_errorString, //
+            TR_KEY_eta, //
+            TR_KEY_haveUnchecked, //
+            TR_KEY_haveValid, //
+            TR_KEY_isFinished, //
+            TR_KEY_leftUntilDone, //
+            TR_KEY_manualAnnounceTime, //
+            TR_KEY_metadataPercentComplete, //
+            TR_KEY_peersConnected, //
+            TR_KEY_peersGettingFromUs, //
+            TR_KEY_peersSendingToUs, //
+            TR_KEY_percentDone, //
+            TR_KEY_queuePosition, //
+            TR_KEY_rateDownload, //
+            TR_KEY_rateUpload, //
+            TR_KEY_recheckProgress, //
+            TR_KEY_seedRatioLimit, //
+            TR_KEY_seedRatioMode, //
+            TR_KEY_sizeWhenDone, //
+            TR_KEY_status, //
+            TR_KEY_uploadedEver, //
+            TR_KEY_webseedsSendingToUs, //
         };
 
         // unchanging fields needed by the details dialog
@@ -756,6 +756,12 @@ void Session::refreshAllTorrents()
 
 void Session::initTorrents(torrent_ids_t const& ids)
 {
+    if (prefs_.getBool(Prefs::SHOW_PIECEBAR))
+    {
+        addKeyName(TorrentProperties::MainStats, TR_KEY_pieceCount);
+        addKeyName(TorrentProperties::MainStats, TR_KEY_pieces);
+    }
+
     refreshTorrents(ids, TorrentProperties::MainAll);
 }
 
