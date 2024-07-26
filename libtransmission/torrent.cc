@@ -1812,6 +1812,12 @@ void tr_torrent::recheck_completeness()
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
 
+        if (new_completeness != TR_LEECH && was_running && session->shouldFullyVerifyCompleteTorrents())
+        {
+            tr_torrentVerify(this);
+            return;
+        }
+
         if (recent_change)
         {
             tr_logAddTraceTor(
@@ -1823,10 +1829,11 @@ void tr_torrent::recheck_completeness()
         }
 
         completeness_ = new_completeness;
-        session->close_torrent_files(id());
 
         if (is_done())
         {
+            session->close_torrent_files(id());
+
             if (recent_change)
             {
                 tr_announcerTorrentCompleted(this);
