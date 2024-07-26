@@ -50,6 +50,7 @@ public:
         ClientGotHaveAll,
         ClientGotHaveNone,
         ClientSentPieceData,
+        ClientSentRequest,
         Error // generic
     };
 
@@ -166,6 +167,18 @@ public:
         auto event = tr_peer_event{};
         event.type = Type::ClientSentPieceData;
         event.length = length;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static auto SentRequest(tr_block_info const& block_info, tr_block_span_t block_span) noexcept
+    {
+        auto const loc_begin = block_info.block_loc(block_span.begin);
+        auto const loc_end = block_info.block_loc(block_span.end);
+        auto event = tr_peer_event{};
+        event.type = Type::ClientSentRequest;
+        event.pieceIndex = loc_begin.piece;
+        event.offset = loc_begin.piece_offset;
+        event.length = loc_end.byte - loc_begin.byte;
         return event;
     }
 };

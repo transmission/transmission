@@ -493,6 +493,7 @@ public:
                 }
             }
 
+            publish(tr_peer_event::SentRequest(tor_.block_info(), *span));
             outgoing_requests.set_span(block_begin, block_end);
         }
     }
@@ -1412,8 +1413,8 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
 
         if (!fext)
         {
-            outgoing_requests.set_has_none();
             publish(tr_peer_event::GotChoke());
+            outgoing_requests.set_has_none();
         }
 
         update_active(TR_PEER_TO_CLIENT);
