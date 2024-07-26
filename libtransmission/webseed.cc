@@ -266,11 +266,14 @@ public:
 
     void on_rejection(tr_block_span_t block_span)
     {
-        outgoing_requests.unset_span(block_span.begin, block_span.end);
         for (auto block = block_span.begin; block < block_span.end; ++block)
         {
-            publish(tr_peer_event::GotRejected(tor.block_info(), block));
+            if (outgoing_requests.test(block))
+            {
+                publish(tr_peer_event::GotRejected(tor.block_info(), block));
+            }
         }
+        outgoing_requests.unset_span(block_span.begin, block_span.end);
     }
 
     void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) override
@@ -287,6 +290,7 @@ public:
             task->request_next_chunk();
 
             outgoing_requests.set_span(span->begin, span->end);
+            publish(tr_peer_event::SentRequest(tor.block_info(), *span));
         }
     }
 
