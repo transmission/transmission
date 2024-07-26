@@ -57,11 +57,15 @@ class Wishlist::Impl
     {
         Candidate(
             tr_piece_index_t piece_in,
+            tr_block_span_t block_span_in,
+            std::vector<uint8_t> n_active_requests_in,
             size_t replication_in,
             tr_priority_t priority_in,
             tr_piece_index_t salt_in,
             Mediator const* mediator)
             : piece{ piece_in }
+            , block_span{ block_span_in }
+            , n_active_requests{ std::move(n_active_requests_in) }
             , replication{ replication_in }
             , priority{ priority_in }
             , salt{ salt_in }
@@ -77,6 +81,9 @@ class Wishlist::Impl
         }
 
         tr_piece_index_t piece;
+        tr_block_span_t block_span;
+
+        std::vector<uint8_t> n_active_requests;
 
         // Caching the following 2 values are highly beneficial, because:
         // - they are often used (mainly because resort_piece() is called
@@ -198,7 +205,7 @@ private:
             return;
         }
 
-        if (auto iter = piece_lookup(piece); iter != std::end(candidates_))
+        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
         {
             ++iter->replication;
             resort_piece(iter);
@@ -207,12 +214,78 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 CandidateVec::iterator piece_lookup(tr_piece_index_t const piece)
+    TR_CONSTEXPR20 void client_sent_request(tr_block_span_t block_span)
+    {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
+        for (auto block = block_span.begin; block < block_span.end;)
+        {
+            auto iter = candidate_lookup_b(block);
+            if (iter == std::end(candidates_))
+            {
+                set_candidates_dirty();
+                break;
+            }
+
+            auto const block_end = std::min(block_span.end, iter->block_span.end);
+            for (; block < block_end; ++block)
+            {
+                ++iter->n_active_requests[block - iter->block_span.begin];
+            }
+        }
+    }
+
+    TR_CONSTEXPR20 void client_got_reject(tr_piece_index_t piece, tr_block_index_t block)
+    {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
+        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
+        {
+            if (auto& active_request = iter->n_active_requests[block - iter->block_span.begin]; active_request > 0)
+            {
+                --active_request;
+            }
+        }
+    }
+
+    TR_CONSTEXPR20 void client_got_choke(tr_bitfield const& requests)
+    {
+        for (auto& candidate : candidates_)
+        {
+            auto const block_begin = candidate.block_span.begin;
+            for (size_t i = 0, n = std::size(candidate.n_active_requests); i < n; ++i)
+            {
+                auto const block = block_begin + i;
+                if (auto& active_request = candidate.n_active_requests[i]; active_request > 0 && requests.test(block))
+                {
+                    --active_request;
+                }
+            }
+        }
+    }
+
+    // ---
+
+    TR_CONSTEXPR20 CandidateVec::iterator candidate_lookup_p(tr_piece_index_t const piece)
     {
         return std::find_if(
             std::begin(candidates_),
             std::end(candidates_),
-            [piece](auto const& candidate) { return candidate.piece == piece; });
+            [piece](auto const& c) { return c.piece == piece; });
+    }
+
+    TR_CONSTEXPR20 CandidateVec::iterator candidate_lookup_b(tr_block_index_t const block)
+    {
+        return std::find_if(
+            std::begin(candidates_),
+            std::end(candidates_),
+            [block](auto const& c) { return c.block_span.begin <= block && block < c.block_span.end; });
     }
 
     void maybe_rebuild_candidate_list()
@@ -235,9 +308,19 @@ private:
                 continue;
             }
 
+            auto const block_span = mediator_->block_span(piece);
+            auto n_active_requests = std::vector<uint8_t>{};
+            n_active_requests.reserve(block_span.end - block_span.begin);
+            for (auto [block, end] = block_span; block < end; ++block)
+            {
+                n_active_requests.emplace_back(mediator_->count_active_requests(block));
+            }
+
             auto const salt = is_sequential ? piece : salter();
             candidates_.emplace_back(
                 piece,
+                block_span,
+                std::move(n_active_requests),
                 mediator_->count_piece_replication(piece),
                 mediator_->priority(piece),
                 salt,
@@ -253,7 +336,7 @@ private:
             return;
         }
 
-        if (auto iter = piece_lookup(piece); iter != std::end(candidates_))
+        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
         {
             candidates_.erase(iter);
         }
@@ -266,7 +349,7 @@ private:
             return;
         }
 
-        if (auto iter = piece_lookup(piece); iter != std::end(candidates_))
+        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
         {
             resort_piece(iter);
         }
@@ -299,7 +382,7 @@ private:
     bool candidates_dirty_ = true;
     bool is_endgame_ = false;
 
-    std::array<libtransmission::ObserverTag, 8U> const tags_;
+    std::array<libtransmission::ObserverTag, 11U> const tags_;
 
     std::unique_ptr<Mediator> const mediator_;
 };
@@ -309,11 +392,15 @@ Wishlist::Impl::Impl(std::unique_ptr<Mediator> mediator_in)
           mediator_in->observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
           mediator_in->observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
           mediator_in->observe_got_block([this](tr_torrent*, tr_piece_index_t p, tr_block_index_t) { resort_piece(p); }),
+          mediator_in->observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { client_got_choke(b); }),
           mediator_in->observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
           mediator_in->observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
+          mediator_in->observe_got_reject([this](tr_torrent*, tr_peer*, tr_piece_index_t p, tr_block_index_t b)
+                                          { client_got_reject(p, b); }),
           mediator_in->observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
           mediator_in->observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
                                                 { set_candidates_dirty(); }),
+          mediator_in->observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { client_sent_request(bs); }),
           mediator_in->observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
       } }
     , mediator_{ std::move(mediator_in) }
@@ -350,8 +437,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // walk the blocks in this piece
-        for (auto [block, end] = mediator_->block_span(candidate.piece); block < end && std::size(blocks) < n_wanted_blocks;
-             ++block)
+        for (auto [block, end] = candidate.block_span; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks that:
             // 1. we've already got, or
@@ -362,7 +448,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             }
 
             // don't request from too many peers
-            if (auto const n_peers = mediator_->count_active_requests(block); n_peers >= max_peers)
+            auto const block_idx = block - candidate.block_span.begin;
+            if (auto const n_peers = candidate.n_active_requests[block_idx]; n_peers >= max_peers)
             {
                 continue;
             }

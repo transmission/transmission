@@ -274,6 +274,7 @@ public:
             task->request_next_chunk();
 
             outgoing_requests.set_span(span->begin, span->end);
+            publish(tr_peer_event::SentRequest(tor.block_info(), *span));
         }
     }
 
