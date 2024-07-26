@@ -515,26 +515,18 @@ public:
         {
         case tr_peer_event::Type::ClientSentPieceData:
             {
-                auto const now = tr_time();
                 auto* const tor = s->tor;
 
                 tor->bytes_uploaded_ += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
-                tor->set_date_active(now);
+                tor->set_date_active(tr_time());
                 tor->session->add_uploaded(event.length);
-
-                msgs->peer_info->set_latest_piece_data_time(now);
             }
 
             break;
 
         case tr_peer_event::Type::ClientGotPieceData:
-            {
-                auto const now = tr_time();
-                on_client_got_piece_data(s->tor, event.length, now);
-                msgs->peer_info->set_latest_piece_data_time(now);
-            }
-
+            on_client_got_piece_data(s->tor, event.length, tr_time());
             break;
 
         case tr_peer_event::Type::ClientGotHave:
