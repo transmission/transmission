@@ -67,6 +67,7 @@ public:
         tr_address client_external_address,
         std::function<tr_port()> get_client_advertised_port)
         : listen_socket_address_{ socket_address }
+        , client_external_address_{ std::move(client_external_address) }
         , from_first_{ from }
         , from_best_{ from }
         , get_client_advertised_port_{ std::move(get_client_advertised_port) }
@@ -74,7 +75,7 @@ public:
         TR_ASSERT(!std::empty(socket_address.port()));
         ++n_known_connectable;
         set_pex_flags(pex_flags);
-        maybe_update_canonical_priority(client_external_address);
+        update_canonical_priority();
     }
 
     tr_peer_info(tr_address address, uint8_t pex_flags, tr_peer_from from, std::function<tr_port()> get_client_advertised_port)
