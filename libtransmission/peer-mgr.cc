@@ -263,12 +263,14 @@ void tr_peer_info::update_canonical_priority()
     // https://www.bittorrent.org/beps/bep_0040.html
     // If the IP addresses are the same, the port numbers (16-bit integers) should be used instead:
     //    priority = crc32-c(sort(client_port, peer_port))
-    // TODO(tearfur): Clarify the endianness from Arvid, then add test cases https://github.com/arvidn/libtorrent/issues/7705
+    // N.B. Although not specified in BEP-40, in libtorrent's implementation, the port numbers are
+    // in network byte order when calculating the crc32-c result.
     if (client_external_address_ == listen_address())
     {
-        auto buf = std::array{ get_client_advertised_port_().host(), listen_socket_address().port().host() };
+        auto buf = std::array{ get_client_advertised_port_().host(), listen_port().host() };
         static_assert(std::is_same_v<std::remove_reference_t<decltype(buf[0])>, uint16_t>);
         std::sort(std::begin(buf), std::end(buf));
+        std::transform(std::begin(buf), std::end(buf), std::begin(buf), [](uint16_t p) { return htons(p); });
         canonical_priority_ = tr_crc32c(reinterpret_cast<uint8_t*>(std::data(buf)), std::size(buf) * sizeof(uint16_t));
         return;
     }
