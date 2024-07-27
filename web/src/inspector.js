@@ -423,15 +423,10 @@ export class Inspector extends EventTarget {
     setTextContent(e.info.error, string || none);
 
     // torrent name
-    switch (torrents.length) {
-      case 0:
-        string = none;
-        break;
-      case 1:
-        string = torrents[0].getName();
-        break;
-      default:
-        string = mixed;
+    if (torrents.length === 1) {
+      string = torrents[0].getName();
+    } else {
+      string = torrents.length > 0 ? mixed : none;
     }
     setTextContent(e.info.name, string);
 
