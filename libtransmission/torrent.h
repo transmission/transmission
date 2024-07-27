@@ -832,7 +832,6 @@ struct tr_torrent
         {
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
-                TR_ASSERT(now >= latest);
                 return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
             }
         }
