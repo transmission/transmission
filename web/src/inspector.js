@@ -423,10 +423,15 @@ export class Inspector extends EventTarget {
     setTextContent(e.info.error, string || none);
 
     // torrent name
-    if (torrents.length === 1) {
-      string = torrents[0].getName();
-    } else {
-      string = torrents.length > 0 ? mixed : none;
+    switch (torrents.length) {
+      case 0:
+        string = none;
+        break;
+      case 1:
+        string = torrents[0].getName();
+        break;
+      default:
+        string = mixed;
     }
     setTextContent(e.info.name, string);
 
@@ -870,7 +875,6 @@ export class Inspector extends EventTarget {
         break;
       default:
         command = 'priority-normal';
-        break;
     }
 
     this._changeFileCommand(indices, command);
