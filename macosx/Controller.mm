@@ -843,6 +843,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
+#pragma mark - NSApplicationDelegate
+
 - (void)applicationWillFinishLaunching:(NSNotification*)notification
 {
     // user notifications
@@ -1091,6 +1093,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //complete cleanup
     tr_sessionClose(self.fLib);
 }
+
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication*)app
+{
+    return YES;
+}
+
+#pragma mark -
 
 - (tr_session*)sessionHandle
 {
