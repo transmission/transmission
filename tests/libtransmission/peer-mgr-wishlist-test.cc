@@ -1136,6 +1136,62 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
     }
 }
 
+TEST_F(PeerMgrWishlistTest, sentRequestIncrementsActiveRequests)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, all missing
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 100;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        // peers has all pieces
+        mediator.piece_replication_[0] = 2;
+        mediator.piece_replication_[1] = 2;
+        mediator.piece_replication_[2] = 2;
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+        (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
+
+        // we sent "Request" messages
+        sent_request_.emit(nullptr, nullptr, { 0, 120 });
+
+        return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    };
+
+    // wishlist only picks blocks with no active requests when not in
+    // end game mode, which are [0, 10) and [250, 300).
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const ranges = get_spans(300);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& range : ranges)
+        {
+            requested.set_span(range.begin, range.end);
+        }
+        EXPECT_EQ(180U, requested.count());
+        EXPECT_EQ(0U, requested.count(0, 120));
+        EXPECT_EQ(180U, requested.count(120, 300));
+    }
+}
+
 TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
 {
     auto mediator = MockMediator{ *this };
