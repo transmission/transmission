@@ -17,6 +17,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h"
+#include <libtransmission/error.h>
 #include "libtransmission/file.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/verify.h"
@@ -47,6 +48,8 @@ void tr_verify_worker::verify_torrent(
     auto buffer = std::vector<std::byte>(1024U * 256U);
     auto sha = tr_sha1{};
     auto last_slept_at = current_time_secs();
+    bool file_valid = false;
+    std::vector<tr_file_index_t> files_ending_in_current_piece;
 
     auto const& metainfo = verify_mediator.metainfo();
     while (!abort_flag && piece < metainfo.piece_count())
@@ -56,8 +59,38 @@ void tr_verify_worker::verify_torrent(
         /* if we're starting a new file... */
         if (file_pos == 0U && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            auto const found = verify_mediator.find_file(file_index);
-            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            file_valid = true;
+            auto error = tr_error{};
+            auto const found = verify_mediator.find_file(file_index, &error);
+            if (!found)
+            {
+                file_valid = false;
+                fd = TR_BAD_SYS_FILE;
+                verify_mediator.on_file_error(file_index, std::string(fmt::format("Error: {:s}.", error.message())));
+            }
+            else if (!found->isFile())
+            {
+                file_valid = false;
+                fd = TR_BAD_SYS_FILE;
+                verify_mediator.on_file_error(file_index, std::string("Not a file."));
+            }
+            else if (found->size != file_length)
+            {
+                file_valid = false;
+                fd = TR_BAD_SYS_FILE;
+                verify_mediator.on_file_error(
+                    file_index,
+                    std::string(fmt::format("Incorrect file size {:d}. Expected {:d}.", found->size, file_length)));
+            }
+            else
+            {
+                fd = tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
+                if (fd == TR_BAD_SYS_FILE)
+                {
+                    file_valid = false;
+                    verify_mediator.on_file_error(file_index, std::string(fmt::format("Error: {:s}.", error.message())));
+                }
+            }
             prev_file_index = file_index;
         }
 
@@ -84,11 +117,44 @@ void tr_verify_worker::verify_torrent(
         piece_pos += bytes_this_pass;
         file_pos += bytes_this_pass;
 
+        /* We want all on_file_error() calls for a file index to be consecutive. Therefore
+         * don't add files for which an error has already been emitted. We don't need to report
+         * piece errors for missing or wrong length files.
+         */
+        if (left_in_file == 0 && file_valid)
+        {
+            files_ending_in_current_piece.push_back(file_index);
+        }
+
         /* if we're finishing a piece... */
         if (left_in_piece == 0U)
         {
             auto const has_piece = sha.finish() == metainfo.piece_hash(piece);
             verify_mediator.on_piece_checked(piece, has_piece);
+
+            if (has_piece)
+            {
+                for (auto const file : files_ending_in_current_piece)
+                {
+                    verify_mediator.on_file_ok(file);
+                }
+            }
+            else
+            {
+                auto const error_msg{ fmt::format("Piece {:d} hash fail", piece) };
+                for (auto const file : files_ending_in_current_piece)
+                {
+                    verify_mediator.on_file_error(file, error_msg);
+                }
+
+                /* Don't report invalid piece for files we can't open. The file error
+                 * has already been reported. */
+                if (left_in_file != 0 && fd != TR_BAD_SYS_FILE)
+                {
+                    verify_mediator.on_file_error(file_index, error_msg);
+                }
+                file_valid = false;
+            }
 
             if (sleep_per_seconds_during_verify > std::chrono::milliseconds::zero())
             {
@@ -104,6 +170,7 @@ void tr_verify_worker::verify_torrent(
             sha.clear();
             ++piece;
             piece_pos = 0U;
+            files_ending_in_current_piece.clear();
         }
 
         /* if we're finishing a file... */
@@ -235,4 +302,96 @@ int tr_verify_worker::Node::compare(Node const& that) const noexcept
     }
 
     return 0;
+}
+
+class SynchronousVerifyMediator final : public tr_verify_worker::Mediator
+{
+public:
+    explicit SynchronousVerifyMediator(
+        tr_torrent_metainfo const& metainfo,
+        std::string_view const data_dir,
+        std::function<void(tr_file_index_t, bool, std::string_view)> file_status_cb)
+        : metainfo_{ metainfo }
+        , data_dir_{ data_dir }
+        , file_status_cb_{ std::move(file_status_cb) }
+    {
+    }
+
+    ~SynchronousVerifyMediator() override = default;
+
+    SynchronousVerifyMediator(SynchronousVerifyMediator const&) = delete;
+    SynchronousVerifyMediator(SynchronousVerifyMediator&&) = delete;
+    SynchronousVerifyMediator& operator=(SynchronousVerifyMediator const&) = delete;
+    SynchronousVerifyMediator& operator=(SynchronousVerifyMediator&&) = delete;
+
+    [[nodiscard]] tr_torrent_metainfo const& metainfo() const override
+    {
+        return metainfo_;
+    }
+
+    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index, tr_error* error)
+        const override
+    {
+        auto filename = tr_pathbuf{};
+        filename.assign(data_dir_, '/', metainfo_.file_subpath(file_index));
+        auto const info = tr_sys_path_get_info(filename, 0, error);
+        if (info)
+        {
+            return tr_torrent_files::FoundFile{ *info, std::move(filename), std::size(data_dir_) };
+        }
+        else
+        {
+            return {};
+        }
+    }
+
+    void on_verify_queued() override
+    {
+    }
+
+    void on_verify_started() override
+    {
+        all_valid = true;
+    }
+
+    void on_piece_checked(tr_piece_index_t /*piece*/, bool /*has_piece*/) override
+    {
+    }
+
+    void on_verify_done(bool /*aborted*/) override
+    {
+    }
+
+    void on_file_ok(tr_file_index_t index) override
+    {
+        file_status_cb_(index, true, "");
+    }
+
+    void on_file_error(tr_file_index_t index, std::string_view error) override
+    {
+        file_status_cb_(index, false, error);
+        all_valid = false;
+    }
+
+    [[nodiscard]] bool torrent_is_valid() const
+    {
+        return all_valid;
+    }
+
+private:
+    tr_torrent_metainfo const& metainfo_;
+    std::string_view const data_dir_;
+    std::function<void(tr_file_index_t, bool, std::string_view)> file_status_cb_;
+    bool all_valid{ false };
+};
+
+bool tr_torrentSynchronousVerify(
+    tr_torrent_metainfo const& metainfo,
+    std::string_view const data_dir,
+    std::function<void(tr_file_index_t, bool, std::string_view)> file_status_cb)
+{
+    std::atomic<bool> const& abort_flag = false;
+    SynchronousVerifyMediator mediator(metainfo, data_dir, std::move(file_status_cb));
+    tr_verify_worker::verify_torrent(mediator, abort_flag, std::chrono::milliseconds::zero());
+    return mediator.torrent_is_valid();
 }

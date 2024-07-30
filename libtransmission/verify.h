@@ -19,13 +19,17 @@
 #include <thread>
 #include <utility> // std::move
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/transmission.h"
 
 class tr_verify_worker
 {
+    friend bool tr_torrentSynchronousVerify(
+        tr_torrent_metainfo const&,
+        std::string_view const data_dir,
+        std::function<void(tr_file_index_t, bool, std::string_view)>);
+
 public:
     class Mediator
     {
@@ -33,12 +37,16 @@ public:
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
-        [[nodiscard]] virtual std::optional<std::string> find_file(tr_file_index_t file_index) const = 0;
+        [[nodiscard]] virtual std::optional<tr_torrent_files::FoundFile> find_file(
+            tr_file_index_t file_index,
+            tr_error* error = nullptr) const = 0;
 
         virtual void on_verify_queued() = 0;
         virtual void on_verify_started() = 0;
         virtual void on_piece_checked(tr_piece_index_t piece, bool has_piece) = 0;
         virtual void on_verify_done(bool aborted) = 0;
+        virtual void on_file_ok(tr_file_index_t index) = 0;
+        virtual void on_file_error(tr_file_index_t index, std::string_view error) = 0;
     };
 
     ~tr_verify_worker();

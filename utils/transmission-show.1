@@ -19,11 +19,46 @@ shows BitTorrent .torrent file metadata
 .Bl -tag -width Ds
 .It Fl h Fl -help
 Show a short help page and exit.
+.It Fl d Fl -header
+Show only header section.
+.It Fl i Fl -info
+Show only info section.
+.It Fl t Fl -trackers
+Show only trackers section.
+.It Fl f Fl -files
+Show only header section.
+.It Fl D Fl -no-header
+Do not show header section.
+.It Fl I Fl -no-info
+Do not show info section.
+.It Fl T Fl -no-trackers
+Do not show trackers section.
+.It Fl F Fl -no-files
+Do not show files section.
+.It Fl b Fl -bytes
+Show file sizes in bytes.
 .It Fl m Fl -magnet
 Show a magnet link for the specified .torrent file
 .It Fl s Fl -scrape
 Ask the torrent's trackers how many peers are in the torrent's swarm
+.It Fl u Fl -unsorted
+Do not sort files by name.
+.It Fl v Fl -verify Ar DIR
+Verify the torrent data files in DIR.
+.It Fl V Fl -version
+Show version number and exit.
 .El
+.Sh EXIT STATUS
+0 If OK,
+.Pp
+1 If an error occurs while reading the torrent file, or verify fails.
+.Sh VERIFY TORRENT
+Use --unsorted if you wish to see the
+status of each file as it is being checked instead of waiting until
+all files have been checked.
+
+Note that torrent hashes are per piece, not per file. A bad or missing file may cause
+hash errors in adjacent files that share the same piece.
 .Sh AUTHORS
 .An -nosplit
 .An Charles Kerr
