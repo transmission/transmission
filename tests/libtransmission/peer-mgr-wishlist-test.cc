@@ -369,9 +369,13 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 
     auto wishlist = Wishlist{ mediator };
 
+    // the endgame state takes effect after it runs out of
+    // blocks for the first time, so we trigger it here
+    (void)wishlist.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
+
     // if we ask wishlist for more blocks than exist,
     // it should omit blocks [5..10) from the return set
-    auto const spans = Wishlist{ std::move(mediator) }.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
+    auto const spans = wishlist.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
