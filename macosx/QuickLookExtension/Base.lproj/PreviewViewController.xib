@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="PreviewViewController">
+            <connections>
+                <outlet property="fileIconImage" destination="1Ys-Mh-UFc" id="dg1-c9-fTq"/>
+                <outlet property="filesField" destination="IZt-Si-qd9" id="Di2-dY-9c4"/>
+                <outlet property="nameField" destination="jTK-Jr-Tk3" id="Df8-hV-eOw"/>
+                <outlet property="totalSizeField" destination="a7o-iq-PkF" id="0ni-0u-2tH"/>
+                <outlet property="trackersField" destination="tii-Ry-T9J" id="crt-JE-UyT"/>
+                <outlet property="view" destination="c22-O7-iKe" id="NRM-P4-wb6"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="c22-O7-iKe" userLabel="Preview View">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jTK-Jr-Tk3" userLabel="Name">
+                    <rect key="frame" x="66" y="236" width="396" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Torrent Name" id="CuV-2I-NWU">
+                        <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a7o-iq-PkF" userLabel="Total Size">
+                    <rect key="frame" x="66" y="212" width="396" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="999,99 GB" id="Xag-ZN-geJ">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IZt-Si-qd9" userLabel="Files">
+                    <rect key="frame" x="18" y="188" width="444" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="charWrapping" title="Files:" id="qD7-88-cNM">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tii-Ry-T9J" userLabel="Trackers">
+                    <rect key="frame" x="18" y="164" width="444" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="charWrapping" title="Trackers:" id="ljY-TL-h0l">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1Ys-Mh-UFc" userLabel="Icon">
+                    <rect key="frame" x="20" y="212" width="40" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="40" id="JNb-tT-ikL"/>
+                        <constraint firstAttribute="height" constant="40" id="UAI-p9-DkG"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="AppIcon" id="Vsw-mi-Skk"/>
+                </imageView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="IZt-Si-qd9" secondAttribute="trailing" constant="20" symbolic="YES" id="0uH-gc-YHf"/>
+                <constraint firstItem="jTK-Jr-Tk3" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="20" symbolic="YES" id="2v8-Mo-7OS"/>
+                <constraint firstItem="tii-Ry-T9J" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="20" symbolic="YES" id="3XA-W1-awf"/>
+                <constraint firstItem="IZt-Si-qd9" firstAttribute="top" secondItem="a7o-iq-PkF" secondAttribute="bottom" constant="8" symbolic="YES" id="6cb-Gz-nZ7"/>
+                <constraint firstItem="a7o-iq-PkF" firstAttribute="leading" secondItem="1Ys-Mh-UFc" secondAttribute="trailing" constant="8" symbolic="YES" id="F8K-XR-4Rs"/>
+                <constraint firstAttribute="trailing" secondItem="tii-Ry-T9J" secondAttribute="trailing" constant="20" symbolic="YES" id="GU0-Io-2TB"/>
+                <constraint firstItem="1Ys-Mh-UFc" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="20" symbolic="YES" id="SgF-ss-2sP"/>
+                <constraint firstItem="jTK-Jr-Tk3" firstAttribute="leading" secondItem="1Ys-Mh-UFc" secondAttribute="trailing" constant="8" symbolic="YES" id="VeS-NK-szS"/>
+                <constraint firstAttribute="trailing" secondItem="jTK-Jr-Tk3" secondAttribute="trailing" constant="20" symbolic="YES" id="ZYc-Wn-cpo"/>
+                <constraint firstAttribute="trailing" secondItem="a7o-iq-PkF" secondAttribute="trailing" constant="20" symbolic="YES" id="ZfS-dG-QfZ"/>
+                <constraint firstItem="tii-Ry-T9J" firstAttribute="top" secondItem="IZt-Si-qd9" secondAttribute="bottom" constant="8" symbolic="YES" id="dwf-2v-Qjy"/>
+                <constraint firstItem="a7o-iq-PkF" firstAttribute="top" secondItem="jTK-Jr-Tk3" secondAttribute="bottom" constant="8" symbolic="YES" id="fMz-Ip-uDD"/>
+                <constraint firstItem="IZt-Si-qd9" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="20" symbolic="YES" id="uhX-pR-Pcj"/>
+                <constraint firstItem="1Ys-Mh-UFc" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="20" symbolic="YES" id="xjW-fi-U2N"/>
+            </constraints>
+            <point key="canvasLocation" x="140" y="154"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="AppIcon" width="128" height="128"/>
+    </resources>
+</document>
