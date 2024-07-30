@@ -325,7 +325,7 @@ public:
         [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_block(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer) override;
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_have(
@@ -333,8 +333,7 @@ public:
         [[nodiscard]] libtransmission::ObserverTag observe_got_have_all(
             libtransmission::SimpleObservable<tr_torrent*>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_reject(
-            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_piece_index_t, tr_block_index_t>::Observer observer)
-            override;
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_piece_completed(
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_priority_changed(
@@ -578,11 +577,11 @@ public:
 
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> peer_disconnect;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t> got_block;
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all;
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_piece_index_t, tr_block_index_t> got_reject;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> got_reject;
     libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t> sent_request;
 
     mutable tr_swarm_stats stats = {};
@@ -800,7 +799,7 @@ private:
             {
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
-                s->got_reject.emit(tor, peer, event.pieceIndex, loc.block);
+                s->got_reject.emit(tor, peer, loc.block);
             }
             break;
 
@@ -812,7 +811,7 @@ private:
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 peer->blame.set(loc.piece);
                 tor->on_block_received(loc.block);
-                s->got_block.emit(tor, event.pieceIndex, loc.block);
+                s->got_block.emit(tor, loc.block);
             }
 
             break;
@@ -974,7 +973,7 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_block(
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer)
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer)
 {
     return swarm_.got_block.observe(std::move(observer));
 }
@@ -998,7 +997,7 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have_all(
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_reject(
-    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_piece_index_t, tr_block_index_t>::Observer observer)
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
 {
     return swarm_.got_reject.observe(std::move(observer));
 }

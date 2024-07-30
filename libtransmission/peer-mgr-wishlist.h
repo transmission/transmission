@@ -48,7 +48,7 @@ public:
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_block(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer) = 0;
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_choke(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_have(
@@ -56,8 +56,7 @@ public:
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_have_all(
             libtransmission::SimpleObservable<tr_torrent*>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_reject(
-            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_piece_index_t, tr_block_index_t>::Observer
-                observer) = 0;
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_piece_completed(
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_priority_changed(

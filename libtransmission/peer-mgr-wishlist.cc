@@ -235,14 +235,14 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void client_got_reject(tr_piece_index_t piece, tr_block_index_t block)
+    TR_CONSTEXPR20 void client_got_reject(tr_block_index_t block)
     {
         if (candidates_dirty_)
         {
             return;
         }
 
-        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_block(block); iter != std::end(candidates_))
         {
             if (auto& active_request = iter->n_active_requests[block - iter->block_span.begin]; active_request > 0)
             {
@@ -264,6 +264,14 @@ private:
                     --active_request;
                 }
             }
+        }
+    }
+
+    TR_CONSTEXPR20 void client_got_block(tr_block_index_t block)
+    {
+        if (auto iter = find_by_block(block); iter != std::end(candidates_))
+        {
+            resort_piece(iter);
         }
     }
 
@@ -324,19 +332,6 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void resort_piece(tr_piece_index_t const piece)
-    {
-        if (candidates_dirty_)
-        {
-            return;
-        }
-
-        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
-        {
-            resort_piece(iter);
-        }
-    }
-
     TR_CONSTEXPR20 void resort_piece(CandidateVec::iterator const pos_old)
     {
         if (candidates_dirty_)
@@ -373,12 +368,11 @@ Wishlist::Impl::Impl(std::unique_ptr<Mediator> mediator_in)
     : tags_{ {
           mediator_in->observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
           mediator_in->observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
-          mediator_in->observe_got_block([this](tr_torrent*, tr_piece_index_t p, tr_block_index_t) { resort_piece(p); }),
+          mediator_in->observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
           mediator_in->observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { client_got_choke(b); }),
           mediator_in->observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
           mediator_in->observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
-          mediator_in->observe_got_reject([this](tr_torrent*, tr_peer*, tr_piece_index_t p, tr_block_index_t b)
-                                          { client_got_reject(p, b); }),
+          mediator_in->observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { client_got_reject(b); }),
           mediator_in->observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
           mediator_in->observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
                                                 { set_candidates_dirty(); }),
