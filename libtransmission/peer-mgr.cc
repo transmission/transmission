@@ -600,6 +600,8 @@ public:
     // depends-on: active_requests
     Peers peers;
 
+    // depends-on: tor
+    WishlistMediator wishlist_mediator{ *this };
     std::unique_ptr<Wishlist> wishlist;
 
     Pool connectable_pool;
@@ -1194,7 +1196,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     tr_swarm& swarm = *torrent->swarm;
     if (!swarm.wishlist)
     {
-        swarm.wishlist = std::make_unique<Wishlist>(std::make_unique<tr_swarm::WishlistMediator>(swarm));
+        swarm.wishlist = std::make_unique<Wishlist>(swarm.wishlist_mediator);
     }
     return swarm.wishlist->next(
         numwant,
