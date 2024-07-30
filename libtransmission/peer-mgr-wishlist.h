@@ -70,7 +70,7 @@ public:
         virtual ~Mediator() = default;
     };
 
-    explicit Wishlist(std::unique_ptr<Mediator> mediator_in);
+    explicit Wishlist(Mediator& mediator_in);
     ~Wishlist();
 
     // the next blocks that we should request from a peer
