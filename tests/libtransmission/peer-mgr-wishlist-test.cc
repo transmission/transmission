@@ -22,7 +22,7 @@ class PeerMgrWishlistTest : public ::testing::Test
 protected:
     struct MockMediator final : public Wishlist::Mediator
     {
-        mutable std::map<tr_block_index_t, size_t> active_request_count_;
+        mutable std::map<tr_block_index_t, uint8_t> active_request_count_;
         mutable std::map<tr_piece_index_t, size_t> missing_block_count_;
         mutable std::map<tr_piece_index_t, tr_block_span_t> block_span_;
         mutable std::map<tr_piece_index_t, tr_priority_t> piece_priority_;
@@ -54,7 +54,7 @@ protected:
             return is_sequential_download_;
         }
 
-        [[nodiscard]] size_t count_active_requests(tr_block_index_t block) const override
+        [[nodiscard]] uint8_t count_active_requests(tr_block_index_t block) const override
         {
             return active_request_count_[block];
         }
@@ -97,9 +97,15 @@ protected:
         }
 
         [[nodiscard]] libtransmission::ObserverTag observe_got_block(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer) override
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override
         {
             return parent_.got_block_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
+        {
+            return parent_.got_choke_.observe(std::move(observer));
         }
 
         [[nodiscard]] libtransmission::ObserverTag observe_got_have(
@@ -112,6 +118,12 @@ protected:
             libtransmission::SimpleObservable<tr_torrent*>::Observer observer) override
         {
             return parent_.got_have_all_.observe(std::move(observer));
+        }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_got_reject(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override
+        {
+            return parent_.got_reject_.observe(std::move(observer));
         }
 
         [[nodiscard]] libtransmission::ObserverTag observe_piece_completed(
@@ -127,6 +139,12 @@ protected:
             return parent_.priority_changed_.observe(std::move(observer));
         }
 
+        [[nodiscard]] libtransmission::ObserverTag observe_sent_request(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) override
+        {
+            return parent_.sent_request_.observe(std::move(observer));
+        }
+
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
             libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override
         {
@@ -136,9 +154,12 @@ protected:
 
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> peer_disconnect_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t> got_block_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have_;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> got_reject_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t> sent_request_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
@@ -155,8 +176,7 @@ protected:
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
 {
-    auto mediator_ptr = std::make_unique<MockMediator>(*this);
-    auto& mediator = *mediator_ptr;
+    auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
@@ -176,7 +196,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     mediator.client_wants_piece_.insert(0);
 
     // we should only get the first piece back
-    auto wishlist = Wishlist{ std::move(mediator_ptr) };
+    auto wishlist = Wishlist{ mediator };
     auto const spans = wishlist.next(1000, PeerHasAllPieces, ClientHasNoActiveRequests);
     ASSERT_EQ(1U, std::size(spans));
     EXPECT_EQ(mediator.block_span_[0].begin, spans[0].begin);
@@ -185,26 +205,26 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
 
 TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 {
-    auto mediator = std::make_unique<MockMediator>(*this);
+    auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator->piece_count_ = 3;
-    mediator->missing_block_count_[0] = 100;
-    mediator->missing_block_count_[1] = 100;
-    mediator->missing_block_count_[2] = 50;
-    mediator->block_span_[0] = { 0, 100 };
-    mediator->block_span_[1] = { 100, 200 };
-    mediator->block_span_[2] = { 200, 250 };
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // peer has piece 1
-    mediator->piece_replication_[0] = 0;
-    mediator->piece_replication_[1] = 1;
-    mediator->piece_replication_[2] = 0;
+    mediator.piece_replication_[0] = 0;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 0;
 
     // and we want all three pieces
-    mediator->client_wants_piece_.insert(0);
-    mediator->client_wants_piece_.insert(1);
-    mediator->client_wants_piece_.insert(2);
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
 
     // but the peer only has the second piece, we don't want to
     // request blocks other than these
@@ -215,7 +235,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 
     // even if we ask wishlist for more blocks than what the peer has,
     // it should only return blocks [100..200)
-    auto const spans = Wishlist{ std::move(mediator) }.next(250, IsPieceOne, ClientHasNoActiveRequests);
+    auto const spans = Wishlist{ mediator }.next(250, IsPieceOne, ClientHasNoActiveRequests);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
@@ -229,26 +249,26 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
 {
-    auto mediator = std::make_unique<MockMediator>(*this);
+    auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator->piece_count_ = 3;
-    mediator->missing_block_count_[0] = 100;
-    mediator->missing_block_count_[1] = 100;
-    mediator->missing_block_count_[2] = 50;
-    mediator->block_span_[0] = { 0, 100 };
-    mediator->block_span_[1] = { 100, 200 };
-    mediator->block_span_[2] = { 200, 250 };
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // peer has all pieces
-    mediator->piece_replication_[0] = 1;
-    mediator->piece_replication_[1] = 1;
-    mediator->piece_replication_[2] = 1;
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
 
     // and we want all three pieces
-    mediator->client_wants_piece_.insert(0);
-    mediator->client_wants_piece_.insert(1);
-    mediator->client_wants_piece_.insert(2);
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
 
     // but we've already requested blocks [0..10) from this peer,
     // so we don't want to send repeated requests
@@ -259,7 +279,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
 
     // even if we ask wishlist for all the blocks,
     // it should omit blocks [0..10) from the return set
-    auto const spans = Wishlist{ std::move(mediator) }.next(250, PeerHasAllPieces, IsBetweenZeroToTen);
+    auto const spans = Wishlist{ mediator }.next(250, PeerHasAllPieces, IsBetweenZeroToTen);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
@@ -272,37 +292,36 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
 {
-    auto mediator = std::make_unique<MockMediator>(*this);
-
+    auto mediator = MockMediator{ *this };
     // setup: three pieces, all missing
-    mediator->piece_count_ = 3;
-    mediator->missing_block_count_[0] = 100;
-    mediator->missing_block_count_[1] = 100;
-    mediator->missing_block_count_[2] = 50;
-    mediator->block_span_[0] = { 0, 100 };
-    mediator->block_span_[1] = { 100, 200 };
-    mediator->block_span_[2] = { 200, 250 };
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // peer has all pieces
-    mediator->piece_replication_[0] = 1;
-    mediator->piece_replication_[1] = 1;
-    mediator->piece_replication_[2] = 1;
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
 
     // and we want all three pieces
-    mediator->client_wants_piece_.insert(0);
-    mediator->client_wants_piece_.insert(1);
-    mediator->client_wants_piece_.insert(2);
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
 
     // but we've already requested blocks [0..10) from someone else,
     // and it is not endgame, so we don't want to send repeated requests
     for (tr_block_index_t block = 0; block < 10; ++block)
     {
-        mediator->active_request_count_[block] = 1;
+        mediator.active_request_count_[block] = 1;
     }
 
     // even if we ask wishlist for all the blocks,
     // it should omit blocks [0..10) from the return set
-    auto const spans = Wishlist{ std::move(mediator) }.next(250, PeerHasAllPieces, ClientHasNoActiveRequests);
+    auto const spans = Wishlist{ mediator }.next(250, PeerHasAllPieces, ClientHasNoActiveRequests);
     auto requested = tr_bitfield{ 250 };
     for (auto const& span : spans)
     {
@@ -315,38 +334,40 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
 
 TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 {
-    auto mediator = std::make_unique<MockMediator>(*this);
+    auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator->piece_count_ = 3;
-    mediator->missing_block_count_[0] = 100;
-    mediator->missing_block_count_[1] = 100;
-    mediator->missing_block_count_[2] = 50;
-    mediator->block_span_[0] = { 0, 100 };
-    mediator->block_span_[1] = { 100, 200 };
-    mediator->block_span_[2] = { 200, 250 };
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // peer has all pieces
-    mediator->piece_replication_[0] = 1;
-    mediator->piece_replication_[1] = 1;
-    mediator->piece_replication_[2] = 1;
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
 
     // and we want all three pieces
-    mediator->client_wants_piece_.insert(0);
-    mediator->client_wants_piece_.insert(1);
-    mediator->client_wants_piece_.insert(2);
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
 
     // we've already requested blocks [0..10) from someone else,
     // but it is endgame, so we can request each block twice.
     // blocks [5..10) are already requested twice
     for (tr_block_index_t block = 0; block < 5; ++block)
     {
-        mediator->active_request_count_[block] = 1;
+        mediator.active_request_count_[block] = 1;
     }
     for (tr_block_index_t block = 5; block < 10; ++block)
     {
-        mediator->active_request_count_[block] = 2;
+        mediator.active_request_count_[block] = 2;
     }
+
+    auto wishlist = Wishlist{ mediator };
 
     // if we ask wishlist for more blocks than exist,
     // it should omit blocks [5..10) from the return set
@@ -366,31 +387,31 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator = std::make_unique<MockMediator>(*this);
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator->piece_count_ = 3;
-        mediator->missing_block_count_[0] = 100;
-        mediator->missing_block_count_[1] = 100;
-        mediator->missing_block_count_[2] = 50;
-        mediator->block_span_[0] = { 0, 100 };
-        mediator->block_span_[1] = { 100, 200 };
-        mediator->block_span_[2] = { 200, 250 };
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 50;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 250 };
 
         // peer has all pieces
-        mediator->piece_replication_[0] = 1;
-        mediator->piece_replication_[1] = 1;
-        mediator->piece_replication_[2] = 1;
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
 
         // and we want all three pieces
-        mediator->client_wants_piece_.insert(0);
-        mediator->client_wants_piece_.insert(1);
-        mediator->client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
 
         // we enabled sequential download
-        mediator->is_sequential_download_ = true;
+        mediator.is_sequential_download_ = true;
 
-        return Wishlist{ std::move(mediator) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     };
 
     // when we ask for blocks, apart from the last piece,
@@ -432,32 +453,32 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 {
-    auto mediator = std::make_unique<MockMediator>(*this);
+    auto mediator = MockMediator{ *this };
 
     // setup: three pieces, all missing
-    mediator->piece_count_ = 3;
-    mediator->missing_block_count_[0] = 100;
-    mediator->missing_block_count_[1] = 100;
-    mediator->missing_block_count_[2] = 50;
-    mediator->block_span_[0] = { 0, 100 };
-    mediator->block_span_[1] = { 100, 200 };
-    mediator->block_span_[2] = { 200, 250 };
+    mediator.piece_count_ = 3;
+    mediator.missing_block_count_[0] = 100;
+    mediator.missing_block_count_[1] = 100;
+    mediator.missing_block_count_[2] = 50;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
 
     // peer has all pieces
-    mediator->piece_replication_[0] = 1;
-    mediator->piece_replication_[1] = 1;
-    mediator->piece_replication_[2] = 1;
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
 
     // and we want everything
     for (tr_piece_index_t i = 0; i < 3; ++i)
     {
-        mediator->client_wants_piece_.insert(i);
+        mediator.client_wants_piece_.insert(i);
     }
 
     // but we only ask for 10 blocks,
     // so that's how many we should get back
     auto const n_wanted = 10U;
-    auto const spans = Wishlist{ std::move(mediator) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    auto const spans = Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     auto n_got = size_t{};
     for (auto const& span : spans)
     {
@@ -470,32 +491,32 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator = std::make_unique<MockMediator>(*this);
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator->piece_count_ = 3;
-        mediator->missing_block_count_[0] = 100;
-        mediator->missing_block_count_[1] = 100;
-        mediator->missing_block_count_[2] = 100;
-        mediator->block_span_[0] = { 0, 100 };
-        mediator->block_span_[1] = { 100, 200 };
-        mediator->block_span_[2] = { 200, 300 };
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 100;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
 
         // peer has all pieces
-        mediator->piece_replication_[0] = 1;
-        mediator->piece_replication_[1] = 1;
-        mediator->piece_replication_[2] = 1;
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
         {
-            mediator->client_wants_piece_.insert(i);
+            mediator.client_wants_piece_.insert(i);
         }
 
         // and the second piece is high priority
-        mediator->piece_priority_[1] = TR_PRI_HIGH;
+        mediator.piece_priority_[1] = TR_PRI_HIGH;
 
-        return Wishlist{ std::move(mediator) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     };
 
     // wishlist should pick the high priority piece's blocks first.
@@ -523,41 +544,41 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator = std::make_unique<MockMediator>(*this);
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, same size
-        mediator->piece_count_ = 3;
-        mediator->block_span_[0] = { 0, 100 };
-        mediator->block_span_[1] = { 100, 200 };
-        mediator->block_span_[2] = { 200, 300 };
+        mediator.piece_count_ = 3;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
 
         // peer has all pieces
-        mediator->piece_replication_[0] = 1;
-        mediator->piece_replication_[1] = 1;
-        mediator->piece_replication_[2] = 1;
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
         {
-            mediator->client_wants_piece_.insert(i);
+            mediator.client_wants_piece_.insert(i);
         }
 
         // but some pieces are closer to completion than others
-        mediator->missing_block_count_[0] = 10;
-        mediator->missing_block_count_[1] = 20;
-        mediator->missing_block_count_[2] = 100;
+        mediator.missing_block_count_[0] = 10;
+        mediator.missing_block_count_[1] = 20;
+        mediator.missing_block_count_[2] = 100;
         for (tr_piece_index_t piece = 0; piece < 3; ++piece)
         {
-            auto const& span = mediator->block_span_[piece];
-            auto const have_end = span.end - mediator->missing_block_count_[piece];
+            auto const& span = mediator.block_span_[piece];
+            auto const have_end = span.end - mediator.missing_block_count_[piece];
 
             for (tr_piece_index_t i = span.begin; i < have_end; ++i)
             {
-                mediator->client_has_block_.insert(i);
+                mediator.client_has_block_.insert(i);
             }
         }
 
-        return Wishlist{ std::move(mediator) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     };
 
     // wishlist prefers to get pieces completed ASAP, so it
@@ -601,29 +622,29 @@ TEST_F(PeerMgrWishlistTest, prefersRarerPieces)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator = std::make_unique<MockMediator>(*this);
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
-        mediator->piece_count_ = 3;
-        mediator->missing_block_count_[0] = 100;
-        mediator->missing_block_count_[1] = 100;
-        mediator->missing_block_count_[2] = 100;
-        mediator->block_span_[0] = { 0, 100 };
-        mediator->block_span_[1] = { 100, 200 };
-        mediator->block_span_[2] = { 200, 300 };
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 100;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
 
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
         {
-            mediator->client_wants_piece_.insert(i);
+            mediator.client_wants_piece_.insert(i);
         }
 
         // but some pieces are rarer than others
-        mediator->piece_replication_[0] = 1;
-        mediator->piece_replication_[1] = 3;
-        mediator->piece_replication_[2] = 2;
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 3;
+        mediator.piece_replication_[2] = 2;
 
-        return Wishlist{ std::move(mediator) }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     };
 
     // wishlist prefers to request rarer pieces, so it
@@ -667,8 +688,7 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -691,7 +711,7 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // a peer that has only the first piece disconnected, now the
@@ -746,8 +766,7 @@ TEST_F(PeerMgrWishlistTest, gotBitfieldIncrementsReplication)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -770,7 +789,7 @@ TEST_F(PeerMgrWishlistTest, gotBitfieldIncrementsReplication)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // a peer with first 2 pieces connected and sent a bitfield, now the
@@ -826,8 +845,7 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -850,13 +868,13 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // we received block 0 from someone, the wishlist should resort the
         // candidate list cache by consulting the mediator
         --mediator.missing_block_count_[0];
-        got_block_.emit(nullptr, 0, 0);
+        got_block_.emit(nullptr, 0);
 
         return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     };
@@ -901,8 +919,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -925,7 +942,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
         mediator.piece_replication_[2] = 2;
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // a peer sent a "Have" message for the first piece, now the
@@ -978,8 +995,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -1007,7 +1023,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         mediator.piece_replication_[2] = 3;
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // a peer sent a "Have All" message, this should not affect the piece order
@@ -1058,8 +1074,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
 {
-    auto mediator_ptr = std::make_unique<MockMediator>(*this);
-    auto& mediator = *mediator_ptr;
+    auto mediator = MockMediator{ *this };
 
     // setup: three pieces, piece 0 is nearly complete
     mediator.piece_count_ = 3;
@@ -1083,7 +1098,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
 
     // allow the wishlist to build its cache, it should have all 3 pieces
     // at this point
-    auto wishlist = Wishlist{ std::move(mediator_ptr) };
+    auto wishlist = Wishlist{ mediator };
     (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
     // we just completed piece 0
@@ -1107,8 +1122,7 @@ TEST_F(PeerMgrWishlistTest, settingPriorityRebuildsWishlist)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -1131,7 +1145,7 @@ TEST_F(PeerMgrWishlistTest, settingPriorityRebuildsWishlist)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // a file priority changed, the cache should be rebuilt.
@@ -1167,8 +1181,7 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
 {
     auto const get_spans = [this](size_t n_wanted)
     {
-        auto mediator_ptr = std::make_unique<MockMediator>(*this);
-        auto& mediator = *mediator_ptr;
+        auto mediator = MockMediator{ *this };
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
@@ -1191,7 +1204,7 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
         }
 
         // allow the wishlist to build its cache
-        auto wishlist = Wishlist{ std::move(mediator_ptr) };
+        auto wishlist = Wishlist{ mediator };
         (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
         // the sequential download setting was changed,
