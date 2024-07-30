@@ -1075,11 +1075,6 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
 
-        // peer has all pieces
-        mediator.piece_replication_[0] = 1;
-        mediator.piece_replication_[1] = 1;
-        mediator.piece_replication_[2] = 1;
-
         // and we want everything
         for (tr_piece_index_t i = 0; i < 3; ++i)
         {
