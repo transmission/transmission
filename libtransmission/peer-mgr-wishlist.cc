@@ -202,7 +202,7 @@ private:
             return;
         }
 
-        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
             ++iter->replication;
             resort_piece(iter);
@@ -220,7 +220,7 @@ private:
 
         for (auto block = block_span.begin; block < block_span.end;)
         {
-            auto iter = candidate_lookup_b(block);
+            auto iter = find_by_block(block);
             if (iter == std::end(candidates_))
             {
                 set_candidates_dirty();
@@ -242,7 +242,7 @@ private:
             return;
         }
 
-        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
             if (auto& active_request = iter->n_active_requests[block - iter->block_span.begin]; active_request > 0)
             {
@@ -269,7 +269,7 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 CandidateVec::iterator candidate_lookup_p(tr_piece_index_t const piece)
+    TR_CONSTEXPR20 CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
     {
         return std::find_if(
             std::begin(candidates_),
@@ -277,7 +277,7 @@ private:
             [piece](auto const& c) { return c.piece == piece; });
     }
 
-    TR_CONSTEXPR20 CandidateVec::iterator candidate_lookup_b(tr_block_index_t const block)
+    TR_CONSTEXPR20 CandidateVec::iterator find_by_block(tr_block_index_t const block)
     {
         return std::find_if(
             std::begin(candidates_),
@@ -318,7 +318,7 @@ private:
             return;
         }
 
-        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
             candidates_.erase(iter);
         }
@@ -331,7 +331,7 @@ private:
             return;
         }
 
-        if (auto iter = candidate_lookup_p(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
             resort_piece(iter);
         }
