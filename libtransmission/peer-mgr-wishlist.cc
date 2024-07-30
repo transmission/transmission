@@ -439,17 +439,17 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         // walk the blocks in this piece
         for (auto [block, end] = candidate.block_span; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
-            // don't request blocks that:
-            // 1. we've already got, or
-            // 2. already has an active request to that peer
-            if (mediator_->client_has_block(block) || has_active_request_to_peer(block))
+            // don't request from too many peers
+            auto const block_idx = block - candidate.block_span.begin;
+            if (auto const n_peers = candidate.n_active_requests[block_idx]; n_peers >= max_peers)
             {
                 continue;
             }
 
-            // don't request from too many peers
-            auto const block_idx = block - candidate.block_span.begin;
-            if (auto const n_peers = candidate.n_active_requests[block_idx]; n_peers >= max_peers)
+            // don't request blocks that:
+            // 1. we've already got, or
+            // 2. already has an active request to that peer
+            if (mediator_->client_has_block(block) || has_active_request_to_peer(block))
             {
                 continue;
             }
