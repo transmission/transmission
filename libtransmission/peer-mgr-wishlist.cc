@@ -100,7 +100,7 @@ class Wishlist::Impl
     using CandidateVec = std::vector<Candidate>;
 
 public:
-    explicit Impl(std::unique_ptr<Mediator> mediator_in);
+    explicit Impl(Mediator& mediator_in);
 
     std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
@@ -303,18 +303,18 @@ private:
         candidates_.clear();
 
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
-        auto const is_sequential = mediator_->is_sequential_download();
-        auto const n_pieces = mediator_->piece_count();
+        auto const is_sequential = mediator_.is_sequential_download();
+        auto const n_pieces = mediator_.piece_count();
         candidates_.reserve(n_pieces);
         for (tr_piece_index_t piece = 0U; piece < n_pieces; ++piece)
         {
-            if (mediator_->count_missing_blocks(piece) <= 0U || !mediator_->client_wants_piece(piece))
+            if (mediator_.count_missing_blocks(piece) <= 0U || !mediator_.client_wants_piece(piece))
             {
                 continue;
             }
 
             auto const salt = is_sequential ? piece : salter();
-            candidates_.emplace_back(piece, salt, mediator_.get());
+            candidates_.emplace_back(piece, salt, &mediator_);
         }
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
@@ -361,25 +361,25 @@ private:
 
     std::array<libtransmission::ObserverTag, 11U> const tags_;
 
-    std::unique_ptr<Mediator> const mediator_;
+    Mediator& mediator_;
 };
 
-Wishlist::Impl::Impl(std::unique_ptr<Mediator> mediator_in)
+Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
-          mediator_in->observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
-          mediator_in->observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
-          mediator_in->observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
-          mediator_in->observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { client_got_choke(b); }),
-          mediator_in->observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
-          mediator_in->observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
-          mediator_in->observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { client_got_reject(b); }),
-          mediator_in->observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
-          mediator_in->observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
-                                                { set_candidates_dirty(); }),
-          mediator_in->observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { client_sent_request(bs); }),
-          mediator_in->observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
+          mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
+          mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
+          mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
+          mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { client_got_choke(b); }),
+          mediator_in.observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
+          mediator_in.observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
+          mediator_in.observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { client_got_reject(b); }),
+          mediator_in.observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
+          mediator_in.observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
+                                               { set_candidates_dirty(); }),
+          mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { client_sent_request(bs); }),
+          mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
       } }
-    , mediator_{ std::move(mediator_in) }
+    , mediator_{ mediator_in }
 {
 }
 
@@ -425,7 +425,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             // don't request blocks that:
             // 1. we've already got, or
             // 2. already has an active request to that peer
-            if (mediator_->client_has_block(block) || has_active_request_to_peer(block))
+            if (mediator_.client_has_block(block) || has_active_request_to_peer(block))
             {
                 continue;
             }
@@ -468,8 +468,8 @@ int Wishlist::Impl::Candidate::compare(Wishlist::Impl::Candidate const& that) co
 
 // ---
 
-Wishlist::Wishlist(std::unique_ptr<Mediator> mediator_in)
-    : impl_{ std::make_unique<Impl>(std::move(mediator_in)) }
+Wishlist::Wishlist(Mediator& mediator_in)
+    : impl_{ std::make_unique<Impl>(mediator_in) }
 {
 }
 
