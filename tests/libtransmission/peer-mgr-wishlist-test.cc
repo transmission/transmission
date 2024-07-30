@@ -13,6 +13,7 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/bitfield.h>
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/peer-mgr-wishlist.h>
 
 #include "gtest/gtest.h"
@@ -1133,6 +1134,81 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         EXPECT_EQ(250U, requested.count());
         EXPECT_EQ(200U, requested.count(0, 200));
         EXPECT_EQ(50U, requested.count(200, 300));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, gotRejectDecrementsActiveRequest)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, all missing
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 100;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        // peers has all pieces
+        mediator.piece_replication_[0] = 2;
+        mediator.piece_replication_[1] = 2;
+        mediator.piece_replication_[2] = 2;
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // we have active requests to the first 250 blocks
+        for (tr_block_index_t i = 0; i < 250; ++i)
+        {
+            mediator.active_request_count_[i] = 1;
+        }
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+        (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
+
+        // a peer sent some "Reject" messages, which cancels active requests
+        auto rejected_set = std::set<tr_block_index_t>{};
+        auto rejected_bitfield = tr_bitfield{ 300 };
+        for (tr_block_index_t i = 0, n = tr_rand_int(250U); i < n; ++i)
+        {
+            rejected_set.insert(tr_rand_int(250U));
+        }
+        for (auto const block : rejected_set)
+        {
+            rejected_bitfield.set(block);
+            got_reject_.emit(nullptr, nullptr, block);
+        }
+
+        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests), std::move(rejected_bitfield) };
+    };
+
+    // wishlist only picks blocks with no active requests when not in
+    // end game mode, which are [250, 300) and some other random blocks.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const [ranges, expected] = get_spans(300);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& range : ranges)
+        {
+            requested.set_span(range.begin, range.end);
+        }
+        EXPECT_EQ(50U + expected.count(), requested.count());
+        EXPECT_EQ(50U, requested.count(250, 300));
+        for (tr_block_index_t i = 0; i < 250; ++i)
+        {
+            EXPECT_EQ(expected.test(i), requested.test(i));
+        }
     }
 }
 
