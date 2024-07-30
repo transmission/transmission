@@ -55,22 +55,19 @@ class Wishlist::Impl
 {
     struct Candidate
     {
-        Candidate(
-            tr_piece_index_t piece_in,
-            tr_block_span_t block_span_in,
-            std::vector<uint8_t> n_active_requests_in,
-            size_t replication_in,
-            tr_priority_t priority_in,
-            tr_piece_index_t salt_in,
-            Mediator const* mediator)
+        Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_in, Mediator const* mediator)
             : piece{ piece_in }
-            , block_span{ block_span_in }
-            , n_active_requests{ std::move(n_active_requests_in) }
-            , replication{ replication_in }
-            , priority{ priority_in }
+            , block_span{ mediator->block_span(piece_in) }
+            , replication{ mediator->count_piece_replication(piece_in) }
+            , priority{ mediator->priority(piece_in) }
             , salt{ salt_in }
             , mediator_{ mediator }
         {
+            n_active_requests.reserve(block_span.end - block_span.begin);
+            for (auto [block, end] = block_span; block < end; ++block)
+            {
+                n_active_requests.emplace_back(mediator_->count_active_requests(block));
+            }
         }
 
         [[nodiscard]] int compare(Candidate const& that) const noexcept; // <=>
@@ -308,23 +305,8 @@ private:
                 continue;
             }
 
-            auto const block_span = mediator_->block_span(piece);
-            auto n_active_requests = std::vector<uint8_t>{};
-            n_active_requests.reserve(block_span.end - block_span.begin);
-            for (auto [block, end] = block_span; block < end; ++block)
-            {
-                n_active_requests.emplace_back(mediator_->count_active_requests(block));
-            }
-
             auto const salt = is_sequential ? piece : salter();
-            candidates_.emplace_back(
-                piece,
-                block_span,
-                std::move(n_active_requests),
-                mediator_->count_piece_replication(piece),
-                mediator_->priority(piece),
-                salt,
-                mediator_.get());
+            candidates_.emplace_back(piece, salt, mediator_.get());
         }
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
