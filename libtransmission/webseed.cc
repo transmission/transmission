@@ -222,7 +222,7 @@ public:
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
         {
-            return outgoing_requests.count();
+            return active_requests.count();
         }
 
         // webseed will never request blocks from us
@@ -253,7 +253,7 @@ public:
 
     void on_rejection(tr_block_span_t block_span)
     {
-        outgoing_requests.unset_span(block_span.begin, block_span.end);
+        active_requests.unset_span(block_span.begin, block_span.end);
         for (auto block = block_span.begin; block < block_span.end; ++block)
         {
             publish(tr_peer_event::GotRejected(tor.block_info(), block));
@@ -273,7 +273,7 @@ public:
             tasks.insert(task);
             task->request_next_chunk();
 
-            outgoing_requests.set_span(span->begin, span->end);
+            active_requests.set_span(span->begin, span->end);
             publish(tr_peer_event::SentRequest(tor.block_info(), *span));
         }
     }
@@ -374,7 +374,7 @@ void tr_webseed_task::use_fetched_blocks()
                     auto data = std::unique_ptr<Cache::BlockData>{ block_buf };
                     if (auto const* const torrent = tr_torrentFindFromId(session, tor_id); torrent != nullptr)
                     {
-                        webseed->outgoing_requests.unset(block);
+                        webseed->active_requests.unset(block);
                         session->cache->write_block(tor_id, block, std::move(data));
                         webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), block));
                     }
