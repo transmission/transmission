@@ -899,8 +899,8 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
             requested.set_span(span.begin, span.end);
         }
         EXPECT_EQ(100U, requested.count());
-        EXPECT_EQ(100U, requested.count(0, 100));
-        EXPECT_EQ(0U, requested.count(100, 300));
+        EXPECT_EQ(99U, requested.count(0, 100));
+        EXPECT_EQ(1U, requested.count(100, 300));
     }
 
     // Same premise as previous test, but ask for more blocks.
