@@ -50,6 +50,7 @@ public:
         ClientGotHaveAll,
         ClientGotHaveNone,
         ClientSentPieceData,
+        ClientSentRequest,
         Error // generic
     };
 
@@ -168,6 +169,18 @@ public:
         event.length = length;
         return event;
     }
+
+    [[nodiscard]] constexpr static auto SentRequest(tr_block_info const& block_info, tr_block_span_t block_span) noexcept
+    {
+        auto const loc_begin = block_info.block_loc(block_span.begin);
+        auto const loc_end = block_info.block_loc(block_span.end);
+        auto event = tr_peer_event{};
+        event.type = Type::ClientSentRequest;
+        event.pieceIndex = loc_begin.piece;
+        event.offset = loc_begin.piece_offset;
+        event.length = loc_end.byte - loc_begin.byte;
+        return event;
+    }
 };
 
 using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& event, void* client_data);
@@ -183,7 +196,7 @@ struct tr_peer
     using Speed = libtransmission::Values::Speed;
 
     explicit tr_peer(tr_torrent const& tor);
-    virtual ~tr_peer();
+    virtual ~tr_peer() = default;
 
     [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
@@ -211,7 +224,7 @@ struct tr_peer
 
     virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    virtual void cancel_block_request(tr_block_index_t /*block*/)
+    virtual void maybe_cancel_block_request(tr_block_index_t /*block*/)
     {
     }
 
@@ -222,6 +235,8 @@ struct tr_peer
     tr_recentHistory<uint16_t> blocks_sent_to_peer;
 
     tr_recentHistory<uint16_t> cancels_sent_to_client;
+
+    tr_bitfield active_requests;
 
     /// The following fields are only to be used in peer-mgr.cc.
     /// TODO(ckerr): refactor them out of `tr_peer`

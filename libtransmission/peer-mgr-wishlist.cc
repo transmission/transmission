@@ -55,18 +55,25 @@ class Wishlist::Impl
 {
     struct Candidate
     {
-        Candidate(
-            tr_piece_index_t piece_in,
-            size_t replication_in,
-            tr_priority_t priority_in,
-            tr_piece_index_t salt_in,
-            Mediator const* mediator)
+        struct BlockState
+        {
+            uint8_t n_req;
+            bool have;
+        };
+
+        Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_in, Mediator const* mediator)
             : piece{ piece_in }
-            , replication{ replication_in }
-            , priority{ priority_in }
+            , block_span{ mediator->block_span(piece_in) }
+            , replication{ mediator->count_piece_replication(piece_in) }
+            , priority{ mediator->priority(piece_in) }
             , salt{ salt_in }
             , mediator_{ mediator }
         {
+            block_states.reserve(block_span.end - block_span.begin);
+            for (auto [block, end] = block_span; block < end; ++block)
+            {
+                block_states.push_back({ mediator_->count_active_requests(block), mediator_->client_has_block(block) });
+            }
         }
 
         [[nodiscard]] int compare(Candidate const& that) const noexcept; // <=>
@@ -77,6 +84,9 @@ class Wishlist::Impl
         }
 
         tr_piece_index_t piece;
+        tr_block_span_t block_span;
+
+        std::vector<BlockState> block_states;
 
         // Caching the following 2 values are highly beneficial, because:
         // - they are often used (mainly because resort_piece() is called
@@ -96,12 +106,12 @@ class Wishlist::Impl
     using CandidateVec = std::vector<Candidate>;
 
 public:
-    explicit Impl(std::unique_ptr<Mediator> mediator_in);
+    explicit Impl(Mediator& mediator_in);
 
     std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
         std::function<bool(tr_piece_index_t)> const& peer_has_piece,
-        std::function<bool(tr_block_index_t)> const& has_active_pending_to_peer);
+        std::function<bool(tr_block_index_t)> const& has_active_request_to_peer);
 
 private:
     constexpr void set_candidates_dirty() noexcept
@@ -198,7 +208,7 @@ private:
             return;
         }
 
-        if (auto iter = piece_lookup(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
             ++iter->replication;
             resort_piece(iter);
@@ -207,12 +217,87 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 CandidateVec::iterator piece_lookup(tr_piece_index_t const piece)
+    TR_CONSTEXPR20 void client_sent_request(tr_block_span_t block_span)
+    {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
+        for (auto block = block_span.begin; block < block_span.end;)
+        {
+            auto iter = find_by_block(block);
+            if (iter == std::end(candidates_))
+            {
+                set_candidates_dirty();
+                break;
+            }
+
+            auto const block_end = std::min(block_span.end, iter->block_span.end);
+            for (; block < block_end; ++block)
+            {
+                ++iter->block_states[block - iter->block_span.begin].n_req;
+            }
+        }
+    }
+
+    TR_CONSTEXPR20 void client_got_reject(tr_block_index_t block)
+    {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
+        if (auto iter = find_by_block(block); iter != std::end(candidates_))
+        {
+            if (auto& n_req = iter->block_states[block - iter->block_span.begin].n_req; n_req > 0)
+            {
+                --n_req;
+            }
+        }
+    }
+
+    TR_CONSTEXPR20 void client_got_choke(tr_bitfield const& requests)
+    {
+        for (auto& candidate : candidates_)
+        {
+            auto const block_begin = candidate.block_span.begin;
+            for (size_t i = 0, n = std::size(candidate.block_states); i < n; ++i)
+            {
+                auto const block = block_begin + i;
+                if (auto& n_req = candidate.block_states[i].n_req; n_req > 0 && requests.test(block))
+                {
+                    --n_req;
+                }
+            }
+        }
+    }
+
+    TR_CONSTEXPR20 void client_got_block(tr_block_index_t block)
+    {
+        if (auto iter = find_by_block(block); iter != std::end(candidates_))
+        {
+            iter->block_states[block - iter->block_span.begin].have = true;
+            resort_piece(iter);
+        }
+    }
+
+    // ---
+
+    TR_CONSTEXPR20 CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
     {
         return std::find_if(
             std::begin(candidates_),
             std::end(candidates_),
-            [piece](auto const& candidate) { return candidate.piece == piece; });
+            [piece](auto const& c) { return c.piece == piece; });
+    }
+
+    TR_CONSTEXPR20 CandidateVec::iterator find_by_block(tr_block_index_t const block)
+    {
+        return std::find_if(
+            std::begin(candidates_),
+            std::end(candidates_),
+            [block](auto const& c) { return c.block_span.begin <= block && block < c.block_span.end; });
     }
 
     void maybe_rebuild_candidate_list()
@@ -225,23 +310,18 @@ private:
         candidates_.clear();
 
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
-        auto const is_sequential = mediator_->is_sequential_download();
-        auto const n_pieces = mediator_->piece_count();
+        auto const is_sequential = mediator_.is_sequential_download();
+        auto const n_pieces = mediator_.piece_count();
         candidates_.reserve(n_pieces);
         for (tr_piece_index_t piece = 0U; piece < n_pieces; ++piece)
         {
-            if (mediator_->count_missing_blocks(piece) <= 0U || !mediator_->client_wants_piece(piece))
+            if (mediator_.count_missing_blocks(piece) <= 0U || !mediator_.client_wants_piece(piece))
             {
                 continue;
             }
 
             auto const salt = is_sequential ? piece : salter();
-            candidates_.emplace_back(
-                piece,
-                mediator_->count_piece_replication(piece),
-                mediator_->priority(piece),
-                salt,
-                mediator_.get());
+            candidates_.emplace_back(piece, salt, &mediator_);
         }
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
@@ -253,22 +333,9 @@ private:
             return;
         }
 
-        if (auto iter = piece_lookup(piece); iter != std::end(candidates_))
+        if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
             candidates_.erase(iter);
-        }
-    }
-
-    TR_CONSTEXPR20 void resort_piece(tr_piece_index_t const piece)
-    {
-        if (candidates_dirty_)
-        {
-            return;
-        }
-
-        if (auto iter = piece_lookup(piece); iter != std::end(candidates_))
-        {
-            resort_piece(iter);
         }
     }
 
@@ -297,32 +364,36 @@ private:
 
     CandidateVec candidates_;
     bool candidates_dirty_ = true;
+    bool is_endgame_ = false;
 
-    std::array<libtransmission::ObserverTag, 8U> const tags_;
+    std::array<libtransmission::ObserverTag, 11U> const tags_;
 
-    std::unique_ptr<Mediator> const mediator_;
+    Mediator& mediator_;
 };
 
-Wishlist::Impl::Impl(std::unique_ptr<Mediator> mediator_in)
+Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
-          mediator_in->observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
-          mediator_in->observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
-          mediator_in->observe_got_block([this](tr_torrent*, tr_piece_index_t p, tr_block_index_t) { resort_piece(p); }),
-          mediator_in->observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
-          mediator_in->observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
-          mediator_in->observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
-          mediator_in->observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
-                                                { set_candidates_dirty(); }),
-          mediator_in->observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
+          mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
+          mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
+          mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
+          mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { client_got_choke(b); }),
+          mediator_in.observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
+          mediator_in.observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
+          mediator_in.observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { client_got_reject(b); }),
+          mediator_in.observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
+          mediator_in.observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
+                                               { set_candidates_dirty(); }),
+          mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { client_sent_request(bs); }),
+          mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
       } }
-    , mediator_{ std::move(mediator_in) }
+    , mediator_{ mediator_in }
 {
 }
 
 std::vector<tr_block_span_t> Wishlist::Impl::next(
     size_t n_wanted_blocks,
     std::function<bool(tr_piece_index_t)> const& peer_has_piece,
-    std::function<bool(tr_block_index_t)> const& has_active_pending_to_peer)
+    std::function<bool(tr_block_index_t)> const& has_active_request_to_peer)
 {
     if (n_wanted_blocks == 0U)
     {
@@ -331,6 +402,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     maybe_rebuild_candidate_list();
 
+    auto const max_peers = is_endgame_ ? EndgameMaxPeers : NormalMaxPeers;
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
@@ -342,26 +414,26 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // if the peer doesn't have this piece that we want...
-        if (!peer_has_piece(candidate.piece))
+        if (candidate.replication == 0 || !peer_has_piece(candidate.piece))
         {
             continue;
         }
 
         // walk the blocks in this piece
-        for (auto [block, end] = mediator_->block_span(candidate.piece); block < end && std::size(blocks) < n_wanted_blocks;
-             ++block)
+        for (auto [block, end] = candidate.block_span; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
-            // don't request blocks that:
-            // 1. we've already got, or
-            // 2. already has an active request to that peer
-            if (mediator_->client_has_block(block) || has_active_pending_to_peer(block))
+            auto const& block_state = candidate.block_states[block - candidate.block_span.begin];
+
+            // don't request from too many peers
+            if (block_state.n_req >= max_peers)
             {
                 continue;
             }
 
-            // don't request from too many peers
-            auto const n_peers = mediator_->count_active_requests(block);
-            if (auto const max_peers = mediator_->is_endgame() ? EndgameMaxPeers : NormalMaxPeers; n_peers >= max_peers)
+            // don't request blocks that:
+            // 1. we've already got, or
+            // 2. already has an active request to that peer
+            if (block_state.have || has_active_request_to_peer(block))
             {
                 continue;
             }
@@ -369,6 +441,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             blocks.emplace_back(block);
         }
     }
+
+    is_endgame_ = std::size(blocks) < n_wanted_blocks;
 
     // Ensure the list of blocks are sorted
     // The list needs to be unique as well, but that should come naturally
@@ -402,8 +476,8 @@ int Wishlist::Impl::Candidate::compare(Wishlist::Impl::Candidate const& that) co
 
 // ---
 
-Wishlist::Wishlist(std::unique_ptr<Mediator> mediator_in)
-    : impl_{ std::make_unique<Impl>(std::move(mediator_in)) }
+Wishlist::Wishlist(Mediator& mediator_in)
+    : impl_{ std::make_unique<Impl>(mediator_in) }
 {
 }
 
