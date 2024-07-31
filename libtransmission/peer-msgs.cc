@@ -559,6 +559,12 @@ private:
         if (can_add_request_from_peer(req))
         {
             peer_requested_.emplace_back(req);
+
+            auto const now_sec = tr_time();
+            auto const now_msec = tr_time_msec();
+            while (fill_output_buffer(now_sec, now_msec) != 0U)
+            {
+            }
         }
         else if (io_->supports_fext())
         {
