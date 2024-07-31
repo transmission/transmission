@@ -925,11 +925,12 @@ bool tr_swarm::WishlistMediator::is_sequential_download() const
 
 uint8_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block) const
 {
-    return std::accumulate(
-        std::begin(swarm_.peers),
-        std::end(swarm_.peers),
-        size_t{},
-        [block](size_t acc, tr_peer const* peer) { return acc + (peer->active_requests.test(block) ? 1 : 0); });
+    auto const op = [block](uint8_t acc, auto const& peer)
+    {
+        return acc + (peer->active_requests.test(block) ? 1U : 0U);
+    };
+    return std::accumulate(std::begin(swarm_.peers), std::end(swarm_.peers), uint8_t{}, op) +
+        std::accumulate(std::begin(swarm_.webseeds), std::end(swarm_.webseeds), uint8_t{}, op);
 }
 
 size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) const
