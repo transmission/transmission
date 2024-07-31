@@ -238,7 +238,7 @@ struct tr_peer
 
     tr_recentHistory<uint16_t> cancels_sent_to_client;
 
-    tr_bitfield outgoing_requests;
+    tr_bitfield active_requests;
 
     /// The following fields are only to be used in peer-mgr.cc.
     /// TODO(ckerr): refactor them out of `tr_peer`
