@@ -55,6 +55,12 @@ class Wishlist::Impl
 {
     struct Candidate
     {
+        struct BlockState
+        {
+            uint8_t n_req;
+            bool have;
+        };
+
         Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_in, Mediator const* mediator)
             : piece{ piece_in }
             , block_span{ mediator->block_span(piece_in) }
@@ -63,10 +69,10 @@ class Wishlist::Impl
             , salt{ salt_in }
             , mediator_{ mediator }
         {
-            n_active_requests.reserve(block_span.end - block_span.begin);
+            block_states.reserve(block_span.end - block_span.begin);
             for (auto [block, end] = block_span; block < end; ++block)
             {
-                n_active_requests.emplace_back(mediator_->count_active_requests(block));
+                block_states.push_back({ mediator_->count_active_requests(block), mediator_->client_has_block(block) });
             }
         }
 
@@ -80,7 +86,7 @@ class Wishlist::Impl
         tr_piece_index_t piece;
         tr_block_span_t block_span;
 
-        std::vector<uint8_t> n_active_requests;
+        std::vector<BlockState> block_states;
 
         // Caching the following 2 values are highly beneficial, because:
         // - they are often used (mainly because resort_piece() is called
@@ -230,7 +236,7 @@ private:
             auto const block_end = std::min(block_span.end, iter->block_span.end);
             for (; block < block_end; ++block)
             {
-                ++iter->n_active_requests[block - iter->block_span.begin];
+                ++iter->block_states[block - iter->block_span.begin].n_req;
             }
         }
     }
@@ -244,9 +250,9 @@ private:
 
         if (auto iter = find_by_block(block); iter != std::end(candidates_))
         {
-            if (auto& active_request = iter->n_active_requests[block - iter->block_span.begin]; active_request > 0)
+            if (auto& n_req = iter->block_states[block - iter->block_span.begin].n_req; n_req > 0)
             {
-                --active_request;
+                --n_req;
             }
         }
     }
@@ -256,12 +262,12 @@ private:
         for (auto& candidate : candidates_)
         {
             auto const block_begin = candidate.block_span.begin;
-            for (size_t i = 0, n = std::size(candidate.n_active_requests); i < n; ++i)
+            for (size_t i = 0, n = std::size(candidate.block_states); i < n; ++i)
             {
                 auto const block = block_begin + i;
-                if (auto& active_request = candidate.n_active_requests[i]; active_request > 0 && requests.test(block))
+                if (auto& n_req = candidate.block_states[i].n_req; n_req > 0 && requests.test(block))
                 {
-                    --active_request;
+                    --n_req;
                 }
             }
         }
@@ -271,6 +277,7 @@ private:
     {
         if (auto iter = find_by_block(block); iter != std::end(candidates_))
         {
+            iter->block_states[block - iter->block_span.begin].have = true;
             resort_piece(iter);
         }
     }
@@ -415,9 +422,10 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         // walk the blocks in this piece
         for (auto [block, end] = candidate.block_span; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
+            auto const& block_state = candidate.block_states[block - candidate.block_span.begin];
+
             // don't request from too many peers
-            auto const block_idx = block - candidate.block_span.begin;
-            if (auto const n_peers = candidate.n_active_requests[block_idx]; n_peers >= max_peers)
+            if (block_state.n_req >= max_peers)
             {
                 continue;
             }
@@ -425,7 +433,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             // don't request blocks that:
             // 1. we've already got, or
             // 2. already has an active request to that peer
-            if (mediator_.client_has_block(block) || has_active_request_to_peer(block))
+            if (block_state.have || has_active_request_to_peer(block))
             {
                 continue;
             }
