@@ -360,7 +360,7 @@ public:
         switch (dir)
         {
         case TR_CLIENT_TO_PEER: // requests we sent
-            return outgoing_requests.count();
+            return active_requests.count();
 
         case TR_PEER_TO_CLIENT: // requests they sent
             return std::size(peer_requested_);
@@ -403,10 +403,10 @@ public:
 
     void maybe_cancel_block_request(tr_block_index_t block) override
     {
-        if (outgoing_requests.test(block))
+        if (active_requests.test(block))
         {
             cancels_sent_to_peer.add(tr_time(), 1);
-            outgoing_requests.unset(block);
+            active_requests.unset(block);
             protocol_send_cancel(peer_request::from_block(tor_, block));
         }
     }
@@ -466,7 +466,7 @@ public:
         TR_ASSERT(client_is_interested());
         TR_ASSERT(!client_is_choked());
 
-        if (outgoing_requests.has_none())
+        if (active_requests.has_none())
         {
             request_timeout_base_ = tr_time();
         }
@@ -493,8 +493,8 @@ public:
                 }
             }
 
+            active_requests.set_span(block_begin, block_end);
             publish(tr_peer_event::SentRequest(tor_.block_info(), *span));
-            outgoing_requests.set_span(block_begin, block_end);
         }
     }
 
@@ -1414,7 +1414,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         if (!fext)
         {
             publish(tr_peer_event::GotChoke());
-            outgoing_requests.set_has_none();
+            active_requests.set_has_none();
         }
 
         update_active(TR_PEER_TO_CLIENT);
@@ -1600,9 +1600,11 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
 
             if (fext)
             {
-                auto const block = tor_.piece_loc(r.index, r.offset).block;
-                outgoing_requests.unset(block);
-                publish(tr_peer_event::GotRejected(tor_.block_info(), block));
+                if (auto const block = tor_.piece_loc(r.index, r.offset).block; active_requests.test(block))
+                {
+                    active_requests.unset(block);
+                    publish(tr_peer_event::GotRejected(tor_.block_info(), block));
+                }
             }
             else
             {
@@ -1645,7 +1647,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
         return { ReadState::Err, len };
     }
 
-    if (!outgoing_requests.test(block))
+    if (!active_requests.test(block))
     {
         logwarn(this, fmt::format("got unrequested piece {:d}:{:d}->{:d}", piece, offset, len));
         return { ReadState::Err, len };
@@ -1701,7 +1703,7 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
 
     logtrace(this, fmt::format("got block {:d}", block));
 
-    if (!outgoing_requests.test(block))
+    if (!active_requests.test(block))
     {
         logdbg(this, "we didn't ask for this message...");
         return 0;
@@ -1721,7 +1723,7 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
         return err;
     }
 
-    outgoing_requests.unset(block);
+    active_requests.unset(block);
     request_timeout_base_ = tr_time();
     publish(tr_peer_event::GotBlock(tor_.block_info(), block));
 
@@ -1893,7 +1895,7 @@ void tr_peerMsgsImpl::update_block_requests()
 
 void tr_peerMsgsImpl::check_request_timeout(time_t now)
 {
-    if (outgoing_requests.has_none() || now - request_timeout_base_ <= RequestTimeoutSecs)
+    if (active_requests.has_none() || now - request_timeout_base_ <= RequestTimeoutSecs)
     {
         return;
     }
@@ -1902,7 +1904,7 @@ void tr_peerMsgsImpl::check_request_timeout(time_t now)
     // cancel all active requests so that we will send a new batch.
     // If the peer still doesn't send anything to us, then it will
     // naturally get weeded out by the peer mgr.
-    for (size_t block = 0; block < std::size(outgoing_requests); ++block)
+    for (size_t block = 0; block < std::size(active_requests); ++block)
     {
         maybe_cancel_block_request(block);
     }

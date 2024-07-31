@@ -529,7 +529,7 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
-            s->got_choke.emit(s->tor, msgs->outgoing_requests);
+            s->got_choke.emit(s->tor, msgs->active_requests);
             break;
 
         case tr_peer_event::Type::ClientGotPort:
@@ -929,7 +929,7 @@ uint8_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block
         std::begin(swarm_.peers),
         std::end(swarm_.peers),
         size_t{},
-        [block](size_t acc, tr_peer const* peer) { return acc + (peer->outgoing_requests.test(block) ? 1 : 0); });
+        [block](size_t acc, tr_peer const* peer) { return acc + (peer->active_requests.test(block) ? 1 : 0); });
 }
 
 size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) const
@@ -1156,7 +1156,7 @@ private:
 tr_peer::tr_peer(tr_torrent const& tor)
     : session{ tor.session }
     , swarm{ tor.swarm }
-    , outgoing_requests{ tor.block_count() }
+    , active_requests{ tor.block_count() }
     , blame{ tor.piece_count() }
 {
 }
@@ -1201,7 +1201,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     return swarm.wishlist->next(
         numwant,
         [peer](tr_piece_index_t p) { return peer->has_piece(p); },
-        [peer](tr_block_index_t b) { return peer->outgoing_requests.test(b); });
+        [peer](tr_block_index_t b) { return peer->active_requests.test(b); });
 }
 
 namespace
