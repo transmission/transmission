@@ -178,7 +178,7 @@ auto constexpr KeepaliveIntervalSecs = time_t{ 100 };
 
 auto constexpr MetadataReqQ = size_t{ 64U };
 
-auto constexpr ReqQDefault = 500U;
+auto constexpr PeerReqQDefault = 500U;
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
@@ -2049,7 +2049,7 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
     static auto constexpr Floor = size_t{ 32 };
     static size_t constexpr Seconds = RequestBufSecs;
     size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
-    auto const ceil = peer_reqq_.value_or(ReqQDefault);
+    auto const ceil = peer_reqq_.value_or(PeerReqQDefault);
 
     return std::clamp(estimated_blocks_in_period, Floor, ceil);
 }
