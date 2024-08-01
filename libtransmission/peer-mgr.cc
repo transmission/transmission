@@ -594,10 +594,8 @@ public:
 
     tr_torrent* const tor;
 
-    // depends-on: active_requests
     std::vector<std::unique_ptr<tr_webseed>> webseeds;
 
-    // depends-on: active_requests
     Peers peers;
 
     // depends-on: tor
