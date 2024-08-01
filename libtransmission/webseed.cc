@@ -222,11 +222,7 @@ public:
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
         {
-            return std::accumulate(
-                std::begin(tasks),
-                std::end(tasks),
-                size_t{},
-                [](size_t sum, auto const* task) { return sum + (task->blocks.end - task->blocks.begin); });
+            return active_requests.count();
         }
 
         // webseed will never request blocks from us
@@ -255,8 +251,9 @@ public:
         connection_limiter.got_data();
     }
 
-    void publish_rejection(tr_block_span_t block_span)
+    void on_rejection(tr_block_span_t block_span)
     {
+        active_requests.unset_span(block_span.begin, block_span.end);
         for (auto block = block_span.begin; block < block_span.end; ++block)
         {
             publish(tr_peer_event::GotRejected(tor.block_info(), block));
@@ -276,7 +273,8 @@ public:
             tasks.insert(task);
             task->request_next_chunk();
 
-            tr_peerMgrClientSentRequests(&tor, this, *span);
+            active_requests.set_span(span->begin, span->end);
+            publish(tr_peer_event::SentRequest(tor.block_info(), *span));
         }
     }
 
@@ -376,6 +374,7 @@ void tr_webseed_task::use_fetched_blocks()
                     auto data = std::unique_ptr<Cache::BlockData>{ block_buf };
                     if (auto const* const torrent = tr_torrentFindFromId(session, tor_id); torrent != nullptr)
                     {
+                        webseed->active_requests.unset(block);
                         session->cache->write_block(tor_id, block, std::move(data));
                         webseed->publish(tr_peer_event::GotBlock(torrent->block_info(), block));
                     }
@@ -422,7 +421,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
 
     if (!success)
     {
-        webseed->publish_rejection({ task->loc_.block, task->blocks.end });
+        webseed->on_rejection({ task->loc_.block, task->blocks.end });
         webseed->tasks.erase(task);
         delete task;
         return;
