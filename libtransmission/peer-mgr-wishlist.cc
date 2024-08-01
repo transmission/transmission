@@ -259,6 +259,11 @@ private:
 
     TR_CONSTEXPR20 void client_got_choke(tr_bitfield const& requests)
     {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
         for (auto& candidate : candidates_)
         {
             auto const block_begin = candidate.block_span.begin;
@@ -275,6 +280,11 @@ private:
 
     TR_CONSTEXPR20 void client_got_block(tr_block_index_t block)
     {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
         if (auto iter = find_by_block(block); iter != std::end(candidates_))
         {
             iter->block_states[block - iter->block_span.begin].have = true;
