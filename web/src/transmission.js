@@ -1026,9 +1026,6 @@ TODO: fix this when notifications get fixed
 
     this._updateFilterSelect();
 
-    clearTimeout(this.refilterTimer);
-    delete this.refilterTimer;
-
     if (rebuildEverything) {
       while (list.firstChild) {
         list.firstChild.remove();
