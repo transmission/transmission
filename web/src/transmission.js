@@ -653,7 +653,7 @@ export class Transmission extends EventTarget {
     const { files } = event_.dataTransfer;
 
     if (files.length > 0) {
-      this.openDialog = new OpenDialog(this, this.remote, '', files);
+      this.setCurrentPopup(new OpenDialog(this, this.remote, '', files));
     }
     event_.preventDefault();
     return false;
