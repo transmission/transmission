@@ -506,7 +506,7 @@ export class Transmission extends EventTarget {
     if (event_.metaKey) {
       a.push('Meta');
     }
-    if (event_.shitKey) {
+    if (event_.shiftKey) {
       a.push('Shift');
     }
     a.push(event_.key.length === 1 ? event_.key.toUpperCase() : event_.key);
