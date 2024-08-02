@@ -51,7 +51,7 @@ export class Transmission extends EventTarget {
 
     this.boundPopupCloseListener = this.popupCloseListener.bind(this);
 
-    this.isTouch = 'ontouchstart' in window ? true : false;
+    this.isTouch = 'ontouchstart' in window;
     this.busyclick = false;
 
     // listen to actions
@@ -622,7 +622,7 @@ export class Transmission extends EventTarget {
   static _isValidURL(string) {
     try {
       const url = new URL(string);
-      return url ? true : false;
+      return Boolean(url);
     } catch {
       return false;
     }
@@ -639,9 +639,9 @@ export class Transmission extends EventTarget {
       return true;
     }
 
-    const type = event_.dataTransfer.types
-      .filter((t) => ['text/uri-list', 'text/plain'].includes(t))
-      .pop();
+    const type = event_.dataTransfer.types.findLast((t) =>
+      ['text/uri-list', 'text/plain'].includes(t),
+    );
     for (const uri of event_.dataTransfer
       .getData(type)
       .split('\n')

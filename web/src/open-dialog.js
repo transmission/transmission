@@ -8,7 +8,7 @@ import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
 export class OpenDialog extends EventTarget {
-  constructor(controller, remote, url = '', files = []) {
+  constructor(controller, remote, url = '', files = null) {
     super();
 
     this.controller = controller;
@@ -47,8 +47,8 @@ export class OpenDialog extends EventTarget {
     const path = this.elements.folder_input.value;
     this.remote.getFreeSpace(path, (dir, bytes) => {
       if (!this.closed) {
-        const string = bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
-        this.elements.freespace.textContent = string;
+        this.elements.freespace.textContent =
+          bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
       }
     });
   }
