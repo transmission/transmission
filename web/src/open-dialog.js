@@ -137,7 +137,7 @@ export class OpenDialog extends EventTarget {
     input.type = 'file';
     input.name = 'torrent-files[]';
     input.id = input_id;
-    input.multiple = 'multiple';
+    input.multiple = true;
     workarea.append(input);
     elements.file_input = input;
 
