@@ -18,7 +18,7 @@ export class OpenDialog extends EventTarget {
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     document.body.append(this.elements.root);
-    if (files.length > 0) {
+    if (files) {
       this.elements.file_input.files = files;
     }
     this._updateFreeSpaceInAddDialog();

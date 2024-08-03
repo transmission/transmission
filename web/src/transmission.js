@@ -1124,13 +1124,6 @@ TODO: fix this when notifications get fixed
     this._rows = rows;
     this.dirtyTorrents.clear();
 
-    // set the odd/even property
-    for (const [index, e] of rows.map((row) => row.getElement()).entries()) {
-      const even = index % 2 === 0;
-      e.classList.toggle('even', even);
-      e.classList.toggle('odd', !even);
-    }
-
     this._updateStatusbar();
     if (
       old_sel_count !== countSelectedRows() ||
