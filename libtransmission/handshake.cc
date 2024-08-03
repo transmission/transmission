@@ -636,8 +636,8 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
-    if ((handshake->is_state(State::AwaitingYb) || handshake->is_state(State::AwaitingVc)) &&
-        handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect())
+    if (handshake->is_state(State::AwaitingYb) && handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED &&
+        handshake->mediator_->allows_tcp() && io->reconnect())
     {
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
         retry();
