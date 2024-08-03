@@ -1471,14 +1471,15 @@ namespace get_peers_helpers
 
 [[nodiscard]] bool is_peer_interesting(tr_torrent const* tor, tr_peer_info const& info)
 {
-    if (tor->is_done() && info.is_upload_only())
+   TR_ASSERT(!std::empty(info.listen_port()));
+   if (std::empty(info.listen_port()))
     {
         return false;
     }
 
-    if (info.is_in_use())
+    if (tor->is_done() && info.is_seed())
     {
-        return true;
+        return false;
     }
 
     if (info.is_blocklisted(tor->session->blocklist()))
