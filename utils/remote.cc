@@ -2207,7 +2207,7 @@ int processResponse(char const* rpcurl, std::string_view response, RemoteConfig&
 
     if (auto otop = tr_variant_serde::json().inplace().parse(response); !otop)
     {
-        tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
+        fmt::print(stderr, "Unable to parse response '{}'\n", response);
         status |= EXIT_FAILURE;
     }
     else
@@ -2397,7 +2397,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
     auto status = EXIT_SUCCESS;
     if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
-        tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
+        fmt::print(stderr, "{}: {}\n", curl_easy_strerror(res), rpcurl_http);
         status |= EXIT_FAILURE;
     }
     else
