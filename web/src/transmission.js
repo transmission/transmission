@@ -639,9 +639,9 @@ export class Transmission extends EventTarget {
       return true;
     }
 
-    const type = event_.dataTransfer.types
-      .filter((t) => ['text/uri-list', 'text/plain'].includes(t))
-      .pop();
+    const type = event_.dataTransfer.types.findLast((t) =>
+      ['text/uri-list', 'text/plain'].includes(t),
+    );
     for (const uri of event_.dataTransfer
       .getData(type)
       .split('\n')
