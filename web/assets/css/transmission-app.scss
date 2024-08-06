@@ -1556,6 +1556,7 @@ dialog {
   display: flex;
   font-size: 1.2em;
   font-weight: bold;
+  overflow-wrap: break-word;
 }
 
 .dialog-logo {
