@@ -134,8 +134,6 @@ private:
 
     ReadState done(bool is_connected)
     {
-        peer_io_->clear_callbacks();
-
         // The responding client of a handshake usually starts sending BT messages immediately after
         // the handshake, so we need to return READ_NOW to ensure those messages are processed.
         return fire_done(is_connected) ? READ_NOW : READ_ERR;
@@ -193,6 +191,7 @@ private:
     [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
 
     bool fire_done(bool is_connected);
+    void fire_timer();
 
     ///
 
