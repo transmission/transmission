@@ -906,7 +906,7 @@ EXIT:
     // ---
 
     // number of bad pieces a peer is allowed to send before we ban them
-    static auto constexpr MaxBadPiecesPerPeer = 5;
+    static auto constexpr MaxBadPiecesPerPeer = 5U;
 
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = 90;
