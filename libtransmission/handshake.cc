@@ -40,8 +40,8 @@ using key_bigend_t = tr_message_stream_encryption::DH::key_bigend_t;
 // 1 A->B: our public key (Ya) and some padding (PadA)
 void tr_handshake::send_ya(tr_peerIo* io)
 {
-    tr_logAddTraceHand(this, "sending MSE handshake (Ya)");
-    send_public_key_and_pad<PadaMaxlen>(io);
+    pad_a_len_ = send_public_key_and_pad<PadaMaxlen>(io);
+    tr_logAddTraceHand(this, fmt::format("sent MSE handshake (Ya)... len(PadA) = {}", pad_a_len_));
     set_state(tr_handshake::State::AwaitingYb);
 }
 
@@ -110,6 +110,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     outbuf.add_uint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
+    ia_len_ = HandshakeSize;
     outbuf.add_uint16(HandshakeSize);
     if (build_handshake_message(peer_io, outbuf))
     {
@@ -144,14 +145,14 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
         filter.encrypt(std::data(VC), std::size(VC), std::data(*encrypted_vc_));
     }
 
-    for (; pad_b_recv_len_ <= PadbMaxlen; ++pad_b_recv_len_)
+    for (; pad_b_len_ <= PadbMaxlen; ++pad_b_len_)
     {
         static auto constexpr Needlen = std::size(VC);
         if (peer_io->read_buffer_size() < Needlen)
         {
             tr_logAddTraceHand(
                 this,
-                fmt::format("in read_vc... need {}, read {}, have {}", Needlen, pad_b_recv_len_, peer_io->read_buffer_size()));
+                fmt::format("in read_vc... need {}, read {}, have {}", Needlen, pad_b_len_, peer_io->read_buffer_size()));
             return READ_LATER;
         }
 
@@ -233,7 +234,9 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    if (ia_len_ > 0U)
+    have_read_anything_from_peer_ = true;
+
+    if (is_incoming() && ia_len_ > 0U)
     {
         // do nothing, the check below won't work correctly
     }
@@ -370,8 +373,8 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     get_dh().setPeerPublicKey(peer_public_key);
 
     // send our public key to the peer
-    tr_logAddTraceHand(this, "sending B->A: Diffie Hellman Yb, PadB");
-    send_public_key_and_pad<PadbMaxlen>(peer_io);
+    pad_b_len_ = send_public_key_and_pad<PadbMaxlen>(peer_io);
+    tr_logAddTraceHand(this, fmt::format("sent B->A: Diffie Hellman Yb, PadB... len(PadB) = {}", pad_b_len_));
 
     set_state(State::AwaitingPadA);
     return READ_NOW;
@@ -382,18 +385,14 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
     // find the end of PadA by looking for HASH('req1', S)
     auto const needle = tr_sha1::digest("req1"sv, get_dh().secret());
 
-    for (; pad_a_recv_len_ <= PadaMaxlen; ++pad_a_recv_len_)
+    for (; pad_a_len_ <= PadaMaxlen; ++pad_a_len_)
     {
         static auto constexpr Needlen = std::size(needle);
         if (peer_io->read_buffer_size() < Needlen)
         {
             tr_logAddTraceHand(
                 this,
-                fmt::format(
-                    "in read_pad_a... need {}, read {}, have {}",
-                    Needlen,
-                    pad_a_recv_len_,
-                    peer_io->read_buffer_size()));
+                fmt::format("in read_pad_a... need {}, read {}, have {}", Needlen, pad_a_len_, peer_io->read_buffer_size()));
             return READ_LATER;
         }
 
