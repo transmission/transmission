@@ -373,7 +373,7 @@ public:
         bool download_queue_enabled = true;
         bool idle_seeding_limit_enabled = false;
         bool incomplete_dir_enabled = false;
-        bool is_incomplete_file_naming_enabled = false;
+        bool is_incomplete_file_naming_enabled = true;
         bool lpd_enabled = true;
         bool peer_port_random_on_start = false;
         bool pex_enabled = true;
