@@ -1794,12 +1794,12 @@ void print_session(tr_variant::Map const& map)
 
     if (auto oi = args->value_if<int64_t>(TR_KEY_peer_port))
     {
-        fmt::print("  Listenport: {:d}\n", *oi);
+        fmt::print("  Listen port: {:d}\n", *oi);
     }
 
     if (auto ob = args->value_if<bool>(TR_KEY_port_forwarding_enabled))
     {
-        fmt::print("  Portforwarding enabled: {:s}\n", *ob ? "Yes" : "No");
+        fmt::print("  Port forwarding enabled: {:s}\n", *ob ? "Yes" : "No");
     }
 
     if (auto ob = args->value_if<bool>(TR_KEY_utp_enabled))
@@ -1832,8 +1832,6 @@ void print_session(tr_variant::Map const& map)
         fmt::print("  Maximum memory cache size: {:s}\n", Memory{ *oi, Memory::Units::MBytes }.to_string());
     }
 
-    fmt::print("\n");
-
     auto const o_alt_enabled = args->value_if<bool>(TR_KEY_alt_speed_enabled);
     auto const o_alt_time_enabled = args->value_if<bool>(TR_KEY_alt_speed_time_enabled);
     auto const o_up_enabled = args->value_if<bool>(TR_KEY_speed_limit_up_enabled);
@@ -1855,6 +1853,7 @@ void print_session(tr_variant::Map const& map)
         o_peer_limit && o_down_limit && o_down_enabled && o_up_limit && o_up_enabled && o_seed_ratio_limit &&
         o_speed_ratio_limited && o_idle_seeding_limited && o_idle_seeding_limit)
     {
+        fmt::print("\n");
         fmt::print("LIMITS\n");
         fmt::print("  Peer limit: {:d}\n", *o_peer_limit);
 
