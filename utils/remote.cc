@@ -1838,6 +1838,11 @@ void print_session(tr_variant::Map const& map)
         fmt::print("  Maximum memory cache size: {:s}\n", Memory{ *oi, Memory::Units::MBytes }.to_string());
     }
 
+    if (auto ob = args->value_if<bool>(TR_KEY_sequentialDownload))
+    {
+        fmt::print("  Sequential download: {:s}\n", *ob ? "Yes" : "No");
+    }
+
     auto const o_alt_enabled = args->value_if<bool>(TR_KEY_alt_speed_enabled);
     auto const o_alt_time_enabled = args->value_if<bool>(TR_KEY_alt_speed_time_enabled);
     auto const o_up_enabled = args->value_if<bool>(TR_KEY_speed_limit_up_enabled);
