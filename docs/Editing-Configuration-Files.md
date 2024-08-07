@@ -101,6 +101,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer-limit-global:** Number (default = 200)
  * **peer-limit-per-torrent:** Number (default = 50)
  * **peer-socket-tos:** String (default = "default") Set the [Type-Of-Service (TOS)](https://en.wikipedia.org/wiki/Type_of_Service) parameter for outgoing TCP packets. Possible values are "default", "lowcost", "throughput", "lowdelay" and "reliability". The value "lowcost" is recommended if you're using a smart router, and shouldn't harm in any case.
+ * **sequentialDownload** Boolean (default = false) Enable sequential download by default when adding torrents.
 
 #### Peer Port
  * **peer-port:** Number (default = 51413)
