@@ -160,7 +160,7 @@ struct tau_scrape_request
 
     tr_scrape_response response = {};
 
-    static auto constexpr ip_protocol = TR_AF_UNSPEC; // NOLINT readability-identifier-naming
+    static auto constexpr ip_protocol = TR_AF_UNSPEC; // NOLINT(readability-identifier-naming)
 
 private:
     time_t const created_at_ = tr_time();
@@ -337,13 +337,14 @@ struct tau_tracker
             return;
         }
 
-        TR_ASSERT(addr_[ip_protocol]);
-        if (!addr_[ip_protocol])
+        auto const& addr = addr_[ip_protocol];
+        TR_ASSERT(addr);
+        if (!addr)
         {
             return;
         }
 
-        auto const& [ss, sslen] = *addr_[ip_protocol];
+        auto const& [ss, sslen] = *addr;
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
@@ -360,14 +361,12 @@ struct tau_tracker
 
         if (action == TAU_ACTION_CONNECT)
         {
-            connection_id[ip_protocol] = buf.to_uint64();
+            auto& conn_id = connection_id[ip_protocol];
+            conn_id = buf.to_uint64();
             connection_expiration_time[ip_protocol] = tr_time() + TauConnectionTtlSecs;
             logdbg(
                 log_name(),
-                fmt::format(
-                    "Got a new {} connection ID from tracker: {}",
-                    tr_ip_protocol_to_sv(ip_protocol),
-                    connection_id[ip_protocol]));
+                fmt::format("Got a new {} connection ID from tracker: {}", tr_ip_protocol_to_sv(ip_protocol), conn_id));
         }
         else if (action == TAU_ACTION_ERROR)
         {
@@ -388,10 +387,10 @@ struct tau_tracker
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             // do we have a DNS request that's ready?
-            if (addr_pending_dns_[ipp] && addr_pending_dns_[ipp]->wait_for(0ms) == std::future_status::ready)
+            if (auto& dns = addr_pending_dns_[ipp]; dns && dns->wait_for(0ms) == std::future_status::ready)
             {
-                addr_[ipp] = addr_pending_dns_[ipp]->get();
-                addr_pending_dns_[ipp].reset();
+                addr_[ipp] = dns->get();
+                dns.reset();
                 addr_expires_at_[ipp] = now + DnsRetryIntervalSecs;
             }
         }
@@ -405,10 +404,10 @@ struct tau_tracker
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             // update the addr if our lookup is past its shelf date
-            if (!addr_pending_dns_[ipp] && addr_expires_at_[ipp] <= now)
+            if (auto& dns = addr_pending_dns_[ipp]; !dns && addr_expires_at_[ipp] <= now)
             {
                 addr_[ipp].reset();
-                addr_pending_dns_[ipp] = std::async(
+                dns = std::async(
                     std::launch::async,
                     [this](tr_address_type ip_protocol) { return lookup(ip_protocol); },
                     static_cast<tr_address_type>(ipp));
@@ -424,6 +423,7 @@ struct tau_tracker
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
             auto const ipp_enum = static_cast<tr_address_type>(ipp);
+            auto& conn_at = connecting_at[ipp];
             logtrace(
                 log_name(),
                 fmt::format(
@@ -432,26 +432,24 @@ struct tau_tracker
                     is_connected(ipp_enum, now),
                     connection_expiration_time[ipp],
                     now,
-                    connecting_at[ipp]));
+                    conn_at));
 
             // also need a valid connection ID...
-            if (addr_[ipp] && !is_connected(ipp_enum, now) && connecting_at[ipp] == 0)
+            if (auto const& addr = addr_[ipp]; addr && !is_connected(ipp_enum, now) && conn_at == 0)
             {
-                TR_ASSERT(addr_[ipp]->first.ss_family == tr_ip_protocol_to_af(ipp_enum));
+                TR_ASSERT(addr->first.ss_family == tr_ip_protocol_to_af(ipp_enum));
+                auto& conn_transc_id = connection_transaction_id[ipp];
 
-                connecting_at[ipp] = now;
-                connection_transaction_id[ipp] = tau_transaction_new();
+                conn_at = now;
+                conn_transc_id = tau_transaction_new();
                 logtrace(
                     log_name(),
-                    fmt::format(
-                        "Trying to connect {}. Transaction ID is {}",
-                        tr_ip_protocol_to_sv(ipp_enum),
-                        connection_transaction_id[ipp]));
+                    fmt::format("Trying to connect {}. Transaction ID is {}", tr_ip_protocol_to_sv(ipp_enum), conn_transc_id));
 
                 auto buf = PayloadBuffer{};
                 buf.add_uint64(0x41727101980LL);
                 buf.add_uint32(TAU_ACTION_CONNECT);
-                buf.add_uint32(connection_transaction_id[ipp]);
+                buf.add_uint32(conn_transc_id);
 
                 sendto(ipp_enum, std::data(buf), std::size(buf));
             }
@@ -560,7 +558,7 @@ private:
     {
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            if (connecting_at[ipp] != 0 && connecting_at[ipp] + ConnectionRequestTtl < now)
+            if (auto const conn_at = connecting_at[ipp]; conn_at != 0 && conn_at + ConnectionRequestTtl < now)
             {
                 auto empty_buf = PayloadBuffer{};
                 on_connection_response(static_cast<tr_address_type>(ipp), TAU_ACTION_ERROR, empty_buf);
@@ -637,10 +635,11 @@ private:
             auto const ipp_enum = static_cast<tr_address_type>(ipp);
             if (addr_[ipp] && (ip_protocol == TR_AF_UNSPEC || ipp == ip_protocol) && is_connected(ipp_enum, now))
             {
-                logdbg(log_name(), fmt::format("sending request w/connection id {}", connection_id[ipp]));
+                auto const conn_id = connection_id[ipp];
+                logdbg(log_name(), fmt::format("sending request w/connection id {}", conn_id));
 
                 auto buf = PayloadBuffer{};
-                buf.add_uint64(connection_id[ipp]);
+                buf.add_uint64(conn_id);
                 buf.add(payload, payload_len);
 
                 sendto(ipp_enum, std::data(buf), std::size(buf));

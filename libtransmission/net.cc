@@ -516,12 +516,16 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
     TR_ASSERT(is_valid());
-    return evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen);
+    if (auto* name = evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen))
+    {
+        return name;
+    }
+    return "Invalid address"sv;
 }
 
 [[nodiscard]] std::string tr_address::display_name() const
 {
-    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+    auto buf = std::array<char, std::max(INET_ADDRSTRLEN, INET6_ADDRSTRLEN)>{};
     return std::string{ display_name(std::data(buf), std::size(buf)) };
 }
 
