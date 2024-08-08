@@ -59,9 +59,6 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 QualifierAlignment: Right
 SortUsingDeclarations: true
 SpaceAfterTemplateKeyword: false
-WhitespaceSensitiveMacros:
-- API_HEADER
-- API_HEADER_CRYPT
 ---
 Language: ObjC
 
