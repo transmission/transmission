@@ -18,6 +18,7 @@ import { LabelsDialog } from './labels-dialog.js';
 import { ShortcutsDialog } from './shortcuts-dialog.js';
 import { StatisticsDialog } from './statistics-dialog.js';
 import { Torrent } from './torrent.js';
+import { TorrentRowGroup } from './torrent-row-group.js';
 import {
   TorrentRow,
   TorrentRendererCompact,
@@ -222,9 +223,9 @@ export class Transmission extends EventTarget {
       }
 
       // if not already, highlight the torrent
-      let row_element = event_.target;
-      while (row_element && !row_element.classList.contains('torrent')) {
-        row_element = row_element.parentNode;
+      const row_element = event_.target?.closest('.torrent');
+      if (!row_element) {
+        return;
       }
       const row = this._rows.find((r) => r.getElement() === row_element);
       if (row && !row.isSelected()) {
@@ -369,6 +370,7 @@ export class Transmission extends EventTarget {
       case Prefs.FilterMode:
       case Prefs.SortDirection:
       case Prefs.SortMode:
+      case Prefs.GroupByPath:
         this.refilterAllSoon();
         break;
 
@@ -404,6 +406,13 @@ export class Transmission extends EventTarget {
     return -1;
   }
 
+  getAllTorrentsPaths() {
+    const paths = [
+      ...new Set(Object.values(this._torrents).map((v) => v.getDownloadDir())),
+    ];
+    return [...paths.sort((a, b) => a.localeCompare(b))];
+  }
+
   /// SELECTION
 
   _getSelectedRows() {
@@ -420,7 +429,7 @@ export class Transmission extends EventTarget {
 
   _setSelectedRow(row) {
     const e_sel = row ? row.getElement() : null;
-    for (const e of this.elements.torrent_list.children) {
+    for (const e of this.elements.torrent_list.querySelectorAll('li.torrent')) {
       e.classList.toggle('selected', e === e_sel);
     }
     this._dispatchSelectionChanged();
@@ -437,14 +446,14 @@ export class Transmission extends EventTarget {
   }
 
   _selectAll() {
-    for (const e of this.elements.torrent_list.children) {
+    for (const e of this.elements.torrent_list.querySelectorAll('li.torrent')) {
       e.classList.add('selected');
     }
     this._dispatchSelectionChanged();
   }
 
   _deselectAll() {
-    for (const e of this.elements.torrent_list.children) {
+    for (const e of this.elements.torrent_list.querySelectorAll('li.torrent')) {
       e.classList.remove('selected');
     }
     this._dispatchSelectionChanged();
@@ -772,6 +781,20 @@ TODO: fix this when notifications get fixed
     this.updateTorrents(null, fields);
   }
 
+  _onRowGroupClicked(event_) {
+    event_.currentTarget.classList.toggle('closed');
+
+    if (this.popup && this.popup.name !== 'inspector') {
+      this.setCurrentPopup(null);
+    }
+
+    event_.stopPropagation();
+    event_.preventDefault();
+
+    this._setSelectedRow(null);
+    this._last_torrent_clicked = null;
+  }
+
   _onRowClicked(event_) {
     const meta_key = event_.metaKey || event_.ctrlKey,
       { row } = event_.currentTarget;
@@ -992,6 +1015,7 @@ TODO: fix this when notifications get fixed
       torrents,
       this.prefs.sort_mode,
       this.prefs.sort_direction,
+      this.prefs.group_by_path,
     );
     for (const [index, tor] of torrents.entries()) {
       rows[index] = id2row[tor.getId()];
@@ -999,7 +1023,8 @@ TODO: fix this when notifications get fixed
   }
 
   _refilter(rebuildEverything) {
-    const { sort_mode, sort_direction, filter_mode } = this.prefs;
+    const { sort_mode, sort_direction, filter_mode, group_by_path } =
+      this.prefs;
     const filter_tracker = this.filterTracker;
     const renderer = this.torrentRenderer;
     const list = this.elements.torrent_list;
@@ -1015,9 +1040,9 @@ TODO: fix this when notifications get fixed
       labels = [];
     }
 
-    const countRows = () => [...list.children].length;
+    const countRows = () => [...list.querySelectorAll('li.torrent')].length;
     const countSelectedRows = () =>
-      [...list.children].reduce(
+      [...list.querySelectorAll('li.torrent')].reduce(
         (n, e) => (n + e.classList.contains('selected') ? 1 : 0),
         0,
       );
@@ -1084,10 +1109,9 @@ TODO: fix this when notifications get fixed
 
     // now we have two sorted arrays of rows
     // and can do a simple two-way sorted merge.
-    const rows = [];
+    const sorted_rows = [];
     const cmax = clean_rows.length;
     const dmax = dirty_rows.length;
-    const frag = document.createDocumentFragment();
     let ci = 0;
     let di = 0;
     while (ci !== cmax || di !== dmax) {
@@ -1102,37 +1126,49 @@ TODO: fix this when notifications get fixed
           dirty_rows[di].getTorrent(),
           sort_mode,
           sort_direction,
+          group_by_path,
         );
         push_clean = c < 0;
       }
 
-      if (push_clean) {
-        rows.push(clean_rows[ci++]);
-      } else {
-        const row = dirty_rows[di++];
-        const e = row.getElement();
-
-        if (ci === cmax) {
-          frag.append(e);
-        } else {
-          list.insertBefore(e, clean_rows[ci].getElement());
-        }
-
-        rows.push(row);
-      }
+      sorted_rows.push({
+        push_clean,
+        row: push_clean ? clean_rows[ci++] : dirty_rows[di++],
+      });
     }
-    list.append(frag);
+
+    // change folder groups if necessary
+    const groupElements = this.updateGroupElements(sorted_rows);
+
+    const rows = [];
+    const fragments = {};
+    for (const { push_clean, row } of sorted_rows) {
+      const rowFolder = group_by_path
+        ? row.getTorrent().getDownloadDir()
+        : null;
+
+      const e = row.getElement();
+      if (push_clean) {
+        if (fragments[rowFolder]) {
+          e.before(fragments[rowFolder]);
+          delete fragments[rowFolder];
+        }
+      } else {
+        if (!fragments[rowFolder]) {
+          fragments[rowFolder] = document.createDocumentFragment();
+        }
+        fragments[rowFolder].append(e);
+      }
+      rows.push(row);
+    }
+
+    for (const rowFolder of Object.keys(fragments)) {
+      groupElements[rowFolder].append(fragments[rowFolder]);
+    }
 
     // update our implementation fields
     this._rows = rows;
     this.dirtyTorrents.clear();
-
-    // set the odd/even property
-    for (const [index, e] of rows.map((row) => row.getElement()).entries()) {
-      const even = index % 2 === 0;
-      e.classList.toggle('even', even);
-      e.classList.toggle('odd', !even);
-    }
 
     this._updateStatusbar();
     if (
@@ -1141,6 +1177,86 @@ TODO: fix this when notifications get fixed
     ) {
       this._dispatchSelectionChanged();
     }
+  }
+
+  updateGroupElements(sorted_rows) {
+    const { group_by_path, display_mode } = this.prefs;
+    const list = this.elements.torrent_list;
+
+    const groupElements = {};
+    if (group_by_path) {
+      const currentFolders = [...list.querySelectorAll('li.folder')].reduce(
+        (acc, el, index) => {
+          if (el.dataset.path && !acc[el.dataset.path]) {
+            acc[el.dataset.path] = { element: el, index };
+          } else {
+            // reserve for incorrect folder elements
+            console.log(el.dataset.path);
+            acc[index + Math.random()] = { element: el, index };
+          }
+
+          return acc;
+        },
+        {},
+      );
+
+      let lastElement = null;
+      let lastIndex = null;
+      const actualFolderSet = new Set();
+      for (const { row } of sorted_rows) {
+        const actualFolderName = row.getTorrent().getDownloadDir();
+        if (actualFolderSet.has(actualFolderName)) {
+          continue;
+        }
+
+        actualFolderSet.add(actualFolderName);
+
+        let groupElement = currentFolders[actualFolderName];
+        if (groupElement) {
+          delete currentFolders[actualFolderName];
+        } else {
+          const group = new TorrentRowGroup(actualFolderName);
+          groupElement = { element: group.getElement(), index: null };
+
+          groupElement.element.group = group;
+          groupElement.element.addEventListener(
+            'click',
+            this._onRowGroupClicked.bind(this),
+          );
+        }
+
+        // set compact
+        groupElement.element.classList.toggle(
+          'compact',
+          display_mode === Prefs.DisplayCompact,
+        );
+        groupElements[actualFolderName] =
+          groupElement.element.querySelector(':scope>ul');
+
+        if (lastElement) {
+          if (
+            groupElement.index === null ||
+            (lastIndex !== null && groupElement.index < lastIndex)
+          ) {
+            lastElement.after(groupElement.element);
+          }
+        } else if (groupElement.index === null) {
+          list.prepend(groupElement.element);
+        }
+        lastElement = groupElement.element;
+        if (groupElement.index !== null) {
+          lastIndex = groupElement.index;
+        }
+      }
+
+      // remove unnecessary folders
+      for (const folderElement of Object.values(currentFolders)) {
+        folderElement.remove();
+      }
+    } else {
+      groupElements[null] = list;
+    }
+    return groupElements;
   }
 
   setFilterTracker(sitename) {

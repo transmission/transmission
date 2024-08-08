@@ -73,6 +73,8 @@
   --package-image-url: url('../img/package.svg');
   --text-image-url: url('../img/file-text.svg');
   --video-image-url: url('../img/film.svg');
+  --folder-open-image-url: url('../img/folder-open.svg');
+  --folder-closed-image-url: url('../img/folder-closed.svg');
 
   --progress: 100%;
 
@@ -429,6 +431,59 @@ a {
   width: 100%;
   user-select: none;
   -webkit-user-select: none;
+
+  .folder {
+    > .data {
+      border-bottom: 1px solid var(--color-border-default);
+      align-items: center;
+      display: flex;
+      padding: 2px 0 2px 3px;
+    }
+
+    .folder-icon {
+      --icon-size: 16px;
+      // color the background svg fill
+      background-color: var(--color-fg-primary);
+      -webkit-mask-image: var(--folder-open-image-url);
+      -webkit-mask-repeat: no-repeat, no-repeat;
+      -webkit-mask-size: var(--icon-size), var(--icon-size);
+      mask-image: var(--folder-open-image-url);
+      mask-repeat: no-repeat, no-repeat;
+      height: var(--icon-size);
+      mask-size: var(--icon-size), var(--icon-size);
+      width: var(--icon-size);
+    }
+
+    .folder-name {
+      font-weight: bold;
+      font-style: italic;
+      margin-bottom: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-left: 10px;
+    }
+
+    > ul {
+      padding: 0;
+    }
+
+    &.closed {
+      .folder-icon {
+        -webkit-mask-image: var(--folder-closed-image-url);
+        mask-image: var(--folder-closed-image-url);
+      }
+
+      > ul {
+        display: none;
+      }
+    }
+
+    &:not(.compact) > .data {
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+  }
 
   .torrent {
     border-bottom: 1px solid var(--color-border-default);
