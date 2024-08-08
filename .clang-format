@@ -59,8 +59,6 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 QualifierAlignment: Right
 SortUsingDeclarations: true
 SpaceAfterTemplateKeyword: false
-StatementMacros:
-- TR_DEFINE_QUARK
 WhitespaceSensitiveMacros:
 - API_HEADER
 - API_HEADER_CRYPT
