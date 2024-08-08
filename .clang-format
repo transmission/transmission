@@ -56,7 +56,7 @@ FixNamespaceComments: true
 IndentGotoLabels: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 QualifierAlignment: Right
-SortUsingDeclarations: true
+SortUsingDeclarations: true # Since clang-format 16, the equivalent value is LexicographicNumeric
 SpaceAfterTemplateKeyword: false
 ---
 Language: ObjC
