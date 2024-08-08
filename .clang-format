@@ -35,7 +35,7 @@ ReflowComments: false
 SortIncludes: Never
 SpaceAfterCStyleCast: false
 SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
+SpacesInAngles: Never
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
