@@ -46,7 +46,7 @@ export class Inspector extends EventTarget {
     document.body.append(this.elements.root);
 
     setTimeout(() => {
-      const spacer = document.getElementById('container-contractor');
+      const spacer = document.querySelector('#container-contractor');
       spacer.classList = 'contract';
     }, 0);
   }
@@ -54,7 +54,7 @@ export class Inspector extends EventTarget {
   close() {
     if (!this.closed) {
       clearInterval(this.interval);
-      const spacer = document.getElementById('container-contractor');
+      const spacer = document.querySelector('#container-contractor');
       spacer.removeAttribute('class');
       this._setTorrents([]);
       this.elements.root.remove();
