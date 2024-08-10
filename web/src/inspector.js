@@ -46,16 +46,14 @@ export class Inspector extends EventTarget {
     document.body.append(this.elements.root);
 
     setTimeout(() => {
-      const spacer = document.querySelector('#container-contractor');
-      spacer.classList = 'contract';
+      document.querySelector('#container-contractor').classList = 'contract';
     }, 0);
   }
 
   close() {
     if (!this.closed) {
       clearInterval(this.interval);
-      const spacer = document.querySelector('#container-contractor');
-      spacer.removeAttribute('class');
+      document.querySelector('#container-contractor').removeAttribute('class');
       this._setTorrents([]);
       this.elements.root.remove();
       this.controller.removeEventListener(
