@@ -512,11 +512,10 @@ private:
                     fmt::arg("error_code", static_cast<int>(rc))));
             return {};
         }
-        auto const info_uniq = std::unique_ptr<addrinfo, void (*)(addrinfo*)>{ info,
-                                                                               [](addrinfo* p) // MSVC forced my hands
-                                                                               {
-                                                                                   freeaddrinfo(p);
-                                                                               } };
+        auto const info_uniq = std::unique_ptr<addrinfo, void (*)(addrinfo*)>{
+            info,
+            [](addrinfo* p) { freeaddrinfo(p); }, // MSVC forced me to write this lambda wrapper
+        };
 
         // N.B. getaddrinfo() will return IPv4-mapped addresses by default on macOS
         auto socket_address = tr_socket_address::from_sockaddr(info->ai_addr);
