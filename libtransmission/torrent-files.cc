@@ -252,28 +252,15 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     }
 
     // move the local data to the tmpdir
+    auto const paths = std::array<std::string_view, 1>{ parent.sv() };
+    for (tr_file_index_t idx = 0, n_files = file_count(); idx < n_files; ++idx)
     {
-        struct moved_file
+        if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
-            tr_pathbuf from;
-            tr_pathbuf to;
-        };
-        std::vector<moved_file> moved_files;
-
-        auto const paths = std::array<std::string_view, 1>{ parent.sv() };
-        for (tr_file_index_t idx = 0, n_files = file_count(); idx < n_files; ++idx)
-        {
-            if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+            // if moving a file fails, give up and let the error propagate
+            if (!tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() }, false, error))
             {
-                auto const f = moved_file{ found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() } };
-
-                // if moving a file fails, give up and let the error propagate
-                if (!tr_file_move(f.from, f.to, false, error))
-                {
-                    return;
-                }
-
-                moved_files.push_back(f);
+                return;
             }
         }
     }
