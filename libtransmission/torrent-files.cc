@@ -265,7 +265,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
         {
             if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
             {
-                moved_file f{ found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() } };
+                auto const f = moved_file{ found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() } };
 
                 // if moving a file fails, give up and let the error propagate
                 if (!tr_file_move_strict(f.from, f.to, error))
