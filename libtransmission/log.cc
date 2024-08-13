@@ -201,10 +201,9 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     auto const [out, len] = fmt::format_to_n(
         buf,
         buflen - 1,
-        "{0:%FT%R:}{1:%S}{2:%z}",
+        "{0:%FT%R:}{1:%S}{0:%z}",
         a_tm,
-        std::chrono::time_point_cast<std::chrono::milliseconds>(a),
-        a_tm);
+        std::chrono::time_point_cast<std::chrono::milliseconds>(a));
     *out = '\0';
     return buf;
 }
