@@ -989,15 +989,15 @@ private:
         bool delete_flag,
         tr_fileFunc delete_func,
         void* delete_user_data,
-        tr_result_notify_func notify_func,
-        void* notify_user_data);
+        tr_torrent_remove_done_func callback,
+        void* callback_user_data);
     friend void tr_torrentRemove(
         tr_torrent* tor,
         bool delete_flag,
         tr_fileFunc delete_func,
         void* delete_user_data,
-        tr_result_notify_func notify_func,
-        void* notify_user_data);
+        tr_torrent_remove_done_func callback,
+        void* callback_user_data);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);
