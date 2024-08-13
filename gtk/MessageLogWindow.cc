@@ -202,7 +202,7 @@ void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
 
 namespace
 {
-using namespace std::chrono;
+using std::chrono::system_clock;
 
 /* similar to asctime, but is utf8-clean */
 Glib::ustring gtr_asctime(system_clock::time_point t)
