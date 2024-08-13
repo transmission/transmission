@@ -51,7 +51,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -922,30 +921,22 @@ void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
             // "Own" the core since refcount has already been incremented before operation start — only decrement required.
             auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
 
-            std::mutex wait_cb_thread;
-            wait_cb_thread.lock();
-
             // Schedule the actual handler in the main thread:
             Glib::signal_idle().connect_once(
-                [processed_id, succeeded, core, &wait_cb_thread]()
+                [processed_id, succeeded, core]()
                 {
-                    if (succeeded)
+                    if (!succeeded)
                     {
-                        auto const& impl = *core->impl_;
-                        if (auto const& [torrent_, position_] = impl.find_torrent_by_id(processed_id); torrent_)
-                        {
-                            /* remove from the gui */
-                            impl.get_raw_model()->remove(position_);
-                        }
+                        return;
                     }
 
-                    wait_cb_thread.unlock();
+                    auto const& impl = *core->impl_;
+                    if (auto const& [torrent_, position_] = impl.find_torrent_by_id(processed_id); torrent_)
+                    {
+                        /* remove from the gui */
+                        impl.get_raw_model()->remove(position_);
+                    }
                 });
-
-            // It is better to wait for the idle signal to be processed before
-            // returning, just to avoid the extremely improbable case of the
-            // tr_torrent_id_t being reused before the idle signal is processed.
-            std::lock_guard waiter{ wait_cb_thread };
         };
 
         // Extend core lifetime, refcount will be decremented in the callback.
