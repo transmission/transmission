@@ -802,7 +802,7 @@ void tr_torrentRemoveInSessionThread(
 
     if (callback != nullptr)
     {
-        callback(ok, callback_user_data);
+        callback(tor->id(), ok, callback_user_data);
     }
 
     if (ok)

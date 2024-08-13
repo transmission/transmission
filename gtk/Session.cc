@@ -32,7 +32,6 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
-#include <glibmm/refptr.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/variant.h>
 
@@ -916,30 +915,24 @@ void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
-        struct CallbackUserData
-        {
-            Glib::RefPtr<Session> session;
-            tr_torrent_id_t id;
-        };
-
         // Callback to remove the torrent entry from the GUI if it was
         // successfuly removed. This is called from the libtransmission thread.
-        auto handle_result = [](bool succeeded, void* user_data)
+        auto handle_result = [](tr_torrent_id_t processed_id, bool succeeded, void* user_data)
         {
+            // "Own" the core since refcount has already been incremented before operation start — only decrement required.
+            auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
+
             std::mutex wait_cb_thread;
             wait_cb_thread.lock();
 
             // Schedule the actual handler in the main thread:
             Glib::signal_idle().connect_once(
-                [=, &wait_cb_thread]()
+                [processed_id, succeeded, core, &wait_cb_thread]()
                 {
-                    // Take ownership of the raw pointer, so it gets deleted when done.
-                    auto ud = std::unique_ptr<CallbackUserData>(static_cast<CallbackUserData*>(user_data));
-
                     if (succeeded)
                     {
-                        auto const& impl = *ud->session->impl_;
-                        if (auto const& [torrent_, position_] = impl.find_torrent_by_id(ud->id); torrent_)
+                        auto const& impl = *core->impl_;
+                        if (auto const& [torrent_, position_] = impl.find_torrent_by_id(processed_id); torrent_)
                         {
                             /* remove from the gui */
                             impl.get_raw_model()->remove(position_);
@@ -955,6 +948,9 @@ void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
             std::lock_guard waiter{ wait_cb_thread };
         };
 
+        // Extend core lifetime, refcount will be decremented in the callback.
+        core_.reference();
+
         /* remove the torrent */
         tr_torrentRemove(
             &torrent->get_underlying(),
@@ -963,7 +959,7 @@ void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr,
             handle_result,
-            new CallbackUserData{ get_core_ptr(), id });
+            &core_);
     }
 }
 
