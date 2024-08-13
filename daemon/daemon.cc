@@ -291,7 +291,7 @@ void printMessage(
     if (ostream != nullptr)
     {
         auto buf = std::array<char, 64>{};
-        auto timestr = tr_logGetTimeStr(now, std::data(buf), std::size(buf));
+        auto const timestr = tr_logGetTimeStr(now, std::data(buf), std::size(buf));
         fmt::print(ostream, "[{:s}] {:s} {:s}\n", timestr, levelName(level), out.c_str());
     }
 
