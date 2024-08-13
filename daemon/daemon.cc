@@ -270,7 +270,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
 void printMessage(
     FILE* ostream,
-    std::chrono::time_point<std::chrono::system_clock> now,
+    std::chrono::system_clock::time_point now,
     tr_log_level level,
     std::string_view name,
     std::string_view message,

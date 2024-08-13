@@ -54,7 +54,7 @@ struct tr_log_message
     long line;
 
     // when the message was generated
-    std::chrono::time_point<std::chrono::system_clock> when;
+    std::chrono::system_clock::time_point when;
 
     // torrent name or code module name associated with the message
     std::string name;
@@ -111,5 +111,5 @@ void tr_logAddMessage(
 
 // ---
 
-std::string_view tr_logGetTimeStr(std::chrono::time_point<std::chrono::system_clock> now, char* buf, size_t buflen);
+std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point now, char* buf, size_t buflen);
 std::string_view tr_logGetTimeStr(char* buf, size_t buflen);

@@ -194,7 +194,7 @@ void tr_logFreeQueue(tr_log_message* freeme)
 
 // ---
 
-std::string_view tr_logGetTimeStr(std::chrono::time_point<std::chrono::system_clock> now, char* buf, size_t buflen)
+std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point now, char* buf, size_t buflen)
 {
     auto const [out, len] = fmt::format_to_n(
         buf,
