@@ -198,11 +198,10 @@ std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point now, cha
 {
     auto const [out, len] = fmt::format_to_n(
         buf,
-        buflen - 1,
+        buflen,
         "{0:%F %H:%M:}{1:%S}",
         now,
         std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()));
-    *out = '\0';
     return { buf, len };
 }
 
