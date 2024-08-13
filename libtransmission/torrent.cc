@@ -763,8 +763,8 @@ void tr_torrentRemoveInSessionThread(
     bool delete_flag,
     tr_fileFunc delete_func,
     void* delete_user_data,
-    tr_result_notify_func notify_func,
-    void* notify_user_data)
+    tr_torrent_remove_done_func callback,
+    void* callback_user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -800,9 +800,9 @@ void tr_torrentRemoveInSessionThread(
         }
     }
 
-    if (notify_func != nullptr)
+    if (callback != nullptr)
     {
-        notify_func(ok, notify_user_data);
+        callback(ok, callback_user_data);
     }
 
     if (ok)
@@ -830,8 +830,8 @@ void tr_torrentRemove(
     bool delete_flag,
     tr_fileFunc delete_func,
     void* delete_user_data,
-    tr_result_notify_func notify_func,
-    void* notify_user_data)
+    tr_torrent_remove_done_func callback,
+    void* callback_user_data)
 {
     using namespace start_stop_helpers;
 
@@ -845,8 +845,8 @@ void tr_torrentRemove(
         delete_flag,
         delete_func,
         delete_user_data,
-        notify_func,
-        notify_user_data);
+        callback,
+        callback_user_data);
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)
