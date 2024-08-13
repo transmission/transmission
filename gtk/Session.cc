@@ -168,6 +168,8 @@ private:
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
 
+    void on_torrent_removal_done(tr_torrent_id_t id, bool succeeded);
+
 private:
     Session& core_;
 
@@ -912,45 +914,41 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 
 void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
+    static auto const callback = [](tr_torrent_id_t processed_id, bool succeeded, void* user_data)
+    {
+        // "Own" the core since refcount has already been incremented before operation start — only decrement required.
+        auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
+
+        Glib::signal_idle().connect_once([processed_id, succeeded, core]()
+                                         { core->impl_->on_torrent_removal_done(processed_id, succeeded); });
+    };
+
     if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
     {
-        // Callback to remove the torrent entry from the GUI if it was
-        // successfuly removed. This is called from the libtransmission thread.
-        auto handle_result = [](tr_torrent_id_t processed_id, bool succeeded, void* user_data)
-        {
-            // "Own" the core since refcount has already been incremented before operation start — only decrement required.
-            auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
-
-            // Schedule the actual handler in the main thread:
-            Glib::signal_idle().connect_once(
-                [processed_id, succeeded, core]()
-                {
-                    if (!succeeded)
-                    {
-                        return;
-                    }
-
-                    auto const& impl = *core->impl_;
-                    if (auto const& [torrent_, position_] = impl.find_torrent_by_id(processed_id); torrent_)
-                    {
-                        /* remove from the gui */
-                        impl.get_raw_model()->remove(position_);
-                    }
-                });
-        };
-
         // Extend core lifetime, refcount will be decremented in the callback.
         core_.reference();
 
-        /* remove the torrent */
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr,
-            handle_result,
+            callback,
             &core_);
+    }
+}
+
+void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
+{
+    if (!succeeded)
+    {
+        return;
+    }
+
+    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
+    {
+        get_raw_model()->remove(position);
     }
 }
 
