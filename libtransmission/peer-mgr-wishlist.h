@@ -44,7 +44,7 @@ public:
         [[nodiscard]] virtual tr_priority_t priority(tr_piece_index_t piece) const = 0;
 
         [[nodiscard]] virtual libtransmission::ObserverTag observe_peer_disconnect(
-            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_block(
@@ -62,6 +62,8 @@ public:
         [[nodiscard]] virtual libtransmission::ObserverTag observe_priority_changed(
             libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer
                 observer) = 0;
+        [[nodiscard]] virtual libtransmission::ObserverTag observe_sent_cancel(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_sent_request(
             libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_sequential_download_changed(
