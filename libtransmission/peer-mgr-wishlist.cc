@@ -446,16 +446,15 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         {
             auto const& block_state = candidate.block_states[block - candidate.block_span.begin];
 
-            // don't request from too many peers
-            if (block_state.n_req >= max_peers)
+            // 1. don't request blocks we already have
+            // 2. don't request from too many peers
+            if (block_state.have || block_state.n_req >= max_peers)
             {
                 continue;
             }
 
-            // don't request blocks that:
-            // 1. we've already got, or
-            // 2. already has an active request to that peer
-            if (block_state.have || has_active_request_to_peer(block))
+            // don't request block from peers which we already requested from
+            if (has_active_request_to_peer(block))
             {
                 continue;
             }
