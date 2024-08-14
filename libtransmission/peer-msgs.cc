@@ -407,6 +407,7 @@ public:
         {
             cancels_sent_to_peer.add(tr_time(), 1);
             active_requests.unset(block);
+            publish(tr_peer_event::SentCancel(tor_.block_info(), block));
             protocol_send_cancel(peer_request::from_block(tor_, block));
         }
     }

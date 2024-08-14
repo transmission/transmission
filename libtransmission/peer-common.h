@@ -49,6 +49,7 @@ public:
         ClientGotHave,
         ClientGotHaveAll,
         ClientGotHaveNone,
+        ClientSentCancel,
         ClientSentPieceData,
         ClientSentRequest,
         Error // generic
@@ -159,6 +160,17 @@ public:
         auto event = tr_peer_event{};
         event.type = Type::ClientGotSuggest;
         event.pieceIndex = piece;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static auto SentCancel(tr_block_info const& block_info, tr_block_index_t block) noexcept
+    {
+        auto const loc = block_info.block_loc(block);
+        auto event = tr_peer_event{};
+        event.type = Type::ClientSentCancel;
+        event.pieceIndex = loc.piece;
+        event.offset = loc.piece_offset;
+        event.length = block_info.block_size(block);
         return event;
     }
 

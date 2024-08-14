@@ -86,7 +86,7 @@ protected:
         }
 
         [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
-            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override
         {
             return parent_.peer_disconnect_.observe(std::move(observer));
         }
@@ -140,6 +140,12 @@ protected:
             return parent_.priority_changed_.observe(std::move(observer));
         }
 
+        [[nodiscard]] libtransmission::ObserverTag observe_sent_cancel(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override
+        {
+            return parent_.sent_cancel_.observe(std::move(observer));
+        }
+
         [[nodiscard]] libtransmission::ObserverTag observe_sent_request(
             libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) override
         {
@@ -153,13 +159,14 @@ protected:
         }
     };
 
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> peer_disconnect_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&> peer_disconnect_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
     libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have_;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all_;
     libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> got_reject_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> sent_cancel_;
     libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t> sent_request_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
@@ -723,7 +730,7 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
         // first piece should be the rarest piece according to the cache
         auto have = tr_bitfield{ 3 };
         have.set(0);
-        peer_disconnect_.emit(nullptr, have);
+        peer_disconnect_.emit(nullptr, have, tr_bitfield{ 300 });
 
         // this is what a real mediator should return at this point:
         // mediator.piece_replication_[0] = 1;
@@ -1187,6 +1194,81 @@ TEST_F(PeerMgrWishlistTest, gotRejectDecrementsActiveRequest)
         }
 
         return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests), std::move(rejected_bitfield) };
+    };
+
+    // wishlist only picks blocks with no active requests when not in
+    // end game mode, which are [250, 300) and some other random blocks.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const [ranges, expected] = get_spans(300);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& range : ranges)
+        {
+            requested.set_span(range.begin, range.end);
+        }
+        EXPECT_EQ(50U + expected.count(), requested.count());
+        EXPECT_EQ(50U, requested.count(250, 300));
+        for (tr_block_index_t i = 0; i < 250; ++i)
+        {
+            EXPECT_EQ(expected.test(i), requested.test(i));
+        }
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, sentCancelDecrementsActiveRequest)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, all missing
+        mediator.piece_count_ = 3;
+        mediator.missing_block_count_[0] = 100;
+        mediator.missing_block_count_[1] = 100;
+        mediator.missing_block_count_[2] = 100;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        // peers has all pieces
+        mediator.piece_replication_[0] = 2;
+        mediator.piece_replication_[1] = 2;
+        mediator.piece_replication_[2] = 2;
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // we have active requests to the first 250 blocks
+        for (tr_block_index_t i = 0; i < 250; ++i)
+        {
+            mediator.active_request_count_[i] = 1;
+        }
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+        (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
+
+        // a peer sent some "Reject" messages, which cancels active requests
+        auto cancelled_set = std::set<tr_block_index_t>{};
+        auto cancelled_bitfield = tr_bitfield{ 300 };
+        for (tr_block_index_t i = 0, n = tr_rand_int(250U); i < n; ++i)
+        {
+            cancelled_set.insert(tr_rand_int(250U));
+        }
+        for (auto const block : cancelled_set)
+        {
+            cancelled_bitfield.set(block);
+            sent_cancel_.emit(nullptr, nullptr, block);
+        }
+
+        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests), std::move(cancelled_bitfield) };
     };
 
     // wishlist only picks blocks with no active requests when not in
