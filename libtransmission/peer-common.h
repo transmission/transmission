@@ -34,6 +34,16 @@ struct tr_peer;
 
 class tr_peer_event
 {
+    [[nodiscard]] constexpr static auto BlockEvent(tr_block_info const& block_info, tr_block_index_t block) noexcept
+    {
+        auto const loc = block_info.block_loc(block);
+        auto event = tr_peer_event{};
+        event.pieceIndex = loc.piece;
+        event.offset = loc.piece_offset;
+        event.length = block_info.block_size(block);
+        return event;
+    }
+
 public:
     enum class Type
     {
@@ -66,12 +76,8 @@ public:
 
     [[nodiscard]] constexpr static auto GotBlock(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.block_loc(block);
-        auto event = tr_peer_event{};
+        auto event = BlockEvent(block_info, block);
         event.type = Type::ClientGotBlock;
-        event.pieceIndex = loc.piece;
-        event.offset = loc.piece_offset;
-        event.length = block_info.block_size(block);
         return event;
     }
 
@@ -146,12 +152,8 @@ public:
 
     [[nodiscard]] constexpr static auto GotRejected(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.block_loc(block);
-        auto event = tr_peer_event{};
+        auto event = BlockEvent(block_info, block);
         event.type = Type::ClientGotRej;
-        event.pieceIndex = loc.piece;
-        event.offset = loc.piece_offset;
-        event.length = block_info.block_size(block);
         return event;
     }
 
@@ -165,12 +167,8 @@ public:
 
     [[nodiscard]] constexpr static auto SentCancel(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.block_loc(block);
-        auto event = tr_peer_event{};
+        auto event = BlockEvent(block_info, block);
         event.type = Type::ClientSentCancel;
-        event.pieceIndex = loc.piece;
-        event.offset = loc.piece_offset;
-        event.length = block_info.block_size(block);
         return event;
     }
 
