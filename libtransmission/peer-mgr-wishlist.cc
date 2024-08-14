@@ -132,7 +132,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void dec_replication_from_bitfield(tr_bitfield const& bitfield)
+    TR_CONSTEXPR20 void dec_replication_bitfield(tr_bitfield const& bitfield)
     {
         if (candidates_dirty_)
         {
@@ -172,7 +172,7 @@ private:
         }
     }
 
-    void inc_replication_from_bitfield(tr_bitfield const& bitfield)
+    void inc_replication_bitfield(tr_bitfield const& bitfield)
     {
         if (candidates_dirty_)
         {
@@ -217,7 +217,7 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 void client_sent_request(tr_block_span_t block_span)
+    TR_CONSTEXPR20 void inc_active_request_span(tr_block_span_t block_span)
     {
         if (candidates_dirty_)
         {
@@ -241,7 +241,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void client_got_reject(tr_block_index_t block)
+    TR_CONSTEXPR20 void dec_active_request_block(tr_block_index_t block)
     {
         if (candidates_dirty_)
         {
@@ -257,7 +257,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void client_got_choke(tr_bitfield const& requests)
+    TR_CONSTEXPR20 void dec_active_request_bitfield(tr_bitfield const& requests)
     {
         if (candidates_dirty_)
         {
@@ -278,6 +278,8 @@ private:
         }
     }
 
+    // ---
+
     TR_CONSTEXPR20 void client_got_block(tr_block_index_t block)
     {
         if (candidates_dirty_)
@@ -290,6 +292,14 @@ private:
             iter->block_states[block - iter->block_span.begin].have = true;
             resort_piece(iter);
         }
+    }
+
+    // ---
+
+    TR_CONSTEXPR20 void peer_disconnect(tr_bitfield const& have, tr_bitfield const& requests)
+    {
+        dec_replication_bitfield(have);
+        dec_active_request_bitfield(requests);
     }
 
     // ---
@@ -376,24 +386,26 @@ private:
     bool candidates_dirty_ = true;
     bool is_endgame_ = false;
 
-    std::array<libtransmission::ObserverTag, 11U> const tags_;
+    std::array<libtransmission::ObserverTag, 12U> const tags_;
 
     Mediator& mediator_;
 };
 
 Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
-          mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b) { dec_replication_from_bitfield(b); }),
-          mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_from_bitfield(b); }),
+          mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b, tr_bitfield const& ar)
+                                              { peer_disconnect(b, ar); }),
+          mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_bitfield(b); }),
           mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
-          mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { client_got_choke(b); }),
+          mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { dec_active_request_bitfield(b); }),
           mediator_in.observe_got_have([this](tr_torrent*, tr_piece_index_t p) { inc_replication_piece(p); }),
           mediator_in.observe_got_have_all([this](tr_torrent*) { inc_replication(); }),
-          mediator_in.observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { client_got_reject(b); }),
+          mediator_in.observe_got_reject([this](tr_torrent*, tr_peer*, tr_block_index_t b) { dec_active_request_block(b); }),
           mediator_in.observe_piece_completed([this](tr_torrent*, tr_piece_index_t p) { remove_piece(p); }),
           mediator_in.observe_priority_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t)
                                                { set_candidates_dirty(); }),
-          mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { client_sent_request(bs); }),
+          mediator_in.observe_sent_cancel([this](tr_torrent*, tr_peer*, tr_block_index_t b) { dec_active_request_block(b); }),
+          mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { inc_active_request_span(bs); }),
           mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
       } }
     , mediator_{ mediator_in }
