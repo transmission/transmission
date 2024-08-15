@@ -24,11 +24,11 @@ protected:
     struct MockMediator final : public Wishlist::Mediator
     {
         mutable std::map<tr_block_index_t, uint8_t> active_request_count_;
-        mutable std::map<tr_piece_index_t, size_t> missing_block_count_;
         mutable std::map<tr_piece_index_t, tr_block_span_t> block_span_;
         mutable std::map<tr_piece_index_t, tr_priority_t> piece_priority_;
         mutable std::map<tr_piece_index_t, size_t> piece_replication_;
         mutable std::set<tr_block_index_t> client_has_block_;
+        mutable std::set<tr_piece_index_t> client_has_piece_;
         mutable std::set<tr_piece_index_t> client_wants_piece_;
         tr_piece_index_t piece_count_ = 0;
         bool is_sequential_download_ = false;
@@ -45,6 +45,11 @@ protected:
             return client_has_block_.count(block) != 0;
         }
 
+        [[nodiscard]] bool client_has_piece(tr_piece_index_t piece) const override
+        {
+            return client_has_piece_.count(piece) != 0;
+        }
+
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override
         {
             return client_wants_piece_.count(piece) != 0;
@@ -58,11 +63,6 @@ protected:
         [[nodiscard]] uint8_t count_active_requests(tr_block_index_t block) const override
         {
             return active_request_count_[block];
-        }
-
-        [[nodiscard]] size_t count_missing_blocks(tr_piece_index_t piece) const override
-        {
-            return missing_block_count_[piece];
         }
 
         [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override
@@ -188,9 +188,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -217,9 +214,6 @@ TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -261,9 +255,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwiceFromSamePeer)
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -303,9 +294,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestDupesWhenNotInEndgame)
     auto mediator = MockMediator{ *this };
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -346,9 +334,6 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -403,9 +388,6 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 50;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 250 };
@@ -469,9 +451,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 
     // setup: three pieces, all missing
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 100;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 50;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 250 };
@@ -507,9 +486,6 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -576,13 +552,12 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         }
 
         // but some pieces are closer to completion than others
-        mediator.missing_block_count_[0] = 10;
-        mediator.missing_block_count_[1] = 20;
-        mediator.missing_block_count_[2] = 100;
+        static auto constexpr MissingBlockCount = std::array{ 10U, 20U, 100U };
+        static_assert(std::size(MissingBlockCount) == 3);
         for (tr_piece_index_t piece = 0; piece < 3; ++piece)
         {
             auto const& span = mediator.block_span_[piece];
-            auto const have_end = span.end - mediator.missing_block_count_[piece];
+            auto const have_end = span.end - MissingBlockCount[piece];
 
             for (tr_piece_index_t i = span.begin; i < have_end; ++i)
             {
@@ -638,9 +613,6 @@ TEST_F(PeerMgrWishlistTest, prefersRarerPieces)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -704,9 +676,6 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -782,9 +751,6 @@ TEST_F(PeerMgrWishlistTest, gotBitfieldIncrementsReplication)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -861,9 +827,6 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -885,7 +848,7 @@ TEST_F(PeerMgrWishlistTest, gotBlockResortsPiece)
 
         // we received block 0 from someone, the wishlist should resort the
         // candidate list cache by consulting the mediator
-        --mediator.missing_block_count_[0];
+        mediator.client_has_block_.insert(0);
         got_block_.emit(nullptr, 0);
 
         return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
@@ -935,9 +898,6 @@ TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1011,9 +971,6 @@ TEST_F(PeerMgrWishlistTest, gotChokeDecrementsActiveRequest)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1076,9 +1033,6 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1152,9 +1106,6 @@ TEST_F(PeerMgrWishlistTest, gotRejectDecrementsActiveRequest)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1227,9 +1178,6 @@ TEST_F(PeerMgrWishlistTest, sentCancelDecrementsActiveRequest)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1302,9 +1250,6 @@ TEST_F(PeerMgrWishlistTest, sentRequestIncrementsActiveRequests)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1356,9 +1301,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
 
     // setup: three pieces, piece 0 is nearly complete
     mediator.piece_count_ = 3;
-    mediator.missing_block_count_[0] = 1;
-    mediator.missing_block_count_[1] = 100;
-    mediator.missing_block_count_[2] = 100;
     mediator.block_span_[0] = { 0, 100 };
     mediator.block_span_[1] = { 100, 200 };
     mediator.block_span_[2] = { 200, 300 };
@@ -1380,7 +1322,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
     (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
 
     // we just completed piece 0
-    mediator.missing_block_count_[0] = 0;
+    mediator.client_has_piece_.insert(0);
     piece_completed_.emit(nullptr, 0);
 
     // receiving a "piece_completed" signal removes the piece from the
@@ -1404,9 +1346,6 @@ TEST_F(PeerMgrWishlistTest, settingPriorityRebuildsWishlist)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
@@ -1463,9 +1402,6 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
 
         // setup: three pieces, all missing
         mediator.piece_count_ = 3;
-        mediator.missing_block_count_[0] = 100;
-        mediator.missing_block_count_[1] = 100;
-        mediator.missing_block_count_[2] = 100;
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
