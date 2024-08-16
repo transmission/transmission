@@ -20,6 +20,11 @@
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/peer-mgr-wishlist.h"
 
+// Asserts in this file are expensive, so hide them in #ifdef
+#ifdef TR_WISHLIST_ASSERT
+#include "libtransmission/tr-assert.h"
+#endif
+
 namespace
 {
 std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
@@ -455,6 +460,13 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
             {
                 break;
             }
+
+#ifdef TR_WISHLIST_ASSERT
+            auto const n_req_truth = mediator_.count_active_requests(block);
+            TR_ASSERT_MSG(
+                n_req == n_req_truth,
+                fmt::format("piece = {}, block = {}, n_req = {}, truth = {}", candidate.piece, block, n_req, n_req_truth));
+#endif
 
             // don't request from too many peers
             if (n_req >= max_peers)
