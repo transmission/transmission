@@ -565,34 +565,63 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
 
     tr_logAddTraceHand(handshake, fmt::format("handling can_read; state is [{}]", handshake->state_string()));
 
-    switch (handshake->state())
+    ReadState ret = READ_NOW;
+    while (ret == READ_NOW)
     {
-    case State::AwaitingHandshake:
-        return handshake->read_handshake(peer_io);
-    case State::AwaitingPeerId:
-        return handshake->read_peer_id(peer_io);
-    case State::AwaitingYa:
-        return handshake->read_ya(peer_io);
-    case State::AwaitingPadA:
-        return handshake->read_pad_a(peer_io);
-    case State::AwaitingCryptoProvide:
-        return handshake->read_crypto_provide(peer_io);
-    case State::AwaitingPadC:
-        return handshake->read_pad_c(peer_io);
-    case State::AwaitingIa:
-        return handshake->read_ia(peer_io);
-    case State::AwaitingYb:
-        return handshake->read_yb(peer_io);
-    case State::AwaitingVc:
-        return handshake->read_vc(peer_io);
-    case State::AwaitingCryptoSelect:
-        return handshake->read_crypto_select(peer_io);
-    case State::AwaitingPadD:
-        return handshake->read_pad_d(peer_io);
-    default:
-        TR_ASSERT_MSG(false, fmt::format("unhandled handshake state {:d}", static_cast<int>(handshake->state())));
-        return READ_ERR;
+        switch (handshake->state())
+        {
+        case State::AwaitingHandshake:
+            ret = handshake->read_handshake(peer_io);
+            break;
+
+        case State::AwaitingPeerId:
+            ret = handshake->read_peer_id(peer_io);
+            break;
+
+        case State::AwaitingYa:
+            ret = handshake->read_ya(peer_io);
+            break;
+
+        case State::AwaitingPadA:
+            ret = handshake->read_pad_a(peer_io);
+            break;
+
+        case State::AwaitingCryptoProvide:
+            ret = handshake->read_crypto_provide(peer_io);
+            break;
+
+        case State::AwaitingPadC:
+            ret = handshake->read_pad_c(peer_io);
+            break;
+
+        case State::AwaitingIa:
+            ret = handshake->read_ia(peer_io);
+            break;
+
+        case State::AwaitingYb:
+            ret = handshake->read_yb(peer_io);
+            break;
+
+        case State::AwaitingVc:
+            ret = handshake->read_vc(peer_io);
+            break;
+
+        case State::AwaitingCryptoSelect:
+            ret = handshake->read_crypto_select(peer_io);
+            break;
+
+        case State::AwaitingPadD:
+            ret = handshake->read_pad_d(peer_io);
+            break;
+
+        default:
+            TR_ASSERT_MSG(false, fmt::format("unhandled handshake state {:d}", static_cast<int>(handshake->state())));
+            ret = READ_ERR;
+            break;
+        }
     }
+
+    return ret;
 }
 
 void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandshake)
