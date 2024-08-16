@@ -5189,7 +5189,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         else
         {
             // Set a fixed height constraint
-            height = [self calculateScrollViewHeightWithDockAdjustment];
+            CGFloat height = [self calculateScrollViewHeightWithDockAdjustment];
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
