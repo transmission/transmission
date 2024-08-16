@@ -581,7 +581,7 @@ private:
         desired_request_count_ = max_available_reqs();
     }
 
-    void update_block_requests();
+    void maybe_send_block_requests();
 
     void check_request_timeout(time_t now);
 
@@ -601,7 +601,7 @@ private:
         return next;
     }
 
-    void update_metadata_requests(time_t now) const;
+    void maybe_send_metadata_requests(time_t now) const;
     [[nodiscard]] size_t add_next_metadata_piece();
     [[nodiscard]] size_t add_next_block(time_t now_sec, uint64_t now_msec);
     [[nodiscard]] size_t fill_output_buffer(time_t now_sec, uint64_t now_msec);
@@ -1804,8 +1804,8 @@ void tr_peerMsgsImpl::pulse()
 
     check_request_timeout(now_sec);
     update_desired_request_count();
-    update_block_requests();
-    update_metadata_requests(now_sec);
+    maybe_send_block_requests();
+    maybe_send_metadata_requests(now_sec);
 
     for (;;)
     {
@@ -1816,7 +1816,7 @@ void tr_peerMsgsImpl::pulse()
     }
 }
 
-void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
+void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 {
     if (!peer_supports_metadata_xfer_)
     {
@@ -1833,7 +1833,7 @@ void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
     }
 }
 
-void tr_peerMsgsImpl::update_block_requests()
+void tr_peerMsgsImpl::maybe_send_block_requests()
 {
     if (!tor_.client_can_download())
     {
