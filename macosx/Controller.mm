@@ -5218,7 +5218,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSScreen* screen = self.fWindow.screen;
     if (screen)
     {
-        NSRect visibleFrame = screen.visibleFrame; // This frame respects the Dock and menu bar
+        // This frame respects the Dock and menu bar
+        NSRect visibleFrame = screen.visibleFrame;
         height = MIN(height, visibleFrame.size.height - [self toolbarHeight] - [self mainWindowComponentHeight]);
     }
 
