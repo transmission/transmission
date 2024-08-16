@@ -411,12 +411,11 @@ void tr_peerIo::can_read_wrapper()
         switch (read_state)
         {
         case ReadState::Now:
-            if (!std::empty(inbuf_))
+        case ReadState::Break:
+            if (std::empty(inbuf_))
             {
-                continue;
+                done = true;
             }
-
-            done = true;
             break;
 
         case ReadState::Later:

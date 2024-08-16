@@ -43,6 +43,7 @@ enum class ReadState : uint8_t
 {
     Now,
     Later,
+    Break,
     Err
 };
 
