@@ -5212,7 +5212,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (CGFloat)calculateScrollViewHeightWithDockAdjustment
 {
-    CGFloat height = [self scrollViewHeight];
+    CGFloat height = self.scrollViewHeight;
 
     // Get the main screen's visible frame
     NSScreen* screen = self.fWindow.screen;
