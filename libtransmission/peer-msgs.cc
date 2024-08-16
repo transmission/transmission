@@ -1788,7 +1788,6 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
 
     active_requests.unset(block);
     publish(tr_peer_event::GotBlock(tor_.block_info(), block));
-    maybe_send_block_requests();
 
     return 0;
 }
@@ -1897,6 +1896,13 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
         auto const [read_state, n_piece_bytes_read] = msgs->can_read_impl(io);
         ret = read_state;
         *piece += n_piece_bytes_read;
+    }
+
+    // If we received piece data, then we might have quota to request new blocks
+    if (*piece > 0U)
+    {
+        msgs->update_desired_request_count();
+        msgs->maybe_send_block_requests();
     }
 
     return ret;
