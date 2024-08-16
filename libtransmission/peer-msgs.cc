@@ -1377,7 +1377,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
                 static_cast<int>(id),
                 std::size(payload)));
         publish(tr_peer_event::GotError(EMSGSIZE));
-        return { READ_ERR, {} };
+        return { ReadState::Err, {} };
     }
 
     switch (id)
@@ -1420,7 +1420,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         if (tor_.has_metainfo() && ui32 >= tor_.piece_count())
         {
             publish(tr_peer_event::GotError(ERANGE));
-            return { READ_ERR, {} };
+            return { ReadState::Err, {} };
         }
 
         /* a peer can send the same HAVE message twice... */
@@ -1508,7 +1508,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         else
         {
             publish(tr_peer_event::GotError(EMSGSIZE));
-            return { READ_ERR, {} };
+            return { ReadState::Err, {} };
         }
 
         break;
@@ -1524,7 +1524,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         else
         {
             publish(tr_peer_event::GotError(EMSGSIZE));
-            return { READ_ERR, {} };
+            return { ReadState::Err, {} };
         }
 
         break;
@@ -1540,7 +1540,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         else
         {
             publish(tr_peer_event::GotError(EMSGSIZE));
-            return { READ_ERR, {} };
+            return { ReadState::Err, {} };
         }
 
         break;
@@ -1556,7 +1556,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         else
         {
             publish(tr_peer_event::GotError(EMSGSIZE));
-            return { READ_ERR, {} };
+            return { ReadState::Err, {} };
         }
 
         break;
@@ -1575,7 +1575,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
             else
             {
                 publish(tr_peer_event::GotError(EMSGSIZE));
-                return { READ_ERR, {} };
+                return { ReadState::Err, {} };
             }
 
             break;
@@ -1591,7 +1591,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         break;
     }
 
-    return { READ_NOW, {} };
+    return { ReadState::Now, {} };
 }
 
 ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
@@ -1610,13 +1610,13 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
     if (loc.block_offset + len > block_size)
     {
         logwarn(this, fmt::format("got unaligned piece {:d}:{:d}->{:d}", piece, offset, len));
-        return { READ_ERR, len };
+        return { ReadState::Err, len };
     }
 
     if (!tr_peerMgrDidPeerRequest(&tor_, this, block))
     {
         logwarn(this, fmt::format("got unrequested piece {:d}:{:d}->{:d}", piece, offset, len));
-        return { READ_ERR, len };
+        return { ReadState::Err, len };
     }
 
     publish(tr_peer_event::GotPieceData(len));
@@ -1626,7 +1626,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
         auto buf = std::make_unique<Cache::BlockData>(block_size);
         payload.to_buf(std::data(*buf), len);
         auto const ok = client_got_block(std::move(buf), block) == 0;
-        return { ok ? READ_NOW : READ_ERR, len };
+        return { ok ? ReadState::Now : ReadState::Err, len };
     }
 
     auto& blocks = incoming_.blocks;
@@ -1635,18 +1635,18 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 
     if (!incoming_block.add_span(loc.block_offset, loc.block_offset + len))
     {
-        return { READ_ERR, len }; // invalid span
+        return { ReadState::Err, len }; // invalid span
     }
 
     if (!incoming_block.has_all())
     {
-        return { READ_LATER, len }; // we don't have the full block yet
+        return { ReadState::Later, len }; // we don't have the full block yet
     }
 
     auto block_buf = std::move(incoming_block.buf);
     blocks.erase(block); // note: invalidates `incoming_block` local
     auto const ok = client_got_block(std::move(block_buf), block) == 0;
-    return { ok ? READ_NOW : READ_ERR, len };
+    return { ok ? ReadState::Now : ReadState::Err, len };
 }
 
 // returns 0 on success, or an errno on failure
@@ -1729,7 +1729,7 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
         auto message_len = uint32_t{};
         if (io->read_buffer_size() < sizeof(message_len))
         {
-            return READ_LATER;
+            return ReadState::Later;
         }
 
         io->read_uint32(&message_len);
@@ -1740,7 +1740,7 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
         if (message_len == 0U)
         {
             logtrace(msgs, "got KeepAlive");
-            return READ_NOW;
+            return ReadState::Now;
         }
 
         current_message_len = message_len;
@@ -1753,7 +1753,7 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
         auto message_type = uint8_t{};
         if (io->read_buffer_size() < sizeof(message_type))
         {
-            return READ_LATER;
+            return ReadState::Later;
         }
 
         io->read_uint8(&message_type);
@@ -1772,7 +1772,7 @@ ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
 
     if (n_left > 0U)
     {
-        return READ_LATER;
+        return ReadState::Later;
     }
 
     // The incoming message is now complete. After processing the message

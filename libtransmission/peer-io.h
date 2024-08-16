@@ -39,11 +39,11 @@ namespace libtransmission::test
 class HandshakeTest;
 } // namespace libtransmission::test
 
-enum ReadState
+enum class ReadState : uint8_t
 {
-    READ_NOW,
-    READ_LATER,
-    READ_ERR
+    Now,
+    Later,
+    Err
 };
 
 enum tr_preferred_transport : uint8_t

@@ -389,7 +389,7 @@ void tr_peerIo::can_read_wrapper()
     {
         size_t piece = 0U;
         auto const old_len = read_buffer_size();
-        auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : READ_ERR;
+        auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : ReadState::Err;
         auto const used = old_len - read_buffer_size();
         auto const overhead = socket_.guess_packet_overhead(used);
 
@@ -410,7 +410,7 @@ void tr_peerIo::can_read_wrapper()
 
         switch (read_state)
         {
-        case READ_NOW:
+        case ReadState::Now:
             if (!std::empty(inbuf_))
             {
                 continue;
@@ -419,11 +419,11 @@ void tr_peerIo::can_read_wrapper()
             done = true;
             break;
 
-        case READ_LATER:
+        case ReadState::Later:
             done = true;
             break;
 
-        case READ_ERR:
+        case ReadState::Err:
             err = true;
             break;
         }
