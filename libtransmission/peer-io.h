@@ -149,6 +149,8 @@ public:
         auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
         filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
         outbuf_.commit_space(n_bytes);
+
+        try_write(SIZE_MAX);
     }
 
     // Write all the data from `buf`.
