@@ -1706,8 +1706,6 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
     {
         msgs->publish(tr_peer_event::SentPieceData(bytes_written));
     }
-
-    msgs->pulse();
 }
 
 ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
