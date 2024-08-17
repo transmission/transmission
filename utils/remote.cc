@@ -862,7 +862,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     }
 }
 
-auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
+auto constexpr BandwidthPriorityNames = std::array<std::string_view, 4>{
     "Low"sv,
     "Normal"sv,
     "High"sv,
@@ -1239,7 +1239,7 @@ void print_details(tr_variant::Map const& map)
 
         if (auto i = t->value_if<int64_t>(TR_KEY_bandwidthPriority); i)
         {
-            fmt::print("  Bandwidth Priority: {:s}\n", bandwidth_priority_names[(*i + 1) & 0b11]);
+            fmt::print("  Bandwidth Priority: {:s}\n", BandwidthPriorityNames[(*i + 1) & 0b11]);
         }
 
         fmt::print("\n");
