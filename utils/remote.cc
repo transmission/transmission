@@ -367,6 +367,7 @@ auto constexpr Options = std::array<tr_option, 103>{
       { 941, "peer-info", "List the current torrent(s)' peers", "pi", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
+static_assert(Options[std::size(Options) - 2].val != 0);
 
 void show_usage()
 {
@@ -685,6 +686,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_priorities,
     TR_KEY_wanted,
 };
+static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
 auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_activityDate,
@@ -743,6 +745,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_webseeds,
     TR_KEY_webseedsSendingToUs,
 };
+static_assert(DetailsKeys[std::size(DetailsKeys) - 1] != tr_quark{});
 
 auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_addedDate,
@@ -761,6 +764,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_status,
     TR_KEY_uploadRatio,
 };
+static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
 
 [[nodiscard]] size_t write_func(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
@@ -868,6 +872,7 @@ auto constexpr BandwidthPriorityNames = std::array<std::string_view, 4>{
     "High"sv,
     "Invalid"sv,
 };
+static_assert(!BandwidthPriorityNames[std::size(BandwidthPriorityNames) - 1].empty());
 
 template<size_t N>
 std::string_view format_date(std::array<char, N>& buf, time_t now)
