@@ -569,7 +569,7 @@ std::string tr_strratio(double ratio, std::string_view infinity)
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool allow_copy, tr_error* error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
@@ -594,7 +594,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     }
 
     // ensure the target directory exists
-    auto newdir = tr_pathbuf{ newpath.sv() };
+    auto newdir = tr_pathbuf{ newpath };
     newdir.popdir();
     if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
@@ -603,9 +603,15 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     }
 
     /* they might be on the same filesystem... */
-    if (tr_sys_path_rename(oldpath, newpath))
+    if (tr_sys_path_rename(oldpath, newpath, error))
     {
         return true;
+    }
+
+    if (!allow_copy)
+    {
+        error->prefix_message("Unable to move file: ");
+        return false;
     }
 
     /* Otherwise, copy the file. */
