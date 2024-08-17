@@ -2083,11 +2083,17 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
     for (auto const& t_var : *torrents)
     {
         auto* const t = t_var.get_if<tr_variant::Map>();
-        auto const tor_id = t->value_if<int64_t>(TR_KEY_id).value_or(-1);
-        if (t == nullptr || tor_id < 0)
+        if (t == nullptr)
         {
             continue;
         }
+
+        auto const tor_id = t->value_if<int64_t>(TR_KEY_id).value_or(-1);
+        if (tor_id < 0)
+        {
+            continue;
+        }
+
         bool include = negate;
         auto const status = get_status_string(*t);
         switch (config.filter[pos])
@@ -2160,6 +2166,7 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
         default:
             break;
         }
+
         if (include)
         {
             ids.insert(tor_id);
