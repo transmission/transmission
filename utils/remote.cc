@@ -1546,7 +1546,7 @@ void print_torrent_list(tr_variant::Map const& map)
         auto const size_when_done = *o_size_when_done;
         auto const left_until_done = *o_left_until_done;
 
-        auto const eta_str = size_when_done != 0 || eta != -1 ? eta_to_string(eta) : "Done";
+        auto const eta_str = left_until_done != 0 || eta != -1 ? eta_to_string(eta) : "Done";
         auto const error_mark = t->value_if<int64_t>(TR_KEY_error).value_or(0) != 0 ? '*' : ' ';
         auto const done_str = size_when_done != 0 ?
             strlpercent(100.0 * (size_when_done - left_until_done) / size_when_done) + '%' :
