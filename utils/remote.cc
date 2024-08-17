@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cctype> /* isspace */
 #include <cmath> // floor
 #include <cstdint> // int64_t
@@ -34,6 +33,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/values.h>
@@ -527,7 +527,7 @@ enum
 
     default:
         fmt::print(stderr, "unrecognized argument {:d}\n", val);
-        assert("unrecognized argument" && 0);
+        TR_ASSERT_MSG(false, "unrecognized argument");
         return -2;
     }
 }
@@ -1448,7 +1448,7 @@ void print_pieces(tr_variant::Map const& map)
             continue;
         }
 
-        assert(*piece_count >= 0);
+        TR_ASSERT(*piece_count >= 0);
         print_pieces_impl(*pieces, static_cast<size_t>(*piece_count));
 
         if (it < std::prev(end))
@@ -2708,7 +2708,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             default:
-                assert("unhandled value" && 0);
+                TR_ASSERT_MSG(false, "unhandled value");
+                break;
             }
 
             args.insert_or_assign(TR_KEY_fields, std::move(fields));
@@ -2885,7 +2886,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             default:
-                assert("unhandled value" && 0);
+                TR_ASSERT_MSG(false, "unhandled value");
                 break;
             }
         }
@@ -2970,7 +2971,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             default:
-                assert("unhandled value" && 0);
+                TR_ASSERT_MSG(false, "unhandled value");
                 break;
             }
         }
@@ -3027,7 +3028,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             default:
-                assert("unhandled value" && 0);
+                TR_ASSERT_MSG(false, "unhandled value");
                 break;
             }
         }
@@ -3094,7 +3095,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             default:
-                assert("unhandled value" && 0);
+                TR_ASSERT_MSG(false, "unhandled value");
                 break;
             }
         }
@@ -3145,7 +3146,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 case 600:
                     return "torrent-reannounce"sv;
                 default:
-                    assert("unhandled value" && 0);
+                    TR_ASSERT_MSG(false, "unhandled value");
                     return ""sv;
                 }
             };
