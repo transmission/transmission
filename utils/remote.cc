@@ -1974,7 +1974,7 @@ void print_session(tr_variant::Map const& map)
 
 void print_session_stats(tr_variant::Map const& map)
 {
-    auto* args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
+    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
     {
         return;
@@ -2526,7 +2526,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
                 if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
                 {
-                    if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                    auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                    TR_ASSERT(args_map != nullptr);
+                    if (args_map != nullptr)
                     {
                         add_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
@@ -2581,7 +2583,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
                 if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
                 {
-                    if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                    auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                    TR_ASSERT(args_map != nullptr);
+                    if (args_map != nullptr)
                     {
                         add_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
@@ -2608,7 +2612,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case TR_OPT_UNK:
                 if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
                 {
-                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                    auto* const args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                    TR_ASSERT(args_map != nullptr);
+                    if (args_map != nullptr)
                     {
                         if (auto const metainfo = get_encoded_metainfo(optarg); !std::empty(metainfo))
                         {
@@ -2636,7 +2642,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         {
             if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
             {
-                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                TR_ASSERT(args_map != nullptr);
+                if (args_map != nullptr)
                 {
                     add_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
@@ -3123,7 +3131,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             auto const is_stop = c == 'S';
             if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
             {
-                if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                auto* const args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                TR_ASSERT(args_map != nullptr);
+                if (args_map != nullptr)
                 {
                     args_map->insert_or_assign(TR_KEY_paused, is_stop);
                 }
@@ -3158,7 +3168,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
             {
-                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                TR_ASSERT(args_map != nullptr);
+                if (args_map != nullptr)
                 {
                     add_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
@@ -3253,7 +3265,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 // 2. Group with --move under MODE_TORRENT_SET_LOCATION
                 if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
                 {
-                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+                    auto* const args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+                    TR_ASSERT(args_map != nullptr);
+                    if (args_map != nullptr)
                     {
                         args_map->try_emplace(TR_KEY_download_dir, optarg_sv);
                     }
@@ -3316,7 +3330,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
     if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
     {
-        if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
+        auto* const args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+        TR_ASSERT(args_map != nullptr);
+        if (args_map != nullptr)
         {
             add_id_arg(*args_map, config);
             status |= flush(rpcurl, &tset, config);
