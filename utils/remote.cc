@@ -2438,9 +2438,8 @@ tr_variant::Map& ensure_sset(tr_variant& sset)
     {
         sset = tr_variant::Map{ 3 };
         map = sset.get_if<tr_variant::Map>();
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-set"sv));
     }
-
-    map->insert_or_assign(TR_KEY_method, tr_variant::unmanaged_string("session-set"sv));
 
     auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -2457,9 +2456,8 @@ tr_variant::Map& ensure_tset(tr_variant& tset)
     {
         tset = tr_variant::Map{ 3 };
         map = tset.get_if<tr_variant::Map>();
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-set"sv));
     }
-
-    map->insert_or_assign(TR_KEY_method, tr_variant::unmanaged_string("torrent-set"sv));
 
     auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
@@ -2476,10 +2474,9 @@ tr_variant::Map& ensure_tadd(tr_variant& tadd)
     {
         tadd = tr_variant::Map{ 3 };
         map = tadd.get_if<tr_variant::Map>();
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-add"sv));
+        map->try_emplace(TR_KEY_tag, TAG_TORRENT_ADD);
     }
-
-    map->insert_or_assign(TR_KEY_method, tr_variant::unmanaged_string("torrent-add"sv));
-    map->insert_or_assign(TR_KEY_tag, TAG_TORRENT_ADD);
 
     auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
     if (args == nullptr)
