@@ -619,6 +619,15 @@ export class Transmission extends EventTarget {
     return true;
   }
 
+  static _isValidURL(string) {
+    try {
+      const url = new URL(string);
+      return Boolean(url);
+    } catch {
+      return false;
+    }
+  }
+
   shouldAddedTorrentsStart() {
     return this.session_properties['start-added-torrents'];
   }
@@ -637,7 +646,7 @@ export class Transmission extends EventTarget {
       .getData(type)
       .split('\n')
       .map((string) => string.trim())
-      .filter((string) => URL.canParse(string))) {
+      .filter((string) => Transmission._isValidURL(string))) {
       this.remote.addTorrentByUrl(uri, paused);
     }
 
