@@ -2283,19 +2283,7 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
                 [[fallthrough]];
 
             default:
-                if (auto o_sv = map.find_if<std::string_view>(TR_KEY_result))
-                {
-                    fmt::print("{:s} responded: {:s}\n", rpcurl, *o_sv);
-
-                    if (*o_sv != "success"sv)
-                    {
-                        status |= EXIT_FAILURE;
-                    }
-                }
-                else
-                {
-                    status |= EXIT_FAILURE;
-                }
+                fmt::print("{:s} responded: {:s}\n", rpcurl, sv);
                 break;
             }
         }
