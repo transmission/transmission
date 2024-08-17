@@ -542,7 +542,7 @@ enum
     return {};
 }
 
-void get_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view fallback = "")
+void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view fallback = "")
 {
     if (std::empty(id_str))
     {
@@ -583,9 +583,9 @@ void get_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view
     }
 }
 
-void get_id_arg(tr_variant::Map& args, RemoteConfig const& config, std::string_view fallback = "")
+void add_id_arg(tr_variant::Map& args, RemoteConfig const& config, std::string_view fallback = "")
 {
-    return get_id_arg(args, config.torrent_ids, fallback);
+    return add_id_arg(args, config.torrent_ids, fallback);
 }
 
 void add_time(tr_variant::Map& args, tr_quark const key, std::string_view arg)
@@ -2523,7 +2523,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                     {
-                        get_id_arg(*args_map, config);
+                        add_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
                     }
                 }
@@ -2578,7 +2578,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 {
                     if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                     {
-                        get_id_arg(*args_map, config);
+                        add_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
                     }
                 }
@@ -2633,7 +2633,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             {
                 if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                 {
-                    get_id_arg(*args_map, config);
+                    add_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
                 }
             }
@@ -2653,7 +2653,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                get_id_arg(args, config, "all");
+                add_id_arg(args, config, "all");
                 break;
             case 'i':
                 map.insert_or_assign(TR_KEY_tag, TAG_DETAILS);
@@ -2663,7 +2663,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                get_id_arg(args, config);
+                add_id_arg(args, config);
                 break;
 
             case 'l':
@@ -2674,7 +2674,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                get_id_arg(args, config, "all");
+                add_id_arg(args, config, "all");
                 break;
 
             case 940:
@@ -2685,26 +2685,26 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 }
 
-                get_id_arg(args, config);
+                add_id_arg(args, config);
                 break;
 
             case 941:
                 map.insert_or_assign(TR_KEY_tag, TAG_PEERS);
                 fields.emplace_back(tr_variant::unmanaged_string("peers"sv));
-                get_id_arg(args, config);
+                add_id_arg(args, config);
                 break;
 
             case 942:
                 map.insert_or_assign(TR_KEY_tag, TAG_PIECES);
                 fields.emplace_back(tr_variant::unmanaged_string("pieces"sv));
                 fields.emplace_back(tr_variant::unmanaged_string("pieceCount"sv));
-                get_id_arg(args, config);
+                add_id_arg(args, config);
                 break;
 
             case 943:
                 map.insert_or_assign(TR_KEY_tag, TAG_TRACKERS);
                 fields.emplace_back(tr_variant::unmanaged_string("trackerStats"sv));
-                get_id_arg(args, config);
+                add_id_arg(args, config);
                 break;
 
             default:
@@ -3104,7 +3104,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             auto args = tr_variant::Map{ 2 };
 
             args.try_emplace(TR_KEY_delete_local_data, c == 840);
-            get_id_arg(args, config);
+            add_id_arg(args, config);
 
             map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-remove"sv));
             map.try_emplace(TR_KEY_arguments, std::move(args));
@@ -3126,7 +3126,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             {
                 auto map = tr_variant::Map{ 2 };
                 auto args = tr_variant::Map{ 1 };
-                get_id_arg(args, config);
+                add_id_arg(args, config);
                 map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(is_stop ? "torrent-stop"sv : "torrent-start"sv));
                 map.try_emplace(TR_KEY_arguments, std::move(args));
 
@@ -3154,14 +3154,14 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             {
                 if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                 {
-                    get_id_arg(*args_map, config);
+                    add_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
                 }
             }
 
             auto map = tr_variant::Map{ 2 };
             auto args = tr_variant::Map{ 1 };
-            get_id_arg(args, config);
+            add_id_arg(args, config);
             map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(Method(c)));
             map.try_emplace(TR_KEY_arguments, std::move(args));
             auto top = tr_variant{ std::move(map) };
@@ -3233,7 +3233,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto args = tr_variant::Map{ 3 };
                     args.try_emplace(TR_KEY_location, optarg_sv);
                     args.try_emplace(TR_KEY_move, true);
-                    get_id_arg(args, config);
+                    add_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-set-location"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3258,7 +3258,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto args = tr_variant::Map{ 3 };
                     args.try_emplace(TR_KEY_location, optarg_sv);
                     args.try_emplace(TR_KEY_move, false);
-                    get_id_arg(args, config);
+                    add_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-set-location"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3272,7 +3272,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     auto args = tr_variant::Map{ 3 };
                     args.try_emplace(TR_KEY_path, rename_from);
                     args.try_emplace(TR_KEY_name, optarg_sv);
-                    get_id_arg(args, config);
+                    add_id_arg(args, config);
                     map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-rename-path"sv));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
@@ -3312,7 +3312,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
     {
         if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
         {
-            get_id_arg(*args_map, config);
+            add_id_arg(*args_map, config);
             status |= flush(rpcurl, &tset, config);
         }
     }
