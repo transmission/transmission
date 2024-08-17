@@ -822,14 +822,14 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
         return "Stopped"s;
 
     case TR_STATUS_CHECK_WAIT:
-        if (auto percent = t.value_if<double>(TR_KEY_recheckProgress))
+        if (auto percent = t.value_if<double>(TR_KEY_recheckProgress); percent)
         {
             return fmt::format("Will Verify ({:.0f}%)", floor(*percent * 100.0));
         }
         return "Will Verify"s;
 
     case TR_STATUS_CHECK:
-        if (auto percent = t.value_if<double>(TR_KEY_recheckProgress))
+        if (auto percent = t.value_if<double>(TR_KEY_recheckProgress); percent)
         {
             return fmt::format("Verifying ({:.0f}%)", floor(*percent * 100.0));
         }
@@ -903,33 +903,33 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("NAME\n");
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_id))
+        if (auto i = t->value_if<int64_t>(TR_KEY_id); i)
         {
             fmt::print("  Id: {:d}\n", *i);
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_name))
+        if (auto sv = t->value_if<std::string_view>(TR_KEY_name); sv)
         {
             fmt::print("  Name: {:s}\n", *sv);
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_hashString))
+        if (auto sv = t->value_if<std::string_view>(TR_KEY_hashString); sv)
         {
             fmt::print("  Hash: {:s}\n", *sv);
         }
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_magnetLink))
+        if (auto sv = t->value_if<std::string_view>(TR_KEY_magnetLink); sv)
         {
             fmt::print("  Magnet: {:s}\n", *sv);
         }
 
-        if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_labels))
+        if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_labels); l != nullptr)
         {
             fmt::print("  Labels: ");
 
             for (auto it = std::begin(*l), begin = std::begin(*l), end = std::end(*l); it != end; ++it)
             {
-                if (auto sv = it->value_if<std::string_view>())
+                if (auto sv = it->value_if<std::string_view>(); sv)
                 {
                     fmt::print(it == begin ? "{:s}" : ", {:s}", *sv);
                 }
@@ -948,12 +948,12 @@ void print_details(tr_variant::Map const& map)
         fmt::print("TRANSFER\n");
         fmt::print("  State: {:s}\n", get_status_string(*t));
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_downloadDir))
+        if (auto sv = t->value_if<std::string_view>(TR_KEY_downloadDir); sv)
         {
             fmt::print("  Location: {:s}\n", *sv);
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_sequentialDownload))
+        if (auto b = t->value_if<bool>(TR_KEY_sequentialDownload); b)
         {
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
         }
@@ -963,17 +963,17 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * (*i - *j) / *i));
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_eta))
+        if (auto i = t->value_if<int64_t>(TR_KEY_eta); i)
         {
             fmt::print("  ETA: {:s}\n", tr_strltime(*i));
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_rateDownload))
+        if (auto i = t->value_if<int64_t>(TR_KEY_rateDownload); i)
         {
             fmt::print("  Download Speed: {:s}\n", Speed{ *i, Speed::Units::Byps }.to_string());
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_rateUpload))
+        if (auto i = t->value_if<int64_t>(TR_KEY_rateUpload); i)
         {
             fmt::print("  Upload Speed: {:s}\n", Speed{ *i, Speed::Units::Byps }.to_string());
         }
@@ -983,7 +983,7 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Have: {:s} ({:s} verified)\n", strlsize(*i + *j), strlsize(*j));
         }
 
-        if (auto oi = t->value_if<int64_t>(TR_KEY_sizeWhenDone))
+        if (auto oi = t->value_if<int64_t>(TR_KEY_sizeWhenDone); oi)
         {
             auto const i = *oi;
             if (i < 1)
@@ -996,13 +996,13 @@ void print_details(tr_variant::Map const& map)
                 fmt::print("  Availability: {:s}%\n", strlpercent(100.0 * (*j + i - *k) / i));
             }
 
-            if (auto j = t->value_if<int64_t>(TR_KEY_totalSize))
+            if (auto j = t->value_if<int64_t>(TR_KEY_totalSize); j)
             {
                 fmt::print("  Total size: {:s} ({:s} wanted)\n", strlsize(*j), strlsize(i));
             }
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_downloadedEver))
+        if (auto i = t->value_if<int64_t>(TR_KEY_downloadedEver); i)
         {
             if (auto corrupt = t->value_if<int64_t>(TR_KEY_corruptEver).value_or(0); corrupt != 0)
             {
@@ -1014,11 +1014,11 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_uploadedEver))
+        if (auto i = t->value_if<int64_t>(TR_KEY_uploadedEver); i)
         {
             fmt::print("  Uploaded: {:s}\n", strlsize(*i));
 
-            if (auto j = t->value_if<int64_t>(TR_KEY_sizeWhenDone))
+            if (auto j = t->value_if<int64_t>(TR_KEY_sizeWhenDone); j)
             {
                 fmt::print("  Ratio: {:s}\n", strlratio(*i, *j));
             }
@@ -1056,11 +1056,11 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Peers: connected to {:d}, uploading to {:d}, downloading from {:d}\n", *i, *j, *k);
         }
 
-        if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_webseeds))
+        if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_webseeds); l != nullptr)
         {
             if (auto const n = std::size(*l); n > 0)
             {
-                if (auto i = t->value_if<int64_t>(TR_KEY_webseedsSendingToUs))
+                if (auto i = t->value_if<int64_t>(TR_KEY_webseedsSendingToUs); i)
                 {
                     fmt::print("  Web Seeds: downloading from {:d} of {:d} web seeds\n", *i, n);
                 }
@@ -1110,7 +1110,7 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Date created: {:s}\n", format_date(buf, i));
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_isPrivate))
+        if (auto b = t->value_if<bool>(TR_KEY_isPrivate); b)
         {
             fmt::print("  Public torrent: {:s}\n", *b ? "No" : "Yes");
         }
@@ -1130,12 +1130,12 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Source: {:s}\n", sv);
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_pieceCount))
+        if (auto i = t->value_if<int64_t>(TR_KEY_pieceCount); i)
         {
             fmt::print("  Piece Count: {:d}\n", *i);
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_pieceSize))
+        if (auto i = t->value_if<int64_t>(TR_KEY_pieceSize); i)
         {
             fmt::print("  Piece Size: {:s}\n", Memory{ *i, Memory::Units::Bytes }.to_string());
         }
@@ -1144,9 +1144,9 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("LIMITS & BANDWIDTH\n");
 
-        if (auto b = t->value_if<bool>(TR_KEY_downloadLimited))
+        if (auto b = t->value_if<bool>(TR_KEY_downloadLimited); b)
         {
-            if (auto i = t->value_if<int64_t>(TR_KEY_downloadLimit))
+            if (auto i = t->value_if<int64_t>(TR_KEY_downloadLimit); i)
             {
                 fmt::print("  Download Limit: ");
 
@@ -1161,9 +1161,9 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_uploadLimited))
+        if (auto b = t->value_if<bool>(TR_KEY_uploadLimited); b)
         {
-            if (auto i = t->value_if<int64_t>(TR_KEY_uploadLimit))
+            if (auto i = t->value_if<int64_t>(TR_KEY_uploadLimit); i)
             {
                 fmt::print("  Upload Limit: ");
 
@@ -1178,7 +1178,7 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_seedRatioMode))
+        if (auto i = t->value_if<int64_t>(TR_KEY_seedRatioMode); i)
         {
             switch (*i)
             {
@@ -1187,7 +1187,7 @@ void print_details(tr_variant::Map const& map)
                 break;
 
             case TR_RATIOLIMIT_SINGLE:
-                if (auto d = t->value_if<double>(TR_KEY_seedRatioLimit))
+                if (auto d = t->value_if<double>(TR_KEY_seedRatioLimit); d)
                 {
                     fmt::print("  Ratio Limit: {:s}\n", strlratio2(*d));
                 }
@@ -1202,7 +1202,7 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_seedIdleMode))
+        if (auto i = t->value_if<int64_t>(TR_KEY_seedIdleMode); i)
         {
             switch (*i)
             {
@@ -1211,7 +1211,7 @@ void print_details(tr_variant::Map const& map)
                 break;
 
             case TR_IDLELIMIT_SINGLE:
-                if (auto j = t->value_if<int64_t>(TR_KEY_seedIdleLimit))
+                if (auto j = t->value_if<int64_t>(TR_KEY_seedIdleLimit); j)
                 {
                     fmt::print("  Idle Limit: {} minutes\n", *j);
                 }
@@ -1227,17 +1227,17 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_honorsSessionLimits))
+        if (auto b = t->value_if<bool>(TR_KEY_honorsSessionLimits); b)
         {
             fmt::print("  Honors Session Limits: {:s}\n", *b ? "Yes" : "No");
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_peer_limit))
+        if (auto i = t->value_if<int64_t>(TR_KEY_peer_limit); i)
         {
             fmt::print("  Peer limit: {:d}\n", *i);
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_bandwidthPriority))
+        if (auto i = t->value_if<int64_t>(TR_KEY_bandwidthPriority); i)
         {
             fmt::print("  Bandwidth Priority: {:s}\n", bandwidth_priority_names[(*i + 1) & 0b11]);
         }
@@ -1381,7 +1381,7 @@ void print_peers(tr_variant::Map const& map)
             continue;
         }
 
-        if (auto* peers = t->find_if<tr_variant::Vector>(TR_KEY_peers))
+        if (auto* peers = t->find_if<tr_variant::Vector>(TR_KEY_peers); peers != nullptr)
         {
             print_peers_impl(*peers);
 
@@ -1466,7 +1466,7 @@ void print_port_test(tr_variant::Map const& map)
         return;
     }
 
-    if (auto is_open = args->value_if<bool>(TR_KEY_port_is_open))
+    if (auto is_open = args->value_if<bool>(TR_KEY_port_is_open); is_open)
     {
         fmt::print("Port is open: {:s}\n", *is_open ? "Yes" : "No");
     }
@@ -1758,17 +1758,17 @@ void print_session(tr_variant::Map const& map)
 
     fmt::print("VERSION\n");
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_version))
+    if (auto sv = args->value_if<std::string_view>(TR_KEY_version); sv)
     {
         fmt::print("  Daemon version: {:s}\n", *sv);
     }
 
-    if (auto i = args->value_if<int64_t>(TR_KEY_rpc_version))
+    if (auto i = args->value_if<int64_t>(TR_KEY_rpc_version); i)
     {
         fmt::print("  RPC version: {:d}\n", *i);
     }
 
-    if (auto i = args->value_if<int64_t>(TR_KEY_rpc_version_minimum))
+    if (auto i = args->value_if<int64_t>(TR_KEY_rpc_version_minimum); i)
     {
         fmt::print("  RPC minimum version: {:d}\n", *i);
     }
@@ -1777,52 +1777,52 @@ void print_session(tr_variant::Map const& map)
 
     fmt::print("CONFIG\n");
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_config_dir))
+    if (auto sv = args->value_if<std::string_view>(TR_KEY_config_dir); sv)
     {
         fmt::print("  Configuration directory: {:s}\n", *sv);
     }
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_download_dir))
+    if (auto sv = args->value_if<std::string_view>(TR_KEY_download_dir); sv)
     {
         fmt::print("  Download directory: {:s}\n", *sv);
     }
 
-    if (auto i = args->value_if<int64_t>(TR_KEY_peer_port))
+    if (auto i = args->value_if<int64_t>(TR_KEY_peer_port); i)
     {
         fmt::print("  Listen port: {:d}\n", *i);
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_port_forwarding_enabled))
+    if (auto b = args->value_if<bool>(TR_KEY_port_forwarding_enabled); b)
     {
         fmt::print("  Port forwarding enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_utp_enabled))
+    if (auto b = args->value_if<bool>(TR_KEY_utp_enabled); b)
     {
         fmt::print("  µTP enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_dht_enabled))
+    if (auto b = args->value_if<bool>(TR_KEY_dht_enabled); b)
     {
         fmt::print("  Distributed hash table enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_lpd_enabled))
+    if (auto b = args->value_if<bool>(TR_KEY_lpd_enabled); b)
     {
         fmt::print("  Local peer discovery enabled: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_pex_enabled))
+    if (auto b = args->value_if<bool>(TR_KEY_pex_enabled); b)
     {
         fmt::print("  Peer exchange allowed: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_encryption))
+    if (auto sv = args->value_if<std::string_view>(TR_KEY_encryption); sv)
     {
         fmt::print("  Encryption: {:s}\n", *sv);
     }
 
-    if (auto i = args->value_if<int64_t>(TR_KEY_cache_size_mb))
+    if (auto i = args->value_if<int64_t>(TR_KEY_cache_size_mb); i)
     {
         fmt::print("  Maximum memory cache size: {:s}\n", Memory{ *i, Memory::Units::MBytes }.to_string());
     }
@@ -1956,12 +1956,12 @@ void print_session(tr_variant::Map const& map)
 
     fmt::print("MISC\n");
 
-    if (auto b = args->value_if<bool>(TR_KEY_start_added_torrents))
+    if (auto b = args->value_if<bool>(TR_KEY_start_added_torrents); b)
     {
         fmt::print("  Autostart added torrents: {:s}\n", *b ? "Yes" : "No");
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_trash_original_torrent_files))
+    if (auto b = args->value_if<bool>(TR_KEY_trash_original_torrent_files); b)
     {
         fmt::print("  Delete automatically added torrents: {:s}\n", *b ? "Yes" : "No");
     }
@@ -1975,7 +1975,7 @@ void print_session_stats(tr_variant::Map const& map)
         return;
     }
 
-    if (auto* d = args->find_if<tr_variant::Map>(TR_KEY_current_stats))
+    if (auto* d = args->find_if<tr_variant::Map>(TR_KEY_current_stats); d != nullptr)
     {
         auto const up = d->value_if<int64_t>(TR_KEY_uploadedBytes);
         auto const down = d->value_if<int64_t>(TR_KEY_downloadedBytes);
@@ -1991,7 +1991,7 @@ void print_session_stats(tr_variant::Map const& map)
         }
     }
 
-    if (auto* d = args->find_if<tr_variant::Map>(TR_KEY_cumulative_stats))
+    if (auto* d = args->find_if<tr_variant::Map>(TR_KEY_cumulative_stats); d != nullptr)
     {
         auto const up = d->value_if<int64_t>(TR_KEY_uploadedBytes);
         auto const down = d->value_if<int64_t>(TR_KEY_downloadedBytes);
@@ -2111,7 +2111,7 @@ void filter_ids(tr_variant::Map const& map, RemoteConfig& config)
             }
             break;
         case 'l': // label
-            if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_labels))
+            if (auto* l = t->find_if<tr_variant::Vector>(TR_KEY_labels); l != nullptr)
             {
                 for (auto const& label_var : *l)
                 {
@@ -2203,7 +2203,7 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
         tr_logAddWarn("Response was not a JSON object");
         status |= EXIT_FAILURE;
     }
-    else if (auto osv = map_ptr->value_if<std::string_view>(TR_KEY_result))
+    else if (auto osv = map_ptr->value_if<std::string_view>(TR_KEY_result); osv)
     {
         auto const& map = *map_ptr;
         auto const& sv = *osv;
@@ -2262,12 +2262,12 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
                 break;
 
             case TAG_TORRENT_ADD:
-                if (auto* b = map.find_if<tr_variant::Map>(TR_KEY_arguments))
+                if (auto* b = map.find_if<tr_variant::Map>(TR_KEY_arguments); b != nullptr)
                 {
                     b = b->find_if<tr_variant::Map>(TR_KEY_torrent_added);
                     if (b != nullptr)
                     {
-                        if (auto i = b->value_if<int64_t>(TR_KEY_id))
+                        if (auto i = b->value_if<int64_t>(TR_KEY_id); i)
                         {
                             config.torrent_ids = std::to_string(*i);
                         }
@@ -2515,9 +2515,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     status |= flush(rpcurl, &tadd, config);
                 }
 
-                if (auto* tset_map = tset.get_if<tr_variant::Map>())
+                if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
                 {
-                    if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                    if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                     {
                         get_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
@@ -2570,9 +2570,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     status |= flush(rpcurl, &tadd, config);
                 }
 
-                if (auto* tset_map = tset.get_if<tr_variant::Map>())
+                if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
                 {
-                    if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                    if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                     {
                         get_id_arg(*args_map, config);
                         status |= flush(rpcurl, &tset, config);
@@ -2597,9 +2597,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case TR_OPT_UNK:
-                if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
+                if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
                 {
-                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                     {
                         if (auto const metainfo = get_encoded_metainfo(optarg); !std::empty(metainfo))
                         {
@@ -2625,9 +2625,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         }
         else if (step_mode == MODE_TORRENT_GET)
         {
-            if (auto* tset_map = tset.get_if<tr_variant::Map>())
+            if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
             {
-                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                 {
                     get_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
@@ -3111,9 +3111,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         else if (step_mode == MODE_TORRENT_START_STOP)
         {
             auto const is_stop = c == 'S';
-            if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
+            if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
             {
-                if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                 {
                     args_map->insert_or_assign(TR_KEY_paused, is_stop);
                 }
@@ -3146,9 +3146,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 }
             };
 
-            if (auto* tset_map = tset.get_if<tr_variant::Map>())
+            if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
             {
-                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                 {
                     get_id_arg(*args_map, config);
                     status |= flush(rpcurl, &tset, config);
@@ -3241,9 +3241,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 // TODO (5.0.0):
                 // 1. Remove tadd.has_value() branch
                 // 2. Group with --move under MODE_TORRENT_SET_LOCATION
-                if (auto* tadd_map = tadd.get_if<tr_variant::Map>())
+                if (auto* tadd_map = tadd.get_if<tr_variant::Map>(); tadd_map != nullptr)
                 {
-                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+                    if (auto* args_map = tadd_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
                     {
                         args_map->try_emplace(TR_KEY_download_dir, optarg_sv);
                     }
@@ -3304,9 +3304,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
         status |= flush(rpcurl, &tadd, config);
     }
 
-    if (auto* tset_map = tset.get_if<tr_variant::Map>())
+    if (auto* tset_map = tset.get_if<tr_variant::Map>(); tset_map != nullptr)
     {
-        if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments))
+        if (auto* args_map = tset_map->find_if<tr_variant::Map>(TR_KEY_arguments); args_map != nullptr)
         {
             get_id_arg(*args_map, config);
             status |= flush(rpcurl, &tset, config);
