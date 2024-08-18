@@ -70,7 +70,8 @@ size_t addPeers(tr_torrent* tor, tr_variant const* l)
         return {};
     }
 
-    auto const pex = tr_pex::from_variant(std::data(*vec), std::size(*vec));
+    auto const n_pex = std::min(std::size(*vec), size_t{ MaxRememberedPeers });
+    auto const pex = tr_pex::from_variant(std::data(*vec), n_pex);
     return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, std::data(pex), std::size(pex));
 }
 
