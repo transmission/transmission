@@ -1,9 +1,12 @@
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > Since `4.1.0` (`rpc-version` 18), Transmission has switched from a bespoke RPC protocol to [JSON-RPC 2.0](https://www.jsonrpc.org/specification).
-> 
+> All RPC strings has been converted to snake_case as well.
+>
 > For backward compatibility, the old RPC protocol will still be available until `5.0.0`.
-> 
-> For documentation of the old RPC protocol, please consult documentation from previous versions.
+> The old RPC strings consisting of a mix of kebab-case and camelCase are still available,
+> but they are deprecated and will be removed in `5.0.0` as well.
+>
+> For documentation of the old RPC protocol and strings, please consult documentation from previous versions.
 > https://github.com/transmission/transmission/blob/4.0.6/docs/rpc-spec.md
 
 # Transmission's RPC specification
