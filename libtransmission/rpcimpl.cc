@@ -236,7 +236,7 @@ using DoneCb = std::function<void(struct tr_rpc_idle_data* data, JsonRpc::Error:
 
         if (auto const val = var.value_if<std::string_view>())
         {
-            if (*val == "recently-active"sv)
+            if (*val == "recently_active"sv || *val == "recently-active")
             {
                 auto const cutoff = tr_time() - RecentlyActiveSeconds;
                 auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
@@ -900,7 +900,8 @@ namespace make_torrent_field_helpers
     auto const format = args_in.value_if<std::string_view>(TR_KEY_format).value_or("object"sv) == "table"sv ? TrFormat::Table :
                                                                                                               TrFormat::Object;
 
-    if (args_in.value_if<std::string_view>(TR_KEY_ids).value_or(""sv) == "recently-active"sv)
+    if (auto val = args_in.value_if<std::string_view>(TR_KEY_ids).value_or(""sv);
+        val == "recently_active"sv || val == "recently-active"sv)
     {
         auto const cutoff = tr_time() - RecentlyActiveSeconds;
         auto const ids = session->torrents().removedSince(cutoff);
