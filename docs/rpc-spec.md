@@ -1,9 +1,9 @@
 > [!IMPORTANT]
-> Transmisson 4.1.0 (`rpc-version` 18) added support for the JSON-RPC 2.0 protocol.
+> Transmisson 4.1.0 (`rpc-version` 18) added support for the JSON-RPC 2.0 protocol and converted all RPC strings to snake_case.
 >
-> The old bespoke RPC protocol is still supported in Transmission 4 but is deprecated and will be removed in the future. People using the old protocol should update their code!
+> The old bespoke RPC protocol, and the old mix of kebab-case and camelCase strings, are still supported in Transmission 4 but are deprecated and will be removed in the future. People using the old protocol should update their code!
 >
-> For documentation of the old RPC protocol, please consult documentation from previous versions.
+> For documentation of the old RPC protocol and strings, please consult documentation from previous versions.
 > https://github.com/transmission/transmission/blob/4.0.6/docs/rpc-spec.md
 
 # Transmission's RPC specification
