@@ -133,7 +133,7 @@ export class Remote {
       {
         id: 'webui',
         jsonrpc: RPC._JsonRpcVersion,
-        method: 'torrent-set',
+        method: 'torrent_set',
         params,
       },
       callback,
@@ -189,7 +189,7 @@ export class Remote {
     this.sendRequest(
       {
         jsonrpc: RPC._JsonRpcVersion,
-        method: 'torrent-set',
+        method: 'torrent_set',
         params,
       },
       () => {
