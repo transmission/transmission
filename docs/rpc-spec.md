@@ -168,7 +168,7 @@ Request parameters:
 | `bandwidth_priority`             | number   | this torrent's bandwidth tr_priority_t
 | `download_limit`                 | number   | maximum download speed (kB/s)
 | `download_limited`               | boolean  | true if `download_limit` is honored
-| `files-unwanted`                 | array    | indices of file(s) to not download
+| `files_unwanted`                 | array    | indices of file(s) to not download
 | `files-wanted`                   | array    | indices of file(s) to download
 | `group`                          | string   | The name of this torrent's bandwidth group
 | `honorsSessionLimits`            | boolean  | true if session upload limits are honored
@@ -194,7 +194,7 @@ Request parameters:
 | `uploadLimited`                  | boolean  | true if `uploadLimit` is honored
 
 Just as an empty `ids` value is shorthand for "all ids", using an empty array
-for `files-wanted`, `files-unwanted`, `priority-high`, `priority-low`, or
+for `files-wanted`, `files_unwanted`, `priority-high`, `priority-low`, or
 `priority-normal` is shorthand for saying "all files".
 
    Response parameters: none
@@ -499,7 +499,7 @@ Request parameters:
 | `peer-limit`                     | number    | maximum number of peers
 | `bandwidth_priority`             | number    | torrent's bandwidth tr_priority_t
 | `files-wanted`                   | array     | indices of file(s) to download
-| `files-unwanted`                 | array     | indices of file(s) to not download
+| `files_unwanted`                 | array     | indices of file(s) to not download
 | `priority-high`                  | array     | indices of high-priority file(s)
 | `priority-low`                   | array     | indices of low-priority file(s)
 | `priority-normal`                | array     | indices of normal-priority file(s)
