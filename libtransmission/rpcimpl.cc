@@ -2433,7 +2433,7 @@ auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandle
     { "torrent_start"sv, torrentStart, true },
     { "torrent_start_now"sv, torrentStartNow, true },
     { "torrent_stop"sv, torrentStop, true },
-    { "torrent-verify"sv, torrentVerify, true },
+    { "torrent_verify"sv, torrentVerify, true },
 } };
 
 using AsyncHandler = void (*)(tr_session*, tr_variant::Map const&, DoneCb&&, tr_rpc_idle_data*);
