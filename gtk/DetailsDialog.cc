@@ -440,7 +440,7 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
     tr_variant top;
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
+    tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddBool(args, key, value);
     tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
@@ -458,7 +458,7 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
     tr_variant top;
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
+    tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddInt(args, key, value);
     tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
@@ -476,7 +476,7 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     tr_variant top;
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
+    tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
     tr_variantDictAddReal(args, key, value);
     tr_variant* const ids = tr_variantDictAddList(args, TR_KEY_ids, ids_.size());
@@ -2389,7 +2389,7 @@ void AddTrackerDialog::on_response(int response)
                 tr_variant top;
 
                 tr_variantInitDict(&top, 2);
-                tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
+                tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
                 auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
                 tr_variantDictAddInt(args, TR_KEY_id, torrent_id_);
                 auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerAdd, 1);
@@ -2436,7 +2436,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
         tr_variant top;
 
         tr_variantInitDict(&top, 2);
-        tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
+        tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
         auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
         tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
         auto* const trackers = tr_variantDictAddList(args, TR_KEY_trackerRemove, 1);
