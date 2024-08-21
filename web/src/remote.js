@@ -281,7 +281,7 @@ export class Remote {
     }
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-add',
+      method: 'torrent_add',
       params: {
         filename: url,
         paused: options.paused,
