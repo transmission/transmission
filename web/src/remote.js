@@ -269,7 +269,7 @@ export class Remote {
   }
   reannounceTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(
-      'torrent-reannounce',
+      'torrent_reannounce',
       torrent_ids,
       callback,
       context,
