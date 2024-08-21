@@ -484,7 +484,7 @@ Response:
 ```
 
 ### 3.4 Adding a torrent
-Method name: `torrent-add`
+Method name: `torrent_add`
 
 Request parameters:
 
@@ -1070,7 +1070,7 @@ Transmission 4.1.0 (`rpc-version-semver` 6.0.0, `rpc-version`: 18)
 |:---|:---
 | `session-get` | new arg `sequential_download`
 | `session-set` | new arg `sequential_download`
-| `torrent-add` | new arg `sequential_download`
+| `torrent_add` | new arg `sequential_download`
 | `torrent-get` | new arg `sequential_download`
 | `torrent-set` | new arg `sequential_download`
 | `torrent-add` | new arg `sequential_download_from_piece`
