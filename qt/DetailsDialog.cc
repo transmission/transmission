@@ -1401,7 +1401,7 @@ void DetailsDialog::onBandwidthPriorityChanged(int index)
     if (index != -1)
     {
         int const priority = ui_.bandwidthPriorityCombo->itemData(index).toInt();
-        torrentSet(TR_KEY_bandwidthPriority, priority);
+        torrentSet(TR_KEY_bandwidth_priority_camel, priority);
     }
 }
 

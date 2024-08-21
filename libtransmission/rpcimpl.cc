@@ -676,7 +676,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_activityDate:
     case TR_KEY_addedDate:
     case TR_KEY_availability:
-    case TR_KEY_bandwidthPriority:
+    case TR_KEY_bandwidth_priority:
+    case TR_KEY_bandwidth_priority_camel:
     case TR_KEY_bytesCompleted:
     case TR_KEY_comment:
     case TR_KEY_corruptEver:
@@ -772,7 +773,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_activityDate: return st.activityDate;
     case TR_KEY_addedDate: return st.addedDate;
     case TR_KEY_availability: return make_piece_availability_vec(tor);
-    case TR_KEY_bandwidthPriority: return tor.get_priority();
+    case TR_KEY_bandwidth_priority:
+    case TR_KEY_bandwidth_priority_camel:
+        return tor.get_priority();
     case TR_KEY_bytesCompleted: return make_bytes_completed_vec(tor);
     case TR_KEY_comment: return tor.comment();
     case TR_KEY_corruptEver: return st.corruptEver;
@@ -1168,7 +1171,7 @@ namespace make_torrent_field_helpers
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (auto const val = args_in.value_if<int64_t>(TR_KEY_bandwidthPriority))
+        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }); val)
         {
             if (auto const priority = static_cast<tr_priority_t>(*val); tr_isPriority(priority))
             {
@@ -1684,7 +1687,7 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, DoneCb&& do
         ctor.set_peer_limit(TR_FORCE, static_cast<uint16_t>(*val));
     }
 
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_bandwidthPriority))
+    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }); val)
     {
         ctor.set_bandwidth_priority(static_cast<tr_priority_t>(*val));
     }
