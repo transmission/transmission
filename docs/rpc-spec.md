@@ -165,7 +165,7 @@ Request parameters:
 
 | Key | Value Type | Value Description
 |:--|:--|:--
-| `bandwidthPriority`   | number   | this torrent's bandwidth tr_priority_t
+| `bandwidth_priority`  | number   | this torrent's bandwidth tr_priority_t
 | `downloadLimit`       | number   | maximum download speed (KBps)
 | `downloadLimited`     | boolean  | true if `downloadLimit` is honored
 | `files-unwanted`      | array    | indices of file(s) to not download
@@ -237,7 +237,7 @@ The 'source' column here corresponds to the data structure there.
 | `activityDate` | number | tr_stat
 | `addedDate` | number | tr_stat
 | `availability` | array (see below)| tr_torrentAvailability()
-| `bandwidthPriority` | number | tr_priority_t
+| `bandwidth_priority` | number | tr_priority_t
 | `comment` | string | tr_torrent_view
 | `corruptEver`| number | tr_stat
 | `creator`| string | tr_torrent_view
@@ -488,7 +488,7 @@ Request parameters:
 | `metainfo`            | string    | base64-encoded .torrent content
 | `paused`              | boolean   | if true, don't start the torrent
 | `peer-limit`          | number    | maximum number of peers
-| `bandwidthPriority`   | number    | torrent's bandwidth tr_priority_t
+| `bandwidth_priority`  | number    | torrent's bandwidth tr_priority_t
 | `files-wanted`        | array     | indices of file(s) to download
 | `files-unwanted`      | array     | indices of file(s) to not download
 | `priority-high`       | array     | indices of high-priority file(s)
