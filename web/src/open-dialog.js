@@ -72,7 +72,7 @@ export class OpenDialog extends EventTarget {
         const o = {
           id: 'webui',
           jsonrpc: RPC._JsonRpcVersion,
-          method: 'torrent-add',
+          method: 'torrent_add',
           params: {
             'download-dir': destination,
             metainfo: contents.slice(Math.max(0, index + key.length)),
@@ -104,7 +104,7 @@ export class OpenDialog extends EventTarget {
       const o = {
         id: 'webui',
         jsonrpc: RPC._JsonRpcVersion,
-        method: 'torrent-add',
+        method: 'torrent_add',
         params: {
           'download-dir': destination,
           filename: url,
