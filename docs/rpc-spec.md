@@ -527,7 +527,7 @@ Method name: `torrent-remove`
 Response parameters: none
 
 ### 3.6 Moving a torrent
-Method name: `torrent-set-location`
+Method name: `torrent_set_location`
 
 Request parameters:
 
