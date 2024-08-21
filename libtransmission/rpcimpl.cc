@@ -2531,7 +2531,14 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
     auto const test = [method_name](auto const& handler)
     {
         auto const& name = std::get<0>(handler);
-        return name == method_name;
+        if (name == method_name)
+        {
+            return true;
+        }
+
+        auto kebab_case = std::string{ name };
+        std::replace(std::begin(kebab_case), std::end(kebab_case), '_', '-');
+        return kebab_case == method_name;
     };
 
     if (auto const end = std::end(AsyncHandlers), handler = std::find_if(std::begin(AsyncHandlers), end, test); handler != end)
