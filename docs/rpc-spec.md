@@ -446,7 +446,7 @@ Response:
 ```
 
 ### 3.4 Adding a torrent
-Method name: `torrent-add`
+Method name: `torrent_add`
 
 Request arguments:
 
