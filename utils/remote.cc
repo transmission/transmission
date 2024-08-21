@@ -762,7 +762,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_doneDate,
     TR_KEY_downloadDir,
     TR_KEY_downloadedEver,
-    TR_KEY_downloadLimit,
+    TR_KEY_download_limit_camel,
     TR_KEY_downloadLimited,
     TR_KEY_error,
     TR_KEY_errorString,
@@ -1216,7 +1216,7 @@ void print_details(tr_variant::Map const& map)
 
         if (auto b = t->value_if<bool>(TR_KEY_downloadLimited); b)
         {
-            if (auto i = t->value_if<int64_t>(TR_KEY_downloadLimit); i)
+            if (auto i = t->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel }); i)
             {
                 fmt::print("  Download Limit: ");
 
@@ -2111,7 +2111,7 @@ void print_groups(tr_variant::Map const& map)
         auto const up_enabled = group->value_if<bool>(TR_KEY_uploadLimited);
         auto const down_enabled = group->value_if<bool>(TR_KEY_downloadLimited);
         auto const up_limit = group->value_if<int64_t>(TR_KEY_uploadLimit);
-        auto const down_limit = group->value_if<int64_t>(TR_KEY_downloadLimit);
+        auto const down_limit = group->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel });
         auto const honors = group->value_if<bool>(TR_KEY_honorsSessionLimits);
         if (name && down_limit && down_enabled && up_limit && up_enabled && honors)
         {
@@ -2988,7 +2988,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'd':
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_downloadLimit, numarg(optarg_sv));
+                    targs->insert_or_assign(TR_KEY_download_limit_camel, numarg(optarg_sv));
                     targs->insert_or_assign(TR_KEY_downloadLimited, true);
                 }
                 else
