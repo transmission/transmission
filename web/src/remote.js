@@ -219,7 +219,7 @@ export class Remote {
   }
   stopTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(
-      'torrent-stop',
+      'torrent_stop',
       torrent_ids,
       callback,
       context,
