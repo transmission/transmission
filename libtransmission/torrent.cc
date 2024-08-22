@@ -1987,7 +1987,10 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 {
     auto const [begin_byte, end_byte] = byte_span_for_file(file);
 
-    auto const begin_block = byte_loc(begin_byte).block;
+    // N.B. If the last file in the torrent is 0 bytes, and the torrent size is a multiple of block size,
+    // then the computed block index will be past-the-end. We handle this with std::min.
+    auto const begin_block = std::min(byte_loc(begin_byte).block, block_count() - 1U);
+
     if (begin_byte >= end_byte) // 0-byte file
     {
         return { begin_block, begin_block + 1 };
