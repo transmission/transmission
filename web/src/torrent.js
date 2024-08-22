@@ -220,7 +220,7 @@ export class Torrent extends EventTarget {
     return this.fields.seed_ratio_limit;
   }
   getSeedRatioMode() {
-    return this.fields.seedRatioMode;
+    return this.fields.seed_ratio_mode;
   }
   getSizeWhenDone() {
     return this.fields.sizeWhenDone;
@@ -569,7 +569,7 @@ Torrent._StatusDownload = 4;
 Torrent._StatusSeedWait = 5;
 Torrent._StatusSeed = 6;
 
-// Torrent.fields.seedRatioMode
+// Torrent.fields.seed_ratio_mode
 Torrent._RatioUseGlobal = 0;
 Torrent._RatioUseLocal = 1;
 Torrent._RatioUnlimited = 2;
@@ -617,7 +617,7 @@ Torrent.Fields.Stats = [
   'rateDownload',
   'rateUpload',
   'recheckProgress',
-  'seedRatioMode',
+  'seed_ratio_mode',
   'seed_ratio_limit',
   'sizeWhenDone',
   'status',

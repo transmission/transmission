@@ -183,7 +183,7 @@ Request parameters:
 | `seed_idle_limit`                | number   | torrent-level number of minutes of seeding inactivity
 | `seed_idle_mode`                 | number   | which seeding inactivity to use. See tr_idlelimit
 | `seed_ratio_limit`               | double   | torrent-level seeding ratio
-| `seedRatioMode`                  | number   | which ratio to use. See tr_ratiolimit
+| `seed_ratio_mode`                | number   | which ratio to use. See tr_ratiolimit
 | `sequential_download`            | boolean  | download torrent pieces sequentially
 | `sequential_download_from_piece` | number   | download from a specific piece when sequential download is enabled
 | `trackerAdd`                     | array    | **DEPRECATED** use `trackerList` instead
@@ -296,7 +296,7 @@ The 'source' column here corresponds to the data structure there.
 | `seed_idle_limit`| number| tr_torrent
 | `seed_idle_mode`| number| tr_inactivelimit
 | `seed_ratio_limit`| double| tr_torrent
-| `seedRatioMode`| number| tr_ratiolimit
+| `seed_ratio_mode`| number| tr_ratiolimit
 | `sequential_download`| boolean| tr_torrent
 | `sequential_download_from_piece`| number| tr_torrent
 | `sizeWhenDone`| number| tr_stat
