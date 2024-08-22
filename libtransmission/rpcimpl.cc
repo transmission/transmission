@@ -703,7 +703,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_hashString:
     case TR_KEY_haveUnchecked:
     case TR_KEY_haveValid:
-    case TR_KEY_honorsSessionLimits:
+    case TR_KEY_honors_session_limits:
+    case TR_KEY_honors_session_limits_camel:
     case TR_KEY_id:
     case TR_KEY_isFinished:
     case TR_KEY_isPrivate:
@@ -805,7 +806,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_hashString: return tr_variant::unmanaged_string(tor.info_hash_string().sv());
     case TR_KEY_haveUnchecked: return st.haveUnchecked;
     case TR_KEY_haveValid: return st.haveValid;
-    case TR_KEY_honorsSessionLimits: return tor.uses_session_limits();
+    case TR_KEY_honors_session_limits:
+    case TR_KEY_honors_session_limits_camel:
+        return tor.uses_session_limits();
     case TR_KEY_id: return st.id;
     case TR_KEY_isFinished: return st.finished;
     case TR_KEY_isPrivate: return tor.is_private();
@@ -1249,7 +1252,7 @@ namespace make_torrent_field_helpers
             tor->use_speed_limit(TR_DOWN, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>(TR_KEY_honorsSessionLimits))
+        if (auto const val = args_in.value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel }); val)
         {
             tr_torrentUseSessionLimits(tor, *val);
         }
@@ -1829,8 +1832,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         if (names.empty() || names.count(name.sv()) > 0U)
         {
             auto const limits = group->get_limits();
-            auto group_map = tr_variant::Map{ 6U };
-            group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+            auto group_map = tr_variant::Map{ 7U };
+            group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
+            group_map.try_emplace(TR_KEY_honors_session_limits_camel, group->are_parent_limits_honored(TR_UP));
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
@@ -1882,7 +1886,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
     group.set_limits(limits);
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_honorsSessionLimits))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel }); val)
     {
         group.honor_parent_limits(TR_UP, *val);
         group.honor_parent_limits(TR_DOWN, *val);

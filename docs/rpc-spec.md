@@ -171,7 +171,7 @@ Request parameters:
 | `files_unwanted`                 | array    | indices of file(s) to not download
 | `files_wanted`                   | array    | indices of file(s) to download
 | `group`                          | string   | The name of this torrent's bandwidth group
-| `honorsSessionLimits`            | boolean  | true if session upload limits are honored
+| `honors_session_limits`          | boolean  | true if session upload limits are honored
 | `ids`                            | array    | torrent list, as described in 3.1
 | `labels`                         | array    | array of string labels
 | `location`                       | string   | new location of the torrent's content
@@ -262,7 +262,7 @@ The 'source' column here corresponds to the data structure there.
 | `hashString`| string| tr_torrent_view
 | `haveUnchecked`| number| tr_stat
 | `haveValid`| number| tr_stat
-| `honorsSessionLimits`| boolean| tr_torrent
+| `honors_session_limits`| boolean| tr_torrent
 | `id` | number | tr_torrent
 | `isFinished` | boolean| tr_stat
 | `isPrivate` | boolean| tr_torrent
@@ -773,7 +773,7 @@ Request parameters:
 
 | Key | Value type | Description
 |:--|:--|:--
-| `honorsSessionLimits` | boolean  | true if session upload limits are honored
+| `honors_session_limits` | boolean  | true if session upload limits are honored
 | `name` | string | Bandwidth group name
 | `speed-limit-down-enabled` | boolean | true means enabled
 | `speed-limit-down` | number | max global download speed (kB/s)
@@ -800,7 +800,7 @@ A bandwidth group description object has:
 
 | Key | Value type | Description
 |:--|:--|:--
-| `honorsSessionLimits` | boolean  | true if session upload limits are honored
+| `honors_session_limits` | boolean  | true if session upload limits are honored
 | `name` | string | Bandwidth group name
 | `speed-limit-down-enabled` | boolean | true means enabled
 | `speed-limit-down` | number | max global download speed (kB/s)
