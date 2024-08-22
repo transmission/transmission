@@ -793,7 +793,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_secondsSeeding,
     TR_KEY_seed_idle_mode_camel,
     TR_KEY_seed_idle_limit_camel,
-    TR_KEY_seedRatioMode,
+    TR_KEY_seed_ratio_mode_camel,
     TR_KEY_seed_ratio_limit_camel,
     TR_KEY_sequential_download,
     TR_KEY_sequential_download_from_piece,
@@ -1248,7 +1248,7 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_seedRatioMode); i)
+        if (auto i = t->value_if<int64_t>({ TR_KEY_seed_ratio_mode, TR_KEY_seed_ratio_mode_camel }); i)
         {
             switch (*i)
             {
@@ -3074,15 +3074,15 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             case 950:
                 args.insert_or_assign(TR_KEY_seed_ratio_limit_camel, tr_num_parse<double>(optarg_sv).value());
-                args.insert_or_assign(TR_KEY_seedRatioMode, TR_RATIOLIMIT_SINGLE);
+                args.insert_or_assign(TR_KEY_seed_ratio_mode_camel, TR_RATIOLIMIT_SINGLE);
                 break;
 
             case 951:
-                args.insert_or_assign(TR_KEY_seedRatioMode, TR_RATIOLIMIT_GLOBAL);
+                args.insert_or_assign(TR_KEY_seed_ratio_mode_camel, TR_RATIOLIMIT_GLOBAL);
                 break;
 
             case 952:
-                args.insert_or_assign(TR_KEY_seedRatioMode, TR_RATIOLIMIT_UNLIMITED);
+                args.insert_or_assign(TR_KEY_seed_ratio_mode_camel, TR_RATIOLIMIT_UNLIMITED);
                 break;
 
             case 955:
