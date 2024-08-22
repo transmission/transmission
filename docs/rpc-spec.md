@@ -177,7 +177,7 @@ Request parameters:
 | `location`                       | string   | new location of the torrent's content
 | `peer_limit`                     | number   | maximum number of peers
 | `priority_high`                  | array    | indices of high-priority file(s)
-| `priority-low`                   | array    | indices of low-priority file(s)
+| `priority_low`                   | array    | indices of low-priority file(s)
 | `priority-normal`                | array    | indices of normal-priority file(s)
 | `queuePosition`                  | number   | position of this torrent in its queue [0...n)
 | `seedIdleLimit`                  | number   | torrent-level number of minutes of seeding inactivity
@@ -194,7 +194,7 @@ Request parameters:
 | `uploadLimited`                  | boolean  | true if `uploadLimit` is honored
 
 Just as an empty `ids` value is shorthand for "all ids", using an empty array
-for `files_wanted`, `files_unwanted`, `priority_high`, `priority-low`, or
+for `files_wanted`, `files_unwanted`, `priority_high`, `priority_low`, or
 `priority-normal` is shorthand for saying "all files".
 
    Response parameters: none
@@ -501,7 +501,7 @@ Request parameters:
 | `files_wanted`                   | array     | indices of file(s) to download
 | `files_unwanted`                 | array     | indices of file(s) to not download
 | `priority_high`                  | array     | indices of high-priority file(s)
-| `priority-low`                   | array     | indices of low-priority file(s)
+| `priority_low`                   | array     | indices of low-priority file(s)
 | `priority-normal`                | array     | indices of normal-priority file(s)
 | `sequential_download`            | boolean   | download torrent pieces sequentially
 | `sequential_download_from_piece` | number    | download from a specific piece when sequential download is enabled
