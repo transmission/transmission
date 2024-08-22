@@ -737,7 +737,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_recheckProgress:
     case TR_KEY_secondsDownloading:
     case TR_KEY_secondsSeeding:
-    case TR_KEY_seedIdleLimit:
+    case TR_KEY_seed_idle_limit:
+    case TR_KEY_seed_idle_limit_camel:
     case TR_KEY_seedIdleMode:
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
@@ -845,7 +846,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_recheckProgress: return st.recheckProgress;
     case TR_KEY_secondsDownloading: return st.secondsDownloading;
     case TR_KEY_secondsSeeding: return st.secondsSeeding;
-    case TR_KEY_seedIdleLimit: return tor.idle_limit_minutes();
+    case TR_KEY_seed_idle_limit:
+    case TR_KEY_seed_idle_limit_camel:
+        return tor.idle_limit_minutes();
     case TR_KEY_seedIdleMode: return tor.idle_limit_mode();
     case TR_KEY_seedRatioLimit: return tor.seed_ratio();
     case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
@@ -1274,7 +1277,7 @@ namespace make_torrent_field_helpers
             tor->use_speed_limit(TR_UP, *val);
         }
 
-        if (auto const val = args_in.value_if<int64_t>(TR_KEY_seedIdleLimit))
+        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_seed_idle_limit, TR_KEY_seed_idle_limit_camel }); val)
         {
             tor->set_idle_limit_minutes(static_cast<uint16_t>(*val));
         }
