@@ -181,7 +181,7 @@ Request parameters:
 | `priority_normal`                | array    | indices of normal-priority file(s)
 | `queue_position`                 | number   | position of this torrent in its queue [0...n)
 | `seed_idle_limit`                | number   | torrent-level number of minutes of seeding inactivity
-| `seedIdleMode`                   | number   | which seeding inactivity to use. See tr_idlelimit
+| `seed_idle_mode`                 | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`                 | double   | torrent-level seeding ratio
 | `seedRatioMode`                  | number   | which ratio to use. See tr_ratiolimit
 | `sequential_download`            | boolean  | download torrent pieces sequentially
@@ -294,7 +294,7 @@ The 'source' column here corresponds to the data structure there.
 | `secondsDownloading`| number| tr_stat
 | `secondsSeeding`| number| tr_stat
 | `seed_idle_limit`| number| tr_torrent
-| `seedIdleMode`| number| tr_inactivelimit
+| `seed_idle_mode`| number| tr_inactivelimit
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
 | `sequential_download`| boolean| tr_torrent
