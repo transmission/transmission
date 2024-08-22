@@ -182,7 +182,7 @@ Request parameters:
 | `queue_position`                 | number   | position of this torrent in its queue [0...n)
 | `seed_idle_limit`                | number   | torrent-level number of minutes of seeding inactivity
 | `seed_idle_mode`                 | number   | which seeding inactivity to use. See tr_idlelimit
-| `seedRatioLimit`                 | double   | torrent-level seeding ratio
+| `seed_ratio_limit`               | double   | torrent-level seeding ratio
 | `seedRatioMode`                  | number   | which ratio to use. See tr_ratiolimit
 | `sequential_download`            | boolean  | download torrent pieces sequentially
 | `sequential_download_from_piece` | number   | download from a specific piece when sequential download is enabled
@@ -295,7 +295,7 @@ The 'source' column here corresponds to the data structure there.
 | `secondsSeeding`| number| tr_stat
 | `seed_idle_limit`| number| tr_torrent
 | `seed_idle_mode`| number| tr_inactivelimit
-| `seedRatioLimit`| double| tr_torrent
+| `seed_ratio_limit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
 | `sequential_download`| boolean| tr_torrent
 | `sequential_download_from_piece`| number| tr_torrent
@@ -607,8 +607,8 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `script-torrent-done-seeding-filename` | string | filename of the script to run
 | `seed-queue-enabled` | boolean | if true, limit how many torrents can be uploaded at once
 | `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
-| `seedRatioLimit` | double | the default seed ratio for torrents to use
-| `seedRatioLimited` | boolean | true if seedRatioLimit is honored by default
+| `seed_ratio_limit` | double | the default seed ratio for torrents to use
+| `seedRatioLimited` | boolean | true if `seed_ratio_limit` is honored by default
 | `sequential_download` | boolean | true means sequential download is enabled by default for added torrents
 | `session-id` | string | the current `X-Transmission-Session-Id` value
 | `speed-limit-down-enabled` | boolean | true means enabled
