@@ -723,7 +723,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_seed_idle_mode_camel:
     case TR_KEY_seed_ratio_limit:
     case TR_KEY_seed_ratio_limit_camel:
-    case TR_KEY_seedRatioMode:
+    case TR_KEY_seed_ratio_mode:
+    case TR_KEY_seed_ratio_mode_camel:
     case TR_KEY_sequential_download:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
@@ -835,7 +836,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_seed_ratio_limit:
     case TR_KEY_seed_ratio_limit_camel:
         return tor.seed_ratio();
-    case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
+    case TR_KEY_seed_ratio_mode:
+    case TR_KEY_seed_ratio_mode_camel:
+        return tor.seed_ratio_mode();
     case TR_KEY_sequential_download: return tor.is_sequential_download();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
@@ -1255,7 +1258,7 @@ namespace make_torrent_field_helpers
             tor->set_seed_ratio(*val);
         }
 
-        if (auto const val = args_in.value_if<int64_t>(TR_KEY_seedRatioMode))
+        if (auto const val = args_in.value_if<int64_t>({ TR_KEY_seed_ratio_mode, TR_KEY_seed_ratio_mode_camel }); val)
         {
             tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*val));
         }
