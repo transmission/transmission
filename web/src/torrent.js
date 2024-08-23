@@ -142,7 +142,7 @@ export class Torrent extends EventTarget {
     return this.fields.eta;
   }
   getFailedEver() {
-    return this.fields.corruptEver;
+    return this.fields.corrupt_ever;
   }
   getFiles() {
     return this.fields.files || [];
@@ -644,7 +644,7 @@ Torrent.Fields.InfoExtra = [
 // fields used in the inspector which need to be periodically refreshed
 Torrent.Fields.StatsExtra = [
   'activity_date',
-  'corruptEver',
+  'corrupt_ever',
   'desiredAvailable',
   'downloadedEver',
   'fileStats',
