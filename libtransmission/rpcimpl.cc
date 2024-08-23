@@ -753,7 +753,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_status:
     case TR_KEY_torrentFile:
     case TR_KEY_totalSize:
-    case TR_KEY_trackerList:
+    case TR_KEY_tracker_list:
+    case TR_KEY_tracker_list_camel:
     case TR_KEY_trackerStats:
     case TR_KEY_trackers:
     case TR_KEY_uploadLimit:
@@ -869,7 +870,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_status: return st.activity;
     case TR_KEY_torrentFile: return tor.torrent_file();
     case TR_KEY_totalSize: return tor.total_size();
-    case TR_KEY_trackerList: return tor.announce_list().to_string();
+    case TR_KEY_tracker_list:
+    case TR_KEY_tracker_list_camel:
+        return tor.announce_list().to_string();
     case TR_KEY_trackerStats: return make_tracker_stats_vec(tor);
     case TR_KEY_trackers: return make_tracker_vec(tor);
     case TR_KEY_uploadLimit: return tr_torrentGetSpeedLimit_KBps(&tor, TR_UP);
@@ -1327,7 +1330,7 @@ namespace make_torrent_field_helpers
             std::tie(err, errmsg) = replace_trackers(tor, *val);
         }
 
-        if (auto const val = args_in.value_if<std::string_view>(TR_KEY_trackerList))
+        if (auto const val = args_in.value_if<std::string_view>({ TR_KEY_tracker_list, TR_KEY_tracker_list_camel }); val)
         {
             if (!tor->set_announce_list(*val))
             {
