@@ -703,7 +703,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_date_created_camel,
     TR_KEY_desired_available_camel,
     TR_KEY_done_date_camel,
-    TR_KEY_downloadDir,
+    TR_KEY_download_dir_camel,
     TR_KEY_downloadedEver,
     TR_KEY_download_limit_camel,
     TR_KEY_download_limited_camel,
@@ -958,7 +958,7 @@ void print_details(tr_variant::Map const& map)
         fmt::print("TRANSFER\n");
         fmt::print("  State: {:s}\n", get_status_string(*t));
 
-        if (auto sv = t->value_if<std::string_view>(TR_KEY_downloadDir); sv)
+        if (auto sv = t->value_if<std::string_view>({ TR_KEY_download_dir, TR_KEY_download_dir_camel }); sv)
         {
             fmt::print("  Location: {:s}\n", *sv);
         }
@@ -1794,7 +1794,7 @@ void print_session(tr_variant::Map const& map)
         fmt::print("  Configuration directory: {:s}\n", *sv);
     }
 
-    if (auto sv = args->value_if<std::string_view>(TR_KEY_download_dir); sv)
+    if (auto sv = args->value_if<std::string_view>({ TR_KEY_download_dir, TR_KEY_download_dir_kebab }); sv)
     {
         fmt::print("  Download directory: {:s}\n", *sv);
     }
@@ -3245,7 +3245,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'w':
                 {
                     auto& args = tadd.has_value() ? ensure_tadd(tadd) : ensure_sset(sset);
-                    args.insert_or_assign(TR_KEY_download_dir, optarg_sv);
+                    args.insert_or_assign(TR_KEY_download_dir_kebab, optarg_sv);
                 }
                 break;
 
@@ -3313,7 +3313,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     TR_ASSERT(args_map != nullptr);
                     if (args_map != nullptr)
                     {
-                        args_map->try_emplace(TR_KEY_download_dir, optarg_sv);
+                        args_map->try_emplace(TR_KEY_download_dir_kebab, optarg_sv);
                     }
                 }
                 else
