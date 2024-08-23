@@ -118,7 +118,7 @@ export class Torrent extends EventTarget {
     return this.fields.added_date;
   }
   getDateCreated() {
-    return this.fields.dateCreated;
+    return this.fields.date_created;
   }
   getDesiredAvailable() {
     return this.fields.desiredAvailable;
@@ -632,7 +632,7 @@ Torrent.Fields.Stats = [
 Torrent.Fields.InfoExtra = [
   'comment',
   'creator',
-  'dateCreated',
+  'date_created',
   'files',
   'hashString',
   'isPrivate',
