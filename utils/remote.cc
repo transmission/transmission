@@ -804,7 +804,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_totalSize,
     TR_KEY_uploadedEver,
     TR_KEY_uploadLimit,
-    TR_KEY_uploadLimited,
+    TR_KEY_upload_limited_camel,
     TR_KEY_uploadRatio,
     TR_KEY_webseeds,
     TR_KEY_webseedsSendingToUs,
@@ -1231,7 +1231,7 @@ void print_details(tr_variant::Map const& map)
             }
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_uploadLimited); b)
+        if (auto b = t->value_if<bool>({ TR_KEY_upload_limited, TR_KEY_upload_limited_camel }); b)
         {
             if (auto i = t->value_if<int64_t>(TR_KEY_uploadLimit); i)
             {
@@ -2108,7 +2108,7 @@ void print_groups(tr_variant::Map const& map)
         }
 
         auto const name = group->value_if<std::string_view>(TR_KEY_name);
-        auto const up_enabled = group->value_if<bool>(TR_KEY_uploadLimited);
+        auto const up_enabled = group->value_if<bool>({ TR_KEY_upload_limited, TR_KEY_upload_limited_camel });
         auto const down_enabled = group->value_if<bool>({ TR_KEY_download_limited, TR_KEY_download_limited_camel });
         auto const up_limit = group->value_if<int64_t>(TR_KEY_uploadLimit);
         auto const down_limit = group->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel });
@@ -3015,7 +3015,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 if (targs != nullptr)
                 {
                     targs->insert_or_assign(TR_KEY_uploadLimit, numarg(optarg_sv));
-                    targs->insert_or_assign(TR_KEY_uploadLimited, true);
+                    targs->insert_or_assign(TR_KEY_upload_limited_camel, true);
                 }
                 else
                 {
@@ -3028,7 +3028,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 'U':
                 if (targs != nullptr)
                 {
-                    targs->insert_or_assign(TR_KEY_uploadLimited, false);
+                    targs->insert_or_assign(TR_KEY_upload_limited_camel, false);
                 }
                 else
                 {
