@@ -709,7 +709,7 @@ TEST_F(RpcTest, torrentGet)
     auto request = tr_variant::Map{ 3U };
 
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "torrent-get"sv);
+    request.try_emplace(TR_KEY_method, "torrent_get"sv);
     request.try_emplace(TR_KEY_id, 12345);
 
     auto params = tr_variant::Map{ 1U };

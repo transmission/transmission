@@ -153,7 +153,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-get',
+      method: 'torrent_get',
       params: {
         fields,
         format: 'table',
