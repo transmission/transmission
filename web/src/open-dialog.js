@@ -81,7 +81,7 @@ export class OpenDialog extends EventTarget {
           jsonrpc: RPC._JsonRpcVersion,
           method: 'torrent_add',
           params: {
-            'download-dir': destination,
+            download_dir: destination,
             metainfo: contents.slice(Math.max(0, index + key.length)),
             paused,
           },
@@ -113,7 +113,7 @@ export class OpenDialog extends EventTarget {
         jsonrpc: RPC._JsonRpcVersion,
         method: 'torrent_add',
         params: {
-          'download-dir': destination,
+          download_dir: destination,
           filename: url,
           paused,
         },
@@ -188,7 +188,7 @@ export class OpenDialog extends EventTarget {
     input.type = 'text';
     input.id = 'add-dialog-folder-input';
     input.addEventListener('change', () => this._updateFreeSpaceInAddDialog());
-    input.value = this.controller.session_properties['download-dir'];
+    input.value = this.controller.session_properties.download_dir;
     workarea.append(input);
     elements.folder_input = input;
 
