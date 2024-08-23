@@ -1320,7 +1320,8 @@ namespace make_torrent_field_helpers
             std::tie(err, errmsg) = add_tracker_urls(tor, *val);
         }
 
-        if (auto const* val = args_in.find_if<tr_variant::Vector>(TR_KEY_trackerRemove))
+        if (auto const* val = args_in.find_if<tr_variant::Vector>({ TR_KEY_tracker_remove, TR_KEY_tracker_remove_camel });
+            val != nullptr)
         {
             std::tie(err, errmsg) = remove_trackers(tor, *val);
         }
