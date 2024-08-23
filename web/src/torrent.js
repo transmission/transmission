@@ -172,7 +172,7 @@ export class Torrent extends EventTarget {
     return this.fields.labels.toSorted();
   }
   getLastActivity() {
-    return this.fields.activityDate;
+    return this.fields.activity_date;
   }
   getLeftUntilDone() {
     return this.fields.leftUntilDone;
@@ -643,7 +643,7 @@ Torrent.Fields.InfoExtra = [
 
 // fields used in the inspector which need to be periodically refreshed
 Torrent.Fields.StatsExtra = [
-  'activityDate',
+  'activity_date',
   'corruptEver',
   'desiredAvailable',
   'downloadedEver',
