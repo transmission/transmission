@@ -46,7 +46,7 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     tr_logAddDebug(fmt::format("Fast preallocation failed: {} ({})", local_error.message(), local_error.code()));
 
-    if (!TR_ERROR_IS_ENOSPC(local_error.code()))
+    if (!tr_error_is_enospc(local_error.code()))
     {
         static char constexpr Zero = '\0';
 
@@ -86,7 +86,7 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     tr_logAddDebug(fmt::format("Full preallocation failed: {} ({})", local_error.message(), local_error.code()));
 
-    if (!TR_ERROR_IS_ENOSPC(local_error.code()))
+    if (!tr_error_is_enospc(local_error.code()))
     {
         auto buf = std::array<uint8_t, 4096>{};
         bool success = true;

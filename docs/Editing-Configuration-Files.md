@@ -77,7 +77,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
- * **message-level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace; default = 2) Set verbosity of Transmission's log messages.
+ * **message-level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace; default = 4) Set verbosity of Transmission's log messages.
  * **pex-enabled:** Boolean (default = true) Enable [Peer Exchange (PEX)](https://en.wikipedia.org/wiki/Peer_exchange).
  * **pidfile:** String Path to file in which daemon PID will be stored (_transmission-daemon only_)
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
@@ -100,7 +100,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer-limit-global:** Number (default = 200)
  * **peer-limit-per-torrent:** Number (default = 50)
- * **peer-socket-tos:** String (default = "default") Set the [Type-Of-Service (TOS)](https://en.wikipedia.org/wiki/Type_of_Service) parameter for outgoing TCP packets. Possible values are "default", "lowcost", "throughput", "lowdelay" and "reliability". The value "lowcost" is recommended if you're using a smart router, and shouldn't harm in any case.
+ * **peer-socket-tos:** String (default = "le") Set the [DiffServ](https://en.wikipedia.org/wiki/Differentiated_services) parameter for outgoing packets. Allowed values are lowercase DSCP names. See the `tr_tos_t` class from `libtransmission/net.h` for the exact list of possible values.
 
 #### Peer Port
  * **peer-port:** Number (default = 51413)

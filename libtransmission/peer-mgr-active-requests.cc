@@ -26,12 +26,12 @@ struct tr_peer;
 class ActiveRequests::Impl
 {
 public:
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return size_;
     }
 
-    size_t count(tr_peer const* peer) const
+    [[nodiscard]] size_t count(tr_peer const* peer) const
     {
         auto const it = count_.find(peer);
         return it != std::end(count_) ? it->second : size_t{};

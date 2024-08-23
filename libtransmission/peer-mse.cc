@@ -14,6 +14,7 @@
 #include "libtransmission/crypto-utils.h" // tr_sha1
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/tr-arc4.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
 using namespace std::literals;

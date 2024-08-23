@@ -1647,7 +1647,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         return 0;
     }
 
-    auto available = swarm->peers.front()->has();
+    auto available = tr_bitfield{ tor->piece_count() };
     for (auto const* const peer : swarm->peers)
     {
         available |= peer->has();

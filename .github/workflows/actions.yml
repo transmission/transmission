@@ -272,6 +272,65 @@ jobs:
         run: |
           if grep 'warning:' makelog; then exit 1; fi
 
+  clang-tidy-libtransmission-win32:
+    runs-on: windows-2022
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: src
+      - name: Prepare Build Deps
+        uses: ./src/.github/actions/prepare-deps-win32
+        with:
+          arch: x64
+          type: CoreDeps
+      - name: Configure
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          cmake `
+            -S src `
+            -B obj `
+            -G Ninja `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
+            -DRUN_CLANG_TIDY=ON
+      - name: Make
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          cmake --build obj --config Debug --target transmission.lib 2>&1 | tee makelog
+      - name: Test for warnings
+        run: |
+          if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
+
+  macos-14-project:
+     runs-on: macos-14
+     needs: [ what-to-make ]
+     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+     steps:
+       - name: Show Configuration
+         run: |
+           echo '${{ toJSON(needs) }}'
+           echo '${{ toJSON(runner) }}'
+           sw_vers
+       - name: Get Source
+         uses: actions/checkout@v4
+         with:
+           path: src
+           submodules: recursive
+       - name: Build
+         run: xcodebuild -project src/Transmission.xcodeproj
+       - uses: actions/upload-artifact@v4
+         with:
+           name: binaries-${{ github.job }}
+           path: pfx/**/*
+
   macos-14-arm64:
     runs-on: macos-14
     needs: [ what-to-make ]
@@ -458,51 +517,16 @@ jobs:
         run: |
           echo '${{ toJSON(needs) }}'
           echo '${{ toJSON(runner) }}'
-      - name: Get Build Tools
-        run: |
-          $DepsPrefix = (Join-Path (Get-Item .).Root.Name "${{ matrix.arch }}-prefix")
-          "DEPS_PREFIX=${DepsPrefix}" | Out-File $Env:GITHUB_ENV -Append
-          (Join-Path $DepsPrefix bin) | Out-File $Env:GITHUB_PATH -Append
-
-          choco install `
-            jom `
-            nasm `
-            nodejs
-          & "C:\Program Files\OpenSSL\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- | Out-Host
-          (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
-          (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
-
-          Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
       - name: Get Source
         uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
-      - name: Get Cache Key
-        id: cache-key
-        run: |
-          try {
-              $DepsHash = & (Join-Path . src release windows main.ps1) -Mode DepsHash -BuildArch ${{ matrix.arch }}
-              "hash=${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
-          } catch {
-              Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
-              exit 1
-          }
-      - name: Get Cache
-        uses: actions/cache@v4
-        id: cache
+      - name: Prepare Build Deps
+        uses: ./src/.github/actions/prepare-deps-win32
         with:
-          path: ${{ env.DEPS_PREFIX }}
-          key: ${{ github.job }}-${{ matrix.arch }}-${{ steps.cache-key.outputs.hash }}
-      - name: Build Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          try {
-              & (Join-Path . src release windows main.ps1) -Mode Build -BuildArch ${{ matrix.arch }} -BuildPart Deps
-          } catch {
-              Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
-              exit 1
-          }
+          arch: ${{ matrix.arch }}
+          type: Deps
       - name: Configure
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}

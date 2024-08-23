@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstdio> /* printf */
 #include <iostream>
 #include <iterator> /* std::back_inserter */
@@ -269,6 +270,7 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
 void printMessage(
     FILE* ostream,
+    std::chrono::system_clock::time_point now,
     tr_log_level level,
     std::string_view name,
     std::string_view message,
@@ -288,9 +290,9 @@ void printMessage(
 
     if (ostream != nullptr)
     {
-        auto timestr = std::array<char, 64>{};
-        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        fmt::print(ostream, "[{:s}] {:s} {:s}\n", std::data(timestr), levelName(level), out.c_str());
+        auto buf = std::array<char, 64>{};
+        auto const timestr = tr_logGetTimeStr(now, std::data(buf), std::size(buf));
+        fmt::print(ostream, "[{:s}] {:s} {:s}\n", timestr, levelName(level), out.c_str());
     }
 
 #ifdef HAVE_SYSLOG
@@ -329,13 +331,24 @@ void printMessage(
 #endif
 }
 
+void printMessage(
+    FILE* ostream,
+    tr_log_level level,
+    std::string_view name,
+    std::string_view message,
+    std::string_view filename,
+    long line)
+{
+    printMessage(ostream, std::chrono::system_clock::now(), level, name, message, filename, line);
+}
+
 void pumpLogMessages(FILE* log_stream)
 {
     tr_log_message* list = tr_logGetQueue();
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        printMessage(log_stream, l->level, l->name, l->message, l->file, l->line);
+        printMessage(log_stream, l->when, l->level, l->name, l->message, l->file, l->line);
     }
 
     // two reasons to not flush stderr:

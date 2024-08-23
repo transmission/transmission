@@ -8,7 +8,7 @@ if(POLICY CMP0114)
 endif()
 
 # Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
-set(MACOS_SUPPORT_MINIMUM 10.14.6)
+set(MACOS_SUPPORT_MINIMUM 11.0)
 
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -233,6 +233,8 @@ if(WIN32)
 endif()
 
 set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
+
+set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
 find_package(Fmt)
