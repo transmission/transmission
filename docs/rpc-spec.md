@@ -186,7 +186,7 @@ Request parameters:
 | `seed_ratio_mode`                | number   | which ratio to use. See tr_ratiolimit
 | `sequential_download`            | boolean  | download torrent pieces sequentially
 | `sequential_download_from_piece` | number   | download from a specific piece when sequential download is enabled
-| `trackerAdd`                     | array    | **DEPRECATED** use `trackerList` instead
+| `tracker_add`                    | array    | **DEPRECATED** use `trackerList` instead
 | `trackerList`                    | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`                  | array    | **DEPRECATED** use `trackerList` instead
 | `trackerReplace`                 | array    | **DEPRECATED** use `trackerList` instead
