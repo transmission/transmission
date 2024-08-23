@@ -710,7 +710,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::AddedDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_added_date); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_kebab }); i)
         {
             helper.load_date_added(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::AddedDate;
