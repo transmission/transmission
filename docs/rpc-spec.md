@@ -186,10 +186,10 @@ Request parameters:
 | `seed_ratio_mode`                | number   | which ratio to use. See tr_ratiolimit
 | `sequential_download`            | boolean  | download torrent pieces sequentially
 | `sequential_download_from_piece` | number   | download from a specific piece when sequential download is enabled
-| `tracker_add`                    | array    | **DEPRECATED** use `trackerList` instead
-| `trackerList`                    | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
-| `trackerRemove`                  | array    | **DEPRECATED** use `trackerList` instead
-| `trackerReplace`                 | array    | **DEPRECATED** use `trackerList` instead
+| `tracker_add`                    | array    | **DEPRECATED** use `tracker_list` instead
+| `tracker_list`                   | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `trackerRemove`                  | array    | **DEPRECATED** use `tracker_list` instead
+| `trackerReplace`                 | array    | **DEPRECATED** use `tracker_list` instead
 | `uploadLimit`                    | number   | maximum upload speed (kB/s)
 | `uploadLimited`                  | boolean  | true if `uploadLimit` is honored
 
@@ -303,7 +303,7 @@ The 'source' column here corresponds to the data structure there.
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
-| `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
+| `tracker_list` | string | string of announce URLs, one per line, with a blank line between tiers
 | `trackerStats`| array (see below)| n/a
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
