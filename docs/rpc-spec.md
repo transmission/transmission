@@ -199,8 +199,8 @@ for `files_wanted`, `files_unwanted`, `priority_high`, `priority_low`, or
 
    Response parameters: none
 
-### 3.3 Torrent accessor: `torrent-get`
-Method name: `torrent-get`.
+### 3.3 Torrent accessor: `torrent_get`
+Method name: `torrent_get`.
 
 Request parameters:
 
@@ -336,7 +336,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view (**Note:** Not to be confused with `torrent-get.wanted`, which is an array of 0/1 instead of boolean)
+| `wanted` | boolean | tr_file_view (**Note:** Not to be confused with `torrent_get.wanted`, which is an array of 0/1 instead of boolean)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -455,7 +455,7 @@ Request:
        "fields": [ "id", "name", "totalSize" ],
        "ids": [ 7, 10 ]
    },
-   "method": "torrent-get",
+   "method": "torrent_get",
    "id": 39693
 }
 ```
@@ -545,7 +545,7 @@ Method name: `torrent-rename-path`
 For more information on the use of this function, see the transmission.h
 documentation of `tr_torrentRenamePath()`. In particular, note that if this
 call succeeds you'll want to update the torrent's `files` and `name` field
-with `torrent-get`.
+with `torrent_get`.
 
 Request parameters:
 
@@ -1071,16 +1071,16 @@ Transmission 4.1.0 (`rpc-version-semver` 6.0.0, `rpc-version`: 18)
 | `session-get` | new arg `sequential_download`
 | `session-set` | new arg `sequential_download`
 | `torrent_add` | new arg `sequential_download`
-| `torrent-get` | new arg `sequential_download`
+| `torrent_get` | new arg `sequential_download`
 | `torrent_set` | new arg `sequential_download`
 | `torrent-add` | new arg `sequential_download_from_piece`
-| `torrent-get` | new arg `sequential_download_from_piece`
+| `torrent_get` | new arg `sequential_download_from_piece`
 | `torrent_set` | new arg `sequential_download_from_piece`
-| `torrent-get` | new arg `files.begin_piece`
-| `torrent-get` | new arg `files.end_piece`
+| `torrent_get` | new arg `files.begin_piece`
+| `torrent_get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`
-| `torrent-get` | new arg `trackerStats.downloader_count`
-| `torrent-get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked
+| `torrent_get` | new arg `trackerStats.downloader_count`
+| `torrent_get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked
 | `session-get` | new arg `preferred_transports`
 | `session-set` | new arg `preferred_transports`
 | `session-get` | :warning: **DEPRECATED** `utp-enabled`. Use `preferred_transports` instead.
