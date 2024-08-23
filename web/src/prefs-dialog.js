@@ -273,7 +273,7 @@ export class PrefsDialog extends EventTarget {
     let input = document.createElement('input');
     input.type = 'text';
     input.id = makeUUID();
-    input.dataset.key = 'download-dir';
+    input.dataset.key = 'download_dir';
     label.setAttribute('for', input.id);
     root.append(input);
     const download_dir = input;
