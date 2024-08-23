@@ -607,32 +607,6 @@ bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* erro
     return tr_sys_path_remove(filename, error);
 }
 
-void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
-{
-    auto const lock = tor->unique_lock();
-
-    if (delete_flag && tor->has_metainfo())
-    {
-        // ensure the files are all closed and idle before moving
-        tor->session->close_torrent_files(tor->id());
-        tor->session->verify_remove(tor);
-
-        if (delete_func == nullptr)
-        {
-            delete_func = removeTorrentFile;
-        }
-
-        auto const delete_func_wrapper = [&delete_func, user_data](char const* filename)
-        {
-            delete_func(filename, user_data, nullptr);
-        };
-
-        tor->files().remove(tor->current_dir(), tor->name(), delete_func_wrapper);
-    }
-
-    tr_torrentFreeInSessionThread(tor);
-}
-
 void freeTorrent(tr_torrent* tor)
 {
     using namespace queue_helpers;
@@ -784,6 +758,59 @@ void tr_torrent::stop_now()
     set_is_queued(false);
 }
 
+void tr_torrentRemoveInSessionThread(
+    tr_torrent* tor,
+    bool delete_flag,
+    tr_fileFunc delete_func,
+    void* delete_user_data,
+    tr_torrent_remove_done_func callback,
+    void* callback_user_data)
+{
+    auto const lock = tor->unique_lock();
+
+    bool ok = true;
+    if (delete_flag && tor->has_metainfo())
+    {
+        // ensure the files are all closed and idle before moving
+        tor->session->close_torrent_files(tor->id());
+        tor->session->verify_remove(tor);
+
+        if (delete_func == nullptr)
+        {
+            delete_func = start_stop_helpers::removeTorrentFile;
+        }
+
+        auto const delete_func_wrapper = [&delete_func, delete_user_data](char const* filename)
+        {
+            delete_func(filename, delete_user_data, nullptr);
+        };
+
+        tr_error error;
+        tor->files().remove(tor->current_dir(), tor->name(), delete_func_wrapper, &error);
+        if (error)
+        {
+            ok = false;
+            tor->is_deleting_ = false;
+
+            tor->error().set_local_error(fmt::format(
+                _("Couldn't remove all torrent files: {error} ({error_code})"),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
+            tr_torrentStop(tor);
+        }
+    }
+
+    if (callback != nullptr)
+    {
+        callback(tor->id(), ok, callback_user_data);
+    }
+
+    if (ok)
+    {
+        tr_torrentFreeInSessionThread(tor);
+    }
+}
+
 void tr_torrentStop(tr_torrent* tor)
 {
     if (!tr_isTorrent(tor))
@@ -798,7 +825,13 @@ void tr_torrentStop(tr_torrent* tor)
     tor->session->run_in_session_thread([tor]() { tor->stop_now(); });
 }
 
-void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+void tr_torrentRemove(
+    tr_torrent* tor,
+    bool delete_flag,
+    tr_fileFunc delete_func,
+    void* delete_user_data,
+    tr_torrent_remove_done_func callback,
+    void* callback_user_data)
 {
     using namespace start_stop_helpers;
 
@@ -806,7 +839,14 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 
     tor->is_deleting_ = true;
 
-    tor->session->run_in_session_thread(removeTorrentInSessionThread, tor, delete_flag, delete_func, user_data);
+    tor->session->run_in_session_thread(
+        tr_torrentRemoveInSessionThread,
+        tor,
+        delete_flag,
+        delete_func,
+        delete_user_data,
+        callback,
+        callback_user_data);
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)
@@ -1690,9 +1730,12 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
     if (!aborted && !tor_->is_deleting_)
     {
         tor_->session->run_in_session_thread(
-            [tor = tor_]()
+            // Do not capture the torrent pointer directly, or else we will crash if program
+            // execution reaches this point while the session thread is about to free this torrent.
+            [tor_id = tor_->id(), session = tor_->session]()
             {
-                if (tor->is_deleting_)
+                auto* const tor = session->torrents().get(tor_id);
+                if (tor == nullptr || tor->is_deleting_)
                 {
                     return;
                 }
@@ -1944,7 +1987,10 @@ tr_block_span_t tr_torrent::block_span_for_file(tr_file_index_t const file) cons
 {
     auto const [begin_byte, end_byte] = byte_span_for_file(file);
 
-    auto const begin_block = byte_loc(begin_byte).block;
+    // N.B. If the last file in the torrent is 0 bytes, and the torrent size is a multiple of block size,
+    // then the computed block index will be past-the-end. We handle this with std::min.
+    auto const begin_block = std::min(byte_loc(begin_byte).block, block_count() - 1U);
+
     if (begin_byte >= end_byte) // 0-byte file
     {
         return { begin_block, begin_block + 1 };

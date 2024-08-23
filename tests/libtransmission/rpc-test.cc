@@ -120,7 +120,7 @@ TEST_F(RpcTest, tagAsync)
     EXPECT_EQ(*tag, 12345);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
 
 TEST_F(RpcTest, tagNoHandler)
@@ -259,7 +259,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
 
 TEST_F(RpcTest, torrentGet)
@@ -298,7 +298,7 @@ TEST_F(RpcTest, torrentGet)
     EXPECT_EQ(1, first_torrent_id);
 
     // cleanup
-    tr_torrentRemove(tor, false, nullptr, nullptr);
+    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
 
 } // namespace libtransmission::test

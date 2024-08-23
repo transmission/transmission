@@ -23,8 +23,11 @@
 #include <sys/stat.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
-#ifdef HAVE_XFS_XFS_H
+#ifdef HAVE_FLOCK
 #include <sys/file.h> /* flock() */
+#endif
+
+#ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
 #endif
 
@@ -983,6 +986,7 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
 
 #endif
 
+    TR_ASSERT(result);
     if (!*result && errno == EAGAIN)
     {
         errno = EWOULDBLOCK;

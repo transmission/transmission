@@ -1,3 +1,4 @@
+include(CheckAtomic)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
@@ -58,13 +59,13 @@ target_sources(${TR_NAME}
         file-win32.cc
         file.cc
         file.h
-        global-ip-cache.cc
-        global-ip-cache.h
         handshake.cc
         handshake.h
         history.h
         inout.cc
         inout.h
+        ip-cache.cc
+        ip-cache.h
         log.cc
         log.h
         lru-cache.h
@@ -298,6 +299,7 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
+        $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
         transmission::crypto_impl
         fmt::fmt-header-only

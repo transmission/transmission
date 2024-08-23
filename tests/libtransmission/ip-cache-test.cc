@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include <libtransmission/global-ip-cache.h>
+#include <libtransmission/ip-cache.h>
 #include <libtransmission/net.h>
 #include <libtransmission/timer.h>
 #include <libtransmission/web.h>
@@ -22,7 +22,7 @@
 
 using namespace std::literals;
 
-class GlobalIPCacheTest : public ::testing::Test
+class IPCacheTest : public ::testing::Test
 {
 protected:
     class MockTimerMaker final : public libtransmission::TimerMaker
@@ -67,7 +67,7 @@ protected:
         }
     };
 
-    class MockMediator : public tr_global_ip_cache::Mediator
+    class MockMediator : public tr_ip_cache::Mediator
     {
     public:
         [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
@@ -81,18 +81,18 @@ protected:
 
     void TearDown() override
     {
-        if (global_ip_cache_)
+        if (ip_cache_)
         {
-            global_ip_cache_->try_shutdown();
+            ip_cache_->try_shutdown();
         }
         ::testing::Test::TearDown();
     }
 
     // To be created within the test body
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_;
+    std::unique_ptr<tr_ip_cache> ip_cache_;
 };
 
-TEST_F(GlobalIPCacheTest, bindAddr)
+TEST_F(IPCacheTest, bindAddr)
 {
     static constexpr auto AddrTests = std::array{
         std::array<std::pair<std::string_view, std::string_view>, 4>{ { { "8.8.8.8"sv, "8.8.8.8"sv },
@@ -119,20 +119,20 @@ TEST_F(GlobalIPCacheTest, bindAddr)
     };
 
     auto mediator = LocalMockMediator{};
-    global_ip_cache_ = tr_global_ip_cache::create(mediator);
+    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         mediator.j_ = 0;
         for (std::size_t& j = mediator.j_; j < std::size(AddrTests[i]); ++j)
         {
-            auto const addr = global_ip_cache_->bind_addr(static_cast<tr_address_type>(i));
+            auto const addr = ip_cache_->bind_addr(static_cast<tr_address_type>(i));
             EXPECT_EQ(addr.display_name(), AddrTests[i][j].second);
         }
     }
 }
 
-TEST_F(GlobalIPCacheTest, setGlobalAddr)
+TEST_F(IPCacheTest, setGlobalAddr)
 {
     static auto constexpr AddrStr = std::array{ "8.8.8.8"sv,
                                                 "192.168.133.133"sv,
@@ -148,7 +148,7 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
     static_assert(std::size(AddrStr) == std::size(AddrTests[TR_AF_INET6]));
 
     auto mediator = MockMediator{};
-    global_ip_cache_ = tr_global_ip_cache::create(mediator);
+    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
@@ -157,8 +157,8 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
             auto const type = static_cast<tr_address_type>(i);
             auto const addr = tr_address::from_string(AddrStr[j]);
             ASSERT_TRUE(addr.has_value());
-            EXPECT_EQ(global_ip_cache_->set_global_addr(type, *addr), AddrTests[i][j]);
-            if (auto const val = global_ip_cache_->global_addr(type); val && AddrTests[i][j])
+            EXPECT_EQ(ip_cache_->set_global_addr(type, *addr), AddrTests[i][j]);
+            if (auto const val = ip_cache_->global_addr(type); val && AddrTests[i][j])
             {
                 EXPECT_EQ(val->display_name(), AddrStr[j]);
             }
@@ -166,7 +166,7 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
     }
 }
 
-TEST_F(GlobalIPCacheTest, globalSourceIPv4)
+TEST_F(IPCacheTest, globalSourceIPv4)
 {
     struct LocalMockMediator final : public MockMediator
     {
@@ -176,10 +176,10 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv4)
         }
     };
     auto mediator = LocalMockMediator{};
-    global_ip_cache_ = tr_global_ip_cache::create(mediator);
+    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
 
-    global_ip_cache_->update_source_addr(TR_AF_INET);
-    auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET);
+    ip_cache_->update_source_addr(TR_AF_INET);
+    auto const addr = ip_cache_->global_source_addr(TR_AF_INET);
     if (!addr)
     {
         GTEST_SKIP() << "globalSourceIPv4 did not return an address, either:\n"
@@ -190,7 +190,7 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv4)
     EXPECT_TRUE(addr->is_ipv4());
 }
 
-TEST_F(GlobalIPCacheTest, globalSourceIPv6)
+TEST_F(IPCacheTest, globalSourceIPv6)
 {
     struct LocalMockMediator final : public MockMediator
     {
@@ -200,10 +200,10 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv6)
         }
     };
     auto mediator = LocalMockMediator{};
-    global_ip_cache_ = tr_global_ip_cache::create(mediator);
+    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
 
-    global_ip_cache_->update_source_addr(TR_AF_INET6);
-    auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET6);
+    ip_cache_->update_source_addr(TR_AF_INET6);
+    auto const addr = ip_cache_->global_source_addr(TR_AF_INET6);
     if (!addr)
     {
         GTEST_SKIP() << "globalSourceIPv6 did not return an address, either:\n"
@@ -214,7 +214,7 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv6)
     EXPECT_TRUE(addr->is_ipv6());
 }
 
-TEST_F(GlobalIPCacheTest, onResponseIPQuery)
+TEST_F(IPCacheTest, onResponseIPQuery)
 {
     static auto constexpr AddrStr = std::array{
         "8.8.8.8"sv,      "192.168.133.133"sv,     "172.16.241.133"sv, "2001:1890:1112:1::20"sv, "fd12:3456:789a:1::1"sv,
@@ -243,7 +243,7 @@ TEST_F(GlobalIPCacheTest, onResponseIPQuery)
     };
 
     auto mediator = LocalMockMediator{};
-    global_ip_cache_ = tr_global_ip_cache::create(mediator);
+    ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
 
     mediator.address_type = 0;
     for (std::size_t& i = mediator.address_type; i < NUM_TR_AF_INET_TYPES; ++i)
@@ -257,9 +257,9 @@ TEST_F(GlobalIPCacheTest, onResponseIPQuery)
             {
                 auto const type = static_cast<tr_address_type>(i);
 
-                global_ip_cache_->update_global_addr(type);
+                ip_cache_->update_global_addr(type);
 
-                auto const global_addr = global_ip_cache_->global_addr(type);
+                auto const global_addr = ip_cache_->global_addr(type);
                 EXPECT_EQ(!!global_addr, j == 200 /* HTTP_OK */ && AddrTests[i][k]);
                 if (global_addr)
                 {
