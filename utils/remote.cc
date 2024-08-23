@@ -752,7 +752,7 @@ static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
 auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_activity_date_camel,
-    TR_KEY_addedDate,
+    TR_KEY_added_date_camel,
     TR_KEY_bandwidth_priority_camel,
     TR_KEY_comment,
     TR_KEY_corruptEver,
@@ -812,7 +812,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 57>{
 static_assert(DetailsKeys[std::size(DetailsKeys) - 1] != tr_quark{});
 
 auto constexpr ListKeys = std::array<tr_quark, 15>{
-    TR_KEY_addedDate,
+    TR_KEY_added_date_camel,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -1141,7 +1141,7 @@ void print_details(tr_variant::Map const& map)
 
         fmt::print("HISTORY\n");
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_addedDate).value_or(0); i != 0)
+        if (auto i = t->value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_camel }).value_or(0); i != 0)
         {
             fmt::print("  Date added:       {:s}\n", format_date(buf, i));
         }
@@ -1584,8 +1584,8 @@ void print_torrent_list(tr_variant::Map const& map)
         [](tr_variant::Map const* f, tr_variant::Map const* s)
         {
             static auto constexpr Min = std::numeric_limits<int64_t>::min();
-            auto const f_time = f->value_if<int64_t>(TR_KEY_addedDate).value_or(Min);
-            auto const s_time = s->value_if<int64_t>(TR_KEY_addedDate).value_or(Min);
+            auto const f_time = f->value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_camel }).value_or(Min);
+            auto const s_time = s->value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_camel }).value_or(Min);
             return f_time < s_time;
         });
 
