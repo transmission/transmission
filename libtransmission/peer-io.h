@@ -39,11 +39,12 @@ namespace libtransmission::test
 class HandshakeTest;
 } // namespace libtransmission::test
 
-enum ReadState
+enum class ReadState : uint8_t
 {
-    READ_NOW,
-    READ_LATER,
-    READ_ERR
+    Now,
+    Later,
+    Break,
+    Err
 };
 
 enum tr_preferred_transport : uint8_t
@@ -148,6 +149,8 @@ public:
         auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
         filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
         outbuf_.commit_space(n_bytes);
+
+        try_write(SIZE_MAX);
     }
 
     // Write all the data from `buf`.
