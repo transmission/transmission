@@ -151,20 +151,19 @@ $ cd Transmission
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
 $ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-$ cd build
-$ cmake --build .
-$ sudo cmake --install .
+$ cmake --build build
+$ sudo cmake --install build
 ```
 
 ### Building Transmission from Git (updating) ###
 ```bash
-$ cd Transmission/build
-$ cmake --build . -t clean
+$ cd Transmission
 $ git submodule foreach --recursive git clean -xfd
 $ git pull --rebase --prune
 $ git submodule update --init --recursive
-$ cmake --build .
-$ sudo cmake --install .
+$ cmake --build build -t clean
+$ cmake --build build
+$ sudo cmake --install build
 ```
 
 ## On Windows ##
