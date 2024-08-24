@@ -168,7 +168,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 59>{
+    static auto constexpr ExpectedKeys = std::array{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -204,6 +204,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_queue_stalled_enabled,
         TR_KEY_queue_stalled_minutes,
         TR_KEY_rename_partial_files,
+        TR_KEY_reqq,
         TR_KEY_rpc_version,
         TR_KEY_rpc_version_minimum,
         TR_KEY_rpc_version_semver,
@@ -242,8 +243,8 @@ TEST_F(RpcTest, sessionGet)
 
     auto missing_keys = std::vector<tr_quark>{};
     std::set_difference(
-        std::begin(expected_keys),
-        std::end(expected_keys),
+        std::begin(ExpectedKeys),
+        std::end(ExpectedKeys),
         std::begin(actual_keys),
         std::end(actual_keys),
         std::inserter(missing_keys, std::begin(missing_keys)));
@@ -253,8 +254,8 @@ TEST_F(RpcTest, sessionGet)
     std::set_difference(
         std::begin(actual_keys),
         std::end(actual_keys),
-        std::begin(expected_keys),
-        std::end(expected_keys),
+        std::begin(ExpectedKeys),
+        std::end(ExpectedKeys),
         std::inserter(unexpected_keys, std::begin(unexpected_keys)));
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
