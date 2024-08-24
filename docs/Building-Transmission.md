@@ -8,6 +8,7 @@ Each option can be set to `ON` or `OFF`, values shown below are the defaults.
 * `-DENABLE_QT=AUTO` - build the Qt client
 * `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
 * `-DENABLE_CLI=OFF` - build the cli client
+* `-DENABLE_TESTS=ON` - build tests
 
 ## On macOS ##
 ### Prerequisites ###
@@ -163,6 +164,18 @@ $ git pull --rebase --prune
 $ git submodule update --init --recursive
 $ cmake --build build -t clean
 $ cmake --build build
+$ sudo cmake --install build
+```
+
+### Building Transmission from Git (first time, with tests) ###
+```bash
+$ git clone --recurse-submodules https://github.com/transmission/transmission Transmission
+$ cd Transmission
+# Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
+# Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+$ cmake --build build
+$ ctest --test-dir build
 $ sudo cmake --install build
 ```
 
