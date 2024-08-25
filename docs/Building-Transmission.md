@@ -9,6 +9,7 @@ Each option can be set to `ON` or `OFF`, values shown below are the defaults.
 * `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
 * `-DENABLE_CLI=OFF` - build the cli client
 * `-DENABLE_TESTS=ON` - build tests
+* `-DREBUILD_WEB=OFF` - rebuild Web assets
 
 ## On macOS ##
 ### Prerequisites ###
@@ -22,6 +23,9 @@ git clone --recurse-submodules https://github.com/transmission/transmission Tran
 
 If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).
 (Note: These are untested snapshots. Use them with care.)
+
+#### Web assets ####
+If Web assets rebuild is wished, NodeJS (`npm`) needs to be installed.
 
 ### Building the native app with Xcode ###
 Transmission has an Xcode project file for building in Xcode.
@@ -87,6 +91,11 @@ Qt6 client:
 $ sudo apt install qt6-svg-dev qt6-tools-dev
 ```
 
+If Web assets rebuild is wished, NodeJS (`npm`) needs to be installed:
+```bash
+$ sudo apt install nodejs
+```
+
 Then you can begin [building.](#building-transmission-from-git-first-time)
 
 #### Debian 11 / Bullseye ####
@@ -108,6 +117,11 @@ For Qt client, one additional package is needed on top of basic dependencies
 $ sudo apt install qttools5-dev
 ```
 
+If Web assets rebuild is wished, NodeJS (`npm`) needs to be installed:
+```bash
+$ sudo apt install nodejs
+```
+
 Then you can begin [building.](#building-transmission-from-git-first-time)
 
 #### Ubuntu ####
@@ -115,6 +129,11 @@ On Ubuntu, you can install the required development tools for GTK with this comm
 
 ```bash
 $ sudo apt-get install build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev libssl-dev
+```
+
+If Web assets rebuild is wished, NodeJS (`npm`) needs to be installed:
+```bash
+$ sudo apt-get install nodejs
 ```
 
 Then you can begin [building.](#building-transmission-from-git-first-time)
@@ -144,6 +163,8 @@ Before building Transmission, you need to set the pkgconfig environment setting:
 ```bash
 $ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 ```
+
+If Web assets rebuild is wished, NodeJS (`npm`) needs to be installed.
 
 ### Building Transmission from Git (first time) ###
 ```bash
@@ -206,6 +227,9 @@ Additional dependencies for the Qt client:
 ```bat
 vcpkg install qt5-tools qt5-winextras
 ```
+
+#### Web assets ####
+If Web assets rebuild is wished, NodeJS (`npm`) needs to be installed.
 
 ### Get Transmission source
 ```bat
