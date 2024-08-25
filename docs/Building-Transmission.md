@@ -10,7 +10,7 @@ Each option can be set to `ON` or `OFF`, values shown below are the defaults.
 * `-DENABLE_CLI=OFF` - build the cli client
 
 ## On macOS ##
-Software prerequisites:
+### Prerequisites ###
  * macOS 11.0 or newer
  * Xcode 12.5.1 or newer
 
