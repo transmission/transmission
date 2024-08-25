@@ -986,6 +986,7 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
 
 #endif
 
+    TR_ASSERT(result);
     if (!*result && errno == EAGAIN)
     {
         errno = EWOULDBLOCK;
