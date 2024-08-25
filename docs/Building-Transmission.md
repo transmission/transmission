@@ -1,5 +1,13 @@
-## Getting the Source ##
+## Get sources ##
 The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
+
+### Configure CMake
+To configure which components are built use the flags below.
+Each option can be set to `ON` or `OFF`, values shown below are the defaults.
+* `-DENABLE_DAEMON=ON` - build transmission daemon
+* `-DENABLE_QT=AUTO` - build the Qt client
+* `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
+* `-DENABLE_CLI=OFF` - build the cli client
 
 ## On macOS ##
 Software prerequisites:
@@ -194,15 +202,7 @@ cd transmission
 git submodule update --init --recursive
 ```
 
-### Configure CMake and build the project
-
-To configure which components are built use the flags below.
-Each option can be set to `ON` or `OFF`, values shown below are the defaults.
-* `-DENABLE_DAEMON=ON` - build transmission daemon
-* `-DENABLE_QT=AUTO` - build the Qt client
-* `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
-* `-DENABLE_CLI=OFF` - build the cli client
-
+### Build the project
 ```bat
 cmake -B build -DCMAKE_TOOLCHAIN_FILE="<path-to-vcpkg>\scripts\buildsystems\vcpkg.cmake" <flags-from-above> <other-cmake-configurations>
 ```
