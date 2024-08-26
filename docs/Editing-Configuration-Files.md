@@ -5,6 +5,18 @@ Note: The client _should_ be closed before making changes, otherwise settings wi
 Some of Transmission's behavior can also be customized via environment variables.
 
 # GTK / Daemon / CLI
+
+> [!IMPORTANT]
+> Transmisson 4.1.0 converted all configuration strings to snake_case.
+> 
+> Your configuration file will be converted to snake_case automatically by running and stopping Transmission.
+> Please keep a backup before upgrading if needed.
+>
+> The old kebab-case strings are still accepted in Transmission 4 but are deprecated and will be removed in the future.
+>
+> For documentation of the old configurations, please consult documentation from previous versions.
+> https://github.com/transmission/transmission/blob/4.0.6/docs/Editing-Configuration-Files.md
+
 ### Overview
 GTK, CLI and daemon (both on a Mac and Linux) use a [JSON](https://www.json.org/) formatted file, mainly because of its human readability.
 (Consult the [JSON website](https://www.json.org/) for detailed information)
@@ -196,7 +208,7 @@ Only keys that differ from above are listed here. These options have been replac
 ##### [RPC](rpc-spec.md)
  * **rpc-access-control-list:** String (Comma-delimited list of IP addresses prefixed with "+" or "-". Wildcards allowed using '\*'. Example: "+127.0.0.\*,-192.168.\*.\*", Default:  "+127.0.0.1")
 
-## macOS
+# macOS
 ### Overview
 macOS has a standardized way of saving user preferences files using [XML](https://en.wikipedia.org/wiki/XML) format. These files are called [plist](https://en.wikipedia.org/wiki/Plist) (short for property list) files. Usually there is no need to modify these files directly, since Apple provided a [command-line tool](https://developer.apple.com/DOCUMENTATION/Darwin/Reference/ManPages/man1/defaults.1.html) to reliably change settings. You do need to restart Transmission before these have effect.
 
