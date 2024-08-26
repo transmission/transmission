@@ -56,6 +56,7 @@ target_sources(${TR_NAME}-qt
         InteropObject.h
         LicenseDialog.cc
         LicenseDialog.h
+        main.cc
         MainWindow.cc
         MainWindow.h
         MakeDialog.cc

@@ -398,6 +398,7 @@ public:
         size_t peer_limit_global = TR_DEFAULT_PEER_LIMIT_GLOBAL;
         size_t peer_limit_per_torrent = TR_DEFAULT_PEER_LIMIT_TORRENT;
         size_t queue_stalled_minutes = 30U;
+        size_t reqq = 2000U;
         size_t seed_queue_size = 10U;
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
@@ -465,6 +466,7 @@ public:
                 { TR_KEY_ratio_limit, &ratio_limit },
                 { TR_KEY_ratio_limit_enabled, &ratio_limit_enabled },
                 { TR_KEY_rename_partial_files, &is_incomplete_file_naming_enabled },
+                { TR_KEY_reqq, &reqq },
                 { TR_KEY_scrape_paused_torrents_enabled, &should_scrape_paused_torrents },
                 { TR_KEY_script_torrent_added_enabled, &script_torrent_added_enabled },
                 { TR_KEY_script_torrent_added_filename, &script_torrent_added_filename },
@@ -691,6 +693,16 @@ public:
     [[nodiscard]] constexpr auto peerLimitPerTorrent() const noexcept
     {
         return settings().peer_limit_per_torrent;
+    }
+
+    [[nodiscard]] constexpr auto reqq() const noexcept
+    {
+        return settings().reqq;
+    }
+
+    constexpr void set_reqq(size_t reqq) noexcept
+    {
+        settings_.reqq = reqq;
     }
 
     // bandwidth

@@ -371,8 +371,8 @@ The 'source' column here corresponds to the data structure there.
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `announceState`           | number     | tr_tracker_view
 | `announce`                | string     | tr_tracker_view
+| `announceState`           | number     | tr_tracker_view
 | `downloadCount`           | number     | tr_tracker_view
 | `hasAnnounced`            | boolean    | tr_tracker_view
 | `hasScraped`              | boolean    | tr_tracker_view
@@ -393,8 +393,8 @@ The 'source' column here corresponds to the data structure there.
 | `leecherCount`            | number     | tr_tracker_view
 | `nextAnnounceTime`        | number     | tr_tracker_view
 | `nextScrapeTime`          | number     | tr_tracker_view
-| `scrapeState`             | number     | tr_tracker_view
 | `scrape`                  | string     | tr_tracker_view
+| `scrapeState`             | number     | tr_tracker_view
 | `seederCount`             | number     | tr_tracker_view
 | `sitename`                | string     | tr_tracker_view
 | `tier`                    | number     | tr_tracker_view
@@ -554,6 +554,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `queue-stalled-enabled` | boolean | whether or not to consider idle torrents as stalled
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
+| `reqq` | number | the number of outstanding block requests a peer is allowed to queue in the client
 | `rpc-version-minimum` | number | the minimum RPC API version supported
 | `rpc-version-semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string
 | `rpc-version` | number | the current RPC API version
