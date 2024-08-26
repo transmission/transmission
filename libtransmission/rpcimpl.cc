@@ -99,7 +99,7 @@ namespace
 
     if (!std::empty(error_string))
     {
-        ret.try_emplace(TR_KEY_errorString, error_string);
+        ret.try_emplace(TR_KEY_error_string, error_string);
     }
 
     if (!std::empty(result))
@@ -702,7 +702,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_edit_date:
     case TR_KEY_edit_date_camel:
     case TR_KEY_error:
-    case TR_KEY_errorString:
+    case TR_KEY_error_string:
+    case TR_KEY_error_string_camel:
     case TR_KEY_eta:
     case TR_KEY_etaIdle:
     case TR_KEY_fileStats:
@@ -832,7 +833,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_edit_date_camel:
         return st.editDate;
     case TR_KEY_error: return st.error;
-    case TR_KEY_errorString: return st.errorString;
+    case TR_KEY_error_string:
+    case TR_KEY_error_string_camel:
+        return st.errorString;
     case TR_KEY_eta: return st.eta;
     case TR_KEY_etaIdle: return st.etaIdle;
     case TR_KEY_fileStats: return make_file_stats_vec(tor);

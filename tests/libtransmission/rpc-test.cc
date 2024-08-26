@@ -87,7 +87,7 @@ TEST_F(RpcTest, NotArrayOrObject)
         EXPECT_EQ(*error_message, "Invalid Request"sv);
         auto const error_data = error->find_if<tr_variant::Map>(TR_KEY_data);
         ASSERT_NE(error_data, nullptr);
-        auto const error_string = error_data->value_if<std::string_view>(TR_KEY_errorString);
+        auto const error_string = error_data->value_if<std::string_view>(TR_KEY_error_string);
         ASSERT_TRUE(error_string);
         EXPECT_EQ(*error_string, "request must be an Array or Object"sv);
         auto const id = response_map->value_if<std::nullptr_t>(TR_KEY_id);
@@ -122,7 +122,7 @@ TEST_F(RpcTest, JsonRpcWrongVersion)
     EXPECT_EQ(*error_message, "Invalid Request"sv);
     auto const error_data = error->find_if<tr_variant::Map>(TR_KEY_data);
     ASSERT_NE(error_data, nullptr);
-    auto const error_string = error_data->value_if<std::string_view>(TR_KEY_errorString);
+    auto const error_string = error_data->value_if<std::string_view>(TR_KEY_error_string);
     ASSERT_TRUE(error_string);
     EXPECT_EQ(*error_string, "JSON-RPC version is not 2.0"sv);
     auto const id = response_map->value_if<std::nullptr_t>(TR_KEY_id);
@@ -210,7 +210,7 @@ TEST_F(RpcTest, idWrongType)
         EXPECT_EQ(*error_message, "Invalid Request"sv);
         auto const error_data = error->find_if<tr_variant::Map>(TR_KEY_data);
         ASSERT_NE(error_data, nullptr);
-        auto const error_string = error_data->value_if<std::string_view>(TR_KEY_errorString);
+        auto const error_string = error_data->value_if<std::string_view>(TR_KEY_error_string);
         ASSERT_TRUE(error_string);
         EXPECT_EQ(*error_string, "id type must be String, Number, or Null"sv);
         auto const id = response_map->value_if<std::nullptr_t>(TR_KEY_id);
@@ -538,7 +538,7 @@ TEST_F(RpcTest, batch)
     EXPECT_EQ(*error_message, "Invalid Request"sv);
     auto error_data = error->find_if<tr_variant::Map>(TR_KEY_data);
     ASSERT_NE(error_data, nullptr);
-    auto error_string = error_data->value_if<std::string_view>(TR_KEY_errorString);
+    auto error_string = error_data->value_if<std::string_view>(TR_KEY_error_string);
     ASSERT_TRUE(error_string);
     EXPECT_EQ(*error_string, "request must be an Object"sv);
     id_null = response_map->value_if<std::nullptr_t>(TR_KEY_id);
@@ -574,7 +574,7 @@ TEST_F(RpcTest, batch)
     EXPECT_EQ(*error_message, "Invalid Request"sv);
     error_data = error->find_if<tr_variant::Map>(TR_KEY_data);
     ASSERT_NE(error_data, nullptr);
-    error_string = error_data->value_if<std::string_view>(TR_KEY_errorString);
+    error_string = error_data->value_if<std::string_view>(TR_KEY_error_string);
     ASSERT_TRUE(error_string);
     EXPECT_EQ(*error_string, "JSON-RPC version is not 2.0"sv);
     id_null = response_map->value_if<std::nullptr_t>(TR_KEY_id);

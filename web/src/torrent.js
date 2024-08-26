@@ -136,7 +136,7 @@ export class Torrent extends EventTarget {
     return this.fields.error;
   }
   getErrorString() {
-    return this.fields.errorString;
+    return this.fields.error_string;
   }
   getETA() {
     return this.fields.eta;
@@ -602,7 +602,7 @@ Torrent.Fields.Metadata = [
 // commonly used fields which need to be periodically refreshed
 Torrent.Fields.Stats = [
   'error',
-  'errorString',
+  'error_string',
   'eta',
   'isFinished',
   'isStalled',
