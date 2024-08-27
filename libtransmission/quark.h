@@ -297,6 +297,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_port_is_open,
     TR_KEY_preallocation,
     TR_KEY_preferred_transports,
+    TR_KEY_primary_mime_type_kebab,
     TR_KEY_primary_mime_type,
     TR_KEY_priorities,
     TR_KEY_priority,
