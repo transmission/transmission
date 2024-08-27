@@ -270,7 +270,7 @@ The 'source' column here corresponds to the data structure there.
 | `labels` | array of strings | tr_torrent
 | `left_until_done` | number| tr_stat
 | `magnet_link` | string| n/a
-| `manualAnnounceTime` | number| **DEPRECATED** don't use it, it never worked
+| `manual_announce_time` | number| **DEPRECATED** don't use it, it never worked
 | `maxConnectedPeers` | number| tr_torrent
 | `metadataPercentComplete` | double| tr_stat
 | `name` | string| tr_torrent_view
@@ -1080,7 +1080,7 @@ Transmission 4.1.0 (`rpc-version-semver` 6.0.0, `rpc-version`: 18)
 | `torrent_get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`
 | `torrent_get` | new arg `trackerStats.downloader_count`
-| `torrent_get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked
+| `torrent_get` | :warning: **DEPRECATED** `manual_announce_time`, it never worked
 | `session-get` | new arg `preferred_transports`
 | `session-set` | new arg `preferred_transports`
 | `session-get` | :warning: **DEPRECATED** `utp-enabled`. Use `preferred_transports` instead.
