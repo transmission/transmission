@@ -288,6 +288,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "pieceCount"sv,
     "pieceSize"sv,
     "piece_count"sv,
+    "piece_size"sv,
     "pieces"sv,
     "port"sv,
     "port-forwarding-enabled"sv,
@@ -595,6 +596,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_percent_complete_camel: return TR_KEY_percent_complete;
     case TR_KEY_percent_done_camel: return TR_KEY_percent_done;
     case TR_KEY_piece_count_camel: return TR_KEY_piece_count;
+    case TR_KEY_piece_size_camel: return TR_KEY_piece_size;
     case TR_KEY_priority_high_kebab: return TR_KEY_priority_high;
     case TR_KEY_priority_low_kebab: return TR_KEY_priority_low;
     case TR_KEY_priority_normal_kebab: return TR_KEY_priority_normal;
