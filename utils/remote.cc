@@ -768,7 +768,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_have_valid_camel,
     TR_KEY_honors_session_limits_camel,
     TR_KEY_id,
-    TR_KEY_isFinished,
+    TR_KEY_is_finished_camel,
     TR_KEY_isPrivate,
     TR_KEY_labels,
     TR_KEY_leftUntilDone,
@@ -811,7 +811,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_error_string_camel,
     TR_KEY_eta,
     TR_KEY_id,
-    TR_KEY_isFinished,
+    TR_KEY_is_finished_camel,
     TR_KEY_leftUntilDone,
     TR_KEY_name,
     TR_KEY_peersGettingFromUs,
@@ -874,7 +874,7 @@ static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
         return "Queued"s;
 
     case TR_STATUS_STOPPED:
-        if (t.value_if<bool>(TR_KEY_isFinished).value_or(false))
+        if (t.value_if<bool>({ TR_KEY_is_finished, TR_KEY_is_finished_camel }).value_or(false))
         {
             return "Finished"s;
         }
