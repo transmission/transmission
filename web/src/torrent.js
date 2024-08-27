@@ -190,7 +190,7 @@ export class Torrent extends EventTarget {
     return this.fields.peers || [];
   }
   getPeersConnected() {
-    return this.fields.peersConnected;
+    return this.fields.peers_connected;
   }
   getPeersGettingFromUs() {
     return this.fields.peersGettingFromUs;
@@ -609,7 +609,7 @@ Torrent.Fields.Stats = [
   'labels',
   'left_until_done',
   'metadata_percent_complete',
-  'peersConnected',
+  'peers_connected',
   'peersGettingFromUs',
   'peersSendingToUs',
   'percentDone',
