@@ -160,7 +160,7 @@ export class Torrent extends EventTarget {
     return this.getHaveValid() + this.getHaveUnchecked();
   }
   getHaveUnchecked() {
-    return this.fields.haveUnchecked;
+    return this.fields.have_unchecked;
   }
   getHaveValid() {
     return this.fields.haveValid;
@@ -648,7 +648,7 @@ Torrent.Fields.StatsExtra = [
   'desired_available',
   'downloaded_ever',
   'file_stats',
-  'haveUnchecked',
+  'have_unchecked',
   'haveValid',
   'peers',
   'startDate',
