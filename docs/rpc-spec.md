@@ -300,7 +300,7 @@ The 'source' column here corresponds to the data structure there.
 | `sequential_download`| boolean| tr_torrent
 | `sequential_download_from_piece`| number| tr_torrent
 | `size_when_done`| number| tr_stat
-| `startDate`| number| tr_stat
+| `start_date`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
 | `tracker_list` | string | string of announce URLs, one per line, with a blank line between tiers
