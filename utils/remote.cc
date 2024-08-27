@@ -778,7 +778,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_peers_getting_from_us_camel,
     TR_KEY_peers_sending_to_us_camel,
     TR_KEY_peer_limit_kebab,
-    TR_KEY_percentDone,
+    TR_KEY_percent_done_camel,
     TR_KEY_pieceCount,
     TR_KEY_pieceSize,
     TR_KEY_rateDownload,
@@ -1020,7 +1020,7 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
         }
 
-        if (auto d = t->value_if<double>(TR_KEY_percentDone); d)
+        if (auto d = t->value_if<double>({ TR_KEY_percent_done, TR_KEY_percent_complete_camel }); d)
         {
             fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * *d));
         }
