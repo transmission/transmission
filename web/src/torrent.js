@@ -76,7 +76,7 @@ export class Torrent extends EventTarget {
     for (const [key, value] of Object.entries(data)) {
       switch (key) {
         case 'files':
-        case 'fileStats': // merge files and fileStats together
+        case 'file_stats': // merge files and file_stats together
           changed |= this.updateFiles(value);
           break;
         case 'trackerStats': // 'trackerStats' is a superset of 'trackers'...
@@ -647,7 +647,7 @@ Torrent.Fields.StatsExtra = [
   'corrupt_ever',
   'desired_available',
   'downloaded_ever',
-  'fileStats',
+  'file_stats',
   'haveUnchecked',
   'haveValid',
   'peers',
