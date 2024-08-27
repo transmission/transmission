@@ -268,7 +268,7 @@ The 'source' column here corresponds to the data structure there.
 | `is_private` | boolean| tr_torrent
 | `is_stalled` | boolean| tr_stat
 | `labels` | array of strings | tr_torrent
-| `leftUntilDone` | number| tr_stat
+| `left_until_done` | number| tr_stat
 | `magnetLink` | string| n/a
 | `manualAnnounceTime` | number| **DEPRECATED** don't use it, it never worked
 | `maxConnectedPeers` | number| tr_torrent

@@ -776,7 +776,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_is_finished_camel,
     TR_KEY_is_private_camel,
     TR_KEY_labels,
-    TR_KEY_leftUntilDone,
+    TR_KEY_left_until_done_camel,
     TR_KEY_magnetLink,
     TR_KEY_name,
     TR_KEY_peersConnected,
@@ -818,7 +818,7 @@ auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_eta,
     TR_KEY_id,
     TR_KEY_is_finished_camel,
-    TR_KEY_leftUntilDone,
+    TR_KEY_left_until_done_camel,
     TR_KEY_name,
     TR_KEY_peersGettingFromUs,
     TR_KEY_peersSendingToUs,
@@ -916,7 +916,8 @@ static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
         {
             return "Idle"s;
         }
-        if (auto left_until_done = t.value_if<int64_t>(TR_KEY_leftUntilDone).value_or(0); left_until_done > 0)
+        if (auto left_until_done = t.value_if<int64_t>({ TR_KEY_left_until_done, TR_KEY_left_until_done_camel }).value_or(0);
+            left_until_done > 0)
         {
             return "Uploading"s;
         }
@@ -1063,7 +1064,7 @@ void print_details(tr_variant::Map const& map)
                 fmt::print("  Availability: None\n");
             }
             else if (auto j = t->value_if<int64_t>({ TR_KEY_desired_available, TR_KEY_desired_available_camel }),
-                     k = t->value_if<int64_t>(TR_KEY_leftUntilDone);
+                     k = t->value_if<int64_t>({ TR_KEY_left_until_done, TR_KEY_left_until_done_camel });
                      j && k)
             {
                 fmt::print("  Availability: {:s}%\n", strlpercent(100.0 * (*j + i - *k) / i));
@@ -1605,7 +1606,7 @@ void print_torrent_list(tr_variant::Map const& map)
         auto o_up = t->value_if<int64_t>(TR_KEY_rateUpload);
         auto o_down = t->value_if<int64_t>(TR_KEY_rateDownload);
         auto o_size_when_done = t->value_if<int64_t>(TR_KEY_sizeWhenDone);
-        auto o_left_until_done = t->value_if<int64_t>(TR_KEY_leftUntilDone);
+        auto o_left_until_done = t->value_if<int64_t>({ TR_KEY_left_until_done, TR_KEY_left_until_done_camel });
         auto o_ratio = t->value_if<double>(TR_KEY_uploadRatio);
         auto o_name = t->value_if<std::string_view>(TR_KEY_name);
 
