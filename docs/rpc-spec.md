@@ -236,7 +236,7 @@ The 'source' column here corresponds to the data structure there.
 | `eta_idle` | number | tr_stat
 | `file_count` | number | tr_info
 | `files`| array (see below)| n/a
-| `fileStats`| array (see below)| n/a
+| `file_stats`| array (see below)| n/a
 | `group`| string| n/a
 | `hashString`| string| tr_torrent_view
 | `haveUnchecked`| number| tr_stat
@@ -306,7 +306,7 @@ The 'source' column here corresponds to the data structure there.
 | `endPiece` | number | tr_file_view
 
 
-`fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
+`file_stats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
