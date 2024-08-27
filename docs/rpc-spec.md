@@ -299,7 +299,7 @@ The 'source' column here corresponds to the data structure there.
 | `seed_ratio_mode`| number| tr_ratiolimit
 | `sequential_download`| boolean| tr_torrent
 | `sequential_download_from_piece`| number| tr_torrent
-| `sizeWhenDone`| number| tr_stat
+| `size_when_done`| number| tr_stat
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
