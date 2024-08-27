@@ -235,6 +235,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "message"sv,
     "message-level"sv,
     "metadataPercentComplete"sv,
+    "metadata_percent_complete"sv,
     "metadata_size"sv,
     "metainfo"sv,
     "method"sv,
@@ -578,6 +579,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_magnet_link_camel: return TR_KEY_magnet_link;
     case TR_KEY_manual_announce_time_camel: return TR_KEY_manual_announce_time;
     case TR_KEY_max_connected_peers_camel: return TR_KEY_max_connected_peers;
+    case TR_KEY_metadata_percent_complete_camel: return TR_KEY_metadata_percent_complete;
     case TR_KEY_peer_limit_kebab: return TR_KEY_peer_limit;
     case TR_KEY_priority_high_kebab: return TR_KEY_priority_high;
     case TR_KEY_priority_low_kebab: return TR_KEY_priority_low;

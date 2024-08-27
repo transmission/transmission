@@ -181,7 +181,7 @@ export class Torrent extends EventTarget {
     return this.fields.magnet_link;
   }
   getMetadataPercentComplete() {
-    return this.fields.metadataPercentComplete;
+    return this.fields.metadata_percent_complete;
   }
   getName() {
     return this.fields.name || 'Unknown';
@@ -608,7 +608,7 @@ Torrent.Fields.Stats = [
   'is_stalled',
   'labels',
   'left_until_done',
-  'metadataPercentComplete',
+  'metadata_percent_complete',
   'peersConnected',
   'peersGettingFromUs',
   'peersSendingToUs',
