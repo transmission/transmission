@@ -250,7 +250,7 @@ export class Torrent extends EventTarget {
     return this.fields.webseedsSendingToUs;
   }
   isFinished() {
-    return this.fields.isFinished;
+    return this.fields.is_finished;
   }
 
   // derived accessors
@@ -604,7 +604,7 @@ Torrent.Fields.Stats = [
   'error',
   'error_string',
   'eta',
-  'isFinished',
+  'is_finished',
   'isStalled',
   'labels',
   'leftUntilDone',
