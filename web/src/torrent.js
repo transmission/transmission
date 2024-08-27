@@ -178,7 +178,7 @@ export class Torrent extends EventTarget {
     return this.fields.left_until_done;
   }
   getMagnetLink() {
-    return this.fields.magnetLink;
+    return this.fields.magnet_link;
   }
   getMetadataPercentComplete() {
     return this.fields.metadataPercentComplete;
@@ -636,7 +636,7 @@ Torrent.Fields.InfoExtra = [
   'files',
   'hash_string',
   'is_private',
-  'magnetLink',
+  'magnet_link',
   'pieceCount',
   'pieceSize',
 ];

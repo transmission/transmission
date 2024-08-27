@@ -122,8 +122,7 @@ bool Session::portTestPending(Session::PortTestIpProtocol const ip_protocol) con
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)
 {
-    auto constexpr MagnetLinkKey = std::string_view{ "magnetLink" };
-    auto constexpr Fields = std::array<std::string_view, 1>{ MagnetLinkKey };
+    static auto const Fields = std::array{ tr_quark_get_string_view(TR_KEY_magnet_link_camel) };
 
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -146,7 +145,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
             tr_variant* const child = tr_variantListChild(torrents, 0);
             if (child != nullptr)
             {
-                auto const link = dictFind<QString>(child, TR_KEY_magnetLink);
+                auto const link = dictFind<QString>(child, TR_KEY_magnet_link_camel);
                 if (link)
                 {
                     QApplication::clipboard()->setText(*link);
