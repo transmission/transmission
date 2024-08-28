@@ -232,7 +232,7 @@ export class Torrent extends EventTarget {
     return this.fields.status;
   }
   getTotalSize() {
-    return this.fields.totalSize;
+    return this.fields.total_size;
   }
   getTrackers() {
     return this.fields.trackers || [];
@@ -596,7 +596,7 @@ Torrent.Fields.Metadata = [
   'file_count',
   'name',
   'primary_mime_type',
-  'totalSize',
+  'total_size',
 ];
 
 // commonly used fields which need to be periodically refreshed
