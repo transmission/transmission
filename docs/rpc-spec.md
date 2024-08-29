@@ -239,7 +239,7 @@ The 'source' column here corresponds to the data structure there.
 | `added_date` | number | tr_stat
 | `availability` | array (see below)| tr_torrentAvailability()
 | `bandwidth_priority` | number | tr_priority_t
-| `bytesCompleted` | array (see below)| n/a
+| `bytes_completed` | array (see below)| n/a
 | `comment` | string | tr_torrent_view
 | `corrupt_ever`| number | tr_stat
 | `creator`| string | tr_torrent_view
@@ -317,13 +317,13 @@ The 'source' column here corresponds to the data structure there.
 
 `availability`: An array of `piece_count` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
 
-`bytesCompleted`: An array of `tr_info.filecount` numbers. Each is the completed bytes for the corresponding file.
+`bytes_completed`: An array of `tr_info.filecount` numbers. Each is the completed bytes for the corresponding file.
 
 `files`: array of objects, each containing:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `bytesCompleted` | number | tr_file_view
+| `bytes_completed` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
 | `begin_piece` | number | tr_file_view
@@ -335,7 +335,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `bytesCompleted` | number | tr_file_view
+| `bytes_completed` | number | tr_file_view
 | `wanted` | boolean | tr_file_view (**Note:** Not to be confused with `torrent_get.wanted`, which is an array of 0/1 instead of boolean)
 | `priority` | number | tr_file_view
 
