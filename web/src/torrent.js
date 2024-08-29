@@ -247,7 +247,7 @@ export class Torrent extends EventTarget {
     return this.fields.uploaded_ever;
   }
   getWebseedsSendingToUs() {
-    return this.fields.webseedsSendingToUs;
+    return this.fields.webseeds_sending_to_us;
   }
   isFinished() {
     return this.fields.is_finished;
@@ -625,7 +625,7 @@ Torrent.Fields.Stats = [
   'download_dir',
   'uploaded_ever',
   'upload_ratio',
-  'webseedsSendingToUs',
+  'webseeds_sending_to_us',
 ];
 
 // fields used by the inspector which only need to be loaded once
