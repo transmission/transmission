@@ -804,7 +804,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_upload_limit_camel:
     case TR_KEY_upload_limited:
     case TR_KEY_upload_limited_camel:
-    case TR_KEY_uploadRatio:
+    case TR_KEY_upload_ratio:
+    case TR_KEY_upload_ratio_camel:
     case TR_KEY_uploaded_ever:
     case TR_KEY_uploaded_ever_camel:
     case TR_KEY_wanted:
@@ -1013,7 +1014,9 @@ namespace make_torrent_field_helpers
     case TR_KEY_upload_limited:
     case TR_KEY_upload_limited_camel:
         return tor.uses_speed_limit(TR_UP);
-    case TR_KEY_uploadRatio: return st.ratio;
+    case TR_KEY_upload_ratio:
+    case TR_KEY_upload_ratio_camel:
+        return st.ratio;
     case TR_KEY_uploaded_ever:
     case TR_KEY_uploaded_ever_camel:
         return st.uploadedEver;
