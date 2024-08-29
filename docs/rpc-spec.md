@@ -302,7 +302,7 @@ The 'source' column here corresponds to the data structure there.
 | `bytes_completed` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
-| `beginPiece` | number | tr_file_view
+| `begin_piece` | number | tr_file_view
 | `endPiece` | number | tr_file_view
 
 
@@ -1033,6 +1033,6 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 |:---|:---
 | `torrent_get` | new arg `sequential_download`
 | `torrent_set` | new arg `sequential_download`
-| `torrent_get` | new arg `files.beginPiece`
+| `torrent_get` | new arg `files.begin_piece`
 | `torrent_get` | new arg `files.endPiece`
 | `port-test` | new arg `ipProtocol`
