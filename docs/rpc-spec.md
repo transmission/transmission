@@ -323,7 +323,7 @@ The 'source' column here corresponds to the data structure there.
 | `client_is_interested` | boolean    | tr_peer_stat
 | `client_name`          | string     | tr_peer_stat
 | `flag_str`             | string     | tr_peer_stat
-| `isDownloadingFrom`    | boolean    | tr_peer_stat
+| `is_downloading_from`  | boolean    | tr_peer_stat
 | `isEncrypted`          | boolean    | tr_peer_stat
 | `isIncoming`           | boolean    | tr_peer_stat
 | `isUploadingTo`        | boolean    | tr_peer_stat
