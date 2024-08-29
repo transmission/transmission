@@ -611,7 +611,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_address, peer.addr);
         peer_map.try_emplace(TR_KEY_client_is_choked, peer.clientIsChoked);
         peer_map.try_emplace(TR_KEY_client_is_choked_camel, peer.clientIsChoked);
-        peer_map.try_emplace(TR_KEY_clientIsInterested, peer.clientIsInterested);
+        peer_map.try_emplace(TR_KEY_client_is_interested, peer.clientIsInterested);
+        peer_map.try_emplace(TR_KEY_client_is_interested_camel, peer.clientIsInterested);
         peer_map.try_emplace(TR_KEY_client_name, peer.client);
         peer_map.try_emplace(TR_KEY_client_name_camel, peer.client);
         peer_map.try_emplace(TR_KEY_peer_id, tr_base64_encode(std::string_view{ peer.peer_id.data(), peer.peer_id.size() }));
