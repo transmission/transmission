@@ -303,7 +303,7 @@ The 'source' column here corresponds to the data structure there.
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
 | `begin_piece` | number | tr_file_view
-| `endPiece` | number | tr_file_view
+| `end_piece` | number | tr_file_view
 
 
 `file_stats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
@@ -1034,5 +1034,5 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent_get` | new arg `sequential_download`
 | `torrent_set` | new arg `sequential_download`
 | `torrent_get` | new arg `files.begin_piece`
-| `torrent_get` | new arg `files.endPiece`
+| `torrent_get` | new arg `files.end_piece`
 | `port-test` | new arg `ipProtocol`
