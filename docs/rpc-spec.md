@@ -319,9 +319,9 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `address`            | string     | tr_peer_stat
-| `clientName`         | string     | tr_peer_stat
 | `clientIsChoked`     | boolean    | tr_peer_stat
 | `clientIsInterested` | boolean    | tr_peer_stat
+| `client_name`        | string     | tr_peer_stat
 | `flagStr`            | string     | tr_peer_stat
 | `isDownloadingFrom`  | boolean    | tr_peer_stat
 | `isEncrypted`        | boolean    | tr_peer_stat
