@@ -339,7 +339,7 @@ The 'source' column here corresponds to the data structure there.
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `fromCache`    | number     | tr_stat
+| `from_cache`   | number     | tr_stat
 | `fromDht`      | number     | tr_stat
 | `fromIncoming` | number     | tr_stat
 | `fromLpd`      | number     | tr_stat
