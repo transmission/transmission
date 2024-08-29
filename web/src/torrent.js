@@ -241,7 +241,7 @@ export class Torrent extends EventTarget {
     return this.fields.rate_upload;
   }
   getUploadRatio() {
-    return this.fields.uploadRatio;
+    return this.fields.upload_ratio;
   }
   getUploadedEver() {
     return this.fields.uploaded_ever;
@@ -624,7 +624,7 @@ Torrent.Fields.Stats = [
   'trackers',
   'download_dir',
   'uploaded_ever',
-  'uploadRatio',
+  'upload_ratio',
   'webseedsSendingToUs',
 ];
 
