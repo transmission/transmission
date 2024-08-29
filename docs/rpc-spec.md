@@ -333,7 +333,7 @@ The 'source' column here corresponds to the data structure there.
 | `port`                 | number     | tr_peer_stat
 | `progress`             | double     | tr_peer_stat
 | `rate_to_client` (B/s) | number     | tr_peer_stat
-| `rateToPeer` (B/s)     | number     | tr_peer_stat
+| `rate_to_peer` (B/s)   | number     | tr_peer_stat
 
 `peers_from`: an object containing:
 
