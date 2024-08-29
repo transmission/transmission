@@ -329,7 +329,7 @@ The 'source' column here corresponds to the data structure there.
 | `is_uploading_to`      | boolean    | tr_peer_stat
 | `is_utp`               | boolean    | tr_peer_stat
 | `peer_is_choked`       | boolean    | tr_peer_stat
-| `peerIsInterested`     | boolean    | tr_peer_stat
+| `peer_is_interested`   | boolean    | tr_peer_stat
 | `port`                 | number     | tr_peer_stat
 | `progress`             | double     | tr_peer_stat
 | `rateToClient` (B/s)   | number     | tr_peer_stat
