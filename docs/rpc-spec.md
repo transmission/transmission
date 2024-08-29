@@ -326,7 +326,7 @@ The 'source' column here corresponds to the data structure there.
 | `is_downloading_from`  | boolean    | tr_peer_stat
 | `is_encrypted`         | boolean    | tr_peer_stat
 | `is_incoming`          | boolean    | tr_peer_stat
-| `isUploadingTo`        | boolean    | tr_peer_stat
+| `is_uploading_to`      | boolean    | tr_peer_stat
 | `isUTP`                | boolean    | tr_peer_stat
 | `peerIsChoked`         | boolean    | tr_peer_stat
 | `peerIsInterested`     | boolean    | tr_peer_stat
