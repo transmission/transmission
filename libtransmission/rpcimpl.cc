@@ -389,7 +389,8 @@ void notifyBatchQueueChange(tr_session* session, std::vector<tr_torrent*> const&
     tr_variant::Map const& args_in,
     tr_variant::Map& /*args_out*/)
 {
-    auto const delete_flag = args_in.value_if<bool>(TR_KEY_delete_local_data).value_or(false);
+    auto const delete_flag = args_in.value_if<bool>({ TR_KEY_delete_local_data, TR_KEY_delete_local_data_kebab })
+                                 .value_or(false);
     auto const type = delete_flag ? TR_RPC_TORRENT_TRASHING : TR_RPC_TORRENT_REMOVING;
 
     for (auto* tor : getTorrents(session, args_in))
