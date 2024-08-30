@@ -279,6 +279,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "name"sv,
     "nextAnnounceTime"sv,
     "nextScrapeTime"sv,
+    "next_announce_time"sv,
     "nodes"sv,
     "nodes6"sv,
     "open-dialog-dir"sv,
@@ -673,6 +674,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_manual_announce_time_camel: return TR_KEY_manual_announce_time;
     case TR_KEY_max_connected_peers_camel: return TR_KEY_max_connected_peers;
     case TR_KEY_metadata_percent_complete_camel: return TR_KEY_metadata_percent_complete;
+    case TR_KEY_next_announce_time_camel: return TR_KEY_next_announce_time;
     case TR_KEY_peer_is_choked_camel: return TR_KEY_peer_is_choked;
     case TR_KEY_peer_is_interested_camel: return TR_KEY_peer_is_interested;
     case TR_KEY_peer_limit_kebab: return TR_KEY_peer_limit;
