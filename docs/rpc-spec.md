@@ -381,7 +381,7 @@ The 'source' column here corresponds to the data structure there.
 |:--|:--|:--
 | `announce`                | string     | tr_tracker_view
 | `announce_state`          | number     | tr_tracker_view
-| `downloadCount`           | number     | tr_tracker_view
+| `download_count`          | number     | tr_tracker_view
 | `hasAnnounced`            | boolean    | tr_tracker_view
 | `hasScraped`              | boolean    | tr_tracker_view
 | `host`                    | string     | tr_tracker_view
