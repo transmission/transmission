@@ -114,7 +114,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-rename-path',
+      method: 'torrent_rename_path',
       params: {
         ids: torrentIds,
         name: newname,

@@ -1598,7 +1598,7 @@ void torrentRenamePath(
     auto const torrents = getTorrents(session, args_in);
     if (std::size(torrents) != 1U)
     {
-        done_cb(idle_data, Error::INVALID_PARAMS, "torrent-rename-path requires 1 torrent"sv);
+        done_cb(idle_data, Error::INVALID_PARAMS, "torrent_rename_path requires 1 torrent"sv);
         return;
     }
 
@@ -2692,7 +2692,7 @@ auto constexpr AsyncHandlers = std::array<std::tuple<std::string_view, AsyncHand
     { "blocklist-update"sv, blocklistUpdate, true },
     { "port-test"sv, portTest, false },
     { "torrent_add"sv, torrentAdd, true },
-    { "torrent-rename-path"sv, torrentRenamePath, true },
+    { "torrent_rename_path"sv, torrentRenamePath, true },
 } };
 
 void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
