@@ -391,7 +391,7 @@ The 'source' column here corresponds to the data structure there.
 | `last_announce_result`     | string     | tr_tracker_view
 | `last_announce_start_time` | number     | tr_tracker_view
 | `last_announce_succeeded`  | boolean    | tr_tracker_view
-| `lastAnnounceTime`         | number     | tr_tracker_view
+| `last_announce_time`       | number     | tr_tracker_view
 | `lastAnnounceTimedOut`     | boolean    | tr_tracker_view
 | `lastScrapeResult`         | string     | tr_tracker_view
 | `lastScrapeStartTime`      | number     | tr_tracker_view
