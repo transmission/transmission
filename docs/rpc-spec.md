@@ -345,7 +345,7 @@ The 'source' column here corresponds to the data structure there.
 | `from_lpd`      | number     | tr_stat
 | `from_ltep`     | number     | tr_stat
 | `from_pex`      | number     | tr_stat
-| `fromTracker`   | number     | tr_stat
+| `from_tracker`  | number     | tr_stat
 
 
 `pieces`: A bitfield holding `piece_count` flags which are set to 'true' if we have the piece matching that position. JSON doesn't allow raw binary data, so this is a base64-encoded string. (Source: tr_torrent)
