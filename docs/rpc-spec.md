@@ -383,7 +383,7 @@ The 'source' column here corresponds to the data structure there.
 | `announce_state`          | number     | tr_tracker_view
 | `download_count`          | number     | tr_tracker_view
 | `has_announced`           | boolean    | tr_tracker_view
-| `hasScraped`              | boolean    | tr_tracker_view
+| `has_scraped`             | boolean    | tr_tracker_view
 | `host`                    | string     | tr_tracker_view
 | `id`                      | number     | tr_tracker_view
 | `isBackup`                | boolean    | tr_tracker_view
