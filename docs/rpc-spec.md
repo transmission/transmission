@@ -388,7 +388,7 @@ The 'source' column here corresponds to the data structure there.
 | `id`                       | number     | tr_tracker_view
 | `is_backup`                | boolean    | tr_tracker_view
 | `last_announce_peer_count` | number     | tr_tracker_view
-| `lastAnnounceResult`       | string     | tr_tracker_view
+| `last_announce_result`     | string     | tr_tracker_view
 | `lastAnnounceStartTime`    | number     | tr_tracker_view
 | `lastAnnounceSucceeded`    | boolean    | tr_tracker_view
 | `lastAnnounceTime`         | number     | tr_tracker_view
