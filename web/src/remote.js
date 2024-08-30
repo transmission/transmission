@@ -245,7 +245,7 @@ export class Remote {
       jsonrpc: RPC._JsonRpcVersion,
       method: 'torrent_remove',
       params: {
-        'delete-local-data': trash,
+        delete_local_data: trash,
         ids: [],
       },
     };
