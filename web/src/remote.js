@@ -243,7 +243,7 @@ export class Remote {
   removeTorrents(torrents, trash) {
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-remove',
+      method: 'torrent_remove',
       params: {
         'delete-local-data': trash,
         ids: [],
