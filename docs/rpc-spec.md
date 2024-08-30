@@ -403,7 +403,7 @@ The 'source' column here corresponds to the data structure there.
 | `next_scrape_time`         | number     | tr_tracker_view
 | `scrape`                   | string     | tr_tracker_view
 | `scrape_state`             | number     | tr_tracker_view
-| `seederCount`              | number     | tr_tracker_view
+| `seeder_count`             | number     | tr_tracker_view
 | `sitename`                 | string     | tr_tracker_view
 | `tier`                     | number     | tr_tracker_view
 
