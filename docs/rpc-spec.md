@@ -512,7 +512,7 @@ The format of the `cookies` should be `NAME=CONTENTS`, where `NAME` is the cooki
 
 Response parameters:
 
-* On success, a `torrent-added` object in the form of one of 3.3's torrent objects with the fields for `id`, `name`, and `hash_string`.
+* On success, a `torrent_added` object in the form of one of 3.3's torrent objects with the fields for `id`, `name`, and `hash_string`.
 
 * When attempting to add a duplicate torrent, a `torrent-duplicate` object in the same form is returned, but the response's `result` value is still `success`.
 
@@ -1073,7 +1073,7 @@ Transmission 4.1.0 (`rpc-version-semver` 6.0.0, `rpc-version`: 18)
 | `torrent_add` | new arg `sequential_download`
 | `torrent_get` | new arg `sequential_download`
 | `torrent_set` | new arg `sequential_download`
-| `torrent-add` | new arg `sequential_download_from_piece`
+| `torrent_add` | new arg `sequential_download_from_piece`
 | `torrent_get` | new arg `sequential_download_from_piece`
 | `torrent_set` | new arg `sequential_download_from_piece`
 | `torrent_get` | new arg `files.begin_piece`
