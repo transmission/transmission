@@ -343,7 +343,7 @@ The 'source' column here corresponds to the data structure there.
 | `from_dht`      | number     | tr_stat
 | `from_incoming` | number     | tr_stat
 | `from_lpd`      | number     | tr_stat
-| `fromLtep`      | number     | tr_stat
+| `from_ltep`     | number     | tr_stat
 | `fromPex`       | number     | tr_stat
 | `fromTracker`   | number     | tr_stat
 
