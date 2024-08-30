@@ -398,7 +398,7 @@ The 'source' column here corresponds to the data structure there.
 | `last_scrape_succeeded`    | boolean    | tr_tracker_view
 | `last_scrape_time`         | number     | tr_tracker_view
 | `last_scrape_timed_out`    | boolean    | tr_tracker_view
-| `leecherCount`             | number     | tr_tracker_view
+| `leecher_count`            | number     | tr_tracker_view
 | `nextAnnounceTime`         | number     | tr_tracker_view
 | `nextScrapeTime`           | number     | tr_tracker_view
 | `scrape`                   | string     | tr_tracker_view
