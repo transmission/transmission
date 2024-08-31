@@ -79,6 +79,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_client_name,
     TR_KEY_code,
     TR_KEY_comment,
+    TR_KEY_compact_view_kebab,
     TR_KEY_compact_view,
     TR_KEY_complete,
     TR_KEY_config_dir,
