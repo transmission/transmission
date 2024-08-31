@@ -567,7 +567,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `alt_speed_time_day` | number | what day(s) to turn on alt speeds (look at tr_sched_day)
 | `alt-speed-time-enabled` | boolean | true means the scheduled on/off times are used
 | `alt_speed_time_end` | number | when to turn off alt speeds (units: same)
-| `alt-speed-up` | number | max global upload speed (kB/s)
+| `alt_speed_up` | number | max global upload speed (kB/s)
 | `blocklist-enabled` | boolean | true means enabled
 | `blocklist-size` | number | number of rules in the blocklist
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
