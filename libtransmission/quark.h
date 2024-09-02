@@ -91,6 +91,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_compact_view_kebab,
     TR_KEY_compact_view,
     TR_KEY_complete,
+    TR_KEY_config_dir_kebab,
     TR_KEY_config_dir,
     TR_KEY_cookies,
     TR_KEY_corrupt,
