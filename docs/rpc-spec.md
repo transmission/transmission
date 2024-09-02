@@ -572,7 +572,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist_size` | number | number of rules in the blocklist
 | `blocklist_url` | string | location of the blocklist to use for `blocklist-update`
 | `cache_size_mb` | number | maximum size of the disk cache (MiB). Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
-| `config-dir` | string | location of transmission's configuration directory
+| `config_dir` | string | location of transmission's configuration directory
 | `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `dht-enabled` | boolean | true means allow DHT in public torrents
 | `download_dir` | string | default path to download torrents
@@ -648,7 +648,7 @@ Request parameters: the mutable properties from 4.1's parameters, i.e. all of th
 except:
 
 * `blocklist_size`
-* `config-dir`
+* `config_dir`
 * `rpc-version-minimum`,
 * `rpc-version-semver`
 * `rpc-version`
