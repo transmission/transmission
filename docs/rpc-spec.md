@@ -613,8 +613,8 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `session_id` | string | the current `X-Transmission-Session-Id` value
 | `speed_limit_down` | number | max global download speed (kB/s)
 | `speed_limit_down_enabled` | boolean | true means enabled
-| `speed-limit-up-enabled` | boolean | true means enabled
 | `speed-limit-up` | number | max global upload speed (kB/s)
+| `speed_limit_up_enabled` | boolean | true means enabled
 | `start-added-torrents` | boolean | true means added torrents will be started right away
 | `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
@@ -777,8 +777,8 @@ Request parameters:
 | `name` | string | Bandwidth group name
 | `speed_limit_down` | number | max global download speed (kB/s)
 | `speed_limit_down_enabled` | boolean | true means enabled
-| `speed-limit-up-enabled` | boolean | true means enabled
 | `speed-limit-up` | number | max global upload speed (kB/s)
+| `speed_limit_up_enabled` | boolean | true means enabled
 
 Response parameters: none
 
@@ -804,8 +804,8 @@ A bandwidth group description object has:
 | `name` | string | Bandwidth group name
 | `speed_limit_down` | number | max global download speed (kB/s)
 | `speed_limit_down_enabled` | boolean | true means enabled
-| `speed-limit-up-enabled` | boolean | true means enabled
 | `speed-limit-up` | number | max global upload speed (kB/s)
+| `speed_limit_up_enabled` | boolean | true means enabled
 
 ## 5 Protocol versions
 This section lists the changes that have been made to the RPC protocol.
