@@ -2296,7 +2296,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetPortForwardingEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_rename_partial_files))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_rename_partial_files, TR_KEY_rename_partial_files_kebab }); val)
     {
         tr_sessionSetIncompleteFileNamingEnabled(session, *val);
     }
@@ -2592,7 +2592,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_queue_stalled_minutes:
     case TR_KEY_queue_stalled_minutes_kebab:
         return session.queueStalledMinutes();
-    case TR_KEY_rename_partial_files: return session.isIncompleteFileNamingEnabled();
+    case TR_KEY_rename_partial_files:
+    case TR_KEY_rename_partial_files_kebab:
+        return session.isIncompleteFileNamingEnabled();
     case TR_KEY_reqq: return session.reqq();
     case TR_KEY_rpc_version: return RpcVersion;
     case TR_KEY_rpc_version_minimum: return RpcVersionMin;
