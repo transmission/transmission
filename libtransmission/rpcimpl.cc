@@ -2021,6 +2021,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled_kebab, limits.down_limited);
             group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_up_enabled, limits.up_limited);
+            group_map.try_emplace(TR_KEY_speed_limit_up_enabled_kebab, limits.up_limited);
             groups_vec.emplace_back(std::move(group_map));
         }
     }
@@ -2051,7 +2052,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         limits.down_limited = *val;
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_up_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_speed_limit_up_enabled, TR_KEY_speed_limit_up_enabled_kebab }); val)
     {
         limits.up_limited = *val;
     }
@@ -2314,7 +2315,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_up_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_speed_limit_up_enabled, TR_KEY_speed_limit_up_enabled_kebab }); val)
     {
         tr_sessionLimitSpeed(session, TR_UP, *val);
     }
@@ -2589,7 +2590,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_speed_limit_down_enabled_kebab:
         return session.is_speed_limited(TR_DOWN);
     case TR_KEY_speed_limit_up: return session.speed_limit(TR_UP).count(Speed::Units::KByps);
-    case TR_KEY_speed_limit_up_enabled: return session.is_speed_limited(TR_UP);
+    case TR_KEY_speed_limit_up_enabled:
+    case TR_KEY_speed_limit_up_enabled_kebab:
+        return session.is_speed_limited(TR_UP);
     case TR_KEY_start_added_torrents: return !session.shouldPauseAddedTorrents();
     case TR_KEY_tcp_enabled: return session.allowsTCP();
     case TR_KEY_trash_original_torrent_files: return session.shouldDeleteSource();
