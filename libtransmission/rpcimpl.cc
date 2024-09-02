@@ -2600,7 +2600,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_rpc_version_minimum:
     case TR_KEY_rpc_version_minimum_kebab:
         return RpcVersionMin;
-    case TR_KEY_rpc_version_semver: return RpcVersionSemver;
+    case TR_KEY_rpc_version_semver:
+    case TR_KEY_rpc_version_semver_kebab:
+        return RpcVersionSemver;
     case TR_KEY_script_torrent_added_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);
     case TR_KEY_script_torrent_added_filename: return session.script(TR_SCRIPT_ON_TORRENT_ADDED);
     case TR_KEY_script_torrent_done_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_DONE);
