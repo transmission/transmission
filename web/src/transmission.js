@@ -741,7 +741,7 @@ export class Transmission extends EventTarget {
   }
 
   shouldAddedTorrentsStart() {
-    return this.session_properties['start-added-torrents'];
+    return this.session_properties.start_added_torrents;
   }
 
   _drop(event_) {
