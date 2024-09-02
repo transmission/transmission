@@ -2193,7 +2193,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionUseAltSpeedTime(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_blocklist_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab }); val)
     {
         session->set_blocklist_enabled(*val);
     }
@@ -2514,7 +2514,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return tr_sessionGetAltSpeed_KBps(&session, TR_UP);
     case TR_KEY_anti_brute_force_enabled: return tr_sessionGetAntiBruteForceEnabled(&session);
     case TR_KEY_anti_brute_force_threshold: return tr_sessionGetAntiBruteForceThreshold(&session);
-    case TR_KEY_blocklist_enabled: return session.blocklist_enabled();
+    case TR_KEY_blocklist_enabled:
+    case TR_KEY_blocklist_enabled_kebab:
+        return session.blocklist_enabled();
     case TR_KEY_blocklist_size: return tr_blocklistGetRuleCount(&session);
     case TR_KEY_blocklist_url: return session.blocklistUrl();
     case TR_KEY_cache_size_mb: return tr_sessionGetCacheLimit_MB(&session);
