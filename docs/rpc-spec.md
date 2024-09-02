@@ -618,7 +618,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `start_added_torrents` | boolean | true means added torrents will be started right away
 | `trash_original_torrent_files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
-| `utp-enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
+| `utp_enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
 | `version` | string | long version string `$version ($revision)`
 
 
@@ -1083,5 +1083,5 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `torrent_get` | :warning: **DEPRECATED** `manual_announce_time`, it never worked
 | `session-get` | new arg `preferred_transports`
 | `session-set` | new arg `preferred_transports`
-| `session-get` | :warning: **DEPRECATED** `utp-enabled`. Use `preferred_transports` instead.
-| `session-set` | :warning: **DEPRECATED** `utp-enabled`. Use `preferred_transports` instead.
+| `session-get` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
+| `session-set` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.

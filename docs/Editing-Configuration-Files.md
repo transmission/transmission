@@ -105,7 +105,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **tcp-enabled:** Boolean (default = true) **DEPRECATED**, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
  * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
  * **torrent_complete_verify_enabled**: Boolean (default = false) Whether to verify the torrent once it finishes downloading.
- * **utp-enabled:** Boolean (default = true) ***DEPRECATED***, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
+ * **utp_enabled:** Boolean (default = true) ***DEPRECATED***, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
  * **preferred_transports:** String[] ("utp" = [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol), "tcp" = TCP; default = ["utp", "tcp"]) List your preference of transport protocols in the order of preferred-first. Omitting the transport protocol from the list will disable it.
    _Note: Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds._
  * **sleep-per-seconds-during-verify:** Number (default = 100) Controls the duration in milliseconds for which the verification process will pause to reduce disk I/O pressure.

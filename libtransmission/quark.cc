@@ -581,6 +581,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "ut_metadata"sv,
     "ut_pex"sv,
     "utp-enabled"sv,
+    "utp_enabled"sv,
     "v"sv,
     "version"sv,
     "wanted"sv,
@@ -840,6 +841,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_upload_limited_camel: return TR_KEY_upload_limited;
     case TR_KEY_upload_ratio_camel: return TR_KEY_upload_ratio;
     case TR_KEY_uploaded_ever_camel: return TR_KEY_uploaded_ever;
+    case TR_KEY_utp_enabled_kebab: return TR_KEY_utp_enabled;
     case TR_KEY_webseeds_sending_to_us_camel: return TR_KEY_webseeds_sending_to_us;
     default: return q;
     }

@@ -582,6 +582,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_ut_holepunch,
     TR_KEY_ut_metadata,
     TR_KEY_ut_pex,
+    TR_KEY_utp_enabled_kebab,
     TR_KEY_utp_enabled,
     TR_KEY_v,
     TR_KEY_version,
