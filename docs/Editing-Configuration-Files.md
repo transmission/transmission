@@ -95,7 +95,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **pidfile:** String Path to file in which daemon PID will be stored (_transmission-daemon only_)
  * **proxy_url:** String? (default = null) Proxy for HTTP(S) requests (for example, requests to tracker). Format `[scheme]://[host]:[port]`, where `scheme` is one of: `http`, `https`, `socks4`, `socks4h`, `socks5`, `socks5h`. If null, Transmission respects the CURL environment variables. If empty string, no proxy is used. For more information see [curl proxy documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
- * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page.
+ * **script_torrent_added_enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page.
  * **script-torrent-added-filename:** String (default = "") Path to script.
  * **script-torrent-done-enabled:** Boolean (default = false) Run a script when a torrent is done downloading. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page.
  * **script-torrent-done-filename:** String (default = "") Path to script.
