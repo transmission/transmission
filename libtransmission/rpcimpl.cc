@@ -2260,7 +2260,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->set_reqq(*val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_pex_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_pex_enabled, TR_KEY_pex_enabled_kebab }); val)
     {
         tr_sessionSetPexEnabled(session, *val);
     }
@@ -2579,7 +2579,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_peer_port_random_on_start:
     case TR_KEY_peer_port_random_on_start_kebab:
         return session.isPortRandom();
-    case TR_KEY_pex_enabled: return session.allows_pex();
+    case TR_KEY_pex_enabled:
+    case TR_KEY_pex_enabled_kebab:
+        return session.allows_pex();
     case TR_KEY_port_forwarding_enabled: return tr_sessionIsPortForwardingEnabled(&session);
     case TR_KEY_preferred_transports: return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled: return session.queueStalledEnabled();
