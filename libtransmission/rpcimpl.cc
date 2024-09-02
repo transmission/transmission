@@ -2306,7 +2306,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetRatioLimit(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_seedRatioLimited))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_seed_ratio_limited, TR_KEY_seed_ratio_limited_camel }); val)
     {
         tr_sessionSetRatioLimited(session, *val);
     }
@@ -2626,7 +2626,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_seed_ratio_limit:
     case TR_KEY_seed_ratio_limit_camel:
         return session.desiredRatio();
-    case TR_KEY_seedRatioLimited: return session.isRatioLimited();
+    case TR_KEY_seed_ratio_limited:
+    case TR_KEY_seed_ratio_limited_camel:
+        return session.isRatioLimited();
     case TR_KEY_seed_queue_enabled:
     case TR_KEY_seed_queue_enabled_kebab:
         return session.queueEnabled(TR_UP);
