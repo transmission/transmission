@@ -78,6 +78,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_bytes_completed,
     TR_KEY_bytes_to_client,
     TR_KEY_bytes_to_peer,
+    TR_KEY_cache_size_mb_kebab,
     TR_KEY_cache_size_mb,
     TR_KEY_client_is_choked_camel,
     TR_KEY_client_is_interested_camel,
