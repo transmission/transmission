@@ -2275,7 +2275,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetUTPEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_lpd_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_lpd_enabled, TR_KEY_lpd_enabled_kebab }); val)
     {
         tr_sessionSetLPDEnabled(session, *val);
     }
@@ -2563,7 +2563,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_incomplete_dir_enabled:
     case TR_KEY_incomplete_dir_enabled_kebab:
         return session.useIncompleteDir();
-    case TR_KEY_lpd_enabled: return session.allowsLPD();
+    case TR_KEY_lpd_enabled:
+    case TR_KEY_lpd_enabled_kebab:
+        return session.allowsLPD();
     case TR_KEY_peer_limit_global: return session.peerLimit();
     case TR_KEY_peer_limit_per_torrent: return session.peerLimitPerTorrent();
     case TR_KEY_peer_port: return session.advertisedPeerPort().host();
