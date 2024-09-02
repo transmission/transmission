@@ -77,6 +77,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "bytes_to_client"sv,
     "bytes_to_peer"sv,
     "cache-size-mb"sv,
+    "cache_size_mb"sv,
     "clientIsChoked"sv,
     "clientIsInterested"sv,
     "clientName"sv,
@@ -642,6 +643,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_blocklist_size_kebab: return TR_KEY_blocklist_size;
     case TR_KEY_blocklist_url_kebab: return TR_KEY_blocklist_url;
     case TR_KEY_bytes_completed_camel: return TR_KEY_bytes_completed;
+    case TR_KEY_cache_size_mb_kebab: return TR_KEY_cache_size_mb;
     case TR_KEY_client_is_choked_camel: return TR_KEY_client_is_choked;
     case TR_KEY_client_is_interested_camel: return TR_KEY_client_is_interested;
     case TR_KEY_client_name_camel: return TR_KEY_client_name;
