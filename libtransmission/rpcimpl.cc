@@ -2620,7 +2620,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_script_torrent_done_seeding_enabled:
     case TR_KEY_script_torrent_done_seeding_enabled_kebab:
         return session.useScript(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
-    case TR_KEY_script_torrent_done_seeding_filename: return session.script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
+    case TR_KEY_script_torrent_done_seeding_filename:
+    case TR_KEY_script_torrent_done_seeding_filename_kebab:
+        return session.script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
     case TR_KEY_seed_ratio_limit:
     case TR_KEY_seed_ratio_limit_camel:
         return session.desiredRatio();
