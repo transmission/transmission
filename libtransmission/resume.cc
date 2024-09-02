@@ -608,6 +608,27 @@ tr_resume::fields_t loadProgress(tr_variant* dict, tr_torrent* tor, tr_torrent::
 
 // ---
 
+void savePeerId(tr_variant* dict, tr_torrent const* tor)
+{
+    tr_variantDictAddStrView(dict, TR_KEY_peer_id, std::string_view{ std::data(tor->peer_id()) });
+}
+
+tr_resume::fields_t loadPeerId(tr_variant* dict, tr_torrent* tor)
+{
+    if (std::string_view sv; tr_variantDictFindStrView(dict, TR_KEY_peer_id, &sv) && !std::empty(sv))
+    {
+        tr_peer_id_t id;
+
+        std::copy(std::begin(sv), std::end(sv), std::begin(id));
+        tor->set_peer_id(id);
+        return tr_resume::PeerId;
+    }
+
+    return {};
+}
+
+// ---
+
 tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& helper, tr_resume::fields_t fields_to_load)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -784,6 +805,11 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         fields_loaded |= loadGroup(&top, tor);
     }
 
+    if ((fields_to_load & tr_resume::PeerId) != 0)
+    {
+        fields_loaded |= loadPeerId(&top, tor);
+    }
+
     return fields_loaded;
 }
 
@@ -905,6 +931,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     saveName(&top, tor);
     saveLabels(&top, tor);
     saveGroup(&top, tor);
+    savePeerId(&top, tor);
 
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(top, tor->resume_file()))

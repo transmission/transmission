@@ -916,6 +916,11 @@ struct tr_torrent
         return peer_id_;
     }
 
+    constexpr void set_peer_id(tr_peer_id_t const& id) noexcept
+    {
+        peer_id_ = id;
+    }
+
     void on_block_received(tr_block_index_t block);
 
     [[nodiscard]] constexpr auto& error() noexcept
