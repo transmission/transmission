@@ -703,6 +703,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_seed_ratio_limit,
         TR_KEY_seed_ratio_limited,
         TR_KEY_sequential_download,
+        TR_KEY_session_id_kebab,
         TR_KEY_session_id,
         TR_KEY_speed_limit_down,
         TR_KEY_speed_limit_down_enabled,

@@ -2636,7 +2636,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_seed_queue_size_kebab:
         return session.queueSize(TR_UP);
     case TR_KEY_sequential_download: return session.sequential_download();
-    case TR_KEY_session_id: return session.sessionId();
+    case TR_KEY_session_id:
+    case TR_KEY_session_id_kebab:
+        return session.sessionId();
     case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_down_enabled: return session.is_speed_limited(TR_DOWN);
     case TR_KEY_speed_limit_up: return session.speed_limit(TR_UP).count(Speed::Units::KByps);
