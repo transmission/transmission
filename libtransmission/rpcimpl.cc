@@ -2339,7 +2339,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        if (auto const val = args_in.value_if<bool>(enabled_key))
+        if (auto const val = args_in.value_if<bool>({ tr_quark_convert(enabled_key), enabled_key }); val)
         {
             session->useScript(script, *val);
         }
@@ -2605,7 +2605,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_rpc_version_semver:
     case TR_KEY_rpc_version_semver_kebab:
         return RpcVersionSemver;
-    case TR_KEY_script_torrent_added_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);
+    case TR_KEY_script_torrent_added_enabled:
+    case TR_KEY_script_torrent_added_enabled_kebab:
+        return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);
     case TR_KEY_script_torrent_added_filename: return session.script(TR_SCRIPT_ON_TORRENT_ADDED);
     case TR_KEY_script_torrent_done_enabled: return session.useScript(TR_SCRIPT_ON_TORRENT_DONE);
     case TR_KEY_script_torrent_done_filename: return session.script(TR_SCRIPT_ON_TORRENT_DONE);
