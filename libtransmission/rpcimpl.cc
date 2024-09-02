@@ -2265,7 +2265,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetPexEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_dht_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab }); val)
     {
         tr_sessionSetDHTEnabled(session, *val);
     }
@@ -2534,7 +2534,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_default_trackers:
     case TR_KEY_default_trackers_kebab:
         return session.defaultTrackersStr();
-    case TR_KEY_dht_enabled: return session.allowsDHT();
+    case TR_KEY_dht_enabled:
+    case TR_KEY_dht_enabled_kebab:
+        return session.allowsDHT();
     case TR_KEY_download_dir:
     case TR_KEY_download_dir_kebab:
         return session.downloadDir();
