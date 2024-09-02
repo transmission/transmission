@@ -665,7 +665,8 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0)
     {
-        if (auto sv = map.value_if<std::string_view>(TR_KEY_incomplete_dir); sv && !std::empty(*sv))
+        if (auto sv = map.value_if<std::string_view>({ TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab });
+            sv && !std::empty(*sv))
         {
             helper.load_incomplete_dir(*sv);
             fields_loaded |= tr_resume::IncompleteDir;
