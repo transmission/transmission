@@ -38,7 +38,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
 ```json
 {
     "rpc-enabled": true,
-    "peer-port": 51413,
+    "peer_port": 51413,
     "rpc-whitelist": "127.0.0.1,192.168.*.*"
 }
 ```
@@ -121,7 +121,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **sequential_download** Boolean (default = false) Enable sequential download by default when adding torrents.
 
 #### Peer Port
- * **peer-port:** Number (default = 51413)
+ * **peer_port:** Number (default = 51413)
  * **peer-port-random-high:** Number (default = 65535)
  * **peer-port-random-low:** Number (default = 1024)
  * **peer_port_random_on_start:** Boolean (default = false)
