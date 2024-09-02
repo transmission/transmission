@@ -2315,7 +2315,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetIdleLimit(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_idle_seeding_limit_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_idle_seeding_limit_enabled, TR_KEY_idle_seeding_limit_enabled_kebab });
+        val)
     {
         tr_sessionSetIdleLimited(session, *val);
     }
@@ -2551,7 +2552,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return session.queueSize(TR_DOWN);
     case TR_KEY_encryption: return getEncryptionModeString(tr_sessionGetEncryption(&session));
     case TR_KEY_idle_seeding_limit: return session.idleLimitMinutes();
-    case TR_KEY_idle_seeding_limit_enabled: return session.isIdleLimited();
+    case TR_KEY_idle_seeding_limit_enabled:
+    case TR_KEY_idle_seeding_limit_enabled_kebab:
+        return session.isIdleLimited();
     case TR_KEY_incomplete_dir: return session.incompleteDir();
     case TR_KEY_incomplete_dir_enabled: return session.useIncompleteDir();
     case TR_KEY_lpd_enabled: return session.allowsLPD();
