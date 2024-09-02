@@ -108,7 +108,7 @@ export class PrefsDialog extends EventTarget {
   }
 
   _onMaybePortChanged(key) {
-    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
+    if (key === 'peer_port' || key === 'port-forwarding-enabled') {
       this._checkPort();
     }
   }
@@ -673,7 +673,7 @@ export class PrefsDialog extends EventTarget {
 
     const input = document.createElement('input');
     input.type = 'number';
-    input.dataset.key = 'peer-port';
+    input.dataset.key = 'peer_port';
     input.id = makeUUID();
     label.setAttribute('for', input.id);
     root.append(input);
