@@ -2540,7 +2540,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_download_dir:
     case TR_KEY_download_dir_kebab:
         return session.downloadDir();
-    case TR_KEY_download_dir_free_space: return tr_sys_path_get_capacity(session.downloadDir()).value_or(tr_sys_path_capacity{}).free;
+    case TR_KEY_download_dir_free_space:
+    case TR_KEY_download_dir_free_space_kebab:
+        return tr_sys_path_get_capacity(session.downloadDir()).value_or(tr_sys_path_capacity{}).free;
     case TR_KEY_download_queue_enabled: return session.queueEnabled(TR_DOWN);
     case TR_KEY_download_queue_size: return session.queueSize(TR_DOWN);
     case TR_KEY_encryption: return getEncryptionModeString(tr_sessionGetEncryption(&session));
