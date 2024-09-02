@@ -610,7 +610,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `seed_ratio_limit` | double | the default seed ratio for torrents to use
 | `seed_ratio_limited` | boolean | true if `seed_ratio_limit` is honored by default
 | `sequential_download` | boolean | true means sequential download is enabled by default for added torrents
-| `session-id` | string | the current `X-Transmission-Session-Id` value
+| `session_id` | string | the current `X-Transmission-Session-Id` value
 | `speed-limit-down-enabled` | boolean | true means enabled
 | `speed-limit-down` | number | max global download speed (kB/s)
 | `speed-limit-up-enabled` | boolean | true means enabled
@@ -652,7 +652,7 @@ except:
 * `rpc_version_minimum`,
 * `rpc_version_semver`
 * `rpc_version`
-* `session-id`
+* `session_id`
 * `units`
 * `version`
 
