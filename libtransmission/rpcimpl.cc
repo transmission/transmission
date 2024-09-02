@@ -2017,6 +2017,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
+            group_map.try_emplace(TR_KEY_speed_limit_down_enabled_kebab, limits.down_limited);
             group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_up_enabled, limits.up_limited);
             groups_vec.emplace_back(std::move(group_map));
@@ -2043,7 +2044,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     auto& group = session->getBandwidthGroup(name);
     auto limits = group.get_limits();
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_down_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_speed_limit_down_enabled, TR_KEY_speed_limit_down_enabled_kebab });
+        val)
     {
         limits.down_limited = *val;
     }
@@ -2300,7 +2302,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_speed_limit_down_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_speed_limit_down_enabled, TR_KEY_speed_limit_down_enabled_kebab });
+        val)
     {
         tr_sessionLimitSpeed(session, TR_DOWN, *val);
     }
@@ -2579,7 +2582,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_session_id_kebab:
         return session.sessionId();
     case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
-    case TR_KEY_speed_limit_down_enabled: return session.is_speed_limited(TR_DOWN);
+    case TR_KEY_speed_limit_down_enabled:
+    case TR_KEY_speed_limit_down_enabled_kebab:
+        return session.is_speed_limited(TR_DOWN);
     case TR_KEY_speed_limit_up: return session.speed_limit(TR_UP).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_up_enabled: return session.is_speed_limited(TR_UP);
     case TR_KEY_start_added_torrents: return !session.shouldPauseAddedTorrents();
