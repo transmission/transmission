@@ -2066,6 +2066,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             group_map.try_emplace(TR_KEY_honors_session_limits_camel, group->are_parent_limits_honored(TR_UP));
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
+            group_map.try_emplace(TR_KEY_speed_limit_down_kebab, limits.down_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled_kebab, limits.down_limited);
             group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
@@ -2105,7 +2106,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         limits.up_limited = *val;
     }
 
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_down))
+    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab }); val)
     {
         limits.down_limit = Speed{ *val, Speed::Units::KByps };
     }
@@ -2355,7 +2356,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetDeleteSource(session, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_down))
+    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab }); val)
     {
         session->set_speed_limit(TR_DOWN, Speed{ *val, Speed::Units::KByps });
     }
@@ -2640,7 +2641,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_session_id:
     case TR_KEY_session_id_kebab:
         return session.sessionId();
-    case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
+    case TR_KEY_speed_limit_down:
+    case TR_KEY_speed_limit_down_kebab:
+        return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_down_enabled:
     case TR_KEY_speed_limit_down_enabled_kebab:
         return session.is_speed_limited(TR_DOWN);
