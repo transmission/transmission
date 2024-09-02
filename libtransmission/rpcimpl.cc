@@ -2291,7 +2291,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetPeerPort(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_port_forwarding_enabled))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_port_forwarding_enabled, TR_KEY_port_forwarding_enabled_kebab }); val)
     {
         tr_sessionSetPortForwardingEnabled(session, *val);
     }
@@ -2582,7 +2582,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_pex_enabled:
     case TR_KEY_pex_enabled_kebab:
         return session.allows_pex();
-    case TR_KEY_port_forwarding_enabled: return tr_sessionIsPortForwardingEnabled(&session);
+    case TR_KEY_port_forwarding_enabled:
+    case TR_KEY_port_forwarding_enabled_kebab:
+        return tr_sessionIsPortForwardingEnabled(&session);
     case TR_KEY_preferred_transports: return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled: return session.queueStalledEnabled();
     case TR_KEY_queue_stalled_minutes: return session.queueStalledMinutes();
