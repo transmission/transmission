@@ -2327,7 +2327,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetIdleLimited(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_start_added_torrents))
+    if (auto const val = args_in.value_if<bool>({ TR_KEY_start_added_torrents, TR_KEY_start_added_torrents_kebab }); val)
     {
         tr_sessionSetPaused(session, !*val);
     }
@@ -2657,7 +2657,9 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_speed_limit_up_enabled:
     case TR_KEY_speed_limit_up_enabled_kebab:
         return session.is_speed_limited(TR_UP);
-    case TR_KEY_start_added_torrents: return !session.shouldPauseAddedTorrents();
+    case TR_KEY_start_added_torrents:
+    case TR_KEY_start_added_torrents_kebab:
+        return !session.shouldPauseAddedTorrents();
     case TR_KEY_tcp_enabled: return session.allowsTCP();
     case TR_KEY_trash_original_torrent_files: return session.shouldDeleteSource();
     case TR_KEY_units: return values_get_units();
