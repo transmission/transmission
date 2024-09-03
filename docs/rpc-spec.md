@@ -671,7 +671,7 @@ Response parameters:
 |:--|:--|:--
 | `active_torrent_count`     | number
 | `download_speed`           | number
-| `pausedTorrentCount`       | number
+| `paused_torrent_count`     | number
 | `torrentCount`             | number
 | `uploadSpeed`              | number
 | `cumulative-stats`         | stats object (see below)
