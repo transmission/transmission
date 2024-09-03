@@ -294,7 +294,7 @@ export class Remote {
   savePrefs(params) {
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'session-set',
+      method: 'session_set',
       params,
     };
     this.sendRequest(o, () => {
