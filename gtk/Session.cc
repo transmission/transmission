@@ -622,7 +622,14 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
             return { torrent, position };
         }
 
-        (current_torrent_id < torrent_id ? begin_position : end_position) = position;
+        if (current_torrent_id < torrent_id)
+        {
+            begin_position = position + 1;
+        }
+        else
+        {
+            end_position = position;
+        }
     }
 
     return {};
