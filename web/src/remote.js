@@ -93,7 +93,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'session-get',
+      method: 'session_get',
     };
     this.sendRequest(o, callback, context);
   }

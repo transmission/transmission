@@ -592,7 +592,7 @@ TEST_F(RpcTest, sessionGet)
 
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "session-get"sv);
+    request_map.try_emplace(TR_KEY_method, "session_get"sv);
     request_map.try_emplace(TR_KEY_id, 12345);
     auto response = tr_variant{};
     tr_rpc_request_exec(
