@@ -669,7 +669,7 @@ Response parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
-| `activeTorrentCount`       | number
+| `active_torrent_count`     | number
 | `downloadSpeed`            | number
 | `pausedTorrentCount`       | number
 | `torrentCount`             | number
