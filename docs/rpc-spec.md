@@ -635,7 +635,7 @@ in a way that is not backwards compatible. There are no plans for this
 to be common behavior.
 
 #### 4.1.1 Mutators
-Method name: `session-set`
+Method name: `session_set`
 
 Request parameters: the mutable properties from 4.1's parameters, i.e. all of them
 except:
@@ -1063,7 +1063,7 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | Method | Description
 |:---|:---
 | `torrent_get` | new arg `sequential_download`
-| `session-set` | new arg `sequential_download`
+| `session_set` | new arg `sequential_download`
 | `torrent_add` | new arg `sequential_download`
 | `torrent_get` | new arg `sequential_download`
 | `torrent_set` | new arg `sequential_download`
