@@ -44,7 +44,7 @@ Response parameters are returned in the `result` Object.
    "params": {
      "fields": [ "version" ]
    },
-   "method": "session-get",
+   "method": "session_get",
    "id": 912313
 }
 ```
@@ -661,7 +661,7 @@ except:
 Response parameters: none
 
 #### 4.1.2 Accessors
-Method name: `session-get`
+Method name: `session_get`
 
 Request parameters: an optional `fields` array of keys (see 4.1)
 
@@ -813,13 +813,13 @@ A bandwidth group description object has:
 This section lists the changes that have been made to the RPC protocol.
 
 There are two ways to check for API compatibility. Since most developers know
-[semver](https://semver.org/), session-get's `rpc_version_semver` is the
+[semver](https://semver.org/), `session_get`'s `rpc_version_semver` is the
 recommended way. That value is a semver-compatible string of the RPC protocol
 version number.
 
 Since Transmission predates the semver 1.0 spec, the previous scheme was for
 the RPC version to be a whole number and to increment it whenever a change was
-made. That is session-get's `rpc_version`. `rpc_version_minimum` lists the
+made. That is `session_get`'s `rpc_version`. `rpc_version_minimum` lists the
 oldest version that is compatible with the current version; i.e. an app coded
 to use `rpc_version_minimum` would still work on a Transmission release running
 `rpc_version`.
@@ -1070,7 +1070,7 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 
 | Method | Description
 |:---|:---
-| `session-get` | new arg `sequential_download`
+| `session_get` | new arg `sequential_download`
 | `session_set` | new arg `sequential_download`
 | `torrent_add` | new arg `sequential_download`
 | `torrent_get` | new arg `sequential_download`
@@ -1083,7 +1083,7 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `port-test` | new arg `ip_protocol`
 | `torrent_get` | new arg `trackerStats.downloader_count`
 | `torrent_get` | :warning: **DEPRECATED** `manual_announce_time`, it never worked
-| `session-get` | new arg `preferred_transports`
+| `session_get` | new arg `preferred_transports`
 | `session_set` | new arg `preferred_transports`
-| `session-get` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
+| `session_get` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
 | `session_set` | :warning: **DEPRECATED** `utp_enabled`. Use `preferred_transports` instead.
