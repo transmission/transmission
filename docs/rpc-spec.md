@@ -616,6 +616,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `speed_limit_up` | number | max global upload speed (kB/s)
 | `speed_limit_up_enabled` | boolean | true means enabled
 | `start_added_torrents` | boolean | true means added torrents will be started right away
+| `tcp_enabled` | boolean | true means allow TCP
 | `trash_original_torrent_files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
 | `utp_enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
@@ -653,6 +654,7 @@ except:
 * `rpc_version_semver`
 * `rpc_version`
 * `session_id`
+* `tcp_enabled`
 * `units`
 * `version`
 
