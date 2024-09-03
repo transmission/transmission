@@ -101,6 +101,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_created_by,
     TR_KEY_creation_date,
     TR_KEY_creator,
+    TR_KEY_cumulative_stats_kebab,
     TR_KEY_cumulative_stats,
     TR_KEY_current_stats,
     TR_KEY_data,
