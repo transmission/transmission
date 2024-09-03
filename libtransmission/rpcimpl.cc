@@ -2492,6 +2492,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
     units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
     units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
+    units_map.try_emplace(TR_KEY_size_bytes_kebab, Storage::units().base());
     units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
     units_map.try_emplace(TR_KEY_size_units_kebab, make_units_vec(Storage::units()));
     units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
@@ -2758,6 +2759,7 @@ namespace session_get_helpers
     // response
     args_out.try_emplace(TR_KEY_path, *path);
     args_out.try_emplace(TR_KEY_size_bytes, capacity ? capacity->free : -1);
+    args_out.try_emplace(TR_KEY_size_bytes_kebab, capacity ? capacity->free : -1);
     args_out.try_emplace(TR_KEY_total_size, capacity ? capacity->total : -1);
 
     if (error)

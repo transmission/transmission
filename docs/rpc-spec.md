@@ -630,7 +630,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `speed_units`  | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
 | `speed_bytes`  | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
 | `size_units`   | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
-| `size-bytes`   | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
+| `size_bytes`   | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
 | `memory-units` | array  | 4 strings: KB/s, MB/s, GB/s, TB/s
 | `memory-bytes` | number | number of bytes in a KB (1000 for kB; 1024 for KiB)
 
@@ -764,7 +764,7 @@ Response parameters:
 | Key | Value type | Description
 |:--|:--|:--
 | `path` | string | same as the Request parameter
-| `size-bytes` | number | the size, in bytes, of the free space in that directory
+| `size_bytes` | number | the size, in bytes, of the free space in that directory
 | `total_size` | number | the total capacity, in bytes, of that directory
 
 ### 4.8 Bandwidth groups

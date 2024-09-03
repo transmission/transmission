@@ -176,7 +176,7 @@ export class Remote {
       params: { path: dir },
     };
     this.sendRequest(o, (response) => {
-      const { path, 'size-bytes': size_bytes } = response.result;
+      const { path, size_bytes } = response.result;
       callback.call(context, path, size_bytes);
     });
   }
