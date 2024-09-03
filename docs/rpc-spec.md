@@ -669,7 +669,7 @@ Response parameters: key/value pairs matching the request's `fields`
 parameter if present, or all supported fields (see 4.1) otherwise.
 
 ### 4.2 Session statistics
-Method name: `session-stats`
+Method name: `session_stats`
 
 Request parameters: none
 
