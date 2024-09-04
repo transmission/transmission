@@ -391,7 +391,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_progress,
     TR_KEY_prompt_before_exit,
     TR_KEY_proxy_url,
-    TR_KEY_queue_move_bottom,
     TR_KEY_queue_stalled_enabled_kebab,
     TR_KEY_queue_stalled_minutes_kebab,
     TR_KEY_queue_position_camel,
