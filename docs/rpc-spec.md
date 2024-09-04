@@ -735,7 +735,7 @@ Response parameters: none
 | Method name | transmission.h source
 |:--|:--
 | `queue_move_top` | tr_torrentQueueMoveTop()
-| `queue-move-up` | tr_torrentQueueMoveUp()
+| `queue_move_up` | tr_torrentQueueMoveUp()
 | `queue-move-down` | tr_torrentQueueMoveDown()
 | `queue-move-bottom` | tr_torrentQueueMoveBottom()
 
