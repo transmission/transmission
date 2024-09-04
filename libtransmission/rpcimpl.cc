@@ -2825,7 +2825,7 @@ using AsyncHandler = void (*)(tr_session*, tr_variant::Map const&, DoneCb&&, tr_
 
 auto constexpr AsyncHandlers = std::array<std::tuple<std::string_view, AsyncHandler, bool /*has_side_effects*/>, 4U>{ {
     { "blocklist_update"sv, blocklistUpdate, true },
-    { "port-test"sv, portTest, false },
+    { "port_test"sv, portTest, false },
     { "torrent_add"sv, torrentAdd, true },
     { "torrent_rename_path"sv, torrentRenamePath, true },
 } };

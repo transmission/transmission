@@ -102,7 +102,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'port-test',
+      method: 'port_test',
       params: {
         ip_protocol,
       },

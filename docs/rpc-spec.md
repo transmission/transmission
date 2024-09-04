@@ -706,7 +706,7 @@ Response parameters: a number `blocklist_size`
 This method tests to see if your incoming peer port is accessible
 from the outside world.
 
-Method name: `port-test`
+Method name: `port_test`
 
 Request parameters: an optional parameter `ip_protocol`.
 `ip_protocol` is a string specifying the IP protocol version to be used for the port test.
@@ -1080,7 +1080,7 @@ Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 | `torrent_set` | new arg `sequential_download_from_piece`
 | `torrent_get` | new arg `files.begin_piece`
 | `torrent_get` | new arg `files.end_piece`
-| `port-test` | new arg `ip_protocol`
+| `port_test` | new arg `ip_protocol`
 | `torrent_get` | new arg `trackerStats.downloader_count`
 | `torrent_get` | :warning: **DEPRECATED** `manual_announce_time`, it never worked
 | `session_get` | new arg `preferred_transports`
