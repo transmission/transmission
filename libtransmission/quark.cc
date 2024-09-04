@@ -390,7 +390,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "prompt-before-exit"sv,
     "proxy_url"sv,
     "queue-move-bottom"sv,
-    "queue-move-down"sv,
     "queue-stalled-enabled"sv,
     "queue-stalled-minutes"sv,
     "queuePosition"sv,
