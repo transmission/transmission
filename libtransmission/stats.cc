@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <array>
 #include <optional>
 #include <utility>
 
@@ -40,26 +39,33 @@ std::optional<tr_variant> load_stats(std::string_view config_dir)
 
 tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 {
+    auto const stats = load_stats(config_dir);
+    if (!stats)
+    {
+        return {};
+    }
+
+    auto const* const map = stats->get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return {};
+    }
+
+    auto const load = [map](tr_quark const quark, uint64_t& dst)
+    {
+        if (auto const val = map->value_if<int64_t>(quark); val)
+        {
+            dst = *val;
+        }
+    };
+
     auto ret = tr_session_stats{};
 
-    if (auto stats = load_stats(config_dir); stats)
-    {
-        auto const key_tgts = std::array<std::pair<tr_quark, uint64_t*>, 5>{
-            { { TR_KEY_downloaded_bytes, &ret.downloadedBytes },
-              { TR_KEY_files_added, &ret.filesAdded },
-              { TR_KEY_seconds_active, &ret.secondsActive },
-              { TR_KEY_session_count, &ret.sessionCount },
-              { TR_KEY_uploaded_bytes, &ret.uploadedBytes } }
-        };
-
-        for (auto& [key, tgt] : key_tgts)
-        {
-            if (auto val = int64_t{}; tr_variantDictFindInt(&*stats, key, &val))
-            {
-                *tgt = val;
-            }
-        }
-    }
+    load(TR_KEY_downloaded_bytes, ret.downloadedBytes);
+    load(TR_KEY_files_added, ret.filesAdded);
+    load(TR_KEY_seconds_active, ret.secondsActive);
+    load(TR_KEY_session_count, ret.sessionCount);
+    load(TR_KEY_uploaded_bytes, ret.uploadedBytes);
 
     return ret;
 }
