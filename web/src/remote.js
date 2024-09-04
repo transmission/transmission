@@ -172,7 +172,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'free-space',
+      method: 'free_space',
       params: { path: dir },
     };
     this.sendRequest(o, (response) => {

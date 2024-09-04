@@ -2799,7 +2799,7 @@ namespace session_get_helpers
 using SyncHandler = std::pair<JsonRpc::Error::Code, std::string> (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&);
 
 auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandler, bool /*has_side_effects*/>, 20U>{ {
-    { "free-space"sv, freeSpace, false },
+    { "free_space"sv, freeSpace, false },
     { "group-get"sv, groupGet, false },
     { "group-set"sv, groupSet, true },
     { "queue_move_bottom"sv, queueMoveBottom, true },
