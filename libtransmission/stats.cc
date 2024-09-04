@@ -73,14 +73,13 @@ tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 void tr_stats::save() const
 {
     auto const saveme = cumulative();
-    auto top = tr_variant{};
-    tr_variantInitDict(&top, 5);
-    tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, saveme.downloadedBytes);
-    tr_variantDictAddInt(&top, TR_KEY_files_added, saveme.filesAdded);
-    tr_variantDictAddInt(&top, TR_KEY_seconds_active, saveme.secondsActive);
-    tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
-    tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
-    tr_variant_serde::json().to_file(top, tr_pathbuf{ config_dir_, "/stats.json"sv });
+    auto map = tr_variant::Map{ 5 };
+    map.try_emplace(TR_KEY_downloaded_bytes, saveme.downloadedBytes);
+    map.try_emplace(TR_KEY_files_added, saveme.filesAdded);
+    map.try_emplace(TR_KEY_seconds_active, saveme.secondsActive);
+    map.try_emplace(TR_KEY_session_count, saveme.sessionCount);
+    map.try_emplace(TR_KEY_uploaded_bytes, saveme.uploadedBytes);
+    tr_variant_serde::json().to_file(tr_variant{ std::move(map) }, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
 void tr_stats::clear()
