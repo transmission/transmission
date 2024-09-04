@@ -2801,7 +2801,7 @@ using SyncHandler = std::pair<JsonRpc::Error::Code, std::string> (*)(tr_session*
 auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandler, bool /*has_side_effects*/>, 20U>{ {
     { "free_space"sv, freeSpace, false },
     { "group-get"sv, groupGet, false },
-    { "group-set"sv, groupSet, true },
+    { "group_set"sv, groupSet, true },
     { "queue_move_bottom"sv, queueMoveBottom, true },
     { "queue_move_down"sv, queueMoveDown, true },
     { "queue_move_top"sv, queueMoveTop, true },
