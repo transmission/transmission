@@ -2448,6 +2448,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     args_out.try_emplace(TR_KEY_cumulative_stats, make_stats_map(session->stats().cumulative()));
     args_out.try_emplace(TR_KEY_cumulative_stats_kebab, make_stats_map(session->stats().cumulative()));
     args_out.try_emplace(TR_KEY_current_stats, make_stats_map(session->stats().current()));
+    args_out.try_emplace(TR_KEY_current_stats_kebab, make_stats_map(session->stats().current()));
     args_out.try_emplace(TR_KEY_download_speed, session->piece_speed(TR_DOWN).base_quantity());
     args_out.try_emplace(TR_KEY_download_speed_camel, session->piece_speed(TR_DOWN).base_quantity());
     args_out.try_emplace(TR_KEY_paused_torrent_count, total - n_running);
