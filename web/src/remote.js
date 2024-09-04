@@ -303,7 +303,7 @@ export class Remote {
   updateBlocklist() {
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'blocklist-update',
+      method: 'blocklist_update',
     };
     this.sendRequest(o, () => {
       this._controller.loadDaemonPrefs();
