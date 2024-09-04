@@ -570,7 +570,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `alt_speed_up` | number | max global upload speed (kB/s)
 | `blocklist_enabled` | boolean | true means enabled
 | `blocklist_size` | number | number of rules in the blocklist
-| `blocklist_url` | string | location of the blocklist to use for `blocklist-update`
+| `blocklist_url` | string | location of the blocklist to use for `blocklist_update`
 | `cache_size_mb` | number | maximum size of the disk cache (MiB). Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
 | `config_dir` | string | location of transmission's configuration directory
 | `default_trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
@@ -696,7 +696,7 @@ A stats object contains:
 | `session_count`    | number     | tr_session_stats
 
 ### 4.3 Blocklist
-Method name: `blocklist-update`
+Method name: `blocklist_update`
 
 Request parameters: none
 

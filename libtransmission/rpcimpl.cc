@@ -2824,7 +2824,7 @@ auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandle
 using AsyncHandler = void (*)(tr_session*, tr_variant::Map const&, DoneCb&&, tr_rpc_idle_data*);
 
 auto constexpr AsyncHandlers = std::array<std::tuple<std::string_view, AsyncHandler, bool /*has_side_effects*/>, 4U>{ {
-    { "blocklist-update"sv, blocklistUpdate, true },
+    { "blocklist_update"sv, blocklistUpdate, true },
     { "port-test"sv, portTest, false },
     { "torrent_add"sv, torrentAdd, true },
     { "torrent_rename_path"sv, torrentRenamePath, true },
