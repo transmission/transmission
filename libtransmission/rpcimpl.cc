@@ -2432,7 +2432,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         stats_map.try_emplace(TR_KEY_files_added, stats.filesAdded);
         stats_map.try_emplace(TR_KEY_files_added_camel, stats.filesAdded);
         stats_map.try_emplace(TR_KEY_secondsActive, stats.secondsActive);
-        stats_map.try_emplace(TR_KEY_sessionCount, stats.sessionCount);
+        stats_map.try_emplace(TR_KEY_session_count, stats.sessionCount);
+        stats_map.try_emplace(TR_KEY_session_count_camel, stats.sessionCount);
         stats_map.try_emplace(TR_KEY_uploaded_bytes, stats.uploadedBytes);
         stats_map.try_emplace(TR_KEY_uploaded_bytes_camel, stats.uploadedBytes);
         return stats_map;
