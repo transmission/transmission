@@ -2802,7 +2802,7 @@ auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandle
     { "free-space"sv, freeSpace, false },
     { "group-get"sv, groupGet, false },
     { "group-set"sv, groupSet, true },
-    { "queue-move-bottom"sv, queueMoveBottom, true },
+    { "queue_move_bottom"sv, queueMoveBottom, true },
     { "queue_move_down"sv, queueMoveDown, true },
     { "queue_move_top"sv, queueMoveTop, true },
     { "queue_move_up"sv, queueMoveUp, true },
