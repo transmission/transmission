@@ -784,8 +784,8 @@ Request parameters:
 
 Response parameters: none
 
-#### 4.8.2 Bandwidth group accessor: `group-get`
-Method name: `group-get`
+#### 4.8.2 Bandwidth group accessor: `group_get`
+Method name: `group_get`
 
 Request parameters: An optional parameter `group`.
 `group` is either a string naming the bandwidth group,
