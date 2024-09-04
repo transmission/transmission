@@ -2804,7 +2804,7 @@ auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandle
     { "group-set"sv, groupSet, true },
     { "queue-move-bottom"sv, queueMoveBottom, true },
     { "queue-move-down"sv, queueMoveDown, true },
-    { "queue-move-top"sv, queueMoveTop, true },
+    { "queue_move_top"sv, queueMoveTop, true },
     { "queue-move-up"sv, queueMoveUp, true },
     { "session_close"sv, sessionClose, true },
     { "session_get"sv, sessionGet, false },

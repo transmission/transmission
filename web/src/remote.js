@@ -11,7 +11,7 @@ export const RPC = {
   _JsonRpcVersion: '2.0',
   _QueueMoveBottom: 'queue-move-bottom',
   _QueueMoveDown: 'queue-move-down',
-  _QueueMoveTop: 'queue-move-top',
+  _QueueMoveTop: 'queue_move_top',
   _QueueMoveUp: 'queue-move-up',
   _Root: '../rpc',
   _TurtleDownSpeedLimit: 'alt_speed_down',
