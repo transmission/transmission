@@ -683,7 +683,7 @@ Response parameters:
 | `torrent_count`            | number
 | `upload_speed`             | number
 | `cumulative_stats`         | stats object (see below)
-| `current-stats`            | stats object (see below)
+| `current_stats`            | stats object (see below)
 
 A stats object contains:
 
