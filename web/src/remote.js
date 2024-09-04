@@ -10,7 +10,7 @@ export const RPC = {
   _DownSpeedLimited: 'speed_limit_down_enabled',
   _JsonRpcVersion: '2.0',
   _QueueMoveBottom: 'queue-move-bottom',
-  _QueueMoveDown: 'queue-move-down',
+  _QueueMoveDown: 'queue_move_down',
   _QueueMoveTop: 'queue_move_top',
   _QueueMoveUp: 'queue_move_up',
   _Root: '../rpc',
