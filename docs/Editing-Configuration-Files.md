@@ -108,7 +108,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **utp_enabled:** Boolean (default = true) ***DEPRECATED***, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
  * **preferred_transports:** String[] ("utp" = [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol), "tcp" = TCP; default = ["utp", "tcp"]) List your preference of transport protocols in the order of preferred-first. Omitting the transport protocol from the list will disable it.
    _Note: Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds._
- * **sleep-per-seconds-during-verify:** Number (default = 100) Controls the duration in milliseconds for which the verification process will pause to reduce disk I/O pressure.
+ * **sleep_per_seconds_during_verify:** Number (default = 100) Controls the duration in milliseconds for which the verification process will pause to reduce disk I/O pressure.
 
 #### Peers
  * **bind-address-ipv4:** String (default = "") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".
