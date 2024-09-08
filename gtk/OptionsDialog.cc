@@ -432,6 +432,7 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
 
     signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
 
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
     if (e->get_text_length() == 0)
     {
         e->grab_focus();
@@ -440,4 +441,5 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     {
         accept->grab_focus();
     }
+#endif
 }

@@ -886,6 +886,7 @@ void gtr_paste_clipboard_url_into_entry_and_focus(Gtk::Entry& entry, Gtk::Widget
             accept.grab_focus();
             return true;
         }
+        entry.grab_focus();
         return false;
     };
 
