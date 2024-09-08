@@ -168,7 +168,7 @@ void setup_item_view_button_event_handling(
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
 bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
 
-void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
+void gtr_paste_clipboard_url_into_entry_and_focus(Gtk::Entry& entry, Gtk::Widget& accept);
 
 /* Only call gtk_label_set_text() if the new text differs from the old.
  * This prevents the label from having to recalculate its size

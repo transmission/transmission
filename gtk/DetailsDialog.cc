@@ -2341,7 +2341,8 @@ AddTrackerDialog::AddTrackerDialog(
     set_title(fmt::format(_("{torrent_name} - Add Tracker"), fmt::arg("torrent_name", tr_torrentName(torrent))));
     set_transient_for(parent);
 
-    gtr_paste_clipboard_url_into_entry(*url_entry_);
+    auto* const accept = get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
+    gtr_paste_clipboard_url_into_entry_and_focus(*url_entry_, *accept);
 }
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(

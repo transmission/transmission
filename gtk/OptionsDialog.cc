@@ -427,7 +427,8 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     set_transient_for(parent);
 
     auto* const e = gtr_get_widget<Gtk::Entry>(builder, "url_entry");
-    gtr_paste_clipboard_url_into_entry(*e);
+    auto* const accept = get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
+    gtr_paste_clipboard_url_into_entry_and_focus(*e, *accept);
 
     signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
 
@@ -437,6 +438,6 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     }
     else
     {
-        get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT))->grab_focus();
+        accept->grab_focus();
     }
 }
