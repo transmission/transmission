@@ -68,7 +68,7 @@ public:
         tr_session* session_in,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,
-        bool is_seed,
+        bool client_is_seed,
         tr_bandwidth* parent_bandwidth);
 
     ~tr_peerIo();
@@ -78,7 +78,7 @@ public:
         tr_bandwidth* parent,
         tr_socket_address const& socket_address,
         tr_sha1_digest_t const& info_hash,
-        bool is_seed,
+        bool client_is_seed,
         bool utp);
 
     static std::shared_ptr<tr_peerIo> new_incoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
@@ -329,9 +329,9 @@ private:
 
     friend class libtransmission::test::HandshakeTest;
 
-    [[nodiscard]] constexpr auto is_seed() const noexcept
+    [[nodiscard]] constexpr auto client_is_seed() const noexcept
     {
-        return is_seed_;
+        return client_is_seed_;
     }
 
     void call_error_callback(tr_error const& error)
@@ -398,7 +398,7 @@ private:
 
     tr_priority_t priority_ = TR_PRI_NORMAL;
 
-    bool const is_seed_;
+    bool const client_is_seed_;
     bool const is_incoming_;
 
     bool utp_supported_ = false;
