@@ -431,15 +431,4 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     gtr_paste_clipboard_url_into_entry_and_focus(*e, *accept);
 
     signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
-
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-    if (e->get_text_length() == 0)
-    {
-        e->grab_focus();
-    }
-    else
-    {
-        accept->grab_focus();
-    }
-#endif
 }
