@@ -966,6 +966,8 @@ void tr_torrent::init(tr_ctor const& ctor)
     TR_ASSERT(session != nullptr);
     auto const lock = unique_lock();
 
+    auto const now_sec = tr_time();
+
     queue_position_ = std::size(session->torrents());
 
     on_metainfo_updated();
@@ -999,7 +1001,7 @@ void tr_torrent::init(tr_ctor const& ctor)
 
     mark_changed();
 
-    date_added_ = tr_time(); // this is a default that will be overwritten by the resume file
+    date_added_ = now_sec; // this is a default that will be overwritten by the resume file
 
     tr_resume::fields_t loaded = {};
 
@@ -1098,6 +1100,12 @@ void tr_torrent::init(tr_ctor const& ctor)
     else
     {
         set_local_error_if_files_disappeared(this, has_any_local_data);
+    }
+
+    // Recover from the bug reported at https://github.com/transmission/transmission/issues/6899
+    if (is_done() && date_done_ == time_t{})
+    {
+        date_done_ = now_sec;
     }
 }
 
