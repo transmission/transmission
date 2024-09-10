@@ -134,7 +134,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
 
     set_state(State::AwaitingVc);
     // LATER, not NOW: recv buffer was just drained and peer was blocking
-    return ReadState::Now;
+    return ReadState::Later;
 }
 
 // MSE spec: "Since the length of [PadB is] unknown,
@@ -395,7 +395,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
 
     set_state(State::AwaitingPadA);
     // LATER, not NOW: recv buffer was just drained and peer was blocking
-    return ReadState::Now;
+    return ReadState::Later;
 }
 
 ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
