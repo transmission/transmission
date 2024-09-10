@@ -690,7 +690,11 @@ void publishError(tr_tier* tier, std::string_view msg)
     publishMessage(tier, msg, tr_tracker_event::Type::Error);
 }
 
-void publishPeerCounts(tr_tier* tier, std::optional<int64_t> seeders, std::optional<int64_t> leechers)
+void publishPeerCounts(
+    tr_tier* tier,
+    std::optional<int64_t> seeders,
+    std::optional<int64_t> leechers,
+    std::optional<int64_t> downloaders)
 {
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
@@ -698,9 +702,14 @@ void publishPeerCounts(tr_tier* tier, std::optional<int64_t> seeders, std::optio
         e.type = tr_tracker_event::Type::Counts;
         e.seeders = seeders;
         e.leechers = leechers;
+        e.downloaders = downloaders;
         tr_logAddDebugTier(
             tier,
-            fmt::format("peer counts: {} seeders, {} leechers.", seeders.value_or(-1), leechers.value_or(-1)));
+            fmt::format(
+                "peer counts: {} seeders, {} leechers, {} downloaders.",
+                seeders.value_or(-1),
+                leechers.value_or(-1),
+                downloaders.value_or(-1)));
 
         tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
@@ -1099,7 +1108,7 @@ void tr_announcer_impl::onAnnounceDone(
             publishPeersPex(tier, response.pex6);
         }
 
-        publishPeerCounts(tier, response.seeders, response.leechers);
+        publishPeerCounts(tier, response.seeders, response.leechers, {});
 
         tier->isRunning = is_running_on_success;
 
@@ -1371,7 +1380,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
                 tracker->consecutive_failures = 0;
             }
 
-            publishPeerCounts(tier, row.seeders, row.leechers);
+            publishPeerCounts(tier, row.seeders, row.leechers, row.downloaders);
         }
     }
 
