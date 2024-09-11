@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cerrno>
 #include <cstddef> // size_t, std::byte
 #include <cstdint> // uint8_t
@@ -123,7 +122,7 @@ public:
         void setPrivateKeyFromBase64(std::string_view b64)
         {
             auto const str = tr_base64_decode(b64);
-            assert(std::size(str) == std::size(private_key_));
+            TR_ASSERT(std::size(str) == std::size(private_key_));
             std::copy_n(reinterpret_cast<std::byte const*>(std::data(str)), std::size(str), std::begin(private_key_));
         }
 
@@ -146,7 +145,7 @@ public:
 #else
             auto const n = write(sock, walk, len);
 #endif
-            assert(n >= 0);
+            TR_ASSERT(n >= 0);
             len -= n;
             walk += n;
         }
@@ -255,8 +254,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    ASSERT_TRUE(res.has_value());
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -285,8 +283,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    ASSERT_TRUE(res.has_value());
     EXPECT_FALSE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -313,8 +310,7 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    ASSERT_TRUE(res.has_value());
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -371,8 +367,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
     waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    ASSERT_TRUE(res.has_value());
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -428,8 +423,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    ASSERT_TRUE(res.has_value());
     EXPECT_FALSE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
@@ -520,8 +514,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    ASSERT_TRUE(res.has_value());
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
