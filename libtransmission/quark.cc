@@ -430,6 +430,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "ratio_limit"sv,
     "ratio_limit_enabled"sv,
     "read-clipboard"sv,
+    "read_clipboard"sv,
     "recheckProgress"sv,
     "recheck_progress"sv,
     "remote-session-enabled"sv,
@@ -912,6 +913,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_rate_upload_camel: return TR_KEY_rate_upload;
     case TR_KEY_ratio_limit_kebab: return TR_KEY_ratio_limit;
     case TR_KEY_ratio_limit_enabled_kebab: return TR_KEY_ratio_limit_enabled;
+    case TR_KEY_read_clipboard_kebab: return TR_KEY_read_clipboard;
     case TR_KEY_recheck_progress_camel: return TR_KEY_recheck_progress;
     case TR_KEY_remote_session_enabled_kebab: return TR_KEY_remote_session_enabled;
     case TR_KEY_remote_session_host_kebab: return TR_KEY_remote_session_host;
