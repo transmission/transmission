@@ -158,6 +158,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_downloaded_bytes,
     TR_KEY_downloaded_ever,
     TR_KEY_downloader_count,
+    TR_KEY_downloading_time_seconds_kebab,
     TR_KEY_downloading_time_seconds,
     TR_KEY_dropped,
     TR_KEY_dropped6,
