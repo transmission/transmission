@@ -372,6 +372,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peer_socket_tos,
     TR_KEY_peers,
     TR_KEY_peers2,
+    TR_KEY_peers2_6_kebab,
     TR_KEY_peers2_6,
     TR_KEY_peers_connected_camel,
     TR_KEY_peers_from_camel,
