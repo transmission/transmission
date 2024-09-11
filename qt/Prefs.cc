@@ -95,7 +95,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password_kebab, QMetaType::QString },
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port_kebab, QMetaType::Int },
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication_kebab, QMetaType::Bool },
-    { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QMetaType::QString },
+    { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username_kebab, QMetaType::QString },
     { SESSION_REMOTE_RPC_URL_PATH, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QMetaType::QStringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
