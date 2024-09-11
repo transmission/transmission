@@ -174,6 +174,8 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
+        EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[0]));
+        EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[1]));
         return std::pair{ tr_peerIo::new_incoming(
                               session,
                               &session->top_bandwidth_,
@@ -185,6 +187,8 @@ public:
     {
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
+        EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[0]));
+        EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[1]));
         auto peer_io = tr_peerIo::create(session, &session->top_bandwidth_, &info_hash, false /*incoming*/, false /*seed*/);
         peer_io->set_socket(tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0]));
         return std::pair{ std::move(peer_io), sockpair[1] };
@@ -208,24 +212,20 @@ public:
         return peer_id;
     }
 
-    static auto runHandshake(
+    static auto startHandshake(
+        std::optional<tr_handshake::Result>& result,
         tr_handshake::Mediator* mediator,
         std::shared_ptr<tr_peerIo> const& peer_io,
         tr_encryption_mode encryption_mode = TR_CLEAR_PREFERRED)
     {
-        auto result = std::optional<tr_handshake::Result>{};
-
-        auto handshake = tr_handshake{ mediator,
-                                       peer_io,
-                                       encryption_mode,
-                                       [&result](auto const& resin)
-                                       {
-                                           result = resin;
-                                           return true;
-                                       } };
-
-        waitFor([&result]() { return result.has_value(); }, MaxWaitMsec);
-        return result;
+        return tr_handshake{ mediator,
+                             peer_io,
+                             encryption_mode,
+                             [&result](auto const& resin)
+                             {
+                                 result = resin;
+                                 return true;
+                             } };
     }
 };
 
@@ -250,7 +250,9 @@ TEST_F(HandshakeTest, incomingPlaintext)
     sendToClient(sock, TorrentWeAreSeeding.info_hash);
     sendToClient(sock, peer_id);
 
-    auto const res = runHandshake(&mediator, io);
+    auto res = std::optional<tr_handshake::Result>{};
+    auto const handshake = startHandshake(res, &mediator, io);
+    waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
     EXPECT_TRUE(res.has_value());
@@ -278,7 +280,9 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     sendToClient(sock, tr_sha1::digest("some other torrent unknown to us"sv));
     sendToClient(sock, makeRandomPeerId());
 
-    auto const res = runHandshake(&mediator, io);
+    auto res = std::optional<tr_handshake::Result>{};
+    auto const handshake = startHandshake(res, &mediator, io);
+    waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
     EXPECT_TRUE(res.has_value());
@@ -304,7 +308,9 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     sendToClient(sock, UbuntuTorrent.info_hash);
     sendToClient(sock, peer_id);
 
-    auto const res = runHandshake(&mediator, io);
+    auto res = std::optional<tr_handshake::Result>{};
+    auto const handshake = startHandshake(res, &mediator, io);
+    waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
     EXPECT_TRUE(res.has_value());
@@ -330,20 +336,39 @@ TEST_F(HandshakeTest, incomingEncrypted)
 
     auto [io, sock] = createIncomingIo(session_);
 
+    auto res = std::optional<tr_handshake::Result>{};
+    auto const handshake = startHandshake(res, &mediator, io);
+
     // Peer->Client data from a successful encrypted handshake recorded
-    // in the wild for replay here
+    // in the wild for replay here. This test will play as the peer.
+    // 1. Peer sends Ya.
     sendB64ToClient(
         sock,
         "svkySIFcCsrDTeHjPt516UFbsoR+5vfbe5/m6stE7u5JLZ10kJ19NmP64E10qI"
         "nn78sCrJgjw1yEHHwrzOcKiRlYvcMotzJMe+SjrFUnaw3KBfn2bcKBhxb/sfM9"
         "J7nJ"sv);
+
+    // 2. Wait for client to reply with Yb.
+    ASSERT_TRUE(waitFor(
+        [&s = std::as_const(sock), buf = std::array<char, 16>{}, n_read = size_t{}]() mutable
+        {
+            if (auto ret = read(s, std::data(buf), std::size(buf)); ret > 0)
+            {
+                n_read += ret;
+            }
+            return n_read >= tr_handshake::DH::KeySize;
+        },
+        MaxWaitMsec));
+
+    // 3. Peer sends the rest of the handshake.
     sendB64ToClient(
         sock,
         "ICAgICAgICAgIKdr4jIBZ4xFfO4xNiRV7Gl2azTSuTFuu06NU1WyRPif018JYe"
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
         "04/1W1A2PHgg+I9puac/i9BsFPcjdQeoVtU73lNCbTDQgTieyjDWmwo="sv);
 
-    auto const res = runHandshake(&mediator, io);
+    // 4. Wait for handshake to complete.
+    waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
     EXPECT_TRUE(res.has_value());
@@ -368,20 +393,39 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
 
     auto [io, sock] = createIncomingIo(session_);
 
+    auto res = std::optional<tr_handshake::Result>{};
+    auto const handshake = startHandshake(res, &mediator, io);
+
     // Peer->Client data from a successful encrypted handshake recorded
-    // in the wild for replay here
+    // in the wild for replay here. This test will play as the peer.
+    // 1. Peer sends Ya.
     sendB64ToClient(
         sock,
         "svkySIFcCsrDTeHjPt516UFbsoR+5vfbe5/m6stE7u5JLZ10kJ19NmP64E10qI"
         "nn78sCrJgjw1yEHHwrzOcKiRlYvcMotzJMe+SjrFUnaw3KBfn2bcKBhxb/sfM9"
         "J7nJ"sv);
+
+    // 2. Wait for client to reply with Yb.
+    ASSERT_TRUE(waitFor(
+        [&s = std::as_const(sock), buf = std::array<char, 16>{}, n_read = size_t{}]() mutable
+        {
+            if (auto ret = read(s, std::data(buf), std::size(buf)); ret >= 0)
+            {
+                n_read += ret;
+            }
+            return n_read >= tr_handshake::DH::KeySize;
+        },
+        MaxWaitMsec));
+
+    // 3. Peer sends the rest of the handshake.
     sendB64ToClient(
         sock,
         "ICAgICAgICAgIKdr4jIBZ4xFfO4xNiRV7Gl2azTSuTFuu06NU1WyRPif018JYe"
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
         "04/1W1A2PHgg+I9puac/i9BsFPcjdQeoVtU73lNCbTDQgTieyjDWmwo="sv);
 
-    auto const res = runHandshake(&mediator, io);
+    // 4. Wait for handshake to complete.
+    waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
     EXPECT_TRUE(res.has_value());
@@ -403,25 +447,77 @@ TEST_F(HandshakeTest, outgoingEncrypted)
 
     auto [io, sock] = createOutgoingIo(session_, UbuntuTorrent.info_hash);
 
+    auto res = std::optional<tr_handshake::Result>{};
+    auto const handshake = startHandshake(res, &mediator, io, TR_ENCRYPTION_PREFERRED);
+
     // Peer->Client data from a successful encrypted handshake recorded
-    // in the wild for replay here
+    // in the wild for replay here. This test will play as the peer.
+    // 1. Wait for client to send Ya.
+    ASSERT_TRUE(waitFor(
+        [&s = std::as_const(sock), buf = std::array<char, 16>{}, n_read = size_t{}]() mutable
+        {
+            if (auto ret = read(s, std::data(buf), std::size(buf)); ret >= 0)
+            {
+                n_read += ret;
+            }
+            return n_read >= tr_handshake::DH::KeySize;
+        },
+        MaxWaitMsec));
+
+    // 2. Peer replies with Yb.
     sendB64ToClient(
         sock,
         "Sfgoq/nrQfD4Iwirfk+uhOmQMOC/QwK/vYiOact1NF9TpWXms3cvlKEKxs0VU"
         "mnmytRh9bh4Lcs1bswlC6R05XrJGzLhZqAqcLUUAR1VTLA5oKSjR1038zFbhn"
-        "c71jqlpney15ChMTnx02Qt+88l0Z9OWLUUJrUVy+OoIaTMSKDDFVOjuj0y+Ii"
-        "cE0ZnN61e0/R/g+APRK5tegw0SLZ3Nr8+y4Dl77sZyc141PR9xvDj0da1eAvf"
-        "BvXyyDem4vUjqiLUNCEV8KDXEMPCPYAQoDZzLvMyOEtJM/if0o0UN88SWtt1k"
-        "jRD8UNvUlXIfM0YsnJhKA6fJ7/4geK7+Wo2aicfaLFOyG5IEJbTg9OQYbDHFa"
-        "oVzD0xY0Dx+J0loqM+CzrPj8UpeXIcbD7pJrT3XPECbFQ12cCY5LW5RymVIx8"
-        "TP0ajGiTxou1L7DbGD54SYgV/4qFbafRsWp9AO+YDJcouFd/jiVN+r3loxvfT"
-        "0A9H9DRAMR0rZKpQpXZ1ZAhAuAOXGHFIvtw8wd6dPybeu5+LoR2S90/IpwHWI"
-        "jbNbypQZuA9hn4JfFMWPP9TG/E11loB4+MkrP22U72ezjL5ipd74AEEP0/u8w"
-        "Gj1t2kXhND9ONfasA+pY25y8GM04M0B7+0xKmsHP7tntwQLAGZATH83rOxaSO"
-        "3+o/RdiKQJAsGxMIU08scBc5VOmrAmjeYrLNpFnpXVuavH5if7490zMCu3DEn"
-        "G9hpbYbiX95T+EUcRbM6pSCvr3Twq1Q="sv);
+        "c71jql"sv);
 
-    auto const res = runHandshake(&mediator, io, TR_ENCRYPTION_PREFERRED);
+    // 3. Wait for client to send HASH('req1', S).
+    static auto constexpr WantedLen = tr_handshake::PadbMaxlen + std::tuple_size_v<tr_sha1_digest_t>;
+    static auto constexpr NeedleBase64 = "mbpZFBwdi4U1snVvboN3sMEpNmU="sv;
+    auto const needle = tr_base64_decode(NeedleBase64);
+    auto buf = libtransmission::StackBuffer<WantedLen, char>{};
+    ASSERT_TRUE(waitFor(
+        [&s = sock, &buf, &needle, n_read = size_t{}]() mutable
+        {
+            static auto constexpr StepSize = 14U;
+            static_assert(WantedLen % StepSize == 0U);
+            while (n_read < WantedLen)
+            {
+                auto const [cur, curlen] = buf.reserve_space(StepSize);
+                auto const ret = read(s, cur, curlen);
+                if (ret <= 0)
+                {
+                    return false;
+                }
+                buf.commit_space(ret);
+                n_read += ret;
+                if (auto const it = std::search(std::begin(buf), std::end(buf), std::begin(needle), std::end(needle));
+                    it != std::end(buf))
+                {
+                    return true;
+                }
+            }
+            return false;
+        },
+        MaxWaitMsec));
+
+    // 4. Peer sends the rest of the handshake.
+    sendB64ToClient(
+        sock,
+        "paZ3steQoTE58dNkLfvPJdGfTli1FCa1FcvjqCGkzEigwxVTo7o9MviInBNGZ"
+        "zetXtP0f4PgD0SubXoMNEi2dza/PsuA5e+7GcnNeNT0fcbw49HWtXgL3wb18s"
+        "g3puL1I6oi1DQhFfCg1xDDwj2AEKA2cy7zMjhLSTP4n9KNFDfPElrbdZI0Q/F"
+        "Db1JVyHzNGLJyYSgOnye/+IHiu/lqNmonH2ixTshuSBCW04PTkGGwxxWqFcw9"
+        "MWNA8fidJaKjPgs6z4/FKXlyHGw+6Sa091zxAmxUNdnAmOS1uUcplSMfEz9Go"
+        "xok8aLtS+w2xg+eEmIFf+KhW2n0bFqfQDvmAyXKLhXf44lTfq95aMb309APR/"
+        "Q0QDEdK2SqUKV2dWQIQLgDlxhxSL7cPMHenT8m3rufi6EdkvdPyKcB1iI2zW8"
+        "qUGbgPYZ+CXxTFjz/UxvxNdZaAePjJKz9tlO9ns4y+YqXe+ABBD9P7vMBo9bd"
+        "pF4TQ/TjX2rAPqWNucvBjNODNAe/tMSprBz+7Z7cECwBmQEx/N6zsWkjt/qP0"
+        "XYikCQLBsTCFNPLHAXOVTpqwJo3mKyzaRZ6V1bmrx+Yn++PdMzArtwxJxvYaW"
+        "2G4l/eU/hFHEWzOqUgr6908KtU"sv);
+
+    // 5. Wait for handshake to complete.
+    waitFor([&res] { return res.has_value(); }, MaxWaitMsec);
 
     // check the results
     EXPECT_TRUE(res.has_value());
