@@ -434,6 +434,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_ratio_mode,
     TR_KEY_ratio_limit,
     TR_KEY_ratio_limit_enabled,
+    TR_KEY_read_clipboard_kebab,
     TR_KEY_read_clipboard,
     TR_KEY_recent_download_dir_1,
     TR_KEY_recent_download_dir_2,
