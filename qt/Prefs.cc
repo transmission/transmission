@@ -94,7 +94,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SESSION_REMOTE_HTTPS, TR_KEY_remote_session_https_kebab, QMetaType::Bool },
     { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password_kebab, QMetaType::QString },
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port_kebab, QMetaType::Int },
-    { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QMetaType::Bool },
+    { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication_kebab, QMetaType::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QMetaType::QString },
     { SESSION_REMOTE_RPC_URL_PATH, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QMetaType::QStringList },
@@ -443,7 +443,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
     settings.try_emplace(TR_KEY_prompt_before_exit, true);
     settings.try_emplace(TR_KEY_remote_session_enabled, false);
-    settings.try_emplace(TR_KEY_remote_session_requres_authentication, false);
+    settings.try_emplace(TR_KEY_remote_session_requires_authentication, false);
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);
     settings.try_emplace(TR_KEY_show_notification_area_icon, false);
