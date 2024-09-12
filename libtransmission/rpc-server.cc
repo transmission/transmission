@@ -270,9 +270,10 @@ void add_time_header(struct evkeyvalq* headers, char const* key, time_t now)
 
 void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::string_view filename)
 {
-    if (req->type != EVHTTP_REQ_GET)
+    auto* const output_headers = evhttp_request_get_output_headers(req);
+    if (auto const cmd = evhttp_request_get_command(req); cmd != EVHTTP_REQ_GET)
     {
-        evhttp_add_header(req->output_headers, "Allow", "GET");
+        evhttp_add_header(output_headers, "Allow", "GET");
         send_simple_response(req, HTTP_BADMETHOD);
         return;
     }
@@ -286,9 +287,9 @@ void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::st
     }
 
     auto const now = tr_time();
-    add_time_header(req->output_headers, "Date", now);
-    add_time_header(req->output_headers, "Expires", now + (24 * 60 * 60));
-    evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess(filename));
+    add_time_header(output_headers, "Date", now);
+    add_time_header(output_headers, "Expires", now + (24 * 60 * 60));
+    evhttp_add_header(output_headers, "Content-Type", mimetype_guess(filename));
 
     auto* const response = make_response(req, server, std::string_view{ std::data(content), std::size(content) });
     evhttp_send_reply(req, HTTP_OK, "OK", response);
