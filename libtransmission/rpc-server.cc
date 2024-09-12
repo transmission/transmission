@@ -311,34 +311,33 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
             "<p>Package Builders: to set a custom default at compile time, "
             "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
             "or tweak tr_getClutchDir() by hand.</p>");
+        return;
+    }
+
+    // convert the URL path component (ex: "/transmission/web/images/favicon.png")
+    // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
+
+    // remove the "/transmission/web/" prefix
+    static auto constexpr Web = "web/"sv;
+    auto subpath = std::string_view{ evhttp_request_get_uri(req) }.substr(std::size(server->url()) + std::size(Web));
+
+    // remove any trailing query / fragment
+    subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
+
+    // if the query is empty, use the default
+    if (std::empty(subpath))
+    {
+        static auto constexpr DefaultPage = "index.html"sv;
+        subpath = DefaultPage;
+    }
+
+    if (tr_strv_contains(subpath, ".."sv))
+    {
+        send_simple_response(req, HTTP_NOTFOUND);
     }
     else
     {
-        // convert `req->uri` (ex: "/transmission/web/images/favicon.png")
-        // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
-
-        // remove the "/transmission/web/" prefix
-        static auto constexpr Web = "web/"sv;
-        auto subpath = std::string_view{ req->uri }.substr(std::size(server->url()) + std::size(Web));
-
-        // remove any trailing query / fragment
-        subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
-
-        // if the query is empty, use the default
-        static auto constexpr DefaultPage = "index.html"sv;
-        if (std::empty(subpath))
-        {
-            subpath = DefaultPage;
-        }
-
-        if (tr_strv_contains(subpath, ".."sv))
-        {
-            send_simple_response(req, HTTP_NOTFOUND);
-        }
-        else
-        {
-            serve_file(req, server, tr_pathbuf{ server->web_client_dir_, '/', subpath });
-        }
+        serve_file(req, server, tr_pathbuf{ server->web_client_dir_, '/', subpath });
     }
 }
 
