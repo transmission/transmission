@@ -555,7 +555,7 @@ void handle_request(struct evhttp_request* req, void* arg)
     }
     else if (!isHostnameAllowed(server, req))
     {
-        char const* const tmp =
+        static auto constexpr Body =
             "<p>Transmission received your request, but the hostname was unrecognized.</p>"
             "<p>To fix this, choose one of the following options:"
             "<ul>"
@@ -568,13 +568,13 @@ void handle_request(struct evhttp_request* req, void* arg)
             "attacks.</p>";
         tr_logAddWarn(
             fmt::format(fmt::runtime(_("Rejected request from {host} (Host not whitelisted)")), fmt::arg("host", remote_host)));
-        send_simple_response(req, 421, tmp);
+        send_simple_response(req, 421, Body);
     }
 #ifdef REQUIRE_SESSION_ID
     else if (!test_session_id(server, req))
     {
         auto const session_id = std::string{ server->session->sessionId() };
-        auto const tmp = fmt::format(
+        auto const body = fmt::format(
             "<p>Your request had an invalid session-id header.</p>"
             "<p>To fix this, follow these steps:"
             "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
@@ -589,7 +589,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             session_id);
         evhttp_add_header(output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
         evhttp_add_header(output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
-        send_simple_response(req, 409, tmp.c_str());
+        send_simple_response(req, 409, body.c_str());
     }
 #endif
     else if (tr_strv_starts_with(location, "rpc"sv))
@@ -601,7 +601,7 @@ void handle_request(struct evhttp_request* req, void* arg)
         tr_logAddWarn(fmt::format(
             fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
             fmt::arg("host", remote_host),
-            fmt::arg("uri", uri)));
+            fmt::arg("uri", uri_sv)));
         send_simple_response(req, HTTP_NOTFOUND, uri);
     }
 }
