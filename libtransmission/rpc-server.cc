@@ -370,10 +370,11 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
 
 void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 {
-    if (req->type == EVHTTP_REQ_POST)
+    if (auto const cmd = evhttp_request_get_command(req); cmd == EVHTTP_REQ_POST)
     {
-        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(req->input_buffer, -1)),
-                                      evbuffer_get_length(req->input_buffer) };
+        auto* const input_buffer = evhttp_request_get_input_buffer(req);
+        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(input_buffer, -1)),
+                                      evbuffer_get_length(input_buffer) };
         handle_rpc_from_json(req, server, json);
         return;
     }
