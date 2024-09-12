@@ -443,9 +443,10 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
     return std::any_of(std::begin(src), std::end(src), [&hostname](auto const& str) { return tr_wildmat(hostname, str); });
 }
 
-bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
+bool test_session_id(tr_rpc_server const* server, evhttp_request* const req)
 {
-    char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
+    auto const* const input_headers = evhttp_request_get_input_headers(req);
+    char const* const session_id = evhttp_find_header(input_headers, TR_RPC_SESSION_ID_HEADER);
     return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
