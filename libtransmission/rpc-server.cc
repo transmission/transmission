@@ -223,9 +223,10 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
 [[nodiscard]] evbuffer* make_response(struct evhttp_request* req, tr_rpc_server const* server, std::string_view content)
 {
     auto* const out = evbuffer_new();
+    auto const* const input_headers = evhttp_request_get_input_headers(req);
+    auto* const output_headers = evhttp_request_get_output_headers(req);
 
-    char const* key = "Accept-Encoding";
-    char const* encoding = evhttp_find_header(req->input_headers, key);
+    char const* encoding = evhttp_find_header(input_headers, "Accept-Encoding");
 
     if (bool const do_compress = encoding != nullptr && tr_strv_contains(encoding, "gzip"sv); !do_compress)
     {
@@ -247,7 +248,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
         if (0 < compressed_len && compressed_len < std::size(content))
         {
             iov.iov_len = compressed_len;
-            evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
+            evhttp_add_header(output_headers, "Content-Encoding", "gzip");
         }
         else
         {
