@@ -1334,7 +1334,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
                 "leechers:{} "
                 "downloads:{} "
                 "downloaders:{} "
-                "min_request_interval:{} "
+                "min_scrape_interval:{} "
                 "err:{} ",
                 response.scrape_url.sv(),
                 response.did_connect,
@@ -1343,7 +1343,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
                 row.leechers.value_or(-1),
                 row.downloads.value_or(-1),
                 row.downloaders.value_or(-1),
-                response.min_request_interval,
+                response.min_scrape_interval,
                 std::empty(response.errmsg) ? "none"sv : response.errmsg));
 
         tier->isScraping = false;
@@ -1366,7 +1366,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
         else
         {
             tier->lastScrapeSucceeded = true;
-            tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response.min_request_interval);
+            tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response.min_scrape_interval);
             tier->scheduleNextScrape();
             tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
 

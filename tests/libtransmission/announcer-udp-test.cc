@@ -113,7 +113,7 @@ protected:
         EXPECT_EQ(expected.did_connect, actual.did_connect);
         EXPECT_EQ(expected.did_timeout, actual.did_timeout);
         EXPECT_EQ(expected.errmsg, actual.errmsg);
-        EXPECT_EQ(expected.min_request_interval, actual.min_request_interval);
+        EXPECT_EQ(expected.min_scrape_interval, actual.min_scrape_interval);
         EXPECT_EQ(expected.scrape_url, actual.scrape_url);
 
         EXPECT_EQ(expected.row_count, actual.row_count);
@@ -168,7 +168,7 @@ protected:
         response.rows[0].downloads = 3;
         response.rows[0].downloaders = std::nullopt;
         response.scrape_url = DefaultScrapeUrl;
-        response.min_request_interval = 0;
+        response.min_scrape_interval = 0;
 
         return std::make_pair(buildScrapeRequestFromResponse(response), response);
     }
@@ -439,7 +439,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, std::nullopt };
     expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, std::nullopt };
     expected_response.scrape_url = DefaultScrapeUrl;
-    expected_response.min_request_interval = 0;
+    expected_response.min_scrape_interval = 0;
 
     // Obtain the source socket address from tracker url
     auto [from, fromlen] = sockaddrFromUrl(expected_response.scrape_url);
@@ -492,7 +492,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     expected_response.rows[0].downloads = std::nullopt;
     expected_response.rows[0].downloaders = std::nullopt;
     expected_response.scrape_url = DefaultScrapeUrl;
-    expected_response.min_request_interval = 0;
+    expected_response.min_scrape_interval = 0;
     expected_response.errmsg = "Unrecognized info-hash";
 
     // Obtain the source socket address from tracker url
@@ -546,7 +546,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     expected_response.rows[0].downloads = std::nullopt;
     expected_response.rows[0].downloaders = std::nullopt;
     expected_response.scrape_url = DefaultScrapeUrl;
-    expected_response.min_request_interval = 0;
+    expected_response.min_scrape_interval = 0;
     expected_response.errmsg = "Unable to Connect";
 
     // Obtain the source socket address from tracker url

@@ -205,7 +205,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "metadata_size"sv,
     "metainfo"sv,
     "method"sv,
-    "min_request_interval"sv,
     "move"sv,
     "msg_type"sv,
     "mtimes"sv,
