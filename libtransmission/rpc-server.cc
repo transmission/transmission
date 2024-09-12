@@ -402,7 +402,7 @@ bool isIPAddressWithOptionalPort(char const* host)
     return evutil_parse_sockaddr_port(host, reinterpret_cast<sockaddr*>(&address), &address_len) != -1;
 }
 
-bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
+bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
 {
     /* If password auth is enabled, any hostname is permitted. */
     if (server->is_password_enabled())
@@ -416,7 +416,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
         return true;
     }
 
-    char const* const host = evhttp_find_header(req->input_headers, "Host");
+    auto const* const host = evhttp_request_get_host(req);
 
     /* No host header, invalid request. */
     if (host == nullptr)
@@ -431,10 +431,10 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
     }
 
     /* Host header might include the port. */
-    auto const hostname = std::string(host, strcspn(host, ":"));
+    auto const hostname = std::string_view{ host, strcspn(host, ":") };
 
     /* localhost is always acceptable. */
-    if (hostname == "localhost" || hostname == "localhost.")
+    if (hostname == "localhost"sv || hostname == "localhost."sv)
     {
         return true;
     }
