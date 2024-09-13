@@ -476,6 +476,9 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
         {
+            tr_logAddWarn(fmt::format(
+                _("Rejected request from {host} (brute force protection active)"),
+                fmt::arg("host", req->remote_host)));
             send_simple_response(req, HttpErrorForbidden);
             return;
         }
