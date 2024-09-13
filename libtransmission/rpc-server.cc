@@ -332,6 +332,9 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 
         if (tr_strv_contains(subpath, ".."sv))
         {
+            tr_logAddWarn(fmt::format(
+                _("Rejected request from {host} (possible directory traversal attack)"),
+                fmt::arg("host", req->remote_host)));
             send_simple_response(req, HTTP_NOTFOUND);
         }
         else
