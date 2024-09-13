@@ -444,7 +444,6 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_remote_session_enabled, false);
     settings.try_emplace(TR_KEY_remote_session_requres_authentication, false);
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
-    settings.try_emplace(TR_KEY_show_extra_peer_details, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);
     settings.try_emplace(TR_KEY_show_notification_area_icon, false);
     settings.try_emplace(TR_KEY_start_minimized, false);
