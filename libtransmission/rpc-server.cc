@@ -505,6 +505,8 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (!is_authorized(server, evhttp_find_header(req->input_headers, "Authorization")))
         {
+            tr_logAddWarn(
+                fmt::format(_("Rejected request from {host} (failed authentication)"), fmt::arg("host", req->remote_host)));
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             if (server->is_anti_brute_force_enabled())
             {
