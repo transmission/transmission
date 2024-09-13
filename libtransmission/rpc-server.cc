@@ -578,6 +578,8 @@ void handle_request(struct evhttp_request* req, void* arg)
         }
         else
         {
+            tr_logAddWarn(
+                fmt::format(_("Unknown URI from {host}: '{uri}'"), fmt::arg("host", req->remote_host), fmt::arg("uri", uri)));
             send_simple_response(req, HTTP_NOTFOUND, req->uri);
         }
     }
