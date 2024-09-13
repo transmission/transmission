@@ -551,6 +551,8 @@ void handle_request(struct evhttp_request* req, void* arg)
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
                 "attacks.</p>";
+            tr_logAddWarn(
+                fmt::format(_("Rejected request from {host} (Host not whitelisted)"), fmt::arg("host", req->remote_host)));
             send_simple_response(req, 421, tmp);
         }
 #ifdef REQUIRE_SESSION_ID
