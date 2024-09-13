@@ -482,6 +482,8 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (!is_address_allowed(server, req->remote_host))
         {
+            tr_logAddWarn(
+                fmt::format(_("Rejected request from {host} (IP not whitelisted)"), fmt::arg("host", req->remote_host)));
             send_simple_response(req, HttpErrorForbidden);
             return;
         }
