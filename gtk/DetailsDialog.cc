@@ -2349,7 +2349,6 @@ AddTrackerDialog::AddTrackerDialog(
 #endif
 
     gtr_paste_clipboard_url_into_entry(*url_entry_);
-    url_entry_->grab_focus();
 }
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(

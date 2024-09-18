@@ -436,6 +436,5 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     set_default(*accept);
 #endif
 
-    e->grab_focus();
     signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
 }
