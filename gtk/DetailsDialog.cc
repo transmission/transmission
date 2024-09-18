@@ -2342,7 +2342,14 @@ AddTrackerDialog::AddTrackerDialog(
     set_transient_for(parent);
 
     auto* const accept = get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
-    gtr_paste_clipboard_url_into_entry_and_focus(*url_entry_, *accept);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    set_default_widget(*accept);
+#else
+    set_default(*accept);
+#endif
+
+    gtr_paste_clipboard_url_into_entry(*url_entry_);
+    url_entry_->grab_focus();
 }
 
 std::unique_ptr<AddTrackerDialog> AddTrackerDialog::create(

@@ -875,18 +875,16 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 ****
 ***/
 
-void gtr_paste_clipboard_url_into_entry_and_focus(Gtk::Entry& entry, Gtk::Widget& accept)
+void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
-    auto const process = [&entry, &accept](Glib::ustring const& text)
+    auto const process = [&entry](Glib::ustring const& text)
     {
         if (auto const sv = tr_strv_strip(text.raw());
             !sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
         {
             entry.set_text(text);
-            accept.grab_focus();
             return true;
         }
-        entry.grab_focus();
         return false;
     };
 

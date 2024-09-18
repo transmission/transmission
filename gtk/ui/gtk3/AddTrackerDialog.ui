@@ -99,6 +99,7 @@
                     <property name="width-request">400</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
+                    <property name="activates-default">1</property>
                     <property name="hexpand">True</property>
                   </object>
                   <packing>
