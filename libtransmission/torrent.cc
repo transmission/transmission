@@ -2102,9 +2102,9 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
         break;
 
     case tr_tracker_event::Type::Counts:
-        if (is_private() && (event->leechers == 0))
+        if (is_private() && (event->leechers == 0 || event->downloaders == 0))
         {
-            swarm_is_all_seeds_.emit(this);
+            swarm_is_all_upload_only_.emit(this);
         }
 
         break;
