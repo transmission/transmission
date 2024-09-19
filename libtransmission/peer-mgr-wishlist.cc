@@ -398,7 +398,7 @@ private:
     bool candidates_dirty_ = true;
     bool is_endgame_ = false;
 
-    std::array<libtransmission::ObserverTag, 12U> const tags_;
+    std::array<libtransmission::ObserverTag, 13U> const tags_;
 
     Mediator& mediator_;
 };
@@ -407,6 +407,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
           mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b, tr_bitfield const& ar)
                                               { peer_disconnect(b, ar); }),
+          mediator_in.observe_got_bad_piece([this](tr_torrent*, tr_piece_index_t) { set_candidates_dirty(); }),
           mediator_in.observe_got_bitfield([this](tr_torrent*, tr_bitfield const& b) { inc_replication_bitfield(b); }),
           mediator_in.observe_got_block([this](tr_torrent*, tr_block_index_t b) { client_got_block(b); }),
           mediator_in.observe_got_choke([this](tr_torrent*, tr_bitfield const& b) { dec_active_request_bitfield(b); }),

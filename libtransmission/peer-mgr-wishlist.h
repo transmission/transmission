@@ -45,6 +45,8 @@ public:
 
         [[nodiscard]] virtual libtransmission::ObserverTag observe_peer_disconnect(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) = 0;
+        [[nodiscard]] virtual libtransmission::ObserverTag observe_got_bad_piece(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_block(

@@ -322,6 +322,8 @@ public:
 
         [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_bad_piece(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_block(
@@ -977,6 +979,12 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_peer_disconnect
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer)
 {
     return swarm_.peer_disconnect.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bad_piece(
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+{
+    return tor_.got_bad_piece_.observe(std::move(observer));
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(

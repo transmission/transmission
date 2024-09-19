@@ -91,6 +91,12 @@ protected:
             return parent_.peer_disconnect_.observe(std::move(observer));
         }
 
+        [[nodiscard]] libtransmission::ObserverTag observe_got_bad_piece(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override
+        {
+            return parent_.got_bad_piece_.observe(std::move(observer));
+        }
+
         [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override
         {
@@ -160,6 +166,7 @@ protected:
     };
 
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&> peer_disconnect_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
     libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke_;
@@ -740,6 +747,81 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
         EXPECT_EQ(150U, requested.count());
         EXPECT_EQ(100U, requested.count(0, 100));
         EXPECT_EQ(50U, requested.count(100, 300));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, gotBadPieceRebuildsWishlist)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, we thought we have all of them
+        mediator.piece_count_ = 3;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+
+        mediator.client_has_piece_.insert(0);
+        mediator.client_has_piece_.insert(1);
+        mediator.client_has_piece_.insert(2);
+
+        // and we want everything
+        for (tr_piece_index_t i = 0; i < 3; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // all pieces had the same rarity
+        mediator.piece_replication_[0] = 2;
+        mediator.piece_replication_[1] = 2;
+        mediator.piece_replication_[2] = 2;
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+        (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
+
+        // piece 1 turns out to be corrupted
+        got_bad_piece_.emit(nullptr, 1);
+        mediator.client_has_piece_.erase(1);
+
+        return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    };
+
+    // The wishlist should consider piece 1 missing, so it will request
+    // blocks from it.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const spans = get_spans(100);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& span : spans)
+        {
+            requested.set_span(span.begin, span.end);
+        }
+        EXPECT_EQ(100U, requested.count());
+        EXPECT_EQ(0U, requested.count(0, 100));
+        EXPECT_EQ(100U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(200, 300));
+    }
+
+    // Same premise as previous test, but ask for more blocks.
+    // But since only piece 1 is missing, we will get 100 blocks only.
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto const spans = get_spans(150);
+        auto requested = tr_bitfield{ 300 };
+        for (auto const& span : spans)
+        {
+            requested.set_span(span.begin, span.end);
+        }
+        EXPECT_EQ(100U, requested.count());
+        EXPECT_EQ(0U, requested.count(0, 100));
+        EXPECT_EQ(100U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(200, 300));
     }
 }
 
