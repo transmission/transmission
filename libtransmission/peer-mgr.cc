@@ -313,6 +313,7 @@ public:
         [[nodiscard]] bool client_has_block(tr_block_index_t block) const override;
         [[nodiscard]] bool client_has_piece(tr_piece_index_t piece) const override;
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override;
+        [[nodiscard]] bool is_aligned_block(tr_block_index_t block) const override;
         [[nodiscard]] bool is_sequential_download() const override;
         [[nodiscard]] uint8_t count_active_requests(tr_block_index_t block) const override;
         [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override;
@@ -933,6 +934,13 @@ bool tr_swarm::WishlistMediator::client_has_piece(tr_piece_index_t piece) const
 bool tr_swarm::WishlistMediator::client_wants_piece(tr_piece_index_t piece) const
 {
     return tor_.piece_is_wanted(piece);
+}
+
+bool tr_swarm::WishlistMediator::is_aligned_block(tr_block_index_t block) const
+{
+    auto const begin_loc = tor_.block_loc(block);
+    auto const end_loc = tor_.byte_loc(begin_loc.byte + tor_.block_size(block) - 1);
+    return begin_loc.piece == end_loc.piece;
 }
 
 bool tr_swarm::WishlistMediator::is_sequential_download() const
