@@ -962,7 +962,17 @@ size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piec
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
 {
-    return tor_.block_span_for_piece(piece);
+    auto span = tor_.block_span_for_piece(piece);
+
+    // Overlapping block spans caused by blocks unaligned to piece boundaries
+    // might cause redundant block requests to be sent out, so detect it and
+    // ensure that block spans within the wishlist do not overlap.
+    if (auto const is_unaligned_piece = tor_.block_loc(span.begin).piece != piece; is_unaligned_piece)
+    {
+        ++span.begin;
+    }
+
+    return span;
 }
 
 tr_piece_index_t tr_swarm::WishlistMediator::piece_count() const
