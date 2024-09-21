@@ -55,11 +55,6 @@ protected:
             return client_wants_piece_.count(piece) != 0;
         }
 
-        [[nodiscard]] bool is_aligned_block(tr_block_index_t /*block*/) const override
-        {
-            return true;
-        }
-
         [[nodiscard]] bool is_sequential_download() const override
         {
             return is_sequential_download_;

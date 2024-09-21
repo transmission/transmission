@@ -36,7 +36,6 @@ public:
         [[nodiscard]] virtual bool client_has_block(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool client_has_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool client_wants_piece(tr_piece_index_t piece) const = 0;
-        [[nodiscard]] virtual bool is_aligned_block(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool is_sequential_download() const = 0;
         [[nodiscard]] virtual uint8_t count_active_requests(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual size_t count_piece_replication(tr_piece_index_t piece) const = 0;
