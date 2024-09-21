@@ -61,31 +61,35 @@ class Wishlist::Impl
 {
     struct Candidate
     {
-        Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_in, Impl* parent)
+        Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_in, Mediator const* mediator)
             : piece{ piece_in }
-            , block_span{ parent->mediator_.block_span(piece_in) }
-            , replication{ parent->mediator_.count_piece_replication(piece_in) }
-            , priority{ parent->mediator_.priority(piece_in) }
+            , block_span{ mediator->block_span(piece_in) }
+            , replication{ mediator->count_piece_replication(piece_in) }
+            , priority{ mediator->priority(piece_in) }
             , salt{ salt_in }
-            , parent_{ parent }
+            , mediator_{ mediator }
         {
+            n_reqs.reserve(block_span.end - block_span.begin);
+            for (auto [block, end] = block_span; block < end; ++block)
+            {
+                if (!mediator_->client_has_block(block))
+                {
+                    n_reqs.try_emplace(block, mediator_->count_active_requests(block));
+                }
+            }
         }
 
         [[nodiscard]] int compare(Candidate const& that) const noexcept; // <=>
 
-        [[nodiscard]] auto operator<(Candidate const& that) const
+        [[nodiscard]] auto operator<(Candidate const& that) const // less than
         {
             return compare(that) < 0;
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto count_missing_blocks() const
-        {
-            auto const [begin, end] = parent_->get_block_range(block_span);
-            return end - begin;
-        }
-
         tr_piece_index_t piece;
         tr_block_span_t block_span;
+
+        small::map<tr_block_index_t, uint8_t> n_reqs;
 
         // Caching the following 2 values are highly beneficial, because:
         // - they are often used (mainly because resort_piece() is called
@@ -99,11 +103,10 @@ class Wishlist::Impl
         tr_piece_index_t salt;
 
     private:
-        Impl* parent_;
+        Mediator const* mediator_;
     };
 
     using CandidateVec = std::vector<Candidate>;
-    using ActiveReqMap = small::map<tr_block_index_t, uint8_t>;
 
 public:
     explicit Impl(Mediator& mediator_in);
@@ -224,9 +227,30 @@ private:
             return;
         }
 
-        for (auto [iter, end] = get_block_range(block_span); iter != end; ++iter)
+        for (auto block = block_span.begin; block < block_span.end;)
         {
-            ++iter->second;
+            auto it_p = find_by_block(block);
+            if (it_p == std::end(candidates_))
+            {
+                set_candidates_dirty();
+                break;
+            }
+
+            auto& n_reqs = it_p->n_reqs;
+
+            auto it_b_begin = std::begin(n_reqs);
+            it_b_begin = it_b_begin->first >= block_span.begin ? it_b_begin : n_reqs.find(block_span.begin);
+
+            auto it_b_end = std::prev(std::end(n_reqs));
+            it_b_end = it_b_end->first < block_span.end ? it_b_end : n_reqs.find(block_span.end - 1);
+            it_b_end = std::next(it_b_end);
+
+            for (auto it_b = it_b_begin; it_b != it_b_end; ++it_b)
+            {
+                ++it_b->second;
+            }
+
+            block = it_p->block_span.end;
         }
     }
 
@@ -237,9 +261,13 @@ private:
             return;
         }
 
-        if (auto iter = n_reqs_.find(block); iter != std::end(n_reqs_) && iter->second > 0U)
+        if (auto it_p = find_by_block(block); it_p != std::end(candidates_))
         {
-            --iter->second;
+            auto& n_reqs = it_p->n_reqs;
+            if (auto it_b = n_reqs.find(block); it_b != std::end(n_reqs) && it_b->second > 0U)
+            {
+                --it_b->second;
+            }
         }
     }
 
@@ -250,11 +278,14 @@ private:
             return;
         }
 
-        for (auto& [block, n_req] : n_reqs_)
+        for (auto& candidate : candidates_)
         {
-            if (n_req > 0U && requests.test(block))
+            for (auto& [block, n_req] : candidate.n_reqs)
             {
-                --n_req;
+                if (n_req > 0U && requests.test(block))
+                {
+                    --n_req;
+                }
             }
         }
     }
@@ -268,19 +299,10 @@ private:
             return;
         }
 
-        n_reqs_.erase(block);
-
-        if (mediator_.is_aligned_block(block))
+        if (auto iter = find_by_block(block); iter != std::end(candidates_))
         {
-            if (auto iter = find_by_block(block); iter != std::end(candidates_))
-            {
-                resort_piece(iter);
-            }
-        }
-        else
-        {
-            // Potentially up to 2 pieces need resorting, so resort_piece() won't work
-            std::sort(std::begin(candidates_), std::end(candidates_));
+            iter->n_reqs.erase(block);
+            resort_piece(iter);
         }
     }
 
@@ -310,38 +332,6 @@ private:
             [block](auto const& c) { return c.block_span.begin <= block && block < c.block_span.end; });
     }
 
-    TR_CONSTEXPR20 std::pair<ActiveReqMap::iterator, ActiveReqMap::iterator> get_block_range(tr_block_span_t span)
-    {
-        struct CompareToSpan
-        {
-            [[nodiscard]] static constexpr int compare(ActiveReqMap::value_type const& item, tr_block_span_t const span) // <=>
-            {
-                if (item.first < span.begin)
-                {
-                    return -1;
-                }
-
-                if (item.first >= span.end)
-                {
-                    return 1;
-                }
-
-                return 0;
-            }
-
-            [[nodiscard]] constexpr bool operator()(ActiveReqMap::value_type const& item, tr_block_span_t const span) const // <
-            {
-                return compare(item, span) < 0;
-            }
-
-            [[nodiscard]] constexpr bool operator()(tr_block_span_t const span, ActiveReqMap::value_type const& item) const // <
-            {
-                return compare(item, span) > 0;
-            }
-        };
-        return std::equal_range(std::begin(n_reqs_), std::end(n_reqs_), span, CompareToSpan{});
-    }
-
     void maybe_rebuild_candidate_list()
     {
         if (!candidates_dirty_)
@@ -350,7 +340,6 @@ private:
         }
         candidates_dirty_ = false;
         candidates_.clear();
-        n_reqs_.clear();
 
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
@@ -364,15 +353,7 @@ private:
             }
 
             auto const salt = is_sequential ? piece : salter();
-            auto const& candidate = candidates_.emplace_back(piece, salt, this);
-
-            for (auto [block, end] = candidate.block_span; block < end; ++block)
-            {
-                if (!mediator_.client_has_block(block))
-                {
-                    n_reqs_.try_emplace(block, mediator_.count_active_requests(block));
-                }
-            }
+            candidates_.emplace_back(piece, salt, &mediator_);
         }
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
@@ -414,7 +395,6 @@ private:
     }
 
     CandidateVec candidates_;
-    ActiveReqMap n_reqs_;
     bool candidates_dirty_ = true;
     bool is_endgame_ = false;
 
@@ -475,10 +455,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // walk the blocks in this piece that we don't have
-        for (auto [it_b, it_b_end] = get_block_range(candidate.block_span); it_b != it_b_end; ++it_b)
+        for (auto const& [block, n_req] : candidate.n_reqs)
         {
-            auto const& [block, n_req] = *it_b;
-
             if (std::size(blocks) >= n_wanted_blocks)
             {
                 break;
@@ -509,16 +487,16 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     is_endgame_ = std::size(blocks) < n_wanted_blocks;
 
-    // Ensure the list of blocks are sorted and unique
+    // Ensure the list of blocks are sorted
+    // The list needs to be unique as well, but that should come naturally
     std::sort(std::begin(blocks), std::end(blocks));
-    blocks.erase(std::unique(std::begin(blocks), std::end(blocks)), std::end(blocks));
     return make_spans(blocks);
 }
 
 int Wishlist::Impl::Candidate::compare(Wishlist::Impl::Candidate const& that) const noexcept
 {
     // prefer pieces closer to completion
-    if (auto const val = tr_compare_3way(count_missing_blocks(), that.count_missing_blocks()); val != 0)
+    if (auto const val = tr_compare_3way(std::size(n_reqs), std::size(that.n_reqs)); val != 0)
     {
         return val;
     }
