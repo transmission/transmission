@@ -239,11 +239,10 @@ private:
             auto& n_reqs = it_p->n_reqs;
 
             auto it_b_begin = std::begin(n_reqs);
-            it_b_begin = it_b_begin->first >= block_span.begin ? it_b_begin : n_reqs.find(block_span.begin);
+            it_b_begin = it_b_begin->first >= block_span.begin ? it_b_begin : n_reqs.lower_bound(block_span.begin);
 
-            auto it_b_end = std::prev(std::end(n_reqs));
-            it_b_end = it_b_end->first < block_span.end ? it_b_end : n_reqs.find(block_span.end - 1);
-            it_b_end = std::next(it_b_end);
+            auto it_b_end = std::end(n_reqs);
+            it_b_end = std::prev(it_b_end)->first < block_span.end ? it_b_end : n_reqs.lower_bound(block_span.end);
 
             for (auto it_b = it_b_begin; it_b != it_b_end; ++it_b)
             {
