@@ -27,7 +27,7 @@
 
 namespace
 {
-std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
+[[nodiscard]] std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
 {
     if (std::empty(blocks))
     {
@@ -111,7 +111,7 @@ class Wishlist::Impl
 public:
     explicit Impl(Mediator& mediator_in);
 
-    std::vector<tr_block_span_t> next(
+    [[nodiscard]] std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
         std::function<bool(tr_piece_index_t)> const& peer_has_piece,
         std::function<bool(tr_block_index_t)> const& has_active_request_to_peer);
@@ -315,7 +315,7 @@ private:
 
     // ---
 
-    TR_CONSTEXPR20 CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
+    [[nodiscard]] TR_CONSTEXPR20 CandidateVec::iterator find_by_piece(tr_piece_index_t const piece)
     {
         return std::find_if(
             std::begin(candidates_),
@@ -323,7 +323,7 @@ private:
             [piece](auto const& c) { return c.piece == piece; });
     }
 
-    TR_CONSTEXPR20 CandidateVec::iterator find_by_block(tr_block_index_t const block)
+    [[nodiscard]] TR_CONSTEXPR20 CandidateVec::iterator find_by_block(tr_block_index_t const block)
     {
         return std::find_if(
             std::begin(candidates_),
