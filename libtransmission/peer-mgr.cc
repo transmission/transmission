@@ -927,7 +927,7 @@ bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
 
 bool tr_swarm::WishlistMediator::client_has_piece(tr_piece_index_t piece) const
 {
-    return tor_.has_piece(piece);
+    return tor_.has_blocks(block_span(piece));
 }
 
 bool tr_swarm::WishlistMediator::client_wants_piece(tr_piece_index_t piece) const
