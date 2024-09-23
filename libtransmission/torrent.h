@@ -342,6 +342,11 @@ struct tr_torrent
         return completion_.has_block(block);
     }
 
+    [[nodiscard]] auto has_blocks(tr_block_span_t span) const
+    {
+        return completion_.has_blocks(span);
+    }
+
     [[nodiscard]] auto count_missing_blocks_in_piece(tr_piece_index_t piece) const
     {
         return completion_.count_missing_blocks_in_piece(piece);
