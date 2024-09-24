@@ -24,7 +24,6 @@
                   </object>
                 </child>
                 <child>
-
                   <object class="GtkGrid" id="url_section_layout">
                     <property name="row-spacing">6</property>
                     <property name="column-spacing">12</property>
