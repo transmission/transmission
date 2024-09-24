@@ -184,7 +184,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 
     // open the file
     int flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
-    flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
+    flags |= TR_SYS_FILE_READ;
     auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
     if (!is_open(fd))
     {
