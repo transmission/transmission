@@ -45,16 +45,15 @@ void EvhttpDeleter::operator()(struct evhttp* evh) const noexcept
     }
 }
 
-struct event * event_new_pri2(
-    struct event_base * base,
+struct event* event_new_pri2(
+    struct event_base* base,
     evutil_socket_t fd,
     short events,
     event_callback_fn callback,
-    void * callback_arg
-)
+    void* callback_arg)
 {
-    struct event * e = event_new(base, fd, events, callback, callback_arg);
-    event_priority_set(e,2);
+    struct event* e = event_new(base, fd, events, callback, callback_arg);
+    event_priority_set(e, 2);
     return e;
 }
 

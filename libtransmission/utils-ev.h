@@ -15,7 +15,7 @@ struct evbuffer;
 struct event;
 struct event_base;
 struct evhttp;
-typedef void (*event_callback_fn)(evutil_socket_t, short, void *);
+typedef void (*event_callback_fn)(evutil_socket_t, short, void*);
 
 namespace libtransmission::evhelpers
 {
@@ -48,12 +48,11 @@ struct EvhttpDeleter
 
 using evhttp_unique_ptr = std::unique_ptr<struct evhttp, EvhttpDeleter>;
 
-struct event * event_new_pri2(
-    struct event_base * base,
+struct event* event_new_pri2(
+    struct event_base* base,
     evutil_socket_t fd,
     short events,
     event_callback_fn callback,
-    void * callback_arg
-);
+    void* callback_arg);
 
 } // namespace libtransmission::evhelpers

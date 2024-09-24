@@ -209,8 +209,18 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        event_read_.reset(libtransmission::evhelpers::event_new_pri2(session_->event_base(), socket_.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
-        event_write_.reset(libtransmission::evhelpers::event_new_pri2(session_->event_base(), socket_.handle.tcp, EV_WRITE, &tr_peerIo::event_write_cb, this));
+        event_read_.reset(libtransmission::evhelpers::event_new_pri2(
+            session_->event_base(),
+            socket_.handle.tcp,
+            EV_READ,
+            &tr_peerIo::event_read_cb,
+            this));
+        event_write_.reset(libtransmission::evhelpers::event_new_pri2(
+            session_->event_base(),
+            socket_.handle.tcp,
+            EV_WRITE,
+            &tr_peerIo::event_write_cb,
+            this));
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -261,8 +271,10 @@ bool tr_peerIo::reconnect()
     }
     socket_ = std::move(sock);
 
-    this->event_read_.reset(libtransmission::evhelpers::event_new_pri2(session_->event_base(), socket_.handle.tcp, EV_READ, event_read_cb, this));
-    this->event_write_.reset(libtransmission::evhelpers::event_new_pri2(session_->event_base(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
+    this->event_read_.reset(
+        libtransmission::evhelpers::event_new_pri2(session_->event_base(), socket_.handle.tcp, EV_READ, event_read_cb, this));
+    this->event_write_.reset(
+        libtransmission::evhelpers::event_new_pri2(session_->event_base(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
 
     event_enable(pending_events);
 

@@ -139,8 +139,8 @@ auto make_event_base()
 {
     tr_session_thread::tr_evthread_init();
 
-    struct event_base *b = event_base_new();
-    event_base_priority_init(b,3);
+    struct event_base* b = event_base_new();
+    event_base_priority_init(b, 3);
     return b;
 }
 
