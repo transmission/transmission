@@ -207,7 +207,6 @@ enum
     TR_KEY_metadata_size,
     TR_KEY_metainfo,
     TR_KEY_method,
-    TR_KEY_min_request_interval,
     TR_KEY_move,
     TR_KEY_msg_type,
     TR_KEY_mtimes,
