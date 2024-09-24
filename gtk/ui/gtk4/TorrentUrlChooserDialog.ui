@@ -42,6 +42,7 @@
                       <object class="GtkEntry" id="url_entry">
                         <property name="width-request">400</property>
                         <property name="focusable">1</property>
+                        <property name="activates-default">1</property>
                         <property name="hexpand">1</property>
                         <layout>
                           <property name="column">1</property>
