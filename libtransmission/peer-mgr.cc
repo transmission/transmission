@@ -949,11 +949,12 @@ size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) 
 
 size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piece) const
 {
-    return std::accumulate(
-        std::begin(swarm_.peers),
-        std::end(swarm_.peers),
-        size_t{},
-        [piece](size_t acc, tr_peer* peer) { return acc + (peer->has_piece(piece) ? 1U : 0U); });
+    auto const op = [piece](size_t acc, auto const& peer)
+    {
+        return acc + (peer->has_piece(piece) ? 1U : 0U);
+    };
+    return std::accumulate(std::begin(swarm_.peers), std::end(swarm_.peers), size_t{}, op) +
+        std::accumulate(std::begin(swarm_.webseeds), std::end(swarm_.webseeds), size_t{}, op);
 }
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
