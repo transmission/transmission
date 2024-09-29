@@ -1112,9 +1112,7 @@ a {
     cursor: pointer;
     font-size: 14px;
     grid-area: name;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   .inspector-torrent-file-list-entry.skip
@@ -1611,6 +1609,7 @@ dialog {
   display: flex;
   font-size: 1.2em;
   font-weight: bold;
+  overflow-wrap: anywhere;
 }
 
 .dialog-logo {
@@ -1739,6 +1738,10 @@ dialog {
   legend {
     font-weight: bolder;
     margin-bottom: 4px;
+  }
+
+  span {
+    overflow-wrap: anywhere;
   }
 }
 
