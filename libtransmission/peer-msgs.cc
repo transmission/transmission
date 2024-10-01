@@ -908,12 +908,6 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     {
         logtrace(this, "got ltep handshake");
         parse_ltep_handshake(payload);
-
-        if (io_->supports_ltep())
-        {
-            send_ltep_handshake();
-            send_ut_pex();
-        }
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
