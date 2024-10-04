@@ -327,7 +327,8 @@ struct tr_torrent
 
     [[nodiscard]] auto has_file(tr_file_index_t file) const
     {
-        return completion_.has_blocks(block_span_for_file(file));
+        auto const span = byte_span_for_file(file);
+        return completion_.count_has_bytes_in_span(span) == span.end - span.begin;
     }
 
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
@@ -1224,7 +1225,7 @@ private:
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
 
-    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
     {
         return fpm_.byte_span_for_file(file);
     }
