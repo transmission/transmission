@@ -13,6 +13,7 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
+#include <maxminddb.h>
 
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
@@ -1136,6 +1137,7 @@ public:
         add(was_updated);
         add(address);
         add(address_collated);
+        add(country);
         add(download_rate_speed);
         add(download_rate_string);
         add(upload_rate_speed);
@@ -1163,6 +1165,7 @@ public:
     Gtk::TreeModelColumn<bool> was_updated;
     Gtk::TreeModelColumn<Glib::ustring> address;
     Gtk::TreeModelColumn<Glib::ustring> address_collated;
+    Gtk::TreeModelColumn<Glib::ustring> country;
     Gtk::TreeModelColumn<Speed> download_rate_speed;
     Gtk::TreeModelColumn<Glib::ustring> download_rate_string;
     Gtk::TreeModelColumn<Speed> upload_rate_speed;
@@ -1217,6 +1220,13 @@ void initPeerRow(
 
     (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
+    MMDB_s mmdb;
+    MMDB_open("/path/to/dbip-country-lite-2024-10.mmdb", MMDB_MODE_MMAP, &mmdb);
+    int gai_error, mmdb_error;
+    MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, "1.1.1.1", &gai_error, &mmdb_error);
+    MMDB_entry_data_s entry_data;
+    MMDB_get_value(&result.entry, &entry_data, "names", "en", NULL);
+    (*iter)[peer_cols.country] = entry_data.utf8_string;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
@@ -1595,6 +1605,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
     view_columns.push_back(&peer_cols.progress);
     view_columns.push_back(&peer_cols.flags);
     view_columns.push_back(&peer_cols.address);
+    view_columns.push_back(&peer_cols.country);
     view_columns.push_back(&peer_cols.client);
 
     /* remove any existing columns */
@@ -1610,6 +1621,13 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Address"), *r);
             c->add_attribute(r->property_text(), *col);
             sort_col = &peer_cols.address_collated;
+        }
+        else if (*col == peer_cols.country)
+        {
+            auto* r = Gtk::make_managed<Gtk::CellRendererText>();
+            c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Country"), *r);
+            c->add_attribute(r->property_text(), *col);
+            // sort_col = &peer_cols.country;
         }
         else if (*col == peer_cols.progress)
         {
