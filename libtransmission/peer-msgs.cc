@@ -310,6 +310,7 @@ public:
     {
         if (tor_.allows_pex())
         {
+            send_ut_pex();
             pex_timer_ = session->timerMaker().create([this]() { send_ut_pex(); });
             pex_timer_->start_repeating(SendPexInterval);
         }
