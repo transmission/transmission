@@ -922,7 +922,7 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
-        if (!tor_->is_public())
+        if (!tor_.is_public())
         {
             logwarn(this, "rejecting ut pex, torrent is private");
             return;
@@ -934,7 +934,7 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
-        if (!tor_->is_public())
+        if (!tor_.is_public())
         {
             logwarn(this, "rejecting ut metadata, torrent is private");
             return;
