@@ -1223,10 +1223,13 @@ void initPeerRow(
     MMDB_s mmdb;
     MMDB_open("/path/to/dbip-country-lite-2024-10.mmdb", MMDB_MODE_MMAP, &mmdb);
     int gai_error, mmdb_error;
-    MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, "1.1.1.1", &gai_error, &mmdb_error);
+    MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, std::data(peer->addr), &gai_error, &mmdb_error);
     MMDB_entry_data_s entry_data;
-    MMDB_get_value(&result.entry, &entry_data, "names", "en", NULL);
-    (*iter)[peer_cols.country] = entry_data.utf8_string;
+    MMDB_get_value(&result.entry, &entry_data, "country", "names", "en", NULL);
+    char country[64];
+    strncpy(country, entry_data.utf8_string, entry_data.data_size);
+    country[entry_data.data_size] = 0;
+    (*iter)[peer_cols.country] = country;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
