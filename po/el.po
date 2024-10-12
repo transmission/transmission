@@ -56,59 +56,59 @@ msgstr "Αδυναμία συνακτικής ανάλυσης επιπέδου 
 
 #: ../daemon/daemon.cc:650
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Αναβολή επαναφόρτωσης έως ότου η συνεδρία έχει εκκινήσει πλήρως."
 
 #: ../daemon/daemon.cc:664
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Επαναφόρτωση ρυθμίσεων από '{path}'"
 
 #: ../daemon/daemon.cc:699
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία εκκίνησης daemon: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:710
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Φόρτωση ρυθμίσεων από '{path}'"
 
 #: ../daemon/daemon.cc:730
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Αποθήκευση pidfile '{path}'"
 
 #: ../daemon/daemon.cc:736 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:471 ../libtransmission/inout.cc:155 ../libtransmission/rpcimpl.cc:1306 ../libtransmission/torrent.cc:1029 ../libtransmission/torrent.cc:1990 ../libtransmission/variant.cc:855
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία αποθήκευσης '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:745
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Απαίτηση πιστοποίησης"
 
 #: ../daemon/daemon.cc:766
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Παρακολούθηση '{path}' για νέα αρχεία torrent"
 
 #: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:181
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας συμβάντος: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία προσθήκης συμβάντος: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:834
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία εκκίνησης daemon event loop: {error} ({error_code})"
 
 #: ../gtk/Application.cc:398
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία καταχώρησης του Transmission ως διαχειριστή {content_type}: {error} ({error_code})"
 
 #: ../gtk/Application.cc:554
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Λήφθηκε σήμα τερματισμού, επιχειρείται ομαλός τερματισμός. Ξαναπροσπαθήστε αν κολλήσει."
 
 #: ../gtk/Application.cc:780
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Το Transmission είναι ένα πρόγραμμα διαμοιρασμού αρχείων. Όταν εκκινείτε ένα torrent, τα δεδομένα του θα γίνουν διαθέσιμα σε άλλους μέσω αποστολής. Όποιο περιεχόμενο μοιράζεστε είναι αποκλειστική ευθύνη σας"
+msgstr "Το Transmission είναι ένα πρόγραμμα διαμοιρασμού αρχείων. Όταν εκκινείτε ένα torrent, τα δεδομένα του θα γίνουν διαθέσιμα σε άλλους μέσω ανεβάσματος. Για όποιο περιεχόμενο μοιράζεστε φέρετε αποκλειστική ευθύνη."
 
 #: ../gtk/Application.cc:786 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:372 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
@@ -120,7 +120,7 @@ msgstr "_Συμφωνώ"
 
 #: ../gtk/Application.cc:1016
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Κλείσιμο συνδέσεων…"
 
 #: ../gtk/Application.cc:1021
 msgid "Sending upload/download totals to tracker…"
@@ -266,15 +266,15 @@ msgstr "Δημόσιο torrent"
 
 #: ../gtk/DetailsDialog.cc:717
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "Δημιουργήθηκε από {creator} την {date}"
 
 #: ../gtk/DetailsDialog.cc:721
 msgid "Created by {creator}"
-msgstr ""
+msgstr "Δημιουργήθηκε από {creator}"
 
 #: ../gtk/DetailsDialog.cc:725
 msgid "Created on {date}"
-msgstr ""
+msgstr "Δημιουργήθηκε την {date}"
 
 #: ../gtk/DetailsDialog.cc:839
 msgid "Unknown"
@@ -299,20 +299,20 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:943
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% από {percent_available}% διαθέσιμα)"
 
 #: ../gtk/DetailsDialog.cc:952
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% από {percent_available}% διαθέσιμα; {unverified_size} μη ελεγχθέντα)"
 
 #: ../gtk/DetailsDialog.cc:985
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
-msgstr ""
+msgstr "{downloaded_size} (+{discarded_size} απορριφθέντα έπειτα από αποτυχημένο checksum)"
 
 #: ../gtk/DetailsDialog.cc:1015
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (Αναλογία: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1056
 msgid "No errors"
@@ -332,27 +332,27 @@ msgstr "Βελτιωτική απόφραξη"
 
 #: ../gtk/DetailsDialog.cc:1498
 msgid "Downloading from this peer"
-msgstr "Γίνεται λήψη από αυτόν τον ομότιμο χρήστη"
+msgstr "Γίνεται λήψη από αυτόν τον διαμοιραστή"
 
 #: ../gtk/DetailsDialog.cc:1502
 msgid "We would download from this peer if they would let us"
-msgstr "Θα γινόταν λήψη απ'αυτόν τον ομότιμο χρήστη αν μας επιτρεπόταν"
+msgstr "Θα γινόταν λήψη απ'αυτόν τον διαμοιραστή αν μας επιτρεπόταν"
 
 #: ../gtk/DetailsDialog.cc:1506
 msgid "Uploading to peer"
-msgstr "Αποστολή σε ομότιμο χρήστη"
+msgstr "Αποστολή σε διαμοιραστή"
 
 #: ../gtk/DetailsDialog.cc:1510
 msgid "We would upload to this peer if they asked"
-msgstr "Θα γίνει αποστολή σε αυτό τον ομότιμο χρήστη αν ζητηθεί"
+msgstr "Θα γίνει αποστολή σε αυτό τον διαμοιραστή αν ζητηθεί"
 
 #: ../gtk/DetailsDialog.cc:1514
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Ο ομότιμος χρήστης μας επιτρέπει την ανταλλαγή δεδομένων, αλλά δεν ενδιαφερόμαστε"
+msgstr "Ο διαμοιραστής μας επιτρέπει την ανταλλαγή δεδομένων, αλλά δεν ενδιαφερόμαστε"
 
 #: ../gtk/DetailsDialog.cc:1518
 msgid "We unchoked this peer, but they're not interested"
-msgstr "Επιτρέπουμε την ανταλλαγή δεδομένων στον ομότιμο χρήστη, αλλά δεν ενδιαφέρεται"
+msgstr "Επιτρέπουμε την ανταλλαγή δεδομένων στον διαμοιραστή, αλλά δεν ενδιαφέρεται"
 
 #: ../gtk/DetailsDialog.cc:1522
 msgid "Encrypted connection"
@@ -360,15 +360,15 @@ msgstr "Κρυπρογραφημένη σύνδεση"
 
 #: ../gtk/DetailsDialog.cc:1526
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "Εύρεση ομότιμου χρήστη μέσω του Peer Exchange (PEX)"
+msgstr "Εύρεση διαμοιραστή μέσω του Peer Exchange (PEX)"
 
 #: ../gtk/DetailsDialog.cc:1530
 msgid "Peer was found through DHT"
-msgstr "Βρέθηκε ομότιμος χρήστης μέσω του DHT"
+msgstr "Βρέθηκε διαμοιραστής μέσω του DHT"
 
 #: ../gtk/DetailsDialog.cc:1534
 msgid "Peer is an incoming connection"
-msgstr "O ομότιμος χρήστης είναι μια εισερχόμενη σύνδεση"
+msgstr "O διαμοιραστής είναι μια εισερχόμενη σύνδεση"
 
 #: ../gtk/DetailsDialog.cc:1538
 msgid "Peer is connected over µTP"
@@ -441,7 +441,7 @@ msgstr ""
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1833
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Λήψη σφάλματος '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1846
 msgid "No updates scheduled"
@@ -449,11 +449,11 @@ msgstr "Δεν έχει προγραμματιστεί καμία ενημέρω
 
 #: ../gtk/DetailsDialog.cc:1853
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Αίτηση για περισσότερους διαμοιραστές {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1860
 msgid "Queued to ask for more peers"
-msgstr "Σε αναμονή αίτησης για επιπλέον ομότιμους χρήστες"
+msgstr "Σε αναμονή αίτησης για επιπλέον διαμοιραστές"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1868
@@ -551,14 +551,14 @@ msgstr[1] "Δεν έχει ολοκληρωθεί η λήψη αυτών των 
 #: ../gtk/Dialogs.cc:78
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "Αυτό το torrent είναι συνδεμένο σε ομότιμους χρήστες."
-msgstr[1] "Αυτά τα torrents είναι συνδεμένα σε ομότιμους χρήστες."
+msgstr[0] "Αυτό το torrent είναι συνδεμένο σε διαμοιραστές."
+msgstr[1] "Αυτά τα torrents είναι συνδεμένα σε διαμοιραστές."
 
 #: ../gtk/Dialogs.cc:85
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "Ένα από αυτά τα torrents είναι συνδεμένo σε ομότιμους χρήστες."
-msgstr[1] "Κάποια από αυτά τα torrents είναι συνδεμένα σε ομότιμους χρήστες."
+msgstr[0] "Ένα από αυτά τα torrents είναι συνδεμένo σε διαμοιραστές."
+msgstr[1] "Κάποια από αυτά τα torrents είναι συνδεμένα σε διαμοιραστές."
 
 #: ../gtk/Dialogs.cc:98
 msgid "One of these torrents has not finished downloading."
@@ -1350,7 +1350,7 @@ msgstr "Εκκίνηση torrent τώρα"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr "Αίτηση στον ιχνηλάτη για ε_πιπλέον ομότιμους χρήστες"
+msgstr "Αίτηση στον ιχνηλάτη για _επιπλέον διαμοιραστές"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
@@ -1590,7 +1590,7 @@ msgstr "Εμφάνιση _περισσότερων  λεπτομερειών"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:617 ../gtk/ui/gtk4/DetailsDialog.ui:461
 msgid "Peers"
-msgstr "Ομότιμοι χρήστες"
+msgstr "Διαμοιραστές"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:738 ../gtk/ui/gtk4/DetailsDialog.ui:536
 msgid "Show _backup trackers"
@@ -2136,17 +2136,17 @@ msgstr "Η σύνδεση απέτυχε"
 
 #: ../libtransmission/announcer-udp.cc:444 ../libtransmission/tr-dht.cc:566
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ανεύρεσης '{address}:{port}': {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:884
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Αναγγελία σφάλματος: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:894
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αναγγελία σφάλματος: {error} (Νέα προσπάθεια σε {count} δευτερόλεπτο) ({url})"
+msgstr[1] "Αναγγελία σφάλματος: {error} (Νέα προσπάθεια σε {count} δευτερόλεπτα) ({url})"
 
 #: ../libtransmission/announcer.cc:1019 ../libtransmission/announcer.cc:1347
 msgid "Could not connect to tracker"
@@ -2392,8 +2392,8 @@ msgstr ""
 #: ../libtransmission/session.cc:1457
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Φορτώθηκαν {count} torrent"
+msgstr[1] "Φορτώθηκαν {count} torrents"
 
 #: ../libtransmission/torrent-metainfo.cc:713
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
@@ -2540,29 +2540,29 @@ msgstr[1] ""
 #: ../utils/create.cc:241
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} κομμάτι, {piece_size}\n"
+msgstr[1] "{piece_count:L} κομμάτια, {piece_size} έκαστο\n"
 
 #: ../utils/remote.cc:143
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ώρα"
+msgstr[1] "ώρες"
 
 #: ../utils/remote.cc:144
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "λεπτό"
+msgstr[1] "λεπτά"
 
 #: ../utils/remote.cc:145 ../utils/remote.cc:165
-msgid "seconds"
+msgid "second"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "δευτερόλεπτο"
+msgstr[1] "δευτερόλεπτα"
 
 #: ../utils/remote.cc:149
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "μέρα"
+msgstr[1] "μέρες"
