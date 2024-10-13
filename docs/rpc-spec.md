@@ -129,6 +129,9 @@ All torrents are used if the `ids` argument is omitted.
 2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
 
+Note that integer torrent ids are not stable across Transmission daemon
+restarts. Use torrent hashes if you need stable ids.
+
 Response arguments: none
 
 ### 3.2 Torrent mutator: `torrent-set`
