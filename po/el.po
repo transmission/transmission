@@ -436,7 +436,7 @@ msgstr[1] ""
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1824
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Η αίτηση για λίστα διαμοιραστών {markup_begin}έληξε {time_span_ago}{markup_end}; θα γίνει νέα προσπάθεια"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1833
@@ -458,24 +458,24 @@ msgstr "Σε αναμονή αίτησης για επιπλέον διαμοι�
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1868
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Ζητήθηκαν περισσότεροι διαμοιραστές {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1893
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "Ο ιχνηλάτης είχε {markup_begin}{seeder_count} {seeder_or_seeders} και {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1895
 msgid "seeder"
 msgid_plural "seeders"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "πάροχος"
+msgstr[1] "πάροχοι"
 
 #: ../gtk/DetailsDialog.cc:1897
 msgid "leecher"
 msgid_plural "leechers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "λήπτης"
+msgstr[1] "λήπτες"
 
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1906
@@ -484,7 +484,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1923
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Αίτηση για περισσότερους διαμοιραστές σε {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1930
 msgid "Queued to ask for peer counts"
@@ -492,11 +492,11 @@ msgstr "Σε αναμονή για αίτηση αριθμού ομότιμων 
 
 #: ../gtk/DetailsDialog.cc:1937
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Ζητήθηκαν αριθμοί διαμοιραστών {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2220
 msgid "{torrent_name} - Edit Trackers"
-msgstr ""
+msgstr "{torrent_name} - Επεξεργασία Ιχνηλατών"
 
 #: ../gtk/DetailsDialog.cc:2254
 msgid "List contains invalid URLs"
@@ -508,7 +508,7 @@ msgstr "Παρακαλώ διορθώστε τα σφάλματα και δοκ�
 
 #: ../gtk/DetailsDialog.cc:2339
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - Προσθήκη Ιχνηλάτη"
 
 #: ../gtk/DetailsDialog.cc:2448 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
 msgid "Trackers"
@@ -516,30 +516,30 @@ msgstr "Ιχνηλάτες"
 
 #: ../gtk/DetailsDialog.cc:2627
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "{torrent_name} Ιδιότητες"
 
 #: ../gtk/DetailsDialog.cc:2632
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ιδιότητες - {torrent_count:L} Torrent"
+msgstr[1] "Ιδιότητες - {torrent_count:L} Torrents"
 
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αφαίρεση torrent;"
+msgstr[1] "Αφαίρεση {count:L} torrents;"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Διαγραφή των κατεβασμένων αρχείων αυτού του torrent;"
+msgstr[1] "Διαγραφή των κατεβασμένων αρχείων αυτών των {count:L} torrents;"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "Μετά την αφαίρεση του torrent, για να είναι δυνατή η επανεκκίνησή του, θα απαιτηθεί το  αρχείο torrent ή ο δεσμός magnet."
+msgstr[0] "Μετά την αφαίρεση του torrent, για να είναι δυνατή η επανεκκίνησή του, θα απαιτηθεί το αρχείο torrent ή ο δεσμός magnet."
 msgstr[1] "Μετά την αφαίρεση των torrent, για να είναι δυνατή η επανεκκίνησή τους, θα απαιτηθούν τα αρχεία torrent ή οι δεσμοί magnet."
 
 #: ../gtk/Dialogs.cc:72
@@ -588,7 +588,7 @@ msgstr "Χαμηλή"
 
 #: ../gtk/FileList.cc:841 ../gtk/Session.cc:311
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία μετονομασίας '{old_path}' σε '{path}': {error} ({error_code})"
 
 #: ../gtk/FileList.cc:954 ../gtk/MessageLogWindow.cc:327
 msgid "Name"
@@ -640,7 +640,7 @@ msgstr ""
 
 #: ../gtk/FreeSpaceLabel.cc:54
 msgid "{disk_space} free"
-msgstr ""
+msgstr "{disk_space} ελεύθερα"
 
 #: ../gtk/MainWindow.cc:381
 msgid ""
@@ -676,27 +676,27 @@ msgstr "Διακοπή αποστολής σε συγκεκριμένη αναλ
 
 #: ../gtk/MainWindow.cc:580
 msgid "Stop at Ratio ({ratio})"
-msgstr ""
+msgstr "Διακοπή σε Αναλογία ({ratio})"
 
 #: ../gtk/MainWindow.cc:593
 msgid "Total Ratio"
-msgstr "Συνολική αναλογία"
+msgstr "Συνολική Αναλογία"
 
 #: ../gtk/MainWindow.cc:594
 msgid "Session Ratio"
-msgstr "Αναλογία συνεδρίας"
+msgstr "Αναλογία Συνεδρίας"
 
 #: ../gtk/MainWindow.cc:595
 msgid "Total Transfer"
-msgstr "Συνολικώς μεταφερθέντα"
+msgstr "Συνολικώς Μεταφερθέντα"
 
 #: ../gtk/MainWindow.cc:596
 msgid "Session Transfer"
-msgstr "Μεταφερθέντα συνεδρίας"
+msgstr "Μεταφερθέντα Συνεδρίας"
 
 #: ../gtk/MainWindow.cc:761 ../gtk/MainWindow.cc:782 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
-msgstr ""
+msgstr "Αναλογία: {ratio}"
 
 #: ../gtk/MainWindow.cc:767
 msgctxt "current session totals"
@@ -718,15 +718,15 @@ msgstr ""
 
 #: ../gtk/MakeDialog.cc:190
 msgid "Creating '{path}'"
-msgstr ""
+msgstr "Δημιουργία '{path}'"
 
 #: ../gtk/MakeDialog.cc:203
 msgid "Created '{path}'"
-msgstr ""
+msgstr "Δημιουργήθηκε το '{path}'"
 
 #: ../gtk/MakeDialog.cc:209 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
 msgid "Couldn't create '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας '{path}': {error} ({error_code})"
 
 #: ../gtk/MakeDialog.cc:227
 msgid "Scanned {file_size}"
@@ -755,22 +755,22 @@ msgstr "Χρόνος"
 #: ../gtk/MessageLogWindow.cc:483
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Κρίσιμο"
 
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Σφάλμα"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Προειδοποίηση"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Πληροφορία"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
@@ -779,7 +779,7 @@ msgstr ""
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας proxy για '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -795,7 +795,7 @@ msgstr "Το torrent oλοκληρώθηκε"
 
 #: ../gtk/Notify.cc:274
 msgid "Start Now"
-msgstr ""
+msgstr "Εκκίνηση Τώρα"
 
 #: ../gtk/Notify.cc:286
 msgid "Torrent Added"
@@ -819,15 +819,15 @@ msgstr "_Άνοιγμα"
 
 #: ../gtk/OptionsDialog.cc:384
 msgid "Show options dialog"
-msgstr ""
+msgstr "Εμφάνιση διαλόγου επιλογών"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "Επιλογή Αρχείου"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
-msgstr ""
+msgstr "(Κανένα)"
 
 #: ../gtk/PrefsDialog.cc:308
 msgid "Allow encryption"
@@ -877,19 +877,19 @@ msgstr "Άγνωστη κατάσταση"
 
 #: ../gtk/PrefsDialog.cc:916
 msgid "Port is {markup_begin}closed{markup_end}"
-msgstr ""
+msgstr "Η θύρα είναι {markup_begin}κλειστή{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:916
 msgid "Port is {markup_begin}open{markup_end}"
-msgstr ""
+msgstr "Η θύρα είναι {markup_begin}ανοιχτή{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:927
 msgid "Testing TCP port…"
-msgstr ""
+msgstr "Έλεγχος θύρας TCP…"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "Μεταφορά '{torrent_name}'"
 
 #: ../gtk/RelocateDialog.cc:96
 msgid "Couldn't move torrent"
@@ -901,21 +901,21 @@ msgstr "Αυτό μπορεί να πάρει λίγο χρόνο…"
 
 #: ../gtk/Session.cc:779 ../libtransmission/watchdir-win32.cc:154 ../libtransmission/watchdir-win32.cc:162
 msgid "Couldn't read '{path}'"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης '{path}'"
 
 #. logging
 #: ../gtk/Session.cc:1037
 msgid "Inhibiting desktop hibernation"
-msgstr "Απαγόρευση αδρανοποίησης επιφάνειας εργασίας"
+msgstr "Απoτροπή αδρανοποίησης επιφάνειας εργασίας"
 
 #: ../gtk/Session.cc:1043 ../gtk/Session.cc:1068
 msgid "Couldn't inhibit desktop hibernation: {error}"
-msgstr ""
+msgstr "Αδυναμία αποτροπής αδρανοποίησης επιφάνειας εργασίας: {error}"
 
 #. logging
 #: ../gtk/Session.cc:1064
 msgid "Allowing desktop hibernation"
-msgstr "Η ρύθμιση για να επιτρέπεται η αδρανοποίηση βρίσκεται σε εξέλιξη"
+msgstr "Ενεργοποίηση αδρανοποίησης επιφάνειας εργασίας"
 
 #: ../gtk/Session.cc:1182
 msgid "Couldn't find pending RPC request for tag {tag}"
@@ -924,8 +924,8 @@ msgstr ""
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ξεκίνησε {count:L} φορά"
+msgstr[1] "Ξεκίνησε {count:L} φορές"
 
 #: ../gtk/StatsDialog.cc:105
 msgid "Reset your statistics?"
@@ -946,11 +946,11 @@ msgstr ""
 #: ../gtk/Torrent.cc:439
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr ""
+msgstr "Έλεγχος τοπικών δεδομένων ({percent_done}% ελεγχθέντα)"
 
 #: ../gtk/Torrent.cc:466
 msgid "{current_size} of {complete_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} από {complete_size} ({percent_done}%)"
 
 #: ../gtk/Torrent.cc:476
 #, no-c-format
@@ -984,15 +984,15 @@ msgstr "Στάσιμο"
 
 #: ../gtk/Torrent.cc:640
 msgid "Tracker warning: '{warning}'"
-msgstr ""
+msgstr "Προειδοποίηση ιχνηλάτη: '{warning}'"
 
 #: ../gtk/Torrent.cc:643
 msgid "Tracker Error: '{error}'"
-msgstr ""
+msgstr "Σφάλμα ιχνηλάτη: '{error}'"
 
 #: ../gtk/Torrent.cc:646
 msgid "Local error: '{error}'"
-msgstr ""
+msgstr "Τοπικό σφάλμα: '{error}'"
 
 #: ../gtk/Torrent.cc:670
 #, no-c-format
@@ -1051,7 +1051,7 @@ msgstr[1] ""
 
 #: ../gtk/Utils.cc:159 ../gtk/Utils.cc:190 ../gtk/Utils.cc:217 ../gtk/Utils.cc:250
 msgid "now"
-msgstr ""
+msgstr "τώρα"
 
 #: ../gtk/Utils.cc:166
 msgid "{days_ago:L} day ago"
