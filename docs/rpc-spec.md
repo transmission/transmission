@@ -129,6 +129,9 @@ All torrents are used if the `ids` argument is omitted.
 2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
 
+Note that integer torrent ids are not stable across Transmission daemon
+restarts. Use torrent hashes if you need stable ids.
+
 Response arguments: none
 
 ### 3.2 Torrent mutator: `torrent-set`
@@ -297,8 +300,9 @@ The 'source' column here corresponds to the data structure there.
 | `beginPiece` | number | tr_file_view
 | `endPiece` | number | tr_file_view
 
+Files are returned in the order they are laid out in the torrent. References to "file indices" throughout this specification should be interpreted as the position of the file within this ordering, with the first file bearing index 0.
 
-`fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
+`fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, in the same order as `files`, each containing:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
