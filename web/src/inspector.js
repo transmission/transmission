@@ -103,6 +103,7 @@ export class Inspector extends EventTarget {
 
     append_section_title('Details');
     rows = [
+      ['name', 'Name:'],
       ['size', 'Size:'],
       ['location', 'Location:'],
       ['hash', 'Hash:'],
@@ -323,7 +324,7 @@ export class Inspector extends EventTarget {
     }
     setTextContent(e.info.availability, fmt.stringSanitizer(string));
 
-    //  downloaded
+    // downloaded
     if (torrents.length === 0) {
       string = none;
     } else {
@@ -366,7 +367,7 @@ export class Inspector extends EventTarget {
     if (torrents.length === 0) {
       string = none;
     } else if (torrents.every((t) => t.isStopped())) {
-      string = stateString; // paused || finished}
+      string = stateString;
     } else {
       const get = (t) => t.getStartDate();
       const first = get(torrents[0]);
@@ -420,6 +421,14 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.error, string || none);
+
+    // torrent name
+    if (torrents.length === 1) {
+      string = torrents[0].getName();
+    } else {
+      string = torrents.length > 0 ? mixed : none;
+    }
+    setTextContent(e.info.name, string);
 
     // size
     if (torrents.length === 0) {
@@ -861,7 +870,6 @@ export class Inspector extends EventTarget {
         break;
       default:
         command = 'priority-normal';
-        break;
     }
 
     this._changeFileCommand(indices, command);

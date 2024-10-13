@@ -962,7 +962,7 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*> got_metainfo_;
     libtransmission::SimpleObservable<tr_torrent*> started_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
-    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
+    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
 
@@ -985,7 +985,20 @@ private:
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
-    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+    friend void tr_torrentRemoveInSessionThread(
+        tr_torrent* tor,
+        bool delete_flag,
+        tr_fileFunc delete_func,
+        void* delete_user_data,
+        tr_torrent_remove_done_func callback,
+        void* callback_user_data);
+    friend void tr_torrentRemove(
+        tr_torrent* tor,
+        bool delete_flag,
+        tr_fileFunc delete_func,
+        void* delete_user_data,
+        tr_torrent_remove_done_func callback,
+        void* callback_user_data);
     friend void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path);
     friend void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority);
     friend void tr_torrentStart(tr_torrent* tor);
