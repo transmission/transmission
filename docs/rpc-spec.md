@@ -300,8 +300,9 @@ The 'source' column here corresponds to the data structure there.
 | `beginPiece` | number | tr_file_view
 | `endPiece` | number | tr_file_view
 
+Files are returned in the order they are laid out in the torrent. References to "file indices" throughout this specification should be interpreted as the position of the file within this ordering, with the first file bearing index 0.
 
-`fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
+`fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, in the same order as `files`, each containing:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
