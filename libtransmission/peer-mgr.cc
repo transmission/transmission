@@ -1173,6 +1173,10 @@ private:
             for (auto* const peer : tor->swarm->peers)
             {
                 peer->peer_info->set_blocklisted_dirty();
+                if (peer->peer_info->is_blocklisted(blocklists_))
+                {
+                    peer->disconnect_soon();
+                }
             }
         }
     }
