@@ -390,8 +390,8 @@ jobs:
           path: pfx/**/*
 
   # Only verify build support on older macOS and SDK
-  macos-12:
-    runs-on: macos-12
+  macos-13:
+    runs-on: macos-13
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
@@ -668,10 +668,10 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  macos-12-x86_64-from-tarball:
+  macos-13-x86_64-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Show Configuration
         run: |
