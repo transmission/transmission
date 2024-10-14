@@ -1137,7 +1137,7 @@ public:
         add(was_updated);
         add(address);
         add(address_collated);
-        add(country);
+        add(location);
         add(download_rate_speed);
         add(download_rate_string);
         add(upload_rate_speed);
@@ -1165,7 +1165,7 @@ public:
     Gtk::TreeModelColumn<bool> was_updated;
     Gtk::TreeModelColumn<Glib::ustring> address;
     Gtk::TreeModelColumn<Glib::ustring> address_collated;
-    Gtk::TreeModelColumn<Glib::ustring> country;
+    Gtk::TreeModelColumn<Glib::ustring> location;
     Gtk::TreeModelColumn<Speed> download_rate_speed;
     Gtk::TreeModelColumn<Glib::ustring> download_rate_string;
     Gtk::TreeModelColumn<Speed> upload_rate_speed;
@@ -1218,18 +1218,25 @@ void initPeerRow(
                 peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
-    (*iter)[peer_cols.address] = std::data(peer->addr);
-    (*iter)[peer_cols.address_collated] = collated_name;
+    // Use libmaxminddb to create location string "City, Country" from IP
     MMDB_s mmdb;
-    MMDB_open("/path/to/dbip-country-lite-2024-10.mmdb", MMDB_MODE_MMAP, &mmdb);
+    MMDB_open("/path/to/dbip-city-lite-2024-10.mmdb", MMDB_MODE_MMAP, &mmdb);
     int gai_error, mmdb_error;
     MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, std::data(peer->addr), &gai_error, &mmdb_error);
     MMDB_entry_data_s entry_data;
+    MMDB_get_value(&result.entry, &entry_data, "city", "names", "en", NULL);
+    int city_len = entry_data.data_size;
+    char location[64];
+    strncpy(location, entry_data.utf8_string, entry_data.data_size);
+    location[entry_data.data_size] = 0;
+    strcat(location, ", ");
     MMDB_get_value(&result.entry, &entry_data, "country", "names", "en", NULL);
-    char country[64];
-    strncpy(country, entry_data.utf8_string, entry_data.data_size);
-    country[entry_data.data_size] = 0;
-    (*iter)[peer_cols.country] = country;
+    strncat(location, entry_data.utf8_string, entry_data.data_size);
+    location[city_len + 2 + entry_data.data_size] = 0;
+
+    (*iter)[peer_cols.address] = std::data(peer->addr);
+    (*iter)[peer_cols.address_collated] = collated_name;
+    (*iter)[peer_cols.location] = location;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
@@ -1608,7 +1615,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
     view_columns.push_back(&peer_cols.progress);
     view_columns.push_back(&peer_cols.flags);
     view_columns.push_back(&peer_cols.address);
-    view_columns.push_back(&peer_cols.country);
+    view_columns.push_back(&peer_cols.location);
     view_columns.push_back(&peer_cols.client);
 
     /* remove any existing columns */
@@ -1625,12 +1632,12 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             c->add_attribute(r->property_text(), *col);
             sort_col = &peer_cols.address_collated;
         }
-        else if (*col == peer_cols.country)
+        else if (*col == peer_cols.location)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererText>();
-            c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Country"), *r);
+            c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Location"), *r);
             c->add_attribute(r->property_text(), *col);
-            // sort_col = &peer_cols.country;
+            // sort_col = &peer_cols.location;
         }
         else if (*col == peer_cols.progress)
         {
