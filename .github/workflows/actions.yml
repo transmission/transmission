@@ -408,9 +408,6 @@ jobs:
         with:
           path: src
           submodules: recursive
-      - name: Set Xcode to 13.2.1
-        run: |
-          sudo xcode-select --switch /Applications/Xcode_13.2.1.app
       - name: Configure
         run: |
           cmake \
