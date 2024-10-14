@@ -906,23 +906,40 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
 
     if (ltep_msgid == LtepMessages::Handshake)
     {
+        if (!io_->supports_ltep())
+        {
+            logwarn(this, "rejecting ltep handshake, peer did not advertise LTEP support");
+            return;
+        }
+
         logtrace(this, "got ltep handshake");
         parse_ltep_handshake(payload);
 
-        if (io_->supports_ltep())
+        if (tor_.allows_pex())
         {
-            send_ltep_handshake();
             send_ut_pex();
         }
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
+        if (!tor_.is_public())
+        {
+            logwarn(this, "rejecting ut pex, torrent is private");
+            return;
+        }
+
         logtrace(this, "got ut pex");
         peer_supports_pex_ = true;
         parse_ut_pex(payload);
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
+        if (!tor_.is_public())
+        {
+            logwarn(this, "rejecting ut metadata, torrent is private");
+            return;
+        }
+
         logtrace(this, "got ut metadata");
         peer_supports_metadata_xfer_ = true;
         parse_ut_metadata(payload);
