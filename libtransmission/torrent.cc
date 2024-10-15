@@ -513,12 +513,14 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
         {
             --walk->queue_position_;
             walk->mark_changed();
+            walk->set_dirty();
         }
 
         if ((old_pos > new_pos) && (new_pos <= walk->queue_position_) && (walk->queue_position_ < old_pos))
         {
             ++walk->queue_position_;
             walk->mark_changed();
+            walk->set_dirty();
         }
 
         max_pos = std::max(max_pos, walk->queue_position_);
@@ -526,6 +528,7 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
 
     queue_position_ = std::min(new_pos, max_pos + 1);
     mark_changed();
+    set_dirty();
 
     TR_ASSERT(torrents_are_sorted_by_queue_position(torrents.get_all()));
 }
@@ -1696,9 +1699,7 @@ void tr_torrent::VerifyMediator::on_verify_started()
 
 void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t const piece, bool const has_piece)
 {
-    auto const had_piece = tor_->has_piece(piece);
-
-    if (has_piece != had_piece)
+    if (auto const had_piece = tor_->has_piece(piece); !has_piece || !had_piece)
     {
         tor_->set_has_piece(piece, has_piece);
         tor_->set_dirty();
@@ -2723,6 +2724,13 @@ void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) n
     {
         tor_.current_dir_ = tor_.incomplete_dir_;
     }
+}
+
+// ---
+
+void tr_torrent::ResumeHelper::load_queue_position(size_t pos) noexcept
+{
+    tor_.queue_position_ = pos;
 }
 
 // ---
