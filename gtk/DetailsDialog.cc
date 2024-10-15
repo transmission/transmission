@@ -13,7 +13,7 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
-#include <maxminddb.h>
+#include <pwd.h>
 
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
@@ -1218,21 +1218,27 @@ void initPeerRow(
                 peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
-    // Use libmaxminddb to create location string "City, Country" from IP
-    MMDB_s mmdb;
-    MMDB_open("/path/to/dbip-city-lite-2024-10.mmdb", MMDB_MODE_MMAP, &mmdb);
-    int gai_error, mmdb_error;
-    MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, std::data(peer->addr), &gai_error, &mmdb_error);
-    MMDB_entry_data_s entry_data;
-    MMDB_get_value(&result.entry, &entry_data, "city", "names", "en", NULL);
-    int city_len = entry_data.data_size;
-    char location[64];
-    strncpy(location, entry_data.utf8_string, entry_data.data_size);
-    location[entry_data.data_size] = 0;
-    strcat(location, ", ");
-    MMDB_get_value(&result.entry, &entry_data, "country", "names", "en", NULL);
-    strncat(location, entry_data.utf8_string, entry_data.data_size);
-    location[city_len + 2 + entry_data.data_size] = 0;
+    // Compute location from IP
+    struct passwd* pw = getpwuid(getuid());
+    char const* homedir = pw->pw_dir;
+    char executable[256], location[64];
+    ;
+    strcpy(executable, homedir);
+    strcat(executable, "/.ip-to-location/ip_to_location");
+    if (access(executable, F_OK) == 0)
+    {
+        strcat(executable, " ");
+        strcat(executable, std::data(peer->addr));
+        strcat(executable, " > /tmp/transmission-peer-location");
+        system(executable);
+        FILE* file = fopen("/tmp/transmission-peer-location", "r");
+        fgets(location, sizeof(location), file);
+        fclose(file);
+    }
+    else
+    {
+        strcpy(location, "");
+    }
 
     (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
