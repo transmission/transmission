@@ -44,11 +44,16 @@ export class Inspector extends EventTarget {
     this._setTorrents(this.controller.getSelectedTorrents());
 
     document.body.append(this.elements.root);
+
+    setTimeout(() => {
+      document.querySelector('#container-contractor').classList = 'contract';
+    }, 0);
   }
 
   close() {
     if (!this.closed) {
       clearInterval(this.interval);
+      document.querySelector('#container-contractor').removeAttribute('class');
       this._setTorrents([]);
       this.elements.root.remove();
       this.controller.removeEventListener(
