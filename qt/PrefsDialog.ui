@@ -866,6 +866,13 @@ To add a new primary URL, add it after a blank line.</string>
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="showPiecebarCheck">
+            <property name="text">
+             <string>Show the downloaded pieces in addition to the progressbar</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

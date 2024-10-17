@@ -345,6 +345,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "show-filterbar"sv,
     "show-notification-area-icon"sv,
     "show-options-window"sv,
+    "show-piecebar"sv,
     "show-statusbar"sv,
     "show-toolbar"sv,
     "show-tracker-scrapes"sv,

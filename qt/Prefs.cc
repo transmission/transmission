@@ -65,6 +65,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { DIR_WATCH_ENABLED, TR_KEY_watch_dir_enabled, QMetaType::Bool },
     { SHOW_TRAY_ICON, TR_KEY_show_notification_area_icon, QMetaType::Bool },
     { START_MINIMIZED, TR_KEY_start_minimized, QMetaType::Bool },
+    { SHOW_PIECEBAR, TR_KEY_show_piecebar, QMetaType::Bool },
     { SHOW_NOTIFICATION_ON_ADD, TR_KEY_torrent_added_notification_enabled, QMetaType::Bool },
     { SHOW_NOTIFICATION_ON_COMPLETE, TR_KEY_torrent_complete_notification_enabled, QMetaType::Bool },
     { ASKQUIT, TR_KEY_prompt_before_exit, QMetaType::Bool },
@@ -448,6 +449,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_show_notification_area_icon, false);
     settings.try_emplace(TR_KEY_start_minimized, false);
     settings.try_emplace(TR_KEY_show_options_window, true);
+    settings.try_emplace(TR_KEY_show_piecebar, true);
     settings.try_emplace(TR_KEY_show_statusbar, true);
     settings.try_emplace(TR_KEY_show_toolbar, true);
     settings.try_emplace(TR_KEY_show_tracker_scrapes, false);
