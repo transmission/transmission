@@ -623,6 +623,11 @@ private:
     void parse_ut_pex(MessageReader& payload);
     void parse_ltep(MessageReader& payload);
 
+    [[nodiscard]] constexpr bool peer_supports_pex() const noexcept
+    {
+        return ut_pex_id_ != 0U;
+    }
+
     void send_ut_pex();
 
     int client_got_block(std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t block);
@@ -694,7 +699,6 @@ private:
 
     // ---
 
-    bool peer_supports_pex_ = false;
     bool client_sent_ltep_handshake_ = false;
 
     size_t desired_request_count_ = 0;
@@ -944,7 +948,6 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
-        peer_supports_pex_ = true;
         parse_ut_pex(payload);
     }
     else if (ltep_msgid == UT_METADATA_ID)
@@ -1009,7 +1012,7 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 void tr_peerMsgsImpl::send_ut_pex()
 {
     // only send pex if both the torrent and peer support it
-    if (!peer_supports_pex_ || !tor_.allows_pex())
+    if (!peer_supports_pex() || !tor_.allows_pex())
     {
         return;
     }
@@ -1235,14 +1238,12 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     }
 
     // check supported messages for utorrent pex
-    peer_supports_pex_ = false;
     auto holepunch_supported = false;
 
     if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
     {
         if (auto ut_pex = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_pex, &ut_pex))
         {
-            peer_supports_pex_ = ut_pex != 0;
             ut_pex_id_ = static_cast<uint8_t>(ut_pex);
             logtrace(this, fmt::format("msgs->ut_pex is {:d}", ut_pex_id_));
         }
