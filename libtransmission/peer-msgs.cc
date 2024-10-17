@@ -577,6 +577,11 @@ private:
 
     // ---
 
+    [[nodiscard]] constexpr bool peer_supports_metadata_xfer() const noexcept
+    {
+        return ut_metadata_id_ != 0U;
+    }
+
     [[nodiscard]] std::optional<int64_t> pop_next_metadata_request()
     {
         auto& reqs = peer_requested_metadata_pieces_;
@@ -676,7 +681,6 @@ private:
     // ---
 
     bool peer_supports_pex_ = false;
-    bool peer_supports_metadata_xfer_ = false;
     bool client_sent_ltep_handshake_ = false;
 
     size_t desired_request_count_ = 0;
@@ -924,7 +928,6 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     else if (ltep_msgid == UT_METADATA_ID)
     {
         logtrace(this, "got ut metadata");
-        peer_supports_metadata_xfer_ = true;
         parse_ut_metadata(payload);
     }
     else
@@ -1201,7 +1204,6 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
     // check supported messages for utorrent pex
     peer_supports_pex_ = false;
-    peer_supports_metadata_xfer_ = false;
     auto holepunch_supported = false;
 
     if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
@@ -1215,7 +1217,6 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
         if (auto ut_metadata = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
         {
-            peer_supports_metadata_xfer_ = ut_metadata != 0;
             ut_metadata_id_ = static_cast<uint8_t>(ut_metadata);
             logtrace(this, fmt::format("msgs->ut_metadata_id_ is {:d}", ut_metadata_id_));
         }
@@ -1239,11 +1240,11 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
     // look for metainfo size (BEP 9)
     if (auto metadata_size = int64_t{};
-        peer_supports_metadata_xfer_ && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
+        peer_supports_metadata_xfer() && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
     {
         if (!tr_metadata_download::is_valid_metadata_size(metadata_size))
         {
-            peer_supports_metadata_xfer_ = false;
+            ut_metadata_id_ = 0U;
         }
         else
         {
@@ -1817,7 +1818,7 @@ void tr_peerMsgsImpl::pulse()
 
 void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
 {
-    if (!peer_supports_metadata_xfer_)
+    if (!peer_supports_metadata_xfer())
     {
         return;
     }
