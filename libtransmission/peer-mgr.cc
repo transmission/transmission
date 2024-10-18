@@ -1136,7 +1136,7 @@ private:
                 if (peer->peer_info->is_blocklisted(blocklists_))
                 {
                     peer->disconnect_soon();
-                    tr_logAddDebug(fmt::format("Peer {} blocked in blocklists update", peer->display_name()));
+                    tr_logAddDebugTor(tor, fmt::format("Peer {} blocked in blocklists update", peer->display_name()));
                 }
             }
         }
