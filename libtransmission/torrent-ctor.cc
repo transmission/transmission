@@ -84,11 +84,6 @@ void tr_ctorFree(tr_ctor* ctor)
     delete ctor;
 }
 
-tr_session* tr_ctorGetSession(tr_ctor const* ctor)
-{
-    return ctor->session();
-}
-
 bool tr_ctorSetMetainfoFromFile(tr_ctor* const ctor, char const* const filename, tr_error* const error)
 {
     return ctor->set_metainfo_from_file(std::string_view{ filename != nullptr ? filename : "" }, error);
