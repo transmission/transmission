@@ -13,6 +13,7 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
+#include <pwd.h>
 
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
@@ -1136,6 +1137,7 @@ public:
         add(was_updated);
         add(address);
         add(address_collated);
+        add(location);
         add(download_rate_speed);
         add(download_rate_string);
         add(upload_rate_speed);
@@ -1163,6 +1165,7 @@ public:
     Gtk::TreeModelColumn<bool> was_updated;
     Gtk::TreeModelColumn<Glib::ustring> address;
     Gtk::TreeModelColumn<Glib::ustring> address_collated;
+    Gtk::TreeModelColumn<Glib::ustring> location;
     Gtk::TreeModelColumn<Speed> download_rate_speed;
     Gtk::TreeModelColumn<Glib::ustring> download_rate_string;
     Gtk::TreeModelColumn<Speed> upload_rate_speed;
@@ -1215,8 +1218,31 @@ void initPeerRow(
                 peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
+    // Compute location from IP
+    struct passwd* pw = getpwuid(getuid());
+    char const* homedir = pw->pw_dir;
+    char executable[256], location[64];
+    ;
+    strcpy(executable, homedir);
+    strcat(executable, "/.ip-to-location/ip_to_location");
+    if (access(executable, F_OK) == 0)
+    {
+        strcat(executable, " ");
+        strcat(executable, std::data(peer->addr));
+        strcat(executable, " > /tmp/transmission-peer-location");
+        system(executable);
+        FILE* file = fopen("/tmp/transmission-peer-location", "r");
+        fgets(location, sizeof(location), file);
+        fclose(file);
+    }
+    else
+    {
+        strcpy(location, "");
+    }
+
     (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
+    (*iter)[peer_cols.location] = location;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
@@ -1595,6 +1621,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
     view_columns.push_back(&peer_cols.progress);
     view_columns.push_back(&peer_cols.flags);
     view_columns.push_back(&peer_cols.address);
+    view_columns.push_back(&peer_cols.location);
     view_columns.push_back(&peer_cols.client);
 
     /* remove any existing columns */
@@ -1610,6 +1637,13 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Address"), *r);
             c->add_attribute(r->property_text(), *col);
             sort_col = &peer_cols.address_collated;
+        }
+        else if (*col == peer_cols.location)
+        {
+            auto* r = Gtk::make_managed<Gtk::CellRendererText>();
+            c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Location"), *r);
+            c->add_attribute(r->property_text(), *col);
+            // sort_col = &peer_cols.location;
         }
         else if (*col == peer_cols.progress)
         {
