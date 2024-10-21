@@ -5183,8 +5183,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             CGFloat height = self.minScrollViewHeightAllowed;
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
-                                                                                    metrics:nil
-                                                                                        views:views];
+                                                                                       metrics:nil
+                                                                                         views:views];
         }
         else
         {
