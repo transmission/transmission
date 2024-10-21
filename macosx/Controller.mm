@@ -5179,7 +5179,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         if (![self.fDefaults boolForKey:@"AutoSize"])
         {
-            //only set a minimum height constraint
+            // Only set a minimum height constraint
             CGFloat height = self.minScrollViewHeightAllowed;
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
@@ -5188,18 +5188,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else
         {
-            //set a fixed height constraint
-            CGFloat height = self.scrollViewHeight;
+            // Set a fixed height constraint
+            CGFloat height = [self calculateScrollViewHeightWithDockAdjustment];
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
                                                                                          views:views];
 
-            //redraw table to avoid empty cells
+            // Redraw table to avoid empty cells
             [self.fTableView reloadData];
         }
 
-        //add height constraint to fStackView
+        // Add height constraint to fStackView
         [self.fStackView addConstraints:self.fStackViewHeightConstraints];
 
         scrollView.hasVerticalScroller = YES;
@@ -5208,6 +5208,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         [self removeStackViewHeightConstraints];
     }
+}
+
+- (CGFloat)calculateScrollViewHeightWithDockAdjustment
+{
+    CGFloat height = self.scrollViewHeight;
+
+    // Get the main screen's visible frame
+    NSScreen* screen = self.fWindow.screen;
+    if (screen)
+    {
+        // This frame respects the Dock and menu bar
+        NSRect visibleFrame = screen.visibleFrame;
+        height = MIN(height, visibleFrame.size.height - [self toolbarHeight] - [self mainWindowComponentHeight]);
+    }
+
+    return height;
 }
 
 - (void)updateForAutoSize
