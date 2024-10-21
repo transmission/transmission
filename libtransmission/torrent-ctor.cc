@@ -205,21 +205,6 @@ bool tr_ctorGetDownloadDir(tr_ctor const* const ctor, tr_ctorMode const mode, ch
     return false;
 }
 
-bool tr_ctorGetIncompleteDir(tr_ctor const* const ctor, char const** setme)
-{
-    if (auto const& val = ctor->incomplete_dir(); !std::empty(val))
-    {
-        if (setme != nullptr)
-        {
-            *setme = val.c_str();
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* const ctor)
 {
     auto const& metainfo = ctor->metainfo();
