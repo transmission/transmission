@@ -77,7 +77,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
-    static auto constexpr BufSize = std::tuple_size_v<tr_sha1_digest_t> * 2 + std::size(VC) + sizeof(crypto_provide_) +
+    static auto constexpr BufSize = (std::tuple_size_v<tr_sha1_digest_t> * 2U) + std::size(VC) + sizeof(crypto_provide_) +
         sizeof(pad_c_len_) + sizeof(ia_len_) + HandshakeSize;
     auto outbuf = libtransmission::StackBuffer<BufSize, std::byte>{};
 

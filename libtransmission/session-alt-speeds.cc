@@ -80,7 +80,7 @@ void tr_session_alt_speeds::set_active(bool active, ChangeReason reason, bool fo
 {
     auto const tm = fmt::localtime(time);
 
-    size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
+    size_t minute_of_the_week = (tm.tm_wday * MinutesPerDay) + (tm.tm_hour * MinutesPerHour) + tm.tm_min;
 
     if (minute_of_the_week >= MinutesPerWeek) /* leap minutes? */
     {
