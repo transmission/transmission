@@ -114,7 +114,7 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
 
     for (auto const& [block, peers_at] : impl_->blocks_)
     {
-        if (peers_at.count(peer) != 0U)
+        if (peers_at.contains(peer))
         {
             removed.push_back(block);
         }
@@ -157,7 +157,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
 bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const
 {
     auto const iter = impl_->blocks_.find(block);
-    return iter != std::end(impl_->blocks_) && (iter->second.count(peer) != 0U);
+    return iter != std::end(impl_->blocks_) && iter->second.contains(peer);
 }
 
 // count how many peers we're asking for `block`
