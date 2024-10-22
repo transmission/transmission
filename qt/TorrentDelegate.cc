@@ -483,8 +483,8 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
         progress_bar_style_.direction = option.direction;
         progress_bar_style_.progress = static_cast<int>(
             progress_bar_style_.minimum +
-            (is_magnet ? tor.metadataPercentDone() : tor.percentDone()) *
-                (progress_bar_style_.maximum - progress_bar_style_.minimum));
+            ((is_magnet ? tor.metadataPercentDone() : tor.percentDone()) *
+             (progress_bar_style_.maximum - progress_bar_style_.minimum)));
     }
 }
 
