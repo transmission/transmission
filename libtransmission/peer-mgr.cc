@@ -76,11 +76,11 @@ private:
         }
 
         return TorrentInfo{
-            tor->info_hash(), // info_hash
-            tor->peer_id(), // client_peer_id
-            tor->id(), // id
-            tor->is_done(), // is_done
-            tor->is_running() // is_running
+            .info_hash = tor->info_hash(),
+            .client_peer_id = tor->peer_id(),
+            .id = tor->id(),
+            .is_done = tor->is_done(),
+            .is_running = tor->is_running(),
         };
     }
 

@@ -1434,11 +1434,29 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
 
     if (tor->is_seed() || length == 0)
     {
-        return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted };
+        return {
+            .name = subpath.c_str(),
+            .have = length,
+            .length = length,
+            .progress = 1.0,
+            .beginPiece = begin,
+            .endPiece = end,
+            .priority = priority,
+            .wanted = wanted,
+        };
     }
 
     auto const have = tor->completion_.count_has_bytes_in_span(tor->byte_span_for_file(file));
-    return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), begin, end, priority, wanted };
+    return {
+        .name = subpath.c_str(),
+        .have = have,
+        .length = length,
+        .progress = have >= length ? 1.0 : have / double(length),
+        .beginPiece = begin,
+        .endPiece = end,
+        .priority = priority,
+        .wanted = wanted,
+    };
 }
 
 size_t tr_torrentFileCount(tr_torrent const* torrent)
@@ -1473,21 +1491,19 @@ size_t tr_torrentTrackerCount(tr_torrent const* tor)
 tr_torrent_view tr_torrentView(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    auto ret = tr_torrent_view{};
-    ret.name = tor->name().c_str();
-    ret.hash_string = tor->info_hash_string().c_str();
-    ret.comment = tor->comment().c_str();
-    ret.creator = tor->creator().c_str();
-    ret.source = tor->source().c_str();
-    ret.total_size = tor->total_size();
-    ret.date_created = tor->date_created();
-    ret.piece_size = tor->piece_size();
-    ret.n_pieces = tor->piece_count();
-    ret.is_private = tor->is_private();
-    ret.is_folder = tor->file_count() > 1 || (tor->file_count() == 1 && tr_strv_contains(tor->file_subpath(0), '/'));
-
-    return ret;
+    return {
+        .name = tor->name().c_str(),
+        .hash_string = tor->info_hash_string().c_str(),
+        .comment = tor->comment().c_str(),
+        .creator = tor->creator().c_str(),
+        .source = tor->source().c_str(),
+        .total_size = tor->total_size(),
+        .date_created = tor->date_created(),
+        .piece_size = tor->piece_size(),
+        .n_pieces = tor->piece_count(),
+        .is_private = tor->is_private(),
+        .is_folder = tor->file_count() > 1 || (tor->file_count() == 1 && tr_strv_contains(tor->file_subpath(0), '/')),
+    };
 }
 
 std::string tr_torrentFilename(tr_torrent const* tor)
