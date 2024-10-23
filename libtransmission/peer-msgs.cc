@@ -573,8 +573,7 @@ private:
 
     [[nodiscard]] bool can_xfer_metadata() const noexcept
     {
-        // FIXME(tearfur): do we really need io_->supports_ltep() here? The peer already gave us their metadata id
-        return io_->supports_ltep() && tor_.is_public() && ut_metadata_id_ != 0U;
+        return tor_.is_public() && ut_metadata_id_ != 0U;
     }
 
     [[nodiscard]] std::optional<int64_t> pop_next_metadata_request()
