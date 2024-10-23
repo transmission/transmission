@@ -585,9 +585,9 @@ private:
 
     // ---
 
-    [[nodiscard]] constexpr bool peer_supports_metadata_xfer() const noexcept
+    [[nodiscard]] bool can_xfer_metadata() const noexcept
     {
-        return ut_metadata_id_ != 0U;
+        return tor_.is_public() && ut_metadata_id_ != 0U;
     }
 
     [[nodiscard]] std::optional<int64_t> pop_next_metadata_request()
@@ -1269,7 +1269,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
     // look for metainfo size (BEP 9)
     if (auto metadata_size = int64_t{};
-        peer_supports_metadata_xfer() && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
+        can_xfer_metadata() && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
     {
         if (!tr_metadata_download::is_valid_metadata_size(metadata_size))
         {
@@ -1364,9 +1364,10 @@ void tr_peerMsgsImpl::parse_ut_metadata(MessageReader& payload_in)
 
     if (msg_type == MetadataMsgType::Request)
     {
-        if (piece >= 0 && tor_.has_metainfo() && tor_.is_public() && std::size(peer_requested_metadata_pieces_) < MetadataReqQ)
+        auto& reqs = peer_requested_metadata_pieces_;
+        if (piece >= 0 && tor_.has_metainfo() && can_xfer_metadata() && std::size(reqs) < MetadataReqQ)
         {
-            peer_requested_metadata_pieces_.push(piece);
+            reqs.push(piece);
         }
         else
         {
@@ -1843,7 +1844,7 @@ void tr_peerMsgsImpl::pulse()
 
 void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 {
-    if (!peer_supports_metadata_xfer())
+    if (!can_xfer_metadata())
     {
         return;
     }
