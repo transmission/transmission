@@ -607,8 +607,7 @@ private:
     [[nodiscard]] bool can_send_ut_pex() const noexcept
     {
         // only send pex if both the torrent and peer support it
-        // FIXME(tearfur): do we really need io_->supports_ltep() here? The peer already gave us their pex id
-        return io_->supports_ltep() && tor_.allows_pex() && ut_pex_id_ != 0U;
+        return tor_.allows_pex() && ut_pex_id_ != 0U;
     }
 
     void send_ut_pex();
