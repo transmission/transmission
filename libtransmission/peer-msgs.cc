@@ -308,12 +308,6 @@ public:
         , callback_{ callback }
         , callback_data_{ callback_data }
     {
-        if (tor_.allows_pex())
-        {
-            pex_timer_ = session->timerMaker().create([this]() { send_ut_pex(); });
-            pex_timer_->start_repeating(SendPexInterval);
-        }
-
         if (io_->supports_ltep())
         {
             send_ltep_handshake();
@@ -623,9 +617,10 @@ private:
     void parse_ut_pex(MessageReader& payload);
     void parse_ltep(MessageReader& payload);
 
-    [[nodiscard]] constexpr bool peer_supports_pex() const noexcept
+    [[nodiscard]] bool can_send_ut_pex() const noexcept
     {
-        return ut_pex_id_ != 0U;
+        // only send pex if both the torrent and peer support it
+        return tor_.allows_pex() && ut_pex_id_ != 0U;
     }
 
     void send_ut_pex();
@@ -941,8 +936,10 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
         // in the reserved bytes of the BT handshake.
         send_ltep_handshake();
 
-        if (io_->supports_ltep())
+        if (can_send_ut_pex())
         {
+            pex_timer_ = session->timerMaker().create([this]() { send_ut_pex(); });
+            pex_timer_->start_repeating(SendPexInterval);
             send_ut_pex();
         }
     }
@@ -1011,8 +1008,7 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 
 void tr_peerMsgsImpl::send_ut_pex()
 {
-    // only send pex if both the torrent and peer support it
-    if (!peer_supports_pex() || !tor_.allows_pex())
+    if (!can_send_ut_pex())
     {
         return;
     }
