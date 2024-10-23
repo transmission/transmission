@@ -1465,14 +1465,15 @@ namespace get_peers_helpers
 
 [[nodiscard]] bool is_peer_interesting(tr_torrent const* tor, tr_peer_info const& info)
 {
-    if (tor->is_done() && info.is_upload_only())
+    TR_ASSERT(!std::empty(info.listen_port()));
+    if (std::empty(info.listen_port()))
     {
         return false;
     }
 
-    if (info.is_in_use())
+    if (tor->is_done() && info.is_upload_only())
     {
-        return true;
+        return false;
     }
 
     if (info.is_blocklisted(tor->session->blocklist()))
@@ -2128,7 +2129,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
             peer_count / (float)relax_strictness_if_fewer_than_n;
         auto const lo = MinUploadIdleSecs;
         auto const hi = MaxUploadIdleSecs;
-        time_t const limit = hi - (hi - lo) * strictness;
+        time_t const limit = hi - ((hi - lo) * strictness);
 
         if (auto const idle_secs = info->idle_secs(now); idle_secs && *idle_secs > limit)
         {

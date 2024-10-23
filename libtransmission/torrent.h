@@ -328,7 +328,8 @@ struct tr_torrent
 
     [[nodiscard]] auto has_file(tr_file_index_t file) const
     {
-        return completion_.has_blocks(block_span_for_file(file));
+        auto const span = byte_span_for_file(file);
+        return completion_.count_has_bytes_in_span(span) == span.end - span.begin;
     }
 
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
@@ -832,7 +833,6 @@ struct tr_torrent
         {
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
-                TR_ASSERT(now >= latest);
                 return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
             }
         }
@@ -1095,7 +1095,7 @@ private:
             {
                 n_secs += date_done_ - date_started_;
             }
-            else if (date_done_ == 0)
+            else if (date_done_ == time_t{})
             {
                 n_secs += now - date_started_;
             }
@@ -1114,7 +1114,7 @@ private:
             {
                 n_secs += now - date_done_;
             }
-            else if (date_done_ != 0)
+            else if (date_done_ != time_t{})
             {
                 n_secs += now - date_started_;
             }
@@ -1225,7 +1225,7 @@ private:
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
 
-    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
     {
         return fpm_.byte_span_for_file(file);
     }
