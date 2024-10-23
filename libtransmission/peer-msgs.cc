@@ -906,7 +906,6 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
 
     if (ltep_msgid == LtepMessages::Handshake)
     {
-        logtrace(this, "got ltep handshake");
         parse_ltep_handshake(payload);
 
         if (io_->supports_ltep())
@@ -917,13 +916,11 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
-        logtrace(this, "got ut pex");
         peer_supports_pex_ = true;
         parse_ut_pex(payload);
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
-        logtrace(this, "got ut metadata");
         peer_supports_metadata_xfer_ = true;
         parse_ut_metadata(payload);
     }
