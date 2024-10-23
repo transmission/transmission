@@ -45,6 +45,8 @@ void EvhttpDeleter::operator()(struct evhttp* evh) const noexcept
     }
 }
 
+// RPC events (evhttp) will default to pri1, one level higher than pri2 events
+// created here. Depends on event_base having three priority levels
 struct event* event_new_pri2(
     struct event_base* base,
     evutil_socket_t fd,
