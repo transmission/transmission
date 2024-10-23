@@ -919,7 +919,6 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
 
         if (io_->supports_ltep())
         {
-            send_ltep_handshake();
             send_ut_pex();
         }
     }
