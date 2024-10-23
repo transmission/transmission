@@ -943,6 +943,8 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 
     if (auto var = tr_variant_serde::benc().inplace().parse(payload.to_string_view()); var)
     {
+        logtrace(this, "got ut pex");
+
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
         if (tr_variantDictFindRaw(&*var, TR_KEY_added, &added, &added_len))
