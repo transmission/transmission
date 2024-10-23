@@ -937,6 +937,10 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 {
     if (!tor_.allows_pex())
     {
+        if (tor_.is_private())
+        {
+            logwarn(this, "got ut pex in private torrent, rejecting");
+        }
         return;
     }
 
