@@ -197,11 +197,11 @@ export class Transmission extends EventTarget {
       ['Seeding', Prefs.FilterSeeding],
       ['Paused', Prefs.FilterPaused],
       ['Finished', Prefs.FilterFinished],
+      ['Error', Prefs.FilterError],
     ]);
     newOpts(e, 'list', [
       ['Private torrents', Prefs.FilterPrivate],
       ['Public torrents', Prefs.FilterPublic],
-      ['Errored torrents', Prefs.FilterError],
     ]);
 
     // listen to filter changes
