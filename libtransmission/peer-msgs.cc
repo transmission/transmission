@@ -1191,11 +1191,11 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
     if (!var || !var->holds_alternative<tr_variant::Map>())
     {
-        logtrace(this, "GET  extended-handshake, couldn't get dictionary");
+        logtrace(this, "got ltep handshake, couldn't get dictionary");
         return;
     }
 
-    logtrace(this, fmt::format("here is the base64-encoded handshake: [{:s}]", tr_base64_encode(handshake_sv)));
+    logtrace(this, fmt::format("got ltep handshake, base64-encoded body: [{:s}]", tr_base64_encode(handshake_sv)));
 
     if (!io_->supports_ltep())
     {
