@@ -1197,6 +1197,11 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
     logtrace(this, fmt::format("here is the base64-encoded handshake: [{:s}]", tr_base64_encode(handshake_sv)));
 
+    if (!io_->supports_ltep())
+    {
+        logwarn(this, "got ltep handshake, but peer did not advertise support in reserved bytes");
+    }
+
     // does the peer prefer encrypted connections?
     if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
     {
