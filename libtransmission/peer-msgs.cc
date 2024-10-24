@@ -308,12 +308,6 @@ public:
         , callback_{ callback }
         , callback_data_{ callback_data }
     {
-        if (tor_.allows_pex())
-        {
-            pex_timer_ = session->timerMaker().create([this]() { send_ut_pex(); });
-            pex_timer_->start_repeating(SendPexInterval);
-        }
-
         if (io_->supports_ltep())
         {
             send_ltep_handshake();
@@ -577,6 +571,11 @@ private:
 
     // ---
 
+    [[nodiscard]] bool can_xfer_metadata() const noexcept
+    {
+        return tor_.is_public() && ut_metadata_id_ != 0U;
+    }
+
     [[nodiscard]] std::optional<int64_t> pop_next_metadata_request()
     {
         auto& reqs = peer_requested_metadata_pieces_;
@@ -603,6 +602,12 @@ private:
     void parse_ut_metadata(MessageReader& payload_in);
     void parse_ut_pex(MessageReader& payload);
     void parse_ltep(MessageReader& payload);
+
+    [[nodiscard]] bool can_send_ut_pex() const noexcept
+    {
+        // only send pex if both the torrent and peer support it
+        return tor_.allows_pex() && ut_pex_id_ != 0U;
+    }
 
     void send_ut_pex();
 
@@ -675,8 +680,6 @@ private:
 
     // ---
 
-    bool peer_supports_pex_ = false;
-    bool peer_supports_metadata_xfer_ = false;
     bool client_sent_ltep_handshake_ = false;
 
     size_t desired_request_count_ = 0;
@@ -906,25 +909,27 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
 
     if (ltep_msgid == LtepMessages::Handshake)
     {
-        logtrace(this, "got ltep handshake");
         parse_ltep_handshake(payload);
 
-        if (io_->supports_ltep())
+        // The peer most likely supports LTEP, so send our LTEP handshake in
+        // case we haven't yet. Usually we would have sent our LTEP handshake
+        // by this point, unless the peer didn't set the "extended" bit (20)
+        // in the reserved bytes of the BT handshake.
+        send_ltep_handshake();
+
+        if (can_send_ut_pex())
         {
-            send_ltep_handshake();
+            pex_timer_ = session->timerMaker().create([this]() { send_ut_pex(); });
+            pex_timer_->start_repeating(SendPexInterval);
             send_ut_pex();
         }
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
-        logtrace(this, "got ut pex");
-        peer_supports_pex_ = true;
         parse_ut_pex(payload);
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
-        logtrace(this, "got ut metadata");
-        peer_supports_metadata_xfer_ = true;
         parse_ut_metadata(payload);
     }
     else
@@ -937,11 +942,17 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 {
     if (!tor_.allows_pex())
     {
+        if (tor_.is_private())
+        {
+            logwarn(this, "got ut pex in private torrent, rejecting");
+        }
         return;
     }
 
     if (auto var = tr_variant_serde::benc().inplace().parse(payload.to_string_view()); var)
     {
+        logtrace(this, "got ut pex");
+
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
         if (tr_variantDictFindRaw(&*var, TR_KEY_added, &added, &added_len))
@@ -978,8 +989,7 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 
 void tr_peerMsgsImpl::send_ut_pex()
 {
-    // only send pex if both the torrent and peer support it
-    if (!peer_supports_pex_ || !tor_.allows_pex())
+    if (!can_send_ut_pex())
     {
         return;
     }
@@ -1187,11 +1197,16 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
     if (!var || !var->holds_alternative<tr_variant::Map>())
     {
-        logtrace(this, "GET  extended-handshake, couldn't get dictionary");
+        logtrace(this, "got ltep handshake, couldn't get dictionary");
         return;
     }
 
-    logtrace(this, fmt::format("here is the base64-encoded handshake: [{:s}]", tr_base64_encode(handshake_sv)));
+    logtrace(this, fmt::format("got ltep handshake, base64-encoded body: [{:s}]", tr_base64_encode(handshake_sv)));
+
+    if (!io_->supports_ltep())
+    {
+        logwarn(this, "got ltep handshake, but peer did not advertise support in reserved bytes");
+    }
 
     // does the peer prefer encrypted connections?
     if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
@@ -1200,22 +1215,18 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     }
 
     // check supported messages for utorrent pex
-    peer_supports_pex_ = false;
-    peer_supports_metadata_xfer_ = false;
     auto holepunch_supported = false;
 
     if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
     {
         if (auto ut_pex = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_pex, &ut_pex))
         {
-            peer_supports_pex_ = ut_pex != 0;
             ut_pex_id_ = static_cast<uint8_t>(ut_pex);
             logtrace(this, fmt::format("msgs->ut_pex is {:d}", ut_pex_id_));
         }
 
         if (auto ut_metadata = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
         {
-            peer_supports_metadata_xfer_ = ut_metadata != 0;
             ut_metadata_id_ = static_cast<uint8_t>(ut_metadata);
             logtrace(this, fmt::format("msgs->ut_metadata_id_ is {:d}", ut_metadata_id_));
         }
@@ -1239,11 +1250,11 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
     // look for metainfo size (BEP 9)
     if (auto metadata_size = int64_t{};
-        peer_supports_metadata_xfer_ && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
+        can_xfer_metadata() && tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &metadata_size))
     {
         if (!tr_metadata_download::is_valid_metadata_size(metadata_size))
         {
-            peer_supports_metadata_xfer_ = false;
+            ut_metadata_id_ = 0U;
         }
         else
         {
@@ -1316,6 +1327,10 @@ void tr_peerMsgsImpl::parse_ut_metadata(MessageReader& payload_in)
     }
 
     logtrace(this, fmt::format("got ut_metadata msg: type {:d}, piece {:d}, total_size {:d}", msg_type, piece, total_size));
+    if (tor_.is_private())
+    {
+        logwarn(this, "got ut metadata in private torrent, rejecting");
+    }
 
     if (msg_type == MetadataMsgType::Reject)
     {
@@ -1330,9 +1345,10 @@ void tr_peerMsgsImpl::parse_ut_metadata(MessageReader& payload_in)
 
     if (msg_type == MetadataMsgType::Request)
     {
-        if (piece >= 0 && tor_.has_metainfo() && tor_.is_public() && std::size(peer_requested_metadata_pieces_) < MetadataReqQ)
+        auto& reqs = peer_requested_metadata_pieces_;
+        if (piece >= 0 && tor_.has_metainfo() && can_xfer_metadata() && std::size(reqs) < MetadataReqQ)
         {
-            peer_requested_metadata_pieces_.push(piece);
+            reqs.push(piece);
         }
         else
         {
@@ -1817,7 +1833,7 @@ void tr_peerMsgsImpl::pulse()
 
 void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
 {
-    if (!peer_supports_metadata_xfer_)
+    if (!can_xfer_metadata())
     {
         return;
     }
