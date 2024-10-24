@@ -235,7 +235,26 @@ private:
                 continue;
             }
 
-            auto const salt = is_sequential ? piece : salter();
+            auto const salt = [&]()
+            {
+                if (!is_sequential)
+                {
+                    return salter();
+                }
+
+                // Download first and last piece first
+                if (piece == 0U)
+                {
+                    return 0U;
+                }
+
+                if (piece == n_pieces - 1U)
+                {
+                    return 1U;
+                }
+
+                return piece + 1U;
+            }();
             candidates_.emplace_back(
                 piece,
                 mediator_->count_piece_replication(piece),
