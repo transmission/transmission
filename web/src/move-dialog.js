@@ -23,11 +23,23 @@ export class MoveDialog extends EventTarget {
       return;
     }
 
+    const paths = this.controller.getAllTorrentsPaths();
+
     this.torrents = torrents;
     this.elements = MoveDialog._create();
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.entry.value = torrents[0].getDownloadDir();
+
+    while (this.elements.datalist.firstChild) {
+      this.elements.datalist.firstChild.remove();
+    }
+    for (const path of paths) {
+      const option = document.createElement('option');
+      option.value = path;
+      this.elements.datalist.append(option);
+    }
+
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -68,9 +80,15 @@ export class MoveDialog extends EventTarget {
 
     const entry = document.createElement('input');
     entry.setAttribute('type', 'text');
+    entry.setAttribute('list', 'path-list');
     entry.id = 'torrent-path';
     elements.entry = entry;
     elements.workarea.append(entry);
+
+    const datalist = document.createElement('datalist');
+    datalist.id = 'path-list';
+    elements.datalist = datalist;
+    elements.workarea.append(datalist);
 
     return elements;
   }
