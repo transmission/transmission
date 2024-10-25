@@ -598,6 +598,8 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
 
 tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error* error)
 {
+    mode_t tmpmask = 0000;
+
     TR_ASSERT(path_template != nullptr);
 
     tr_sys_file_t const ret = mkstemp(path_template);
@@ -607,6 +609,12 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error* error)
         error->set_from_errno(errno);
     }
 
+    else
+    {
+        tmpmask = umask(0);
+        fchmod(ret, 0666 - tmpmask);
+        umask(tmpmask);
+    }
     set_file_for_single_pass(ret);
 
     return ret;
