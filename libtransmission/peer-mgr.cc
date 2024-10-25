@@ -2608,15 +2608,13 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
     }
 
     // only keep the best `max` candidates
-    if (static auto constexpr Max = tr_peerMgr::OutboundCandidates::requested_inline_size; Max < std::size(candidates))
-    {
-        std::partial_sort(
-            std::begin(candidates),
-            std::begin(candidates) + Max,
-            std::end(candidates),
-            [](auto const& a, auto const& b) { return a.score < b.score; });
-        candidates.resize(Max);
-    }
+    auto const n_keep = std::min(tr_peerMgr::OutboundCandidates::requested_inline_size, std::size(candidates));
+    std::partial_sort(
+        std::begin(candidates),
+        std::begin(candidates) + n_keep,
+        std::end(candidates),
+        [](auto const& a, auto const& b) { return a.score < b.score; });
+    candidates.resize(n_keep);
 
     // put the best candidates at the end of the list
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
