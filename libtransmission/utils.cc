@@ -41,8 +41,6 @@
 
 #include <fmt/core.h>
 
-#include <sys/stat.h>
-
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
 
@@ -207,14 +205,6 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
             break;
         }
         contents.remove_prefix(n_written);
-    }
-
-    std::string_view daemon_config = ".config/transmission-daemon/";
-    size_t found = filename.find(daemon_config);
-
-    if (found != std::string_view::npos)
-    {
-	fchmod(fd, 0640);
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
