@@ -214,16 +214,16 @@ TEST_P(JSONTest, test3)
 {
     static auto constexpr Input =
         "{ \"error\": 2,"
-        "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
+        "  \"error_string\": \"torrent not registered with this tracker 6UHsVW'*C\","
         "  \"eta\": 262792,"
         "  \"id\": 25,"
-        "  \"leftUntilDone\": 2275655680 }"sv;
+        "  \"left_until_done\": 2275655680 }"sv;
 
     auto var = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
     EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
 
     auto sv = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&var, TR_KEY_errorString, &sv));
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, TR_KEY_error_string, &sv));
     EXPECT_EQ("torrent not registered with this tracker 6UHsVW'*C"sv, sv);
 }
 
