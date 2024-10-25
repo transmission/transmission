@@ -142,16 +142,7 @@ public:
 
     [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
-    {
-        outbuf_info_.emplace_back(n_bytes, is_piece_data);
-
-        auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
-        filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
-        outbuf_.commit_space(n_bytes);
-
-        try_write(SIZE_MAX);
-    }
+    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
