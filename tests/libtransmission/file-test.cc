@@ -1132,7 +1132,7 @@ TEST_F(FileTest, fileOpen)
     auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
-    EXPECT_EQ(5U, info->size);
+    EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &error);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_FALSE(error) << error;
