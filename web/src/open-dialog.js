@@ -153,11 +153,6 @@ export class OpenDialog extends EventTarget {
     input.value = url;
     workarea.append(input);
     elements.url_input = input;
-    input.addEventListener('keyup', ({ key }) => {
-      if (key === 'Enter') {
-        confirm.click();
-      }
-    });
 
     input_id = makeUUID();
     label = document.createElement('label');

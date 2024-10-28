@@ -603,7 +603,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 953:
-            if (auto const ratio_limit = tr_num_parse<double>(optstr); optstr)
+            if (auto const ratio_limit = tr_num_parse<double>(optstr); ratio_limit)
             {
                 tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, *ratio_limit);
             }
