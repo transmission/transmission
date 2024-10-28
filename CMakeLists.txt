@@ -771,7 +771,7 @@ endif()
 
 if(RUN_CLANG_TIDY)
     message(STATUS "Looking for clang-tidy")
-    find_program(CLANG_TIDY clang-tidy)
+    find_program(CLANG_TIDY clang-tidy-20)
     if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
     else()
