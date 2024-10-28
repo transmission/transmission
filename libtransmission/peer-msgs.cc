@@ -585,7 +585,7 @@ private:
 
     // ---
 
-    [[nodiscard]] bool can_xfer_metadata() const noexcept
+    [[nodiscard]] constexpr bool can_xfer_metadata() const noexcept
     {
         return tor_.is_public() && ut_metadata_id_ != 0U;
     }
@@ -617,7 +617,7 @@ private:
     void parse_ut_pex(MessageReader& payload);
     void parse_ltep(MessageReader& payload);
 
-    [[nodiscard]] bool can_send_ut_pex() const noexcept
+    [[nodiscard]] constexpr bool can_send_ut_pex() const noexcept
     {
         // only send pex if both the torrent and peer support it
         return tor_.allows_pex() && ut_pex_id_ != 0U;
