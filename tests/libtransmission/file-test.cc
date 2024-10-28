@@ -1129,7 +1129,7 @@ TEST_F(FileTest, fileOpen)
     createFileWithContents(path1, "test");
 
     /* File gets truncated */
-    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
+    auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(5U, info->size);
