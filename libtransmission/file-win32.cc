@@ -1071,7 +1071,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error* error)
         native_flags |= LOCKFILE_FAIL_IMMEDIATELY;
     }
 
-    bool ret = LockFileEx(handle, native_flags, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
+    bool const ret = LockFileEx(handle, native_flags, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
 
     if (!ret)
     {
