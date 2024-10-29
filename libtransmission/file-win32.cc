@@ -825,11 +825,6 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/,
     auto ret = open_file(path, native_access, native_disposition, native_flags, error);
     auto success = ret != TR_BAD_SYS_FILE;
 
-    if (success && (flags & TR_SYS_FILE_APPEND) != 0)
-    {
-        success = SetFilePointer(ret, 0, nullptr, FILE_END) != INVALID_SET_FILE_POINTER;
-    }
-
     if (!success)
     {
         set_system_error(error, GetLastError());

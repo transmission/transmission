@@ -560,12 +560,11 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         int native_value;
     };
 
-    auto constexpr NativeMap = std::array<native_map_item, 8>{
+    auto constexpr NativeMap = std::array<native_map_item, 7U>{
         { { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, O_RDWR },
           { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ, O_RDONLY },
           { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_WRITE, O_WRONLY },
           { TR_SYS_FILE_CREATE, TR_SYS_FILE_CREATE, O_CREAT },
-          { TR_SYS_FILE_APPEND, TR_SYS_FILE_APPEND, O_APPEND },
           { TR_SYS_FILE_TRUNCATE, TR_SYS_FILE_TRUNCATE, O_TRUNC },
           { TR_SYS_FILE_SEQUENTIAL, TR_SYS_FILE_SEQUENTIAL, O_SEQUENTIAL } }
     };
