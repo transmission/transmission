@@ -59,8 +59,7 @@ enum tr_sys_file_lock_flags_t
 {
     TR_SYS_FILE_LOCK_SH = (1 << 0),
     TR_SYS_FILE_LOCK_EX = (1 << 1),
-    TR_SYS_FILE_LOCK_NB = (1 << 2),
-    TR_SYS_FILE_LOCK_UN = (1 << 3)
+    TR_SYS_FILE_LOCK_NB = (1 << 2)
 };
 
 enum tr_sys_path_get_info_flags_t
