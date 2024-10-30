@@ -761,19 +761,20 @@ else()
     endif()
 endif()
 
-if(RUN_CLANG_TIDY STREQUAL "AUTO")
-    if(DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
-        set(RUN_CLANG_TIDY OFF)
-    else()
-        set(RUN_CLANG_TIDY ON)
-    endif()
+if(RUN_CLANG_TIDY STREQUAL "AUTO" AND (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR})) # skip clang-tidy on LGTM/appveyor
+    set(RUN_CLANG_TIDY OFF)
 endif()
 
 if(RUN_CLANG_TIDY)
+    tr_get_required_flag(RUN_CLANG_TIDY CLANG_TIDY_IS_REQUIRED)
+
     message(STATUS "Looking for clang-tidy")
     find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
+        if(CLANG_TIDY_IS_REQUIRED)
+            message(FATAL_ERROR "clang-tidy is required but wasn't found")
+        endif()
     else()
         message(STATUS "Looking for clang-tidy - found")
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
