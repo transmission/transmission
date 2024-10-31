@@ -906,7 +906,6 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
 
     if (ltep_msgid == LtepMessages::Handshake)
     {
-        logtrace(this, "got ltep handshake");
         parse_ltep_handshake(payload);
 
         if (io_->supports_ltep())
@@ -917,13 +916,11 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     }
     else if (ltep_msgid == UT_PEX_ID)
     {
-        logtrace(this, "got ut pex");
         peer_supports_pex_ = true;
         parse_ut_pex(payload);
     }
     else if (ltep_msgid == UT_METADATA_ID)
     {
-        logtrace(this, "got ut metadata");
         peer_supports_metadata_xfer_ = true;
         parse_ut_metadata(payload);
     }
@@ -937,11 +934,17 @@ void tr_peerMsgsImpl::parse_ut_pex(MessageReader& payload)
 {
     if (!tor_.allows_pex())
     {
+        if (tor_.is_private())
+        {
+            logwarn(this, "got ut pex in private torrent, rejecting");
+        }
         return;
     }
 
     if (auto var = tr_variant_serde::benc().inplace().parse(payload.to_string_view()); var)
     {
+        logtrace(this, "got ut pex");
+
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
         if (tr_variantDictFindRaw(&*var, TR_KEY_added, &added, &added_len))
@@ -1187,11 +1190,16 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
     if (!var || !var->holds_alternative<tr_variant::Map>())
     {
-        logtrace(this, "GET  extended-handshake, couldn't get dictionary");
+        logtrace(this, "got ltep handshake, couldn't get dictionary");
         return;
     }
 
-    logtrace(this, fmt::format("here is the base64-encoded handshake: [{:s}]", tr_base64_encode(handshake_sv)));
+    logtrace(this, fmt::format("got ltep handshake, base64-encoded body: [{:s}]", tr_base64_encode(handshake_sv)));
+
+    if (!io_->supports_ltep())
+    {
+        logwarn(this, "got ltep handshake, but peer did not advertise support in reserved bytes");
+    }
 
     // does the peer prefer encrypted connections?
     if (auto e = int64_t{}; tr_variantDictFindInt(&*var, TR_KEY_e, &e))
@@ -1316,6 +1324,10 @@ void tr_peerMsgsImpl::parse_ut_metadata(MessageReader& payload_in)
     }
 
     logtrace(this, fmt::format("got ut_metadata msg: type {:d}, piece {:d}, total_size {:d}", msg_type, piece, total_size));
+    if (tor_.is_private())
+    {
+        logwarn(this, "got ut metadata in private torrent, rejecting");
+    }
 
     if (msg_type == MetadataMsgType::Reject)
     {
