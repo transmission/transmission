@@ -55,6 +55,9 @@
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
+#ifndef _WIN32
+#include <sys/stat.h> /* umask() */
+#endif
 
 using namespace std::literals;
 using namespace libtransmission::Values;
@@ -193,6 +196,15 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
     {
         return false;
     }
+#ifndef _WIN32
+    // set file mode per settings umask()
+    else
+    {
+	mode_t val = umask(0);
+	fchmod(fd, 0666 - val);
+	::umask(val);
+    }
+#endif
 
     // Save the contents. This might take >1 pass.
     auto ok = true;
