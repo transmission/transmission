@@ -379,7 +379,7 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
 tr_variant load_settings(char const* config_dir)
 {
     auto app_defaults = tr_variant::make_map();
-    tr_variantDictAddStr(&app_defaults, TR_KEY_watch_dir, ""sv);
+    tr_variantDictAddStrView(&app_defaults, TR_KEY_watch_dir, ""sv);
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
