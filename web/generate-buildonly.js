@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import url from 'node:url';
 
-const __dirname = import.meta.dirname;
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const obj = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'),
 );
