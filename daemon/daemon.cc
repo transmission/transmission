@@ -384,6 +384,7 @@ tr_variant load_settings(char const* config_dir)
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
     tr_variantDictAddBool(&app_defaults, TR_KEY_start_paused, false);
+    tr_variantDictAddStrView(&app_defaults, TR_KEY_pidfile, ""sv);
     return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
 }
 
