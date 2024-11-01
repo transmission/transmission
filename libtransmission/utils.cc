@@ -197,7 +197,7 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
 #ifndef _WIN32
     // set file mode per settings umask()
     {
-        mode_t val = ::umask(0);
+        auto const val = ::umask(0);
         fchmod(fd, 0666 - val);
         ::umask(val);
     }
