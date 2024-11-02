@@ -864,6 +864,7 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_logAddInfoTor(tor, _("Removing torrent"));
     }
 
+    tor->set_dirty(!tor->is_deleting_);
     tor->stop_now();
 
     if (tor->is_deleting_)
