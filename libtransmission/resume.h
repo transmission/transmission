@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,8 +11,9 @@
 
 #include <cstdint> // uint64_t
 
-struct tr_ctor;
-struct tr_torrent;
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/torrent.h"
 
 namespace tr_resume
 {
@@ -43,11 +44,13 @@ auto inline constexpr Filenames = fields_t{ 1 << 20 };
 auto inline constexpr Name = fields_t{ 1 << 21 };
 auto inline constexpr Labels = fields_t{ 1 << 22 };
 auto inline constexpr Group = fields_t{ 1 << 23 };
+auto inline constexpr SequentialDownload = fields_t{ 1 << 24 };
+auto inline constexpr QueueState = fields_t{ 1 << 25 };
 
 auto inline constexpr All = ~fields_t{ 0 };
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, bool* did_rename_to_hash_only_name);
+fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const& ctor);
 
-void save(tr_torrent* tor);
+void save(tr_torrent* tor, tr_torrent::ResumeHelper const& helper);
 
 } // namespace tr_resume

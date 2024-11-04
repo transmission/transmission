@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,7 +9,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 /**
  * A memory buffer which uses a builtin array of N bytes, using heap
@@ -26,15 +26,23 @@ private:
 
 public:
     using value_type = Char;
-    using const_reference = const Char&;
+    using const_reference = Char const&;
 
     tr_strbuf()
     {
         ensure_sz();
     }
 
-    tr_strbuf(tr_strbuf const& other) = delete;
-    tr_strbuf& operator=(tr_strbuf const& other) = delete;
+    tr_strbuf(tr_strbuf const& other)
+    {
+        assign(other.sv());
+    }
+
+    tr_strbuf& operator=(tr_strbuf const& other)
+    {
+        assign(other.sv());
+        return *this;
+    }
 
     tr_strbuf(tr_strbuf&& other)
         : buffer_{ std::move(other.buffer_) }

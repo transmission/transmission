@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -50,11 +50,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)setTorrents:(NSArray<NSString*>*)files
 {
     uint64_t size = 0;
@@ -69,20 +64,20 @@
             [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
         {
             auto metainfo = tr_torrent_metainfo{};
-            if (metainfo.parseTorrentFile(file.UTF8String))
+            if (metainfo.parse_torrent_file(file.UTF8String))
             {
                 ++count;
 
-                size += metainfo.totalSize();
+                size += metainfo.total_size();
 
-                auto const n_files = metainfo.fileCount();
+                auto const n_files = metainfo.file_count();
                 fileCount += n_files;
                 // only useful when one torrent
                 if (count == 1)
                 {
                     if (n_files == 1)
                     {
-                        name = [NSString convertedStringFromCString:metainfo.fileSubpath(0).c_str()];
+                        name = [NSString convertedStringFromCString:metainfo.file_subpath(0).c_str()];
                     }
                     else
                     {

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
 <interface domain="transmission-gtk">
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkDialog" id="OptionsDialog">
@@ -54,7 +53,6 @@
           </packing>
         </child>
         <child>
-          <!-- n-columns=2 n-rows=8 -->
           <object class="GtkGrid" id="dialog_content_layout">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
@@ -245,8 +243,8 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
-      <action-widget response="-3">open_button</action-widget>
+      <action-widget response="cancel">cancel_button</action-widget>
+      <action-widget response="accept">open_button</action-widget>
     </action-widgets>
   </object>
 </interface>

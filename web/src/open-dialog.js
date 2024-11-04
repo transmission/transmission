@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -8,7 +8,7 @@ import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
 export class OpenDialog extends EventTarget {
-  constructor(controller, remote, url = '') {
+  constructor(controller, remote, url = '', files = null) {
     super();
 
     this.controller = controller;
@@ -17,8 +17,11 @@ export class OpenDialog extends EventTarget {
     this.elements = this._create(url);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    this._updateFreeSpaceInAddDialog();
     document.body.append(this.elements.root);
+    if (files) {
+      this.elements.file_input.files = files;
+    }
+    this._updateFreeSpaceInAddDialog();
     this.elements.url_input.focus();
   }
 
@@ -44,8 +47,8 @@ export class OpenDialog extends EventTarget {
     const path = this.elements.folder_input.value;
     this.remote.getFreeSpace(path, (dir, bytes) => {
       if (!this.closed) {
-        const string = bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
-        this.elements.freespace.textContent = string;
+        this.elements.freespace.textContent =
+          bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
       }
     });
   }
@@ -80,7 +83,7 @@ export class OpenDialog extends EventTarget {
               new AlertDialog({
                 heading: `Error adding "${file.name}"`,
                 message: response.result,
-              })
+              }),
             );
           }
         });
@@ -107,7 +110,7 @@ export class OpenDialog extends EventTarget {
             new AlertDialog({
               heading: `Error adding "${url}"`,
               message: payload.result,
-            })
+            }),
           );
         }
       });
@@ -134,7 +137,7 @@ export class OpenDialog extends EventTarget {
     input.type = 'file';
     input.name = 'torrent-files[]';
     input.id = input_id;
-    input.multiple = 'multiple';
+    input.multiple = true;
     workarea.append(input);
     elements.file_input = input;
 
@@ -150,11 +153,6 @@ export class OpenDialog extends EventTarget {
     input.value = url;
     workarea.append(input);
     elements.url_input = input;
-    input.addEventListener('keyup', ({ key }) => {
-      if (key === 'Enter') {
-        confirm.click();
-      }
-    });
 
     input_id = makeUUID();
     label = document.createElement('label');

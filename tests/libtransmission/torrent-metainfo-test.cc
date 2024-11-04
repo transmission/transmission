@@ -4,17 +4,23 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cerrno>
+#include <cstddef> // size_t
 #include <string_view>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -37,9 +43,9 @@ TEST_F(TorrentMetainfoTest, magnetLink)
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
-    EXPECT_EQ(0U, metainfo.fileCount()); // because it's a magnet link
-    EXPECT_EQ(2U, std::size(metainfo.announceList()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
+    EXPECT_EQ(0U, metainfo.file_count()); // because it's a magnet link
+    EXPECT_EQ(2U, std::size(metainfo.announce_list()));
+    EXPECT_EQ(MagnetLink, metainfo.magnet());
 }
 
 #define BEFORE_PATH \
@@ -78,7 +84,7 @@ TEST_F(TorrentMetainfoTest, bucket)
     for (auto const& test : tests)
     {
         auto metainfo = tr_torrent_metainfo{};
-        EXPECT_EQ(test.expected_parse_result, metainfo.parseBenc(test.benc));
+        EXPECT_EQ(test.expected_parse_result, metainfo.parse_benc(test.benc));
     }
 }
 
@@ -91,7 +97,7 @@ TEST_F(TorrentMetainfoTest, parseBencFuzzRegressions)
     for (auto const& test : Tests)
     {
         auto tm = tr_torrent_metainfo{};
-        tm.parseBenc(tr_base64_decode(test));
+        tm.parse_benc(tr_base64_decode(test));
     }
 }
 
@@ -106,116 +112,56 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
         auto tm = tr_torrent_metainfo{};
-        tm.parseBenc({ std::data(buf), std::size(buf) });
+        tm.parse_benc({ std::data(buf), std::size(buf) });
     }
 }
-
-#if 0
-TEST_F(TorrentMetainfoTest, sanitize)
-{
-    struct LocalTest
-    {
-        std::string_view input;
-        std::string_view expected_output;
-    };
-
-    auto const tests = std::array<LocalTest, 29>{
-        // skipped
-        LocalTest{ ""sv, ""sv },
-        { "."sv, ""sv },
-        { ".."sv, ""sv },
-        { "....."sv, ""sv },
-        { "  "sv, ""sv },
-        { " . "sv, ""sv },
-        { ". . ."sv, ""sv },
-        // replaced with '_'
-        { "/"sv, "_"sv },
-        { "////"sv, "____"sv },
-        { "\\\\"sv, "__"sv },
-        { "/../"sv, "_.._"sv },
-        { "foo<bar:baz/boo"sv, "foo_bar_baz_boo"sv },
-        { "t\0e\x01s\tt\ri\nn\fg"sv, "t_e_s_t_i_n_g"sv },
-        // appended with '_'
-        { "con"sv, "con_"sv },
-        { "cOm4"sv, "cOm4_"sv },
-        { "LPt9.txt"sv, "LPt9_.txt"sv },
-        { "NUL.tar.gz"sv, "NUL_.tar.gz"sv },
-        // trimmed
-        { " foo"sv, "foo"sv },
-        { "foo "sv, "foo"sv },
-        { " foo "sv, "foo"sv },
-        { "foo."sv, "foo"sv },
-        { "foo..."sv, "foo"sv },
-        { " foo... "sv, "foo"sv },
-        // unmodified
-        { "foo"sv, "foo"sv },
-        { ".foo"sv, ".foo"sv },
-        { "..foo"sv, "..foo"sv },
-        { "foo.bar.baz"sv, "foo.bar.baz"sv },
-        { "null"sv, "null"sv },
-        { "compass"sv, "compass"sv },
-    };
-
-    auto out = std::string{};
-    for (auto const& test : tests)
-    {
-        out.clear();
-        auto const success = tr_metainfoAppendSanitizedPathComponent(out, test.input);
-        EXPECT_EQ(!std::empty(out), success);
-        EXPECT_EQ(test.expected_output, out);
-    }
-}
-#endif
 
 TEST_F(TorrentMetainfoTest, AndroidTorrent)
 {
     auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
 
     auto* ctor = tr_ctorNew(session_);
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
-    EXPECT_EQ(336, metainfo->infoDictOffset());
-    EXPECT_EQ(26583, metainfo->infoDictSize());
-    EXPECT_EQ(592, metainfo->piecesOffset());
+    EXPECT_EQ(336, metainfo->info_dict_offset());
+    EXPECT_EQ(26583, metainfo->info_dict_size());
+    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
+    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
-    auto const tgt_filename = tr_pathbuf{ ::testing::TempDir(), "save-contents-test.torrent" };
+    auto const tgt_filename = tr_pathbuf{ sandbox, "save-contents-test.torrent" };
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
-    tr_error* error = nullptr;
-    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
-    EXPECT_NE(nullptr, error);
-    if (error != nullptr)
-    {
-        EXPECT_EQ(EINVAL, error->code);
-        tr_error_clear(&error);
-    }
+    auto error = tr_error{};
+    EXPECT_FALSE(ctor->save(tgt_filename, &error));
+    EXPECT_TRUE(error);
+    EXPECT_EQ(EINVAL, error.code());
+    error = {};
 
     // now try saving _with_ metainfo
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
+    EXPECT_TRUE(ctor->save(tgt_filename, &error));
+    EXPECT_FALSE(error) << error;
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(src_filename.sv(), src_contents, &error));
+    EXPECT_TRUE(tr_file_read(src_filename.sv(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(tgt_filename.sv(), tgt_contents, &error));
+    EXPECT_TRUE(tr_file_read(tgt_filename.sv(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup
     EXPECT_TRUE(tr_sys_path_remove(tgt_filename, &error));
-    EXPECT_EQ(nullptr, error) << *error;
-    tr_error_clear(&error);
+    EXPECT_FALSE(error) << error;
     tr_ctorFree(ctor);
 }
 
@@ -224,15 +170,15 @@ TEST_F(TorrentMetainfoTest, magnetInfoHash)
     // compatibility with magnet torrents created by Transmission <= 3.0
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/gimp-2.10.32-1-arm64.dmg.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
 }
 
 TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 2 }, tm.webseedCount());
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+    EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ(
         "https://cdimage.debian.org/cdimage/release/11.2.0//srv/cdbuilder.debian.org/dst/deb-cd/weekly-builds/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso"sv,
         tm.webseed(0));
@@ -245,8 +191,8 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedList)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-list.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 2 }, tm.webseedCount());
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+    EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
     EXPECT_EQ("http://webseed-two.com/"sv, tm.webseed(1));
 }
@@ -255,8 +201,8 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-string.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 1 }, tm.webseedCount());
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+    EXPECT_EQ(size_t{ 1 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }
 
@@ -264,7 +210,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
 {
     auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+    EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
 } // namespace libtransmission::test

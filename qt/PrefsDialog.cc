@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include "PrefsDialog.h"
 
 #include <cassert>
+#include <optional>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -36,9 +37,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -49,7 +48,7 @@ class PreferenceWidget
 
 public:
     explicit PreferenceWidget(QObject* object)
-        : object_(object)
+        : object_{ object }
     {
     }
 
@@ -84,7 +83,7 @@ public:
     }
 
 private:
-    QObject* const object_;
+    QObject* object_;
 };
 
 char const* const PreferenceWidget::PrefKey = "pref-key";
@@ -151,11 +150,30 @@ QString qtDayName(int day)
     }
 }
 
+[[nodiscard]] bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
+{
+    if (ancestor == nullptr)
+    {
+        return false;
+    }
+
+    while (descendant != nullptr)
+    {
+        if (descendant == ancestor)
+        {
+            return true;
+        }
+
+        descendant = descendant->parent();
+    }
+
+    return false;
+}
 } // namespace
 
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 {
-    PreferenceWidget pref_widget(widget);
+    auto pref_widget = PreferenceWidget{ widget };
 
     if (pref_widget.is<QCheckBox>())
     {
@@ -171,7 +189,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QTimeEdit>())
     {
-        pref_widget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(prefs_.getInt(pref_key) * 60));
+        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
     }
     else if (pref_widget.is<QLineEdit>())
     {
@@ -199,11 +217,11 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 
 void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
 {
-    PreferenceWidget pref_widget(widget);
+    auto pref_widget = PreferenceWidget{ widget };
 
     pref_widget.setPrefKey(pref_key);
     updateWidgetValue(widget, pref_key);
-    widgets_.insert(pref_key, widget);
+    widgets_.try_emplace(pref_key, widget);
 
     if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
@@ -236,30 +254,12 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     }
 }
 
-static bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
-{
-    if (ancestor == nullptr)
-    {
-        return false;
-    }
-    while (descendant != nullptr)
-    {
-        if (descendant == ancestor)
-        {
-            return true;
-        }
-
-        descendant = descendant->parent();
-    }
-    return false;
-}
-
 void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
 {
     // We don't want to change the preference every time there's a keystroke
     // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
     // only update the pref when the text changed AND focus was lost.
-    char const constexpr* const StartValue = "StartValue";
+    char constexpr const* const StartValue = "StartValue";
 
     if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
     {
@@ -279,7 +279,7 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
 
 void PrefsDialog::checkBoxToggled(bool checked)
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QCheckBox>())
     {
@@ -289,7 +289,7 @@ void PrefsDialog::checkBoxToggled(bool checked)
 
 void PrefsDialog::spinBoxEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QDoubleSpinBox>())
     {
@@ -303,17 +303,17 @@ void PrefsDialog::spinBoxEditingFinished()
 
 void PrefsDialog::timeEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QTimeEdit>())
     {
-        setPref(pref_widget.getPrefKey(), QTime(0, 0).secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
+        setPref(pref_widget.getPrefKey(), QTime{ 0, 0 }.secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
     }
 }
 
 void PrefsDialog::lineEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QLineEdit>())
     {
@@ -328,7 +328,7 @@ void PrefsDialog::lineEditingFinished()
 
 void PrefsDialog::pathChanged(QString const& path)
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<PathButton>())
     {
@@ -336,9 +336,7 @@ void PrefsDialog::pathChanged(QString const& path)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::initRemoteTab()
 {
@@ -358,9 +356,7 @@ void PrefsDialog::initRemoteTab()
     connect(ui_.openWebClientButton, &QAbstractButton::clicked, &session_, &Session::launchWebInterface);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::altSpeedDaysEdited(int i)
 {
@@ -370,18 +366,18 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_unit_str = Formatter::get().unitStr(Formatter::get().SPEED, Formatter::get().KB);
-    auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
-    QLocale const locale;
+    auto const suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+
+    auto const locale = QLocale{};
 
     ui_.uploadSpeedLimitSpin->setSuffix(suffix);
     ui_.downloadSpeedLimitSpin->setSuffix(suffix);
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant(TR_SCHED_ALL));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant(TR_SCHED_WEEKDAY));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant(TR_SCHED_WEEKEND));
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant{ TR_SCHED_ALL });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant{ TR_SCHED_WEEKDAY });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant{ TR_SCHED_WEEKEND });
     ui_.altSpeedLimitDaysCombo->insertSeparator(ui_.altSpeedLimitDaysCombo->count());
 
     for (int i = locale.firstDayOfWeek(); i <= Qt::Sunday; ++i)
@@ -410,7 +406,7 @@ void PrefsDialog::initSpeedTab()
     sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
                    << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedLimitsSectionLayout);
     cr->addLayout(ui_.altSpeedLimitsSectionLayout);
     cr->update();
@@ -418,9 +414,7 @@ void PrefsDialog::initSpeedTab()
     connect(ui_.altSpeedLimitDaysCombo, qOverload<int>(&QComboBox::activated), this, &PrefsDialog::altSpeedDaysEdited);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::initDesktopTab()
 {
@@ -431,23 +425,85 @@ void PrefsDialog::initDesktopTab()
     linkWidgetToPref(ui_.playSoundOnTorrentCompletedCheck, Prefs::COMPLETE_SOUND_ENABLED);
 }
 
-/***
-****
-***/
+// ---
 
-void PrefsDialog::onPortTested(bool isOpen)
+QString PrefsDialog::getPortStatusText(PrefsDialog::PortTestStatus status) noexcept
 {
-    ui_.testPeerPortButton->setEnabled(true);
-    widgets_[Prefs::PEER_PORT]->setEnabled(true);
-    ui_.peerPortStatusLabel->setText(isOpen ? tr("Port is <b>open</b>") : tr("Port is <b>closed</b>"));
+    switch (status)
+    {
+    case PORT_TEST_UNKNOWN:
+        return tr("unknown");
+    case PORT_TEST_CHECKING:
+        return tr("checking…");
+    case PORT_TEST_OPEN:
+        return tr("open");
+    case PORT_TEST_CLOSED:
+        return tr("closed");
+    case PORT_TEST_ERROR:
+        return tr("error");
+    default:
+        return {};
+    }
+}
+
+void PrefsDialog::updatePortStatusLabel()
+{
+    auto const status_ipv4 = getPortStatusText(port_test_status_[Session::PORT_TEST_IPV4]);
+    auto const status_ipv6 = getPortStatusText(port_test_status_[Session::PORT_TEST_IPV6]);
+
+    ui_.peerPortStatusLabel->setText(
+        port_test_status_[Session::PORT_TEST_IPV4] == port_test_status_[Session::PORT_TEST_IPV6] ?
+            tr("Status: <b>%1</b>").arg(status_ipv4) :
+            tr("Status: <b>%1</b> (IPv4), <b>%2</b> (IPv6)").arg(status_ipv4).arg(status_ipv6));
+}
+
+void PrefsDialog::portTestSetEnabled()
+{
+    // Depend on the RPC call status instead of the UI status, so that the widgets
+    // won't be enabled even if the port peer port changed while we have port-test
+    // RPC call(s) in-flight.
+    auto const sensitive = !session_.portTestPending(Session::PORT_TEST_IPV4) &&
+        !session_.portTestPending(Session::PORT_TEST_IPV6);
+    ui_.testPeerPortButton->setEnabled(sensitive);
+    widgets_[Prefs::PEER_PORT]->setEnabled(sensitive);
+}
+
+void PrefsDialog::onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol)
+{
+    constexpr auto StatusFromResult = [](std::optional<bool> const res)
+    {
+        if (!res)
+        {
+            return PORT_TEST_ERROR;
+        }
+        if (!*res)
+        {
+            return PORT_TEST_CLOSED;
+        }
+        return PORT_TEST_OPEN;
+    };
+
+    // Only update the UI if the current status is "checking", so that
+    // we won't show the port test results for the old peer port if it
+    // changed while we have port-test RPC call(s) in-flight.
+    if (port_test_status_[ip_protocol] == PORT_TEST_CHECKING)
+    {
+        port_test_status_[ip_protocol] = StatusFromResult(result);
+        updatePortStatusLabel();
+    }
+    portTestSetEnabled();
 }
 
 void PrefsDialog::onPortTest()
 {
-    ui_.peerPortStatusLabel->setText(tr("Testing TCP Port…"));
-    ui_.testPeerPortButton->setEnabled(false);
-    widgets_[Prefs::PEER_PORT]->setEnabled(false);
-    session_.portTest();
+    port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_CHECKING;
+    port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_CHECKING;
+    updatePortStatusLabel();
+
+    session_.portTest(Session::PORT_TEST_IPV4);
+    session_.portTest(Session::PORT_TEST_IPV6);
+
+    portTestSetEnabled();
 }
 
 void PrefsDialog::initNetworkTab()
@@ -466,18 +522,18 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
     linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.incomingPeersSectionLayout);
     cr->addLayout(ui_.peerLimitsSectionLayout);
     cr->update();
 
     connect(ui_.testPeerPortButton, &QAbstractButton::clicked, this, &PrefsDialog::onPortTest);
     connect(&session_, &Session::portTested, this, &PrefsDialog::onPortTested);
+
+    updatePortStatusLabel();
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onBlocklistDialogDestroyed(QObject* o)
 {
@@ -500,12 +556,11 @@ void PrefsDialog::onBlocklistUpdated(int n)
 
 void PrefsDialog::onUpdateBlocklistClicked()
 {
-    blocklist_dialog_ = new QMessageBox(
-        QMessageBox::Information,
-        QString(),
-        tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
-        QMessageBox::Close,
-        this);
+    blocklist_dialog_ = new QMessageBox{ QMessageBox::Information,
+                                         QString{},
+                                         tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
+                                         QMessageBox::Close,
+                                         this };
     connect(blocklist_dialog_, &QDialog::rejected, this, &PrefsDialog::onUpdateBlocklistCancelled);
     connect(&session_, &Session::blocklistUpdated, this, &PrefsDialog::onBlocklistUpdated);
     blocklist_dialog_->show();
@@ -532,7 +587,7 @@ void PrefsDialog::initPrivacyTab()
     block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton
                    << ui_.autoUpdateBlocklistCheck;
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.encryptionSectionLayout);
     cr->addLayout(ui_.blocklistSectionLayout);
     cr->update();
@@ -543,19 +598,14 @@ void PrefsDialog::initPrivacyTab()
     updateBlocklistLabel();
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::onIdleLimitChanged()
 {
-    //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s)", nullptr, ui_.idleLimitSpin->value());
-
-    if (ui_.idleLimitSpin->suffix() != units_suffix)
-    {
-        ui_.idleLimitSpin->setSuffix(units_suffix);
-    }
+    //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s)");
+    auto const placeholder = QStringLiteral("%1");
+    Utils::updateSpinBoxFormat(ui_.idleLimitSpin, "PrefsDialog", units_format, placeholder);
 }
 
 void PrefsDialog::initSeedingTab()
@@ -578,13 +628,10 @@ void PrefsDialog::initSeedingTab()
 
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
-    //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s) ago", nullptr, ui_.queueStalledMinutesSpin->value());
-
-    if (ui_.queueStalledMinutesSpin->suffix() != units_suffix)
-    {
-        ui_.queueStalledMinutesSpin->setSuffix(units_suffix);
-    }
+    //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s) ago");
+    auto const placeholder = QStringLiteral("%1");
+    Utils::updateSpinBoxFormat(ui_.queueStalledMinutesSpin, "PrefsDialog", units_format, placeholder);
 }
 
 void PrefsDialog::initDownloadingTab()
@@ -625,7 +672,7 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
     linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.addingSectionLayout);
     cr->addLayout(ui_.downloadQueueSectionLayout);
     cr->addLayout(ui_.incompleteSectionLayout);
@@ -665,16 +712,14 @@ void PrefsDialog::updateSeedingWidgetsLocality()
     ui_.doneSeedingScriptStack->setFixedHeight(ui_.doneSeedingScriptStack->currentWidget()->sizeHint().height());
 }
 
-/***
-****
-***/
+// ---
 
 PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , prefs_(prefs)
-    , is_server_(session.isServer())
-    , is_local_(session_.isLocal())
+    : BaseDialog{ parent }
+    , session_{ session }
+    , prefs_{ prefs }
+    , is_server_{ session.isServer() }
+    , is_local_{ session_.isLocal() }
 {
     ui_.setupUi(this);
 
@@ -728,9 +773,7 @@ void PrefsDialog::setPref(int key, QVariant const& v)
     refreshPref(key);
 }
 
-/***
-****
-***/
+// ---
 
 void PrefsDialog::sessionUpdated()
 {
@@ -805,19 +848,19 @@ void PrefsDialog::refreshPref(int key)
         }
 
     case Prefs::PEER_PORT:
-        ui_.peerPortStatusLabel->setText(tr("Status unknown"));
-        ui_.testPeerPortButton->setEnabled(true);
+        port_test_status_[Session::PORT_TEST_IPV4] = PORT_TEST_UNKNOWN;
+        port_test_status_[Session::PORT_TEST_IPV6] = PORT_TEST_UNKNOWN;
+        updatePortStatusLabel();
+        portTestSetEnabled();
         break;
 
     default:
         break;
     }
 
-    key2widget_t::iterator const it(widgets_.find(key));
-
-    if (it != widgets_.end())
+    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
     {
-        QWidget* w(it.value());
+        QWidget* const w = iter->second;
 
         w->blockSignals(true);
 

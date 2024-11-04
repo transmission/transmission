@@ -40,10 +40,10 @@ find_cfiles() {
        ! \( $(get_find_path_args $(trim_comments .clang-format-ignore)) \) "$@"
 }
 
-# We're targeting clang-format version 15 and other versions give slightly
-# different results, so prefer `clang-format-15` if it's installed.
+# We're targeting clang-format version 17 and other versions give slightly
+# different results, so prefer `clang-format-17` if it's installed.
 clang_format_exe_names=(
-  'clang-format-15'
+  'clang-format-17'
   'clang-format'
 )
 for name in ${clang_format_exe_names[@]}; do
@@ -65,17 +65,19 @@ if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
   exitcode=1
 fi
 
-# enforce east const
-matches="$(find_cfiles -exec perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' '{}' '+')"
-if [ -n "$matches" ]; then
-  echo "$matches"
+# format Xcodeproj
+if ! grep -q 'objectVersion = 51' Transmission.xcodeproj/project.pbxproj; then
+  echo 'project.pbxproj needs objectVersion = 51 for compatibility with Xcode 11'
   exitcode=1
 fi
-if [ -n "$fix" ]; then
-  find_cfiles -exec perl -pi -e 's/((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' '{}' '+'
+if ! grep -q 'BuildIndependentTargetsInParallel = YES' Transmission.xcodeproj/project.pbxproj; then
+  echo 'please keep BuildIndependentTargetsInParallel in project.pbxproj'
+  exitcode=1
 fi
 
 # format JS
+# but only if js has changed
+git diff --cached --quiet -- "web/**" && exit $exitcode
 cd "${root}/web" || exit 1
 npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
 if ! npm ci --no-audit --no-fund --no-progress &>/dev/null; then

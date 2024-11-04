@@ -3,11 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::equal
 #include <array>
-#include <cstdlib>
+#include <cstdio>
 #include <set>
+#include <string>
 #include <string_view>
 #include <vector>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -15,11 +19,10 @@
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
-
-#include "test-fixtures.h"
+#include <libtransmission/utils.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using AnnounceListTest = ::testing::Test;
 using namespace std::literals;
@@ -35,7 +38,9 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ(Announce, tracker.announce.sv());
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.sv());
     EXPECT_EQ(Tier, tracker.tier);
-    EXPECT_EQ("example.org:443"sv, tracker.host.sv());
+    EXPECT_EQ("example.org", tracker.announce_parsed.host);
+    EXPECT_EQ("example.org"sv, tracker.announce_parsed.authority);
+    EXPECT_EQ(443, tracker.announce_parsed.port);
 }
 
 TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
@@ -59,9 +64,15 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     EXPECT_EQ(Announce1, announce_list.at(0).announce.sv());
     EXPECT_EQ(Announce2, announce_list.at(1).announce.sv());
     EXPECT_EQ(Announce3, announce_list.at(2).announce.sv());
-    EXPECT_EQ("example.org:443"sv, announce_list.at(0).host.sv());
-    EXPECT_EQ("example.org:80"sv, announce_list.at(1).host.sv());
-    EXPECT_EQ("example.org:999"sv, announce_list.at(2).host.sv());
+    EXPECT_EQ("example.org"sv, announce_list.at(0).announce_parsed.host);
+    EXPECT_EQ("example.org"sv, announce_list.at(1).announce_parsed.host);
+    EXPECT_EQ("example.org"sv, announce_list.at(2).announce_parsed.host);
+    EXPECT_EQ(443, announce_list.at(0).announce_parsed.port);
+    EXPECT_EQ(80, announce_list.at(1).announce_parsed.port);
+    EXPECT_EQ(999, announce_list.at(2).announce_parsed.port);
+    EXPECT_EQ("example.org"sv, announce_list.at(0).announce_parsed.authority);
+    EXPECT_EQ("example.org"sv, announce_list.at(1).announce_parsed.authority);
+    EXPECT_EQ("example.org:999"sv, announce_list.at(2).announce_parsed.authority);
 }
 
 TEST_F(AnnounceListTest, canAddWithoutScrape)
@@ -162,9 +173,9 @@ TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
 
     // confirm that each has a unique id
     auto ids = std::set<tr_tracker_id_t>{};
-    for (size_t i = 0, n = std::size(announce_list); i < n; ++i)
+    for (auto const& tracker : announce_list)
     {
-        ids.insert(announce_list.at(i).id);
+        ids.insert(tracker.id);
     }
     EXPECT_EQ(std::size(announce_list), std::size(ids));
 }
@@ -272,6 +283,18 @@ TEST_F(AnnounceListTest, canReplace)
     EXPECT_EQ(Announce2, announce_list.at(0).announce.sv());
 }
 
+TEST_F(AnnounceListTest, canReplaceWithDiffQuery)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce1 = "https://www.example.com/1/announce"sv;
+    auto constexpr Announce2 = "https://www.example.com/2/announce?pass=1999"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Announce1, Tier));
+    EXPECT_TRUE(announce_list.replace(announce_list.at(0).id, Announce2));
+    EXPECT_EQ(Announce2, announce_list.at(0).announce.sv());
+}
+
 TEST_F(AnnounceListTest, canNotReplaceInvalidId)
 {
     auto constexpr Tier = tr_tracker_tier_t{ 1 };
@@ -321,10 +344,10 @@ TEST_F(AnnounceListTest, announceToScrape)
         { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
     } };
 
-    for (auto const test : Tests)
+    for (auto const& test : Tests)
     {
-        auto const scrape = tr_announce_list::announceToScrape(tr_quark_new(test.announce));
-        EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
+        auto const scrape = tr_announce_list::announce_to_scrape(test.announce);
+        EXPECT_EQ(test.expected_scrape, scrape.value_or(""));
     }
 }
 
@@ -340,12 +363,13 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
-    tr_error* error = nullptr;
-    EXPECT_TRUE(tr_loadFile(OriginalFile, original_content, &error));
-    EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_saveFile(test_file.sv(), original_content, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const test_file = tr_pathbuf{ sandbox, "transmission-announce-list-test.torrent"sv };
+    auto error = tr_error{};
+    EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
+    EXPECT_FALSE(error) << error;
+    EXPECT_TRUE(tr_file_save(test_file.sv(), original_content, &error));
+    EXPECT_FALSE(error) << error;
 
     // make an announce_list for it
     auto announce_list = tr_announce_list();
@@ -355,34 +379,34 @@ TEST_F(AnnounceListTest, save)
 
     // try saving to a nonexistent torrent file
     EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
-    EXPECT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    tr_error_clear(&error);
+    EXPECT_TRUE(error);
+    EXPECT_NE(0, error.code());
+    error = {};
 
     // now save to a real torrent file
     EXPECT_TRUE(announce_list.save(std::string{ test_file.sv() }, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // load the original
     auto original_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(original_tm.parseBenc({ std::data(original_content), std::size(original_content) }));
+    EXPECT_TRUE(original_tm.parse_benc({ std::data(original_content), std::size(original_content) }));
 
     // load the scratch that we saved to
     auto modified_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file.sv()));
+    EXPECT_TRUE(modified_tm.parse_torrent_file(test_file.sv()));
 
     // test that non-announce parts of the metainfo are the same
     EXPECT_EQ(original_tm.name(), modified_tm.name());
-    EXPECT_EQ(original_tm.fileCount(), modified_tm.fileCount());
-    EXPECT_EQ(original_tm.dateCreated(), modified_tm.dateCreated());
-    EXPECT_EQ(original_tm.pieceCount(), modified_tm.pieceCount());
+    EXPECT_EQ(original_tm.file_count(), modified_tm.file_count());
+    EXPECT_EQ(original_tm.date_created(), modified_tm.date_created());
+    EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
 
     // test that the saved version has the updated announce list
     EXPECT_TRUE(std::equal(
         std::begin(announce_list),
         std::end(announce_list),
-        std::begin(modified_tm.announceList()),
-        std::end(modified_tm.announceList())));
+        std::begin(modified_tm.announce_list()),
+        std::end(modified_tm.announce_list())));
 
     // cleanup
     (void)std::remove(test_file.c_str());
@@ -417,7 +441,7 @@ TEST_F(AnnounceListTest, parseThreeTier)
     EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.sv());
     EXPECT_EQ(2U, announce_list.at(2).tier);
-    EXPECT_EQ(fmt::format("{:s}\n", Text), announce_list.toString());
+    EXPECT_EQ(fmt::format("{:s}\n", Text), announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
@@ -439,7 +463,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
     EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.sv());
     EXPECT_EQ(2U, announce_list.at(2).tier);
-    EXPECT_EQ(Text, announce_list.toString());
+    EXPECT_EQ(Text, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
@@ -477,7 +501,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
         "https://www.example.com/b/announce\n"
         "\n"
         "https://www.example.com/c/announce\n"sv;
-    EXPECT_EQ(ExpectedText, announce_list.toString());
+    EXPECT_EQ(ExpectedText, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
@@ -510,7 +534,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
         "https://www.example.com/b/announce\n"
         "\n"
         "https://www.example.com/c/announce\n"sv;
-    EXPECT_EQ(ExpectedText, announce_list.toString());
+    EXPECT_EQ(ExpectedText, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierCrLf)
@@ -539,7 +563,7 @@ TEST_F(AnnounceListTest, parseThreeTierCrLf)
         "https://www.example.com/b/announce\n"
         "\n"
         "https://www.example.com/c/announce\n"sv;
-    EXPECT_EQ(ExpectedText, announce_list.toString());
+    EXPECT_EQ(ExpectedText, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseMultiTrackerInTier)
@@ -583,7 +607,7 @@ TEST_F(AnnounceListTest, parseMultiTrackerInTier)
     EXPECT_EQ("https://www.example.com/i/announce", announce_list.at(8).announce.sv());
     EXPECT_EQ(2U, announce_list.at(8).tier);
 
-    EXPECT_EQ(Text, announce_list.toString());
+    EXPECT_EQ(Text, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseInvalidUrl)
@@ -632,7 +656,7 @@ TEST_F(AnnounceListTest, addAnnounceListWithSingleTracker)
         "https://www.bar.com/announce\n"
         "\n"
         "https://www.baz.com/announce\n"sv;
-    EXPECT_EQ(Expected, announce_list.toString());
+    EXPECT_EQ(Expected, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, addAnnounceWithSingleTier)
@@ -659,7 +683,7 @@ TEST_F(AnnounceListTest, addAnnounceWithSingleTier)
         "\n"
         "https://www.baz.com/announce\n"
         "https://www.qux.com/announce\n"sv;
-    EXPECT_EQ(Expected, announce_list.toString());
+    EXPECT_EQ(Expected, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, addAnnounceListWithMultiTier)
@@ -688,5 +712,5 @@ TEST_F(AnnounceListTest, addAnnounceListWithMultiTier)
         "https://www.baz.com/announce\n"
         "\n"
         "https://www.qux.com/announce\n"sv;
-    EXPECT_EQ(Expected, announce_list.toString());
+    EXPECT_EQ(Expected, announce_list.to_string());
 }

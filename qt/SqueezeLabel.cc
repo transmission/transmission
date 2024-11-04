@@ -42,29 +42,40 @@
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOption>
+#include <QTimer>
+
+#if QT_CONFIG(accessibility)
+#include <QAccessible>
+#endif
 
 #include "SqueezeLabel.h"
 
 SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent)
-    : QLabel(text, parent)
+    : QLabel{ text, parent }
 {
 }
 
 SqueezeLabel::SqueezeLabel(QWidget* parent)
-    : QLabel(parent)
+    : QLabel{ parent }
 {
 }
 
 void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
 {
+#if QT_CONFIG(accessibility)
+    // NOTE: QLabel doesn't notify on text/cursor changes so we're checking for it when repaint is requested
+    updateAccessibilityIfNeeded();
+#endif
+
     if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)) != 0)
     {
-        return QLabel::paintEvent(paint_event);
+        QLabel::paintEvent(paint_event);
+        return;
     }
 
-    QPainter painter(this);
-    QFontMetrics const fm = fontMetrics();
-    QStyleOption opt;
+    auto painter = QPainter{ this };
+    auto const fm = fontMetrics();
+    auto opt = QStyleOption{};
     opt.initFrom(this);
     auto const full_text = text();
     auto const elided_text = fm.elidedText(full_text, Qt::ElideRight, width());
@@ -74,3 +85,48 @@ void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
     setToolTip(full_text != elided_text ? full_text : QString{});
 #endif
 }
+
+#if QT_CONFIG(accessibility)
+
+void SqueezeLabel::updateAccessibilityIfNeeded()
+{
+    // NOTE: Dispatching events asynchronously to avoid blocking the painting
+
+    if (auto const new_text = text(); new_text != old_text_)
+    {
+        if (QAccessible::isActive())
+        {
+            QTimer::singleShot(
+                0,
+                this,
+                [this, old_text = old_text_, new_text]()
+                {
+                    QAccessibleTextUpdateEvent event(this, 0, old_text, new_text);
+                    event.setCursorPosition(selectionStart());
+                    QAccessible::updateAccessibility(&event);
+                });
+        }
+
+        old_text_ = new_text;
+    }
+
+    // NOTE: Due to QLabel implementation specifics, this block will never be entered :(
+    if (auto const new_position = selectionStart(); new_position != old_position_ && !hasSelectedText())
+    {
+        if (QAccessible::isActive())
+        {
+            QTimer::singleShot(
+                0,
+                this,
+                [this, new_position]()
+                {
+                    QAccessibleTextCursorEvent event(this, new_position);
+                    QAccessible::updateAccessibility(&event);
+                });
+        }
+
+        old_position_ = new_position;
+    }
+}
+
+#endif // QT_CONFIG(accessibility)

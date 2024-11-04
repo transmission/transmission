@@ -1,0 +1,75 @@
+
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
+"22.title" = "做种限制";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
+"23.title" = "传输带宽";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
+"29.title" = "KB/s";
+
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
+"30.title" = "分享率：";
+
+/* Class = "NSTextFieldCell"; title = "Advanced"; ObjectID = "31"; */
+"31.title" = "高级";
+
+/* Class = "NSTextFieldCell"; title = "Maximum connections:"; ObjectID = "32"; */
+"32.title" = "最大连接数：";
+
+/* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "35"; */
+"35.title" = "节点";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "40"; */
+"40.title" = "无限制";
+
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "41"; */
+"41.title" = "全局设置";
+
+/* Class = "NSMenuItem"; title = "Stop at Ratio"; ObjectID = "42"; */
+"42.title" = "按分享率停止做种";
+
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
+"43.title" = "限制上传：";
+
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
+"44.title" = "下载限制：";
+
+/* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
+"45.title" = "保持在全局带宽限制范围内";
+
+/* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
+"46.title" = "优先级";
+
+/* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
+"47.title" = "传输优先级：";
+
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
+"50.title" = "低";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "51"; */
+"51.title" = "正常";
+
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "52"; */
+"52.title" = "高";
+
+/* Class = "NSMenuItem"; title = "Stop When Inactive"; ObjectID = "86"; */
+"86.title" = "闲置时停止做种";
+
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "87"; */
+"87.title" = "全局设置";
+
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "88"; */
+"88.title" = "无限制";
+
+/* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
+"89.title" = "闲置：";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
+"98.title" = "分钟";
+
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
+"114.title" = "做种完成时从传输列表中移除";

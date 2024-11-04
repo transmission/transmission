@@ -6,13 +6,16 @@
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include <algorithm>
-#include <type_traits>
+#include <ctime> // time_t
+#include <vector>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/transmission.h> // tr_block_index_t
 
 #include <libtransmission/peer-mgr-active-requests.h>
 
 #include "gtest/gtest.h"
+
+struct tr_peer;
 
 class PeerMgrActiveRequestsTest : public ::testing::Test
 {

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QColor>
+#include <QCoreApplication>
 #include <QDataStream>
 #include <QFile>
 #include <QFileIconProvider>
@@ -20,13 +21,10 @@
 #include <QStyle>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter
 
 #include "Utils.h"
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -81,7 +79,7 @@ int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
     option.font = view->font();
 
     return view->style()
-        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view)
+        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize{ QWIDGETSIZE_MAX, QWIDGETSIZE_MAX }, view)
         .width();
 }
 
@@ -92,7 +90,7 @@ int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
     option.text = text;
     option.sortIndicator = view->isSortIndicatorShown() ? QStyleOptionHeader::SortDown : QStyleOptionHeader::None;
 
-    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize(), view).width();
+    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize{}, view).width();
 }
 
 QColor Utils::getFadedColor(QColor const& color)
@@ -100,4 +98,26 @@ QColor Utils::getFadedColor(QColor const& color)
     QColor faded_color(color);
     faded_color.setAlpha(128);
     return faded_color;
+}
+
+void Utils::updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder)
+{
+    QString const units_format = QCoreApplication::translate(context, format, nullptr, spinBox->value());
+    auto const placeholder_pos = units_format.indexOf(placeholder);
+    if (placeholder_pos == -1)
+    {
+        return;
+    }
+
+    auto const units_prefix = units_format.left(placeholder_pos);
+    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
+
+    if (spinBox->prefix() != units_prefix)
+    {
+        spinBox->setPrefix(units_prefix);
+    }
+    if (spinBox->suffix() != units_suffix)
+    {
+        spinBox->setSuffix(units_suffix);
+    }
 }

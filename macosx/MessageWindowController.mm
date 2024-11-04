@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -21,7 +21,7 @@ typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
 
 static NSTimeInterval const kUpdateSeconds = 0.75;
 
-@interface MessageWindowController ()
+@interface MessageWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSTableView* fMessageTable;
 
@@ -50,6 +50,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     NSWindow* window = self.window;
     window.frameAutosaveName = @"MessageWindowFrame";
     [window setFrameUsingName:@"MessageWindowFrame"];
@@ -141,7 +142,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
     [_fTimer invalidate];
 }
 
@@ -250,9 +250,10 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
         auto const file_string = std::string{ currentMessage->file };
         NSString* file = [(@(file_string.c_str())).lastPathComponent stringByAppendingFormat:@":%ld", currentMessage->line];
 
+        auto const secs_since_1970 = std::chrono::system_clock::to_time_t(currentMessage->when);
         NSDictionary* message = @{
             @"Message" : @(currentMessage->message.c_str()),
-            @"Date" : [NSDate dateWithTimeIntervalSince1970:currentMessage->when],
+            @"Date" : [NSDate dateWithTimeIntervalSince1970:secs_since_1970],
             @"Index" : @(currentIndex++), //more accurate when sorting by date
             @"Level" : @(currentMessage->level),
             @"Name" : name,
@@ -323,7 +324,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
     }
 }
 
-#warning don't cut off end
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
     NSString* message = self.fDisplayedMessages[row][@"Message"];

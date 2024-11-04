@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.4.0'
+$global:Qt6Version = '6.6.2'
 
 $global:Qt6Deps = @(
     'DBus'
@@ -33,8 +33,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
 
     $ConfigOptions = @(
         '-platform'; 'win32-msvc'
-        '-mp'
-        # '-ltcg' # error C1002 on VS 2019 16.5.4
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir
@@ -51,17 +49,50 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-freetype'
         '-no-harfbuzz'
         '-no-feature-androiddeployqt'
-        '-no-feature-assistant' # No need in GUI tools
+        '-no-feature-assistant'
         '-no-feature-clang'
         '-no-feature-clangcpp'
-        '-no-feature-designer' # No need in GUI tools
+        '-no-feature-commandlinkbutton'
+        '-no-feature-concurrent'
+        '-no-feature-designer'
+        '-no-feature-dial'
+        '-no-feature-distancefieldgenerator'
+        '-no-feature-dockwidget'
+        '-no-feature-fontcombobox'
+        '-no-feature-gestures'
+        '-no-feature-graphicsview'
+        '-no-feature-keysequenceedit'
+        '-no-feature-lcdnumber'
+        '-no-feature-mdiarea'
+        '-no-feature-networklistmanager'
+        '-no-feature-opengl'
+        '-no-feature-pdf'
+        '-no-feature-pixeltool'
+        '-no-feature-printsupport'
+        '-no-feature-qtattributionsscanner'
+        '-no-feature-raster-64bit'
         '-no-feature-schannel'
+        '-no-feature-scroller'
+        '-no-feature-sharedmemory'
+        '-no-feature-splashscreen'
         '-no-feature-sql'
+        '-no-feature-syntaxhighlighter'
+        '-no-feature-systemsemaphore'
         '-no-feature-testlib'
+        '-no-feature-textmarkdownreader'
+        '-no-feature-textmarkdownwriter'
+        '-no-feature-textodfwriter'
+        '-no-feature-tuiotouch'
+        '-no-feature-undocommand'
+        '-no-feature-whatsthis'
+        '-no-feature-windeployqt'
+        '-no-feature-wizard'
         '-nomake'; 'examples'
         '-nomake'; 'tests'
         '-I'; (Join-Path $DepsPrefixDir include).Replace('\', '/')
         '-L'; (Join-Path $DepsPrefixDir lib).Replace('\', '/')
+        '--'
+        "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
     )
 
     if ($env:LDFLAGS) {
@@ -70,6 +101,7 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     }
 
     # No need in GUI tools
+    Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'TARGET Qt::Widgets' 'QT_FEATURE_designer'
     Edit-TextFile (Join-Path $SourceDir qttools src linguist CMakeLists.txt) 'add_subdirectory[(]linguist[)]' ''
 
     Invoke-NativeCommand cmake -E remove_directory $BuildDir

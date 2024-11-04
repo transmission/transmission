@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,7 +9,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
 @interface PortChecker ()
 
 @property(nonatomic, weak) NSObject<PortCheckerDelegate>* fDelegate;
-@property(nonatomic) port_status_t fStatus;
+@property(nonatomic) PortStatus fStatus;
 
 @property(nonatomic) NSURLSession* fSession;
 @property(nonatomic) NSURLSessionDataTask* fTask;
@@ -28,7 +28,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
                                              delegateQueue:nil];
         _fDelegate = delegate;
 
-        _fStatus = PORT_STATUS_CHECKING;
+        _fStatus = PortStatusChecking;
 
         _fTimer = [NSTimer scheduledTimerWithTimeInterval:kCheckFireInterval target:self selector:@selector(startProbe:)
                                                  userInfo:@(portNumber)
@@ -47,7 +47,7 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
     [self cancelProbe];
 }
 
-- (port_status_t)status
+- (PortStatus)status
 {
     return self.fStatus;
 }
@@ -72,37 +72,37 @@ static NSTimeInterval const kCheckFireInterval = 3.0;
                                                   timeoutInterval:15.0];
 
     _fTask = [_fSession dataTaskWithRequest:portProbeRequest
-                          completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable response, NSError* _Nullable error) {
+                          completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable, NSError* _Nullable error) {
                               if (error)
                               {
                                   NSLog(@"Unable to get port status: connection failed (%@)", error.localizedDescription);
-                                  [self callBackWithStatus:PORT_STATUS_ERROR];
+                                  [self callBackWithStatus:PortStatusError];
                                   return;
                               }
                               NSString* probeString = [[NSString alloc] initWithData:data ?: NSData.data encoding:NSUTF8StringEncoding];
                               if (!probeString)
                               {
                                   NSLog(@"Unable to get port status: invalid data received");
-                                  [self callBackWithStatus:PORT_STATUS_ERROR];
+                                  [self callBackWithStatus:PortStatusError];
                               }
                               else if ([probeString isEqualToString:@"1"])
                               {
-                                  [self callBackWithStatus:PORT_STATUS_OPEN];
+                                  [self callBackWithStatus:PortStatusOpen];
                               }
                               else if ([probeString isEqualToString:@"0"])
                               {
-                                  [self callBackWithStatus:PORT_STATUS_CLOSED];
+                                  [self callBackWithStatus:PortStatusClosed];
                               }
                               else
                               {
                                   NSLog(@"Unable to get port status: invalid response (%@)", probeString);
-                                  [self callBackWithStatus:PORT_STATUS_ERROR];
+                                  [self callBackWithStatus:PortStatusError];
                               }
                           }];
     [_fTask resume];
 }
 
-- (void)callBackWithStatus:(port_status_t)status
+- (void)callBackWithStatus:(PortStatus)status
 {
     self.fStatus = status;
 

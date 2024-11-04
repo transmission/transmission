@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,14 +7,9 @@
    implement missing (or duplicate) functionality without exposing internal
    details in header files. */
 
-#include "transmission.h"
-
-#include "crypto-utils.h"
-#include "tr-macros.h"
-
-// ---
-
 #ifdef TR_CRYPTO_X509_FALLBACK
+
+#include "libtransmission/crypto-utils.h"
 
 tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t /*handle*/)
 {

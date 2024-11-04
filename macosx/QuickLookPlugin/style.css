@@ -1,7 +1,16 @@
+:root {
+  color-scheme: light dark;
+}
+
 html {
   color: rgb(0,0,0);
-  font-family: 'Lucida Grande', Sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Lucida Grande', sans-serif;
   text-align: left;
+}
+
+table {
+  width: 100%;
+  border-spacing: 0;
 }
 
 th {
@@ -10,12 +19,45 @@ th {
   text-align: left;
 }
 
+tr:nth-child(even) {
+  background: rgb(244,245,245);
+}
+tr:nth-child(even) td:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+tr:nth-child(even) td:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
 td {
   color: rgb(80,80,80);
   text-align: left;
+}
+td.grey {
+  color: rgb(133,133,133);
 }
 
 img.icon {
   margin-right: 8px;
   vertical-align: text-bottom;
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+      color: rgb(255,255,255);
+    }
+
+    th {
+      color: rgb(200,200,200);
+    }
+
+    tr:nth-child(even) {
+      background: rgb(50,50,50);
+    }
+
+    td {
+      color: rgb(175,175,175);
+    }
 }

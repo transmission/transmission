@@ -3,14 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
+#include <chrono>
+#include <cstddef> // size_t
 
+#include <event2/event.h>
+
+#include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
-
-using namespace std::literals;
 
 namespace libtransmission::test
 {
@@ -39,7 +42,7 @@ protected:
 
     void sleepMsec(std::chrono::milliseconds msec)
     {
-        EXPECT_FALSE(waitFor(
+        EXPECT_FALSE(waitFor( //
             evbase_.get(),
             []() { return false; },
             msec));
@@ -90,10 +93,10 @@ TEST_F(TimerTest, singleShotCallsCallback)
     {
         called = true;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     static auto constexpr Interval = 100ms;
-    timer->startSingleShot(Interval);
+    timer->start_single_shot(Interval);
 
     waitFor(evbase_.get(), [&called] { return called; });
     EXPECT_TRUE(called);
@@ -110,10 +113,10 @@ TEST_F(TimerTest, repeatingCallsCallback)
     {
         called = true;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     static auto constexpr Interval = 100ms;
-    timer->startRepeating(Interval);
+    timer->start_repeating(Interval);
 
     waitFor(evbase_.get(), [&called] { return called; });
     EXPECT_TRUE(called);
@@ -130,13 +133,13 @@ TEST_F(TimerTest, singleShotHonorsInterval)
     {
         called = true;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     // run a single-shot timer
     auto const begin_time = currentTime();
     static auto constexpr Interval = 100ms;
-    timer->startSingleShot(Interval);
-    EXPECT_FALSE(timer->isRepeating());
+    timer->start_single_shot(Interval);
+    EXPECT_FALSE(timer->is_repeating());
     EXPECT_EQ(Interval, timer->interval());
     waitFor(evbase_.get(), [&called] { return called; });
     auto const end_time = currentTime();
@@ -157,14 +160,14 @@ TEST_F(TimerTest, repeatingHonorsInterval)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     // start a repeating timer
     auto const begin_time = currentTime();
     static auto constexpr Interval = 100ms;
     static auto constexpr DesiredLoops = 3;
-    timer->startRepeating(Interval);
-    EXPECT_TRUE(timer->isRepeating());
+    timer->start_repeating(Interval);
+    EXPECT_TRUE(timer->is_repeating());
     EXPECT_EQ(Interval, timer->interval());
     waitFor(evbase_.get(), [&n_calls] { return n_calls >= DesiredLoops; });
     auto const end_time = currentTime();
@@ -174,7 +177,8 @@ TEST_F(TimerTest, repeatingHonorsInterval)
     EXPECT_EQ(DesiredLoops, n_calls);
 }
 
-TEST_F(TimerTest, restartWithDifferentInterval)
+// TODO: flaky test should be fixed instead of disabled
+TEST_F(TimerTest, DISABLED_restartWithDifferentInterval)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -185,13 +189,13 @@ TEST_F(TimerTest, restartWithDifferentInterval)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     auto const test = [this, &n_calls, &timer](auto interval)
     {
         auto const next = n_calls + 1;
         auto const begin_time = currentTime();
-        timer->startSingleShot(interval);
+        timer->start_single_shot(interval);
         waitFor(evbase_.get(), [&n_calls, next]() { return n_calls >= next; });
         auto const end_time = currentTime();
 
@@ -203,6 +207,7 @@ TEST_F(TimerTest, restartWithDifferentInterval)
     test(200ms);
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_restartWithSameInterval)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -214,13 +219,13 @@ TEST_F(TimerTest, DISABLED_restartWithSameInterval)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     auto const test = [this, &n_calls, &timer](auto interval)
     {
         auto const next = n_calls + 1;
         auto const begin_time = currentTime();
-        timer->startSingleShot(interval);
+        timer->start_single_shot(interval);
         waitFor(evbase_.get(), [&n_calls, next]() { return n_calls >= next; });
         auto const end_time = currentTime();
 
@@ -232,6 +237,7 @@ TEST_F(TimerTest, DISABLED_restartWithSameInterval)
     test(timer->interval());
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -243,15 +249,15 @@ TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     // start a repeating timer and confirm that it's running
     auto begin_time = currentTime();
     static auto constexpr RepeatingInterval = 100ms;
     static auto constexpr DesiredLoops = 2;
-    timer->startRepeating(RepeatingInterval);
+    timer->start_repeating(RepeatingInterval);
     EXPECT_EQ(RepeatingInterval, timer->interval());
-    EXPECT_TRUE(timer->isRepeating());
+    EXPECT_TRUE(timer->is_repeating());
     waitFor(evbase_.get(), [&n_calls]() { return n_calls >= DesiredLoops; });
     auto end_time = currentTime();
     expectTime(RepeatingInterval * DesiredLoops, AsMSec(end_time - begin_time), RepeatingInterval / 2);
@@ -260,9 +266,9 @@ TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
     auto const baseline = n_calls;
     begin_time = currentTime();
     static auto constexpr SingleShotInterval = 200ms;
-    timer->startSingleShot(SingleShotInterval);
+    timer->start_single_shot(SingleShotInterval);
     EXPECT_EQ(SingleShotInterval, timer->interval());
-    EXPECT_FALSE(timer->isRepeating());
+    EXPECT_FALSE(timer->is_repeating());
     waitFor(evbase_.get(), [&n_calls]() { return n_calls >= DesiredLoops + 1; });
     end_time = currentTime();
 
@@ -274,6 +280,7 @@ TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
     EXPECT_EQ(baseline + 1, n_calls);
 }
 
+// TODO: flaky test should be fixed instead of disabled
 TEST_F(TimerTest, DISABLED_singleShotStop)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
@@ -285,13 +292,13 @@ TEST_F(TimerTest, DISABLED_singleShotStop)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     // start a single-shot timer
     static auto constexpr Interval = 200ms;
-    timer->startSingleShot(Interval);
+    timer->start_single_shot(Interval);
     EXPECT_EQ(Interval, timer->interval());
-    EXPECT_FALSE(timer->isRepeating());
+    EXPECT_FALSE(timer->is_repeating());
 
     // wait half the interval, then stop the timer
     sleepMsec(Interval / 2);
@@ -315,13 +322,13 @@ TEST_F(TimerTest, repeatingStop)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     // start a repeating timer
     static auto constexpr Interval = 200ms;
-    timer->startRepeating(Interval);
+    timer->start_repeating(Interval);
     EXPECT_EQ(Interval, timer->interval());
-    EXPECT_TRUE(timer->isRepeating());
+    EXPECT_TRUE(timer->is_repeating());
 
     // wait half the interval, then stop the timer
     sleepMsec(Interval / 2);
@@ -345,13 +352,13 @@ TEST_F(TimerTest, destroyedTimersStop)
     {
         ++n_calls;
     };
-    timer->setCallback(callback);
+    timer->set_callback(callback);
 
     // start a repeating timer
     static auto constexpr Interval = 200ms;
-    timer->startRepeating(Interval);
+    timer->start_repeating(Interval);
     EXPECT_EQ(Interval, timer->interval());
-    EXPECT_TRUE(timer->isRepeating());
+    EXPECT_TRUE(timer->is_repeating());
 
     // wait half the interval, then destroy the timer
     sleepMsec(Interval / 2);

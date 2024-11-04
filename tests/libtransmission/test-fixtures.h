@@ -21,8 +21,8 @@
 #include <libtransmission/crypto-utils.h> // tr_base64_decode()
 #include <libtransmission/error.h>
 #include <libtransmission/file.h> // tr_sys_file_*()
-#include <libtransmission/platform.h> // TR_PATH_DELIMITER
 #include <libtransmission/quark.h>
+#include <libtransmission/torrent-ctor.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -33,7 +33,7 @@ using namespace std::literals;
 
 inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
 {
-    os << err.message << ' ' << err.code;
+    os << err.message() << ' ' << err.code();
     return os;
 }
 
@@ -89,7 +89,7 @@ inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds
             return false;
         }
 
-        tr_wait(10ms);
+        std::this_thread::sleep_for(10ms);
     }
 }
 
@@ -140,6 +140,14 @@ public:
         return sandbox_dir_;
     }
 
+    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
+    {
+        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
+        tr_sys_dir_create_temp(std::data(path));
+        tr_sys_path_native_separators(std::data(path));
+        return path;
+    }
+
 protected:
     static std::string get_default_parent_dir()
     {
@@ -148,21 +156,8 @@ protected:
             return path;
         }
 
-        tr_error* error = nullptr;
-        auto path = tr_sys_dir_get_current(&error);
-        if (error != nullptr)
-        {
-            tr_error_free(error);
-        }
-        return path;
-    }
-
-    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
-    {
-        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
-        tr_sys_dir_create_temp(std::data(path));
-        tr_sys_path_native_separators(std::data(path));
-        return path;
+        auto error = tr_error{};
+        return tr_sys_dir_get_current(&error);
     }
 
     static void rimraf(std::string const& path, bool verbose = false)
@@ -210,29 +205,30 @@ protected:
         dir.popdir();
         if (auto const info = tr_sys_path_get_info(path); !info)
         {
-            tr_error* error = nullptr;
+            auto error = tr_error{};
             tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-            EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
-            tr_error_clear(&error);
+            EXPECT_FALSE(error) << "path[" << path << "] dir[" << dir << "] " << error;
         }
 
         errno = tmperr;
     }
 
-    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error** error = nullptr)
+    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error* error = nullptr)
     {
+        auto local_error = tr_error{};
+        if (error == nullptr)
+        {
+            error = &local_error;
+        }
+
         uint64_t n_left = data_len;
         auto const* left = static_cast<uint8_t const*>(data);
-
         while (n_left > 0)
         {
             uint64_t n = {};
-            tr_error* local_error = nullptr;
-            if (!tr_sys_file_write(fd, left, n_left, &n, &local_error))
+            if (!tr_sys_file_write(fd, left, n_left, &n, error))
             {
-                fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
-                tr_error_propagate(error, &local_error);
-                tr_error_free(local_error);
+                fmt::print(stderr, "Error writing file: '{:s}'\n", error->message());
                 break;
             }
 
@@ -247,20 +243,17 @@ protected:
 
         buildParentDir(tmpl);
 
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         auto const fd = tr_sys_file_open_temp(tmpl, &error);
         blockingFileWrite(fd, payload, n, &error);
-        tr_sys_file_flush(fd, &error);
-        tr_sys_file_flush(fd, &error);
         tr_sys_file_close(fd, &error);
-        if (error != nullptr)
+        if (error)
         {
             fmt::print(
                 "Couldn't create '{path}': {error} ({error_code})\n",
                 fmt::arg("path", tmpl),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
         }
         sync();
 
@@ -279,8 +272,6 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
-        tr_sys_file_flush(fd);
-        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 
@@ -310,83 +301,36 @@ private:
     Sandbox sandbox_;
 };
 
-inline void ensureFormattersInited()
-{
-    static constexpr int MEM_K = 1024;
-    static char const constexpr* const MEM_K_STR = "KiB";
-    static char const constexpr* const MEM_M_STR = "MiB";
-    static char const constexpr* const MEM_G_STR = "GiB";
-    static char const constexpr* const MEM_T_STR = "TiB";
-
-    static constexpr int DISK_K = 1000;
-    static char const constexpr* const DISK_K_STR = "kB";
-    static char const constexpr* const DISK_M_STR = "MB";
-    static char const constexpr* const DISK_G_STR = "GB";
-    static char const constexpr* const DISK_T_STR = "TB";
-
-    static constexpr int SPEED_K = 1000;
-    static char const constexpr* const SPEED_K_STR = "kB/s";
-    static char const constexpr* const SPEED_M_STR = "MB/s";
-    static char const constexpr* const SPEED_G_STR = "GB/s";
-    static char const constexpr* const SPEED_T_STR = "TB/s";
-
-    static std::once_flag flag;
-
-    std::call_once(
-        flag,
-        []()
-        {
-            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-        });
-}
-
 class SessionTest : public SandboxedTest
 {
 private:
     std::shared_ptr<tr_variant> settings_;
 
-    tr_session* sessionInit(tr_variant* settings)
+    tr_session* sessionInit(tr_variant& settings)
     {
-        ensureFormattersInited();
+        auto* const settings_map = settings.get_if<tr_variant::Map>();
+        EXPECT_NE(settings_map, nullptr);
 
         // download dir
-        auto sv = "Downloads"sv;
-        auto q = TR_KEY_download_dir;
-        (void)tr_variantDictFindStrView(settings, q, &sv);
-        auto const download_dir = tr_pathbuf{ sandboxDir(), '/', sv };
+        auto key = TR_KEY_download_dir;
+        auto val = settings_map->value_if<std::string_view>(key).value_or("Downloads"sv);
+        auto const download_dir = tr_pathbuf{ sandboxDir(), '/', val };
         tr_sys_dir_create(download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
-        tr_variantDictAddStr(settings, q, download_dir);
+        (*settings_map)[key] = download_dir.sv();
 
         // incomplete dir
-        sv = "Incomplete"sv;
-        q = TR_KEY_incomplete_dir;
-        (void)tr_variantDictFindStrView(settings, q, &sv);
-        tr_variantDictAddStr(settings, q, tr_pathbuf{ sandboxDir(), '/', sv });
+        key = TR_KEY_incomplete_dir;
+        val = settings_map->value_if<std::string_view>(key).value_or("Incomplete"sv);
+        auto const incomplete_dir = tr_pathbuf{ sandboxDir(), '/', val };
+        (*settings_map)[key] = incomplete_dir.sv();
 
         // blocklists
         tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         // fill in any missing settings
-
-        q = TR_KEY_port_forwarding_enabled;
-        if (tr_variantDictFind(settings, q) == nullptr)
-        {
-            tr_variantDictAddBool(settings, q, false);
-        }
-
-        q = TR_KEY_dht_enabled;
-        if (tr_variantDictFind(settings, q) == nullptr)
-        {
-            tr_variantDictAddBool(settings, q, false);
-        }
-
-        q = TR_KEY_message_level;
-        if (tr_variantDictFind(settings, q) == nullptr)
-        {
-            tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
-        }
+        settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
+        settings_map->try_emplace(TR_KEY_dht_enabled, false);
+        settings_map->try_emplace(TR_KEY_message_level, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
         return tr_sessionInit(sandboxDir().data(), !verbose, settings);
     }
@@ -409,8 +353,16 @@ protected:
     {
         auto verified_lock = std::unique_lock(verified_mutex_);
         auto const n_previously_verified = std::size(verified_);
-        auto* const tor = tr_torrentNew(ctor, nullptr);
 
+        ctor->set_verify_done_callback(
+            [this](tr_torrent* const tor)
+            {
+                auto lambda_verified_lock = std::lock_guard{ verified_mutex_ };
+                verified_.emplace_back(tor);
+                verified_cv_.notify_one();
+            });
+
+        auto* const tor = tr_torrentNew(ctor, nullptr);
         auto const stop_waiting = [this, tor, n_previously_verified]()
         {
             return std::size(verified_) > n_previously_verified && verified_.back() == tor;
@@ -426,7 +378,7 @@ protected:
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
         //     512 files-filled-with-zeroes/512
-        char const* benc_base64 =
+        static auto constexpr BencBase64 =
             "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
             "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
             "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
@@ -447,24 +399,24 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto const benc = tr_base64_decode(benc_base64);
+        auto const benc = tr_base64_decode(BencBase64);
         EXPECT_LT(0U, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error) << *error;
+        EXPECT_FALSE(error) << error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // maybe create the files
         if (state != ZeroTorrentState::NoFiles)
         {
             auto const* const metainfo = tr_ctorGetMetainfo(ctor);
-            for (tr_file_index_t i = 0, n = metainfo->fileCount(); i < n; ++i)
+            for (tr_file_index_t i = 0, n = metainfo->file_count(); i < n; ++i)
             {
                 auto const base = state == ZeroTorrentState::Partial && tr_sessionIsIncompleteDirEnabled(session_) ?
                     tr_sessionGetIncompleteDir(session_) :
                     tr_sessionGetDownloadDir(session_);
-                auto const& subpath = metainfo->fileSubpath(i);
+                auto const& subpath = metainfo->file_subpath(i);
                 auto const partial = state == ZeroTorrentState::Partial && i == 0;
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
@@ -474,15 +426,15 @@ protected:
                 tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
-                auto const file_size = metainfo->fileSize(i);
+                auto const file_size = metainfo->file_size(i);
                 for (uint64_t j = 0; j < file_size; ++j)
                 {
-                    auto const ch = partial && j < metainfo->pieceSize() ? '\1' : '\0';
+                    auto const ch = partial && j < metainfo->piece_size() ? '\1' : '\0';
                     tr_sys_file_write(fd, &ch, 1, nullptr);
                 }
 
-                tr_sys_file_flush(fd);
                 tr_sys_file_close(fd);
+                sync();
             }
         }
 
@@ -491,10 +443,24 @@ protected:
         return tor;
     }
 
+    [[nodiscard]] tr_torrent* zeroTorrentMagnetInit()
+    {
+        static auto constexpr V1Hash = "fa5794674a18241bec985ddc3390e3cb171345e4";
+
+        auto ctor = tr_ctorNew(session_);
+        ctor->set_metainfo_from_magnet_link(V1Hash);
+        tr_ctorSetPaused(ctor, TR_FORCE, true);
+
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+        EXPECT_NE(nullptr, tor);
+        tr_ctorFree(ctor);
+        return tor;
+    }
+
     void blockingTorrentVerify(tr_torrent* tor)
     {
         EXPECT_NE(nullptr, tor->session);
-        EXPECT_FALSE(tor->session->amInSessionThread());
+        EXPECT_FALSE(tor->session->am_in_session_thread());
 
         auto verified_lock = std::unique_lock(verified_mutex_);
 
@@ -515,12 +481,7 @@ protected:
         {
             auto* settings = new tr_variant{};
             tr_variantInitDict(settings, 10);
-            auto constexpr deleter = [](tr_variant* v)
-            {
-                tr_variantClear(v);
-                delete v;
-            };
-            settings_.reset(settings, deleter);
+            settings_.reset(settings);
         }
 
         return settings_.get();
@@ -530,15 +491,9 @@ protected:
     {
         SandboxedTest::SetUp();
 
-        auto callback = [this](tr_torrent* tor, bool /*aborted*/)
-        {
-            auto verified_lock = std::scoped_lock(verified_mutex_);
-            verified_.emplace_back(tor);
-            verified_cv_.notify_one();
-        };
+        init_mgr_ = tr_lib_init();
 
-        session_ = sessionInit(settings());
-        session_->verifier_->addCallback(callback);
+        session_ = sessionInit(*settings());
     }
 
     virtual void TearDown() override
@@ -554,6 +509,8 @@ private:
     std::mutex verified_mutex_;
     std::condition_variable verified_cv_;
     std::vector<tr_torrent*> verified_;
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 };
 
 } // namespace test

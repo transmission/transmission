@@ -1,12 +1,13 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
-#include <set>
 #include <utility>
+
+#include <small/set.hpp>
 
 #include <QApplication>
 #include <QStyle>
@@ -18,15 +19,12 @@
 #include "Formatter.h"
 #include "IconCache.h"
 
-QHash<QString, int> const& FileTreeItem::getMyChildRows()
+std::unordered_map<QString, int> const& FileTreeItem::getMyChildRows() const
 {
-    int const n = childCount();
-
     // ensure that all the rows are hashed
-    while (first_unhashed_row_ < n)
+    for (int const n = childCount(); first_unhashed_row_ < n; ++first_unhashed_row_)
     {
-        child_rows_.insert(children_[first_unhashed_row_]->name(), first_unhashed_row_);
-        ++first_unhashed_row_;
+        child_rows_.emplace(children_[first_unhashed_row_]->name(), first_unhashed_row_);
     }
 
     return child_rows_;
@@ -50,7 +48,7 @@ FileTreeItem::~FileTreeItem()
     }
 
     // remove this child from the parent
-    parent_->child_rows_.remove(name());
+    parent_->child_rows_.erase(name());
     it = siblings.erase(it);
 
     // invalidate the row numbers of the siblings that came after this child
@@ -67,28 +65,30 @@ void FileTreeItem::appendChild(FileTreeItem* child)
 
 FileTreeItem* FileTreeItem::child(QString const& filename)
 {
-    FileTreeItem* item(nullptr);
+    auto const& child_rows = getMyChildRows();
 
-    if (int const row = getMyChildRows().value(filename, -1); row != -1)
+    if (auto const iter = child_rows.find(filename); iter != std::end(child_rows))
     {
-        item = child(row);
+        auto* const item = child(iter->second);
         assert(filename == item->name());
+        return item;
     }
 
-    return item;
+    return {};
 }
 
 int FileTreeItem::row() const
 {
-    int i(-1);
+    auto const& child_rows = parent_->getMyChildRows();
 
-    if (parent_ != nullptr)
+    if (auto const iter = child_rows.find(name()); iter != std::end(child_rows))
     {
-        i = parent_->getMyChildRows().value(name(), -1);
-        assert(i == -1 || this == parent_->children_[i]);
+        auto const idx = iter->second;
+        assert(this == parent_->children_[idx]);
+        return idx;
     }
 
-    return i;
+    return -1;
 }
 
 QVariant FileTreeItem::data(int column, int role) const
@@ -165,6 +165,9 @@ QVariant FileTreeItem::data(int column, int role) const
             }
 
             break;
+
+        default:
+            break;
         }
 
         break;
@@ -184,62 +187,50 @@ QVariant FileTreeItem::data(int column, int role) const
         }
 
         break;
+
+    default:
+        break;
     }
 
     return value;
 }
 
-void FileTreeItem::getSubtreeWantedSize(uint64_t& have, uint64_t& total) const
+std::pair<uint64_t, uint64_t> FileTreeItem::get_subtree_wanted_size() const
 {
-    if (is_wanted_)
+    auto have = is_wanted_ ? have_size_ : 0U;
+    auto total = is_wanted_ ? total_size_ : 0U;
+
+    for (auto const* const child : children_)
     {
-        have += have_size_;
-        total += total_size_;
+        auto const [child_have, child_total] = child->get_subtree_wanted_size();
+        have += child_have;
+        total += child_total;
     }
 
-    for (FileTreeItem const* const i : children_)
-    {
-        i->getSubtreeWantedSize(have, total);
-    }
+    return { have, total };
 }
 
 double FileTreeItem::progress() const
 {
-    double d(0);
-    uint64_t have(0);
-    uint64_t total(0);
+    auto const [have, total] = get_subtree_wanted_size();
 
-    getSubtreeWantedSize(have, total);
-
-    if (total != 0)
-    {
-        d = static_cast<double>(have) / static_cast<double>(total);
-    }
-
-    return d;
+    return have >= total ? 1.0 : static_cast<double>(have) / static_cast<double>(total);
 }
 
 QString FileTreeItem::sizeString() const
 {
-    return Formatter::get().sizeToString(size());
+    return Formatter::storage_to_string(size());
 }
 
 uint64_t FileTreeItem::size() const
 {
-    if (std::empty(children_))
-    {
-        return total_size_;
-    }
-
-    uint64_t have = 0;
-    uint64_t total = 0;
-    getSubtreeWantedSize(have, total);
+    auto const [have, total] = get_subtree_wanted_size();
     return total;
 }
 
 std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
 {
-    auto changed_columns = std::set<int>{};
+    auto changed_columns = small::max_size_set<int, FileTreeModel::NUM_COLUMNS>{};
 
     if (name_ != name)
     {
@@ -337,7 +328,7 @@ int FileTreeItem::priority() const
     return i;
 }
 
-void FileTreeItem::setSubtreePriority(int priority, QSet<int>& ids)
+void FileTreeItem::setSubtreePriority(int priority, file_indices_t& setme_changed_ids)
 {
     if (priority_ != priority)
     {
@@ -345,13 +336,13 @@ void FileTreeItem::setSubtreePriority(int priority, QSet<int>& ids)
 
         if (file_index_ >= 0)
         {
-            ids.insert(file_index_);
+            setme_changed_ids.insert(file_index_);
         }
     }
 
     for (FileTreeItem* const child : children_)
     {
-        child->setSubtreePriority(priority, ids);
+        child->setSubtreePriority(priority, setme_changed_ids);
     }
 }
 
@@ -387,21 +378,21 @@ int FileTreeItem::isSubtreeWanted() const
     return wanted;
 }
 
-void FileTreeItem::setSubtreeWanted(bool b, QSet<int>& ids)
+void FileTreeItem::setSubtreeWanted(bool wanted, file_indices_t& setme_changed_ids)
 {
-    if (is_wanted_ != b)
+    if (is_wanted_ != wanted)
     {
-        is_wanted_ = b;
+        is_wanted_ = wanted;
 
         if (file_index_ >= 0)
         {
-            ids.insert(file_index_);
+            setme_changed_ids.insert(file_index_);
         }
     }
 
     for (FileTreeItem* const child : children_)
     {
-        child->setSubtreeWanted(b, ids);
+        child->setSubtreeWanted(wanted, setme_changed_ids);
     }
 }
 
@@ -425,9 +416,4 @@ QString FileTreeItem::path() const
     }
 
     return item_path;
-}
-
-bool FileTreeItem::isComplete() const
-{
-    return have_size_ == totalSize();
 }

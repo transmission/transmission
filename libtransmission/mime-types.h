@@ -1,4 +1,7 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file was generated with libtransmission/mime-types.js
+// DO NOT EDIT MANUALLY
+
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,7 +17,7 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
+inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1250>{
     { { "123", "application/vnd.lotus-1-2-3" },
       { "1km", "application/vnd.1000minds.decision-model+xml" },
       { "3dml", "text/vnd.in3d.3dml" },
@@ -51,12 +54,16 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "air", "application/vnd.adobe.air-application-installer-package+zip" },
       { "ait", "application/vnd.dvb.ait" },
       { "ami", "application/vnd.amiga.ami" },
+      { "aml", "application/automationml-aml+xml" },
+      { "amlx", "application/automationml-amlx+zip" },
       { "amr", "audio/amr" },
       { "apk", "application/vnd.android.package-archive" },
       { "apng", "image/apng" },
-      { "apng", "image/vnd.mozilla.apng" },
       { "appcache", "text/cache-manifest" },
+      { "appinstaller", "application/appinstaller" },
       { "application", "application/x-ms-application" },
+      { "appx", "application/appx" },
+      { "appxbundle", "application/appxbundle" },
       { "apr", "application/vnd.lotus-approach" },
       { "arc", "application/x-freearc" },
       { "arj", "application/x-arj" },
@@ -154,6 +161,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "cjs", "application/node" },
       { "cla", "application/vnd.claymore" },
       { "class", "application/java-vm" },
+      { "cld", "model/vnd.cld" },
       { "clkk", "application/vnd.crick.clicker.keyboard" },
       { "clkp", "application/vnd.crick.clicker.palette" },
       { "clkt", "application/vnd.crick.clicker.template" },
@@ -235,6 +243,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template" },
       { "dp", "application/vnd.osgi.dp" },
       { "dpg", "application/vnd.dpgraph" },
+      { "dpx", "image/dpx" },
       { "dra", "audio/vnd.dra" },
       { "drle", "image/dicom-rle" },
       { "dsc", "text/prs.lines.tag" },
@@ -456,6 +465,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "jpf", "image/jpx" },
       { "jpg", "image/jpeg" },
       { "jpg2", "image/jp2" },
+      { "jpgm", "image/jpm" },
       { "jpgm", "video/jpm" },
       { "jpgv", "video/jpeg" },
       { "jph", "image/jph" },
@@ -469,6 +479,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "jsonld", "application/ld+json" },
       { "jsonml", "application/jsonml+json" },
       { "jsx", "text/jsx" },
+      { "jt", "model/jt" },
       { "jxr", "image/jxr" },
       { "jxra", "image/jxra" },
       { "jxrs", "image/jxrs" },
@@ -596,6 +607,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "mp2a", "audio/mpeg" },
       { "mp3", "audio/mp3" },
       { "mp3", "audio/mpeg" },
+      { "mp4", "application/mp4" },
       { "mp4", "video/mp4" },
       { "mp4a", "audio/mp4" },
       { "mp4s", "application/mp4" },
@@ -606,6 +618,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "mpeg", "video/mpeg" },
       { "mpf", "application/media-policy-dataset+xml" },
       { "mpg", "video/mpeg" },
+      { "mpg4", "application/mp4" },
       { "mpg4", "video/mp4" },
       { "mpga", "audio/mpeg" },
       { "mpkg", "application/vnd.apple.installer+xml" },
@@ -627,6 +640,8 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "msh", "model/mesh" },
       { "msi", "application/octet-stream" },
       { "msi", "application/x-msdownload" },
+      { "msix", "application/msix" },
+      { "msixbundle", "application/msixbundle" },
       { "msl", "application/vnd.mobius.msl" },
       { "msm", "application/octet-stream" },
       { "msp", "application/octet-stream" },
@@ -939,6 +954,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "spp", "application/scvp-vp-response" },
       { "spq", "application/scvp-vp-request" },
       { "spx", "audio/ogg" },
+      { "sql", "application/sql" },
       { "sql", "application/x-sql" },
       { "src", "application/x-wais-source" },
       { "srt", "application/x-subrip" },
@@ -1047,6 +1063,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "uri", "text/uri-list" },
       { "uris", "text/uri-list" },
       { "urls", "text/uri-list" },
+      { "usda", "model/vnd.usda" },
       { "usdz", "model/vnd.usdz+zip" },
       { "ustar", "application/x-ustar" },
       { "utz", "application/vnd.uiq.theme" },
@@ -1127,6 +1144,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1235>{
       { "webmanifest", "application/manifest+json" },
       { "webp", "image/webp" },
       { "wg", "application/vnd.pmi.widget" },
+      { "wgsl", "text/wgsl" },
       { "wgt", "application/widget" },
       { "wif", "application/watcherinfo+xml" },
       { "wks", "application/vnd.ms-works" },

@@ -1,3 +1,8 @@
+@define-color tr_transfer_down_color #5379a9;
+@define-color tr_transfer_up_color #26a955;
+@define-color tr_transfer_idle_color #636363;
+@define-color tr_error_color #ff453a;
+
 .tr-workarea.frame {
     border-left-width: 0;
     border-right-width: 0;
@@ -30,4 +35,63 @@
 
 .tr-small {
     font-size: small;
+}
+
+.tr-workarea row {
+    margin: 0;
+    padding: 3px;
+}
+
+row .tr-list-item label {
+    margin: 0;
+    padding: 0;
+}
+
+row .tr-list-item.tr-compact progressbar trough {
+    min-width: 50px;
+}
+
+row .tr-list-item.tr-compact progressbar trough,
+row .tr-list-item.tr-compact progressbar progress {
+    min-height: 3px;
+}
+
+row .tr-list-item.tr-compact .tr-status {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+row .tr-list-item.tr-transfer-down progressbar progress {
+    background-image: none;
+    background-color: @tr_transfer_down_color;
+    border-color: @tr_transfer_down_color;
+}
+
+row .tr-list-item.tr-transfer-up progressbar progress {
+    background-image: none;
+    background-color: @tr_transfer_up_color;
+    border-color: @tr_transfer_up_color;
+}
+
+row .tr-list-item.tr-transfer-idle progressbar progress {
+    background-image: none;
+    background-color: @tr_transfer_idle_color;
+    border-color: @tr_transfer_idle_color;
+}
+
+row:not(:selected) .tr-list-item.tr-error label {
+    color: @tr_error_color;
+}
+
+frame,
+frame border {
+    border-style: none;
+}
+
+frame > grid {
+    margin: 6px 0 0 18px;
+}
+
+frame + frame {
+    margin-top: 6px;
 }

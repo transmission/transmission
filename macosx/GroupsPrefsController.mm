@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -39,6 +39,7 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self.fTableView registerForDraggedTypes:@[ kGroupTableViewDataType ]];
 
     [self.fSelectedColorView addObserver:self forKeyPath:@"color" options:0 context:NULL];

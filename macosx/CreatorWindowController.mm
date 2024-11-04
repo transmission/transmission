@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -24,7 +24,7 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
     TrackerSegmentTagRemove = 1,
 };
 
-@interface CreatorWindowController ()
+@interface CreatorWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSImageView* fIconView;
 @property(nonatomic) IBOutlet NSTextField* fNameField;
@@ -44,7 +44,7 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
 
 @property(nonatomic, readonly) std::shared_ptr<tr_metainfo_builder> fBuilder;
 @property(nonatomic, readonly) NSURL* fPath;
-@property(nonatomic) std::shared_future<tr_error*> fFuture;
+@property(nonatomic) std::shared_future<tr_error> fFuture;
 @property(nonatomic) NSURL* fLocation; // path to new torrent file
 @property(nonatomic) NSMutableArray<NSString*>* fTrackers;
 
@@ -56,7 +56,7 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
 
 @end
 
-NSMutableSet* creatorWindowControllerSet = nil;
+static NSMutableSet* creatorWindowControllerSet;
 
 @implementation CreatorWindowController
 
@@ -95,7 +95,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         _fPath = path;
         _fBuilder = std::make_shared<tr_metainfo_builder>(_fPath.path.UTF8String);
 
-        if (_fBuilder->fileCount() == 0U)
+        if (_fBuilder->file_count() == 0U)
         {
             NSAlert* alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> no files -> button")];
@@ -109,7 +109,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
             return nil;
         }
-        if (_fBuilder->totalSize() == 0U)
+        if (_fBuilder->total_size() == 0U)
         {
             NSAlert* alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> zero size -> button")];
@@ -158,6 +158,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.window.restorationClass = [self class];
 
     NSString* name = self.fPath.lastPathComponent;
@@ -170,17 +171,17 @@ NSMutableSet* creatorWindowControllerSet = nil;
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = self.fPath.path;
 
-    auto const is_folder = self.fBuilder->fileCount() > 1 || tr_strvContains(self.fBuilder->path(0), '/');
+    auto const is_folder = self.fBuilder->file_count() > 1 || tr_strv_contains(self.fBuilder->path(0), '/');
 
     NSImage* icon = [NSWorkspace.sharedWorkspace
         iconForFileType:is_folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : self.fPath.pathExtension];
     icon.size = self.fIconView.frame.size;
     self.fIconView.image = icon;
 
-    NSString* status_string = [NSString stringForFileSize:self.fBuilder->totalSize()];
+    NSString* status_string = [NSString stringForFileSize:self.fBuilder->total_size()];
     if (is_folder)
     {
-        NSUInteger const count = self.fBuilder->fileCount();
+        NSUInteger const count = self.fBuilder->file_count();
         NSString* const fileString = count != 1 ?
             [NSString localizedStringWithFormat:NSLocalizedString(@"%lu files", "Create torrent -> info"), count] :
             NSLocalizedString(@"1 file", "Create torrent -> info");
@@ -189,7 +190,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     self.fStatusField.stringValue = status_string;
 
     [self updatePiecesField];
-    self.fPieceSizeStepper.intValue = static_cast<int>(log2(self.fBuilder->pieceSize()));
+    self.fPieceSizeStepper.intValue = static_cast<int>(log2(self.fBuilder->piece_size()));
 
     self.fLocation = [[self.fDefaults URLForKey:@"CreatorLocationURL"]
         URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
@@ -354,7 +355,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (IBAction)cancelCreateProgress:(id)sender
 {
-    self.fBuilder->cancelChecksums();
+    self.fBuilder->cancel_checksums();
     [self.fTimer fire];
 }
 
@@ -362,7 +363,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 {
     uint32_t const piece_size = 1U << [(NSStepper*)sender intValue];
 
-    if (self.fBuilder->setPieceSize(piece_size))
+    if (self.fBuilder->set_piece_size(piece_size))
     {
         [self updatePiecesField];
     }
@@ -513,8 +514,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (void)updatePiecesField
 {
-    auto const piece_size = self.fBuilder->pieceSize();
-    auto const piece_count = self.fBuilder->pieceCount();
+    auto const piece_size = self.fBuilder->piece_size();
+    auto const piece_count = self.fBuilder->piece_count();
 
     if (piece_count == 1U)
     {
@@ -601,7 +602,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     {
         trackers.add((char*)(self.fTrackers[i]).UTF8String, trackers.nextTier());
     }
-    self.fBuilder->setAnnounceList(std::move(trackers));
+    self.fBuilder->set_announce_list(std::move(trackers));
 
     //store values
     [self.fDefaults setObject:self.fTrackers forKey:@"CreatorTrackers"];
@@ -616,11 +617,11 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"BeginCreateTorrentFile" object:self.fLocation userInfo:nil];
 
-    self.fBuilder->setComment(self.fCommentView.string.UTF8String);
-    self.fBuilder->setPrivate(self.fPrivateCheck.state == NSControlStateValueOn);
-    self.fBuilder->setSource(self.fSource.stringValue.UTF8String);
+    self.fBuilder->set_comment(self.fCommentView.string.UTF8String);
+    self.fBuilder->set_private(self.fPrivateCheck.state == NSControlStateValueOn);
+    self.fBuilder->set_source(self.fSource.stringValue.UTF8String);
 
-    self.fFuture = self.fBuilder->makeChecksums();
+    self.fFuture = self.fBuilder->make_checksums();
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil
                                                   repeats:YES];
 }
@@ -631,7 +632,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     if (!is_done)
     {
-        auto const [current, total] = self.fBuilder->checksumStatus();
+        auto const [current, total] = self.fBuilder->checksum_status();
         self.fProgressIndicator.doubleValue = static_cast<double>(current) / total;
 
         if (!self.fStarted)
@@ -667,13 +668,13 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [self.fTimer invalidate];
     self.fTimer = nil;
 
-    tr_error* error = self.fFuture.get();
-    if (error == nullptr)
+    auto error = self.fFuture.get();
+    if (!error)
     {
         self.fBuilder->save(self.fLocation.path.UTF8String, &error);
     }
 
-    if (error != nullptr)
+    if (error)
     {
         auto* const alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
@@ -681,11 +682,11 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                        self.fLocation.lastPathComponent];
         alert.alertStyle = NSAlertStyleWarning;
 
-        alert.informativeText = [NSString stringWithFormat:@"%s (%d)", error->message, error->code];
+        alert.informativeText = [NSString
+            stringWithFormat:@"%.*s (%d)", static_cast<int>(std::size(error.message())), std::data(error.message()), error.code()];
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse /*returnCode*/) {
             [self.window close];
         }];
-        tr_error_free(error);
     }
     else
     {

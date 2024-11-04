@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -110,6 +110,7 @@ typedef struct PieceInfo
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.torrent = nil;
 }
 
@@ -129,7 +130,7 @@ typedef struct PieceInfo
     self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
     [self clearView];
-    [self setNeedsDisplay];
+    self.needsDisplay = YES;
 }
 
 - (void)clearView
@@ -151,22 +152,22 @@ typedef struct PieceInfo
 
     // get the current state
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-    NSInteger const numCells = MIN(_torrent.pieceCount, kMaxCells);
+    int const numCells = static_cast<int>(MIN(_torrent.pieceCount, kMaxCells));
     PieceInfo info;
     [self.torrent getAvailability:info.available size:numCells];
     [self.torrent getAmountFinished:info.complete size:numCells];
 
     // compute bounds and color of each cell
-    NSInteger const across = (NSInteger)ceil(sqrt(numCells));
+    int const across = static_cast<int>(ceil(sqrt(numCells)));
     CGFloat const fullWidth = self.bounds.size.width;
     NSInteger const cellWidth = (NSInteger)((fullWidth - (across + 1) * kBetweenPadding) / across);
     NSInteger const extraBorder = (NSInteger)((fullWidth - ((cellWidth + kBetweenPadding) * across + kBetweenPadding)) / 2);
     NSMutableArray<NSValue*>* cellBounds = [NSMutableArray arrayWithCapacity:numCells];
     NSMutableArray<NSColor*>* cellColors = [NSMutableArray arrayWithCapacity:numCells];
-    for (NSInteger index = 0; index < numCells; index++)
+    for (int index = 0; index < numCells; index++)
     {
-        NSInteger const row = index / across;
-        NSInteger const col = index % across;
+        int const row = index / across;
+        int const col = index % across;
 
         cellBounds[index] = [NSValue valueWithRect:NSMakeRect(
                                                        col * (cellWidth + kBetweenPadding) + kBetweenPadding + extraBorder,
@@ -184,19 +185,19 @@ typedef struct PieceInfo
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
             NSRect cFillRects[numCells];
-            for (NSInteger i = 0; i < numCells; ++i)
+            for (int i = 0; i < numCells; ++i)
             {
                 cFillRects[i] = cellBounds[i].rectValue;
             }
             NSColor* cFillColors[numCells];
-            for (NSInteger i = 0; i < numCells; ++i)
+            for (int i = 0; i < numCells; ++i)
             {
                 cFillColors[i] = cellColors[i];
             }
             NSRectFillListWithColors(cFillRects, cFillColors, numCells);
             return YES;
         }];
-        [self setNeedsDisplay];
+        self.needsDisplay = YES;
     }
 
     // save the current state so we can compare it later

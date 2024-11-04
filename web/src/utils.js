@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -21,23 +21,6 @@ export const Utils = {
     }
 
     return result;
-  },
-
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
   },
 };
 
@@ -62,6 +45,11 @@ export function createTextualTabsContainer(id, tabs, callback) {
   buttons.classList.add('tabs-buttons');
   root.append(buttons);
 
+  const dismiss = document.createElement('button');
+  dismiss.classList.add('tabs-container-close');
+  dismiss.innerHTML = '&times;';
+  root.append(dismiss);
+
   const pages = document.createElement('div');
   pages.classList.add('tabs-pages');
   root.append(pages);
@@ -80,7 +68,7 @@ export function createTextualTabsContainer(id, tabs, callback) {
     pages.append(page);
 
     button.addEventListener('click', () =>
-      toggleClass(buttons, button, pages, page, callback)
+      toggleClass(buttons, button, pages, page, callback),
     );
   }
 
@@ -89,45 +77,7 @@ export function createTextualTabsContainer(id, tabs, callback) {
 
   return {
     buttons: button_array,
-    root,
-  };
-}
-
-export function createTabsContainer(id, tabs, callback) {
-  const root = document.createElement('div');
-  root.id = id;
-  root.classList.add('tabs-container');
-
-  const buttons = document.createElement('div');
-  buttons.classList.add('tabs-buttons');
-  root.append(buttons);
-
-  const pages = document.createElement('div');
-  pages.classList.add('tabs-pages');
-  root.append(pages);
-
-  const button_array = [];
-  for (const [button_id, page] of tabs) {
-    const button = document.createElement('button');
-    button.id = button_id;
-    button.classList.add('tabs-button');
-    button.setAttribute('type', 'button');
-    buttons.append(button);
-    button_array.push(button);
-
-    page.classList.add('hidden', 'tabs-page');
-    pages.append(page);
-
-    button.addEventListener('click', () =>
-      toggleClass(buttons, button, pages, page, callback)
-    );
-  }
-
-  button_array[0].classList.add('selected');
-  pages.children[0].classList.remove('hidden');
-
-  return {
-    buttons: button_array,
+    dismiss,
     root,
   };
 }
@@ -175,6 +125,12 @@ export function createDialogContainer(id) {
   confirm.textContent = 'OK';
   buttons.append(confirm);
 
+  win.addEventListener('keyup', ({ key }) => {
+    if (key === 'Enter') {
+      confirm.click();
+    }
+  });
+
   const bend = document.createElement('span');
   bend.classList.add('dialog-buttons-end');
   buttons.append(bend);
@@ -190,12 +146,16 @@ export function createDialogContainer(id) {
 }
 
 export function makeUUID() {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
   // source: https://stackoverflow.com/a/2117523/6568470
-  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replaceAll(/[018]/g, (c) =>
     (
       c ^
       (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-    ).toString(16)
+    ).toString(16),
   );
 }
 
@@ -260,41 +220,9 @@ function setOrDeleteAttribute(element, attribute, b) {
 export function setEnabled(element, b) {
   setOrDeleteAttribute(element, 'disabled', !b);
 }
-export function setChecked(element, b) {
-  setOrDeleteAttribute(element, 'checked', b);
-}
 
 export function addCheckedClass(element, b) {
   element.classList.toggle('checked', b);
-}
-
-function getBestMenuPos(r, bounds) {
-  let { x, y } = r;
-  const { width, height } = r;
-
-  if (x > bounds.x + bounds.width - width && x - width >= bounds.x) {
-    x -= width;
-  } else {
-    x = Math.min(x, bounds.x + bounds.width - width);
-  }
-
-  if (y > bounds.y + bounds.height - height && y - height >= bounds.y) {
-    y -= height;
-  } else {
-    y = Math.min(y, bounds.y + bounds.height - height);
-  }
-
-  return new DOMRect(x, y, width, height);
-}
-
-export function movePopup(popup, x, y, boundingElement) {
-  const initial_pos = new DOMRect(x, y, popup.clientWidth, popup.clientHeight);
-  const clamped_pos = getBestMenuPos(
-    initial_pos,
-    boundingElement.getBoundingClientRect()
-  );
-  popup.style.left = `${clamped_pos.left}px`;
-  popup.style.top = `${clamped_pos.top}px`;
 }
 
 export class OutsideClickListener extends EventTarget {

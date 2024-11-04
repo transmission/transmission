@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -22,13 +22,9 @@
 #include <event2/event.h>
 #include <event2/thread.h>
 
-#include "transmission.h"
-
-#include "log.h"
-#include "session-thread.h"
-#include "tr-assert.h"
-#include "utils.h" // for tr_net_init()
-#include "utils-ev.h"
+#include "libtransmission/session-thread.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils-ev.h"
 
 using namespace std::literals;
 
@@ -105,16 +101,23 @@ int cond_wait(void* vcond, void* vlock, struct timeval const* tv)
     return success == std::cv_status::timeout ? 1 : 0;
 }
 
+#if defined(_WIN32) && defined(__clang_analyzer__)
+// See https://github.com/llvm/llvm-project/issues/98823
+#define WORKAROUND_CLANG_TIDY_GH98823
+#endif
+
 unsigned long thread_current_id()
 {
+#ifndef WORKAROUND_CLANG_TIDY_GH98823
     thread_local auto const hashed = std::hash<std::thread::id>()(std::this_thread::get_id());
     return hashed;
+#else
+    return 0;
+#endif
 }
 
-void initEvthreadsOnce()
+void init_evthreads_once()
 {
-    tr_net_init();
-
     evthread_lock_callbacks constexpr LockCbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
     };
@@ -132,7 +135,7 @@ void initEvthreadsOnce()
 
 } // namespace tr_evthread_init_helpers
 
-auto makeEventBase()
+auto make_event_base()
 {
     tr_session_thread::tr_evthread_init();
 
@@ -148,7 +151,7 @@ void tr_session_thread::tr_evthread_init()
     using namespace tr_evthread_init_helpers;
 
     static auto evthread_flag = std::once_flag{};
-    std::call_once(evthread_flag, initEvthreadsOnce);
+    std::call_once(evthread_flag, init_evthreads_once);
 }
 
 class tr_session_thread_impl final : public tr_session_thread
@@ -158,7 +161,7 @@ public:
     {
         auto lock = std::unique_lock(is_looping_mutex_);
 
-        thread_ = std::thread(&tr_session_thread_impl::sessionThreadFunc, this, eventBase());
+        thread_ = std::thread(&tr_session_thread_impl::session_thread_func, this, event_base());
         thread_id_ = thread_.get_id();
 
         // wait for the session thread's main loop to start
@@ -172,46 +175,51 @@ public:
 
     ~tr_session_thread_impl() override
     {
-        TR_ASSERT(!amInSessionThread());
+        TR_ASSERT(!am_in_session_thread());
         TR_ASSERT(is_looping_);
 
         // Stop the first event loop. This is the steady-state loop that runs
-        // continuously, even when there are no events. See: sessionThreadFunc()
+        // continuously, even when there are no events. See: session_thread_func()
         is_shutting_down_ = true;
-        event_base_loopexit(eventBase(), nullptr);
+        event_base_loopexit(event_base(), nullptr);
 
         // Wait on the second event loop. This is the shutdown loop that exits
         // as soon as there are no events. This step is to give pending tasks
         // a chance to finish.
         auto lock = std::unique_lock(is_looping_mutex_);
         is_looping_cv_.wait_for(lock, Deadline, [this]() { return !is_looping_; });
-        event_base_loopexit(eventBase(), nullptr);
+        event_base_loopexit(event_base(), nullptr);
         thread_.join();
     }
 
-    [[nodiscard]] struct event_base* eventBase() noexcept override
+    [[nodiscard]] struct event_base* event_base() noexcept override
     {
         return evbase_.get();
     }
 
-    [[nodiscard]] bool amInSessionThread() const noexcept override
+    [[nodiscard]] bool am_in_session_thread() const noexcept override
     {
         return thread_id_ == std::this_thread::get_id();
     }
 
+    void queue(std::function<void(void)>&& func) override
+    {
+        work_queue_mutex_.lock();
+        work_queue_.emplace_back(std::move(func));
+        work_queue_mutex_.unlock();
+
+        event_active(work_queue_event_.get(), 0, {});
+    }
+
     void run(std::function<void(void)>&& func) override
     {
-        if (amInSessionThread())
+        if (am_in_session_thread())
         {
             func();
         }
         else
         {
-            work_queue_mutex_.lock();
-            work_queue_.emplace_back(std::move(func));
-            work_queue_mutex_.unlock();
-
-            event_active(work_queue_event_.get(), 0, {});
+            queue(std::move(func));
         }
     }
 
@@ -219,7 +227,7 @@ private:
     using callback = std::function<void(void)>;
     using work_queue_t = std::list<callback>;
 
-    void sessionThreadFunc(struct event_base* evbase)
+    void session_thread_func(struct event_base* evbase)
     {
 #ifndef _WIN32
         /* Don't exit when writing on a broken socket */
@@ -253,13 +261,13 @@ private:
         ToggleLooping({}, {}, this);
     }
 
-    static void onWorkAvailableStatic(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
+    static void on_work_available_static(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
     {
-        static_cast<tr_session_thread_impl*>(vself)->onWorkAvailable();
+        static_cast<tr_session_thread_impl*>(vself)->on_work_available();
     }
-    void onWorkAvailable()
+    void on_work_available()
     {
-        TR_ASSERT(amInSessionThread());
+        TR_ASSERT(am_in_session_thread());
 
         // steal the work queue
         auto work_queue_lock = std::unique_lock(work_queue_mutex_);
@@ -274,9 +282,9 @@ private:
         }
     }
 
-    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ makeEventBase() };
+    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ make_event_base() };
     libtransmission::evhelpers::event_unique_ptr const work_queue_event_{
-        event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this)
+        event_new(evbase_.get(), -1, 0, on_work_available_static, this)
     };
 
     work_queue_t work_queue_;

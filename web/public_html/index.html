@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xml:lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -9,6 +9,7 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="./transmission-app.css" rel="stylesheet" />
     <link href="./images/favicon.ico" rel="icon" />
     <link href="./images/favicon.png" rel="shortcut icon" />
     <link rel="apple-touch-icon" href="./images/webclip-icon.png" />
@@ -17,7 +18,7 @@
   </head>
   <body>
     <div id="app"></div>
-    <div class="mainwin">
+    <div id="mainwin">
       <header class="mainwin-toolbar" id="mainwin-toolbar">
         <button
           aria-keyshortcuts="Alt+O"
@@ -137,15 +138,17 @@
             xmlns:xl="http://www.w3.org/1999/xlink"
             xmlns:dc="http://purl.org/dc/elements/1.1/"
             viewBox="-1 -1 26 26"
+            fill-opacity="1"
+            stroke="currentColor"
+            fill="none"
             width="26"
             height="26"
           >
-            <g fill-opacity="1" stroke="currentColor" fill="none">
+            <g>
               <circle
                 cx="12"
                 cy="12"
                 r="12.0000191748228"
-                stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
@@ -186,7 +189,7 @@
         </button>
       </header>
 
-      <header class="mainwin-filterbar" id="statusbar">
+      <header id="mainwin-statusbar">
         <span>Show</span>
         <select id="filter-mode">
           <option value="all">All</option>
@@ -199,25 +202,57 @@
         <select id="filter-tracker"></select>
         <input type="search" id="torrent-search" placeholder="Filter" />
         <span id="filter-count">&nbsp;</span>
-        <span class="flex"></span>
-        <div class="speed-dn-icon"></div>
-        <div id="speed-dn-label"></div>
-        <div class="speed-up-icon"></div>
-        <div id="speed-up-label"></div>
+        <span class="flexible-space"></span>
+        <div class="speed-container">
+          <div id="speed-dn-label"></div>
+          <div id="speed-dn-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-chevron-down"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="speed-container">
+          <span class="flexible-space"></span>
+          <div id="speed-up-label"></div>
+          <div id="speed-up-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-chevron-up"
+            >
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </div>
+        </div>
       </header>
 
-      <main class="mainwin-workarea">
+      <main id="mainwin-workarea">
         <div id="torrent-container">
-          <ul class="torrent-list flex" id="torrent-list"></ul>
+          <ul class="flex" id="torrent-list"></ul>
         </div>
       </main>
 
-      <iframe
-        name="torrent-upload-frame"
-        id="torrent-upload-frame"
-        src="about:blank"
-        title="Add Torrent"
-      ></iframe>
+      <div class="upload-div">
+        <h2>Drag your torrent files here to add them to Transmission.</h2>
+      </div>
     </div>
   </body>
 </html>

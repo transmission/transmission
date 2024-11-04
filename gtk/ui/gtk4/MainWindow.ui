@@ -7,8 +7,8 @@
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="toolbar">
-            <property name="css-classes">toolbar
-horizontal</property>
+            <property name="css-classes"><![CDATA[toolbar
+horizontal]]></property>
             <property name="can-focus">1</property>
             <child>
               <object class="GtkButton" id="open_file_button">
@@ -59,6 +59,7 @@ horizontal</property>
             <child>
               <object class="GtkButton" id="remove_torrent_button">
                 <property name="focusable">1</property>
+                <property name="tooltip-text" translatable="yes">Remove torrent</property>
                 <property name="action-name">win.remove-torrent</property>
                 <property name="label" translatable="1">Remove torrent</property>
                 <property name="use-underline">1</property>
@@ -114,22 +115,9 @@ horizontal</property>
             <property name="hscrollbar-policy">never</property>
             <property name="has-frame">1</property>
             <property name="child">
-              <object class="GtkTreeView" id="torrents_view">
+              <object class="GtkListView" id="torrents_view">
                 <property name="focusable">1</property>
-                <property name="headers-visible">0</property>
-                <property name="fixed-height-mode">1</property>
-                <child internal-child="selection">
-                  <object class="GtkTreeSelection" id="torrents_view_selection">
-                    <property name="mode">multiple</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkTreeViewColumn" id="torrent_column">
-                    <property name="resizable">1</property>
-                    <property name="sizing">fixed</property>
-                    <property name="title" translatable="1">Torrent</property>
-                  </object>
-                </child>
+                <property name="tab-behavior">item</property>
               </object>
             </property>
             <style>

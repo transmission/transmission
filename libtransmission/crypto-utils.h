@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,13 +10,35 @@
 #include <cstddef> // size_t
 #include <cstdint>
 #include <limits>
-#include <memory>
 #include <optional>
 #include <random> // for std::uniform_int_distribution<T>
 #include <string>
 #include <string_view>
 
-#include "transmission.h" // tr_sha1_digest_t
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha256_d...
+#include "libtransmission/tr-strbuf.h"
+
+#if defined(WITH_CCRYPTO)
+#include <CommonCrypto/CommonDigest.h>
+using tr_sha1_context_t = CC_SHA1_CTX;
+using tr_sha256_context_t = CC_SHA256_CTX;
+#elif defined(WITH_MBEDTLS)
+#include <mbedtls/sha1.h>
+#include <mbedtls/sha256.h>
+using tr_sha1_context_t = mbedtls_sha1_context;
+using tr_sha256_context_t = mbedtls_sha256_context;
+#elif defined(WITH_OPENSSL)
+#include <openssl/evp.h>
+using tr_sha1_context_t = EVP_MD_CTX*;
+using tr_sha256_context_t = EVP_MD_CTX*;
+#elif defined(WITH_WOLFSSL)
+#include <wolfssl/wolfcrypt/sha.h>
+#include <wolfssl/wolfcrypt/sha256.h>
+using tr_sha1_context_t = wc_Sha;
+using tr_sha256_context_t = wc_Sha256;
+#else
+#error no crypto library specified
+#endif
 
 /**
  * @addtogroup utils Utilities
@@ -26,39 +48,53 @@
 class tr_sha1
 {
 public:
-    static std::unique_ptr<tr_sha1> create();
-    virtual ~tr_sha1() = default;
+    tr_sha1();
+    tr_sha1(tr_sha1&&) = delete;
+    tr_sha1(tr_sha1 const&) = delete;
+    tr_sha1& operator=(tr_sha1&&) = delete;
+    tr_sha1& operator=(tr_sha1 const&) = delete;
+    ~tr_sha1();
 
-    virtual void clear() = 0;
-    virtual void add(void const* data, size_t data_length) = 0;
-    [[nodiscard]] virtual tr_sha1_digest_t finish() = 0;
+    void add(void const* data, size_t data_length);
+    [[nodiscard]] tr_sha1_digest_t finish();
+    void clear();
 
     template<typename... T>
-    [[nodiscard]] static tr_sha1_digest_t digest(T const&... args)
+    [[nodiscard]] static auto digest(T const&... args)
     {
-        auto context = tr_sha1::create();
-        (context->add(std::data(args), std::size(args)), ...);
-        return context->finish();
+        auto context = tr_sha1{};
+        (context.add(std::data(args), std::size(args)), ...);
+        return context.finish();
     }
+
+private:
+    tr_sha1_context_t handle_;
 };
 
 class tr_sha256
 {
 public:
-    static std::unique_ptr<tr_sha256> create();
-    virtual ~tr_sha256() = default;
+    tr_sha256();
+    tr_sha256(tr_sha256&&) = delete;
+    tr_sha256(tr_sha256 const&) = delete;
+    tr_sha256& operator=(tr_sha256&&) = delete;
+    tr_sha256& operator=(tr_sha256 const&) = delete;
+    ~tr_sha256();
 
-    virtual void clear() = 0;
-    virtual void add(void const* data, size_t data_length) = 0;
-    [[nodiscard]] virtual tr_sha256_digest_t finish() = 0;
+    void add(void const* data, size_t data_length);
+    [[nodiscard]] tr_sha256_digest_t finish();
+    void clear();
 
     template<typename... T>
-    [[nodiscard]] static tr_sha256_digest_t digest(T const&... args)
+    [[nodiscard]] static auto digest(T const&... args)
     {
-        auto context = tr_sha256::create();
-        (context->add(std::data(args), std::size(args)), ...);
-        return context->finish();
+        auto context = tr_sha256{};
+        (context.add(std::data(args), std::size(args)), ...);
+        return context.finish();
     }
+
+private:
+    tr_sha256_context_t handle_;
 };
 
 /** @brief Opaque SSL context type. */
@@ -133,20 +169,24 @@ T tr_rand_obj()
  */
 [[nodiscard]] std::string tr_base64_decode(std::string_view input);
 
+using tr_sha1_string = tr_strbuf<char, sizeof(tr_sha1_digest_t) * 2U + 1U>;
+
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
  */
-[[nodiscard]] std::string tr_sha1_to_string(tr_sha1_digest_t const&);
+[[nodiscard]] tr_sha1_string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
  * @brief Generate a sha1 digest from a hex string.
  */
 [[nodiscard]] std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
 
+using tr_sha256_string = tr_strbuf<char, sizeof(tr_sha256_digest_t) * 2U + 1U>;
+
 /**
  * @brief Generate an ascii hex string for a sha256 digest.
  */
-[[nodiscard]] std::string tr_sha256_to_string(tr_sha256_digest_t const&);
+[[nodiscard]] tr_sha256_string tr_sha256_to_string(tr_sha256_digest_t const&);
 
 /**
  * @brief Generate a sha256 digest from a hex string.

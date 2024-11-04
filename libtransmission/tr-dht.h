@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,15 +8,24 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+#include <ctime>
 #include <memory>
 #include <string_view>
 #include <vector>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#endif
+
 #include <dht/dht.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h" // tr_port
+#include "libtransmission/net.h" // tr_port
+#include "libtransmission/tr-macros.h"
 
 struct tr_pex;
 
@@ -66,7 +75,7 @@ public:
             return ::dht_search(id, port, af, callback, closure);
         }
 
-        virtual int init(int s, int s6, unsigned const char* id, unsigned const char* v)
+        virtual int init(int s, int s6, unsigned char const* id, unsigned char const* v)
         {
             return ::dht_init(s, s6, id, v);
         }
@@ -82,17 +91,17 @@ public:
     public:
         virtual ~Mediator() = default;
 
-        [[nodiscard]] virtual std::vector<tr_torrent_id_t> torrentsAllowingDHT() const = 0;
-        [[nodiscard]] virtual tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t) const = 0;
+        [[nodiscard]] virtual std::vector<tr_torrent_id_t> torrents_allowing_dht() const = 0;
+        [[nodiscard]] virtual tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t) const = 0;
 
-        [[nodiscard]] virtual std::string_view configDir() const = 0;
-        [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
+        [[nodiscard]] virtual std::string_view config_dir() const = 0;
+        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual API& api()
         {
             return api_;
         }
 
-        virtual void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) = 0;
+        virtual void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) = 0;
 
     private:
         API api_;
@@ -105,6 +114,6 @@ public:
         tr_socket_t udp6_socket);
     virtual ~tr_dht() = default;
 
-    virtual void addNode(tr_address const& address, tr_port port) = 0;
-    virtual void handleMessage(unsigned char const* msg, size_t msglen, struct sockaddr* from, socklen_t fromlen) = 0;
+    virtual void maybe_add_node(tr_address const& address, tr_port port) = 0;
+    virtual void handle_message(unsigned char const* msg, size_t msglen, struct sockaddr* from, socklen_t fromlen) = 0;
 };

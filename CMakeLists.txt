@@ -3,9 +3,12 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
 
 # Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
-set(MACOS_SUPPORT_MINIMUM 10.13)
+set(MACOS_SUPPORT_MINIMUM 11.0)
 
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -15,9 +18,19 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         FORCE)
 endif()
 
+if(VCPKG_TARGET_ANDROID)
+    include(cmake/VcpkgAndroid.cmake)
+endif()
+
 project(transmission)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(TR_THIRD_PARTY_DIR_NAME third-party)
+set(TR_THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+set(TR_THIRD_PARTY_BINARY_DIR ${PROJECT_BINARY_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+
+list(APPEND CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/cmake"
+    "${TR_THIRD_PARTY_SOURCE_DIR}/rpavlik-cmake-modules")
 
 set(CMAKE_MACOSX_RPATH ON)
 
@@ -35,8 +48,9 @@ set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
-set(GTKMM_MINIMUM 3.24.0)
-set(OPENSSL_MINIMUM 0.9.7)
+set(GTKMM3_MINIMUM 3.24.0)
+set(GTKMM4_MINIMUM 4.11.1)
+set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 1.3)
 set(NPM_MINIMUM 8.1.307) # Node.js 14
 set(PSL_MINIMUM 0.21.1)
@@ -56,7 +70,8 @@ option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
-tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" OFF)
+tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
+tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
@@ -80,8 +95,8 @@ set(TR_NAME ${PROJECT_NAME})
 
 # these should be the only five lines you need to change
 set(TR_VERSION_MAJOR "4")
-set(TR_VERSION_MINOR "0")
-set(TR_VERSION_PATCH "1")
+set(TR_VERSION_MINOR "1")
+set(TR_VERSION_PATCH "0")
 set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
 set(TR_VERSION_DEV TRUE)
 
@@ -93,6 +108,19 @@ elseif(NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
 else()
     set(TR_STABLE_RELEASE 1)
 endif()
+
+# derived from above: CFBundleVersion
+# note: CFBundleVersion only honors 3 numbers, so third number has to hold both patch and beta info.
+# 5.0.1-dev     -> 14719.0.100
+# 5.0.1-beta.1  -> 14719.0.101
+# 5.0.1         -> 14719.0.199
+math(EXPR CFBUNDLE_1 "${TR_VERSION_MAJOR} + 14714")
+math(EXPR CFBUNDLE_2 "${TR_VERSION_MINOR}")
+math(EXPR CFBUNDLE_3 "${TR_VERSION_PATCH} * 100 + 0${TR_STABLE_RELEASE} * 99 + 0${TR_VERSION_BETA_NUMBER}")
+set(CFBUNDLE_VERSION "${CFBUNDLE_1}.${CFBUNDLE_2}.${CFBUNDLE_3}")
+unset(CFBUNDLE_1)
+unset(CFBUNDLE_2)
+unset(CFBUNDLE_3)
 
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
@@ -137,9 +165,16 @@ else()
 endif()
 string(APPEND TR_PEER_ID_PREFIX "-")
 
-set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
+set(TR_VCS_REVISION_FILE "${PROJECT_SOURCE_DIR}/REVISION")
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+## Compiler standard version
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
 
@@ -148,11 +183,9 @@ if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
 elseif(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE TR_VCS_REVISION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    include(GetGitRevisionDescription)
+    get_git_head_revision(TR_REFSPEC TR_VCS_REVISION)
+    unset(TR_REFSPEC)
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -199,20 +232,28 @@ if(WIN32)
     endforeach()
 endif()
 
-set(CMAKE_FOLDER "third-party")
+set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
-find_package(Fmt)
-find_package(WideInteger)
+set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
+
 find_package(FastFloat)
+find_package(Fmt)
+find_package(RapidJSON)
+find_package(Small)
 find_package(UtfCpp)
+find_package(WideInteger)
+
 find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-if(NOT TARGET CURL::libcurl)
-    add_library(CURL::libcurl INTERFACE IMPORTED)
-    target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
-    target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
+
+if(ENABLE_DEPRECATED STREQUAL "AUTO")
+    if(DEFINED ENV{CI})
+        set(ENABLE_DEPRECATED OFF)
+    else()
+        set(ENABLE_DEPRECATED ON)
+    endif()
 endif()
 
 set(CRYPTO_PKG "")
@@ -284,7 +325,7 @@ if(ENABLE_GTK)
 
     if(USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 4)
         pkg_check_modules(GTK4
-            gtkmm-4.0>=${GTKMM_MINIMUM}
+            gtkmm-4.0>=${GTKMM4_MINIMUM}
             glibmm-2.68>=${GLIBMM_MINIMUM}
             giomm-2.68>=${GIOMM_MINIMUM})
         set(GTK_VERSION 4)
@@ -293,7 +334,7 @@ if(ENABLE_GTK)
 
     if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
         pkg_check_modules(GTK3
-            gtkmm-3.0>=${GTKMM_MINIMUM}
+            gtkmm-3.0>=${GTKMM3_MINIMUM}
             glibmm-2.4>=${GLIBMM_MINIMUM}
             giomm-2.4>=${GIOMM_MINIMUM})
         set(GTK_VERSION 3)
@@ -442,8 +483,6 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
-set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
-
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
@@ -473,7 +512,13 @@ if(NOT USE_SYSTEM_NATPMP)
             NATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+if(WIN32)
+    # https://github.com/miniupnp/miniupnp/pull/304
+    set(TR_MINIUPNPC_LIBNAME libminiupnpc)
+else()
+    set(TR_MINIUPNPC_LIBNAME miniupnpc)
+endif()
+tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
@@ -483,18 +528,10 @@ if(NOT USE_SYSTEM_MINIUPNPC)
     target_compile_definitions(miniupnpc::libminiupnpc
         INTERFACE
             MINIUPNP_STATICLIB)
-
-    set(MINIUPNPC_VERSION 1.9)
-    set(MINIUPNPC_API_VERSION 12)
 endif()
+unset(TR_MINIUPNPC_LIBNAME)
 
-target_compile_definitions(miniupnpc::libminiupnpc
-    INTERFACE
-        SYSTEM_MINIUPNP
-        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
-
-add_subdirectory(third-party/jsonsl)
-add_subdirectory(third-party/wildmat)
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht dht
     TARGET dht::dht)
@@ -516,32 +553,36 @@ tr_add_external_auto_library(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-set(TR_WEB_ASSETS ${CMAKE_SOURCE_DIR}/web/public_html)
-if(NOT ${REBUILD_WEB} STREQUAL "OFF")
+set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
+if(REBUILD_WEB)
+    tr_get_required_flag(REBUILD_WEB NPM_IS_REQUIRED)
+
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
-        if ("${REBUILD_WEB}" STREQUAL "ON")
+        set(NPM_FOUND OFF)
+        if(NPM_IS_REQUIRED)
             message(FATAL_ERROR "Could NOT find NPM, minimum required is \"${NPM_MINIMUM}\"")
-        else() # AUTO
-            set(REBUILD_WEB OFF)
         endif()
     else()
         execute_process(COMMAND "${NPM}" --version
             OUTPUT_STRIP_TRAILING_WHITESPACE
             OUTPUT_VARIABLE NPM_VERSION_STRING)
-        if ("${NPM_VERSION_STRING}" VERSION_GREATER_EQUAL "${NPM_MINIMUM}")
+        if("${NPM_VERSION_STRING}" VERSION_GREATER_EQUAL "${NPM_MINIMUM}")
             message(STATUS "Found NPM: ${NPM} (found suitable version \"${NPM_VERSION_STRING}\", minimum required is \"${NPM_MINIMUM}\")")
-            set(REBUILD_WEB ON)
-        elseif ("${REBUILD_WEB}" STREQUAL "ON")
+            set(NPM_FOUND ON)
+        elseif(NPM_IS_REQUIRED)
             message(FATAL_ERROR "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
-        else() # AUTO
+        else()
             message(STATUS "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
-            set(REBUILD_WEB OFF)
+            set(NPM_FOUND OFF)
         endif()
     endif()
-    if(REBUILD_WEB)
-      add_subdirectory(web)
-    endif()
+
+    tr_fixup_auto_option(REBUILD_WEB NPM_FOUND NPM_IS_REQUIRED)
+endif()
+
+if(REBUILD_WEB)
+    add_subdirectory(web)
 endif()
 
 if(WITH_INOTIFY)
@@ -585,13 +626,6 @@ endif()
 
 unset(CMAKE_FOLDER)
 
-## Compiler standard version
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 ### Compiler Warnings
 
 set(C_WARNING_FLAGS)
@@ -614,7 +648,6 @@ else()
         -Wextra
         -Wcast-align
         -Wduplicated-cond
-        -Wexit-time-destructors
         -Wextra-semi
         -Wextra-semi-stmt
         -Wextra-tokens
@@ -732,19 +765,20 @@ else()
     endif()
 endif()
 
-if(RUN_CLANG_TIDY STREQUAL "AUTO")
-    if(DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
-        set(RUN_CLANG_TIDY OFF)
-    else()
-        set(RUN_CLANG_TIDY ON)
-    endif()
+if(RUN_CLANG_TIDY STREQUAL "AUTO" AND (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR})) # skip clang-tidy on LGTM/appveyor
+    set(RUN_CLANG_TIDY OFF)
 endif()
 
 if(RUN_CLANG_TIDY)
+    tr_get_required_flag(RUN_CLANG_TIDY CLANG_TIDY_IS_REQUIRED)
+
     message(STATUS "Looking for clang-tidy")
     find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
+        if(CLANG_TIDY_IS_REQUIRED)
+            message(FATAL_ERROR "clang-tidy is required but wasn't found")
+        endif()
     else()
         message(STATUS "Looking for clang-tidy - found")
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
@@ -816,7 +850,7 @@ if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
     string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "+r${TR_VCS_REVISION}")
 endif()
 list(APPEND CPACK_SOURCE_IGNORE_FILES
-    "${CMAKE_BINARY_DIR}"
+    "${PROJECT_BINARY_DIR}"
     "[.]git"
     "node_modules")
 
@@ -825,17 +859,17 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
 if(GIT_FOUND)
     execute_process(
         COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE TR_GIT_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
-        configure_file("${CMAKE_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
+        configure_file("${PROJECT_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh" --check
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         set_property(
             TARGET check-format format
             PROPERTY FOLDER "utility")

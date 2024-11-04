@@ -1,16 +1,15 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <unordered_set>
 
 #include <QString>
-#include <QMap>
-#include <QSet>
 #include <QTimer>
 
 #include <libtransmission/tr-macros.h>
@@ -46,7 +45,7 @@ public:
     // QWidget
     QSize sizeHint() const override
     {
-        return QSize(440, 460);
+        return QSize{ 440, 460 };
     }
 
 private:
@@ -67,6 +66,9 @@ private slots:
     void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
     void onSessionCalled(Session::Tag tag);
 
+    // Details tab
+    void onButtonBoxClicked(QAbstractButton* button);
+
     // Tracker tab
     void onTrackerSelectionChanged();
     void onAddTrackerClicked();
@@ -77,8 +79,8 @@ private slots:
     void onTrackerListEdited(QString);
 
     // Files tab
-    void onFilePriorityChanged(QSet<int> const& file_indices, int);
-    void onFileWantedChanged(QSet<int> const& file_indices, bool);
+    void onFilePriorityChanged(file_indices_t const& file_indices, int);
+    void onFileWantedChanged(file_indices_t const& file_indices, bool);
     void onPathEdited(QString const& old_path, QString const& new_name);
     void onOpenRequested(QString const& path) const;
 
@@ -132,14 +134,16 @@ private:
     torrent_ids_t ids_;
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
+    bool labels_need_refresh_ = true;
+    QString labels_baseline_;
 
     std::shared_ptr<TrackerModel> tracker_model_;
     std::shared_ptr<TrackerModelFilter> tracker_filter_;
     std::shared_ptr<TrackerDelegate> tracker_delegate_;
 
-    QMap<QString, QTreeWidgetItem*> peers_;
+    std::map<QString, QTreeWidgetItem*> peers_;
 
-    QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.svg"));
+    QIcon const icon_encrypted_ = QIcon{ QStringLiteral(":/icons/encrypted.svg") };
     QIcon const icon_unencrypted_ = {};
 
     static int prev_tab_index_;

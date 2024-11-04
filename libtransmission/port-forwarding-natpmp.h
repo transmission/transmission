@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,10 +12,11 @@
 #include <ctime> // time_t
 #include <cstdint>
 
-#include "transmission.h" // tr_port_forwarding_state
-
 #include "natpmp.h"
-#include "net.h" // tr_port
+
+#include "libtransmission/transmission.h" // tr_port_forwarding_state
+
+#include "libtransmission/net.h" // tr_port
 
 class tr_natpmp
 {

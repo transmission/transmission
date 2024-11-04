@@ -1,18 +1,21 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <memory>
+#include <cstddef> // std::byte
+#include <cstdint>
+#include <limits> // std::numeric_limits
+#include <string_view>
 
 #include <math/wide_integer/uintwide_t.h>
 
-#include "transmission.h"
-
-#include "crypto-utils.h" // tr_sha1
-#include "peer-mse.h"
-#include "tr-arc4.h"
+#include "libtransmission/crypto-utils.h" // tr_sha1
+#include "libtransmission/peer-mse.h"
+#include "libtransmission/tr-arc4.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
 using namespace std::literals;
 
@@ -75,18 +78,13 @@ namespace tr_message_stream_encryption
     return tr_rand_obj<DH::private_key_bigend_t>();
 }
 
-[[nodiscard]] auto generatePublicKey(DH::private_key_bigend_t const& private_key) noexcept
-{
-    auto const private_key_wi = wi::import_bits<wi::private_key_t>(private_key);
-    auto const public_key_wi = math::wide_integer::powm(wi::generator, private_key_wi, wi::prime);
-    return wi::export_bits(public_key_wi);
-}
-
 DH::key_bigend_t DH::publicKey() noexcept
 {
     if (public_key_ == key_bigend_t{})
     {
-        public_key_ = generatePublicKey(private_key_);
+        auto const private_key_wi = wi::import_bits<wi::private_key_t>(private_key_);
+        auto const public_key_wi = math::wide_integer::powm(wi::generator, private_key_wi, wi::prime);
+        public_key_ = wi::export_bits(public_key_wi);
     }
 
     return public_key_;
@@ -103,7 +101,7 @@ void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 
 // --- Filter
 
-void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
@@ -112,7 +110,7 @@ void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     dec_key_.discard(1024);
 }
 
-void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);

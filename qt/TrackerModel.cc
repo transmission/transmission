@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -33,7 +33,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
             break;
 
         case Qt::DecorationRole:
-            var = QIcon(tracker_info.st.getFavicon());
+            var = QIcon{ tracker_info.st.getFavicon() };
             break;
 
         case TrackerRole:
@@ -78,7 +78,7 @@ struct CompareTrackers
 void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t const& ids)
 {
     // build a list of the TrackerInfos
-    std::vector<TrackerInfo> trackers;
+    auto trackers = std::vector<TrackerInfo>{};
 
     for (int const id : ids)
     {
@@ -99,8 +99,8 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
     }
 
     // sort 'em
-    CompareTrackers const comp;
-    std::sort(trackers.begin(), trackers.end(), comp);
+    static auto constexpr Comp = CompareTrackers{};
+    std::sort(trackers.begin(), trackers.end(), Comp);
 
     // merge 'em with the existing list
     unsigned int old_index = 0;
@@ -111,19 +111,19 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
         bool const is_end_of_old = old_index == rows_.size();
         bool const is_end_of_new = new_index == trackers.size();
 
-        if (is_end_of_old || (!is_end_of_new && comp(trackers.at(new_index), rows_.at(old_index))))
+        if (is_end_of_old || (!is_end_of_new && Comp(trackers.at(new_index), rows_.at(old_index))))
         {
             // add this new row
-            beginInsertRows(QModelIndex(), old_index, old_index);
+            beginInsertRows(QModelIndex{}, old_index, old_index);
             rows_.insert(rows_.begin() + old_index, trackers.at(new_index));
             endInsertRows();
             ++old_index;
             ++new_index;
         }
-        else if (is_end_of_new || (!is_end_of_old && comp(rows_.at(old_index), trackers.at(new_index))))
+        else if (is_end_of_new || (!is_end_of_old && Comp(rows_.at(old_index), trackers.at(new_index))))
         {
             // remove this old row
-            beginRemoveRows(QModelIndex(), old_index, old_index);
+            beginRemoveRows(QModelIndex{}, old_index, old_index);
             rows_.erase(rows_.begin() + old_index);
             endRemoveRows();
         }

@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
@@ -23,8 +23,8 @@ export const RPC = {
 export class Remote {
   // TODO: decouple from controller
   constructor(controller) {
+    this._connection_alert = null;
     this._controller = controller;
-    this._error = '';
     this._session_id = '';
   }
 
@@ -56,6 +56,11 @@ export class Remote {
         if (callback) {
           callback.call(context, payload, response_argument);
         }
+
+        if (this._connection_alert) {
+          this._connection_alert.close();
+          this._connection_alert = null;
+        }
       })
       .catch((error) => {
         if (error.message === Remote._SessionHeader) {
@@ -66,13 +71,13 @@ export class Remote {
         }
         console.trace(error);
         this._controller.togglePeriodicSessionRefresh(false);
-        this._controller.setCurrentPopup(
-          new AlertDialog({
-            heading: 'Connection failed',
-            message:
-              'Could not connect to the server. You may need to reload the page to reconnect.',
-          })
-        );
+
+        this._connection_alert = new AlertDialog({
+          heading: 'Connection failed',
+          message:
+            'Could not connect to the server. You may need to reload the page to reconnect.',
+        });
+        this._controller.setCurrentPopup(this._connection_alert);
       });
   }
 
@@ -84,8 +89,11 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
-  checkPort(callback, context) {
+  checkPort(ipProtocol, callback, context) {
     const o = {
+      arguments: {
+        ipProtocol,
+      },
       method: 'port-test',
     };
     this.sendRequest(o, callback, context);
@@ -160,7 +168,7 @@ export class Remote {
       },
       () => {
         this._controller.refreshTorrents([torrentId]);
-      }
+      },
     );
   }
 
@@ -189,7 +197,7 @@ export class Remote {
       'torrent-stop',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
 
@@ -202,7 +210,7 @@ export class Remote {
         move: true,
       },
       callback,
-      context
+      context,
     );
   }
 
@@ -229,7 +237,7 @@ export class Remote {
       'torrent-verify',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   reannounceTorrents(torrent_ids, callback, context) {
@@ -237,7 +245,7 @@ export class Remote {
       'torrent-reannounce',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   addTorrentByUrl(url, options) {
@@ -279,7 +287,7 @@ export class Remote {
       RPC._QueueMoveTop,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsToBottom(torrent_ids, callback, context) {
@@ -287,7 +295,7 @@ export class Remote {
       RPC._QueueMoveBottom,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsUp(torrent_ids, callback, context) {
@@ -295,7 +303,7 @@ export class Remote {
       RPC._QueueMoveUp,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsDown(torrent_ids, callback, context) {
@@ -303,7 +311,7 @@ export class Remote {
       RPC._QueueMoveDown,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
 }

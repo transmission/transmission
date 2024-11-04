@@ -1,9 +1,10 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "StatusBarController.h"
 #import "NSStringAdditions.h"
+#import "Utils.h"
 
 typedef NSString* StatusRatioType NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -15,11 +16,11 @@ typedef NSString* StatusTransferType NS_TYPED_EXTENSIBLE_ENUM;
 static StatusTransferType const StatusTransferTypeTotal = @"TransferTotal";
 static StatusTransferType const StatusTransferTypeSession = @"TransferSession";
 
-typedef NS_ENUM(unsigned int, statusTag) {
-    STATUS_RATIO_TOTAL_TAG = 0,
-    STATUS_RATIO_SESSION_TAG = 1,
-    STATUS_TRANSFER_TOTAL_TAG = 2,
-    STATUS_TRANSFER_SESSION_TAG = 3
+typedef NS_ENUM(NSUInteger, StatusTag) {
+    StatusTagTotalRatio = 0,
+    StatusTagSessionRatio = 1,
+    StatusTagTotalTransfer = 2,
+    StatusTagSessionTransfer = 3
 };
 
 @interface StatusBarController ()
@@ -54,11 +55,12 @@ typedef NS_ENUM(unsigned int, statusTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     //localize menu items
-    [self.fStatusButton.menu itemWithTag:STATUS_RATIO_TOTAL_TAG].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
-    [self.fStatusButton.menu itemWithTag:STATUS_RATIO_SESSION_TAG].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");
-    [self.fStatusButton.menu itemWithTag:STATUS_TRANSFER_TOTAL_TAG].title = NSLocalizedString(@"Total Transfer", "Status Bar -> status menu");
-    [self.fStatusButton.menu itemWithTag:STATUS_TRANSFER_SESSION_TAG].title = NSLocalizedString(@"Session Transfer", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:StatusTagTotalRatio].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:StatusTagSessionRatio].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:StatusTagTotalTransfer].title = NSLocalizedString(@"Total Transfer", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:StatusTagSessionTransfer].title = NSLocalizedString(@"Session Transfer", "Status Bar -> status menu");
 
     self.fStatusButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     self.fTotalDLField.cell.backgroundStyle = NSBackgroundStyleRaised;
@@ -73,21 +75,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
                                              object:nil];
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate
 {
     //set rates
-    if (dlRate != self.fPreviousDownloadRate)
+    if (!isSpeedEqual(self.fPreviousDownloadRate, dlRate))
     {
         self.fTotalDLField.stringValue = [NSString stringForSpeed:dlRate];
         self.fPreviousDownloadRate = dlRate;
     }
 
-    if (ulRate != self.fPreviousUploadRate)
+    if (!isSpeedEqual(self.fPreviousUploadRate, ulRate))
     {
         self.fTotalULField.stringValue = [NSString stringForSpeed:ulRate];
         self.fPreviousUploadRate = ulRate;
@@ -127,16 +124,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
     NSString* statusLabel;
     switch ([sender tag])
     {
-    case STATUS_RATIO_TOTAL_TAG:
+    case StatusTagTotalRatio:
         statusLabel = StatusRatioTypeTotal;
         break;
-    case STATUS_RATIO_SESSION_TAG:
+    case StatusTagSessionRatio:
         statusLabel = StatusRatioTypeSession;
         break;
-    case STATUS_TRANSFER_TOTAL_TAG:
+    case StatusTagTotalTransfer:
         statusLabel = StatusTransferTypeTotal;
         break;
-    case STATUS_TRANSFER_SESSION_TAG:
+    case StatusTagSessionTransfer:
         statusLabel = StatusTransferTypeSession;
         break;
     default:
@@ -202,16 +199,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
         NSString* statusLabel;
         switch (menuItem.tag)
         {
-        case STATUS_RATIO_TOTAL_TAG:
+        case StatusTagTotalRatio:
             statusLabel = StatusRatioTypeTotal;
             break;
-        case STATUS_RATIO_SESSION_TAG:
+        case StatusTagSessionRatio:
             statusLabel = StatusRatioTypeSession;
             break;
-        case STATUS_TRANSFER_TOTAL_TAG:
+        case StatusTagTotalTransfer:
             statusLabel = StatusTransferTypeTotal;
             break;
-        case STATUS_TRANSFER_SESSION_TAG:
+        case StatusTagSessionTransfer:
             statusLabel = StatusTransferTypeSession;
             break;
         default:

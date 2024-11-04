@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,7 +14,6 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 
 #include <glibmm/date.h>
@@ -43,11 +42,16 @@
 
 #include <fmt/core.h>
 
+#include <array>
 #include <limits>
 #include <map>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
+
+using namespace libtransmission::Values;
 
 /**
 ***
@@ -795,10 +799,10 @@ RemotePage::RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> con
         store_ = whitelist_tree_model_new(gtr_pref_string_get(TR_KEY_rpc_whitelist));
 
         view_->set_model(store_);
-        setup_tree_view_button_event_handling(
+        setup_item_view_button_event_handling(
             *view_,
             {},
-            [this](double view_x, double view_y) { return on_tree_view_button_released(*view_, view_x, view_y); });
+            [this](double view_x, double view_y) { return on_item_view_button_released(*view_, view_x, view_y); });
 
         whitelist_widgets_.push_back(view_);
         auto const sel = view_->get_selection();
@@ -840,20 +844,22 @@ public:
 SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : PageBase(cast_item, builder, core)
 {
+    auto const speed_units_kbyps_str = Speed::units().display_name(Speed::Units::KByps);
+
     localize_label(
         *init_check_button("upload_limit_check", TR_KEY_speed_limit_up_enabled),
-        fmt::arg("speed_units", speed_K_str));
+        fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("upload_limit_spin", TR_KEY_speed_limit_up, 0, std::numeric_limits<int>::max(), 5);
 
     localize_label(
         *init_check_button("download_limit_check", TR_KEY_speed_limit_down_enabled),
-        fmt::arg("speed_units", speed_K_str));
+        fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("download_limit_spin", TR_KEY_speed_limit_down, 0, std::numeric_limits<int>::max(), 5);
 
-    localize_label(*get_widget<Gtk::Label>("alt_upload_limit_label"), fmt::arg("speed_units", speed_K_str));
+    localize_label(*get_widget<Gtk::Label>("alt_upload_limit_label"), fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("alt_upload_limit_spin", TR_KEY_alt_speed_up, 0, std::numeric_limits<int>::max(), 5);
 
-    localize_label(*get_widget<Gtk::Label>("alt_download_limit_label"), fmt::arg("speed_units", speed_K_str));
+    localize_label(*get_widget<Gtk::Label>("alt_download_limit_label"), fmt::arg("speed_units", speed_units_kbyps_str));
     init_spin_button("alt_download_limit_spin", TR_KEY_alt_speed_down, 0, std::numeric_limits<int>::max(), 5);
 
     init_time_combo("alt_speed_start_time_combo", TR_KEY_alt_speed_time_begin);
@@ -875,9 +881,22 @@ public:
     TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
+    enum PortTestStatus : uint8_t
+    {
+        PORT_TEST_UNKNOWN = 0U,
+        PORT_TEST_CHECKING,
+        PORT_TEST_OPEN,
+        PORT_TEST_CLOSED,
+        PORT_TEST_ERROR
+    };
+
+    void portTestSetSensitive();
+    void updatePortStatusText();
     void onCorePrefsChanged(tr_quark key);
-    void onPortTested(bool isOpen);
+    void onPortTested(std::optional<bool> result, Session::PortTestIpProtocol ip_protocol);
     void onPortTest();
+
+    static std::string_view getPortStatusText(PortTestStatus status) noexcept;
 
 private:
     Glib::RefPtr<Session> core_;
@@ -888,15 +907,18 @@ private:
 
     sigc::connection portTag_;
     sigc::connection prefsTag_;
+
+    std::array<PortTestStatus, Session::NUM_PORT_TEST_IP_PROTOCOL> portTestStatus_ = {};
 };
 
 void NetworkPage::onCorePrefsChanged(tr_quark const key)
 {
     if (key == TR_KEY_peer_port)
     {
-        gtr_label_set_text(*portLabel_, _("Status unknown"));
-        portButton_->set_sensitive(true);
-        portSpin_->set_sensitive(true);
+        portTestStatus_[Session::PORT_TEST_IPV4] = PORT_TEST_UNKNOWN;
+        portTestStatus_[Session::PORT_TEST_IPV6] = PORT_TEST_UNKNOWN;
+        updatePortStatusText();
+        portTestSetSensitive();
     }
 }
 
@@ -906,28 +928,92 @@ NetworkPage::~NetworkPage()
     portTag_.disconnect();
 }
 
-void NetworkPage::onPortTested(bool isOpen)
+std::string_view NetworkPage::getPortStatusText(PortTestStatus const status) noexcept
 {
-    portLabel_->set_markup(fmt::format(
-        isOpen ? _("Port is {markup_begin}open{markup_end}") : _("Port is {markup_begin}closed{markup_end}"),
-        fmt::arg("markup_begin", "<b>"),
-        fmt::arg("markup_end", "</b>")));
-    portButton_->set_sensitive(true);
-    portSpin_->set_sensitive(true);
+    switch (status)
+    {
+    case PORT_TEST_UNKNOWN:
+        return C_("Port test status", "unknown");
+    case PORT_TEST_CHECKING:
+        return C_("Port test status", "checking…");
+    case PORT_TEST_OPEN:
+        return C_("Port test status", "open");
+    case PORT_TEST_CLOSED:
+        return C_("Port test status", "closed");
+    case PORT_TEST_ERROR:
+        return C_("Port test status", "error");
+    default:
+        return {};
+    }
+}
+
+void NetworkPage::updatePortStatusText()
+{
+    auto const status_ipv4 = getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV4]);
+    auto const status_ipv6 = getPortStatusText(portTestStatus_[Session::PORT_TEST_IPV6]);
+
+    portLabel_->set_markup(
+        portTestStatus_[Session::PORT_TEST_IPV4] == portTestStatus_[Session::PORT_TEST_IPV6] ?
+            fmt::format(_("Status: <b>{status}</b>"), fmt::arg("status", status_ipv4)) :
+            fmt::format(
+                _("Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"),
+                fmt::arg("status_ipv4", status_ipv4),
+                fmt::arg("status_ipv6", status_ipv6)));
+}
+
+void NetworkPage::portTestSetSensitive()
+{
+    // Depend on the RPC call status instead of the UI status, so that the widgets
+    // won't be enabled even if the port peer port changed while we have port-test
+    // RPC call(s) in-flight.
+    auto const sensitive = !core_->port_test_pending(Session::PORT_TEST_IPV4) &&
+        !core_->port_test_pending(Session::PORT_TEST_IPV6);
+    portButton_->set_sensitive(sensitive);
+    portSpin_->set_sensitive(sensitive);
+}
+
+void NetworkPage::onPortTested(std::optional<bool> const result, Session::PortTestIpProtocol const ip_protocol)
+{
+    auto constexpr ResultToStatus = [](std::optional<bool> const res)
+    {
+        if (!res)
+        {
+            return PORT_TEST_ERROR;
+        }
+        if (!*res)
+        {
+            return PORT_TEST_CLOSED;
+        }
+        return PORT_TEST_OPEN;
+    };
+
+    // Only update the UI if the current status is "checking", so that
+    // we won't show the port test results for the old peer port if it
+    // changed while we have port-test RPC call(s) in-flight.
+    if (auto& status = portTestStatus_[ip_protocol]; status == PORT_TEST_CHECKING)
+    {
+        status = ResultToStatus(result);
+        updatePortStatusText();
+    }
+    portTestSetSensitive();
 }
 
 void NetworkPage::onPortTest()
 {
-    portButton_->set_sensitive(false);
-    portSpin_->set_sensitive(false);
-    portLabel_->set_text(_("Testing TCP port…"));
+    portTestStatus_[Session::PORT_TEST_IPV4] = PORT_TEST_CHECKING;
+    portTestStatus_[Session::PORT_TEST_IPV6] = PORT_TEST_CHECKING;
+    updatePortStatusText();
 
     if (!portTag_.connected())
     {
-        portTag_ = core_->signal_port_tested().connect([this](bool is_open) { onPortTested(is_open); });
+        portTag_ = core_->signal_port_tested().connect(
+            [this](std::optional<bool> status, Session::PortTestIpProtocol ip_protocol) { onPortTested(status, ip_protocol); });
     }
 
-    core_->port_test();
+    core_->port_test(Session::PORT_TEST_IPV4);
+    core_->port_test(Session::PORT_TEST_IPV6);
+
+    portTestSetSensitive();
 }
 
 NetworkPage::NetworkPage(
@@ -941,6 +1027,7 @@ NetworkPage::NetworkPage(
     , portSpin_(init_spin_button("listening_port_spin", TR_KEY_peer_port, 1, std::numeric_limits<uint16_t>::max(), 1))
 {
     portButton_->signal_clicked().connect([this]() { onPortTest(); });
+    updatePortStatusText();
 
     prefsTag_ = core_->signal_prefs_changed().connect([this](auto key) { onCorePrefsChanged(key); });
 

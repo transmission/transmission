@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,10 +6,10 @@
 #pragma once
 
 #include <memory>
+#include <set>
 
 #include <QObject>
 #include <QFileSystemWatcher>
-#include <QSet>
 #include <QString>
 
 #include <libtransmission/tr-macros.h>
@@ -47,6 +47,6 @@ private:
 
     TorrentModel const& model_;
 
-    QSet<QString> watch_dir_files_;
+    std::set<QString> watch_dir_files_;
     std::unique_ptr<QFileSystemWatcher> watcher_;
 };

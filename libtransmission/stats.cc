@@ -1,64 +1,64 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
+#include <array>
+#include <optional>
+#include <utility>
 
-#include "file.h"
-#include "stats.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for tr_getRatio(), tr_time()
-#include "variant.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/file.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/stats.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for tr_getRatio(), tr_time()
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
-tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
+namespace
+{
+std::optional<tr_variant> load_stats(std::string_view config_dir)
+{
+    if (auto filename = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(filename))
+    {
+        return tr_variant_serde::json().parse_file(filename);
+    }
+
+    // maybe the user just upgraded from an old version of Transmission
+    // that was still using stats.benc
+    if (auto filename = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(filename))
+    {
+        return tr_variant_serde::benc().parse_file(filename);
+    }
+
+    return {};
+}
+} // namespace
+
+tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 {
     auto ret = tr_session_stats{};
 
-    auto top = tr_variant{};
-    auto filename = tr_pathbuf{ config_dir, "/stats.json"sv };
-    bool loaded = tr_sys_path_exists(filename) && tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr);
-
-    if (!loaded)
+    if (auto stats = load_stats(config_dir); stats)
     {
-        // maybe the user just upgraded from an old version of Transmission
-        // that was still using stats.benc
-        filename.assign(config_dir, "/stats.benc");
-        loaded = tr_sys_path_exists(filename) && tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.sv(), nullptr);
-    }
+        auto const key_tgts = std::array<std::pair<tr_quark, uint64_t*>, 5>{
+            { { TR_KEY_downloaded_bytes, &ret.downloadedBytes },
+              { TR_KEY_files_added, &ret.filesAdded },
+              { TR_KEY_seconds_active, &ret.secondsActive },
+              { TR_KEY_session_count, &ret.sessionCount },
+              { TR_KEY_uploaded_bytes, &ret.uploadedBytes } }
+        };
 
-    if (loaded)
-    {
-        auto i = int64_t{};
-
-        if (tr_variantDictFindInt(&top, TR_KEY_downloaded_bytes, &i))
+        for (auto& [key, tgt] : key_tgts)
         {
-            ret.downloadedBytes = (uint64_t)i;
+            if (auto val = int64_t{}; tr_variantDictFindInt(&*stats, key, &val))
+            {
+                *tgt = val;
+            }
         }
-
-        if (tr_variantDictFindInt(&top, TR_KEY_files_added, &i))
-        {
-            ret.filesAdded = (uint64_t)i;
-        }
-
-        if (tr_variantDictFindInt(&top, TR_KEY_seconds_active, &i))
-        {
-            ret.secondsActive = (uint64_t)i;
-        }
-
-        if (tr_variantDictFindInt(&top, TR_KEY_session_count, &i))
-        {
-            ret.sessionCount = (uint64_t)i;
-        }
-
-        if (tr_variantDictFindInt(&top, TR_KEY_uploaded_bytes, &i))
-        {
-            ret.uploadedBytes = (uint64_t)i;
-        }
-
-        tr_variantClear(&top);
     }
 
     return ret;
@@ -67,7 +67,6 @@ tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
 void tr_stats::save() const
 {
     auto const saveme = cumulative();
-    auto const filename = tr_pathbuf{ config_dir_, "/stats.json"sv };
     auto top = tr_variant{};
     tr_variantInitDict(&top, 5);
     tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, saveme.downloadedBytes);
@@ -75,14 +74,12 @@ void tr_stats::save() const
     tr_variantDictAddInt(&top, TR_KEY_seconds_active, saveme.secondsActive);
     tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
-    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
-    tr_variantClear(&top);
+    tr_variant_serde::json().to_file(top, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
 void tr_stats::clear()
 {
     single_ = old_ = Zero;
-    is_dirty_ = true;
     start_time_ = tr_time();
 }
 

@@ -1,10 +1,11 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "InfoOptionsViewController.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
+#import "Utils.h"
 
 typedef NS_ENUM(NSInteger, OptionPopupType) {
     OptionPopupTypeGlobal = 0,
@@ -74,6 +75,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self checkWindowSize];
 
     [self setGlobalLabels];
@@ -82,11 +84,6 @@ static CGFloat const kStackViewSpacing = 8.0;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateOptionsNotification:)
                                                name:@"UpdateOptionsNotification"
                                              object:nil];
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (CGFloat)fHorizLayoutHeight
@@ -299,7 +296,7 @@ static CGFloat const kStackViewSpacing = 8.0;
             checkRatio = kInvalidValue;
         }
 
-        if (!multipleRatioLimits && ratioLimit != torrent.ratioLimit)
+        if (!multipleRatioLimits && !isRatioEqual(ratioLimit, torrent.ratioLimit))
         {
             multipleRatioLimits = YES;
         }

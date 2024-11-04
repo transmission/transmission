@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -18,7 +18,7 @@
 class Application : public Gtk::Application
 {
 public:
-    Application(std::string const& config_dir, bool start_paused, bool is_iconified);
+    Application(std::string const& config_dir, bool start_paused, bool start_iconified);
     ~Application() override;
 
     TR_DISABLE_COPY_MOVE(Application)

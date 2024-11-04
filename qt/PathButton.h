@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -28,7 +28,11 @@ public:
     void setNameFilter(QString const& name_filter);
 
     void setPath(QString const& path);
-    QString const& path() const;
+
+    [[nodiscard]] constexpr auto const& path() const noexcept
+    {
+        return path_;
+    }
 
     // QWidget
     QSize sizeHint() const override;

@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © Het Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Cliënt</translation>
+        <translation>Cliënt</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -61,24 +61,95 @@
         <source>I &amp;Agree</source>
         <translation>Ik ga &amp;akkoord</translation>
     </message>
+    <message>
+        <location line="+74"/>
+        <source>B/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>kB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+3"/>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>KiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>kB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TB</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+105"/>
+        <location line="+43"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent voltooid</numerusform>
+            <numerusform>Torrents voltooid</numerusform>
         </translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent toegevoegd</translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+429"/>
+        <location filename="../DetailsDialog.cc" line="+469"/>
         <source>None</source>
         <translation>Geen</translation>
     </message>
@@ -89,7 +160,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+267"/>
+        <location line="+268"/>
         <source>Unknown</source>
         <translation>Onbekend</translation>
     </message>
@@ -106,7 +177,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 weggegooid na mislukte controlesom)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -122,16 +193,16 @@
         <location line="+63"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
-            <numerusform>%1 (Ln stuk van %2)</numerusform>
-            <numerusform>%1 (Ln stukken van %2)</numerusform>
+            <numerusform>%1 (%Ln fragment @ %2)</numerusform>
+            <numerusform>%1 (%Ln fragmenten @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+6"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
-            <numerusform>%1 (%Ln stuk)</numerusform>
-            <numerusform>%1 (%Ln stukken)</numerusform>
+            <numerusform>%1 (%Ln fragment)</numerusform>
+            <numerusform>%1 (%Ln fragmenten)</numerusform>
         </translation>
     </message>
     <message>
@@ -145,7 +216,7 @@
         <translation>Publieke torrent</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+102"/>
         <source>Created by %1</source>
         <translation>Gemaakt door %1</translation>
     </message>
@@ -160,7 +231,7 @@
         <translation>Gemaakt door %1 op %2</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+207"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Versleutelde verbinding</translation>
@@ -218,34 +289,25 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+130"/>
-        <source> minute(s)</source>
-        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform>minuut</numerusform>
-            <numerusform>minuten</numerusform>
-        </translation>
+        <translation>Peer is aangesloten via μTP</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+165"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg tracker-aankondiging URL&apos;s toe, één per regel:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+37"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen nieuwe URL&apos;s gevonden.</translation>
     </message>
     <message>
-        <location line="-834"/>
+        <location line="-881"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -268,18 +330,27 @@
         <translation>%1 (verhouding: %2)</translation>
     </message>
     <message>
-        <location line="+273"/>
+        <location line="+308"/>
         <location line="+55"/>
         <source>N/A</source>
         <translation>n.v.t.</translation>
     </message>
-    <message>
-        <location line="+391"/>
-        <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <location line="+362"/>
+        <source>%1 minute(s)</source>
+        <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+31"/>
+        <source>Add URL(s)</source>
+        <translation>URL(&apos;s) toevoegen</translation>
+    </message>
+    <message>
+        <location line="+116"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>
@@ -320,7 +391,7 @@
         <translation>Stop met seeden bij een inactiviteit van: </translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+77"/>
         <source>Up</source>
         <translation>Omhoog</translation>
     </message>
@@ -425,12 +496,17 @@
         <translation>Locatie:</translation>
     </message>
     <message>
-        <location line="+124"/>
-        <source>Edit Trackers</source>
+        <location line="+40"/>
+        <source>Labels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-190"/>
+        <location line="+101"/>
+        <source>Edit Trackers</source>
+        <translation>Trackers bewerken</translation>
+    </message>
+    <message>
+        <location line="-207"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
@@ -447,10 +523,10 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Toegevoegd:</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+31"/>
         <source>Comment:</source>
         <translation>Opmerking:</translation>
     </message>
@@ -548,29 +624,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+297"/>
-        <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location filename="../FileTreeItem.cc" line="+281"/>
+        <location filename="../FileTreeView.cc" line="+110"/>
+        <location line="+255"/>
         <source>Low</source>
         <translation>Laag</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+253"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-253"/>
+        <location line="+254"/>
         <source>Normal</source>
         <translation>Normaal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-253"/>
         <source>Mixed</source>
         <translation>Gemengd</translation>
     </message>
@@ -578,7 +654,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+195"/>
+        <location filename="../FileTreeModel.cc" line="+202"/>
         <source>File</source>
         <translation>Bestand</translation>
     </message>
@@ -606,7 +682,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+245"/>
         <source>Check Selected</source>
         <translation>Geselecteerde aanvinken</translation>
     </message>
@@ -633,19 +709,19 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Hernoemen…</translation>
     </message>
 </context>
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+48"/>
-        <location line="+145"/>
+        <location filename="../FilterBar.cc" line="+47"/>
+        <location line="+156"/>
         <source>All</source>
         <translation>Alles</translation>
     </message>
     <message>
-        <location line="-136"/>
+        <location line="-147"/>
         <source>Active</source>
         <translation>Actief</translation>
     </message>
@@ -680,91 +756,20 @@
         <translation>Fout</translation>
     </message>
     <message>
-        <location line="+140"/>
+        <location line="+151"/>
         <source>Show:</source>
         <translation>Tonen:</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken…</translation>
     </message>
 </context>
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+24"/>
-        <source>B/s</source>
-        <translation>B/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>kB/s</source>
-        <translation>kB/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MB/s</source>
-        <translation>MB/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GB/s</source>
-        <translation>GB/s</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TB/s</source>
-        <translation>TB/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+1"/>
-        <source>B</source>
-        <translation>B</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>kB</source>
-        <translation>kB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MB</source>
-        <translation>MB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GB</source>
-        <translation>GB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TB</source>
-        <translation>TB</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>KiB</source>
-        <translation>KiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>MiB</source>
-        <translation>MiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>GiB</source>
-        <translation>GiB</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>TiB</source>
-        <translation>TiB</translation>
-    </message>
-    <message>
-        <location line="+37"/>
+        <location filename="../Formatter.cc" line="+21"/>
         <location line="+25"/>
         <source>Unknown</source>
         <translation>Onbekend</translation>
@@ -775,14 +780,8 @@
         <source>None</source>
         <translation>Geen</translation>
     </message>
-    <message>
-        <location filename="../Formatter.h" line="+64"/>
-        <location line="+7"/>
-        <source>%1 %2</source>
-        <translation>%1 %2</translation>
-    </message>
     <message numerus="yes">
-        <location filename="../Formatter.cc" line="+41"/>
+        <location line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln dag</numerusform>
@@ -817,9 +816,9 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+52"/>
+        <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Vrije ruimte berekenen…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -895,17 +894,17 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Opties</translation>
+        <translation>Opties</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistieken</translation>
+        <translation>Statistieken</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Openen…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +919,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nieuw…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1160,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Verander sessie…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Locatie instellen…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;URL openen…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1236,13 +1235,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+733"/>
+        <location line="+762"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>Beperkt op %1</translation>
     </message>
     <message>
-        <location line="-687"/>
+        <location line="-716"/>
         <source>Limit Upload Speed</source>
         <translation>Uploadsnelheid begrenzen</translation>
     </message>
@@ -1258,12 +1257,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+720"/>
+        <location line="+749"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Stoppen bij verhouding (%1)</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-403"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session) notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
@@ -1274,19 +1273,19 @@
         <translation>Inactief</translation>
     </message>
     <message>
-        <location line="+30"/>
-        <location line="+15"/>
+        <location line="+28"/>
+        <location line="+19"/>
         <source>Ratio: %1</source>
         <translation>Verhouding: %1</translation>
     </message>
     <message>
-        <location line="-10"/>
-        <location line="+5"/>
+        <location line="-14"/>
+        <location line="+7"/>
         <source>Down: %1, Up: %2</source>
         <translation>Download: %1$s, Upload: %2$s</translation>
     </message>
     <message>
-        <location line="+424"/>
+        <location line="+433"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrentbestanden (*.torrent);;Alle bestanden (*.*)</translation>
     </message>
@@ -1301,17 +1300,17 @@
         <translation>Torrent openen</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-1012"/>
         <source>Speed Limits</source>
         <translation>Snelheidslimieten</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+537"/>
         <source>Network Error</source>
         <translation>Netwerkfout</translation>
     </message>
     <message>
-        <location line="+434"/>
+        <location line="+444"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Klik om tijdelijke snelheidslimieten uit te schakelen
@@ -1325,7 +1324,7 @@
 (%1 down, %2 up)</translation>
     </message>
     <message>
-        <location line="+136"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
         <translation>Torrent verwijderen?</translation>
     </message>
@@ -1343,7 +1342,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-505"/>
+        <location line="-510"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>Toont %L1 van %Ln torrent</numerusform>
@@ -1351,7 +1350,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+510"/>
+        <location line="+515"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>Gedownloade bestanden van deze %Ln torrent verwijderen?</numerusform>
@@ -1437,7 +1436,7 @@
         <translation>Nieuwe torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+304"/>
+        <location filename="../MakeDialog.cc" line="+307"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Geen bron geselecteerd&lt;/i&gt;</translation>
     </message>
@@ -1454,7 +1453,7 @@
         <source>%Ln Piece(s)</source>
         <translation>
             <numerusform>&amp;Ln stuk</numerusform>
-            <numerusform>%Ln stukken</numerusform>
+            <numerusform>%Ln fragmenten</numerusform>
         </translation>
     </message>
     <message>
@@ -1485,7 +1484,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;fragmenten grootte:</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1512,7 +1511,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">Bron:</translation>
+        <translation>&amp;Bron:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1538,15 +1537,15 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>‘%1’ aangemaakt!</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon &quot;%1&quot;: %2 (%3) niet aanmaken</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+53"/>
         <source>Open Torrent</source>
         <translation>Open torrent</translation>
     </message>
@@ -1678,7 +1677,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&amp;Op dagen:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+380"/>
         <source>Every Day</source>
         <translation>Elke dag</translation>
     </message>
@@ -1740,12 +1739,30 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Testen van TCP Poort…</translation>
+    </message>
+    <message numerus="yes">
+        <location line="+105"/>
+        <source>%1 minute(s)</source>
+        <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+26"/>
+        <source>%1 minute(s) ago</source>
+        <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <location line="+154"/>
+        <location line="+16"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer &quot;Torrent Done Downloading&quot; Script</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1773,28 +1790,10 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <source>Options</source>
         <translation>Opties</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-255"/>
-        <source> minute(s)</source>
-        <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform>minuut</numerusform>
-            <numerusform>minuten</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+10"/>
+        <location filename="../PrefsDialog.cc" line="-242"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location line="+19"/>
-        <source> minute(s) ago</source>
-        <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation>
-            <numerusform>minuut geleden</numerusform>
-            <numerusform>minuten geleden</numerusform>
-        </translation>
+        <translation>Selecteer &quot;Torrent Done Seeding&quot; Script</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-651"/>
@@ -1842,7 +1841,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Op afstand</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+168"/>
+        <location filename="../PrefsDialog.cc" line="+184"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Zwarte lijst bevat %Ln regel&lt;/i&gt;</numerusform>
@@ -1880,7 +1879,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Ontvang &amp;automatische updates</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-227"/>
+        <location filename="../PrefsDialog.cc" line="-221"/>
         <source>Allow encryption</source>
         <translation>Sta versleuteling toe</translation>
     </message>
@@ -1983,42 +1982,42 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Leest klembordinhoud van de gebruiker op torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Detecteer nieuwe torrents vanuit het klembord</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Roep scrip&amp;t aan als downloaden voltooid is:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Roept scrip&amp;t aan wanneer seeding is voltooid:</translation>
     </message>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>μTP is een hulpmiddel voor het verminderen van netwerkcongestie.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>μ&amp;TP inschakelen voor peer-verbindingen</translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard openbare trackers</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers te gebruiken op alle openbare torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Als u een back-up-URL wilt toevoegen, voegt u deze toe aan de volgende regel na een primaire URL.&lt;/p&gt;&lt;p&gt;Als u een nieuwe primaire URL wilt toevoegen, voegt u deze toe na een lege regel.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2086,7 +2085,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Versleuteling</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+75"/>
+        <location filename="../PrefsDialog.cc" line="+69"/>
         <source>Select Incomplete Directory</source>
         <translation>Selecteer map voor onvoltooide torrents</translation>
     </message>
@@ -2096,20 +2095,20 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>Selecteer een map om in de gaten te houden</translation>
     </message>
     <message numerus="yes">
-        <location line="-101"/>
+        <location line="-94"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Update geslaagd!&lt;/b&gt;&lt;p&gt;zwarte lijst heeft nu %Ln regel.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Update gelukt!&lt;/b&gt;&lt;p&gt;zwarte lijst heeft nu %Ln regels.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Zwarte lijst bijwerken&lt;/b&gt;&lt;p&gt;Verkrijgen van nieuwe zwarte lijst…&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+87"/>
         <source>Select Destination</source>
         <translation>Selecteer bestemming</translation>
     </message>
@@ -2178,14 +2177,14 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-308"/>
+        <location filename="../Application.cc" line="-326"/>
         <source>Invalid option</source>
         <translation>Ongeldige optie</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+325"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Nu starten</translation>
     </message>
 </context>
 <context>
@@ -2224,7 +2223,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+503"/>
         <source>Error Renaming Path</source>
         <translation>Fout hernoemen pad</translation>
     </message>
@@ -2234,12 +2233,12 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation>&lt;p&gt;&lt;b&gt;Kan ‘%1’ niet naar ‘%2’ hernoemen: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Corrigeer de fouten en probeer het opnieuw.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+528"/>
+        <location line="+530"/>
         <source>Error Adding Torrent</source>
         <translation>Fout bij toevoegen van torrent</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+38"/>
         <source>%1 (copy of %2)</source>
         <translation>%1 (kopie van %2)</translation>
     </message>
@@ -2247,16 +2246,16 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Dubbele torrent(s)</numerusform>
-            <numerusform>Dubbele torrent(s)</numerusform>
+            <numerusform>Dubbele torrent</numerusform>
+            <numerusform>Dubbele torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>Kon %n gedupliceerde torrent(s) niet toevoegen</numerusform>
-            <numerusform>Kon %n gedupliceerde torrent(s) niet toevoegen</numerusform>
+            <numerusform>Kan %n dubbele torrent niet toevoegen</numerusform>
+            <numerusform>Kon %n gedupliceerde torrents niet toevoegen</numerusform>
         </translation>
     </message>
 </context>
@@ -2306,6 +2305,15 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="+13"/>
         <source>Pass&amp;word:</source>
         <translation>&amp;Wachtwoord:</translation>
+    </message>
+</context>
+<context>
+    <name>Speed</name>
+    <message>
+        <location filename="../Speed.h" line="+40"/>
+        <location line="+6"/>
+        <source>%1 %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2361,7 +2369,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+323"/>
+        <location filename="../Torrent.cc" line="+304"/>
         <source>Verifying local data</source>
         <translation>Lokale gegevens verifiëren</translation>
     </message>
@@ -2467,12 +2475,22 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <translation> - Resterende tijd onbekend</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+38"/>
         <source>Ratio: %1</source>
         <translation>Verhouding: %1</translation>
     </message>
+    <message>
+        <location line="+18"/>
+        <source>%1 left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Remaining time unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+44"/>
+        <location line="+40"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
@@ -2528,7 +2546,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         </translation>
     </message>
     <message>
-        <location line="-76"/>
+        <location line="-96"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Lokale gegevens verifiëren (%1 % getest)</translation>
     </message>
@@ -2536,7 +2554,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+210"/>
+        <location filename="../TrackerDelegate.cc" line="+213"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2576,7 +2594,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Nu vragen om peer aantallen… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2612,7 +2630,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Nu vragen om meer peers… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -2631,27 +2649,27 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Trackers bewerken</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tracker aankondigings-URL</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als u een nieuwe primaire URL wilt toevoegen, voegt u deze toe na een lege regel.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Als u een back-up-URL wilt toevoegen, voegt u deze toe aan de volgende regel na een primaire URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Zie ook Standaard openbare trackers in Bewerken &gt; Voorkeuren &gt; Netwerk</translation>
     </message>
 </context>
 </TS>

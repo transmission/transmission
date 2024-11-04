@@ -3,21 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/platform.h>
-#include <libtransmission/subprocess.h>
-
-#include "gtest/internal/gtest-port.h" // GetArgvs()
-
-#include "test-fixtures.h"
-
 #include <array>
+#include <cerrno>
+#include <cstdlib> // setenv
+#include <cstring> // strerror
 #include <fstream>
 #include <map>
 #include <string>
 #include <string_view>
+
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/subprocess.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/utils.h>
+
+#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -31,7 +33,7 @@ std::string getTestProgramPath(std::string const& filename)
 {
     auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front().data());
     auto const exe_dir = tr_sys_path_dirname(exe_path);
-    return std::string{ exe_dir } + TR_PATH_DELIMITER + filename;
+    return fmt::format("{:s}/{:s}", exe_dir, filename);
 }
 
 class SubprocessTest
@@ -43,9 +45,7 @@ protected:
 
     [[nodiscard]] std::string buildSandboxPath(std::string const& filename) const
     {
-        auto path = sandbox_.path();
-        path += TR_PATH_DELIMITER;
-        path += filename;
+        auto path = fmt::format("{:s}/{:s}", sandbox_.path(), filename);
         tr_sys_path_native_separators(&path.front());
         return path;
     }
@@ -84,20 +84,18 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 
     auto args = std::array<char const*, 2>{ missing_exe_path.data(), nullptr };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_FALSE(ret);
-    EXPECT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    EXPECT_NE(nullptr, error->message);
-
-    tr_error_clear(&error);
+    EXPECT_TRUE(error);
+    EXPECT_NE(0, error.code());
+    EXPECT_NE(""sv, error.message());
 }
 
 TEST_P(SubprocessTest, SpawnAsyncArgs)
 {
     auto const result_path = buildSandboxPath("result.txt");
-    bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_strvEndsWith(tr_strlower(self_path_), ".cmd"sv);
+    bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_strv_ends_with(tr_strlower(self_path_), ".cmd"sv);
 
     auto const test_arg1 = std::string{ "arg1 " };
     auto const test_arg2 = std::string{ " arg2" };
@@ -113,10 +111,10 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
                                                   allow_batch_metachars ? test_arg4.data() : nullptr,
                                                   nullptr };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     bool const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     waitForFileToBeReadable(result_path);
 
@@ -182,10 +180,10 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     setenv("FOO", "bar", 1 /*true*/); // inherited
     setenv("ZOO", "tar", 1 /*true*/); // overridden
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     bool const ret = tr_spawn_async(std::data(args), env, {}, &error);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     waitForFileToBeReadable(result_path);
 
@@ -221,10 +219,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 
     auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.c_str(), arg_dump_cwd_.c_str(), nullptr };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     bool const ret = tr_spawn_async(std::data(args), {}, test_dir, &error);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     waitForFileToBeReadable(result_path);
 
@@ -249,10 +247,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
 
     auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     waitForFileToBeReadable(result_path);
 
@@ -274,13 +272,12 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
 
     auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const ret = tr_spawn_async(std::data(args), {}, TR_IF_WIN32("C:\\", "/") "tr-missing-test-work-dir", &error);
     EXPECT_FALSE(ret);
-    EXPECT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    EXPECT_NE(nullptr, error->message);
-    tr_error_clear(&error);
+    EXPECT_TRUE(error);
+    EXPECT_NE(0, error.code());
+    EXPECT_NE(""sv, error.message());
 }
 
 INSTANTIATE_TEST_SUITE_P(

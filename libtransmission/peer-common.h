@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,26 +10,25 @@
 #endif
 
 #include <array>
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "block-info.h"
-#include "history.h"
-#include "interned-string.h"
-#include "net.h" // tr_port
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/history.h"
+#include "libtransmission/net.h" // tr_port
 
 /**
  * @addtogroup peers Peers
  * @{
  */
 
-class tr_peer;
 class tr_swarm;
-struct peer_atom;
 struct tr_bandwidth;
+struct tr_peer;
 
 // --- Peer Publish / Subscribe
 
@@ -38,19 +37,20 @@ class tr_peer_event
 public:
     enum class Type
     {
-        ClientGotBlock,
+        // Unless otherwise specified, all events are for BT peers only
+        ClientGotBlock, // applies to webseed too
         ClientGotChoke,
-        ClientGotPieceData,
+        ClientGotPieceData, // applies to webseed too
         ClientGotAllowedFast,
         ClientGotSuggest,
         ClientGotPort,
-        ClientGotRej,
+        ClientGotRej, // applies to webseed too
         ClientGotBitfield,
         ClientGotHave,
         ClientGotHaveAll,
         ClientGotHaveNone,
         ClientSentPieceData,
-        Error
+        Error // generic
     };
 
     Type type = Type::Error;
@@ -64,12 +64,12 @@ public:
 
     [[nodiscard]] constexpr static auto GotBlock(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.blockLoc(block);
+        auto const loc = block_info.block_loc(block);
         auto event = tr_peer_event{};
         event.type = Type::ClientGotBlock;
         event.pieceIndex = loc.piece;
         event.offset = loc.piece_offset;
-        event.length = block_info.blockSize(block);
+        event.length = block_info.block_size(block);
         return event;
     }
 
@@ -144,12 +144,12 @@ public:
 
     [[nodiscard]] constexpr static auto GotRejected(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.blockLoc(block);
+        auto const loc = block_info.block_loc(block);
         auto event = tr_peer_event{};
         event.type = Type::ClientGotRej;
         event.pieceIndex = loc.piece;
         event.offset = loc.piece_offset;
-        event.length = block_info.blockSize(block);
+        event.length = block_info.block_size(block);
         return event;
     }
 
@@ -170,67 +170,52 @@ public:
     }
 };
 
-using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const& event, void* client_data);
+using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& event, void* client_data);
 
 /**
  * State information about a connected peer.
  *
- * @see struct peer_atom
+ * @see tr_peer_info
  * @see tr_peerMsgs
  */
-class tr_peer
+struct tr_peer
 {
-public:
-    tr_peer(tr_torrent const* tor, peer_atom* atom = nullptr);
+    using Speed = libtransmission::Values::Speed;
+
+    explicit tr_peer(tr_torrent const& tor);
     virtual ~tr_peer();
 
-    virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
+    [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] bool has_piece(tr_piece_index_t piece) const noexcept
     {
         return has().test(piece);
     }
 
-    [[nodiscard]] float percentDone() const noexcept
+    [[nodiscard]] float percent_done() const noexcept
     {
         return has().percent();
     }
 
-    [[nodiscard]] bool isSeed() const noexcept
+    [[nodiscard]] bool is_seed() const noexcept
     {
-        return has().hasAll();
+        return has().has_all();
     }
 
     [[nodiscard]] virtual std::string display_name() const = 0;
 
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
 
-    [[nodiscard]] virtual tr_bandwidth& bandwidth() noexcept = 0;
-
     // requests that have been made but haven't been fulfilled yet
-    [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
+    [[nodiscard]] virtual size_t active_req_count(tr_direction) const noexcept = 0;
 
-    [[nodiscard]] tr_bytes_per_second_t get_piece_speed_bytes_per_second(uint64_t now, tr_direction direction) const
+    virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
+
+    virtual void cancel_block_request(tr_block_index_t /*block*/)
     {
-        auto bytes_per_second = tr_bytes_per_second_t{};
-        isTransferringPieces(now, direction, &bytes_per_second);
-        return bytes_per_second;
     }
 
-    virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
-
-    struct RequestLimit
-    {
-        // How many blocks we could request.
-        size_t max_spans = 0;
-
-        // How many spans those blocks could be in.
-        // This is for webseeds, which make parallel requests.
-        size_t max_blocks = 0;
-    };
-
-    // how many blocks could we request from this peer right now?
-    [[nodiscard]] virtual RequestLimit canRequest() const noexcept = 0;
+    virtual void ban() = 0;
 
     tr_session* const session;
 
@@ -243,14 +228,8 @@ public:
     /// The following fields are only to be used in peer-mgr.cc.
     /// TODO(ckerr): refactor them out of `tr_peer`
 
-    // hook to private peer-mgr information
-    peer_atom* const atom;
-
     // whether or not this peer sent us any given block
     tr_bitfield blame;
-
-    // whether or not we should free this peer soon.
-    bool do_purge = false;
 
     // how many bad pieces this piece has contributed to
     uint8_t strikes = 0;
@@ -268,13 +247,15 @@ struct tr_swarm_stats
 {
     std::array<uint16_t, 2> active_peer_count;
     uint16_t active_webseed_count;
+    // connected peers
     uint16_t peer_count;
+    // connected peers by peer source
     std::array<uint16_t, TR_PEER_FROM__MAX> peer_from_count;
+    // known peers by peer source
+    std::array<uint16_t, TR_PEER_FROM__MAX> known_peer_from_count;
 };
 
 tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);
-
-void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 
 // ---
 

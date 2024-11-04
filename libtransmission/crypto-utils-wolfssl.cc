@@ -1,9 +1,8 @@
-// This file Copyright 2014-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
 #include <mutex>
 
 #include <wolfssl/options.h>
@@ -15,11 +14,16 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+
+#ifndef WITH_WOLFSSL
+#error wolfssl module
+#endif
 
 #if LIBWOLFSSL_VERSION_HEX >= 0x04000000 // 4.0.0
 using TR_WC_RNG = WC_RNG;
@@ -30,9 +34,9 @@ using TR_WC_RNG = RNG;
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-// ---
-
-static void log_wolfssl_error(int error_code, char const* file, int line)
+namespace
+{
+void log_wolfssl_error(int error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -48,7 +52,7 @@ static void log_wolfssl_error(int error_code, char const* file, int line)
     }
 }
 
-static bool check_wolfssl_result(int result, char const* file, int line)
+bool check_wolfssl_result(int result, char const* file, int line)
 {
     bool const ret = result == 0;
 
@@ -64,7 +68,7 @@ static bool check_wolfssl_result(int result, char const* file, int line)
 
 // ---
 
-static TR_WC_RNG* get_rng()
+TR_WC_RNG* get_rng()
 {
     static TR_WC_RNG rng;
     static bool rng_initialized = false;
@@ -82,93 +86,68 @@ static TR_WC_RNG* get_rng()
     return &rng;
 }
 
-static std::mutex rng_mutex_;
-
-// ---
-
-namespace
-{
-
-class Sha1Impl final : public tr_sha1
-{
-public:
-    Sha1Impl()
-    {
-        clear();
-    }
-
-    ~Sha1Impl() override = default;
-
-    void clear() override
-    {
-        wc_InitSha(&handle_);
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        if (data_length > 0U)
-        {
-            wc_ShaUpdate(&handle_, static_cast<byte const*>(data), data_length);
-        }
-    }
-
-    [[nodiscard]] tr_sha1_digest_t finish() override
-    {
-        auto digest = tr_sha1_digest_t{};
-        wc_ShaFinal(&handle_, reinterpret_cast<byte*>(std::data(digest)));
-        clear();
-        return digest;
-    }
-
-private:
-    wc_Sha handle_ = {};
-};
-
-class Sha256Impl final : public tr_sha256
-{
-public:
-    Sha256Impl()
-    {
-        clear();
-    }
-
-    ~Sha256Impl() override = default;
-
-    void clear() override
-    {
-        wc_InitSha256(&handle_);
-    }
-
-    void add(void const* data, size_t data_length) override
-    {
-        if (data_length > 0U)
-        {
-            wc_Sha256Update(&handle_, static_cast<byte const*>(data), data_length);
-        }
-    }
-
-    [[nodiscard]] tr_sha256_digest_t finish() override
-    {
-        auto digest = tr_sha256_digest_t{};
-        wc_Sha256Final(&handle_, reinterpret_cast<byte*>(std::data(digest)));
-        clear();
-        return digest;
-    }
-
-private:
-    wc_Sha256 handle_ = {};
-};
+std::mutex rng_mutex_;
 
 } // namespace
 
-std::unique_ptr<tr_sha1> tr_sha1::create()
+// --- sha1
+
+tr_sha1::tr_sha1()
 {
-    return std::make_unique<Sha1Impl>();
+    clear();
 }
 
-std::unique_ptr<tr_sha256> tr_sha256::create()
+tr_sha1::~tr_sha1() = default;
+
+void tr_sha1::clear()
 {
-    return std::make_unique<Sha256Impl>();
+    wc_InitSha(&handle_);
+}
+
+void tr_sha1::add(void const* data, size_t data_length)
+{
+    if (data_length > 0U)
+    {
+        wc_ShaUpdate(&handle_, static_cast<byte const*>(data), data_length);
+    }
+}
+
+tr_sha1_digest_t tr_sha1::finish()
+{
+    auto digest = tr_sha1_digest_t{};
+    wc_ShaFinal(&handle_, reinterpret_cast<byte*>(std::data(digest)));
+    clear();
+    return digest;
+}
+
+// --- sha256
+
+tr_sha256::tr_sha256()
+{
+    clear();
+}
+
+tr_sha256::~tr_sha256() = default;
+
+void tr_sha256::clear()
+{
+    wc_InitSha256(&handle_);
+}
+
+void tr_sha256::add(void const* data, size_t data_length)
+{
+    if (data_length > 0U)
+    {
+        wc_Sha256Update(&handle_, static_cast<byte const*>(data), data_length);
+    }
+}
+
+tr_sha256_digest_t tr_sha256::finish()
+{
+    auto digest = tr_sha256_digest_t{};
+    wc_Sha256Final(&handle_, reinterpret_cast<byte*>(std::data(digest)));
+    clear();
+    return digest;
 }
 
 // ---
@@ -182,6 +161,6 @@ bool tr_rand_buffer_crypto(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
-    auto const lock = std::lock_guard(rng_mutex_);
+    auto const lock = std::lock_guard{ rng_mutex_ };
     return check_result(wc_RNG_GenerateBlock(get_rng(), static_cast<byte*>(buffer), length));
 }

@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -29,4 +29,4 @@ std::string gtr_pref_string_get(tr_quark key);
 void gtr_pref_string_set(tr_quark key, std::string_view value);
 
 void gtr_pref_save(tr_session* /*session*/);
-tr_variant* gtr_pref_get_all();
+tr_variant& gtr_pref_get_all();

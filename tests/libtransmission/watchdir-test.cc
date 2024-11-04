@@ -4,23 +4,35 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
+#include <set>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/time.h> // timeval
+#endif
+
+#include <event2/event.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/file.h>
-#include <libtransmission/net.h>
+#include <libtransmission/timer.h>
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/watchdir.h>
 #include <libtransmission/watchdir-base.h>
-#include <libtransmission/timer-ev.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
-
-#include <event2/event.h>
 
 using namespace std::literals;
 
@@ -39,7 +51,7 @@ static_assert(ProcessEventsTimeout > GenericRescanInterval);
 namespace libtransmission::test
 {
 
-enum class WatchMode
+enum class WatchMode : uint8_t
 {
     NATIVE,
     GENERIC
@@ -53,13 +65,16 @@ private:
     std::shared_ptr<struct event_base> ev_base_;
     std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
 
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
+
 protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
+        init_mgr_ = tr_lib_init();
         ev_base_.reset(event_base_new(), event_base_free);
         timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
-        Watchdir::setGenericRescanInterval(GenericRescanInterval);
+        Watchdir::set_generic_rescan_interval(GenericRescanInterval);
     }
 
     void TearDown() override
@@ -73,7 +88,7 @@ protected:
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
         auto watchdir = force_generic ?
-            Watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
+            Watchdir::create_generic(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
             Watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
 
         if (auto* const base_watchdir = dynamic_cast<impl::BaseWatchdir*>(watchdir.get()); base_watchdir != nullptr)
@@ -91,12 +106,8 @@ protected:
 
     static std::string createDir(std::string_view dirname, std::string_view basename)
     {
-        auto path = std::string{ dirname };
-        path += TR_PATH_DELIMITER;
-        path += basename;
-
+        auto path = fmt::format("{:s}/{:s}", dirname, basename);
         tr_sys_dir_create(path, 0, 0700);
-
         return path;
     }
 
@@ -137,7 +148,7 @@ TEST_P(WatchDirTest, initialScan)
     // setup: start with an empty directory.
     // this block confirms that it's empty
     {
-        auto called = bool{ false };
+        auto called = false;
         auto callback = [&called](std::string_view /*dirname*/, std::string_view /*basename*/)
         {
             called = true;
@@ -215,6 +226,7 @@ TEST_P(WatchDirTest, watch)
     EXPECT_TRUE(std::empty(names));
 }
 
+// TODO(ckerr): flaky test should be fixed instead of disabled
 TEST_P(WatchDirTest, DISABLED_retry)
 {
     auto const path = sandboxDir();

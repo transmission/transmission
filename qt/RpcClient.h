@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,10 +9,10 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 
 #include <QFuture>
 #include <QFutureInterface>
-#include <QHash>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QObject>
@@ -55,12 +55,19 @@ class RpcClient : public QObject
 public:
     explicit RpcClient(QObject* parent = nullptr);
 
+    [[nodiscard]] constexpr auto const& url() const noexcept
+    {
+        return url_;
+    }
+
+    [[nodiscard]] constexpr auto isLocal() const noexcept
+    {
+        return session_ != nullptr || url_is_loopback_;
+    }
+
     void stop();
     void start(tr_session* session);
     void start(QUrl const& url);
-
-    bool isLocal() const;
-    QUrl const& url() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
@@ -80,12 +87,10 @@ private:
     QNetworkAccessManager* networkAccessManager();
     int64_t getNextTag();
 
-    void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
+    void sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise);
+    void sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
     [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
-
-    static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
 
     std::optional<QNetworkRequest> request_;
 
@@ -93,7 +98,8 @@ private:
     QString session_id_;
     QUrl url_;
     QNetworkAccessManager* nam_ = {};
-    QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
+    std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
+    bool url_is_loopback_ = false;
 };

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,6 +16,7 @@
 #include <QMetaType>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 
 #include <libtransmission/transmission.h>
 
@@ -23,13 +24,8 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/tr-macros.h>
 
-#include "FaviconCache.h"
 #include "IconCache.h"
 #include "Speed.h"
-
-#ifdef ERROR
-#undef ERROR
-#endif
 
 class QPixmap;
 
@@ -110,6 +106,7 @@ class TorrentHash
 {
 private:
     tr_sha1_digest_t data_ = {};
+    QString data_str_;
 
 public:
     TorrentHash() = default;
@@ -117,22 +114,13 @@ public:
     explicit TorrentHash(tr_sha1_digest_t const& data)
         : data_{ data }
     {
+        auto const hashstr = tr_sha1_to_string(data_);
+        data_str_ = QString::fromUtf8(std::data(hashstr), std::size(hashstr));
     }
 
-    explicit TorrentHash(char const* str)
+    explicit TorrentHash(std::string_view const str)
+        : TorrentHash{ tr_sha1_from_string(str).value_or(tr_sha1_digest_t{}) }
     {
-        if (auto const hash = tr_sha1_from_string(str != nullptr ? str : ""); hash)
-        {
-            data_ = *hash;
-        }
-    }
-
-    explicit TorrentHash(QString const& str)
-    {
-        if (auto const hash = tr_sha1_from_string(str.toStdString()); hash)
-        {
-            data_ = *hash;
-        }
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto operator==(TorrentHash const& that) const
@@ -150,9 +138,9 @@ public:
         return data_ < that.data_;
     }
 
-    QString toString() const
+    [[nodiscard]] constexpr auto& toString() const noexcept
     {
-        return QString::fromStdString(tr_sha1_to_string(data_));
+        return data_str_;
     }
 };
 
@@ -300,10 +288,9 @@ public:
 
     [[nodiscard]] constexpr auto ratio() const noexcept
     {
-        auto const u = uploadedEver();
-        auto const d = downloadedEver();
-        auto const t = totalSize();
-        return double(u) / (d ? d : t);
+        auto const numerator = static_cast<double>(uploadedEver());
+        auto const denominator = sizeWhenDone();
+        return denominator > 0U ? numerator / denominator : double{};
     }
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
@@ -414,19 +401,24 @@ public:
 
     bool includesTracker(QString const& sitename) const;
 
+    [[nodiscard]] constexpr auto const& labels() const noexcept
+    {
+        return labels_;
+    }
+
     [[nodiscard]] constexpr auto const& sitenames() const noexcept
     {
         return sitenames_;
     }
 
-    [[nodiscard]] Speed uploadLimit() const
+    [[nodiscard]] constexpr auto uploadLimit() const
     {
-        return Speed::fromKBps(upload_limit_);
+        return Speed{ upload_limit_, Speed::Units::KByps };
     }
 
-    [[nodiscard]] Speed downloadLimit() const
+    [[nodiscard]] constexpr auto downloadLimit() const
     {
-        return Speed::fromKBps(download_limit_);
+        return Speed{ download_limit_, Speed::Units::KByps };
     }
 
     [[nodiscard]] constexpr auto uploadIsLimited() const noexcept
@@ -573,8 +565,8 @@ public:
         DOWNLOAD_LIMITED,
         DOWNLOAD_SPEED,
         EDIT_DATE,
-        ERROR,
-        ERROR_STRING,
+        TORRENT_ERROR,
+        TORRENT_ERROR_STRING,
         ETA,
         FAILED_EVER,
         FILE_COUNT,
@@ -587,6 +579,7 @@ public:
         IS_FINISHED,
         IS_PRIVATE,
         IS_STALLED,
+        LABELS,
         LEFT_UNTIL_DONE,
         MANUAL_ANNOUNCE_TIME,
         METADATA_PERCENT_COMPLETE,
@@ -642,7 +635,6 @@ private:
     time_t start_date_ = {};
 
     int bandwidth_priority_ = {};
-    int download_limit_ = {};
     int error_ = {};
     int eta_ = {};
     int peer_limit_ = {};
@@ -655,10 +647,10 @@ private:
     int seed_idle_mode_ = {};
     int seed_ratio_mode_ = {};
     int status_ = {};
-    int upload_limit_ = {};
     int webseeds_sending_to_us_ = {};
 
     uint64_t desired_available_ = {};
+    uint64_t download_limit_ = {};
     uint64_t downloaded_ever_ = {};
     uint64_t failed_ever_ = {};
     uint64_t file_count_ = {};
@@ -668,6 +660,7 @@ private:
     uint64_t piece_size_ = {};
     uint64_t size_when_done_ = {};
     uint64_t total_size_ = {};
+    uint64_t upload_limit_ = {};
     uint64_t uploaded_ever_ = {};
 
     double metadata_percent_complete_ = {};
@@ -689,6 +682,7 @@ private:
     PeerList peers_;
     FileList files_;
 
+    QStringList labels_;
     std::vector<QString> sitenames_;
     TrackerStatsList tracker_stats_;
 

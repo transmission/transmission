@@ -53,6 +53,9 @@
 "%lu IP address rules in list" = "%lu direcciones IP cargadas";
 
 /* Inspector -> Peers tab -> peers */
+/* "%lu Known:" = ""; */
+
+/* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu descubrimientos locales";
 
 /* Inspector -> Peers tab -> peers */
@@ -214,6 +217,9 @@
 /* inspector -> peer table -> header tool tip */
 "Available" = "Disponible";
 
+/* Transfer speed (bytes per second) */
+/* "B/s" = ""; */
+
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Ancho de banda";
 
@@ -295,7 +301,6 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "DL" = "↓";
 
@@ -444,6 +449,9 @@
 /* View menu -> Status Bar */
 "Hide Status Bar" = "Ocultar barra de estado";
 
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Ocultar barra de tareas";
+
 /* File Outline -> Priority Menu */
 "High" = "Alta";
 
@@ -477,6 +485,9 @@
 
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
+
+/* Inspector -> Peers tab -> peers */
+/* "Known:" = ""; */
 
 /* Tracker last announce */
 "Last Announce" = "Último anuncio";
@@ -673,9 +684,6 @@
    Preferences -> toolbar item title */
 "Peers" = "Clientes";
 
-/* Inspector -> Peers tab -> table row tooltip */
-"Port" = "Puerto";
-
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Sitio de comprobación de puertos caido";
 
@@ -684,6 +692,9 @@
 
 /* Preferences -> Network -> port status */
 "Port is open" = "El puerto está abierto";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "Puerto: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "640";
@@ -882,6 +893,9 @@
 /* Torrent cell -> button info */
 "Show the data file in Finder" = "Mostrar archivos en el Finder";
 
+/* View menu -> Toolbar */
+/* "Show Toolbar" = ""; */
+
 /* Dock item
    Status Bar -> speed tooltip */
 "Speed Limit" = "Límite de Velocidad";
@@ -985,6 +999,9 @@
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Esta carpeta no contiene archivos.";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+/* "This option is not available if Default location is set to Same as torrent file." = ""; */
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "La tarea está activa. Una vez eliminada, necesitará el archivo torrent o el enlace magnet para reanudar la tarea.";

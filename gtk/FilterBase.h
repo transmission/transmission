@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,16 +15,21 @@
 #include <glibmm/object.h>
 #endif
 
+#include <cstdint>
+
 template<typename T>
 class FilterBase : public IF_GTKMM4(Gtk::Filter, Glib::Object)
 {
-public:
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    enum class Change{
+public:
+    // clang-format off
+    enum class Change : uint8_t
+    {
         DIFFERENT,
         LESS_STRICT,
         MORE_STRICT,
     };
+    // clang-format on
 #endif
 
 public:

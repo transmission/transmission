@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -8,24 +8,39 @@ import { Torrent } from './torrent.js';
 import { setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
+  createIcon: (torrent) => {
+    const icon = document.createElement('div');
+    icon.classList.add('icon');
+    icon.dataset.iconMimeType = torrent
+      .getPrimaryMimeType()
+      .split('/', 1)
+      .pop();
+    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    return icon;
+  },
+
   formatDL: (t) => {
-    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
+    return `▼ ${Formatter.speedBps(t.getDownloadSpeed())}`;
   },
   formatETA: (t) => {
     const eta = t.getETA();
     if (eta < 0 || eta >= 999 * 60 * 60) {
       return '';
     }
-    return `ETA: ${Formatter.timeInterval(eta)}`;
+    return `ETA: ${Formatter.timeInterval(eta, 1)}`;
   },
-  formatLabels: (t) => {
-    if (t.getLabels().length > 0) {
-      return `🏷 ${t.getLabels().join(', ')}`;
+  formatLabels: (t, label) => {
+    const labels = t.getLabels();
+    label.innerHTML = '';
+    for (const label_ of labels) {
+      const s = document.createElement('span');
+      s.classList.add('torrent-label');
+      s.textContent = label_;
+      label.append(s);
     }
-    return '';
   },
   formatUL: (t) => {
-    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
+    return `▲ ${Formatter.speedBps(t.getUploadSpeed())}`;
   },
   getProgressInfo: (controller, t) => {
     const status = t.getStatus();
@@ -38,13 +53,13 @@ const TorrentRendererHelper = {
 
     if (t.needsMetaData()) {
       classList.push('magnet');
-      percent = Math.round(t.getMetadataPercentComplete() * 100);
+      percent = t.getMetadataPercentComplete() * 100;
     } else if (status === Torrent._StatusCheck) {
       classList.push('verify');
-      percent = Math.round(t.getRecheckProgress() * 100);
+      percent = t.getRecheckProgress() * 100;
     } else if (t.getLeftUntilDone() > 0) {
       classList.push('leech');
-      percent = Math.round(t.getPercentDone() * 100);
+      percent = t.getPercentDone() * 100;
     } else {
       classList.push('seed');
       const seed_ratio_limit = t.seedRatioLimit(controller);
@@ -65,8 +80,10 @@ const TorrentRendererHelper = {
 
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
+    const pct_str = `${Formatter.percentString(info.percent, 2)}%`;
     progressbar.className = info.classList.join(' ');
-    progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
+    progressbar.style.setProperty('--progress', pct_str);
+    progressbar.dataset.progress = pct_str;
   },
 };
 
@@ -136,7 +153,7 @@ export class TorrentRendererFull {
     if (t.isChecking()) {
       return [
         'Verifying local data (',
-        Formatter.percentString(100 * t.getRecheckProgress()),
+        Formatter.percentString(100 * t.getRecheckProgress(), 1),
         '% tested)',
       ].join('');
     }
@@ -153,7 +170,7 @@ export class TorrentRendererFull {
       const percent = 100 * t.getMetadataPercentComplete();
       return [
         `Magnetized transfer - ${MetaDataStatus} metadata (`,
-        Formatter.percentString(percent),
+        Formatter.percentString(percent, 1),
         '%)',
       ].join('');
     }
@@ -175,7 +192,7 @@ export class TorrentRendererFull {
           Formatter.size(t.getTotalSize()),
           ' (',
           t.getPercentDoneStr(),
-          '%)'
+          '%)',
         );
       }
       // append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
@@ -184,7 +201,7 @@ export class TorrentRendererFull {
         Formatter.size(t.getUploadedEver()),
         ' (Ratio ',
         Formatter.ratioString(t.getUploadRatio()),
-        ')'
+        ')',
       );
     } else {
       // not done yet
@@ -194,7 +211,7 @@ export class TorrentRendererFull {
         Formatter.size(sizeWhenDone),
         ' (',
         t.getPercentDoneStr(),
-        '%)'
+        '%)',
       );
     }
 
@@ -205,7 +222,7 @@ export class TorrentRendererFull {
       if (eta < 0 || eta >= 999 * 60 * 60 /* arbitrary */) {
         c.push('remaining time unknown');
       } else {
-        c.push(Formatter.timeInterval(t.getETA()), ' remaining');
+        c.push(Formatter.timeInterval(t.getETA(), 1), ' remaining');
       }
     }
 
@@ -216,14 +233,18 @@ export class TorrentRendererFull {
   render(controller, t, root) {
     const is_stopped = t.isStopped();
 
+    root.classList.toggle('paused', is_stopped);
+
     // name
     let e = root._name_container;
     setTextContent(e, t.getName());
-    e.classList.toggle('paused', is_stopped);
 
     // labels
-    e = root._labels_container;
-    setTextContent(e, TorrentRendererHelper.formatLabels(t));
+    TorrentRendererHelper.formatLabels(t, root._labels_container);
+
+    // progress details
+    e = root._progress_details_container;
+    e.innerHTML = TorrentRendererFull.getProgressDetails(controller, t);
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
@@ -234,10 +255,6 @@ export class TorrentRendererFull {
     e = root._peer_details_container;
     e.classList.toggle('error', has_error);
     setTextContent(e, TorrentRendererFull.getPeerDetails(t));
-
-    // progress details
-    e = root._progress_details_container;
-    setTextContent(e, TorrentRendererFull.getProgressDetails(controller, t));
 
     // pause/resume button
     e = root._toggle_running_button;
@@ -250,48 +267,38 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    const icon = TorrentRendererHelper.createIcon(torrent);
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
-
     const labels = document.createElement('div');
     labels.className = 'torrent-labels';
-
-    const peers = document.createElement('div');
-    peers.className = 'torrent-peer-details';
-
+    const details = document.createElement('div');
+    details.className = 'torrent-progress-details';
     const progress = document.createElement('div');
     progress.classList.add('torrent-progress');
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'full');
     progress.append(progressbar);
+    const peers = document.createElement('div');
+    peers.className = 'torrent-peer-details';
     const button = document.createElement('a');
     button.className = 'torrent-pauseresume-button';
     progress.append(button);
 
-    const details = document.createElement('div');
-    details.className = 'torrent-progress-details';
-
     root.append(icon);
     root.append(name);
     root.append(labels);
-    root.append(peers);
-    root.append(progress);
     root.append(details);
+    root.append(progress);
+    root.append(peers);
 
     root._icon = icon;
     root._name_container = name;
     root._labels_container = labels;
-    root._peer_details_container = peers;
     root._progress_details_container = details;
     root._progressbar = progressbar;
+    root._peer_details_container = peers;
     root._toggle_running_button = button;
 
     return root;
@@ -325,7 +332,7 @@ export class TorrentRendererCompact {
     }
     if (t.isSeeding()) {
       return `Ratio: ${Formatter.ratioString(
-        t.getUploadRatio()
+        t.getUploadRatio(),
       )}, ${TorrentRendererHelper.formatUL(t)}`;
     }
     return t.getStateString();
@@ -333,24 +340,24 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
+    root.classList.toggle('paused', t.isStopped());
+
     // name
     let e = root._name_container;
-    e.classList.toggle('paused', t.isStopped());
     setTextContent(e, t.getName());
 
     // labels
-    e = root._labels_container;
-    setTextContent(e, TorrentRendererHelper.formatLabels(t));
+    TorrentRendererHelper.formatLabels(t, root._labels_container);
+
+    // progressbar
+    TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
+    root._progressbar.classList.add('compact');
 
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
     e = root._details_container;
     e.classList.toggle('error', has_error);
     setTextContent(e, TorrentRendererCompact.getPeerDetails(t));
-
-    // progressbar
-    TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
-    root._progressbar.classList.add('compact');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -358,13 +365,7 @@ export class TorrentRendererCompact {
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'compact');
 
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
+    const icon = TorrentRendererHelper.createIcon(torrent);
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';

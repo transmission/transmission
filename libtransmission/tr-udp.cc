@@ -1,28 +1,35 @@
-// This file Copyright © 2010-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #include <array>
 #include <cerrno>
-#include <cstdint>
-#include <cstring> /* memcmp(), memset() */
+#include <cstddef>
+#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
+#endif
 
 #include <event2/event.h>
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "log.h"
-#include "net.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-utp.h"
-#include "utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 namespace
 {
-/* Since we use a single UDP socket in order to implement multiple
-   µTP sockets, try to set up huge buffers. */
+
+// Since we use a single UDP socket in order to implement multiple
+// µTP sockets, try to set up huge buffers.
 void set_socket_buffers(tr_socket_t fd, bool large)
 {
     static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
@@ -35,33 +42,25 @@ void set_socket_buffers(tr_socket_t fd, bool large)
     socklen_t sbuf_len = sizeof(sbuf);
 
     int size = large ? RecvBufferSize : SmallBufferSize;
-    int rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
-
-    if (rc < 0)
+    if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size)) < 0)
     {
         tr_logAddDebug(fmt::format("Couldn't set receive buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     size = large ? SendBufferSize : SmallBufferSize;
-    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&size), sizeof(size));
-
-    if (rc < 0)
+    if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&size), sizeof(size)) < 0)
     {
         tr_logAddDebug(fmt::format("Couldn't set send buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     if (large)
     {
-        rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&rbuf), &rbuf_len);
-
-        if (rc < 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&rbuf), &rbuf_len) < 0)
         {
             rbuf = 0;
         }
 
-        rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&sbuf), &sbuf_len);
-
-        if (rc < 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&sbuf), &sbuf_len) < 0)
         {
             sbuf = 0;
         }
@@ -93,41 +92,64 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
     auto from = sockaddr_storage{};
     auto fromlen = socklen_t{ sizeof(from) };
     auto* const from_sa = reinterpret_cast<sockaddr*>(&from);
-
-    auto const rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, from_sa, &fromlen);
-    if (rc <= 0)
-    {
-        return;
-    }
-
-    /* Since most packets we receive here are µTP, make quick inline
-       checks for the other protocols. The logic is as follows:
-       - all DHT packets start with 'd'
-       - all UDP tracker packets start with a 32-bit (!) "action", which
-         is between 0 and 3
-       - the above cannot be µTP packets, since these start with a 4-bit
-         version number (1). */
     auto* const session = static_cast<tr_session*>(vsession);
-    if (buf[0] == 'd')
+    auto got_utp_packet = false;
+
+    auto const from_str = [from_sa]
     {
-        if (session->dht_)
+        return tr_socket_address::from_sockaddr(from_sa).value_or(tr_socket_address{}).display_name();
+    };
+
+    for (;;)
+    {
+        auto const n_read = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, from_sa, &fromlen);
+        if (n_read <= 0)
         {
-            buf[rc] = '\0'; // libdht requires zero-terminated messages
-            session->dht_->handleMessage(std::data(buf), rc, from_sa, fromlen);
+            if (got_utp_packet)
+            {
+                // To reduce protocol overhead, we wait until we've read all UDP packets
+                // we can, then send one ACK for each µTP socket that received packet(s).
+                tr_utp_issue_deferred_acks(session);
+            }
+            return;
         }
-    }
-    else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
-    {
-        if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
+
+        // Since most packets we receive here are µTP, make quick inline
+        // checks for the other protocols. The logic is as follows:
+        // - all DHT packets start with 'd' (100)
+        // - all UDP tracker packets start with a 32-bit (!) "action", which
+        //   is between 0 and 3
+        // - the above cannot be µTP packets, since these start with a 4-bit
+        //   "type" between 0 and 4, followed by a 4-bit version number (1)
+        if (buf[0] == 'd')
         {
-            tr_logAddTrace("Couldn't parse UDP tracker packet.");
+            if (session->dht_)
+            {
+                buf[n_read] = '\0'; // libdht requires zero-terminated messages
+                session->dht_->handle_message(std::data(buf), n_read, from_sa, fromlen);
+            }
         }
-    }
-    else if (session->allowsUTP() && (session->utp_context != nullptr))
-    {
-        if (!tr_utpPacket(std::data(buf), rc, from_sa, fromlen, session))
+        else if (n_read >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            tr_logAddTrace("Unexpected UDP packet");
+            if (!session->announcer_udp_->handle_message(std::data(buf), n_read, from_sa, fromlen))
+            {
+                tr_logAddTrace(fmt::format("{} Couldn't parse UDP tracker packet.", from_str()));
+            }
+        }
+        else if (session->allowsUTP() && session->utp_context != nullptr)
+        {
+            if (tr_utp_packet(std::data(buf), n_read, from_sa, fromlen, session))
+            {
+                got_utp_packet = true;
+            }
+            else
+            {
+                tr_logAddTrace(fmt::format(
+                    "{} Unexpected UDP packet... len {} [{}]",
+                    from_str(),
+                    n_read,
+                    tr_base64_encode({ reinterpret_cast<char const*>(std::data(buf)), static_cast<size_t>(n_read) })));
+            }
         }
     }
 }
@@ -146,18 +168,28 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
     if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto optval = int{ 1 };
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+        (void)evutil_make_listen_socket_reuseable(sock);
 
-        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET);
-        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
+        auto const addr = session_.bind_address(TR_AF_INET);
+        auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
-        if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
+        if (evutil_make_socket_nonblocking(sock) != 0)
+        {
+            auto const error_code = errno;
+            tr_logAddWarn(fmt::format(
+                _("Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+
+            tr_net_close_socket(sock);
+        }
+        else if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name(udp_port_)),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -165,33 +197,44 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", addr.display_name(udp_port_)));
+            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(event_new(session_.eventBase(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp4_event_.reset(event_new(session_.event_base(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp4_event_.get(), nullptr);
         }
     }
 
-    if (!tr_net_hasIPv6(udp_port_))
+    if (!session.has_ip_protocol(TR_AF_INET6))
     {
         // no IPv6; do nothing
     }
     else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
-        auto optval = int{ 1 };
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+        (void)evutil_make_listen_socket_reuseable(sock);
+        (void)evutil_make_listen_socket_ipv6only(sock);
 
-        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET6);
-        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
+        auto const addr = session_.bind_address(TR_AF_INET6);
+        auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
-        if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
+        if (evutil_make_socket_nonblocking(sock) != 0)
+        {
+            auto const error_code = errno;
+            tr_logAddWarn(fmt::format(
+                _("Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
+
+            tr_net_close_socket(sock);
+        }
+        else if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv6 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name(udp_port_)),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -199,19 +242,12 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_)));
+            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp6_event_.get(), nullptr);
-
-#ifdef IPV6_V6ONLY
-            // Since we always open an IPv4 socket on the same port,
-            // this shouldn't matter.  But I'm superstitious.
-            int one = 1;
-            (void)setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&one), sizeof(one));
-#endif
         }
     }
 }
@@ -237,6 +273,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
+    auto const addrport = tr_socket_address::from_sockaddr(to);
     if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
         errno = EAFNOSUPPORT;
@@ -246,16 +283,22 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't warn on bad sockets; the system may not support IPv6
         return;
     }
+    else if (
+        addrport && addrport->address().is_global_unicast_address() &&
+        !session_.global_source_address(tr_af_to_ip_protocol(to->sa_family)))
+    {
+        // don't try to connect to a global address if we don't have connectivity to public internet
+        return;
+    }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
         return;
     }
 
     auto display_name = std::string{};
-    if (auto const addrport = tr_address::from_sockaddr(to); addrport)
+    if (addrport)
     {
-        auto const& [addr, port] = *addrport;
-        display_name = addr.display_name(port);
+        display_name = addrport->display_name();
     }
 
     tr_logAddWarn(fmt::format(

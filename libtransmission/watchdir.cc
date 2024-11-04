@@ -1,22 +1,23 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
-#include <set>
+#include <string>
+#include <string_view>
+
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
-
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for _()
-#include "watchdir-base.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/watchdir-base.h"
 
 using namespace std::literals;
 
@@ -43,20 +44,15 @@ namespace
 {
     auto const path = tr_pathbuf{ dir, '/', name };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const info = tr_sys_path_get_info(path, 0, &error);
-    if (error != nullptr)
+    if (error && !tr_error_is_enoent(error.code()))
     {
-        if (!TR_ERROR_IS_ENOENT(error->code))
-        {
-            tr_logAddWarn(fmt::format(
-                _("Skipping '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-        }
-
-        tr_error_free(error);
+        tr_logAddWarn(fmt::format(
+            _("Skipping '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
 
     return info && info->isFile();
@@ -109,46 +105,21 @@ void BaseWatchdir::processFile(std::string_view basename)
 
 void BaseWatchdir::scan()
 {
-    tr_error* error = nullptr;
-    auto const dir = tr_sys_dir_open(dirname_.c_str(), &error);
-    if (dir == TR_BAD_SYS_DIR)
+    auto error = tr_error{};
+
+    for (auto const& file : tr_sys_dir_get_files(dirname_, tr_basename_is_not_dotfile, &error))
+    {
+        processFile(file);
+    }
+
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", dirname()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
-        return;
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
-
-    for (;;)
-    {
-        char const* const name = tr_sys_dir_read_name(dir, &error);
-        if (name == nullptr)
-        {
-            break;
-        }
-
-        if ("."sv == name || ".."sv == name)
-        {
-            continue;
-        }
-
-        processFile(name);
-    }
-
-    if (error != nullptr)
-    {
-        tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", dirname()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
-    }
-
-    tr_sys_dir_close(dir);
 }
 
 } // namespace impl

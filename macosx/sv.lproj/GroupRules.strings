@@ -1,0 +1,63 @@
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "11"; */
+"11.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "12"; */
+"12.title" = "Avbryt";
+
+/* Class = "NSMenuItem"; title = "begins with"; ObjectID = "40"; */
+"40.title" = "börjar med";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
+"42.title" = "är";
+
+/* Class = "NSMenuItem"; title = "of the following are true"; ObjectID = "49"; */
+"49.title" = "av följande är sanna";
+
+/* Class = "NSMenuItem"; title = "Any"; ObjectID = "50"; */
+"50.title" = "Vilken som helst";
+
+/* Class = "NSMenuItem"; title = "All"; ObjectID = "51"; */
+"51.title" = "Alla";
+
+/* Class = "NSMenuItem"; title = "Name"; ObjectID = "100"; */
+"100.title" = "Namn";
+
+/* Class = "NSMenuItem"; title = "Comment"; ObjectID = "102"; */
+"102.title" = "Kommentar:";
+
+/* Class = "NSMenuItem"; title = "matches"; ObjectID = "118"; */
+"118.title" = "matchar";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "153"; */
+"153.title" = "innehåller";
+
+/* Class = "NSMenuItem"; title = "begins with"; ObjectID = "154"; */
+"154.title" = "börjar med";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "155"; */
+"155.title" = "slutar med";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "156"; */
+"156.title" = "är";
+
+/* Class = "NSMenuItem"; title = "Any File"; ObjectID = "161"; */
+"161.title" = "Vilken fil som helst";
+
+/* Class = "NSMenuItem"; title = "Any Tracker"; ObjectID = "162"; */
+"162.title" = "Vilken spårare som helst";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "163"; */
+"163.title" = "slutar med";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "164"; */
+"164.title" = "är inte";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "165"; */
+"165.title" = "innehåller";
+
+/* Class = "NSMenuItem"; title = "None"; ObjectID = "166"; */
+"166.title" = "Ingen";
+
+/* Class = "NSMenuItem"; title = "matches"; ObjectID = "167"; */
+"167.title" = "matchar";

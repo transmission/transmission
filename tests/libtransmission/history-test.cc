@@ -3,7 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
+#include <cstddef> // size_t
+
 #include <libtransmission/history.h>
 
 #include "gtest/gtest.h"

@@ -3,16 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -20,13 +19,17 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_int()
-#include <libtransmission/platform.h>
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using UtilsTest = ::testing::Test;
@@ -34,50 +37,50 @@ using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)
 {
-    EXPECT_FALSE(tr_strvContains("a test is this"sv, "TEST"sv));
-    EXPECT_FALSE(tr_strvContains("test"sv, "testt"sv));
-    EXPECT_FALSE(tr_strvContains("test"sv, "this is a test"sv));
-    EXPECT_TRUE(tr_strvContains(" test "sv, "tes"sv));
-    EXPECT_TRUE(tr_strvContains(" test"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("a test is this"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("test "sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, ""sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "t"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "te"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("this is a test"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains(""sv, ""sv));
+    EXPECT_FALSE(tr_strv_contains("a test is this"sv, "TEST"sv));
+    EXPECT_FALSE(tr_strv_contains("test"sv, "testt"sv));
+    EXPECT_FALSE(tr_strv_contains("test"sv, "this is a test"sv));
+    EXPECT_TRUE(tr_strv_contains(" test "sv, "tes"sv));
+    EXPECT_TRUE(tr_strv_contains(" test"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("a test is this"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("test "sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, ""sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, "t"sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, "te"sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("this is a test"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains(""sv, ""sv));
 }
 
 TEST_F(UtilsTest, trStrvStartsWith)
 {
-    EXPECT_FALSE(tr_strvStartsWith(""sv, "this is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, " his is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "his is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "string"sv));
-    EXPECT_TRUE(tr_strvStartsWith(""sv, ""sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, ""sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this "sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this is"sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this"sv));
+    EXPECT_FALSE(tr_strv_starts_with(""sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a string"sv, " his is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a string"sv, "his is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a string"sv, "string"sv));
+    EXPECT_TRUE(tr_strv_starts_with(""sv, ""sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, "this "sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, "this is"sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, "this"sv));
 }
 
 TEST_F(UtilsTest, trStrvEndsWith)
 {
-    EXPECT_FALSE(tr_strvEndsWith(""sv, "string"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "alphabet"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "strin"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this is"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this"sv));
-    EXPECT_FALSE(tr_strvEndsWith("tring"sv, "string"sv));
-    EXPECT_TRUE(tr_strvEndsWith(""sv, ""sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, " string"sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, ""sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "a string"sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "g"sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "string"sv));
+    EXPECT_FALSE(tr_strv_ends_with(""sv, "string"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "alphabet"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "strin"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "this is"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "this"sv));
+    EXPECT_FALSE(tr_strv_ends_with("tring"sv, "string"sv));
+    EXPECT_TRUE(tr_strv_ends_with(""sv, ""sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, " string"sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, "a string"sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, "g"sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, "string"sv));
 }
 
 TEST_F(UtilsTest, trStrvSep)
@@ -85,32 +88,32 @@ TEST_F(UtilsTest, trStrvSep)
     auto constexpr Delim = ',';
 
     auto sv = "token1,token2,token3"sv;
-    EXPECT_EQ("token1"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ("token3"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
 
     sv = " token1,token2"sv;
-    EXPECT_EQ(" token1"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(" token1"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
 
     sv = "token1;token2"sv;
-    EXPECT_EQ("token1;token2"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token1;token2"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
 
     sv = ""sv;
-    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
 }
 
 TEST_F(UtilsTest, trStrvStrip)
 {
-    EXPECT_EQ(""sv, tr_strvStrip("              "sv));
-    EXPECT_EQ("test test"sv, tr_strvStrip("    test test     "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip("   test     "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip("   test "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip(" test       "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip(" test "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
+    EXPECT_EQ(""sv, tr_strv_strip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strv_strip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip("test"sv));
 }
 
 TEST_F(UtilsTest, strvReplaceInvalid)
@@ -151,15 +154,15 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 }
 
-TEST_F(UtilsTest, strvReplaceInvalidFuzz)
+TEST_F(UtilsTest, strvConvertUtf8Fuzz)
 {
     auto buf = std::vector<char>{};
     for (size_t i = 0; i < 1000; ++i)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_replace_invalid({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_replace_invalid(out));
+        auto const out = tr_strv_convert_utf8({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_convert_utf8(out));
     }
 }
 
@@ -175,20 +178,20 @@ TEST_F(UtilsTest, trParseNumberRange)
         return ss.str();
     };
 
-    auto numbers = tr_parseNumberRange("1-10,13,16-19"sv);
+    auto numbers = tr_num_parse_range("1-10,13,16-19"sv);
     EXPECT_EQ(std::string("1 2 3 4 5 6 7 8 9 10 13 16 17 18 19 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-5,3-7,2-6"sv);
+    numbers = tr_num_parse_range("1-5,3-7,2-6"sv);
     EXPECT_EQ(std::string("1 2 3 4 5 6 7 "), tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-Hello"sv);
+    numbers = tr_num_parse_range("1-Hello"sv);
     auto const empty_string = std::string{};
     EXPECT_EQ(empty_string, tostring(numbers));
 
-    numbers = tr_parseNumberRange("1-"sv);
+    numbers = tr_num_parse_range("1-"sv);
     EXPECT_EQ(empty_string, tostring(numbers));
 
-    numbers = tr_parseNumberRange("Hello"sv);
+    numbers = tr_num_parse_range("Hello"sv);
     EXPECT_EQ(empty_string, tostring(numbers));
 }
 
@@ -222,60 +225,6 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-TEST_F(UtilsTest, trStrlcpy)
-{
-    // destination will be initialized with this char
-    char const initial_char = '1';
-    std::array<char, 100> destination = { initial_char };
-
-    std::vector<std::string> const tests{
-        "a",
-        "",
-        "12345678901234567890",
-        "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
-    };
-
-    for (auto const& test : tests)
-    {
-        auto c_string = test.c_str();
-        auto length = strlen(c_string);
-
-        destination.fill(initial_char);
-
-        auto response = tr_strlcpy(&destination, c_string, 98);
-
-        // Check response length
-        ASSERT_EQ(response, length);
-
-        // Check what was copied
-        for (unsigned i = 0U; i < 97U; ++i)
-        {
-            if (i <= length)
-            {
-                ASSERT_EQ(destination[i], c_string[i]);
-            }
-            else
-            {
-                ASSERT_EQ(destination[i], initial_char);
-            }
-        }
-
-        // tr_strlcpy should only write this far if (length >= 98)
-        if (length >= 98)
-        {
-            ASSERT_EQ(destination[97], '\0');
-        }
-        else
-        {
-            ASSERT_EQ(destination[97], initial_char);
-        }
-
-        // tr_strlcpy should not write this far
-        ASSERT_EQ(destination[98], initial_char);
-        ASSERT_EQ(destination[99], initial_char);
-    }
-}
-
 TEST_F(UtilsTest, env)
 {
     char const* test_key = "TR_TEST_ENV";
@@ -283,21 +232,18 @@ TEST_F(UtilsTest, env)
     unsetenv(test_key);
 
     EXPECT_FALSE(tr_env_key_exists(test_key));
-    EXPECT_EQ(123, tr_env_get_int(test_key, 123));
     EXPECT_EQ(""sv, tr_env_get_string(test_key));
     EXPECT_EQ("a"sv, tr_env_get_string(test_key, "a"sv));
 
     setenv(test_key, "", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
-    EXPECT_EQ(456, tr_env_get_int(test_key, 456));
     EXPECT_EQ("", tr_env_get_string(test_key, ""));
     EXPECT_EQ("", tr_env_get_string(test_key, "b"));
 
     setenv(test_key, "135", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
-    EXPECT_EQ(135, tr_env_get_int(test_key, 789));
     EXPECT_EQ("135", tr_env_get_string(test_key, ""));
     EXPECT_EQ("135", tr_env_get_string(test_key, "c"));
 }
@@ -316,29 +262,29 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    filename.assign(::testing::TempDir(), "filename.txt"sv);
+    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
-    tr_error* error = nullptr;
-    EXPECT_TRUE(tr_saveFile(filename.sv(), contents, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    auto error = tr_error{};
+    EXPECT_TRUE(tr_file_save(filename.sv(), contents, &error));
+    EXPECT_FALSE(error) << error;
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(filename.sv(), buf, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_TRUE(tr_file_read(filename.sv(), buf, &error));
+    EXPECT_FALSE(error) << error;
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);
 
     // remove the tempfile
     EXPECT_TRUE(tr_sys_path_remove(filename, &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
-    EXPECT_FALSE(tr_saveFile(filename.sv(), contents, &error));
-    ASSERT_NE(nullptr, error);
-    EXPECT_NE(0, error->code);
-    tr_error_clear(&error);
+    EXPECT_FALSE(tr_file_save(filename.sv(), contents, &error));
+    ASSERT_TRUE(error);
+    EXPECT_NE(0, error.code());
 }
 
 TEST_F(UtilsTest, ratioToString)

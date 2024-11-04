@@ -9,6 +9,10 @@ Copyright 2017 Endless Mobile, Inc.
   <project_license>GPL-2.0 OR GPL-3.0</project_license>
 
   <name>Transmission</name>
+  <developer_name>The Transmission Project</developer_name>
+  <developer id="transmissionbt.com">
+    <name>The Transmission Project</name>
+  </developer>
   <summary>Download and share files over BitTorrent</summary>
 
   <description>
@@ -29,13 +33,33 @@ Copyright 2017 Endless Mobile, Inc.
     </p>
   </description>
   <url type="homepage">https://transmissionbt.com/</url>
+  <url type="bugtracker">https://github.com/transmission/transmission/issues</url>
+  <url type="faq">https://transmissionbt.com/help/gtk/latest/html/FAQ.html</url>
+  <url type="help">https://transmissionbt.com/help/gtk/latest/index.html</url>
+  <url type="donation">https://transmissionbt.com/donate</url>
+  <url type="translate">https://explore.transifex.com/transmissionbt/transmissionbt/</url>
+  <url type="contact">https://github.com/transmission/transmission/discussions</url>
+  <url type="vcs-browser">https://github.com/transmission/transmission</url>
+  <url type="contribute">https://github.com/transmission/transmission/blob/main/CONTRIBUTING.md</url>
   <screenshots>
     <screenshot type="default">
       <image type="source">https://raw.githubusercontent.com/transmission/transmission/main/gtk/screenshots/a.png</image>
+      <caption>Main window, showing an ongoing download of Fedora Workstation</caption>
     </screenshot>
   </screenshots>
   <update_contact>info_AT_transmissionbt.com</update_contact>
   <content_rating type="oars-1.1">
     <content_attribute id="social-info">mild</content_attribute>
   </content_rating>
+  <releases>
+    <release date="2023-12-06" version="4.0.5" />
+    <release date="2023-08-23" version="4.0.4" />
+    <release date="2023-04-14" version="4.0.3" />
+    <release date="2023-03-16" version="4.0.2" />
+    <release date="2023-02-23" version="4.0.1" />
+    <release date="2023-02-08" version="4.0.0" />
+    <release date="2020-05-03" version="3.00" />
+  </releases>
+  <translation type="gettext">transmission-gtk</translation>
+  <launchable type="desktop-id">transmission-gtk.desktop</launchable>
 </component>

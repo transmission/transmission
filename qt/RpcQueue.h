@@ -1,4 +1,4 @@
-// This file Copyright © 2016-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,13 +7,13 @@
 
 #include <cstdint>
 #include <functional>
+#include <queue>
 #include <type_traits>
+#include <utility>
 
 #include <QFutureInterface>
 #include <QFutureWatcher>
 #include <QObject>
-#include <QPair>
-#include <QQueue>
 
 #include <libtransmission/tr-macros.h>
 
@@ -27,7 +27,7 @@ class RpcQueue : public QObject
 public:
     explicit RpcQueue(QObject* parent = nullptr);
 
-    void setTolerateErrors(bool tolerate_errors = true)
+    constexpr void setTolerateErrors(bool tolerate_errors = true)
     {
         tolerate_errors_ = tolerate_errors;
     }
@@ -35,13 +35,13 @@ public:
     template<typename Func>
     void add(Func func)
     {
-        queue_.enqueue(qMakePair(normalizeFunc(func), ErrorHandlerFunction()));
+        queue_.emplace(normalizeFunc(func), ErrorHandlerFunction());
     }
 
     template<typename Func, typename ErrorHandler>
     void add(Func func, ErrorHandler error_handler)
     {
-        queue_.enqueue(qMakePair(normalizeFunc(func), normalizeErrorHandler(error_handler)));
+        queue_.emplace(normalizeFunc(func), normalizeErrorHandler(error_handler));
     }
 
     // The first function in queue is ran synchronously
@@ -151,7 +151,7 @@ private:
     Tag const tag_ = next_tag++;
     bool tolerate_errors_ = {};
     QFutureInterface<RpcResponse> promise_;
-    QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;
+    std::queue<std::pair<QueuedFunction, ErrorHandlerFunction>> queue_;
     ErrorHandlerFunction next_error_handler_;
     QFutureWatcher<RpcResponse> future_watcher_;
 

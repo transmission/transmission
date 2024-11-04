@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,8 +15,9 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h" // tr_block_index_t
-#include "peer-common.h" // tr_peer*
+#include "libtransmission/transmission.h" // tr_block_index_t
+
+struct tr_peer;
 
 /**
  * Bookkeeping for the active requests we have --

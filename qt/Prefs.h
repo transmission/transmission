@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,7 +8,6 @@
 #include <array>
 
 #include <QObject>
-#include <QSet>
 #include <QString>
 #include <QVariant>
 
@@ -198,13 +197,12 @@ private:
         int type;
     };
 
-    void initDefaults(tr_variant*) const;
+    [[nodiscard]] static tr_variant get_default_app_settings();
 
     void set(int key, char const* value) = delete;
 
     QString const config_dir_;
 
-    QSet<int> temporary_prefs_;
     std::array<QVariant, PREFS_COUNT> mutable values_;
 
     static std::array<PrefItem, PREFS_COUNT> const Items;

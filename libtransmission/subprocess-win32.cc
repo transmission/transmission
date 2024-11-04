@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,29 +12,30 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <fmt/xchar.h> // for wchar_t support
 
 #include <windows.h>
 
-#include "transmission.h"
-#include "error.h"
-#include "subprocess.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/error.h"
+#include "libtransmission/subprocess.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
 namespace
 {
 
-enum class tr_app_type
+enum class tr_app_type : uint8_t
 {
     EXE,
     BATCH
 };
 
-void set_system_error(tr_error** error, DWORD code, std::string_view what)
+void set_system_error(tr_error* error, DWORD code, std::string_view what)
 {
     if (error == nullptr)
     {
@@ -43,25 +44,30 @@ void set_system_error(tr_error** error, DWORD code, std::string_view what)
 
     if (auto const message = tr_win32_format_message(code); !std::empty(message))
     {
-        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message));
+        error->set(code, fmt::format("{:s} failed: {:s}", what, message));
     }
     else
     {
-        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: Unknown error: {:#08x}"), what, code));
+        error->set(code, fmt::format("{:s} failed: Unknown error: {:#08x}", what, code));
     }
+}
+
+constexpr bool to_bool(BOOL value) noexcept
+{
+    return value != FALSE;
 }
 
 // "The sort is case-insensitive, Unicode order, without regard to locale" © MSDN
 class WStrICompare
 {
 public:
-    [[nodiscard]] auto compare(std::wstring_view a, std::wstring_view b) const noexcept // <=>
+    [[nodiscard]] static auto compare(std::wstring_view a, std::wstring_view b) noexcept // <=>
     {
         int diff = wcsnicmp(std::data(a), std::data(b), std::min(std::size(a), std::size(b)));
 
         if (diff == 0)
         {
-            diff = std::size(a) < std::size(b) ? -1 : (std::size(a) > std::size(b) ? 1 : 0);
+            diff = tr_compare_3way(std::size(a), std::size(b));
         }
 
         return diff;
@@ -88,7 +94,7 @@ auto to_env_string(SortedWideEnv const& wide_env)
 
     for (auto const& [key, val] : wide_env)
     {
-        fmt::format_to(std::back_inserter(ret), FMT_STRING(L"{:s}={:s}"), key, val);
+        fmt::format_to(std::back_inserter(ret), L"{:s}={:s}", key, val);
         ret.insert(std::end(ret), L'\0');
     }
 
@@ -143,12 +149,14 @@ auto get_current_env()
 
 void append_argument(std::string& arguments, char const* argument)
 {
+    TR_ASSERT(argument != nullptr);
+
     if (!std::empty(arguments))
     {
         arguments += ' ';
     }
 
-    if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == nullptr)
+    if (*argument != '\0' && strpbrk(argument, " \t\n\v\"") == nullptr)
     {
         arguments += argument;
         return;
@@ -174,6 +182,9 @@ void append_argument(std::string& arguments, char const* argument)
 
         case '"':
             backslash_count = backslash_count * 2 + 1;
+            break;
+
+        default:
             break;
         }
 
@@ -204,7 +215,7 @@ auto get_app_type(char const* app)
 {
     auto const lower = tr_strlower(app);
 
-    if (tr_strvEndsWith(lower, ".cmd") || tr_strvEndsWith(lower, ".bat"))
+    if (tr_strv_ends_with(lower, ".cmd") || tr_strv_ends_with(lower, ".bat"))
     {
         return tr_app_type::BATCH;
     }
@@ -270,7 +281,7 @@ bool tr_spawn_async(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
     std::string_view work_dir,
-    tr_error** error)
+    tr_error* error)
 {
     // full_env = current_env + env;
     auto full_env = get_current_env();
@@ -295,7 +306,7 @@ bool tr_spawn_async(
 
     PROCESS_INFORMATION pi;
 
-    bool const ret = CreateProcessW(
+    bool const ret = to_bool(CreateProcessW(
         nullptr,
         std::data(cmd_line),
         nullptr,
@@ -305,7 +316,7 @@ bool tr_spawn_async(
         std::empty(full_env) ? nullptr : to_env_string(full_env).data(),
         std::empty(current_dir) ? nullptr : current_dir.c_str(),
         &si,
-        &pi);
+        &pi));
 
     if (ret)
     {

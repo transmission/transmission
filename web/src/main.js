@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -18,7 +18,7 @@ function main() {
   const transmission = new Transmission(action_manager, notifications, prefs);
 
   const scroll_soon = debounce(() =>
-    transmission.elements.torrent_list.scrollTo(0, 1)
+    transmission.elements.torrent_list.scrollTo(0, 1),
   );
   window.addEventListener('load', scroll_soon);
   window.addEventListener('orientationchange', scroll_soon);

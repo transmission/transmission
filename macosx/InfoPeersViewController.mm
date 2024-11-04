@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -49,6 +49,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightPeers"];
     if (height != 0.0)
     {
@@ -91,7 +92,6 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     [self setWebSeedTableHidden:YES animate:NO];
 }
 
-#warning subclass?
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
@@ -140,6 +140,13 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     NSUInteger ltep = 0;
     NSUInteger toUs = 0;
     NSUInteger fromUs = 0;
+    NSUInteger knownTracker = 0;
+    NSUInteger knownIncoming = 0;
+    NSUInteger knownCache = 0;
+    NSUInteger knownLpd = 0;
+    NSUInteger knownPex = 0;
+    NSUInteger knownDht = 0;
+    NSUInteger knownLtep = 0;
     BOOL anyActive = false;
     for (Torrent* torrent in self.fTorrents)
     {
@@ -169,6 +176,13 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
                 fromUs += torrent.peersGettingFromUs;
             }
         }
+        knownTracker += torrent.totalKnownPeersTracker;
+        knownIncoming += torrent.totalKnownPeersIncoming;
+        knownCache += torrent.totalKnownPeersCache;
+        knownLpd += torrent.totalKnownPeersLocal;
+        knownPex += torrent.totalKnownPeersPex;
+        knownDht += torrent.totalKnownPeersDHT;
+        knownLtep += torrent.totalKnownPeersLTEP;
     }
 
     [self.fPeers sortUsingDescriptors:self.peerSortDescriptors];
@@ -209,44 +223,8 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
                 connectedText = [connectedText stringByAppendingFormat:@": %@", [upDownComponents componentsJoinedByString:@", "]];
             }
 
-            NSMutableArray* fromComponents = [NSMutableArray arrayWithCapacity:7];
-            if (tracker > 0)
-            {
-                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"),
-                                                                              tracker]];
-            }
-            if (incoming > 0)
-            {
-                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"),
-                                                                              incoming]];
-            }
-            if (cache > 0)
-            {
-                [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
-            }
-            if (lpd > 0)
-            {
-                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"),
-                                                                              lpd]];
-            }
-            if (pex > 0)
-            {
-                [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
-            }
-            if (dht > 0)
-            {
-                [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
-            }
-            if (ltep > 0)
-            {
-                [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
-            }
-
-            connectedText = [connectedText stringByAppendingFormat:@"\n%@", [fromComponents componentsJoinedByString:@", "]];
+            connectedText = [connectedText
+                stringByAppendingFormat:@"\n%@", [self connectedTextFrom:tracker:incoming:cache:lpd:pex:dht:ltep]];
         }
 
         self.fConnectedPeersField.stringValue = connectedText;
@@ -265,6 +243,67 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 
         self.fConnectedPeersField.stringValue = notActiveString;
     }
+    auto totalKnown = knownTracker + knownIncoming + knownCache + knownLpd + knownPex + knownDht + knownLtep;
+    NSString* knownText = [self connectedTextFrom:knownTracker:knownIncoming:knownCache:knownLpd:knownPex:knownDht:knownLtep];
+    if (totalKnown <= 1)
+    {
+        self.fConnectedPeersField.toolTip = [NSLocalizedString(@"Known:", "Inspector -> Peers tab -> peers")
+            stringByAppendingFormat:@" %@", totalKnown > 0 ? knownText : @"0"];
+    }
+    else
+    {
+        self.fConnectedPeersField.toolTip = [[NSString
+            localizedStringWithFormat:NSLocalizedString(@"%lu Known:", "Inspector -> Peers tab -> peers"), totalKnown]
+            stringByAppendingFormat:@" %@", knownText];
+    }
+}
+
+- (NSString*)connectedTextFrom:(NSUInteger)tracker //
+                              :(NSUInteger)incoming
+                              :(NSUInteger)cache
+                              :(NSUInteger)lpd
+                              :(NSUInteger)pex
+                              :(NSUInteger)dht
+                              :(NSUInteger)ltep
+{
+    NSMutableArray* fromComponents = [NSMutableArray arrayWithCapacity:7];
+    if (tracker > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"), tracker]];
+    }
+    if (incoming > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"), incoming]];
+    }
+    if (cache > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
+    }
+    if (lpd > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"), lpd]];
+    }
+    if (pex > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
+    }
+    if (dht > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
+    }
+    if (ltep > 0)
+    {
+        [fromComponents
+            addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
+    }
+
+    return [fromComponents componentsJoinedByString:@", "];
 }
 
 - (void)saveViewSize
@@ -314,7 +353,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 
         if ([ident isEqualToString:@"Encryption"])
         {
-            return [peer[@"Encryption"] boolValue] ? [NSImage systemSymbol:@"lock.fill" withFallback:@"Lock"] : nil;
+            return [peer[@"Encryption"] boolValue] ? [NSImage imageWithSystemSymbolName:@"lock.fill" accessibilityDescription:nil] : nil;
         }
         else if ([ident isEqualToString:@"Client"])
         {
@@ -428,8 +467,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
         {
             portString = NSLocalizedString(@"N/A", "Inspector -> Peers tab -> table row tooltip");
         }
-        [components addObject:[NSString stringWithFormat:@"%@: %@",
-                                                         NSLocalizedString(@"Port", "Inspector -> Peers tab -> table row tooltip"),
+        [components addObject:[NSString stringWithFormat:NSLocalizedString(@"Port: %@", "Inspector -> Peers tab -> table row tooltip"),
                                                          portString]];
 
         NSInteger const peerFrom = [peer[@"From"] integerValue];

@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,9 +11,9 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "tr-macros.h" // tr_sha1_digest_t
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
@@ -31,6 +31,7 @@ struct tr_url_parsed_t
     std::string_view scheme; // "http"
     std::string_view authority; // "example.com:80"
     std::string_view host; // "example.com"
+    std::string_view host_wo_brackets; // "example.com" ("[::1]" -> "::1")
     std::string_view sitename; // "example"
     std::string_view path; // /"over/there"
     std::string_view query; // "name=ferret"

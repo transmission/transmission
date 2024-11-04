@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,10 +9,7 @@
 
 @class FileListNode;
 
-typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
-    TorrentDeterminationAutomatic = 0,
-    TorrentDeterminationUserSpecified
-};
+typedef NS_ENUM(NSUInteger, TorrentDeterminationType) { TorrentDeterminationAutomatic = 0, TorrentDeterminationUserSpecified };
 
 extern NSString* const kTorrentDidChangeGroupNotification;
 
@@ -34,8 +31,8 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* currentDirectory;
 
-- (void)getAvailability:(int8_t*)tab size:(NSInteger)size;
-- (void)getAmountFinished:(float*)tab size:(NSInteger)size;
+- (void)getAvailability:(int8_t*)tab size:(int)size;
+- (void)getAmountFinished:(float*)tab size:(int)size;
 @property(nonatomic) NSIndexSet* previousFinishedPieces;
 
 - (void)update;
@@ -45,7 +42,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)startTransfer;
 - (void)startMagnetTransferAfterMetaDownload;
 - (void)stopTransfer;
-- (void)startQueue;
 - (void)sleep;
 - (void)wakeUp;
 - (void)idleLimitHit;
@@ -114,6 +110,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* torrentLocation;
 @property(nonatomic, readonly) NSString* dataLocation;
+@property(nonatomic, readonly) NSString* lastKnownDataLocation;
 - (NSString*)fileLocation:(FileListNode*)node;
 
 - (void)renameTorrent:(NSString*)newName completionHandler:(void (^)(BOOL didRename))completionHandler;
@@ -121,6 +118,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
               withName:(NSString*)newName
      completionHandler:(void (^)(BOOL didRename))completionHandler;
 
+@property(nonatomic, readonly) time_t eta;
 @property(nonatomic, readonly) CGFloat progress;
 @property(nonatomic, readonly) CGFloat progressDone;
 @property(nonatomic, readonly) CGFloat progressLeft;
@@ -161,6 +159,14 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSUInteger totalPeersDHT;
 @property(nonatomic, readonly) NSUInteger totalPeersLocal;
 @property(nonatomic, readonly) NSUInteger totalPeersLTEP;
+
+@property(nonatomic, readonly) NSUInteger totalKnownPeersTracker;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersIncoming;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersCache;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersPex;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersDHT;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersLocal;
+@property(nonatomic, readonly) NSUInteger totalKnownPeersLTEP;
 
 @property(nonatomic, readonly) NSUInteger peersSendingToUs;
 @property(nonatomic, readonly) NSUInteger peersGettingFromUs;

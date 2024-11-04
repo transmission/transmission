@@ -12,8 +12,8 @@ target_sources(${TR_NAME}-gtk
         DetailsDialog.h
         Dialogs.cc
         Dialogs.h
+        DynamicPropertyStore.h
         FaviconCache.cc
-        FaviconCache.h
         FileList.cc
         FileList.h
         FilterBar.cc
@@ -73,6 +73,10 @@ target_sources(${TR_NAME}-gtk
         Utils.cc
         Utils.h)
 
+tr_allow_compile_if(
+    [=[[GTK_VERSION EQUAL 3]]=]
+        TorrentCellRenderer.cc)
+
 target_sources(${TR_NAME}-gtk
     PRIVATE
         ui/gtk3/AddTrackerDialog.ui
@@ -106,6 +110,8 @@ target_sources(${TR_NAME}-gtk
         ui/gtk4/PrefsDialog.ui
         ui/gtk4/RelocateDialog.ui
         ui/gtk4/StatsDialog.ui
+        ui/gtk4/TorrentListItemCompact.ui
+        ui/gtk4/TorrentListItemFull.ui
         ui/gtk4/TorrentUrlChooserDialog.ui)
 
 source_group(Ui/GTK4
@@ -158,21 +164,23 @@ target_compile_definitions(${TR_NAME}-gtk
     PRIVATE
         TRANSMISSIONLOCALEDIR="${CMAKE_INSTALL_FULL_LOCALEDIR}"
         GETTEXT_PACKAGE="${TR_NAME}-gtk"
-        G_DISABLE_DEPRECATED
-        GDK_PIXBUF_DISABLE_DEPRECATED
-        GDK_DISABLE_DEPRECATED
-        GTK_DISABLE_DEPRECATED
-        PANGO_DISABLE_DEPRECATED
-        # FIXME: these break libnotify's headers
-        # G_DISABLE_SINGLE_INCLUDES
-        # GTK_DISABLE_SINGLE_INCLUDES
-        GDKMM_DISABLE_DEPRECATED
-        GIOMM_DISABLE_DEPRECATED
-        GLIBMM_DISABLE_DEPRECATED
-        GTKMM_DISABLE_DEPRECATED
-        PANGOMM_DISABLE_DEPRECATED
-        SIGCXX_DISABLE_DEPRECATED
         $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>)
+
+if(NOT ENABLE_DEPRECATED)
+    target_compile_definitions(${TR_NAME}-gtk
+        PRIVATE
+            G_DISABLE_DEPRECATED
+            GDK_PIXBUF_DISABLE_DEPRECATED
+            GDK_DISABLE_DEPRECATED
+            GTK_DISABLE_DEPRECATED
+            PANGO_DISABLE_DEPRECATED
+            GDKMM_DISABLE_DEPRECATED
+            GIOMM_DISABLE_DEPRECATED
+            GLIBMM_DISABLE_DEPRECATED
+            GTKMM_DISABLE_DEPRECATED
+            PANGOMM_DISABLE_DEPRECATED
+            SIGCXX_DISABLE_DEPRECATED)
+endif()
 
 target_compile_options(${TR_NAME}-gtk
     PRIVATE
@@ -218,7 +226,7 @@ foreach(ICON ${PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
     install(
-        FILES icons/${ICON}
+        FILES ${SOURCE_ICONS_DIR}/${ICON}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/
         RENAME ${ICON_NAME})
 endforeach()

@@ -52,4 +52,10 @@ foreach(P daemon)
             FILES ${TR_NAME}-${P}.1
             DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
     endif()
+
+    if (WITH_SYSTEMD)
+        install(
+            FILES ${TR_NAME}-${P}.service
+            DESTINATION lib/systemd/system)
+    endif()
 endforeach()
