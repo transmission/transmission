@@ -416,6 +416,7 @@ public:
         std::string script_torrent_added_filename;
         std::string script_torrent_done_filename;
         std::string script_torrent_done_seeding_filename;
+        std::string proxy_url;
         tr_encryption_mode encryption_mode = TR_ENCRYPTION_PREFERRED;
         tr_log_level log_level = TR_LOG_INFO;
         tr_mode_t umask = 022;
@@ -462,6 +463,7 @@ public:
                 { TR_KEY_port_forwarding_enabled, &port_forwarding_enabled },
                 { TR_KEY_preallocation, &preallocation_mode },
                 { TR_KEY_preferred_transport, &preferred_transport },
+                { TR_KEY_proxy_url, &proxy_url },
                 { TR_KEY_queue_stalled_enabled, &queue_stalled_enabled },
                 { TR_KEY_queue_stalled_minutes, &queue_stalled_minutes },
                 { TR_KEY_ratio_limit, &ratio_limit },
