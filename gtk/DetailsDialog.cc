@@ -13,7 +13,6 @@
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
-#include <pwd.h>
 
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
@@ -22,6 +21,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 #include <glibmm/markup.h>
+#include <glibmm/miscutils.h>
 #include <glibmm/quark.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/adjustment.h>
@@ -1219,11 +1219,9 @@ void initPeerRow(
                 "."));
 
     // Compute location from IP
-    struct passwd* pw = getpwuid(getuid());
-    char const* homedir = pw->pw_dir;
+    std::string homedir = Glib::get_home_dir();
     char executable[256], location[64];
-    ;
-    strcpy(executable, homedir);
+    strcpy(executable, homedir.c_str());
     strcat(executable, "/.ip-to-location/ip_to_location");
     if (access(executable, F_OK) == 0)
     {
