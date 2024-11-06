@@ -258,19 +258,19 @@ struct tr_tracker
             return 20U;
 
         case 2:
-            return tr_rand_int(60U) + 60U * 5U;
+            return tr_rand_int(60U) + (60U * 5U);
 
         case 3:
-            return tr_rand_int(60U) + 60U * 15U;
+            return tr_rand_int(60U) + (60U * 15U);
 
         case 4:
-            return tr_rand_int(60U) + 60U * 30U;
+            return tr_rand_int(60U) + (60U * 30U);
 
         case 5:
-            return tr_rand_int(60U) + 60U * 60U;
+            return tr_rand_int(60U) + (60U * 60U);
 
         default:
-            return tr_rand_int(60U) + 60U * 120U;
+            return tr_rand_int(60U) + (60U * 120U);
         }
     }
 

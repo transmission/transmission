@@ -949,11 +949,12 @@ size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) 
 
 size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piece) const
 {
-    return std::accumulate(
-        std::begin(swarm_.peers),
-        std::end(swarm_.peers),
-        size_t{},
-        [piece](size_t acc, tr_peer* peer) { return acc + (peer->has_piece(piece) ? 1U : 0U); });
+    auto const op = [piece](size_t acc, auto const& peer)
+    {
+        return acc + (peer->has_piece(piece) ? 1U : 0U);
+    };
+    return std::accumulate(std::begin(swarm_.peers), std::end(swarm_.peers), size_t{}, op) +
+        std::accumulate(std::begin(swarm_.webseeds), std::end(swarm_.webseeds), size_t{}, op);
 }
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
@@ -1465,14 +1466,15 @@ namespace get_peers_helpers
 
 [[nodiscard]] bool is_peer_interesting(tr_torrent const* tor, tr_peer_info const& info)
 {
-    if (tor->is_done() && info.is_upload_only())
+    TR_ASSERT(!std::empty(info.listen_port()));
+    if (std::empty(info.listen_port()))
     {
         return false;
     }
 
-    if (info.is_in_use())
+    if (tor->is_done() && info.is_upload_only())
     {
-        return true;
+        return false;
     }
 
     if (info.is_blocklisted(tor->session->blocklist()))
@@ -2128,7 +2130,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
             peer_count / (float)relax_strictness_if_fewer_than_n;
         auto const lo = MinUploadIdleSecs;
         auto const hi = MaxUploadIdleSecs;
-        time_t const limit = hi - (hi - lo) * strictness;
+        time_t const limit = hi - ((hi - lo) * strictness);
 
         if (auto const idle_secs = info->idle_secs(now); idle_secs && *idle_secs > limit)
         {
@@ -2606,15 +2608,13 @@ void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_pee
     }
 
     // only keep the best `max` candidates
-    if (static auto constexpr Max = tr_peerMgr::OutboundCandidates::requested_inline_size; Max < std::size(candidates))
-    {
-        std::partial_sort(
-            std::begin(candidates),
-            std::begin(candidates) + Max,
-            std::end(candidates),
-            [](auto const& a, auto const& b) { return a.score < b.score; });
-        candidates.resize(Max);
-    }
+    auto const n_keep = std::min(tr_peerMgr::OutboundCandidates::requested_inline_size, std::size(candidates));
+    std::partial_sort(
+        std::begin(candidates),
+        std::begin(candidates) + n_keep,
+        std::end(candidates),
+        [](auto const& a, auto const& b) { return a.score < b.score; });
+    candidates.resize(n_keep);
 
     // put the best candidates at the end of the list
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
