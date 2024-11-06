@@ -482,8 +482,6 @@ public:
                 task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
                 return CURL_WRITEFUNC_PAUSE;
             }
-
-            task->impl.mediator.notifyBandwidthConsumed(*tag, bytes_used);
         }
 
         evbuffer_add(task->body(), data, bytes_used);
