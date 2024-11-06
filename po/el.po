@@ -283,14 +283,14 @@ msgstr "Άγνωστος"
 #: ../gtk/DetailsDialog.cc:876 ../gtk/MakeDialog.cc:388
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{total_size} σε {file_count:L} αρχείο"
+msgstr[1] "{total_size} σε {file_count:L} αρχεία"
 
 #: ../gtk/DetailsDialog.cc:891 ../gtk/MakeDialog.cc:394
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "({piece_count} κομμάτι BitTorrent @ {piece_size})"
+msgstr[1] "({piece_count} κομμάτια BitTorrent @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:935
 msgid "{current_size} ({percent_done}%)"
@@ -430,8 +430,8 @@ msgstr "Διαμοιραστές δικτύου"
 #: ../gtk/DetailsDialog.cc:1812
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Λήφθηκε λίστα {markup_begin}{peer_count} διαμοιραστή{markup_end} {time_span_ago}"
+msgstr[1] "Λήφθηκε λίστα {markup_begin}{peer_count} διαμοιραστών{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1824
@@ -480,7 +480,7 @@ msgstr[1] "λήπτες"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1906
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Λήφθηκε σφάλμα απόξεσης '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1923
 msgid "Asking for peer counts in {time_span_from_now}"
@@ -636,7 +636,7 @@ msgstr "Ε_μφάνιση:"
 
 #: ../gtk/FilterBar.cc:587
 msgid "_Show {count:L} of:"
-msgstr ""
+msgstr "Ε_μφάνιση {count:L} από:"
 
 #: ../gtk/FreeSpaceLabel.cc:54
 msgid "{disk_space} free"
@@ -647,12 +647,16 @@ msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Απενεργοποίηση Εναλλακτικών Ορίων Ταχύτητας\n"
+" ({download_speed} κάτω, {upload_speed} πάνω)"
 
 #: ../gtk/MainWindow.cc:382
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Ενεργοποίηση Εναλλακτικών Ορίων Ταχύτητας\n"
+" ({download_speed} κάτω, {upload_speed} πάνω)"
 
 #: ../gtk/MainWindow.cc:434
 msgid "Unlimited"
@@ -701,12 +705,12 @@ msgstr "Αναλογία: {ratio}"
 #: ../gtk/MainWindow.cc:767
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Κάτω: {downloaded_size}, Πάνω: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:775
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Κάτω: {downloaded_size}, Πάνω: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:809
 msgid "{download_speed} ▼"
@@ -730,7 +734,7 @@ msgstr "Αδυναμία δημιουργίας '{path}': {error} ({error_code})
 
 #: ../gtk/MakeDialog.cc:227
 msgid "Scanned {file_size}"
-msgstr ""
+msgstr "Σαρώθηκαν {file_size}"
 
 #: ../gtk/MakeDialog.cc:382 ../gtk/MakeDialog.cc:545 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
 msgid "No source selected"
@@ -856,16 +860,16 @@ msgstr "Σαββατοκύριακα"
 #: ../gtk/PrefsDialog.cc:553
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Η λίστα φραγής έχει {count:L} καταχώρηση"
+msgstr[1] "Η λίστα φραγής έχει {count:L} καταχωρήσεις"
 
 #: ../gtk/PrefsDialog.cc:569
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "Η λίστα φραγής ενημερώθηκε!"
 
 #: ../gtk/PrefsDialog.cc:569
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "Αδυναμία ενημέρωσης λίστας φραγής"
 
 #: ../gtk/PrefsDialog.cc:581
 msgid "Getting new blocklist…"
@@ -919,7 +923,7 @@ msgstr "Ενεργοποίηση αδρανοποίησης επιφάνειας
 
 #: ../gtk/Session.cc:1182
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Αδυναμία εύρεσης εκρεμμούς PRC αιτήματος για την ετικέτα {tag}"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -955,20 +959,20 @@ msgstr "{current_size} από {complete_size} ({percent_done}%)"
 #: ../gtk/Torrent.cc:476
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{current_size} από {complete_size} ({percent_complete}%), {uploaded_size} ανεβασμένα (Αναλογία: {ratio}, Στόχος: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:488
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{current_size} από {complete_size} ({percent_complete}%), {uploaded_size} ανεβασμένα (Αναλογία: {ratio})"
 
 #: ../gtk/Torrent.cc:498
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{complete_size}, {uploaded_size} ανεβασμένα (Αναλογία: {ratio}, Στόχος: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:507
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{complete_size}, {uploaded_size} ανεβασμένα (Αναλογία: {ratio})"
 
 #: ../gtk/Torrent.cc:520
 msgid "Remaining time unknown"
@@ -998,56 +1002,56 @@ msgstr "Τοπικό σφάλμα: '{error}'"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Λήψη μεταδεδομένων από {active_count} συνδεδεμένο διαμοιραστή (ολοκληρωμένη κατά {percent_done}%)"
+msgstr[1] "Λήψη μεταδεδομένων από {active_count} συνδεδεμένους διαμοιραστές (ολοκληρωμένη κατά {percent_done}%)"
 
 #: ../gtk/Torrent.cc:681
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Λήψη από {active_count} από {connected_count} συνδεδεμένο διαμοιραστή και διαμοιραστή δικτύου"
+msgstr[1] "Λήψη από {active_count} από {connected_count} συνδεδεμένους διαμοιραστές και διαμοιραστές δικτύου"
 
 #: ../gtk/Torrent.cc:692
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Λήψη από {active_count} διαμοιραστή δικτύου"
+msgstr[1] "Λήψη από {active_count} διαμοιραστές δικτύου"
 
 #: ../gtk/Torrent.cc:700
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Λήψη από {active_count} από {connected_count} συνδεδεμένο διαμοιραστή"
+msgstr[1] "Λήψη από {active_count} από {connected_count} συνδεδεμένους διαμοιραστές"
 
 #: ../gtk/Torrent.cc:709
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Διαμοιρασμός σε {active_count} από {connected_count} συνδεδεμένο διαμοιραστή"
+msgstr[1] "Διαμοιρασμός σε {active_count} από {connected_count} συνδεδεμένους διαμοιραστές"
 
 #: ../gtk/Utils.cc:134
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_from_now:L} μέρα από τώρα"
+msgstr[1] "{days_from_now:L} μέρες από τώρα"
 
 #: ../gtk/Utils.cc:141
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_from_now:L} ώρα από τώρα"
+msgstr[1] "{hours_from_now:L} ώρες από τώρα"
 
 #: ../gtk/Utils.cc:148
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_from_now:L} λεπτό από τώρα"
+msgstr[1] "{minutes_from_now:L} λεπτά από τώρα"
 
 #: ../gtk/Utils.cc:155
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_from_now:L} δευτερόλεπτο από τώρα"
+msgstr[1] "{seconds_from_now:L} δευτερόλεπτα από τώρα"
 
 #: ../gtk/Utils.cc:159 ../gtk/Utils.cc:190 ../gtk/Utils.cc:217 ../gtk/Utils.cc:250
 msgid "now"
@@ -1056,103 +1060,103 @@ msgstr "τώρα"
 #: ../gtk/Utils.cc:166
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "πριν {days_ago:L} μέρα"
+msgstr[1] "πριν {days_ago:L} μέρες"
 
 #: ../gtk/Utils.cc:172
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "πριν {hours_ago:L} ώρα"
+msgstr[1] "πριν {hours_ago:L} ώρες"
 
 #: ../gtk/Utils.cc:179
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "πριν {minutes_ago:L} λεπτό"
+msgstr[1] "πριν {minutes_ago:L} λεπτά"
 
 #: ../gtk/Utils.cc:186
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "πριν {seconds_ago:L} δευτερόλεπτο"
+msgstr[1] "πριν {seconds_ago:L} δευτερόλεπτα"
 
 #: ../gtk/Utils.cc:199
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days:L} μέρα"
+msgstr[1] "{days:L} μέρες"
 
 #: ../gtk/Utils.cc:204
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} ώρα"
+msgstr[1] "{hours:L} ώρες"
 
 #: ../gtk/Utils.cc:209
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} λεπτό"
+msgstr[1] "{minutes:L} λεπτά"
 
 #: ../gtk/Utils.cc:214
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} δευτερόλεπτο"
+msgstr[1] "{seconds:L} δευτερόλεπτα"
 
 #: ../gtk/Utils.cc:225
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "μένει {days_left:L} μέρα"
+msgstr[1] "μένουν {days_left:L} μέρες"
 
 #: ../gtk/Utils.cc:232
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "μένει {hours_left:L} ώρα"
+msgstr[1] "μένουν {hours_left:L} ώρες"
 
 #: ../gtk/Utils.cc:239
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "μένει {minutes_left:L} λεπτό"
+msgstr[1] "μένουν {minutes_left:L} λεπτά"
 
 #: ../gtk/Utils.cc:246
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "μένει {seconds_left:L} δευτερόλεπτο"
+msgstr[1] "μένουν {seconds_left:L} δευτερόλεπτα"
 
 #: ../gtk/Utils.cc:265
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr ""
+msgstr "Το μονοπάτι του αρχείου torrent '{path}' χρησιμοποιείται ήδη από το '{torrent_name}'."
 
 #: ../gtk/Utils.cc:276
 msgid "Couldn't open torrent"
-msgstr ""
+msgstr "Αδυναμία ανοίγματος torrent"
 
 #: ../gtk/Utils.cc:536
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία μετακίνησης '{path}' στον κάδο: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:643
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Αδυναμία ανοίγματος '{url}'"
 
 #: ../gtk/Utils.cc:860 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
-msgstr ""
+msgstr "Μη υποστηριζόμενο URL: '{url}'"
 
 #. modal
 #: ../gtk/Utils.cc:866
 msgid "Transmission doesn't know how to use '{url}'"
-msgstr ""
+msgstr "Το Transmission δεν γνωρίζει πως να χρησιμοποιήσει το '{url}'"
 
 #: ../gtk/Utils.cc:871
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Αυτός ο μαγνητικός σύνδεσμος μοιάζει να προορίζεται για κάτι διαφορετικό του BitTorrent."
 
 #: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1181,7 +1185,7 @@ msgstr "[αρχεία torrent ή urls]"
 
 #: ../gtk/main.cc:106
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Εκτελέστε '{program} --help' για να δείτε την πλήρη λίστα των διαθέσιμων εντολών.\n"
 
 #: ../gtk/main.cc:120
 msgid "B/s"
@@ -1189,19 +1193,19 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
-msgstr "GB/s"
+msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "MB/s"
-msgstr "MB/s"
+msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "TB/s"
-msgstr "TB/s"
+msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "kB/s"
-msgstr "kB/s"
+msgstr ""
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
@@ -1209,35 +1213,35 @@ msgstr ""
 
 #: ../gtk/main.cc:121
 msgid "GiB"
-msgstr "GiB"
+msgstr ""
 
 #: ../gtk/main.cc:121
 msgid "KiB"
-msgstr "KiB"
+msgstr ""
 
 #: ../gtk/main.cc:121
 msgid "MiB"
-msgstr "MiB"
+msgstr ""
 
 #: ../gtk/main.cc:121
 msgid "TiB"
-msgstr "TiB"
+msgstr ""
 
 #: ../gtk/main.cc:122
 msgid "GB"
-msgstr "GB"
+msgstr ""
 
 #: ../gtk/main.cc:122
 msgid "MB"
-msgstr "MB"
+msgstr ""
 
 #: ../gtk/main.cc:122
 msgid "TB"
-msgstr "TB"
+msgstr ""
 
 #: ../gtk/main.cc:122
 msgid "kB"
-msgstr "kB"
+msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1574,7 +1578,7 @@ msgstr "Προέλευση:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:402 ../gtk/ui/gtk4/DetailsDialog.ui:296
 msgid "Added:"
-msgstr ""
+msgstr "Προστέθηκαν:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
@@ -1614,11 +1618,11 @@ msgstr "Τήρηση καθολικών _ορίων"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:873 ../gtk/ui/gtk4/DetailsDialog.ui:626
 msgid "Limit _download speed ({speed_units}):"
-msgstr ""
+msgstr "Περιορισμός ταχύτητας _κατεβάσματος ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:888 ../gtk/ui/gtk4/DetailsDialog.ui:638
 msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
+msgstr "Περιορισμός ταχύτητας _ανεβάσματος ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:905 ../gtk/ui/gtk3/OptionsDialog.ui:145 ../gtk/ui/gtk4/DetailsDialog.ui:650 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
@@ -1657,10 +1661,12 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Για την προσθήκη εφεδρικού URL, προσθέστε το στην επόμενη γραμμή μετά το κύριο URL.\n"
+"Για την προσθήκη νέου κύριου URL, προσθέστε το μετά από μία κενή γραμμή."
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:123 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "Δείτε επίσης τους Προεπιλεγμένους Δημόσιους Ιχνηλάτες στο Επεξεργασία > Προτιμήσεις > Δίκτυο"
 
 #: ../gtk/ui/gtk3/MainWindow.ui:144
 msgid "Torrent"
@@ -1692,7 +1698,7 @@ msgstr "Α_ρχείο προέλευσης:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:193 ../gtk/ui/gtk4/MakeDialog.ui:115
 msgid "Piece size:"
-msgstr ""
+msgstr "Μέγεθος κομματιού:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:244 ../gtk/ui/gtk4/MakeDialog.ui:150
 msgid "Properties"
@@ -1708,7 +1714,7 @@ msgstr "Σ_χόλιο:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:360 ../gtk/ui/gtk4/MakeDialog.ui:235
 msgid "_Source:"
-msgstr ""
+msgstr "_Πηγή:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:387 ../gtk/ui/gtk4/MakeDialog.ui:258
 msgid "_Private torrent"
@@ -1764,7 +1770,7 @@ msgstr "_Εκκίνηση κατά την προσθήκη"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:479 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:315
 msgid "Mo_ve torrent file to the trash"
-msgstr ""
+msgstr "_Μετακίνηση αρχείου torrent στον κάδο"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:8 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -1777,12 +1783,12 @@ msgstr "Όρια ταχύτητας"
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:95 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
-msgstr ""
+msgstr "_Ανέβασμα ({speed_units}):"
 
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:110 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr ""
+msgstr "_Κατέβασμα ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:175 ../gtk/ui/gtk4/PrefsDialog.ui:97
 msgid "Alternative Speed Limits"
@@ -1795,12 +1801,12 @@ msgstr "Παράκαμψη συνηθισμένων ορίων ταχυτήτω�
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:235 ../gtk/ui/gtk4/PrefsDialog.ui:133
 msgid "U_pload ({speed_units}):"
-msgstr ""
+msgstr "Α_νέβασμα ({speed_units}):"
 
 #. Labels a spinbutton for alternate download speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:249 ../gtk/ui/gtk4/PrefsDialog.ui:145
 msgid "Do_wnload ({speed_units}):"
-msgstr ""
+msgstr "Κα_τέβασμα ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:261 ../gtk/ui/gtk4/PrefsDialog.ui:157
 msgid "_Scheduled times:"
@@ -1822,7 +1828,7 @@ msgstr "Προσθήκη"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:430 ../gtk/ui/gtk4/PrefsDialog.ui:275
 msgid "Automatically add torrent files _from:"
-msgstr ""
+msgstr "Αυτόματη προσθήκη αρχείων torrent _από:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:445 ../gtk/ui/gtk4/PrefsDialog.ui:287
 msgid "Show the Torrent Options _dialog"
@@ -1862,7 +1868,7 @@ msgstr "Διατήρηση _μη ολοκληρωμένων torrents σε:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:731 ../gtk/ui/gtk4/PrefsDialog.ui:498
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Εκτέλεση scrip_t όταν η λήψη ολοκληρωθεί"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:787 ../gtk/ui/gtk4/PrefsDialog.ui:537
 msgctxt "Gerund"
@@ -1883,7 +1889,7 @@ msgstr "Παύση διαμοιρασμού σε περίπτωση αδράνε
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:857 ../gtk/ui/gtk4/PrefsDialog.ui:590
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Εκτέλεση scrip_t όταν ολοκληρωθεί ο διαμοιρασμός:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:923 ../gtk/ui/gtk4/PrefsDialog.ui:639
 msgctxt "Gerund"
@@ -1948,11 +1954,11 @@ msgstr "Μέγιστος αριθμός ομότιμων χρηστών _συν�
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Ενεργοποίηση µ_TP για επικοινωνία διαμοιραστών"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "To µTP είναι ένα εργαλείο μείωσης της συμφόρησης του δικτύου."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "Use PE_X to find more peers"
@@ -1980,7 +1986,7 @@ msgstr "Το LPD είναι ένα εργαλείο ανεύρεσης ομότ�
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
 msgid "Default Public Trackers"
-msgstr ""
+msgstr "Προεπιλεγμένοι Δημόσιοι Ιχνηλάτες"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1565 ../gtk/ui/gtk4/PrefsDialog.ui:1087
 msgid ""
@@ -1989,6 +1995,10 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Ιχνηλάτες προς χρήση σε όλα τα δημόσια torrents.\n"
+"\n"
+"Για την προσθήκη εφεδρικού URL, προσθέστε το στην επόμενη γραμμή μετά το κύριο URL.\n"
+"Για την προσθήκη νέου κύριου URL, προσθέστε το μετά από μία κενή γραμμή."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
 msgid "Network"
@@ -2120,11 +2130,11 @@ msgstr "_URL"
 
 #: ../libtransmission/announcer-http.cc:441
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία προσπέλασης απόκρισης ανακοίνωσης: {error} ({error_code})"
 
 #: ../libtransmission/announcer-http.cc:648
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία προσπέλασης απόκρισης απόξεσης: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:146 ../libtransmission/announcer-udp.cc:247
 msgid "Unknown error"
@@ -2163,121 +2173,121 @@ msgstr "Επιτυχία"
 #: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:401
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Η λίστα φραγής '{path}' έχει {count} καταχώρηση"
+msgstr[1] "Η λίστα φραγής '{path}' έχει {count} καταχωρήσεις"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:257
 msgid "Couldn't parse line: '{line}'"
-msgstr ""
+msgstr "Αδυναμία προσπέλασης γραμμής: '{line}'"
 
 #: ../libtransmission/blocklist.cc:385
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Επανεγγραφή παλιού τύπου αρχείου λίστας φραγής σε νέο τύπο"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:42 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:45
 msgid "{crypto_library} error: {error} ({error_code})"
-msgstr ""
+msgstr "{crypto_library} σφάλμα: {error} ({error_code})"
 
 #: ../libtransmission/global-ip-cache.cc:277
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Επιτυχής ενημέρωση {protocol} διεύθυνσης πηγής σε {ip}"
 
 #: ../libtransmission/global-ip-cache.cc:291
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Το σύστημά σας δεν υποστηρίζει το {protocol}"
 
 #: ../libtransmission/global-ip-cache.cc:315
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Επιτυχής ενημέρωση καθολικής διεύθυνσης {type} σε {ip} με χρήση του {url}"
 
 #: ../libtransmission/inout.cc:119
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία απόκτησης '{path}': {error} ({error_code})"
 
 #: ../libtransmission/log.cc:274
 msgid "Too many messages like this! I won't log this message anymore this session."
-msgstr ""
+msgstr "Πολλά παρόμοια μηνύματα! Παύση καταχώρησης αυτού του μηνύματος σε αυτή τη συνεδρία."
 
 #: ../libtransmission/makemeta.cc:80 ../libtransmission/watchdir.cc:52
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Παράβλεψη '{path}': {error} ({error_code})"
 
 #: ../libtransmission/net.cc:186
 msgid "Couldn't create socket: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας υποδοχής (socket): {error} ({error_code})"
 
 #: ../libtransmission/net.cc:262
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία καθορισμού διεύθυνσης πηγής {address} σε {socket}: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:282
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία σύνδεσης υποδοχής {socket} σε {address}:{port}: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:347
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Αδυναμία δέσμευσης θύρας {port} στην {address}: {error} ({error_code}) -- Μήπως μία άλλη συνεδρία του Transmission τρέχει ήδη;"
 
 #: ../libtransmission/net.cc:348
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δέσμευσης θύρας {port} στην {address}: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:192
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ανοίγματος '{path}': {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:220
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δέσμευσης '{path}': {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:239
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία περικοπής '{path}': {error} ({error_code})"
 
 #: ../libtransmission/peer-io.cc:675
 msgid "Unknown state: {state}"
-msgstr ""
+msgstr "Άγνωστη κατάσταση: {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:90
 msgid "Found public address '{address}'"
-msgstr ""
+msgstr "Βρέθηκε η δημόσια διεύθυνση '{address}'"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:127
 msgid "Port {port} is no longer forwarded"
-msgstr ""
+msgstr "Η θύρα {port} δεν προωθείται πιά"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:181
 msgid "Port {port} forwarded successfully"
-msgstr ""
+msgstr "Η θύρα {port} προωθήθηκε επιτυχώς"
 
 #: ../libtransmission/port-forwarding-upnp.cc:281
 msgid "Found Internet Gateway Device '{url}'"
-msgstr ""
+msgstr "Βρέθηκε Internet Gateway Device '{url}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:282
 msgid "Local Address is '{address}'"
-msgstr ""
+msgstr "Η τοπική διεύθυνση είναι '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:306
 msgid "Port {port} is not forwarded"
-msgstr ""
+msgstr "Η θύρα {port} δεν προωθείται"
 
 #: ../libtransmission/port-forwarding-upnp.cc:316
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr ""
+msgstr "Διακοπή προώθησης θυρών δια μέσου του '{url}', υπηρεσία '{type}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:348
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr ""
+msgstr "Προώθηση θυρών δια μέσου του '{url}', υπηρεσία '{type}'. (τοπική διεύθυνση: {address}:{port})"
 
 #: ../libtransmission/port-forwarding-upnp.cc:356
 msgid "Port {port} is forwarded"
-msgstr ""
+msgstr "Η θύρα {port} προωθείται"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-msgstr ""
+msgstr "Αν ο δρομολογητής σας υποστηρίζει UPnP, παρακαλώ βεβαιωθείτε ότι το UPnP είναι ενεργοποιημένο!"
 
 #: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
@@ -2297,49 +2307,49 @@ msgstr "Δεν έγινε προώθηση"
 
 #: ../libtransmission/port-forwarding.cc:201
 msgid "Mapped private port {private_port} to public port {public_port}"
-msgstr ""
+msgstr "Απεικόνιση ιδιωτικής θύρας {private_port} στη δημόσια θύρα {public_port}"
 
 #: ../libtransmission/port-forwarding.cc:216
 msgid "State changed from '{old_state}' to '{state}'"
-msgstr ""
+msgstr "Η κατάσταση άλλαξε από '{old_state}' σε '{state}'"
 
 #: ../libtransmission/rpc-server.cc:104
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
-msgstr ""
+msgstr "Το μονοπάτι της υποδοχής Unix πρέπει να αποτελείται από λιγότερο από {count} χαρακτήρες (συμπεριλαμβανομένου του προθέματος '{prefix}')"
 
 #: ../libtransmission/rpc-server.cc:598
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
-msgstr ""
+msgstr "Οι υποδοχές Unix δεν υποστηρίζονται στα Windows. Παρακαλώ αλλάξτε το '{key}' στις ρυθμίσεις."
 
 #: ../libtransmission/rpc-server.cc:625
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
-msgstr ""
+msgstr "Αδυναμία καθορισμού λειτουργίας υποδοχής RPC σε {mode:#o}, χρήση προκαθορισμένου 0755"
 
 #: ../libtransmission/rpc-server.cc:688
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδυναμία δέσμευσης στη {address} έπειτα από {count} προσπάθεια, παραίτηση"
+msgstr[1] "Αδυναμία δέσμευσης στη {address} έπειτα από {count} προσπάθειες, παραίτηση"
 
 #: ../libtransmission/rpc-server.cc:699
 msgid "Listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "Παρακολούθηση για RPC και αιτήματα Web στην '{address}'"
 
 #: ../libtransmission/rpc-server.cc:727
 msgid "Stopped listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "Διακοπή παρακολούθηση για RPC και αιτήματα Web στην '{address}'"
 
 #: ../libtransmission/rpc-server.cc:749
 msgid "Added '{entry}' to host whitelist"
-msgstr ""
+msgstr "Προστέθηκε '{entry}' στην λίστα επιτρεπόμενων του οικοδεσπότη"
 
 #: ../libtransmission/rpc-server.cc:883
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
-msgstr ""
+msgstr "Η ρύθμιση '{key}' έχει τιμή '{value}' αλλά πρέπει να είναι μία IPv4 ή IPv6 διεύθυνση ή ένα μονοπάτι υποδοχής Unix. Χρήση προκαθορισμένης τιμής '0.0.0.0'"
 
 #: ../libtransmission/rpc-server.cc:896
 msgid "Serving RPC and Web requests on {address}"
-msgstr ""
+msgstr "Εξυπηρέτηση RPC και Web αιτημάτων στην {address}"
 
 #: ../libtransmission/rpc-server.cc:901
 msgid "Whitelist enabled"
@@ -2351,43 +2361,43 @@ msgstr "Απαιτείται κωδικός"
 
 #: ../libtransmission/rpc-server.cc:912
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr ""
+msgstr "Εξυπηρέτηση RPC και Web αιτημάτων από '{path}'"
 
 #: ../libtransmission/rpcimpl.cc:1199
 msgid "Couldn't test port: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ελέγχου θύρας: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1261
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία απόκτησης λίστας φραγής: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1399
 msgid "Couldn't fetch torrent: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία απόκτησης torrent: {error} ({error_code})"
 
 #: ../libtransmission/session-alt-speeds.cc:98
 msgid "Time to turn off turtle mode"
-msgstr ""
+msgstr "Ώρα για απενεργοποίηση της λειτουργίας χελώνας"
 
 #: ../libtransmission/session-alt-speeds.cc:98
 msgid "Time to turn on turtle mode"
-msgstr ""
+msgstr "Ώρα για ενεργοποίηση της λειτουργίας χελώνας"
 
 #: ../libtransmission/session-id.cc:150
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ανοίγματος αρχείου κλειδιού συνεδρίας '{path}': {error} ({error_code})"
 
 #: ../libtransmission/session.cc:418
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Παρακολούθηση για εισερχόμενες συνδέσεις διαμοιραστών στην {hostport}"
 
 #: ../libtransmission/session.cc:730
 msgid "Transmission version {version} starting"
-msgstr ""
+msgstr "Εκκίνηση Transmission έκδοσης {version}"
 
 #: ../libtransmission/session.cc:1410
 msgid "Transmission version {version} shutting down"
-msgstr ""
+msgstr "Τερματισμός Transmission έκδοσης {version}"
 
 #: ../libtransmission/session.cc:1457
 msgid "Loaded {count} torrent"
@@ -2397,31 +2407,31 @@ msgstr[1] "Φορτώθηκαν {count} torrents"
 
 #: ../libtransmission/torrent-metainfo.cc:713
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr ""
+msgstr "Μετακίνηση αρχείου torrent από '{old_path}' στο '{path}'"
 
 #: ../libtransmission/torrent.cc:138
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία χρήσης μεταδεδομένων από '{path}' για '{magnet}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:167
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Δε βρέθηκαν δεδομένα! Βεβαιωθείτε ότι οι δίσκοι σας είναι συνδεδεμένοι ή χρησιμοποιήστε \"Καθορισμός Τοποθεσίας\". Για επανακατέβασμα, χρησιμοποιήστε \"Επαλήθευση Τοπικών Δεδομένων\" και εκκινήστε έπειτα το torrent."
 
 #: ../libtransmission/torrent.cc:400
 msgid "Calling script '{path}'"
-msgstr ""
+msgstr "Εκτέλεση  script '{path}'"
 
 #: ../libtransmission/torrent.cc:408
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία εκτέλεσης script '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:442
 msgid "Seed ratio reached; pausing torrent"
-msgstr ""
+msgstr "Στόχος αναλογίας διαμοιρασμού επετεύχθη· παύση torrent"
 
 #: ../libtransmission/torrent.cc:449
 msgid "Seeding idle limit reached; pausing torrent"
-msgstr ""
+msgstr "Όριο αδράνειας διαμοιρασμού· παύση torrent"
 
 #: ../libtransmission/torrent.cc:707
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2429,7 +2439,7 @@ msgstr "Επανεκκινήθηκε χειροκίνητα -- απενεργο�
 
 #: ../libtransmission/torrent.cc:760
 msgid "Pausing torrent"
-msgstr ""
+msgstr "Παύση torrent"
 
 #: ../libtransmission/torrent.cc:813
 msgid "Removing torrent"
@@ -2437,105 +2447,105 @@ msgstr "Γίνεται αφαίρεση του torrent"
 
 #: ../libtransmission/torrent.cc:1121 ../libtransmission/torrent.cc:2159
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία μετακίνησης '{old_path}' σε '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1569
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Παύση torrent καθώς δε βρέθηκαν δεδομένα! Βεβαιωθείτε ότι οι δίσκοι σας είναι συνδεδεμένοι ή χρησιμοποιήστε \"Καθορισμός Τοποθεσίας\". Για επανακατέβασμα, εκκινήστε το torrent."
 
 #: ../libtransmission/torrent.cc:2043
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Προειδοποίηση ιχνηλάτη: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:540
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Αδυναμία προσπέλασης '{filename}' γραμμή: '{line}'"
 
 #: ../libtransmission/tr-lpd.cc:255
 msgid "Couldn't initialize LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία αρχικοποίησης LPD: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:165
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δέσμευσης υποδοχής IPv4 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:199
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δέσμευσης υποδοχής IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:98
 msgid "Unknown socket family"
-msgstr ""
+msgstr "Άγνωστη οικογένεια υποδοχών"
 
 #: ../libtransmission/utils.cc:134
 msgid "Couldn't read '{path}': Not a regular file"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης '{path}': ιδιότυπο αρχείο"
 
 #: ../libtransmission/variant-json.cc:236
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία προσπέλασης JSON στη θέση {position} '{text}': {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
 msgid "Couldn't watch '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία παρακολούθησης '{path}': {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:270
 msgid "Couldn't read event: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης γεγονότος: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:151 ../libtransmission/watchdir-win32.cc:279
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης γεγονότος: αναμενόμενο {expected_size}, ληφθέν {actual_size}"
 
 #: ../libtransmission/watchdir-inotify.cc:168 ../libtransmission/watchdir-win32.cc:304
 msgid "Couldn't read filename: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης ονόματος αρχείου: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:177 ../libtransmission/watchdir-win32.cc:313
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης ονόματος αρχείου: αναμενόμενο {expected_size}, ληφθέν {actual_size}"
 
 #: ../libtransmission/watchdir-win32.cc:141
 msgid "Couldn't convert '{path}' to native path"
-msgstr ""
+msgstr "Αδυναμία μετατροπής '{path}' σε ντόπιο μονοπάτι"
 
 #: ../libtransmission/watchdir-win32.cc:170
 msgid "Couldn't create pipe: {error} ({error_code})"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας αγωγού: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-win32.cc:194
 msgid "Couldn't create thread"
-msgstr ""
+msgstr "Αδυναμία δημιουργίας νήματος"
 
 #: ../libtransmission/watchdir-win32.cc:223
 msgid "Couldn't read directory changes"
-msgstr ""
+msgstr "Αδυναμία ανάγνωσης αλλαγών καταλόγου αρχείων"
 
 #: ../libtransmission/watchdir-win32.cc:230
 msgid "Couldn't wait for directory changes"
-msgstr ""
+msgstr "Αδυναμία αναμονής αλλαγών καταλόγου αρχείων"
 
 #: ../libtransmission/web.cc:185
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
-msgstr ""
+msgstr "Θα γίνει επαλήθευση πιστοποιητικών ιχνηλάτη με χρήση της μεταβλητής περιβάλλοντος CURL_CA_BUNDLE: {bundle}"
 
 #: ../libtransmission/web.cc:186
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
-msgstr ""
+msgstr "NB: αυτό λειτουργεί μόνο αν χτιστεί έναντι του libcurl με openssl ή gnutls, ΟΧΙ nss"
 
 #: ../libtransmission/web.cc:187
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr ""
+msgstr "NB: Άκυρα πιστοποιητικά φαίνονται ως 'Αδυναμία σύνδεσης με ιχνηλάτη' όπως πολλά άλλα σφάλματα"
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Αδυναμία απόκτησης '{url}': αναμονή για κώδικα απόκρισης HTTP {expected_code}, λήφθηκε {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} αρχείο, {total_size}\n"
+msgstr[1] "{file_count:L} αρχεία, {total_size}\n"
 
 #: ../utils/create.cc:241
 msgid "{piece_count:L} piece, {piece_size}\n"
