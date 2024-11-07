@@ -1238,13 +1238,15 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
 
     if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
     {
-        if (auto ut_pex = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_pex, &ut_pex))
+        auto const tor_is_public = tor_.is_public();
+
+        if (auto ut_pex = int64_t{}; tor_is_public && tr_variantDictFindInt(sub, TR_KEY_ut_pex, &ut_pex))
         {
             ut_pex_id_ = static_cast<uint8_t>(ut_pex);
             logtrace(this, fmt::format("msgs->ut_pex is {:d}", ut_pex_id_));
         }
 
-        if (auto ut_metadata = int64_t{}; tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
+        if (auto ut_metadata = int64_t{}; tor_is_public && tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &ut_metadata))
         {
             ut_metadata_id_ = static_cast<uint8_t>(ut_metadata);
             logtrace(this, fmt::format("msgs->ut_metadata_id_ is {:d}", ut_metadata_id_));
