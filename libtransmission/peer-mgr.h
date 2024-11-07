@@ -233,7 +233,7 @@ public:
 
     // ---
 
-    constexpr auto set_connected(time_t now, bool is_connected = true) noexcept
+    constexpr auto set_connected(time_t now, bool is_connected = true, bool is_disconnecting = false) noexcept
     {
         if (is_connected_ == is_connected)
         {
@@ -248,7 +248,7 @@ public:
         {
             piece_data_at_ = {};
         }
-        else if (has_transferred_piece_data())
+        else if (has_transferred_piece_data() || !is_disconnecting)
         {
             num_consecutive_fruitless_ = {};
         }

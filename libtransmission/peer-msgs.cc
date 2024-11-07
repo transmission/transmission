@@ -2094,7 +2094,7 @@ tr_peerMsgs::tr_peerMsgs(
 
 tr_peerMsgs::~tr_peerMsgs()
 {
-    peer_info->set_connected(tr_time(), false);
+    peer_info->set_connected(tr_time(), false, is_disconnecting());
     TR_ASSERT(n_peers > 0U);
     --n_peers;
 }
