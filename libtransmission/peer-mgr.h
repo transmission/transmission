@@ -233,7 +233,7 @@ public:
 
     // ---
 
-    constexpr auto set_connected(time_t now, bool is_connected = true) noexcept
+    constexpr auto set_connected(time_t now, bool is_connected = true, bool is_disconnecting = false) noexcept
     {
         if (is_connected_ == is_connected)
         {
@@ -252,7 +252,7 @@ public:
         {
             num_consecutive_fruitless_ = {};
         }
-        else
+        else if (is_disconnecting)
         {
             on_fruitless_connection();
         }
