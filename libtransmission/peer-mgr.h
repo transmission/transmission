@@ -248,11 +248,11 @@ public:
         {
             piece_data_at_ = {};
         }
-        else if (has_transferred_piece_data() || !is_disconnecting)
+        else if (has_transferred_piece_data())
         {
             num_consecutive_fruitless_ = {};
         }
-        else
+        else if (is_disconnecting)
         {
             on_fruitless_connection();
         }
