@@ -143,11 +143,6 @@ public:
             return std::nullopt;
         }
 
-        // Notify the system that `byte_count` of download bandwidth was used
-        virtual void notifyBandwidthConsumed([[maybe_unused]] int bandwidth_tag, [[maybe_unused]] size_t byte_count)
-        {
-        }
-
         // Return the number of bytes that should be allowed. See tr_bandwidth::clamp()
         [[nodiscard]] virtual size_t clamp([[maybe_unused]] int bandwidth_tag, size_t byte_count) const
         {
