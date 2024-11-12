@@ -8,7 +8,7 @@ if(POLICY CMP0114)
 endif()
 
 # Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
-set(MACOS_SUPPORT_MINIMUM 10.14.6)
+set(MACOS_SUPPORT_MINIMUM 11.0)
 
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -71,7 +71,7 @@ option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
 tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
-tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" OFF)
+tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
@@ -554,31 +554,35 @@ tr_add_external_auto_library(B64 libb64 b64
         -DLIBB64_SHARED:BOOL=OFF)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
-if(NOT ${REBUILD_WEB} STREQUAL "OFF")
+if(REBUILD_WEB)
+    tr_get_required_flag(REBUILD_WEB NPM_IS_REQUIRED)
+
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
-        if ("${REBUILD_WEB}" STREQUAL "ON")
+        set(NPM_FOUND OFF)
+        if(NPM_IS_REQUIRED)
             message(FATAL_ERROR "Could NOT find NPM, minimum required is \"${NPM_MINIMUM}\"")
-        else() # AUTO
-            set(REBUILD_WEB OFF)
         endif()
     else()
         execute_process(COMMAND "${NPM}" --version
             OUTPUT_STRIP_TRAILING_WHITESPACE
             OUTPUT_VARIABLE NPM_VERSION_STRING)
-        if ("${NPM_VERSION_STRING}" VERSION_GREATER_EQUAL "${NPM_MINIMUM}")
+        if("${NPM_VERSION_STRING}" VERSION_GREATER_EQUAL "${NPM_MINIMUM}")
             message(STATUS "Found NPM: ${NPM} (found suitable version \"${NPM_VERSION_STRING}\", minimum required is \"${NPM_MINIMUM}\")")
-            set(REBUILD_WEB ON)
-        elseif ("${REBUILD_WEB}" STREQUAL "ON")
+            set(NPM_FOUND ON)
+        elseif(NPM_IS_REQUIRED)
             message(FATAL_ERROR "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
-        else() # AUTO
+        else()
             message(STATUS "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
-            set(REBUILD_WEB OFF)
+            set(NPM_FOUND OFF)
         endif()
     endif()
-    if(REBUILD_WEB)
-      add_subdirectory(web)
-    endif()
+
+    tr_fixup_auto_option(REBUILD_WEB NPM_FOUND NPM_IS_REQUIRED)
+endif()
+
+if(REBUILD_WEB)
+    add_subdirectory(web)
 endif()
 
 if(WITH_INOTIFY)
@@ -761,19 +765,20 @@ else()
     endif()
 endif()
 
-if(RUN_CLANG_TIDY STREQUAL "AUTO")
-    if(DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
-        set(RUN_CLANG_TIDY OFF)
-    else()
-        set(RUN_CLANG_TIDY ON)
-    endif()
+if(RUN_CLANG_TIDY STREQUAL "AUTO" AND (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR})) # skip clang-tidy on LGTM/appveyor
+    set(RUN_CLANG_TIDY OFF)
 endif()
 
 if(RUN_CLANG_TIDY)
+    tr_get_required_flag(RUN_CLANG_TIDY CLANG_TIDY_IS_REQUIRED)
+
     message(STATUS "Looking for clang-tidy")
     find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
+        if(CLANG_TIDY_IS_REQUIRED)
+            message(FATAL_ERROR "clang-tidy is required but wasn't found")
+        endif()
     else()
         message(STATUS "Looking for clang-tidy - found")
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")

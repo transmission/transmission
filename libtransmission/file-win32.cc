@@ -825,11 +825,6 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/,
     auto ret = open_file(path, native_access, native_disposition, native_flags, error);
     auto success = ret != TR_BAD_SYS_FILE;
 
-    if (success && (flags & TR_SYS_FILE_APPEND) != 0)
-    {
-        success = SetFilePointer(ret, 0, nullptr, FILE_END) != INVALID_SET_FILE_POINTER;
-    }
-
     if (!success)
     {
         set_system_error(error, GetLastError());
@@ -1054,33 +1049,24 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
-    TR_ASSERT(
-        !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+    TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB)) == 0);
+    TR_ASSERT(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) == 1);
 
-    bool ret = false;
     auto overlapped = OVERLAPPED{};
 
-    if ((operation & TR_SYS_FILE_LOCK_UN) == 0)
+    DWORD native_flags = 0;
+
+    if ((operation & TR_SYS_FILE_LOCK_EX) != 0)
     {
-        DWORD native_flags = 0;
-
-        if ((operation & TR_SYS_FILE_LOCK_EX) != 0)
-        {
-            native_flags |= LOCKFILE_EXCLUSIVE_LOCK;
-        }
-
-        if ((operation & TR_SYS_FILE_LOCK_NB) != 0)
-        {
-            native_flags |= LOCKFILE_FAIL_IMMEDIATELY;
-        }
-
-        ret = LockFileEx(handle, native_flags, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
+        native_flags |= LOCKFILE_EXCLUSIVE_LOCK;
     }
-    else
+
+    if ((operation & TR_SYS_FILE_LOCK_NB) != 0)
     {
-        ret = UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
+        native_flags |= LOCKFILE_FAIL_IMMEDIATELY;
     }
+
+    bool const ret = LockFileEx(handle, native_flags, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
 
     if (!ret)
     {
