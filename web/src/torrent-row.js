@@ -45,7 +45,8 @@ const TorrentRendererHelper = {
   getProgressInfo: (controller, t) => {
     const status = t.getStatus();
     const classList = ['torrent-progress-bar'];
-    let percent = null;
+    let percent = 100;
+    let ratio = null;
 
     if (status === Torrent._StatusStopped) {
       classList.push('paused');
@@ -62,11 +63,13 @@ const TorrentRendererHelper = {
       percent = t.getPercentDone() * 100;
     } else {
       classList.push('seed');
-      const seed_ratio_limit = t.seedRatioLimit(controller);
-      percent =
-        seed_ratio_limit > 0
-          ? (t.getUploadRatio() * 100) / seed_ratio_limit
-          : 100;
+      if (status !== Torrent._StatusStopped) {
+        const seed_ratio_limit = t.seedRatioLimit(controller);
+        ratio =
+          seed_ratio_limit > 0
+            ? (t.getUploadRatio() * 100) / seed_ratio_limit
+            : 100;
+      }
     }
     if (t.isQueued()) {
       classList.push('queued');
@@ -75,15 +78,17 @@ const TorrentRendererHelper = {
     return {
       classList,
       percent,
+      ratio,
     };
   },
 
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
-    const pct_str = `${Formatter.percentString(info.percent, 2)}%`;
+    const percent = Math.min(info.ratio || info.percent, 100);
+    const pct_str = `${Formatter.percentString(percent, 2)}%`;
     progressbar.className = info.classList.join(' ');
     progressbar.style.setProperty('--progress', pct_str);
-    progressbar.dataset.progress = pct_str;
+    progressbar.dataset.progress = info.ratio ? '100%' : pct_str;
   },
 };
 
