@@ -360,7 +360,7 @@ public:
         switch (dir)
         {
         case TR_CLIENT_TO_PEER: // requests we sent
-            return tr_peerMgrCountActiveRequestsToPeer(&tor_, this);
+            return active_requests.count();
 
         case TR_PEER_TO_CLIENT: // requests they sent
             return std::size(peer_requested_);
@@ -401,10 +401,15 @@ public:
         update_active();
     }
 
-    void cancel_block_request(tr_block_index_t block) override
+    void maybe_cancel_block_request(tr_block_index_t block) override
     {
-        cancels_sent_to_peer.add(tr_time(), 1);
-        protocol_send_cancel(peer_request::from_block(tor_, block));
+        if (active_requests.test(block))
+        {
+            cancels_sent_to_peer.add(tr_time(), 1);
+            active_requests.unset(block);
+            publish(tr_peer_event::SentCancel(tor_.block_info(), block));
+            protocol_send_cancel(peer_request::from_block(tor_, block));
+        }
     }
 
     void set_choke(bool peer_is_choked) override
@@ -462,9 +467,15 @@ public:
         TR_ASSERT(client_is_interested());
         TR_ASSERT(!client_is_choked());
 
+        if (active_requests.has_none())
+        {
+            request_timeout_base_ = tr_time();
+        }
+
         for (auto const *span = block_spans, *span_end = span + n_spans; span != span_end; ++span)
         {
-            for (auto [block, block_end] = *span; block < block_end; ++block)
+            auto const [block_begin, block_end] = *span;
+            for (auto block = block_begin; block < block_end; ++block)
             {
                 // Note that requests can't cross over a piece boundary.
                 // So if a piece isn't evenly divisible by the block size,
@@ -483,7 +494,8 @@ public:
                 }
             }
 
-            tr_peerMgrClientSentRequests(&tor_, this, *span);
+            active_requests.set_span(block_begin, block_end);
+            publish(tr_peer_event::SentRequest(tor_.block_info(), *span));
         }
     }
 
@@ -568,7 +580,9 @@ private:
         desired_request_count_ = max_available_reqs();
     }
 
-    void update_block_requests();
+    void maybe_send_block_requests();
+
+    void check_request_timeout(time_t now);
 
     [[nodiscard]] constexpr auto client_reqq() const noexcept
     {
@@ -591,7 +605,7 @@ private:
         return next;
     }
 
-    void update_metadata_requests(time_t now) const;
+    void maybe_send_metadata_requests(time_t now) const;
     [[nodiscard]] size_t add_next_metadata_piece();
     [[nodiscard]] size_t add_next_block(time_t now_sec, uint64_t now_msec);
     [[nodiscard]] size_t fill_output_buffer(time_t now_sec, uint64_t now_msec);
@@ -700,6 +714,8 @@ private:
 
     time_t choke_changed_at_ = 0;
 
+    time_t request_timeout_base_ = {};
+
     tr_incoming incoming_ = {};
 
     // if the peer supports the Extension Protocol in BEP 10 and
@@ -715,6 +731,9 @@ private:
 
     // seconds between periodic send_ut_pex() calls
     static auto constexpr SendPexInterval = 90s;
+
+    // how many seconds we expect the next piece block to arrive
+    static auto constexpr RequestTimeoutSecs = time_t{ 90 };
 };
 
 // ---
@@ -1396,6 +1415,7 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
         if (!fext)
         {
             publish(tr_peer_event::GotChoke());
+            active_requests.set_has_none();
         }
 
         update_active(TR_PEER_TO_CLIENT);
@@ -1581,7 +1601,11 @@ ReadResult tr_peerMsgsImpl::process_peer_message(uint8_t id, MessageReader& payl
 
             if (fext)
             {
-                publish(tr_peer_event::GotRejected(tor_.block_info(), tor_.piece_loc(r.index, r.offset).block));
+                if (auto const block = tor_.piece_loc(r.index, r.offset).block; active_requests.test(block))
+                {
+                    active_requests.unset(block);
+                    publish(tr_peer_event::GotRejected(tor_.block_info(), block));
+                }
             }
             else
             {
@@ -1620,13 +1644,19 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 
     if (loc.block_offset + len > block_size)
     {
-        logwarn(this, fmt::format("got unaligned piece {:d}:{:d}->{:d}", piece, offset, len));
+        logwarn(this, fmt::format("got unaligned block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
         return { ReadState::Err, len };
     }
 
-    if (!tr_peerMgrDidPeerRequest(&tor_, this, block))
+    if (!active_requests.test(block))
     {
-        logwarn(this, fmt::format("got unrequested piece {:d}:{:d}->{:d}", piece, offset, len));
+        logwarn(this, fmt::format("got unrequested block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
+        return { ReadState::Err, len };
+    }
+
+    if (tor_.has_block(block))
+    {
+        logtrace(this, fmt::format("got completed block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
         return { ReadState::Err, len };
     }
 
@@ -1664,34 +1694,14 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
 // returns 0 on success, or an errno on failure
 int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t const block)
 {
-    auto const n_expected = tor_.block_size(block);
-
-    if (!block_data)
+    if (auto const n_bytes = block_data ? std::size(*block_data) : 0U; n_bytes != tor_.block_size(block))
     {
-        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, 0));
-        return EMSGSIZE;
-    }
-
-    if (std::size(*block_data) != tor_.block_size(block))
-    {
-        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, std::size(*block_data)));
+        auto const n_expected = tor_.block_size(block);
+        logdbg(this, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, n_bytes));
         return EMSGSIZE;
     }
 
     logtrace(this, fmt::format("got block {:d}", block));
-
-    if (!tr_peerMgrDidPeerRequest(&tor_, this, block))
-    {
-        logdbg(this, "we didn't ask for this message...");
-        return 0;
-    }
-
-    auto const loc = tor_.block_loc(block);
-    if (tor_.has_piece(loc.piece))
-    {
-        logtrace(this, "we did ask for this message, but the piece is already complete...");
-        return 0;
-    }
 
     // NB: if writeBlock() fails the torrent may be paused.
     // If this happens, this object will be destructed and must no longer be used.
@@ -1700,6 +1710,8 @@ int tr_peerMsgsImpl::client_got_block(std::unique_ptr<Cache::BlockData> block_da
         return err;
     }
 
+    active_requests.unset(block);
+    request_timeout_base_ = tr_time();
     publish(tr_peer_event::GotBlock(tor_.block_info(), block));
 
     return 0;
@@ -1716,8 +1728,6 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
         msgs->peer_info->set_latest_piece_data_time(tr_time());
         msgs->publish(tr_peer_event::SentPieceData(bytes_written));
     }
-
-    msgs->pulse();
 }
 
 ReadState tr_peerMsgsImpl::can_read(tr_peerIo* io, void* vmsgs, size_t* piece)
@@ -1814,9 +1824,10 @@ void tr_peerMsgsImpl::pulse()
     auto const now_sec = tr_time();
     auto const now_msec = tr_time_msec();
 
+    check_request_timeout(now_sec);
     update_desired_request_count();
-    update_block_requests();
-    update_metadata_requests(now_sec);
+    maybe_send_block_requests();
+    maybe_send_metadata_requests(now_sec);
 
     for (;;)
     {
@@ -1827,7 +1838,7 @@ void tr_peerMsgsImpl::pulse()
     }
 }
 
-void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
+void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 {
     if (!peer_supports_metadata_xfer_)
     {
@@ -1844,14 +1855,14 @@ void tr_peerMsgsImpl::update_metadata_requests(time_t now) const
     }
 }
 
-void tr_peerMsgsImpl::update_block_requests()
+void tr_peerMsgsImpl::maybe_send_block_requests()
 {
     if (!tor_.client_can_download())
     {
         return;
     }
 
-    auto const n_active = tr_peerMgrCountActiveRequestsToPeer(&tor_, this);
+    auto const n_active = active_req_count(TR_CLIENT_TO_PEER);
     if (n_active >= desired_request_count_)
     {
         return;
@@ -1864,6 +1875,23 @@ void tr_peerMsgsImpl::update_block_requests()
     if (auto const requests = tr_peerMgrGetNextRequests(&tor_, this, n_wanted); !std::empty(requests))
     {
         request_blocks(std::data(requests), std::size(requests));
+    }
+}
+
+void tr_peerMsgsImpl::check_request_timeout(time_t now)
+{
+    if (active_requests.has_none() || now - request_timeout_base_ <= RequestTimeoutSecs)
+    {
+        return;
+    }
+
+    // If we didn't receive any piece data from this peer for a while,
+    // cancel all active requests so that we will send a new batch.
+    // If the peer still doesn't send anything to us, then it will
+    // naturally get weeded out by the peer mgr.
+    for (size_t block = 0; block < std::size(active_requests); ++block)
+    {
+        maybe_cancel_block_request(block);
     }
 }
 
