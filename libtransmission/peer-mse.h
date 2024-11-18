@@ -131,8 +131,8 @@ private:
         }
     }
 
-    tr_arc4 dec_key_ = {};
-    tr_arc4 enc_key_ = {};
+    tr_arc4 dec_key_;
+    tr_arc4 enc_key_;
     bool dec_active_ = false;
     bool enc_active_ = false;
 };

@@ -363,7 +363,7 @@ private:
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 
-    tr_peer_socket socket_ = {};
+    tr_peer_socket socket_;
 
     tr_bandwidth bandwidth_;
 
