@@ -208,6 +208,10 @@ void tr_variant::Merge::operator()(std::monostate const& src)
 {
     tgt_ = src;
 }
+void tr_variant::Merge::operator()(std::nullptr_t const& src)
+{
+    tgt_ = src;
+}
 void tr_variant::Merge::operator()(bool const& src)
 {
     tgt_ = src;
