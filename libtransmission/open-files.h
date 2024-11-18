@@ -24,7 +24,7 @@
 class tr_open_files
 {
 public:
-    enum class Preallocation
+    enum class Preallocation : uint8_t
     {
         None,
         Sparse,

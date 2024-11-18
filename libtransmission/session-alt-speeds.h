@@ -187,7 +187,7 @@ private:
     // bitfield of all the minutes in a week.
     // Each bit's value indicates whether the scheduler wants
     // alt speeds on or off at that given minute.
-    std::bitset<10080> minutes_{};
+    std::bitset<10080> minutes_;
 
     // recent change that was made by the scheduler
     std::optional<bool> scheduler_set_is_active_to_;

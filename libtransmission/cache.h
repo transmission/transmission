@@ -81,7 +81,7 @@ private:
 
     tr_torrents const& torrents_;
 
-    Blocks blocks_ = {};
+    Blocks blocks_;
     size_t max_blocks_ = 0;
 
     mutable size_t disk_writes_ = 0;

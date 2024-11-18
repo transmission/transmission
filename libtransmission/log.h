@@ -14,7 +14,7 @@
 
 // ---
 
-enum tr_log_level
+enum tr_log_level : uint8_t
 {
     // No logging at all
     TR_LOG_OFF,
