@@ -573,6 +573,7 @@ private:
 
     struct WalkFuncs
     {
+        void (*null_func)(tr_variant const& var, std::nullptr_t val, void* user_data);
         void (*int_func)(tr_variant const& var, int64_t val, void* user_data);
         void (*bool_func)(tr_variant const& var, bool val, void* user_data);
         void (*double_func)(tr_variant const& var, double val, void* user_data);
