@@ -26,7 +26,7 @@
 
 #endif /* _WIN32 */
 
-constexpr inline bool tr_error_is_enoent(int code) noexcept
+constexpr bool tr_error_is_enoent(int code) noexcept
 {
 #ifdef _WIN32
     return code == ERROR_FILE_NOT_FOUND || code == ERROR_PATH_NOT_FOUND;
@@ -35,7 +35,7 @@ constexpr inline bool tr_error_is_enoent(int code) noexcept
 #endif
 }
 
-constexpr inline bool tr_error_is_enospc(int code) noexcept
+constexpr bool tr_error_is_enospc(int code) noexcept
 {
 #ifdef _WIN32
     return code == ERROR_DISK_FULL;

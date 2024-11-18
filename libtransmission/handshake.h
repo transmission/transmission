@@ -320,7 +320,7 @@ private:
 
     ///
 
-    std::optional<DH> dh_{};
+    std::optional<DH> dh_;
 
     DoneFunc on_done_;
 
