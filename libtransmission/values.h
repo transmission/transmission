@@ -16,7 +16,7 @@
 
 namespace libtransmission::Values
 {
-enum class MemoryUnits
+enum class MemoryUnits : uint8_t
 {
     Bytes,
     KBytes,
@@ -27,7 +27,7 @@ enum class MemoryUnits
 
 using StorageUnits = MemoryUnits;
 
-enum class SpeedUnits
+enum class SpeedUnits : uint8_t
 {
     Byps,
     KByps,
@@ -38,7 +38,7 @@ enum class SpeedUnits
 
 struct Config
 {
-    enum class Base
+    enum class Base : uint8_t
     {
         Kilo = 1000U,
         Kibi = 1024U
