@@ -30,15 +30,15 @@
 struct tr_variant
 {
 public:
-    enum Type : size_t
+    enum Type : uint8_t
     {
-        NoneIndex = 0,
-        BoolIndex = 1,
-        IntIndex = 2,
-        DoubleIndex = 3,
-        StringIndex = 4,
-        VectorIndex = 5,
-        MapIndex = 6
+        NoneIndex,
+        BoolIndex,
+        IntIndex,
+        DoubleIndex,
+        StringIndex,
+        VectorIndex,
+        MapIndex
     };
 
     using Vector = std::vector<tr_variant>;
