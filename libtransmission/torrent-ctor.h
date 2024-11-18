@@ -29,7 +29,7 @@ struct tr_torrent;
 struct tr_ctor
 {
 public:
-    explicit tr_ctor(tr_session* const session);
+    explicit tr_ctor(tr_session* session);
 
     [[nodiscard]] constexpr auto* session() const noexcept
     {

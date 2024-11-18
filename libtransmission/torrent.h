@@ -948,7 +948,7 @@ struct tr_torrent
         return queue_position_;
     }
 
-    void set_unique_queue_position(size_t const new_pos);
+    void set_unique_queue_position(size_t new_pos);
 
     static constexpr struct
     {
@@ -1281,7 +1281,7 @@ private:
         std::string_view oldpath,
         std::string_view newname,
         tr_torrent_rename_done_func callback,
-        void* const callback_user_data);
+        void* callback_user_data);
 
     void start_in_session_thread();
 
