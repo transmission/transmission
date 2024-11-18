@@ -950,7 +950,7 @@ struct tr_torrent
 
     void set_unique_queue_position(size_t const new_pos);
 
-    static inline constexpr struct
+    static constexpr struct
     {
         constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
         {
