@@ -38,7 +38,7 @@ enum class SpeedUnits : uint8_t
 
 struct Config
 {
-    enum class Base : uint8_t
+    enum class Base : uint16_t
     {
         Kilo = 1000U,
         Kibi = 1024U

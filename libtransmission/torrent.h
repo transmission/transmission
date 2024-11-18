@@ -1087,7 +1087,7 @@ private:
         static auto constexpr MinUpdateMSec = 800U;
 
         uint64_t timestamp_msec_ = {};
-        Speed speed_ = {};
+        Speed speed_;
     };
 
     [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept

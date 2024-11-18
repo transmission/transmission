@@ -219,7 +219,7 @@ private:
 
     tr_torrent::VerifyDoneCallback verify_done_callback_;
 
-    tr_torrent::labels_t labels_ = {};
+    tr_torrent::labels_t labels_;
 
     std::vector<tr_file_index_t> wanted_;
     std::vector<tr_file_index_t> unwanted_;

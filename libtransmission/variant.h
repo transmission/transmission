@@ -554,7 +554,7 @@ public:
     // ---
 
     // Tracks errors when parsing / saving
-    tr_error error_ = {};
+    tr_error error_;
 
 private:
     friend tr_variant;
