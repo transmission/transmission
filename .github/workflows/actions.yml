@@ -803,14 +803,14 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  debian-11-from-tarball:
+  debian-12-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
     env:
       NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
-      image: debian:11-slim
+      image: debian:12-slim
     steps:
       - name: Show Configuration
         run: |
