@@ -6,8 +6,6 @@
 
 // This file defines the public API for the libtransmission library.
 
-// FIXME: trigger CI
-
 #pragma once
 
 // --- Basic Types
