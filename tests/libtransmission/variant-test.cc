@@ -85,20 +85,19 @@ TEST_F(VariantTest, getType)
 
 TEST_F(VariantTest, parseInt)
 {
-    auto constexpr Benc = "i64e"sv;
-    auto constexpr ExpectVal = int64_t{ 64 };
+    static auto constexpr Benc = "i64e"sv;
+    static auto constexpr ExpectVal = int64_t{ 64 };
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ(ExpectVal, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithMissingEnd)
 {
-    auto constexpr Benc = "i64"sv;
+    static auto constexpr Benc = "i64"sv;
 
     auto benc = Benc;
     EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
@@ -107,7 +106,7 @@ TEST_F(VariantTest, parseIntWithMissingEnd)
 
 TEST_F(VariantTest, parseIntEmptyBuffer)
 {
-    auto constexpr Benc = ""sv;
+    static auto constexpr Benc = ""sv;
 
     auto benc = Benc;
     EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
@@ -116,7 +115,7 @@ TEST_F(VariantTest, parseIntEmptyBuffer)
 
 TEST_F(VariantTest, parseIntWithBadDigits)
 {
-    auto constexpr Benc = "i6z4e"sv;
+    static auto constexpr Benc = "i6z4e"sv;
 
     auto benc = Benc;
     EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
@@ -125,20 +124,19 @@ TEST_F(VariantTest, parseIntWithBadDigits)
 
 TEST_F(VariantTest, parseNegativeInt)
 {
-    auto constexpr Benc = "i-3e"sv;
-    auto constexpr Expected = int64_t{ -3 };
+    static auto constexpr Benc = "i-3e"sv;
+    static auto constexpr Expected = int64_t{ -3 };
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseNegativeWithLeadingZero)
 {
-    auto constexpr Benc = "i-03e"sv;
+    static auto constexpr Benc = "i-03e"sv;
 
     auto benc = Benc;
     EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
@@ -147,20 +145,19 @@ TEST_F(VariantTest, parseNegativeWithLeadingZero)
 
 TEST_F(VariantTest, parseIntZero)
 {
-    auto constexpr Benc = "i0e"sv;
-    auto constexpr Expected = int64_t{ 0 };
+    static auto constexpr Benc = "i0e"sv;
+    static auto constexpr Expected = int64_t{ 0 };
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
 
 TEST_F(VariantTest, parseIntWithLeadingZero)
 {
-    auto constexpr Benc = "i04e"sv;
+    static auto constexpr Benc = "i04e"sv;
 
     auto benc = Benc;
     EXPECT_FALSE(transmission::benc::impl::ParseInt(&benc));
@@ -181,8 +178,7 @@ TEST_F(VariantTest, str)
     // good string
     inout = benc = "4:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ("boat"sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
@@ -195,16 +191,14 @@ TEST_F(VariantTest, str)
     // empty string
     inout = benc = "0:"sv;
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ(""sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // short string
     inout = benc = "3:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    ASSERT_TRUE(value);
     EXPECT_EQ("boa"sv, *value);
     EXPECT_EQ(std::data(benc) + benc.find('t'), std::data(inout));
 }
@@ -261,13 +255,7 @@ TEST_F(VariantTest, parse)
 
 TEST_F(VariantTest, bencParseAndReencode)
 {
-    struct LocalTest
-    {
-        std::string_view benc;
-        bool is_good;
-    };
-
-    auto constexpr Tests = std::array<LocalTest, 9>{ {
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 9>{ {
         { "llleee"sv, true },
         { "d3:cow3:moo4:spam4:eggse"sv, true },
         { "d4:spaml1:a1:bee"sv, true },
@@ -282,14 +270,14 @@ TEST_F(VariantTest, bencParseAndReencode)
     auto serde = tr_variant_serde::benc();
     serde.inplace();
 
-    for (auto const& test : Tests)
+    for (auto const& [benc, is_good] : Tests)
     {
-        auto var = serde.parse(test.benc);
-        EXPECT_EQ(test.is_good, var.has_value());
+        auto var = serde.parse(benc);
+        EXPECT_EQ(is_good, var.has_value());
         if (var)
         {
-            EXPECT_EQ(test.benc.data() + test.benc.size(), serde.end());
-            EXPECT_EQ(test.benc, serde.to_string(*var));
+            EXPECT_EQ(benc.data() + benc.size(), serde.end());
+            EXPECT_EQ(benc, serde.to_string(*var));
         }
     }
 }
@@ -338,13 +326,7 @@ TEST_F(VariantTest, bencMalformedIncompleteString)
 
 TEST_F(VariantTest, bencToJson)
 {
-    struct LocalTest
-    {
-        std::string_view benc;
-        std::string_view expected;
-    };
-
-    auto constexpr Tests = std::array<LocalTest, 5>{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 5>{
         { { "i6e"sv, "6"sv },
           { "d5:helloi1e5:worldi2ee"sv, R"({"hello":1,"world":2})"sv },
           { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee"sv, R"({"foo":[1,2,3],"hello":1,"world":2})"sv },
@@ -358,10 +340,10 @@ TEST_F(VariantTest, bencToJson)
     benc_serde.inplace();
     json_serde.compact();
 
-    for (auto const& test : Tests)
+    for (auto const& [benc, expected] : Tests)
     {
-        auto top = benc_serde.parse(test.benc).value_or(tr_variant{});
-        EXPECT_EQ(test.expected, json_serde.to_string(top));
+        auto top = benc_serde.parse(benc).value_or(tr_variant{});
+        EXPECT_EQ(expected, json_serde.to_string(top));
     }
 }
 
@@ -428,7 +410,7 @@ TEST_F(VariantTest, merge)
 TEST_F(VariantTest, stackSmash)
 {
     // make a nested list of list of lists.
-    int constexpr Depth = STACK_SMASH_DEPTH;
+    static int constexpr Depth = STACK_SMASH_DEPTH;
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
     // confirm that it fails instead of crashing
@@ -484,10 +466,10 @@ TEST_F(VariantTest, boolAndIntRecast)
 
 TEST_F(VariantTest, dictFindType)
 {
-    auto constexpr ExpectedStr = "this-is-a-string"sv;
-    auto constexpr ExpectedBool = true;
-    auto constexpr ExpectedInt = 1234;
-    auto constexpr ExpectedReal = 0.3;
+    static auto constexpr ExpectedStr = "this-is-a-string"sv;
+    static auto constexpr ExpectedBool = true;
+    static auto constexpr ExpectedInt = 1234;
+    static auto constexpr ExpectedReal = 0.3;
 
     auto const key_bool = tr_quark_new("this-is-a-bool"sv);
     auto const key_real = tr_quark_new("this-is-a-real"sv);
