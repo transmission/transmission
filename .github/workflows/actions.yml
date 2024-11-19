@@ -190,7 +190,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew uninstall -f pkg-config pkg-config@0.29.2
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -343,7 +344,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew uninstall -f pkg-config pkg-config@0.29.2
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3
@@ -402,7 +404,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew unlink pkg-config
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -620,7 +623,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext ninja node pkg-config
+          brew uninstall -f pkg-config pkg-config@0.29.2
+          brew install cmake gettext ninja node pkgconf
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -681,7 +685,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext ninja node pkg-config
+          brew unlink pkg-config
+          brew install cmake gettext ninja node pkgconf
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install qt
@@ -746,7 +751,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext ninja node pkg-config
+          brew unlink pkg-config
+          brew install cmake gettext ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3
