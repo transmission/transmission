@@ -66,7 +66,7 @@ jobs:
           get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
           get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web        CMakeLists.txt cmake third-party libtransmission web
+          get_changes web        CMakeLists.txt cmake third-party web
           get_changes ci-actions .github/workflows/actions.yml
           cat "$GITHUB_OUTPUT"
 
