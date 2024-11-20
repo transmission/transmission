@@ -1309,7 +1309,7 @@ private:
 
     // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::bind_address())
     WebMediator web_mediator_{ this };
-    std::unique_ptr<tr_web> web_;
+    std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
 public:
     // depends-on: settings_, open_files_, torrents_
