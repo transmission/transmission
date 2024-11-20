@@ -200,6 +200,7 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}
         transmission::gtk_impl
         fmt::fmt-header-only
+        libmaxminddb::maxminddb
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)

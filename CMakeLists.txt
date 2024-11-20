@@ -238,6 +238,8 @@ set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
 find_package(Fmt)
+find_package(MaxMindDB)
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/libmaxminddb)
 find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
