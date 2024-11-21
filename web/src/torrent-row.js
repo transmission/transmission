@@ -272,7 +272,16 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
+    const select = document.createElement('div');
+    select.classList.add('select');
+
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.checked = true;
+    select.append(check);
+
     const icon = TorrentRendererHelper.createIcon(torrent);
+    select.append(icon);
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
@@ -291,7 +300,7 @@ export class TorrentRendererFull {
     button.className = 'torrent-pauseresume-button';
     progress.append(button);
 
-    root.append(icon);
+    root.append(select);
     root.append(name);
     root.append(labels);
     root.append(details);
@@ -370,7 +379,16 @@ export class TorrentRendererCompact {
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'compact');
 
+    const select = document.createElement('div');
+    select.classList.add('select');
+
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.checked = true;
+    select.append(check);
+
     const icon = TorrentRendererHelper.createIcon(torrent);
+    select.append(icon);
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';
@@ -386,7 +404,7 @@ export class TorrentRendererCompact {
     root.append(details);
     root.append(labels);
     root.append(name);
-    root.append(icon);
+    root.append(select);
     root.className = 'torrent compact';
     root._progressbar = progressbar;
     root._details_container = details;
