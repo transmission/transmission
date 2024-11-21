@@ -202,8 +202,11 @@ export class Transmission extends EventTarget {
         this._deselectAll();
       }
     });
-    e.addEventListener('dblclick', () => {
-      if (!this.popup || this.popup.name !== 'inspector') {
+    e.addEventListener('dblclick', (event_) => {
+      if (
+        !event_.target.classList.contains('select') &&
+        (!this.popup || this.popup.name !== 'inspector')
+      ) {
         this.action_manager.click('show-inspector');
       }
     });
