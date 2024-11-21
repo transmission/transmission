@@ -704,6 +704,7 @@ a {
     &.selected {
       background-color: var(--color-bg-selected);
       color: var(--color-fg-selected);
+
       .select {
         input[type='checkbox'] {
           display: block;
