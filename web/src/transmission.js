@@ -804,7 +804,10 @@ TODO: fix this when notifications get fixed
       window.focus();
 
       // Apple-Click, not selected
-    } else if (!row.isSelected() && meta_key) {
+    } else if (
+      !row.isSelected() &&
+      (event_.target.classList.contains('select') || meta_key)
+    ) {
       this._selectRow(row);
 
       // Regular Click, not selected
@@ -812,7 +815,10 @@ TODO: fix this when notifications get fixed
       this._setSelectedRow(row);
 
       // Apple-Click, selected
-    } else if (row.isSelected() && meta_key) {
+    } else if (
+      row.isSelected() &&
+      (event_.target.classList.contains('select') || meta_key)
+    ) {
       this._deselectRow(row);
 
       // Regular Click, selected
