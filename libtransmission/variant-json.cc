@@ -203,11 +203,11 @@ private:
 
 std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
-    auto* const begin = std::data(input);
-    TR_ASSERT(begin != nullptr); // RapidJSON will dereference a nullptr if this is false
+    auto* begin = std::data(input);
     if (begin == nullptr)
     {
-        return {};
+        // RapidJSON will dereference a nullptr otherwise
+        begin = "";
     }
 
     auto const size = std::size(input);
