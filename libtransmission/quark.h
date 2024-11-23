@@ -223,6 +223,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_nodes6,
     TR_KEY_open_dialog_dir,
     TR_KEY_p,
+    TR_KEY_params,
     TR_KEY_path,
     TR_KEY_path_utf_8,
     TR_KEY_paused,
