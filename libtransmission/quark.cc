@@ -346,6 +346,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "open-dialog-dir"sv,
     "open_dialog_dir"sv,
     "p"sv,
+    "params"sv,
     "path"sv,
     "path.utf-8"sv,
     "paused"sv,
