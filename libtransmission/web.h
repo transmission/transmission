@@ -91,7 +91,7 @@ public:
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;
 
-        static auto inline constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
+        static auto constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
     };
 
     void fetch(FetchOptions&& options);

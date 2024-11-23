@@ -72,7 +72,7 @@ public:
     uint32_t offset = 0; // for GotBlock
     uint32_t length = 0; // for GotBlock, GotPieceData
     int err = 0; // errno for GotError
-    tr_port port = {}; // for GotPort
+    tr_port port; // for GotPort
 
     [[nodiscard]] constexpr static auto GotBlock(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
