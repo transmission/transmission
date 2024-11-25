@@ -113,20 +113,28 @@ export class ContextMenu extends EventTarget {
         const wheret = t.lastChild.getBoundingClientRect();
         const y = Math.min(
           0,
-          document.documentElement.clientHeight - window.visualViewport.offsetTop - where.top - t.clientHeight + 3,
+          document.documentElement.clientHeight -
+            window.visualViewport.offsetTop -
+            where.top -
+            t.clientHeight +
+            3,
         );
         const x = Math.min(
           0,
-          document.documentElement.clientWidth - window.visualViewport.offsetLeft - where.right - t.clientWidth - 3,
+          document.documentElement.clientWidth -
+            window.visualViewport.offsetLeft -
+            where.right -
+            t.clientWidth -
+            3,
         );
 
-        t.style.top = y + 'px';
+        t.style.top = `${y}px`;
         if (x) {
           t.lastChild.classList = 'poppy left';
-          t.style.left = -where.width - wheret.width + 'px';
+          t.style.left = `${-where.width - wheret.width}px`;
         } else {
           t.lastChild.classList = 'poppy right';
-          t.style.left = x + 'px';
+          t.style.left = `${x}px`;
         }
       });
     };
@@ -137,7 +145,7 @@ export class ContextMenu extends EventTarget {
 
       for (const arg of args) {
         arrow.append(add_item(arg));
-      };
+      }
 
       const e = document.createElement('DIV');
       e.textContent = text;
@@ -156,7 +164,7 @@ export class ContextMenu extends EventTarget {
       add_submenu(e);
 
       return e;
-    }
+    };
 
     root.dismissed = false;
 
