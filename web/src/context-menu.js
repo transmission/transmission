@@ -82,9 +82,30 @@ export class ContextMenu extends EventTarget {
       return item;
     };
 
-    const add_submenu = (e) => {
-      e.addEventListener('mousedown', (e_) => {
-        const t = e.lastChild.lastChild;
+    const add_arrow = (text, ...args) => {
+      const item = document.createElement('DIV');
+      item.textContent = text;
+      item.classList.add('context-menuitem');
+
+      const arrow = document.createElement('DIV');
+      arrow.classList = 'arrow';
+      item.append(arrow);
+
+      const submenu = document.createElement('DIV');
+      submenu.classList = 'submenu';
+      arrow.append(submenu);
+
+      const open = document.createElement('DIV');
+      open.classList = 'open right';
+      submenu.append(open);
+
+      for (const arg of args) {
+        open.append(add_item(arg));
+      }
+
+      item.addEventListener('click', (e_) => {
+        const t = item.lastChild.lastChild;
+
         if (
           !e_.target.classList.contains('right') &&
           !e_.target.parentNode.classList.contains('right') &&
@@ -92,24 +113,16 @@ export class ContextMenu extends EventTarget {
           !e_.target.parentNode.classList.contains('left') &&
           t.style.display === 'block'
         ) {
-          root.dismissed = true;
           t.style.display = 'none';
-        }
-      });
-
-      e.addEventListener('click', () => {
-        if (root.dismissed) {
-          root.dismissed = false;
           return;
         }
 
-        for (const p of document.querySelectorAll('.context-submenu')) {
+        for (const p of document.querySelectorAll('.submenu')) {
           p.style.display = 'none';
         }
 
-        const t = e.lastChild.lastChild;
         t.style.display = 'block';
-        const where = e.getBoundingClientRect();
+        const where = item.getBoundingClientRect();
         const wheret = t.lastChild.getBoundingClientRect();
         const y = Math.min(
           0,
@@ -129,43 +142,16 @@ export class ContextMenu extends EventTarget {
 
         t.style.top = `${y}px`;
         if (x) {
-          t.lastChild.classList = 'poppy left';
+          t.lastChild.classList = 'open left';
           t.style.left = `${-where.width - wheret.width}px`;
         } else {
-          t.lastChild.classList = 'poppy right';
+          t.lastChild.classList = 'open right';
           t.style.left = `${x}px`;
         }
       });
+
+      return item;
     };
-
-    const add_arrow = (text, ...args) => {
-      const arrow = document.createElement('DIV');
-      arrow.classList = 'poppy right';
-
-      for (const arg of args) {
-        arrow.append(add_item(arg));
-      }
-
-      const e = document.createElement('DIV');
-      e.textContent = text;
-      e.classList.add('context-menuitem');
-
-      const a = document.createElement('DIV');
-      a.classList = 'context-arrow';
-
-      const p = document.createElement('DIV');
-      p.classList = 'context-submenu';
-
-      p.append(arrow);
-      a.append(p);
-      e.append(a);
-
-      add_submenu(e);
-
-      return e;
-    };
-
-    root.dismissed = false;
 
     root.append(
       add_item('resume-selected-torrents'),
