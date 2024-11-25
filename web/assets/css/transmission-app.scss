@@ -1317,7 +1317,7 @@ a {
   user-select: none;
   -webkit-user-select: none;
 
-  .context-arrow {
+  .arrow {
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     border-left: 4px solid var(--color-fg-secondary);
@@ -1327,7 +1327,7 @@ a {
     position: relative;
     top: 5px;
 
-    .context-submenu {
+    .submenu {
       display: none;
       margin: 0 3px;
       pointer-events: auto;
@@ -1353,7 +1353,7 @@ a {
         }
       }
 
-      .poppy {
+      .open {
         background-color: var(--color-bg-primary);
         border-radius: 5px;
         color: var(--color-fg-on-popup);
