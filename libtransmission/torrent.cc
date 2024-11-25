@@ -1601,8 +1601,14 @@ void tr_torrentStartNow(tr_torrent* tor)
 void tr_torrentVerify(tr_torrent* tor)
 {
     tor->session->run_in_session_thread(
-        [tor]()
+        [session = tor->session, tor_id = tor->id()]()
         {
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr)
+            {
+                return;
+            }
+
             TR_ASSERT(tor->session->am_in_session_thread());
             auto const lock = tor->unique_lock();
 
