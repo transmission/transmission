@@ -1364,13 +1364,13 @@ a {
         &.left {
           position: relative;
           display: block;
-          animation: left 200ms linear 1 normal forwards;
+          animation: left 200ms linear 1;
         }
 
         &.right {
           position: relative;
           display: block;
-          animation: right 200ms linear 1 normal forwards;
+          animation: right 200ms linear 1;
         }
 
         @keyframes left {
