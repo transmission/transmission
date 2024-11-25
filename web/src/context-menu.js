@@ -73,36 +73,115 @@ export class ContextMenu extends EventTarget {
         this.close();
       });
       actions[action] = item;
-      root.append(item);
+      return item;
     };
 
     const add_separator = () => {
       const item = document.createElement('div');
       item.classList.add('context-menu-separator');
-      root.append(item);
+      return item;
     };
 
-    add_item('resume-selected-torrents');
-    add_item('resume-selected-torrents-now');
-    add_item('pause-selected-torrents');
-    add_separator();
-    add_item('move-top');
-    add_item('move-up');
-    add_item('move-down');
-    add_item('move-bottom');
-    add_separator();
-    add_item('remove-selected-torrents', true);
-    add_item('trash-selected-torrents', true);
-    add_separator();
-    add_item('verify-selected-torrents');
-    add_item('show-move-dialog');
-    add_item('show-rename-dialog');
-    add_item('show-labels-dialog');
-    add_separator();
-    add_item('reannounce-selected-torrents');
-    add_separator();
-    add_item('select-all');
-    add_item('deselect-all');
+    const add_submenu = (e) => {
+      e.addEventListener('mousedown', (e_) => {
+        const t = e.lastChild.lastChild;
+        if (
+          !e_.target.classList.contains('right') &&
+          !e_.target.parentNode.classList.contains('right') &&
+          !e_.target.classList.contains('left') &&
+          !e_.target.parentNode.classList.contains('left') &&
+          t.style.display === 'block'
+        ) {
+          root.dismissed = true;
+          t.style.display = 'none';
+        }
+      });
+
+      e.addEventListener('click', () => {
+        if (root.dismissed) {
+          root.dismissed = false;
+          return;
+        }
+
+        for (const p of document.querySelectorAll('.context-submenu')) {
+          p.style.display = 'none';
+        }
+
+        const t = e.lastChild.lastChild;
+        t.style.display = 'block';
+        const where = e.getBoundingClientRect();
+        const wheret = t.lastChild.getBoundingClientRect();
+        const y = Math.min(
+          0,
+          document.documentElement.clientHeight - window.visualViewport.offsetTop - where.top - t.clientHeight + 3,
+        );
+        const x = Math.min(
+          0,
+          document.documentElement.clientWidth - window.visualViewport.offsetLeft - where.right - t.clientWidth - 3,
+        );
+
+        t.style.top = y + 'px';
+        if (x) {
+          t.lastChild.classList = 'poppy left';
+          t.style.left = -where.width - wheret.width + 'px';
+        } else {
+          t.lastChild.classList = 'poppy right';
+          t.style.left = x + 'px';
+        }
+      });
+    };
+
+    const add_arrow = (text, ...args) => {
+      const arrow = document.createElement('DIV');
+      arrow.classList = 'poppy right';
+
+      for (const arg of args) {
+        arrow.append(add_item(arg));
+      };
+
+      const e = document.createElement('DIV');
+      e.textContent = text;
+      e.classList.add('context-menuitem');
+
+      const a = document.createElement('DIV');
+      a.classList = 'context-arrow';
+
+      const p = document.createElement('DIV');
+      p.classList = 'context-submenu';
+
+      p.append(arrow);
+      a.append(p);
+      e.append(a);
+
+      add_submenu(e);
+
+      return e;
+    }
+
+    root.dismissed = false;
+
+    root.append(
+      add_item('resume-selected-torrents'),
+      add_item('resume-selected-torrents-now'),
+      add_item('pause-selected-torrents'),
+      add_separator(),
+      add_item('move-top'),
+      add_item('move-up'),
+      add_item('move-down'),
+      add_item('move-bottom'),
+      add_separator(),
+      add_item('remove-selected-torrents', true),
+      add_item('trash-selected-torrents', true),
+      add_separator(),
+      add_item('verify-selected-torrents'),
+      add_item('show-move-dialog'),
+      add_item('show-rename-dialog'),
+      add_item('show-labels-dialog'),
+      add_separator(),
+      add_item('reannounce-selected-torrents'),
+      add_separator(),
+      add_arrow('Select operation', 'select-all', 'deselect-all'),
+    );
 
     return { actions, root };
   }
