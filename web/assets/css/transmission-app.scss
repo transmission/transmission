@@ -1336,14 +1336,16 @@ a {
       transform: translate(7px, -18px);
       z-index: 3;
       border-radius: 5px;
-      animation: shadow 400ms linear 1 normal forwards;
+      animation: shadow 200ms ease-in normal forwards;
 
       @keyframes shadow {
         0% {
-          box-shadow: 0;
+          background: rgba(0, 0, 0, 0);
+          box-shadow: none;
         }
 
         100% {
+          background: rgba(0, 0, 0, 0.04);
           box-shadow:
             0 3px 6px -4px rgba(0, 0, 0, 0.12),
             0 6px 16px rgba(0, 0, 0, 0.08),
