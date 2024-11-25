@@ -124,8 +124,7 @@ export class ContextMenu extends EventTarget {
           document.documentElement.clientWidth -
             window.visualViewport.offsetLeft -
             where.right -
-            t.clientWidth -
-            3,
+            t.clientWidth,
         );
 
         t.style.top = `${y}px`;
