@@ -927,9 +927,14 @@ void tr_peerMsgsImpl::parse_ltep(MessageReader& payload)
     {
         parse_ltep_handshake(payload);
 
+        // The peer most likely supports LTEP, so send our LTEP handshake in
+        // case we haven't yet. Usually we would have sent our LTEP handshake
+        // by this point, unless the peer didn't set the "extended" bit (20)
+        // in the reserved bytes of the BT handshake.
+        send_ltep_handshake();
+
         if (io_->supports_ltep())
         {
-            send_ltep_handshake();
             send_ut_pex();
         }
     }
