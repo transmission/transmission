@@ -37,11 +37,14 @@ class IncompleteDirTest
 protected:
     void SetUp() override
     {
-        auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir);
-        auto const incomplete_dir = GetParam().first;
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir);
-        tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
+        if (auto* map = settings()->get_if<tr_variant::Map>(); map != nullptr)
+        {
+            auto const download_dir = GetParam().second;
+            map->insert_or_assign(TR_KEY_download_dir, download_dir);
+            auto const incomplete_dir = GetParam().first;
+            map->insert_or_assign(TR_KEY_incomplete_dir, incomplete_dir);
+            map->insert_or_assign(TR_KEY_incomplete_dir_enabled, true);
+        }
 
         SessionTest::SetUp();
     }
