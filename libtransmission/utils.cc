@@ -134,7 +134,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (*error)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -143,7 +143,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
 
     if (!info || !info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
+        tr_logAddError(fmt::format(fmt::runtime(_("Couldn't read '{path}': Not a regular file")), fmt::arg("path", filename)));
         error->set(TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -153,7 +153,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -164,7 +164,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -624,7 +624,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
     if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't remove '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
             fmt::arg("path", oldpath),
             fmt::arg("error", log_error.message()),
             fmt::arg("error_code", log_error.code())));
