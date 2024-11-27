@@ -32,6 +32,7 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #else
 #include <arpa/inet.h>
+#include <sys/stat.h> /* umask() */
 #endif
 
 #define UTF_CPP_CPLUSPLUS 201703L
@@ -193,6 +194,14 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
     {
         return false;
     }
+#ifndef _WIN32
+    // set file mode per settings umask()
+    {
+        auto const val = ::umask(0);
+        ::umask(val);
+        fchmod(fd, 0666 & ~val);
+    }
+#endif
 
     // Save the contents. This might take >1 pass.
     auto ok = true;
