@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -237,6 +238,23 @@ TEST_P(JSONTest, unescape)
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, tr_quark_new("string-1"sv), &sv));
     EXPECT_EQ("/usr/lib"sv, sv);
+}
+
+TEST_P(JSONTest, parseJsonFuzz)
+{
+    auto serde = tr_variant_serde::json().inplace();
+
+    auto var = serde.parse({ nullptr, 0U });
+    EXPECT_FALSE(var);
+
+    auto buf = std::vector<char>{};
+    for (size_t i = 0; i < 100000U; ++i)
+    {
+        buf.resize(tr_rand_int(1024U));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+
+        (void)serde.parse({ std::data(buf), std::size(buf) });
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P( //
