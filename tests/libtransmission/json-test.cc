@@ -60,8 +60,25 @@ TEST_P(JSONTest, testElements)
         "  \"null\": null }"
     };
 
-    auto var = tr_variant_serde::json().inplace().parse(in).value_or(tr_variant{});
-    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
+    // Same as In, just formatted differently
+    static auto constexpr Out = std::string_view{
+        // clang-format off
+        "{"
+            "\"escaped\":\"bell \\b formfeed \\f linefeed \\n carriage return \\r tab \\t\","
+            "\"false\":false,"
+            "\"float\":6.5,"
+            "\"int\":5,"
+            "\"null\":null,"
+            "\"string\":\"hello world\","
+            "\"true\":true"
+        "}"
+        // clang-format on
+    };
+
+    auto serde = tr_variant_serde::json().inplace().compact();
+    auto var = serde.parse(in).value_or(tr_variant{});
+    auto const* const map = var.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
 
     auto sv = std::string_view{};
     auto key = tr_quark_new("string"sv);
@@ -86,8 +103,10 @@ TEST_P(JSONTest, testElements)
     EXPECT_TRUE(tr_variantDictFindBool(&var, tr_quark_new("false"sv), &f));
     EXPECT_FALSE(f);
 
-    EXPECT_TRUE(tr_variantDictFindStrView(&var, tr_quark_new("null"sv), &sv));
-    EXPECT_EQ(""sv, sv);
+    auto n = map->value_if<std::nullptr_t>(tr_quark_new("null"sv));
+    EXPECT_TRUE(n);
+
+    EXPECT_EQ(serde.to_string(var), Out);
 }
 
 TEST_P(JSONTest, testUtf8)
