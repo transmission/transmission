@@ -239,15 +239,16 @@ TEST_F(MakemetaTest, announceSingleTracker)
     // generate the torrent and parse it as a variant
     EXPECT_FALSE(builder.make_checksums().get().has_value());
     auto top = tr_variant_serde::benc().parse(builder.benc());
-    EXPECT_TRUE(top.has_value());
+    ASSERT_TRUE(top);
+    auto* map = top->get_if<tr_variant::Map>();
 
     // confirm there's an "announce" entry
-    auto single_announce = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&*top, TR_KEY_announce, &single_announce));
-    EXPECT_EQ(SingleAnnounce, single_announce);
+    auto single_announce = map->value_if<std::string_view>(TR_KEY_announce);
+    ASSERT_TRUE(single_announce);
+    EXPECT_EQ(SingleAnnounce, *single_announce);
 
     // confirm there's not an "announce-list" entry
-    EXPECT_EQ(nullptr, tr_variantDictFind(&*top, TR_KEY_announce_list));
+    EXPECT_EQ(map->find(TR_KEY_announce_list), std::end(*map));
 }
 
 TEST_F(MakemetaTest, announceMultiTracker)
@@ -267,18 +268,18 @@ TEST_F(MakemetaTest, announceMultiTracker)
     // generate the torrent and parse it as a variant
     EXPECT_FALSE(builder.make_checksums().get().has_value());
     auto top = tr_variant_serde::benc().parse(builder.benc());
-    EXPECT_TRUE(top.has_value());
+    ASSERT_TRUE(top);
+    auto* map = top->get_if<tr_variant::Map>();
 
     // confirm there's an "announce" entry
-    auto single_announce = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&*top, TR_KEY_announce, &single_announce));
-    EXPECT_EQ(builder.announce_list().at(0).announce.sv(), single_announce);
+    auto single_announce = map->value_if<std::string_view>(TR_KEY_announce);
+    ASSERT_TRUE(single_announce);
+    EXPECT_EQ(builder.announce_list().at(0).announce.sv(), *single_announce);
 
     // confirm there's an "announce-list" entry
-    tr_variant* announce_list_variant = nullptr;
-    EXPECT_TRUE(tr_variantDictFindList(&*top, TR_KEY_announce_list, &announce_list_variant));
-    EXPECT_NE(nullptr, announce_list_variant);
-    EXPECT_EQ(std::size(builder.announce_list()), tr_variantListSize(announce_list_variant));
+    auto* announce_list_variant = map->find_if<tr_variant::Vector>(TR_KEY_announce_list);
+    ASSERT_NE(announce_list_variant, nullptr);
+    EXPECT_EQ(std::size(builder.announce_list()), std::size(*announce_list_variant));
 }
 
 TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)

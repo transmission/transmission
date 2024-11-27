@@ -479,9 +479,7 @@ protected:
     {
         if (!settings_)
         {
-            auto* settings = new tr_variant{};
-            tr_variantInitDict(settings, 10);
-            settings_.reset(settings);
+            settings_ = std::make_shared<tr_variant>(tr_variant::make_map(10U));
         }
 
         return settings_.get();

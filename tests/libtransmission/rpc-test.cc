@@ -32,38 +32,43 @@ using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
 {
-    auto i = int64_t{};
-    auto sv = std::string_view{};
-
     auto top = tr_rpc_parse_list_str("12"sv);
-    EXPECT_TRUE(top.holds_alternative<int64_t>());
-    EXPECT_TRUE(tr_variantGetInt(&top, &i));
-    EXPECT_EQ(12, i);
+    auto i = top.value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(12, *i);
 
     top = tr_rpc_parse_list_str("6,7"sv);
-    EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
-    EXPECT_EQ(2U, tr_variantListSize(&top));
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
-    EXPECT_EQ(6, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
-    EXPECT_EQ(7, i);
+    auto* v = top.get_if<tr_variant::Vector>();
+    ASSERT_NE(v, nullptr);
+    EXPECT_EQ(2U, std::size(*v));
+    i = (*v)[0].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(6, *i);
+    i = (*v)[1].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(7, *i);
 
     top = tr_rpc_parse_list_str("asdf"sv);
-    EXPECT_TRUE(top.holds_alternative<std::string_view>());
-    EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
-    EXPECT_EQ("asdf"sv, sv);
+    auto sv = top.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ("asdf"sv, *sv);
 
     top = tr_rpc_parse_list_str("1,3-5"sv);
-    EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
-    EXPECT_EQ(4U, tr_variantListSize(&top));
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
-    EXPECT_EQ(1, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
-    EXPECT_EQ(3, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 2), &i));
-    EXPECT_EQ(4, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 3), &i));
-    EXPECT_EQ(5, i);
+    v = top.get_if<tr_variant::Vector>();
+    ASSERT_NE(v, nullptr);
+    EXPECT_EQ(4U, std::size(*v));
+    i = (*v)[0].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(1, *i);
+    i = (*v)[1].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(3, *i);
+    i = (*v)[2].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(4, *i);
+    i = (*v)[3].value_if<int64_t>();
+    ASSERT_TRUE(i);
+    EXPECT_EQ(5, *i);
 }
 
 TEST_F(RpcTest, tagSync)
@@ -154,18 +159,18 @@ TEST_F(RpcTest, sessionGet)
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
-    auto request = tr_variant{};
-    tr_variantInitDict(&request, 1);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
+    auto request_map = tr_variant::Map{ 1U };
+    request_map.try_emplace(TR_KEY_method, "session-get"sv);
     auto response = tr_variant{};
     tr_rpc_request_exec(
         session_,
-        request,
+        std::move(request_map),
         [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
-    EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
-    tr_variant* args = nullptr;
-    EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
+    auto* response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* args_map = response_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+    ASSERT_NE(args_map, nullptr);
 
     // what we expected
     static auto constexpr ExpectedKeys = std::array{
@@ -233,10 +238,7 @@ TEST_F(RpcTest, sessionGet)
 
     // what we got
     std::set<tr_quark> actual_keys;
-    auto key = tr_quark{};
-    tr_variant* val = nullptr;
-    auto n = size_t{};
-    while ((tr_variantDictChild(args, n++, &key, &val)))
+    for (auto const& [key, val] : *args_map)
     {
         actual_keys.insert(key);
     }
@@ -268,35 +270,36 @@ TEST_F(RpcTest, torrentGet)
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
-    tr_variant request;
-    tr_variantInitDict(&request, 1);
+    auto request = tr_variant::Map{ 1U };
 
-    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-get");
+    request.try_emplace(TR_KEY_method, "torrent-get");
 
-    tr_variant* args_in = tr_variantDictAddDict(&request, TR_KEY_arguments, 1);
-    tr_variant* fields = tr_variantDictAddList(args_in, TR_KEY_fields, 1);
-    tr_variantListAddStrView(fields, tr_quark_get_string_view(TR_KEY_id));
+    auto args_in = tr_variant::Map{ 1U };
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    args_in.try_emplace(TR_KEY_fields, std::move(fields));
+    request.try_emplace(TR_KEY_arguments, std::move(args_in));
 
     auto response = tr_variant{};
     tr_rpc_request_exec(
         session_,
-        request,
+        std::move(request),
         [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
 
-    EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
-    tr_variant* args = nullptr;
-    EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
+    auto* response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* args_out = response_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+    ASSERT_NE(args_out, nullptr);
 
-    tr_variant* torrents = nullptr;
-    EXPECT_TRUE(tr_variantDictFindList(args, TR_KEY_torrents, &torrents));
-    EXPECT_EQ(1UL, tr_variantListSize(torrents));
+    auto* torrents = args_out->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    ASSERT_NE(torrents, nullptr);
+    EXPECT_EQ(1UL, std::size(*torrents));
 
-    tr_variant* first_torrent = tr_variantListChild(torrents, 0);
-    EXPECT_TRUE(first_torrent != nullptr);
-    EXPECT_TRUE(first_torrent->holds_alternative<tr_variant::Map>());
-    int64_t first_torrent_id = 0;
-    EXPECT_TRUE(tr_variantDictFindInt(first_torrent, TR_KEY_id, &first_torrent_id));
-    EXPECT_EQ(1, first_torrent_id);
+    auto* first_torrent = (*torrents)[0].get_if<tr_variant::Map>();
+    ASSERT_NE(first_torrent, nullptr);
+    auto first_torrent_id = first_torrent->value_if<int64_t>(TR_KEY_id);
+    ASSERT_TRUE(first_torrent_id);
+    EXPECT_EQ(1, *first_torrent_id);
 
     // cleanup
     tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
