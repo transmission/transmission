@@ -36,6 +36,8 @@ target_sources(${TR_NAME}-gtk
         MainWindow.h
         MakeDialog.cc
         MakeDialog.h
+        MaxMindDB.cc
+        MaxMindDB.h
         MessageLogWindow.cc
         MessageLogWindow.h
         Notify.cc

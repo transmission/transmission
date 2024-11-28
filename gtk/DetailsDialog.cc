@@ -9,12 +9,11 @@
 #include "FileList.h"
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
+#include "MaxMindDB.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
-#include <curl/curl.h>
-#include <maxminddb.h>
 
 #include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
@@ -1193,13 +1192,6 @@ public:
 
 PeerModelColumns const peer_cols;
 
-// Callback function to write data to a file
-size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
-{
-    size_t written = fwrite(ptr, size, nmemb, stream);
-    return written;
-}
-
 void initPeerRow(
     Gtk::TreeModel::iterator const& iter,
     std::string_view key,
@@ -1227,53 +1219,9 @@ void initPeerRow(
                 peer_addr4_octets + sizeof(peer_addr4.s_addr), // TODO(C++20): Use std::span
                 "."));
 
-    // TODO: create a function for the computation of the location
-    // TODO: eliminate warnings
-    // Compute location from IP
-    std::string homedir = Glib::get_home_dir();
-    char mmdb_file[256]; // database file
-    strcpy(mmdb_file, homedir.c_str());
-    strcat(mmdb_file, "/.dbip-city-lite");
-    strcat(mmdb_file, ".mmdb.gz");
-
-    CURL* curl;
-    FILE* fp;
-    CURLcode res;
-    // TODO: change the date accordingly
-    std::string url = "https://download.db-ip.com/free/dbip-city-lite-2024-11.mmdb.gz"; // Replace with the actual URL
-    curl = curl_easy_init();
-    if (curl)
-    {
-        fp = fopen(mmdb_file, "wb");
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-        res = curl_easy_perform(curl);
-        // always cleanup
-        curl_easy_cleanup(curl);
-    }
-    // TODO: decompress mmdb.gz file
-
-    // TODO: handle non existing file and errors
-    MMDB_s mmdb;
-    MMDB_open(mmdb_file, MMDB_MODE_MMAP, &mmdb);
-    int gai_error, mmdb_error;
-    MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, std::data(peer->addr), &gai_error, &mmdb_error);
-    MMDB_entry_data_s entry_data;
-    MMDB_get_value(&result.entry, &entry_data, "city", "names", "en", NULL);
-    char location[64];
-    int city_len = entry_data.data_size;
-    location[city_len] = 0;
-    strncpy(location, entry_data.utf8_string, entry_data.data_size);
-    MMDB_get_value(&result.entry, &entry_data, "country", "names", "en", NULL);
-    strcat(location, ", ");
-    strncat(location, entry_data.utf8_string, entry_data.data_size);
-    location[city_len + 2 + entry_data.data_size] = 0;
-    printf("%s", location);
-
     (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
-    (*iter)[peer_cols.location] = location;
+    (*iter)[peer_cols.location] = get_location_from_ip(std::data(peer->addr));
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
