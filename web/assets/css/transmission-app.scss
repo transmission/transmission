@@ -40,6 +40,7 @@
   --green-300: #7cef99;
   --green-400: #67c87f;
   --green-500: #34dc70;
+  --grey: rgba(128, 128, 130, 0.66);
   --grey-200: #e1e4e8;
   --grey-40: #666;
   --grey-500: #828282;
@@ -99,7 +100,7 @@
     --color-border-default: var(--default-border-dark);
     --color-border-stark: var(--dark-mode-white);
     --color-border-starkest: var(--grey-500);
-    --color-fg-disabled: #808088;
+    --color-fg-disabled: var(--grey);
     --color-fg-on-popup: var(--nice-grey);
     --color-fg-primary: var(--dark-mode-white);
     --color-fg-secondary: var(--nice-grey);
@@ -163,7 +164,7 @@
     --color-border-stark: var(--grey-500);
     --color-border-starkest: #d0d7de;
     --color-dialog-border: var(--nice-grey);
-    --color-fg-disabled: var(--grey-500);
+    --color-fg-disabled: var(--grey);
     --color-fg-error: var(--red-500);
     --color-fg-on-popup: var(--grey-900);
     --color-fg-port-closed: var(--red-500);

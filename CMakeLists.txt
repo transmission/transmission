@@ -559,7 +559,12 @@ set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
     tr_get_required_flag(REBUILD_WEB NPM_IS_REQUIRED)
 
-    find_program(NPM npm)
+    if(WIN32)
+        find_program(NPM npm.cmd)
+    else()
+        find_program(NPM npm)
+    endif()
+
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
         set(NPM_FOUND OFF)
         if(NPM_IS_REQUIRED)

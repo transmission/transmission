@@ -45,7 +45,7 @@ using tr_sys_dir_t = tr_sys_dir_win32*;
 /** @brief Platform-specific invalid directory descriptor constant. */
 #define TR_BAD_SYS_DIR ((tr_sys_dir_t) nullptr)
 
-enum tr_sys_file_open_flags_t
+enum tr_sys_file_open_flags_t : uint8_t
 {
     TR_SYS_FILE_READ = (1 << 0),
     TR_SYS_FILE_WRITE = (1 << 1),
@@ -54,29 +54,29 @@ enum tr_sys_file_open_flags_t
     TR_SYS_FILE_SEQUENTIAL = (1 << 4)
 };
 
-enum tr_sys_file_lock_flags_t
+enum tr_sys_file_lock_flags_t : uint8_t
 {
     TR_SYS_FILE_LOCK_SH = (1 << 0),
     TR_SYS_FILE_LOCK_EX = (1 << 1),
     TR_SYS_FILE_LOCK_NB = (1 << 2)
 };
 
-enum tr_sys_path_get_info_flags_t
+enum tr_sys_path_get_info_flags_t : uint8_t
 {
     TR_SYS_PATH_NO_FOLLOW = (1 << 0)
 };
 
-enum tr_sys_file_preallocate_flags_t
+enum tr_sys_file_preallocate_flags_t : uint8_t
 {
     TR_SYS_FILE_PREALLOC_SPARSE = (1 << 0)
 };
 
-enum tr_sys_dir_create_flags_t
+enum tr_sys_dir_create_flags_t : uint8_t
 {
     TR_SYS_DIR_CREATE_PARENTS = (1 << 0)
 };
 
-enum tr_sys_path_type_t
+enum tr_sys_path_type_t : uint8_t
 {
     TR_SYS_PATH_IS_FILE,
     TR_SYS_PATH_IS_DIRECTORY,
