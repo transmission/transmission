@@ -22,6 +22,62 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
     return written;
 }
 
+// Function to decompress the mmdb.gz file after download
+void decompress_gz_file(std::string filename)
+{
+    std::ifstream gz_file(filename, std::ios::binary);
+    if (!gz_file)
+    {
+        std::cerr << "Error opening " + filename + " to perform decompression" << std::endl;
+        return;
+    }
+
+    // Read the entire .gz file into a buffer
+    std::vector<char> gz_data((std::istreambuf_iterator<char>(gz_file)), std::istreambuf_iterator<char>());
+
+    // Initialize decompressor
+    libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
+    if (decompressor == nullptr)
+    {
+        std::cerr << "libdeflate: Failed to create decompressor" << std::endl;
+        return;
+    }
+
+    // Prepare buffer to hold decompressed data (estimate maximum decompressed size)
+    size_t decompressed_size = gz_data.size() * 4;
+    std::vector<char> decompressed_data(decompressed_size);
+
+    // Perform the decompression
+    size_t decompressed_len;
+    int result = libdeflate_gzip_decompress(
+        decompressor,
+        gz_data.data(),
+        gz_data.size(),
+        decompressed_data.data(),
+        decompressed_size,
+        &decompressed_len);
+
+    if (result != LIBDEFLATE_SUCCESS)
+    {
+        std::cerr << "libdeflate: Decompression of " + filename + " failed" << std::endl;
+    }
+    else
+    {
+        // Write decompressed data to the output file
+        filename.erase(filename.size() - 3, 3); // erase ".gz" suffix
+        std::ofstream output_file(filename, std::ios::binary);
+        if (!output_file)
+        {
+            std::cerr << "Error opening " + filename + " to save decompression result" << std::endl;
+        }
+        else
+        {
+            output_file.write(decompressed_data.data(), decompressed_len);
+        }
+    }
+    libdeflate_free_decompressor(decompressor);
+}
+
 // Function to download and update the mmdb file
 // Free database with monthly updates from <https://db-ip.com/>
 void maintain_mmdb_file(std::string mmdb_file)
@@ -30,7 +86,11 @@ void maintain_mmdb_file(std::string mmdb_file)
     using namespace std::chrono;
     auto date_time = Glib::DateTime::create_now_utc(system_clock::to_time_t(system_clock::now()));
     std::string year = std::to_string(date_time.get_year());
-    std::string month = std::to_string(date_time.get_month()); // TODO: pad
+    std::string month = std::to_string(date_time.get_month());
+    if (month.size() == 1)
+    {
+        month = "0" + month; // pad
+    }
 
     std::string url = "";
     if (access(mmdb_file.c_str(), F_OK) == -1)
@@ -52,10 +112,13 @@ void maintain_mmdb_file(std::string mmdb_file)
             time_t build_epoch = mmdb.metadata.build_epoch;
             date_time = Glib::DateTime::create_now_utc(build_epoch);
             std::string mmdb_year = std::to_string(date_time.get_year());
-            std::string mmdb_month = std::to_string(date_time.get_month()); // TODO: pad
+            std::string mmdb_month = std::to_string(date_time.get_month());
+            if (mmdb_month.size() == 1)
+            {
+                mmdb_month = "0" + mmdb_month; // pad
+            }
             if (month != mmdb_month || year != mmdb_year)
             {
-                // TODO: delete existing
                 url = "https://download.db-ip.com/free/dbip-city-lite-" + year + "-" + month + ".mmdb.gz";
             }
         }
@@ -79,56 +142,7 @@ void maintain_mmdb_file(std::string mmdb_file)
             fclose(fp);
 
             // Decompress mmdb.gz file
-            std::ifstream gz_file(mmdb_file + ".gz", std::ios::binary);
-            if (!gz_file)
-            {
-                std::cerr << "Error opening " + mmdb_file + ".gz" << std::endl;
-                return;
-            }
-
-            // Read the entire .gz file into a buffer
-            std::vector<char> gz_data((std::istreambuf_iterator<char>(gz_file)), std::istreambuf_iterator<char>());
-
-            // Initialize decompressor
-            libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
-            if (decompressor == nullptr)
-            {
-                std::cerr << "LIBDEFLATE: Failed to create decompressor" << std::endl;
-                return;
-            }
-
-            // Prepare buffer to hold decompressed data (estimate maximum decompressed size)
-            size_t decompressed_size = gz_data.size() * 4;
-            std::vector<char> decompressed_data(decompressed_size);
-
-            // Perform the decompression
-            size_t decompressed_len;
-            int result = libdeflate_gzip_decompress(
-                decompressor,
-                gz_data.data(),
-                gz_data.size(),
-                decompressed_data.data(),
-                decompressed_size,
-                &decompressed_len);
-
-            if (result != LIBDEFLATE_SUCCESS)
-            {
-                std::cerr << "LIBDEFLATE: Decompression of " + mmdb_file + ".gz" + " failed" << std::endl;
-            }
-            else
-            {
-                // Write decompressed data to the output file
-                std::ofstream output_file(mmdb_file, std::ios::binary);
-                if (!output_file)
-                {
-                    std::cerr << "Error opening output file" << std::endl;
-                }
-                else
-                {
-                    output_file.write(decompressed_data.data(), decompressed_len);
-                }
-            }
-            libdeflate_free_decompressor(decompressor);
+            decompress_gz_file(mmdb_file + ".gz");
         }
     }
 }
