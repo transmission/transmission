@@ -94,6 +94,7 @@ export class OverflowMenu extends EventTarget {
     switch (event_.key) {
       case Prefs.SortDirection:
       case Prefs.SortMode:
+      case Prefs.GroupByPath:
         this.root.querySelector(`[data-pref="${event_.key}"]`).value =
           event_.value;
         break;
@@ -215,6 +216,29 @@ export class OverflowMenu extends EventTarget {
       this.prefs.sort_direction = event_.target.checked
         ? Prefs.SortDescending
         : Prefs.SortAscending;
+    });
+
+    // group by path
+
+    div = document.createElement('div');
+    div.classList.add('table-row');
+    options.append(div);
+
+    check = document.createElement('input');
+    check.id = 'display-group-by-path-check';
+    check.dataset.pref = Prefs.GroupByPath;
+    check.type = 'checkbox';
+    div.append(check);
+
+    label = document.createElement('label');
+    label.id = 'display-groupby-path-label';
+    label.setAttribute('for', check.id);
+    label.textContent = 'Group by path';
+    div.append(label);
+
+    check.checked = this.prefs.group_by_path === true;
+    check.addEventListener('input', (event_) => {
+      this.prefs.group_by_path = event_.target.checked;
     });
 
     // compact
