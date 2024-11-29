@@ -1218,7 +1218,7 @@ namespace make_torrent_field_helpers
                 }
                 else
                 {
-                    return { {}, Error::FILE_IDX_OOR, {} };
+                    return { {}, Error::FILE_IDX_OOR, std::string{} };
                 }
             }
         }
