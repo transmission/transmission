@@ -1,16 +1,18 @@
 > [!IMPORTANT] 
-> Since `4.1.0` (`rpc_version` 18), Transmission has switched to snake_case for all RPC strings.
-> Transmission used to use a mix of kebab-case and camelCase. Those are still available for backward compatibility,
-> but they are deprecated and will be removed in `5.0.0`.
+> Since `4.1.0` (`rpc_version` 18), Transmission has switched from a bespoke RPC protocol to [JSON-RPC 2.0](https://www.jsonrpc.org/specification).
+> The strings are also converted from kebab-case/camelCase to snake_case.
 > 
-> For documentation of the old RPC strings, please consult documentation from previous versions.
+> For backward compatibility, the old RPC protocol are still available, and the kebab-case/camelCase strings can be used in
+> both the old and new protocol. But from `5.0.0` and onwards, only the JSON-RPC 2.0 protocol and snake_case strings will be kept.
+> 
+> For documentation of the old RPC protocol and strings, please consult documentation from previous versions.
 > https://github.com/transmission/transmission/blob/4.0.6/docs/rpc-spec.md
 
 # Transmission's RPC specification
 This document describes a protocol for interacting with Transmission sessions remotely.
 
 ### 1.1 Terminology
-The [JSON](https://www.json.org/) terminology in [RFC 4627](https://datatracker.ietf.org/doc/html/rfc4627) is used.
+The [JSON](https://www.json.org/) terminology in [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259) is used.
 RPC requests and responses are formatted in JSON.
 
 ### 1.2 Tools
@@ -32,48 +34,48 @@ Some people outside of the Transmission project have written libraries that wrap
 
 
 ## 2 Message format
-Messages are formatted as objects. There are two types: requests (described in [section 2.1](#21-requests)) and responses (described in [section 2.2](#22-responses)).
+Transmission follows the [JSON-RPC 2.0](https://www.jsonrpc.org/specification) specification and supports the entirety of it,
+except that parameters by-position is not supported, meaning the request parameters must be an Object.
 
-All text **must** be UTF-8 encoded.
+Response parameters are returned in the `result` Object.
 
-### 2.1 Requests
-Requests support three keys:
-
-1. A required `method` string telling the name of the method to invoke
-2. An optional `arguments` object of key/value pairs. The keys allowed are defined by the `method`.
-3. An optional `tag` number used by clients to track responses. If provided by a request, the response MUST include the same tag.
-
+#### Example request
 ```json
 {
-   "arguments": {
-     "fields": [
-       "version"
-     ]
+   "jsonrpc": "2.0",
+   "params": {
+     "fields": [ "version" ]
    },
    "method": "session_get",
-   "tag": 912313
+   "id": 912313
 }
 ```
 
-
-### 2.2 Responses
-Responses to a request will include:
-
-1. A required `result` string whose value MUST be `success` on success, or an error string on failure.
-2. An optional `arguments` object of key/value pairs. Its keys contents are defined by the `method` and `arguments` of the original request.
-3. An optional `tag` number as described in 2.1.
-
+#### Example response
 ```json
 {
-   "arguments": {
-      "version": "2.93 (3c5870d4f5)"
+   "jsonrpc": "2.0",
+   "result": {
+      "version": "4.1.0-dev (ae226418eb)"
    },
-   "result": "success",
-   "tag": 912313
+   "id": 912313
 }
 ```
 
-### 2.3 Transport mechanism
+### 2.1 Error data
+
+JSON-RPC 2.0 allows for additional information about an error be included in the `data` key of the Error object in an implementation-defined format.
+
+In Transmission, this key is an Object that includes:
+
+1. An optional `error_string` string that provides additional information that is not included in the `message` key of the Error object.
+2. An optional `result` Object that contains additional keys defined by the method.
+
+```json
+// TODO
+```
+
+### 2.2 Transport mechanism
 HTTP POSTing a JSON-encoded request is the preferred way of communicating
 with a Transmission RPC server. The current Transmission implementation
 has the default URL as `http://host:9091/transmission/rpc`. Clients
@@ -81,7 +83,10 @@ may use this as a default, but should allow the URL to be reconfigured,
 since the port and path may be changed to allow mapping and/or multiple
 daemons to run on a single server.
 
-#### 2.3.1 CSRF protection
+The RPC server will normally return HTTP 200 regardless of whether the
+request succeeded. For JSON-RPC 2.0 notifications, HTTP 204 will be returned.
+
+#### 2.2.1 CSRF protection
 Most Transmission RPC servers require a `X-Transmission-Session-Id`
 header to be sent with requests, to prevent CSRF attacks.
 
@@ -93,7 +98,7 @@ right `X-Transmission-Session-Id` in its own headers.
 So, the correct way to handle a 409 response is to update your
 `X-Transmission-Session-Id` and to resend the previous request.
 
-#### 2.3.2 DNS rebinding protection
+#### 2.2.2 DNS rebinding protection
 Additional check is being made on each RPC request to make sure that the
 client sending the request does so using one of the allowed hostnames by
 which RPC server is meant to be available.
@@ -107,7 +112,7 @@ addresses are always implicitly allowed.
 For more information on configuration, see settings.json documentation for
 `rpc_host_whitelist_enabled` and `rpc_host_whitelist` keys.
 
-#### 2.3.3 Authentication
+#### 2.2.3 Authentication
 Enabling authentication is an optional security feature that can be enabled
 on Transmission RPC servers. Authentication occurs by method of HTTP Basic
 Access Authentication.
@@ -128,8 +133,8 @@ username and password (respectively), separated by a colon.
 | `torrent_verify`     | tr_torrentVerify         | verify torrent
 | `torrent_reannounce` | tr_torrentManualUpdate   | re-announce to trackers now
 
-Request arguments: `ids`, which specifies which torrents to use.
-All torrents are used if the `ids` argument is omitted.
+Request parameters: `ids`, which specifies which torrents to use.
+All torrents are used if the `ids` parameter is omitted.
 
 `ids` should be one of the following:
 
@@ -140,12 +145,12 @@ All torrents are used if the `ids` argument is omitted.
 Note that integer torrent ids are not stable across Transmission daemon
 restarts. Use torrent hashes if you need stable ids.
 
-Response arguments: none
+Response parameters: none
 
 ### 3.2 Torrent mutator: `torrent_set`
 Method name: `torrent_set`
 
-Request arguments:
+Request parameters:
 
 | Key | Value Type | Value Description
 |:--|:--|:--
@@ -180,20 +185,20 @@ Just as an empty `ids` value is shorthand for "all ids", using an empty array
 for `files_wanted`, `files_unwanted`, `priority_high`, `priority_low`, or
 `priority_normal` is shorthand for saying "all files".
 
-   Response arguments: none
+   Response parameters: none
 
 ### 3.3 Torrent accessor: `torrent_get`
 Method name: `torrent_get`.
 
-Request arguments:
+Request parameters:
 
 1. An optional `ids` array as described in 3.1.
 2. A required `fields` array of keys. (see list below)
 3. An optional `format` string specifying how to format the
    `torrents` response field. Allowed values are `objects`
-   (default) and `table`. (see "Response arguments" below)
+   (default) and `table`. (see "Response parameters" below)
 
-Response arguments:
+Response parameters:
 
 1. A `torrents` array.
 
@@ -425,12 +430,13 @@ Request:
 
 ```json
 {
-   "arguments": {
+   "jsonrpc": "2.0",
+   "params": {
        "fields": [ "id", "name", "total_size" ],
        "ids": [ 7, 10 ]
    },
    "method": "torrent_get",
-   "tag": 39693
+   "id": 39693
 }
 ```
 
@@ -438,7 +444,8 @@ Response:
 
 ```json
 {
-   "arguments": {
+   "jsonrpc": "2.0",
+   "result": {
       "torrents": [
          {
              "id": 10,
@@ -452,15 +459,14 @@ Response:
          }
       ]
    },
-   "result": "success",
-   "tag": 39693
+   "id": 39693
 }
 ```
 
 ### 3.4 Adding a torrent
 Method name: `torrent_add`
 
-Request arguments:
+Request parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
@@ -478,11 +484,11 @@ Request arguments:
 | `priority_low`       | array     | indices of low-priority file(s)
 | `priority_normal`    | array     | indices of normal-priority file(s)
 
-Either `filename` **or** `metainfo` **must** be included. All other arguments are optional.
+Either `filename` **or** `metainfo` **must** be included. All other parameters are optional.
 
 The format of the `cookies` should be `NAME=CONTENTS`, where `NAME` is the cookie name and `CONTENTS` is what the cookie should contain. Set multiple cookies like this: `name1=content1; name2=content2;` etc. See [libcurl documentation](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTCOOKIE) for more information.
 
-Response arguments:
+Response parameters:
 
 * On success, a `torrent_added` object in the form of one of 3.3's torrent objects with the fields for `id`, `name`, and `hash_string`.
 
@@ -496,12 +502,12 @@ Method name: `torrent_remove`
 | `ids`               | array   | torrent list, as described in 3.1
 | `delete_local_data` | boolean | delete local data. (default: false)
 
-Response arguments: none
+Response parameters: none
 
 ### 3.6 Moving a torrent
 Method name: `torrent_set_location`
 
-Request arguments:
+Request parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
@@ -509,7 +515,7 @@ Request arguments:
 | `location` | string  | the new torrent location
 | `move`     | boolean | if true, move from previous location. otherwise, search `location` for files (default: false)
 
-Response arguments: none
+Response parameters: none
 
 ### 3.7 Renaming a torrent's path
 Method name: `torrent_rename_path`
@@ -519,7 +525,7 @@ documentation of `tr_torrentRenamePath()`. In particular, note that if this
 call succeeds you'll want to update the torrent's `files` and `name` field
 with `torrent_get`.
 
-Request arguments:
+Request parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
@@ -527,10 +533,10 @@ Request arguments:
 | `path` | string | the path to the file or folder that will be renamed
 | `name` | string | the file or folder's new name
 
-Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
+Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 
 ## 4  Session requests
-### 4.1 Session arguments
+### 4.1 Session parameters
 | Key | Value Type | Description
 |:--|:--|:--
 | `alt_speed_down` | number | max global download speed (KBps)
@@ -616,7 +622,7 @@ to be common behavior.
 #### 4.1.1 Mutators
 Method name: `session_set`
 
-Request arguments: the mutable properties from 4.1's arguments, i.e. all of them
+Request parameters: the mutable properties from 4.1's parameters, i.e. all of them
 except:
 
 * `blocklist_size`
@@ -629,22 +635,22 @@ except:
 * `units`
 * `version`
 
-Response arguments: none
+Response parameters: none
 
 #### 4.1.2 Accessors
 Method name: `session_get`
 
-Request arguments: an optional `fields` array of keys (see 4.1)
+Request parameters: an optional `fields` array of keys (see 4.1)
 
-Response arguments: key/value pairs matching the request's `fields`
-argument if present, or all supported fields (see 4.1) otherwise.
+Response parameters: key/value pairs matching the request's `fields`
+parameter if present, or all supported fields (see 4.1) otherwise.
 
 ### 4.2 Session statistics
 Method name: `session_stats`
 
-Request arguments: none
+Request parameters: none
 
-Response arguments:
+Response parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
@@ -669,9 +675,9 @@ A stats object contains:
 ### 4.3 Blocklist
 Method name: `blocklist_update`
 
-Request arguments: none
+Request parameters: none
 
-Response arguments: a number `blocklist_size`
+Response parameters: a number `blocklist_size`
 
 ### 4.4 Port checking
 This method tests to see if your incoming peer port is accessible
@@ -679,14 +685,14 @@ from the outside world.
 
 Method name: `port_test`
 
-Request arguments: an optional argument `ip_protocol`.
+Request parameters: an optional parameter `ip_protocol`.
 `ip_protocol` is a string specifying the IP protocol version to be used for the port test.
 Set to `ipv4` to check IPv4, or set to `ipv6` to check IPv6.
-For backwards compatibility, it is allowed to omit this argument to get the behaviour before Transmission `4.1.0`,
+For backwards compatibility, it is allowed to omit this parameter to get the behaviour before Transmission `4.1.0`,
 which is to check whichever IP protocol the OS happened to use to connect to our port test service,
 frankly not very useful.
 
-Response arguments:
+Response parameters:
 
 | Key | Value Type | Description
 | :-- | :-- | :--
@@ -694,13 +700,13 @@ Response arguments:
 | `ip_protocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if it cannot be determined
 
 ### 4.5 Session shutdown
-This method tells the transmission session to shut down.
+This method tells the Transmission session to shut down.
 
 Method name: `session_close`
 
-Request arguments: none
+Request parameters: none
 
-Response arguments: none
+Response parameters: none
 
 ### 4.6 Queue movement requests
 | Method name | transmission.h source
@@ -710,13 +716,13 @@ Response arguments: none
 | `queue_move_down` | tr_torrentQueueMoveDown()
 | `queue_move_bottom` | tr_torrentQueueMoveBottom()
 
-Request arguments:
+Request parameters:
 
 | Key | Value Type | Description
 |:--|:--|:--
 | `ids` | array | torrent list, as described in 3.1.
 
-Response arguments: none
+Response parameters: none
 
 ### 4.7 Free space
 This method tests how much free space is available in a
@@ -724,17 +730,17 @@ client-specified folder.
 
 Method name: `free_space`
 
-Request arguments:
+Request parameters:
 
 | Key | Value type | Description
 |:--|:--|:--
 | `path` | string | the directory to query
 
-Response arguments:
+Response parameters:
 
 | Key | Value type | Description
 |:--|:--|:--
-| `path` | string | same as the Request argument
+| `path` | string | same as the Request parameter
 | `size_bytes` | number | the size, in bytes, of the free space in that directory
 | `total_size` | number | the total capacity, in bytes, of that directory
 
@@ -753,17 +759,17 @@ Request parameters:
 | `speed_limit_up` | number | max global upload speed (KBps)
 | `speed_limit_up_enabled` | boolean | true means enabled
 
-Response arguments: none
+Response parameters: none
 
 #### 4.8.2 Bandwidth group accessor: `group_get`
 Method name: `group_get`
 
-Request arguments: An optional argument `group`.
+Request parameters: An optional parameter `group`.
 `group` is either a string naming the bandwidth group,
 or a list of such strings.
 If `group` is omitted, all bandwidth groups are used.
 
-Response arguments:
+Response parameters:
 
 | Key | Value type | Description
 |:--|:--|:--
@@ -1038,6 +1044,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 
 :bomb: switch to snake_case for all strings
+:bomb: switch to the JSON-RPC 2.0 protocol
 
 | Method | Description
 |:---|:---
