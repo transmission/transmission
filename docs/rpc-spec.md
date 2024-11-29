@@ -72,7 +72,20 @@ In Transmission, this key is an Object that includes:
 2. An optional `result` Object that contains additional keys defined by the method.
 
 ```json
-// TODO
+{
+   "jsonrpc": "2.0",
+   "error": {
+      "code": 7,
+      "message": "HTTP error from backend service",
+      "data": {
+         "error_string": "Couldn't test port: No Response (0)",
+         "result": {
+            "ip_protocol": "ipv6"
+         }
+      }
+   },
+   "id": 912313
+}
 ```
 
 ### 2.2 Transport mechanism
