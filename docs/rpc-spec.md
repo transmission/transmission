@@ -1068,6 +1068,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 Transmission 4.1.0 (`rpc_version_semver` 6.0.0, `rpc_version`: 18)
 
 :bomb: switch to the JSON-RPC 2.0 protocol
+:bomb: switch to snake_case for all strings
 
 | Method | Description
 |:---|:---
