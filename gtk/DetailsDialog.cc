@@ -22,7 +22,6 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 #include <glibmm/markup.h>
-#include <glibmm/miscutils.h>
 #include <glibmm/quark.h>
 #include <glibmm/ustring.h>
 #include <gtkmm/adjustment.h>
