@@ -7,12 +7,16 @@
 
 #include "Session.h"
 #include <curl/curl.h>
+#include <libdeflate.h>
 #include <maxminddb.h>
 
 #include <glibmm/miscutils.h>
 
 #include <cstddef>
+#include <fstream>
+#include <iostream>
 #include <string>
+#include <vector>
 
 // Callback function for `curl_easy_setopt` to write data to a file
 size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
@@ -78,8 +82,54 @@ void maintain_mmdb_file(std::string mmdb_file)
             fclose(fp);
 
             // Decompress mmdb.gz file
-            // TODO: use libdeflate
-            system(("gzip -d " + mmdb_file + ".gz").c_str());
+            // Open the .gz file
+            std::ifstream gz_file(mmdb_file + ".gz", std::ios::binary);
+            if (!gz_file)
+            {
+                std::cerr << "Error opening .gz file!" << std::endl;
+            }
+
+            // Read the entire .gz file into a buffer
+            std::vector<char> gz_data((std::istreambuf_iterator<char>(gz_file)), std::istreambuf_iterator<char>());
+
+            // Initialize decompression context
+            libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
+            if (decompressor == nullptr)
+            {
+                std::cerr << "Failed to create decompressor!" << std::endl;
+            }
+
+            // Prepare buffer to hold decompressed data (estimate maximum decompressed size)
+            size_t decompressed_size = gz_data.size() * 4;
+            std::vector<char> decompressed_data(decompressed_size);
+
+            // Perform the decompression
+            size_t decompressed_len;
+            int result = libdeflate_gzip_decompress(
+                decompressor,
+                gz_data.data(),
+                gz_data.size(),
+                decompressed_data.data(),
+                decompressed_size,
+                &decompressed_len);
+
+            if (result != LIBDEFLATE_SUCCESS)
+            {
+                std::cerr << "Decompression failed!" << std::endl;
+                libdeflate_free_decompressor(decompressor);
+            }
+
+            // Write decompressed data to the output file
+            std::ofstream output_file(mmdb_file, std::ios::binary);
+            if (!output_file)
+            {
+                std::cerr << "Error opening output file!" << std::endl;
+                libdeflate_free_decompressor(decompressor);
+            }
+            output_file.write(decompressed_data.data(), decompressed_len);
+
+            // Clean up
+            libdeflate_free_decompressor(decompressor);
         }
         // TODO: handle non-existing file and errors
     }
