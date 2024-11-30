@@ -249,7 +249,10 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 void tr_torrent::on_have_all_metainfo()
 {
     auto& m = metadata_download_;
-    TR_ASSERT(m);
+    if (!m)
+    {
+        return;
+    }
 
     if (auto error = tr_error{}; !use_new_metainfo(&error)) /* drat. */
     {
@@ -307,7 +310,17 @@ void tr_torrent::set_metadata_piece(int64_t const piece, void const* const data,
     if (auto& m = metadata_download_; m && m->set_metadata_piece(piece, data, len))
     {
         tr_logAddDebugTor(this, fmt::format("we now have all the metainfo!"));
-        on_have_all_metainfo();
+
+        // Why queue this invocation in session thread:
+        // https://github.com/transmission/transmission/pull/6383#discussion_r1429202253
+        session->queue_session_thread(
+            [s = session, id = id()]
+            {
+                if (auto* tor = s->torrents().get(id); tor != nullptr)
+                {
+                    tor->on_have_all_metainfo();
+                }
+            });
     }
 }
 
