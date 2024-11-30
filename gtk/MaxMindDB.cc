@@ -13,6 +13,7 @@
 #include <glibmm/miscutils.h>
 
 #include <cstddef>
+#include <cstdio>
 #include <string>
 
 // Callback function for `curl_easy_setopt` to write data to a file
@@ -103,7 +104,11 @@ void maintain_mmdb_file(std::string mmdb_file)
         int status = MMDB_open(mmdb_file.c_str(), MMDB_MODE_MMAP, &mmdb);
         if (MMDB_SUCCESS != status)
         {
-            fprintf(stderr, "MMDB: Error while opening database file (%s, %s)\n", mmdb_file.c_str(), MMDB_strerror(status));
+            fprintf(
+                stderr,
+                "libmaxminddb: Error while opening database file (%s, %s)\n",
+                mmdb_file.c_str(),
+                MMDB_strerror(status));
             url = "https://download.db-ip.com/free/dbip-city-lite-" + year + "-" + month + ".mmdb.gz";
         }
         else
@@ -125,25 +130,37 @@ void maintain_mmdb_file(std::string mmdb_file)
         MMDB_close(&mmdb);
     }
 
-    if (url != "")
+    if (url == "") // no need for a download
     {
-        // Download mmdb.gz file
-        CURL* curl;
-        curl = curl_easy_init();
-        if (curl)
-        {
-            FILE* fp;
-            fp = fopen((mmdb_file + ".gz").c_str(), "wb");
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-            curl_easy_perform(curl);
-            curl_easy_cleanup(curl); // always cleanup
-            fclose(fp);
+        return;
+    }
 
-            // Decompress mmdb.gz file
-            decompress_gz_file(mmdb_file + ".gz");
+    // Download mmdb.gz file
+    CURL* curl = curl_easy_init();
+    if (curl)
+    {
+        FILE* fp;
+        fp = fopen((mmdb_file + ".gz").c_str(), "wb");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        CURLcode res = curl_easy_perform(curl);
+        curl_easy_cleanup(curl); // always cleanup
+        fclose(fp);
+
+        if (res != CURLE_OK)
+        {
+            fprintf(
+                stderr,
+                "libcurl: Error downloading %s to %s - %s\n",
+                url.c_str(),
+                (mmdb_file + ".gz").c_str(),
+                curl_easy_strerror(res));
+            return;
         }
+
+        // Decompress mmdb.gz file
+        decompress_gz_file(mmdb_file + ".gz");
     }
 }
 
@@ -162,14 +179,14 @@ std::string get_location_from_ip(std::string ip)
     int status = MMDB_open(mmdb_file.c_str(), MMDB_MODE_MMAP, &mmdb);
     if (MMDB_SUCCESS != status)
     {
-        fprintf(stderr, "MMDB: Error while opening database file (%s, %s)\n", mmdb_file.c_str(), MMDB_strerror(status));
+        fprintf(stderr, "libmaxminddb: Error while opening database file (%s, %s)\n", mmdb_file.c_str(), MMDB_strerror(status));
         return "";
     }
     int gai_error, mmdb_error;
     MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, ip.c_str(), &gai_error, &mmdb_error);
     if (0 != gai_error || MMDB_SUCCESS != mmdb_error || !result.found_entry)
     {
-        fprintf(stderr, "MMDB: Error while looking up IP %s\n", ip.c_str());
+        fprintf(stderr, "libmaxminddb: Error while looking up IP %s\n", ip.c_str());
         MMDB_close(&mmdb);
         return "";
     }
@@ -177,7 +194,7 @@ std::string get_location_from_ip(std::string ip)
     status = MMDB_get_value(&result.entry, &entry_data, "city", "names", "en", NULL);
     if (MMDB_SUCCESS != status || !entry_data.has_data)
     {
-        fprintf(stderr, "MMDB: Error while getting value of city for IP %s\n", ip.c_str());
+        fprintf(stderr, "libmaxminddb: Error while getting value of city for IP %s\n", ip.c_str());
         MMDB_close(&mmdb);
         return "";
     }
@@ -187,7 +204,7 @@ std::string get_location_from_ip(std::string ip)
     status = MMDB_get_value(&result.entry, &entry_data, "country", "names", "en", NULL);
     if (MMDB_SUCCESS != status || !entry_data.has_data)
     {
-        fprintf(stderr, "MMDB: Error while getting value of country for IP %s\n", ip.c_str());
+        fprintf(stderr, "libmaxminddb: Error while getting value of country for IP %s\n", ip.c_str());
         MMDB_close(&mmdb);
         return "";
     }
