@@ -301,7 +301,6 @@ target_link_libraries(${TR_NAME}
     PUBLIC
         transmission::crypto_impl
         fmt::fmt-header-only
-        libmaxminddb::maxminddb
         small::small
         libevent::event)
 

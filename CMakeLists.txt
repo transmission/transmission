@@ -238,8 +238,6 @@ set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
 find_package(FastFloat)
 find_package(Fmt)
-find_package(MaxMindDB)
-add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/libmaxminddb)
 find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
@@ -533,6 +531,7 @@ if(NOT USE_SYSTEM_MINIUPNPC)
 endif()
 unset(TR_MINIUPNPC_LIBNAME)
 
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/libmaxminddb)
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht dht

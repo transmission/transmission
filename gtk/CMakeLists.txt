@@ -29,6 +29,8 @@ target_sources(${TR_NAME}-gtk
         HigWorkarea.h
         IconCache.cc
         IconCache.h
+        IPToLocation.cc
+        IPToLocation.h
         ListModelAdapter.cc
         ListModelAdapter.h
         main.cc
@@ -36,8 +38,6 @@ target_sources(${TR_NAME}-gtk
         MainWindow.h
         MakeDialog.cc
         MakeDialog.h
-        MaxMindDB.cc
-        MaxMindDB.h
         MessageLogWindow.cc
         MessageLogWindow.h
         Notify.cc
@@ -202,7 +202,7 @@ target_link_libraries(${TR_NAME}-gtk
         ${TR_NAME}
         transmission::gtk_impl
         fmt::fmt-header-only
-        libmaxminddb::maxminddb
+        maxminddb::maxminddb
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)

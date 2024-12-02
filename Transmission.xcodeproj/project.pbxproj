@@ -4000,7 +4000,6 @@
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
@@ -4038,7 +4037,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = app;
@@ -4057,7 +4055,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4080,7 +4077,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4099,7 +4095,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 					"third-party/libevent/include",
 				);
@@ -4250,7 +4245,6 @@
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
@@ -4278,9 +4272,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Release;
@@ -4307,7 +4300,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = app;
@@ -4513,7 +4505,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = app;
@@ -4532,9 +4523,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = "Release - Debug";
@@ -4579,7 +4569,6 @@
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
@@ -4611,9 +4600,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = "Release - Debug";
@@ -4630,9 +4618,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = "Release - Debug";
@@ -4704,7 +4691,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4732,7 +4718,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4760,7 +4745,6 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4823,9 +4807,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Release;
@@ -4842,9 +4825,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Release;
@@ -4993,9 +4975,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Debug;
@@ -5012,9 +4993,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = "Release - Debug";
@@ -5031,9 +5011,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Release;
@@ -5050,9 +5029,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Debug;
@@ -5069,9 +5047,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = "Release - Debug";
@@ -5088,9 +5065,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Release;
@@ -5107,9 +5083,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Debug;
@@ -5126,9 +5101,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = "Release - Debug";
@@ -5145,9 +5119,8 @@
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/fmt/include",
-					"third-party/libevent/include",
-					"third-party/libmaxminddb/include",
 					"third-party/small/include",
+					"third-party/libevent/include",
 				);
 			};
 			name = Release;
