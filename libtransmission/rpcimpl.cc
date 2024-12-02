@@ -52,36 +52,41 @@ namespace JsonRpc
 // https://www.jsonrpc.org/specification#error_object
 namespace Error
 {
-auto constexpr Messages = std::array<std::pair<Error::Code, std::string_view>, N_ERROR + 5U>{ {
-    { PARSE_ERROR, "Parse error"sv },
-    { INVALID_REQUEST, "Invalid Request"sv },
-    { METHOD_NOT_FOUND, "Method not found"sv },
-    { INVALID_PARAMS, "Invalid params"sv },
-    { INTERNAL_ERROR, "Internal error"sv },
-    { SUCCESS, "success"sv },
-    { SET_ANNOUNCE_LIST, "error setting announce list"sv },
-    { INVALID_TRACKER_LIST, "Invalid tracker list"sv },
-    { PATH_NOT_ABSOLUTE, "path is not absolute"sv },
-    { UNRECOGNIZED_INFO, "unrecognized info"sv },
-    { SYSTEM_ERROR, "system error"sv },
-    { FILE_IDX_OOR, "file index out of range"sv },
-    { HTTP_ERROR, "HTTP error from backend service"sv },
-    { CORRUPT_TORRENT, "invalid or corrupt torrent file"sv },
-} };
-static_assert(Messages[std::size(Messages) - 1].first != SUCCESS);
-
 [[nodiscard]] std::string_view get_message(Code code)
 {
-    auto const test = [code](auto const& error)
+    switch (code)
     {
-        return error.first == code;
-    };
-    if (auto end = std::end(Messages), it = std::find_if(std::begin(Messages), end, test); it != end)
-    {
-        return it->second;
+    case PARSE_ERROR:
+        return "Parse error"sv;
+    case INVALID_REQUEST:
+        return "Invalid Request"sv;
+    case METHOD_NOT_FOUND:
+        return "Method not found"sv;
+    case INVALID_PARAMS:
+        return "Invalid params"sv;
+    case INTERNAL_ERROR:
+        return "Internal error"sv;
+    case SUCCESS:
+        return "success"sv;
+    case SET_ANNOUNCE_LIST:
+        return "error setting announce list"sv;
+    case INVALID_TRACKER_LIST:
+        return "Invalid tracker list"sv;
+    case PATH_NOT_ABSOLUTE:
+        return "path is not absolute"sv;
+    case UNRECOGNIZED_INFO:
+        return "unrecognized info"sv;
+    case SYSTEM_ERROR:
+        return "system error"sv;
+    case FILE_IDX_OOR:
+        return "file index out of range"sv;
+    case HTTP_ERROR:
+        return "HTTP error from backend service"sv;
+    case CORRUPT_TORRENT:
+        return "invalid or corrupt torrent file"sv;
+    default:
+        return {};
     }
-
-    return ""sv;
 }
 
 [[nodiscard]] tr_variant::Map build_data(std::string_view error_string, tr_variant::Map&& result)
