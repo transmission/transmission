@@ -184,25 +184,24 @@ export const icon = {
   delete: () => {
     const svg = namespace('svg', icon32);
     svg.append(
-      namespace('polyline', {points: '3 6 5 6 21 6'}),
-      namespace('path', {d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'}),
-      namespace('line', {x1: 10, x2: 10, y1: 11, y2: 17}),
-      namespace('line', {x1: 14, x2: 14, y1: 11, y2: 17}),
+      namespace('polyline', { points: '3 6 5 6 21 6' }),
+      namespace('path', {
+        d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'
+      }),
+      namespace('line', { x1: 10, x2: 10, y1: 11, y2: 17 }),
+      namespace('line', { x1: 14, x2: 14, y1: 11, y2: 17 }),
     );
     return svg;
   },
   inspector: () => {
-    const svg = namespace(
-      'svg',
-      {
-        fill: 'none',
-        'fill-opacity': 1,
-        height: 26,
-        stroke: 'currentColor',
-        viewBox: '-1 -1 26 26',
-        width: 26,
-      },
-    );
+    const svg = namespace('svg', {
+      fill: 'none',
+      'fill-opacity': 1,
+      height: 26,
+      stroke: 'currentColor',
+      viewBox: '-1 -1 26 26',
+      width: 26,
+    });
     const g = namespace('g', {});
     g.append(
       namespace('circle', {
@@ -224,36 +223,35 @@ export const icon = {
   mimeType: (torrent) => {
     const e = document.createElement('div');
     e.classList.add('icon');
-    e.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
+    e.dataset.iconMimeType = torrent.getPrimaryMimeType().split('/', 1).pop();
     e.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
     return e;
   },
   open: () => {
     const svg = namespace('svg', icon32)
     svg.append(
-      namespace('path', {d: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'}),
-      namespace('line', {x1: 12, x2: 12, y1: 11, y2: 17}),
-      namespace('line', {x1: 9, x2: 15, y1: 14, y2: 14}),
+      namespace('path', {
+        d: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'
+      }),
+      namespace('line', { x1: 12, x2: 12, y1: 11, y2: 17 }),
+      namespace('line', { x1: 9, x2: 15, y1: 14, y2: 14 }),
     );
     return svg;
   },
   overflow: () => {
     const svg = namespace('svg', icon32);
     svg.append(
-      namespace('line', {x1: 3, x2: 21, y1: 12, y2: 12}),
-      namespace('line', {x1: 3, x2: 21, y1: 6, y2: 6}),
-      namespace('line', {x1: 3, x2: 21, y1: 18, y2: 18}),
+      namespace('line', { x1: 3, x2: 21, y1: 12, y2: 12 }),
+      namespace('line', { x1: 3, x2: 21, y1: 6, y2: 6 }),
+      namespace('line', { x1: 3, x2: 21, y1: 18, y2: 18 }),
     );
     return svg;
   },
   pause: () => {
-    const svg = namespace('svg', icon32)
+    const svg = namespace('svg', icon32);
     svg.append(
-      namespace('rect', {height: 16, width: 4, x: 6, y: 4}),
-      namespace('rect', {height: 16, width: 4, x: 14, y: 4}),
+      namespace('rect', { height: 16, width: 4, x: 6, y: 4 }),
+      namespace('rect', { height: 16, width: 4, x: 14, y: 4 }),
     );
     return svg;
   },
@@ -261,7 +259,7 @@ export const icon = {
     const e = document.createElement('div');
     e.classList = 'icon';
     const svg = namespace('svg', icon32);
-    svg.append(namespace('polyline', {points: '6 9 12 15 18 9'}));
+    svg.append(namespace('polyline', { points: '6 9 12 15 18 9' }));
     e.append(svg);
     return e;
   },
@@ -269,15 +267,13 @@ export const icon = {
     const e = document.createElement('div');
     e.classList = 'icon';
     const svg = namespace('svg', icon32);
-    svg.append(namespace('polyline', {points: '18 15 12 9 6 15'}));
+    svg.append(namespace('polyline', { points: '18 15 12 9 6 15' }));
     e.append(svg);
     return e;
   },
   start: () => {
     const svg = namespace('svg', icon32)
-    svg.append(
-      namespace('polyline', {points: '5 3 19 12 5 21 5 3'}),
-    );
+    svg.append(namespace('polyline', { points: '5 3 19 12 5 21 5 3' }));
     return svg;
   },
 };
