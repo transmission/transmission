@@ -102,7 +102,7 @@ export class TorrentRendererFull {
     } else if (t.isDownloading()) {
       const peer_count = t.getPeersConnected();
       const webseed_count = t.getWebseedsSendingToUs();
-      const s = ['Downloading from '];
+      const s = ['Downloading from'];
       if (peer_count) {
         s.push(
           t.getPeersSendingToUs(),
