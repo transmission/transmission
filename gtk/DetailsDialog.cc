@@ -2341,6 +2341,13 @@ AddTrackerDialog::AddTrackerDialog(
     set_title(fmt::format(_("{torrent_name} - Add Tracker"), fmt::arg("torrent_name", tr_torrentName(torrent))));
     set_transient_for(parent);
 
+    auto* const accept = get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    set_default_widget(*accept);
+#else
+    set_default(*accept);
+#endif
+
     gtr_paste_clipboard_url_into_entry(*url_entry_);
 }
 
