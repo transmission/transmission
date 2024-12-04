@@ -23,7 +23,7 @@ jobs:
       make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-web: 'false' # this is handled in the webapp workflow
+      make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
       test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
     steps:
       - name: Check Push to Main Branch
@@ -66,7 +66,7 @@ jobs:
           get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
           get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web        CMakeLists.txt cmake third-party libtransmission web
+          get_changes web        CMakeLists.txt cmake web
           get_changes ci-actions .github/workflows/actions.yml
           cat "$GITHUB_OUTPUT"
 
@@ -190,7 +190,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew uninstall -f pkg-config pkg-config@0.29.2 # https://github.com/actions/runner-images/issues/10984
+          brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -343,13 +344,14 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew uninstall -f pkg-config pkg-config@0.29.2 # https://github.com/actions/runner-images/issues/10984
+          brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install --formula gtkmm3
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install qt
+        run: brew install --formula qt
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -402,7 +404,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+          brew unlink pkg-config # https://github.com/actions/runner-images/issues/10984
+          brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -620,7 +623,8 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext ninja node pkg-config
+          brew uninstall -f pkg-config pkg-config@0.29.2 # https://github.com/actions/runner-images/issues/10984
+          brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -681,10 +685,11 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext ninja node pkg-config
+          brew unlink pkg-config # https://github.com/actions/runner-images/issues/10984
+          brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install qt
+        run: brew install --formula qt
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -746,10 +751,11 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew install cmake gettext ninja node pkg-config
+          brew unlink pkg-config # https://github.com/actions/runner-images/issues/10984
+          brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install --formula gtkmm3
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -829,9 +835,12 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            npm \
             pkg-config \
             xz-utils
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev

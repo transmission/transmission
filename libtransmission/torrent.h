@@ -948,9 +948,9 @@ struct tr_torrent
         return queue_position_;
     }
 
-    void set_unique_queue_position(size_t const new_pos);
+    void set_unique_queue_position(size_t new_pos);
 
-    static inline constexpr struct
+    static constexpr struct
     {
         constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
         {
@@ -1087,7 +1087,7 @@ private:
         static auto constexpr MinUpdateMSec = 800U;
 
         uint64_t timestamp_msec_ = {};
-        Speed speed_ = {};
+        Speed speed_;
     };
 
     [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
@@ -1281,7 +1281,7 @@ private:
         std::string_view oldpath,
         std::string_view newname,
         tr_torrent_rename_done_func callback,
-        void* const callback_user_data);
+        void* callback_user_data);
 
     void start_in_session_thread();
 
