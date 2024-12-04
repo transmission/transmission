@@ -50,7 +50,7 @@ function toggleClass(buttons, button, pages, page, callback) {
 function namespace(tagname, attrs) {
   const e = document.createElementNS('http://www.w3.org/2000/svg', tagname);
 
-  for (const attr in attrs) {
+  for (const attr of Object.keys(attrs)) {
     e.setAttribute(attr, attrs[attr]);
   }
 
