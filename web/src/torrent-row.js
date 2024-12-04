@@ -77,8 +77,6 @@ const TorrentRendererHelper = {
     };
 
   },
-  symbol: {down: '▼', up: '▲'},
-
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     const percent = Math.min(info.ratio || info.percent, 100);
@@ -87,6 +85,7 @@ const TorrentRendererHelper = {
     progressbar.style.setProperty('--progress', pct_str);
     progressbar.dataset.progress = info.ratio ? '100%' : pct_str;
   },
+  symbol: {down: '▼', up: '▲'},
 };
 
 ///
