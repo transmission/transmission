@@ -409,23 +409,17 @@ a {
     align-items: inherit;
     flex-direction: inherit;
 
-    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
-      width: 100px;
+    .icon {
+      fill: var(--color-fg-primary);
+    
+      svg {
+        width: 20px;
+      }
     }
-  }
 
-  #speed-up-icon,
-  #speed-dn-icon {
-    fill: var(--color-fg-primary);
-
-    svg {
-      width: 20px;
+    & + .speed-container {
+      min-width: 100px;
     }
-  }
-
-  #speed-dn-label,
-  #speed-up-label {
-    text-align: right;
   }
 }
 
