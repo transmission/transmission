@@ -411,13 +411,13 @@ a {
 
     .icon {
       fill: var(--color-fg-primary);
-    
+
       svg {
         width: 20px;
       }
     }
 
-    +.speed-container {
+    + .speed-container {
       min-width: 100px;
     }
   }
