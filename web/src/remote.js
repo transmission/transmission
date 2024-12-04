@@ -46,15 +46,17 @@ export class Remote {
     })
       .then((response) => {
         response_argument = response;
-        if (response.status === 409) {
-          const error = new Error(Remote._SessionHeader);
-          error.header = response.headers.get(Remote._SessionHeader);
-          throw error;
+        switch (response.status) {
+          case 409: {
+            const error = new Error(Remote._SessionHeader);
+            error.header = response.headers.get(Remote._SessionHeader);
+            throw error;
+          }
+          case 204:
+            return null;
+          default:
+            return response.json();
         }
-        if (response.status === 204) {
-          return null;
-        }
-        return response.json();
       })
       .then((payload) => {
         if (callback) {

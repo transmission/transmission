@@ -5,8 +5,8 @@
 
 import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
-import { createDialogContainer, makeUUID } from './utils.js';
 import { RPC } from './remote.js';
+import { createDialogContainer, makeUUID } from './utils.js';
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
