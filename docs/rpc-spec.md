@@ -2,7 +2,7 @@
 > Since `4.1.0` (`rpc_version` 18), Transmission has switched from a bespoke RPC protocol to [JSON-RPC 2.0](https://www.jsonrpc.org/specification).
 > The strings are also converted from kebab-case/camelCase to snake_case.
 > 
-> For backward compatibility, the old RPC protocol are still available, and the kebab-case/camelCase strings can be used in
+> For backward compatibility, the old RPC protocol is still available, and the kebab-case/camelCase strings can be used in
 > both the old and new protocol. But from `5.0.0` and onwards, only the JSON-RPC 2.0 protocol and snake_case strings will be kept.
 > 
 > For documentation of the old RPC protocol and strings, please consult documentation from previous versions.
