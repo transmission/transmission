@@ -417,7 +417,7 @@ a {
       }
     }
 
-    & + .speed-container {
+    +.speed-container {
       min-width: 100px;
     }
   }
