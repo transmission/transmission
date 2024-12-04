@@ -1511,7 +1511,8 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
         return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
     };
 
-    // we should get pieces in order when we ask for blocks
+    // we should get pieces in sequential order when we ask for blocks,
+    // except the last piece should follow immediately after the first piece
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
@@ -1526,8 +1527,8 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
         }
         EXPECT_EQ(150U, requested.count());
         EXPECT_EQ(100U, requested.count(0, 100));
-        EXPECT_EQ(50U, requested.count(100, 200));
-        EXPECT_EQ(0U, requested.count(200, 300));
+        EXPECT_EQ(0U, requested.count(100, 200));
+        EXPECT_EQ(50U, requested.count(200, 300));
     }
 
     // Same premise as previous test, but ask for more blocks.
@@ -1540,7 +1541,8 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
             requested.set_span(span.begin, span.end);
         }
         EXPECT_EQ(250U, requested.count());
-        EXPECT_EQ(200U, requested.count(0, 200));
-        EXPECT_EQ(50U, requested.count(200, 300));
+        EXPECT_EQ(100U, requested.count(0, 100));
+        EXPECT_EQ(50U, requested.count(100, 200));
+        EXPECT_EQ(100U, requested.count(200, 300));
     }
 }
