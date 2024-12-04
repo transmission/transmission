@@ -134,6 +134,7 @@ void maintain_mmdb_file(std::string const& mmdb_file)
             std::cerr << "Error opening " + mmdb_file + ".gz to download MaxMind database\n";
             return;
         }
+
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);

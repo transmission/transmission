@@ -494,6 +494,12 @@ tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
+tr_add_external_auto_library(MAXMINDDB libmaxminddb maxminddb
+    TARGET maxminddb::maxminddb
+    CMAKE_ARGS
+        -DBUILD_TESTING=OFF
+        -DMAXMINDDB_BUILD_BINARIES=OFF)
+
 tr_add_external_auto_library(EVENT2 libevent event
     TARGET libevent::event
     CMAKE_ARGS
@@ -531,7 +537,6 @@ if(NOT USE_SYSTEM_MINIUPNPC)
 endif()
 unset(TR_MINIUPNPC_LIBNAME)
 
-add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/libmaxminddb)
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht dht

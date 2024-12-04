@@ -201,6 +201,7 @@ target_link_libraries(${TR_NAME}-gtk
     PRIVATE
         ${TR_NAME}
         transmission::gtk_impl
+        deflate::deflate
         fmt::fmt-header-only
         maxminddb::maxminddb
         $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
