@@ -75,7 +75,6 @@ const TorrentRendererHelper = {
       percent,
       ratio,
     };
-
   },
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
@@ -85,7 +84,7 @@ const TorrentRendererHelper = {
     progressbar.style.setProperty('--progress', pct_str);
     progressbar.dataset.progress = info.ratio ? '100%' : pct_str;
   },
-  symbol: {down: '▼', up: '▲'},
+  symbol: { down: '▼', up: '▲' },
 };
 
 ///
@@ -115,9 +114,7 @@ export class TorrentRendererFull {
         }
       }
       if (webseed_count) {
-        s.push(
-          fmt.countString('web seed', 'web seeds', webseed_count),
-        );
+        s.push(fmt.countString('web seed', 'web seeds', webseed_count));
       }
       s.push(
         '-',
@@ -237,7 +234,11 @@ export class TorrentRendererFull {
     TorrentRendererHelper.formatLabels(t, root._labels_container);
 
     // progress details
-    TorrentRendererFull.renderProgressDetails(controller, t, root._progress_details_container);
+    TorrentRendererFull.renderProgressDetails(
+      controller,
+      t,
+      root._progress_details_container,
+    );
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
@@ -336,7 +337,8 @@ export class TorrentRendererCompact {
         setTextContent(peer_details, s.join(' '));
       }
     } else if (t.isSeeding()) {
-      const str = ['Ratio:',
+      const str = [
+        'Ratio:',
         Formatter.ratioString(t.getUploadRatio()),
         '-',
         TorrentRendererHelper.symbol.up,
@@ -353,8 +355,7 @@ export class TorrentRendererCompact {
     root.classList.toggle('paused', t.isStopped());
 
     // name
-    let e = root._name_container;
-    setTextContent(e, t.getName());
+    setTextContent(root._name_container, t.getName());
 
     // labels
     TorrentRendererHelper.formatLabels(t, root._labels_container);
