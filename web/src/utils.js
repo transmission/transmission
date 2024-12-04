@@ -33,7 +33,7 @@ const icon32 = {
   'stroke-width': 2,
   viewBox: '0 0 24 24',
   width: 32,
-}
+};
 
 function toggleClass(buttons, button, pages, page, callback) {
   for (const element of buttons.children) {
@@ -186,7 +186,7 @@ export const icon = {
     svg.append(
       namespace('polyline', { points: '3 6 5 6 21 6' }),
       namespace('path', {
-        d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'
+        d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
       }),
       namespace('line', { x1: 10, x2: 10, y1: 11, y2: 17 }),
       namespace('line', { x1: 14, x2: 14, y1: 11, y2: 17 }),
@@ -228,10 +228,10 @@ export const icon = {
     return e;
   },
   open: () => {
-    const svg = namespace('svg', icon32)
+    const svg = namespace('svg', icon32);
     svg.append(
       namespace('path', {
-        d: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'
+        d: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z',
       }),
       namespace('line', { x1: 12, x2: 12, y1: 11, y2: 17 }),
       namespace('line', { x1: 9, x2: 15, y1: 14, y2: 14 }),
@@ -272,7 +272,7 @@ export const icon = {
     return e;
   },
   start: () => {
-    const svg = namespace('svg', icon32)
+    const svg = namespace('svg', icon32);
     svg.append(namespace('polyline', { points: '5 3 19 12 5 21 5 3' }));
     return svg;
   },
