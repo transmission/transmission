@@ -43,7 +43,7 @@ export class Transmission extends EventTarget {
     this.speed = {
       down: document.querySelector('#speed-down'),
       up: document.querySelector('#speed-up'),
-    }
+    };
 
     for (const [selector, name] of [
       ['#toolbar-open', 'open'],
@@ -61,9 +61,9 @@ export class Transmission extends EventTarget {
     }
 
     document.querySelector('.speed-container').append(icon.speedDown());
-    document.querySelector('.speed-container + .speed-container').append(
-      icon.speedUp(),
-    );
+    document
+      .querySelector('.speed-container + .speed-container')
+      .append(icon.speedUp());
 
     this.addEventListener('torrent-selection-changed', (event_) =>
       this.action_manager.update(event_),
