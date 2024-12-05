@@ -155,6 +155,10 @@ void maintain_mmdb_file(std::string const& mmdb_file)
 
         // Decompress mmdb.gz file
         decompress_gz_file(mmdb_file + ".gz");
+        if (remove((mmdb_file + ".gz").c_str()) != 0)
+        {
+            perror(("Error deleting " + mmdb_file + ".gz").c_str());
+        }
     }
 }
 
