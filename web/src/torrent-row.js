@@ -87,10 +87,14 @@ const TorrentRendererHelper = {
   symbol: { down: '▼', up: '▲' },
 };
 
-function _div(className) {
-  const div = document.createElement('div');
-  div.className = className;
-  return div;
+function new_divs(...cs) {
+  const es = [];
+  for (const className of cs) {
+    const e = document.createElement('div');
+    e.className = className;
+    es.push(e);
+  }
+  return es;
 }
 
 ///
@@ -261,36 +265,37 @@ export class TorrentRendererFull {
 
   // eslint-disable-next-line class-methods-use-this
   createRow(torrent) {
-    const containers_1 = {
-      _name_container: _div('torrent-name'),
-      _labels_container: _div('torrent-labels'),
-      _progress_details_container: _div('torrent-progress-details'),
-    }
-
-    const root = Object.assign(document.createElement('li'), containers_1);
+    const root = document.createElement('li');
     root.className = 'torrent';
-    root.append(TorrentRendererHelper.createIcon(torrent));
-    root.append(...Object.values(containers_1));
+
+    const [name, labels, details, progress, progressbar, peers] = new_divs(
+      'torrent-name',
+      'torrent-labels',
+      'torrent-progress-details',
+      'torrent-progress',
+      'torrent-progress-bar full',
+      'torrent-peer-details',
+    );
 
     const button = document.createElement('a');
     button.className = 'torrent-pauseresume-button';
+    progress.append(progressbar, button);
 
-    const [progress, progressbar, peers] = [
-      _div('torrent-progress'),
-      _div('torrent-progress-bar full'),
-      _div('torrent-peer-details'),
-    ]
-    progress.append(progressbar);
-    progress.append(button);
-    root.append(progress);
-    root.append(peers);
+    root.append(
+      TorrentRendererHelper.createIcon(torrent),
+      name,
+      labels,
+      details,
+      progress,
+      peers,
+    );
 
-    const containers_2 = {
-      _progressbar: progressbar,
-      _toggle_running_button: button,
-      _peer_details_container: peers,
-    };
-    Object.assign(root, containers_2);
+    root._name_container = name;
+    root._labels_container = labels;
+    root._progress_details_container = details;
+    root._progressbar = progressbar;
+    root._toggle_running_button = button;
+    root._peer_details_container = peers;
 
     return root;
   }
@@ -364,17 +369,28 @@ export class TorrentRendererCompact {
 
   // eslint-disable-next-line class-methods-use-this
   createRow(torrent) {
-    const containers = {
-      _name_container: _div('torrent-name compact'),
-      _labels_container: _div('torrent-labels compact'),
-      _details_container: _div('torrent-peer-details compact'),
-      _progressbar: _div('torrent-progress-bar compact'),
-    }
-
-    const root = Object.assign(document.createElement('li'), containers);
+    const root = document.createElement('li');
     root.className = 'torrent compact';
-    root.append(TorrentRendererHelper.createIcon(torrent));
-    root.append(...Object.values(containers));
+
+    const [name, labels, peers, progressbar] = new_divs(
+      'torrent-name compact',
+      'torrent-labels compact',
+      'torrent-peer-details compact',
+      'torrent-progress-bar compact',
+    );
+
+    root.append(
+      TorrentRendererHelper.createIcon(torrent),
+      name,
+      labels,
+      peers,
+      progressbar,
+    );
+
+    root._name_container = name;
+    root._labels_container = labels;
+    root._details_container = peers;
+    root._progressbar = progressbar;
 
     return root;
   }
