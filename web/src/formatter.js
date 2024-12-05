@@ -129,11 +129,10 @@ export const Formatter = {
   speed(KBps) {
     if (KBps < 999.95) {
       return fmt_kBps.format(KBps);
-    } else if (KBps < 999950) {
+    } else if (KBps < 999_950) {
       return fmt_MBps.format(KBps / 1000);
-    } else {
-      return fmt_GBps.format(KBps / 1000000);
     }
+    return fmt_GBps.format(KBps / 1_000_000);
   },
 
   speedBps(Bps) {
