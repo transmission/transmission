@@ -417,8 +417,8 @@ a {
       }
     }
 
-    + .speed-container {
-      min-width: 100px;
+    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
+      width: 100px;
     }
   }
 }
