@@ -12,6 +12,12 @@
   }
 }
 
+@mixin viewport-large {
+  @media (width >= 950px) {
+    @content;
+  }
+}
+
 :root {
   /* z-index enum */
   --z-index-popup: 2;
@@ -813,6 +819,10 @@ a {
   @include for-tablet-portrait-up {
     border-left: 1px solid var(--color-border-default);
     width: 570px;
+  }
+
+  @include viewport-large {
+    position: initial;
   }
 }
 
