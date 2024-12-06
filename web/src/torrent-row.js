@@ -224,8 +224,8 @@ export class TorrentRendererFull {
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     const is_stopped = t.isStopped();
-
     root.classList.toggle('paused', is_stopped);
+    const { button, progressbar } = root.elements;
 
     // name
     setTextContent(root.elements.name, t.getName());
@@ -241,7 +241,6 @@ export class TorrentRendererFull {
     );
 
     // progressbar
-    const progressbar = root.elements.progressbar;
     TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
     progressbar.classList.add('full');
 
@@ -249,7 +248,6 @@ export class TorrentRendererFull {
     TorrentRendererFull.renderPeerDetails(t, root.elements.peer_details);
 
     // pause/resume button
-    const button = root.elements.button;
     button.alt = is_stopped ? 'Resume' : 'Pause';
     button.dataset.action = is_stopped ? 'resume' : 'pause';
   }
@@ -289,12 +287,12 @@ export class TorrentRendererFull {
     );
 
     root.elements = {
-      button: button,
-      labels: labels,
-      name: name,
-      peer_details: peer_details,
-      progress_details: progress_details,
-      progressbar: progressbar,
+      button,
+      labels,
+      name,
+      peer_details,
+      progress_details,
+      progressbar,
     };
 
     return root;
@@ -363,7 +361,7 @@ export class TorrentRendererCompact {
     TorrentRendererCompact.renderPeerDetails(t, root.elements.peer_details);
 
     // progressbar
-    const progressbar = root.elements.progressbar;
+    const { progressbar } = root.elements;
     TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
     progressbar.classList.add('compact');
   }
@@ -389,10 +387,10 @@ export class TorrentRendererCompact {
     );
 
     root.elements = {
-      labels: labels,
-      name: name,
-      peer_details: peer_details,
-      progressbar: progressbar,
+      labels,
+      name,
+      peer_details,
+      progressbar,
     }
 
     return root;
