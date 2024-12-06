@@ -5,7 +5,7 @@
 
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { setTextContent } from './utils.js';
+import { setTextContent, new_elements } from './utils.js';
 
 const TorrentRendererHelper = {
   createIcon: (torrent) => {
@@ -86,16 +86,6 @@ const TorrentRendererHelper = {
   },
   symbol: { down: '▼', up: '▲' },
 };
-
-function new_elements(...cs) {
-  const es = [];
-  for (const className of cs) {
-    const e = document.createElement('div');
-    e.className = className;
-    es.push(e);
-  }
-  return es;
-}
 
 ///
 
