@@ -228,28 +228,28 @@ export class TorrentRendererFull {
     root.classList.toggle('paused', is_stopped);
 
     // name
-    setTextContent(root.element.name, t.getName());
+    setTextContent(root.name, t.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(t, root.element.labels);
+    TorrentRendererHelper.formatLabels(t, root.labels);
 
     // progress details
     TorrentRendererFull.renderProgressDetails(
       controller,
       t,
-      root.element.progress_details,
+      root.progress_details,
     );
 
     // progressbar
-    const progressbar = root.element.progressbar;
+    const progressbar = root.progressbar;
     TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
     progressbar.classList.add('full');
 
     // peer details
-    TorrentRendererFull.renderPeerDetails(t, root.element.peer_details);
+    TorrentRendererFull.renderPeerDetails(t, root.peer_details);
 
     // pause/resume button
-    const button = root.element.button;
+    const button = root.button;
     button.alt = is_stopped ? 'Resume' : 'Pause';
     button.dataset.action = is_stopped ? 'resume' : 'pause';
   }
@@ -288,14 +288,14 @@ export class TorrentRendererFull {
       peer_details,
     );
 
-    root.element = {
+    Object.assign(root, {
       button,
       labels,
       name,
       peer_details,
       progress_details,
       progressbar,
-    };
+    });
 
     return root;
   }
@@ -354,16 +354,16 @@ export class TorrentRendererCompact {
     root.classList.toggle('paused', t.isStopped());
 
     // name
-    setTextContent(root.element.name, t.getName());
+    setTextContent(root.name, t.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(t, root.element.labels);
+    TorrentRendererHelper.formatLabels(t, root.labels);
 
     // peer details
-    TorrentRendererCompact.renderPeerDetails(t, root.element.peer_details);
+    TorrentRendererCompact.renderPeerDetails(t, root.peer_details);
 
     // progressbar
-    const progressbar = root.element.progressbar;
+    const progressbar = root.progressbar;
     TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
     progressbar.classList.add('compact');
   }
@@ -388,12 +388,12 @@ export class TorrentRendererCompact {
       progressbar,
     );
 
-    root.element = {
+    Object.assign(root, {
       labels,
       name,
       peer_details,
       progressbar,
-    }
+    });
 
     return root;
   }
