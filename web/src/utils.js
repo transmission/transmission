@@ -36,6 +36,16 @@ function toggleClass(buttons, button, pages, page, callback) {
   }
 }
 
+export function new_elements(...cs) {
+  const es = [];
+  for (const className of cs) {
+    const e = document.createElement('div');
+    e.className = className;
+    es.push(e);
+  }
+  return es;
+}
+
 export function createTextualTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');
   root.id = id;
