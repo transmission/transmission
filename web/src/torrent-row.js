@@ -87,7 +87,7 @@ const TorrentRendererHelper = {
   symbol: { down: '▼', up: '▲' },
 };
 
-function new_divs(...cs) {
+function new_elements(...cs) {
   const es = [];
   for (const className of cs) {
     const e = document.createElement('div');
@@ -238,27 +238,28 @@ export class TorrentRendererFull {
     root.classList.toggle('paused', is_stopped);
 
     // name
-    setTextContent(root._name_container, t.getName());
+    setTextContent(root.element.name, t.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(t, root._labels_container);
+    TorrentRendererHelper.formatLabels(t, root.element.labels);
 
     // progress details
     TorrentRendererFull.renderProgressDetails(
       controller,
       t,
-      root._progress_details_container,
+      root.element.progress_details,
     );
 
     // progressbar
-    TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
-    root._progressbar.classList.add('full');
+    const progressbar = root.element.progressbar;
+    TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
+    progressbar.classList.add('full');
 
     // peer details
-    TorrentRendererFull.renderPeerDetails(t, root._peer_details_container);
+    TorrentRendererFull.renderPeerDetails(t, root.element.peer_details);
 
     // pause/resume button
-    const button = root._toggle_running_button;
+    const button = root.element.button;
     button.alt = is_stopped ? 'Resume' : 'Pause';
     button.dataset.action = is_stopped ? 'resume' : 'pause';
   }
@@ -268,7 +269,14 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
-    const [name, labels, details, progress, progressbar, peers] = new_divs(
+    const [
+      name,
+      labels,
+      progress_details,
+      progress,
+      progressbar,
+      peer_details
+    ] = new_elements(
       'torrent-name',
       'torrent-labels',
       'torrent-progress-details',
@@ -285,17 +293,19 @@ export class TorrentRendererFull {
       TorrentRendererHelper.createIcon(torrent),
       name,
       labels,
-      details,
+      progress_details,
       progress,
-      peers,
+      peer_details,
     );
 
-    root._name_container = name;
-    root._labels_container = labels;
-    root._progress_details_container = details;
-    root._progressbar = progressbar;
-    root._toggle_running_button = button;
-    root._peer_details_container = peers;
+    root.element = {
+      name,
+      labels,
+      progress_details,
+      progressbar,
+      button,
+      peer_details,
+    };
 
     return root;
   }
@@ -354,17 +364,18 @@ export class TorrentRendererCompact {
     root.classList.toggle('paused', t.isStopped());
 
     // name
-    setTextContent(root._name_container, t.getName());
+    setTextContent(root.element.name, t.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(t, root._labels_container);
+    TorrentRendererHelper.formatLabels(t, root.element.labels);
 
     // peer details
-    TorrentRendererCompact.renderPeerDetails(t, root._details_container);
+    TorrentRendererCompact.renderPeerDetails(t, root.element.peer_details);
 
     // progressbar
-    TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
-    root._progressbar.classList.add('compact');
+    const progressbar = root.element.progressbar;
+    TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
+    progressbar.classList.add('compact');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -372,7 +383,7 @@ export class TorrentRendererCompact {
     const root = document.createElement('li');
     root.className = 'torrent compact';
 
-    const [name, labels, peers, progressbar] = new_divs(
+    const [name, labels, peer_details, progressbar] = new_elements(
       'torrent-name compact',
       'torrent-labels compact',
       'torrent-peer-details compact',
@@ -383,14 +394,16 @@ export class TorrentRendererCompact {
       TorrentRendererHelper.createIcon(torrent),
       name,
       labels,
-      peers,
+      peer_details,
       progressbar,
     );
 
-    root._name_container = name;
-    root._labels_container = labels;
-    root._details_container = peers;
-    root._progressbar = progressbar;
+    root.element = {
+      name,
+      labels,
+      peer_details,
+      progressbar,
+    }
 
     return root;
   }
