@@ -5,15 +5,19 @@
 
 #include "IPToLocation.h"
 
-#include "Session.h"
 #include <curl/curl.h>
 #include <libdeflate.h>
 #include <maxminddb.h>
 
+#include <glibmm/datetime.h>
+#include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdio>
+#include <fstream>
+#include <iostream>
 #include <string>
 
 // Function to decompress the mmdb.gz file after download
@@ -87,7 +91,7 @@ void maintain_mmdb_file(std::string const& mmdb_file)
     }
 
     std::string url;
-    if (access(mmdb_file.c_str(), F_OK) == -1)
+    if (!Glib::file_test(mmdb_file, Glib::FileTest::EXISTS))
     {
         url = "https://download.db-ip.com/free/dbip-city-lite-" + year + "-" + month + ".mmdb.gz";
     }
@@ -128,7 +132,7 @@ void maintain_mmdb_file(std::string const& mmdb_file)
     CURL* curl = curl_easy_init();
     if (curl != nullptr)
     {
-        FILE* fp = fopen((mmdb_file + ".gz").c_str(), "wb");
+        FILE* fp = std::fopen((mmdb_file + ".gz").c_str(), "wb");
         if (fp == nullptr)
         {
             std::cerr << "Error opening " + mmdb_file + ".gz to download MaxMind database\n";
@@ -141,7 +145,7 @@ void maintain_mmdb_file(std::string const& mmdb_file)
         CURLcode const res = curl_easy_perform(curl);
         curl_easy_cleanup(curl); // always cleanup
 
-        if (fclose(fp) != 0)
+        if (std::fclose(fp) != 0)
         {
             std::cerr << "Error closing " + mmdb_file + ".gz\n";
             return;
@@ -157,7 +161,7 @@ void maintain_mmdb_file(std::string const& mmdb_file)
         decompress_gz_file(mmdb_file + ".gz");
         if (remove((mmdb_file + ".gz").c_str()) != 0)
         {
-            perror(("Error deleting " + mmdb_file + ".gz").c_str());
+            std::perror(("Error deleting " + mmdb_file + ".gz").c_str());
         }
     }
 }
