@@ -289,12 +289,12 @@ export class TorrentRendererFull {
     );
 
     root.element = {
-      name,
+      button,
       labels,
+      name,
+      peer_details,
       progress_details,
       progressbar,
-      button,
-      peer_details,
     };
 
     return root;
@@ -389,8 +389,8 @@ export class TorrentRendererCompact {
     );
 
     root.element = {
-      name,
       labels,
+      name,
       peer_details,
       progressbar,
     }
