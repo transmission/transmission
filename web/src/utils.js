@@ -57,7 +57,8 @@ function namespace(tagname, attrs) {
   return e;
 }
 
-function renderIcon(...svgca) { // SVG Command Array
+function renderIcon(...svgca) {
+  // SVG Command Array
   const svg = namespace('svg', icon32);
   for (const c of svgca) {
     svg.append(namespace(c[0], c[1]));
