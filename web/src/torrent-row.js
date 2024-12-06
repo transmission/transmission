@@ -266,7 +266,7 @@ export class TorrentRendererFull {
       progress_details,
       progress,
       progressbar,
-      peer_details
+      peer_details,
     ] = new_elements(
       'torrent-name',
       'torrent-labels',
@@ -394,7 +394,7 @@ export class TorrentRendererCompact {
       name,
       peer_details,
       progressbar,
-    }
+    };
 
     return root;
   }
