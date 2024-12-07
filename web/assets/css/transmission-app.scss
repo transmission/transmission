@@ -27,7 +27,7 @@
   --dialog-padding: 20px;
   --logo-size: 64px;
   --pauseresume-size: 20px;
-  --popup-top: 51px; // TODO: ugly that this is hardcoded
+  --popup-top: 82px; // TODO: ugly that this is hardcoded
   --toolbar-height: 50px;
 
   /* colors related to torrent status */
@@ -290,12 +290,6 @@ a {
   flex: 1;
   flex-direction: row;
   overflow: auto;
-
-  @include viewport-large {
-    .contract {
-      min-width: 570px;
-    }
-  }
 }
 
 .popup,
@@ -817,16 +811,9 @@ a {
   @include viewport-large {
     box-shadow: initial;
   }
-}
 
-#inspector,
-#prefs-dialog {
-  @include viewport-small {
-    left: 0;
-  }
-  @include viewport-medium {
-    border-left: 1px solid var(--color-border-default);
-    width: 570px;
+  @include viewport-large {
+    position: initial;
   }
 }
 
@@ -835,7 +822,6 @@ a {
   background: $background-color;
   bottom: 0;
   right: 0;
-  top: var(--popup-top);
   z-index: var(--z-index-popup);
 
   .tabs-page {
@@ -947,14 +933,17 @@ a {
   flex-direction: column;
   position: absolute;
   right: 0;
-  top: var(--popup-top);
   z-index: var(--z-index-popup);
 
   @include viewport-small {
+    top: 0;
     left: 0;
   }
   @include viewport-medium {
-    width: 550px;
+    border-left: 1px solid var(--color-border-default);
+    min-width: 570px;
+    top: var(--popup-top);
+    width: 570px;
   }
 }
 
