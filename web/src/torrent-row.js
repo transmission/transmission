@@ -325,13 +325,13 @@ export class TorrentRendererCompact {
         if (have_dn) {
           s.push(
             TorrentRendererHelper.symbol.down,
-            Formatter.speedBps(t.getDownloadSpeed()),
+            fmt.speedBps(t.getDownloadSpeed()),
           );
         }
         if (have_up) {
           s.push(
             TorrentRendererHelper.symbol.up,
-            Formatter.speedBps(t.getUploadSpeed()),
+            fmt.speedBps(t.getUploadSpeed()),
           );
         }
         setTextContent(peer_details, s.join(' '));
@@ -339,7 +339,7 @@ export class TorrentRendererCompact {
     } else if (t.isSeeding()) {
       const str = [
         'Ratio:',
-        Formatter.ratioString(t.getUploadRatio()),
+        fmt.ratioString(t.getUploadRatio()),
         '-',
         TorrentRendererHelper.symbol.up,
         fmt.speedBps(t.getUploadSpeed()),
@@ -361,12 +361,12 @@ export class TorrentRendererCompact {
     // labels
     TorrentRendererHelper.formatLabels(t, labels);
 
-    // peer details
-    TorrentRendererCompact.renderPeerDetails(t, peer_details);
-
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
     progressbar.classList.add('compact');
+
+    // peer details
+    TorrentRendererCompact.renderPeerDetails(t, peer_details);
   }
 
   // eslint-disable-next-line class-methods-use-this
