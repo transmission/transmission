@@ -43,7 +43,7 @@ export class Inspector extends EventTarget {
     );
     this._setTorrents(this.controller.getSelectedTorrents());
 
-    document.body.append(this.elements.root);
+    document.querySelector('#mainwin-workarea').append(this.elements.root);
   }
 
   close() {
