@@ -32,8 +32,8 @@ For a more detailed description, and dependencies, visit [How to Build Transmiss
 ### Building a Transmission release from the command line
 
 ```bash
-$ tar xf transmission-4.0.4.tar.xz
-$ cd transmission-4.0.4
+$ tar xf transmission-4.0.6.tar.xz
+$ cd transmission-4.0.6
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
 $ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
