@@ -415,8 +415,8 @@ a {
     align-items: inherit;
     flex-direction: inherit;
 
-    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
-      width: 100px;
+    + .speed-container {
+      min-width: 100px;
     }
   }
 
