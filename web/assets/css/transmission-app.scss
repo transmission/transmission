@@ -933,6 +933,7 @@ a {
   flex-direction: column;
   position: absolute;
   right: 0;
+  top: var(--popup-top);
   z-index: var(--z-index-popup);
 
   @include viewport-small {
@@ -942,7 +943,6 @@ a {
   @include viewport-medium {
     border-left: 1px solid var(--color-border-default);
     min-width: 570px;
-    top: var(--popup-top);
     width: 570px;
   }
 }
