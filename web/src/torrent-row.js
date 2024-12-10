@@ -5,20 +5,9 @@
 
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { setTextContent } from './utils.js';
+import { icon, setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
-  createIcon: (torrent) => {
-    const icon = document.createElement('div');
-    icon.classList.add('icon');
-    icon.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
-    icon.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
-    return icon;
-  },
-
   formatDL: (t) => {
     return `▼ ${Formatter.speedBps(t.getDownloadSpeed())}`;
   },
@@ -272,7 +261,7 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
-    const icon = TorrentRendererHelper.createIcon(torrent);
+    const _icon = icon.mimeType(torrent);
 
     const name = document.createElement('div');
     name.className = 'torrent-name';
@@ -291,14 +280,14 @@ export class TorrentRendererFull {
     button.className = 'torrent-pauseresume-button';
     progress.append(button);
 
-    root.append(icon);
+    root.append(_icon);
     root.append(name);
     root.append(labels);
     root.append(details);
     root.append(progress);
     root.append(peers);
 
-    root._icon = icon;
+    root._icon = _icon;
     root._name_container = name;
     root._labels_container = labels;
     root._progress_details_container = details;
@@ -370,7 +359,7 @@ export class TorrentRendererCompact {
     const progressbar = document.createElement('div');
     progressbar.classList.add('torrent-progress-bar', 'compact');
 
-    const icon = TorrentRendererHelper.createIcon(torrent);
+    const _icon = icon.mimeType(torrent);
 
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';
@@ -386,7 +375,7 @@ export class TorrentRendererCompact {
     root.append(details);
     root.append(labels);
     root.append(name);
-    root.append(icon);
+    root.append(_icon);
     root.className = 'torrent compact';
     root._progressbar = progressbar;
     root._details_container = details;
