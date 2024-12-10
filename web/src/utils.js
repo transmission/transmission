@@ -230,13 +230,6 @@ export const icon = Object.freeze({
     svg.append(g);
     return svg;
   },
-  mimeType: (torrent) => {
-    const e = document.createElement('div');
-    e.classList.add('icon');
-    e.dataset.iconMimeType = torrent.getPrimaryMimeType().split('/', 1).pop();
-    e.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
-    return e;
-  },
   open: () => {
     return renderIcon(
       [
