@@ -245,9 +245,9 @@ export class TorrentRendererFull {
     root._progressbar.classList.add('full');
 
     // pause/resume button
-    const e = root._toggle_running_button;
-    e.alt = is_stopped ? 'Resume' : 'Pause';
-    e.dataset.action = is_stopped ? 'resume' : 'pause';
+    const button = root._toggle_running_button;
+    button.alt = is_stopped ? 'Resume' : 'Pause';
+    button.dataset.action = is_stopped ? 'resume' : 'pause';
 
     // peer details
     TorrentRendererFull.renderPeerDetails(t, root._peer_details_container);
@@ -323,13 +323,13 @@ export class TorrentRendererCompact {
         if (have_dn) {
           s.push(
             TorrentRendererHelper.symbol.down,
-            Formatter.speedBps(t.getDownloadSpeed()),
+            fmt.speedBps(t.getDownloadSpeed()),
           );
         }
         if (have_up) {
           s.push(
             TorrentRendererHelper.symbol.up,
-            Formatter.speedBps(t.getUploadSpeed()),
+            fmt.speedBps(t.getUploadSpeed()),
           );
         }
         setTextContent(peer_details, s.join(' '));
@@ -337,7 +337,7 @@ export class TorrentRendererCompact {
     } else if (t.isSeeding()) {
       const str = [
         'Ratio:',
-        Formatter.ratioString(t.getUploadRatio()),
+        fmt.ratioString(t.getUploadRatio()),
         '-',
         TorrentRendererHelper.symbol.up,
         fmt.speedBps(t.getUploadSpeed()),
