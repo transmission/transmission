@@ -189,7 +189,7 @@ export function makeUUID() {
   );
 }
 
-export const icon = Object.seal({
+export const icon = Object.freeze({
   delete: () => {
     return renderIcon(
       ['polyline', { points: '3 6 5 6 21 6' }],
