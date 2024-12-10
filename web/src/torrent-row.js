@@ -5,7 +5,7 @@
 
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import { setTextContent, new_elements } from './utils.js';
+import { setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
   createIcon: (torrent) => {
@@ -224,35 +224,33 @@ export class TorrentRendererFull {
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     const is_stopped = t.isStopped();
+
     root.classList.toggle('paused', is_stopped);
-    const {
-      button,
-      labels,
-      name,
-      peer_details,
-      progressbar,
-      progress_details,
-    } = root.elements;
 
     // name
-    setTextContent(name, t.getName());
+    setTextContent(root._name_container, t.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(t, labels);
+    TorrentRendererHelper.formatLabels(t, root._labels_container);
 
     // progress details
-    TorrentRendererFull.renderProgressDetails(controller, t, progress_details);
+    TorrentRendererFull.renderProgressDetails(
+      controller,
+      t,
+      root._progress_details_container,
+    );
 
     // progressbar
-    TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
-    progressbar.classList.add('full');
-
-    // peer details
-    TorrentRendererFull.renderPeerDetails(t, peer_details);
+    TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
+    root._progressbar.classList.add('full');
 
     // pause/resume button
-    button.alt = is_stopped ? 'Resume' : 'Pause';
-    button.dataset.action = is_stopped ? 'resume' : 'pause';
+    const e = root._toggle_running_button;
+    e.alt = is_stopped ? 'Resume' : 'Pause';
+    e.dataset.action = is_stopped ? 'resume' : 'pause';
+
+    // peer details
+    TorrentRendererFull.renderPeerDetails(t, root._peer_details_container);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -260,25 +258,27 @@ export class TorrentRendererFull {
     const root = document.createElement('li');
     root.className = 'torrent';
 
-    const [
-      name,
-      labels,
-      progress_details,
-      progress,
-      progressbar,
-      peer_details,
-    ] = new_elements(
-      'torrent-name',
-      'torrent-labels',
-      'torrent-progress-details',
-      'torrent-progress',
-      'torrent-progress-bar full',
-      'torrent-peer-details',
-    );
+    const name = document.createElement('div');
+    name.className = 'torrent-name';
+
+    const labels = document.createElement('div');
+    labels.className = 'torrent-labels';
+
+    const progress_details = document.createElement('div');
+    progress_details.className = 'torrent-progress-details';
+
+    const progressbar = document.createElement('div');
+    progressbar.className = 'torrent-progress-bar full';
 
     const button = document.createElement('a');
     button.className = 'torrent-pauseresume-button';
+
+    const progress = document.createElement('div');
+    progress.className = 'torrent-progress';
     progress.append(progressbar, button);
+
+    const peer_details = document.createElement('div');
+    peer_details.className = 'torrent-peer-details';
 
     root.append(
       TorrentRendererHelper.createIcon(torrent),
@@ -289,14 +289,12 @@ export class TorrentRendererFull {
       peer_details,
     );
 
-    root.elements = {
-      button,
-      labels,
-      name,
-      peer_details,
-      progress_details,
-      progressbar,
-    };
+    root._name_container = name;
+    root._labels_container = labels;
+    root._progress_details_container = progress_details;
+    root._progressbar = progressbar;
+    root._peer_details_container = peer_details;
+    root._toggle_running_button = button;
 
     return root;
   }
@@ -325,13 +323,13 @@ export class TorrentRendererCompact {
         if (have_dn) {
           s.push(
             TorrentRendererHelper.symbol.down,
-            fmt.speedBps(t.getDownloadSpeed()),
+            Formatter.speedBps(t.getDownloadSpeed()),
           );
         }
         if (have_up) {
           s.push(
             TorrentRendererHelper.symbol.up,
-            fmt.speedBps(t.getUploadSpeed()),
+            Formatter.speedBps(t.getUploadSpeed()),
           );
         }
         setTextContent(peer_details, s.join(' '));
@@ -339,7 +337,7 @@ export class TorrentRendererCompact {
     } else if (t.isSeeding()) {
       const str = [
         'Ratio:',
-        fmt.ratioString(t.getUploadRatio()),
+        Formatter.ratioString(t.getUploadRatio()),
         '-',
         TorrentRendererHelper.symbol.up,
         fmt.speedBps(t.getUploadSpeed()),
@@ -353,20 +351,19 @@ export class TorrentRendererCompact {
   // eslint-disable-next-line class-methods-use-this
   render(controller, t, root) {
     root.classList.toggle('paused', t.isStopped());
-    const { labels, name, peer_details, progressbar } = root.elements;
 
     // name
-    setTextContent(name, t.getName());
+    setTextContent(root._name_container, t.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(t, labels);
-
-    // progressbar
-    TorrentRendererHelper.renderProgressbar(controller, t, progressbar);
-    progressbar.classList.add('compact');
+    TorrentRendererHelper.formatLabels(t, root._labels_container);
 
     // peer details
-    TorrentRendererCompact.renderPeerDetails(t, peer_details);
+    TorrentRendererCompact.renderPeerDetails(t, root._details_container);
+
+    // progressbar
+    TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
+    root._progressbar.classList.add('compact');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -374,12 +371,17 @@ export class TorrentRendererCompact {
     const root = document.createElement('li');
     root.className = 'torrent compact';
 
-    const [name, labels, peer_details, progressbar] = new_elements(
-      'torrent-name compact',
-      'torrent-labels compact',
-      'torrent-peer-details compact',
-      'torrent-progress-bar compact',
-    );
+    const name = document.createElement('div');
+    name.className = 'torrent-name compact';
+
+    const labels = document.createElement('div');
+    labels.className = 'torrent-labels compact';
+
+    const peer_details = document.createElement('div');
+    peer_details.className = 'torrent-peer-details compact';
+
+    const progressbar = document.createElement('div');
+    progressbar.className = 'torrent-progress-bar compact';
 
     root.append(
       TorrentRendererHelper.createIcon(torrent),
@@ -389,12 +391,10 @@ export class TorrentRendererCompact {
       progressbar,
     );
 
-    root.elements = {
-      labels,
-      name,
-      peer_details,
-      progressbar,
-    };
+    root._name_container = name;
+    root._labels_container = labels;
+    root._details_container = peer_details;
+    root._progressbar = progressbar;
 
     return root;
   }
