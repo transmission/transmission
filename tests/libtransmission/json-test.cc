@@ -61,7 +61,23 @@ TEST_P(JSONTest, testElements)
         "  \"null\": null }"
     };
 
-    auto const var = tr_variant_serde::json().inplace().parse(In).value_or(tr_variant{});
+    // Same as In, just formatted differently
+    static auto constexpr Out = std::string_view{
+        // clang-format off
+        "{"
+            "\"escaped\":\"bell \\b formfeed \\f linefeed \\n carriage return \\r tab \\t\","
+            "\"false\":false,"
+            "\"float\":6.5,"
+            "\"int\":5,"
+            "\"null\":null,"
+            "\"string\":\"hello world\","
+            "\"true\":true"
+        "}"
+        // clang-format on
+    };
+
+    auto serde = tr_variant_serde::json().inplace().compact();
+    auto var = serde.parse(In).value_or(tr_variant{});
     auto const* const map = var.get_if<tr_variant::Map>();
     ASSERT_NE(map, nullptr);
 
@@ -89,9 +105,10 @@ TEST_P(JSONTest, testElements)
     ASSERT_TRUE(b);
     EXPECT_FALSE(*b);
 
-    sv = map->value_if<std::string_view>(tr_quark_new("null"sv));
-    ASSERT_TRUE(sv);
-    EXPECT_EQ(""sv, *sv);
+    auto n = map->value_if<std::nullptr_t>(tr_quark_new("null"sv));
+    EXPECT_TRUE(n);
+
+    EXPECT_EQ(serde.to_string(var), Out);
 }
 
 TEST_P(JSONTest, testUtf8)
