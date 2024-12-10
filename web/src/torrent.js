@@ -462,88 +462,73 @@ export class Torrent extends EventTarget {
 
     return a - b || Torrent.compareByName(ta, tb);
   }
+  static compareByPath(ta, tb) {
+    const a = ta.getDownloadDir();
+    const b = tb.getDownloadDir();
 
-  static compareTorrents(a, b, sortMode, sortDirection) {
-    let index = 0;
+    return a.localeCompare(b);
+  }
+
+  static getComparer(sortMode, sortDirection, groupByPath) {
+    let comparer = null;
 
     switch (sortMode) {
       case Prefs.SortByActivity:
-        index = Torrent.compareByActivity(a, b);
+        comparer = Torrent.compareByActivity;
         break;
       case Prefs.SortByAge:
-        index = Torrent.compareByAge(a, b);
+        comparer = Torrent.compareByAge;
         break;
       case Prefs.SortByQueue:
-        index = Torrent.compareByQueue(a, b);
+        comparer = Torrent.compareByQueue;
         break;
       case Prefs.SortByProgress:
-        index = Torrent.compareByProgress(a, b);
+        comparer = Torrent.compareByProgress;
         break;
       case Prefs.SortBySize:
-        index = Torrent.compareBySize(a, b);
+        comparer = Torrent.compareBySize;
         break;
       case Prefs.SortByState:
-        index = Torrent.compareByState(a, b);
+        comparer = Torrent.compareByState;
         break;
       case Prefs.SortByRatio:
-        index = Torrent.compareByRatio(a, b);
+        comparer = Torrent.compareByRatio;
         break;
       case Prefs.SortByName:
-        index = Torrent.compareByName(a, b);
+        comparer = Torrent.compareByName;
         break;
       default:
         console.log(`Unrecognized sort mode: ${sortMode}`);
-        index = Torrent.compareByName(a, b);
+        comparer = Torrent.compareByName;
         break;
     }
 
     if (sortDirection === Prefs.SortDescending) {
-      index = -index;
+      const innerComparer = comparer;
+      comparer = (a, b) => -innerComparer(a, b);
     }
 
-    return index;
+    if (groupByPath) {
+      const innerComparer = comparer;
+      comparer = (a, b) => this.compareByPath(a, b) || innerComparer(a, b);
+    }
+
+    return comparer;
+  }
+
+  static compareTorrents(a, b, sortMode, sortDirection, groupByPath) {
+    return Torrent.getComparer(sortMode, sortDirection, groupByPath)(a, b);
   }
 
   /**
    * @param torrents an array of Torrent objects
    * @param sortMode one of Prefs.SortBy*
    * @param sortDirection Prefs.SortAscending or Prefs.SortDescending
+   * @param groupByPath boolean
    */
-  static sortTorrents(torrents, sortMode, sortDirection) {
-    switch (sortMode) {
-      case Prefs.SortByActivity:
-        torrents.sort(this.compareByActivity);
-        break;
-      case Prefs.SortByAge:
-        torrents.sort(this.compareByAge);
-        break;
-      case Prefs.SortByName:
-        torrents.sort(this.compareByName);
-        break;
-      case Prefs.SortByProgress:
-        torrents.sort(this.compareByProgress);
-        break;
-      case Prefs.SortByQueue:
-        torrents.sort(this.compareByQueue);
-        break;
-      case Prefs.SortByRatio:
-        torrents.sort(this.compareByRatio);
-        break;
-      case Prefs.SortBySize:
-        torrents.sort(this.compareBySize);
-        break;
-      case Prefs.SortByState:
-        torrents.sort(this.compareByState);
-        break;
-      default:
-        console.log(`Unrecognized sort mode: ${sortMode}`);
-        torrents.sort(this.compareByName);
-        break;
-    }
-
-    if (sortDirection === Prefs.SortDescending) {
-      torrents.reverse();
-    }
+  static sortTorrents(torrents, sortMode, sortDirection, groupByPath) {
+    const comparer = Torrent.getComparer(sortMode, sortDirection, groupByPath);
+    torrents.sort(comparer);
 
     return torrents;
   }

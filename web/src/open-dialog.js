@@ -22,6 +22,17 @@ export class OpenDialog extends EventTarget {
       this.elements.file_input.files = files;
     }
     this._updateFreeSpaceInAddDialog();
+    while (this.elements.datalist.firstChild) {
+      this.elements.datalist.firstChild.remove();
+    }
+
+    const paths = this.controller.getAllTorrentsPaths();
+    for (const path of paths) {
+      const option = document.createElement('option');
+      option.value = path;
+      this.elements.datalist.append(option);
+    }
+
     this.elements.url_input.focus();
   }
 
@@ -172,8 +183,14 @@ export class OpenDialog extends EventTarget {
     input.id = 'add-dialog-folder-input';
     input.addEventListener('change', () => this._updateFreeSpaceInAddDialog());
     input.value = this.controller.session_properties['download-dir'];
+    input.setAttribute('list', 'path-list');
     workarea.append(input);
     elements.folder_input = input;
+
+    const datalist = document.createElement('datalist');
+    datalist.id = 'path-list';
+    elements.datalist = datalist;
+    workarea.append(datalist);
 
     const checkarea = document.createElement('div');
     workarea.append(checkarea);
