@@ -53,7 +53,7 @@ export class ContextMenu extends EventTarget {
     root.style.pointerEvents = 'none';
 
     const actions = {};
-    const add_item = (action, warn = false) => {
+    const new_item = (action, warn = false) => {
       const item = document.createElement('div');
       const text = this.action_manager.text(action);
       item.role = 'menuitem';
@@ -73,36 +73,108 @@ export class ContextMenu extends EventTarget {
         this.close();
       });
       actions[action] = item;
-      root.append(item);
+      return item;
     };
 
-    const add_separator = () => {
+    const new_separator = () => {
       const item = document.createElement('div');
       item.classList.add('context-menu-separator');
-      root.append(item);
+      return item;
     };
 
-    add_item('resume-selected-torrents');
-    add_item('resume-selected-torrents-now');
-    add_item('pause-selected-torrents');
-    add_separator();
-    add_item('move-top');
-    add_item('move-up');
-    add_item('move-down');
-    add_item('move-bottom');
-    add_separator();
-    add_item('remove-selected-torrents', true);
-    add_item('trash-selected-torrents', true);
-    add_separator();
-    add_item('verify-selected-torrents');
-    add_item('show-move-dialog');
-    add_item('show-rename-dialog');
-    add_item('show-labels-dialog');
-    add_separator();
-    add_item('reannounce-selected-torrents');
-    add_separator();
-    add_item('select-all');
-    add_item('deselect-all');
+    const new_submenu = (text, ...items) => {
+      const item = document.createElement('DIV');
+      item.textContent = text;
+      item.classList.add('context-menuitem');
+
+      const arrow = document.createElement('DIV');
+      arrow.classList = 'arrow';
+      item.append(arrow);
+
+      const submenu = document.createElement('DIV');
+      submenu.classList = 'submenu';
+      arrow.append(submenu);
+
+      const open = document.createElement('DIV');
+      open.classList = 'open right';
+      submenu.append(open);
+      open.append(...items.map((t) => new_item(t)));
+
+      item.addEventListener('click', (e_) => {
+        const t = item.lastChild.lastChild;
+
+        if (
+          !e_.target.classList.contains('right') &&
+          !e_.target.parentNode.classList.contains('right') &&
+          !e_.target.classList.contains('left') &&
+          !e_.target.parentNode.classList.contains('left') &&
+          t.style.display === 'block'
+        ) {
+          t.style.display = 'none';
+          return;
+        }
+
+        for (const p of document.querySelectorAll('.submenu')) {
+          p.style.display = 'none';
+        }
+
+        t.style.display = 'block';
+        const where = item.getBoundingClientRect();
+        const wheret = t.lastChild.getBoundingClientRect();
+        const y = Math.min(
+          0,
+          document.documentElement.clientHeight -
+            window.visualViewport.offsetTop -
+            where.top -
+            t.clientHeight +
+            3,
+        );
+        const x = Math.min(
+          0,
+          document.documentElement.clientWidth -
+            window.visualViewport.offsetLeft -
+            where.right -
+            t.clientWidth,
+        );
+
+        t.style.top = `${y}px`;
+        if (x) {
+          t.lastChild.classList = 'open left';
+          t.style.left = `${-where.width - wheret.width}px`;
+        } else {
+          t.lastChild.classList = 'open right';
+          t.style.left = `${x}px`;
+        }
+      });
+
+      return item;
+    };
+
+    root.append(
+      new_item('resume-selected-torrents'),
+      new_item('resume-selected-torrents-now'),
+      new_item('pause-selected-torrents'),
+      new_separator(),
+      new_submenu(
+        'Move in the queue',
+        'move-top',
+        'move-up',
+        'move-down',
+        'move-bottom',
+      ),
+      new_separator(),
+      new_item('remove-selected-torrents', true),
+      new_item('trash-selected-torrents', true),
+      new_separator(),
+      new_item('verify-selected-torrents'),
+      new_item('show-move-dialog'),
+      new_item('show-rename-dialog'),
+      new_item('show-labels-dialog'),
+      new_separator(),
+      new_item('reannounce-selected-torrents'),
+      new_separator(),
+      new_submenu('Select operation', 'select-all', 'deselect-all'),
+    );
 
     return { actions, root };
   }
