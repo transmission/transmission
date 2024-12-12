@@ -220,19 +220,26 @@ export class TorrentRendererFull {
   render(controller, torrent, root) {
     const is_stopped = torrent.isStopped();
     root.classList.toggle('paused', is_stopped);
-    const { button, progressbar } = root;
+    const {
+      button,
+      labels,
+      name,
+      peer_details,
+      progressbar,
+      progress_details,
+    } = root;
 
     // name
-    setTextContent(root.name, torrent.getName());
+    setTextContent(name, torrent.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(torrent, root.labels);
+    TorrentRendererHelper.formatLabels(torrent, labels);
 
     // progress details
     TorrentRendererFull.renderProgressDetails(
       controller,
       torrent,
-      root.progress_details);
+      progress_details);
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, torrent, progressbar);
@@ -243,7 +250,7 @@ export class TorrentRendererFull {
     button.dataset.action = is_stopped ? 'resume' : 'pause';
 
     // peer details
-    TorrentRendererFull.renderPeerDetails(torrent, root.peer_details);
+    TorrentRendererFull.renderPeerDetails(torrent, peer_details);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -334,18 +341,18 @@ export class TorrentRendererCompact {
   // eslint-disable-next-line class-methods-use-this
   render(controller, torrent, root) {
     root.classList.toggle('paused', torrent.isStopped());
+    const { labels, name, peer_details, progressbar } = root;
 
     // name
-    setTextContent(root.name, torrent.getName());
+    setTextContent(name, torrent.getName());
 
     // labels
-    TorrentRendererHelper.formatLabels(torrent, root.labels);
+    TorrentRendererHelper.formatLabels(torrent, labels);
 
     // peer details
-    TorrentRendererCompact.renderPeerDetails(torrent, root.peer_details);
+    TorrentRendererCompact.renderPeerDetails(torrent, peer_details);
 
     // progressbar
-    const { progressbar } = root;
     TorrentRendererHelper.renderProgressbar(controller, torrent, progressbar);
     progressbar.classList.add('compact');
   }
