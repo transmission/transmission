@@ -74,10 +74,7 @@ const TorrentRendererHelper = {
   },
   symbol: { down: '▼', up: '▲' },
   updateIcon: (e, torrent) => {
-    e.dataset.iconMimeType = torrent
-      .getPrimaryMimeType()
-      .split('/', 1)
-      .pop();
+    e.dataset.iconMimeType = torrent.getPrimaryMimeType().split('/', 1).pop();
     e.dataset.iconMultifile = torrent.getFileCount() > 1 ? 'true' : 'false';
   },
 };
@@ -239,7 +236,8 @@ export class TorrentRendererFull {
     TorrentRendererFull.renderProgressDetails(
       controller,
       torrent,
-      progress_details);
+      progress_details,
+    );
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, torrent, progressbar);
@@ -272,7 +270,7 @@ export class TorrentRendererFull {
       e.className = className;
       root.append(e);
       root[name] = e;
-    };
+    }
 
     TorrentRendererHelper.updateIcon(root.icon, torrent);
 
@@ -375,7 +373,7 @@ export class TorrentRendererCompact {
       e.className = className;
       root.append(e);
       root[name] = e;
-    };
+    }
 
     TorrentRendererHelper.updateIcon(root.icon, torrent);
 
