@@ -409,8 +409,8 @@ a {
     align-items: inherit;
     flex-direction: inherit;
 
-    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
-      width: 100px;
+    + .speed-container {
+      min-width: 100px;
     }
   }
 
@@ -570,11 +570,9 @@ a {
 
       align-items: center;
       display: flex;
-      flex-direction: row-reverse;
 
       .icon {
         -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
-        flex-shrink: 0;
         height: var(--icon-size);
         mask-size: var(--icon-size), calc(var(--icon-size) / 2);
         width: var(--icon-size);

@@ -429,16 +429,14 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     set_transient_for(parent);
 
     auto* const e = gtr_get_widget<Gtk::Entry>(builder, "url_entry");
+    auto* const accept = get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
     gtr_paste_clipboard_url_into_entry(*e);
 
-    signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    set_default_widget(*accept);
+#else
+    set_default(*accept);
+#endif
 
-    if (e->get_text_length() == 0)
-    {
-        e->grab_focus();
-    }
-    else
-    {
-        get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT))->grab_focus();
-    }
+    signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
 }

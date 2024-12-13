@@ -1601,17 +1601,18 @@ void tr_torrentStartNow(tr_torrent* tor)
 void tr_torrentVerify(tr_torrent* tor)
 {
     tor->session->run_in_session_thread(
-        [tor]()
+        [session = tor->session, tor_id = tor->id()]()
         {
-            TR_ASSERT(tor->session->am_in_session_thread());
-            auto const lock = tor->unique_lock();
+            TR_ASSERT(session->am_in_session_thread());
+            auto const lock = session->unique_lock();
 
-            if (tor->is_deleting_)
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
             {
                 return;
             }
 
-            tor->session->verify_remove(tor);
+            session->verify_remove(tor);
 
             if (!tor->has_metainfo())
             {
@@ -1631,7 +1632,7 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->start_when_stable_ = false;
             }
 
-            tor->session->verify_add(tor);
+            session->verify_add(tor);
         });
 }
 
