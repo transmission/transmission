@@ -139,10 +139,10 @@ export class ContextMenu extends EventTarget {
 
         t.style.top = `${y}px`;
         if (x) {
-          t.lastChild.classList = 'open left';
+          t.lastChild.className = 'open left';
           t.style.left = `${-where.width - wheret.width}px`;
         } else {
-          t.lastChild.classList = 'open right';
+          t.lastChild.className = 'open right';
           t.style.left = `${x}px`;
         }
       });
