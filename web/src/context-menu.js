@@ -83,20 +83,20 @@ export class ContextMenu extends EventTarget {
     };
 
     const new_submenu = (text, ...items) => {
-      const item = document.createElement('DIV');
+      const item = document.createElement('div');
+      item.className = 'context-menuitem';
       item.textContent = text;
-      item.classList.add('context-menuitem');
 
-      const arrow = document.createElement('DIV');
-      arrow.classList = 'arrow';
+      const arrow = document.createElement('div');
+      arrow.className = 'arrow';
       item.append(arrow);
 
-      const submenu = document.createElement('DIV');
-      submenu.classList = 'submenu';
+      const submenu = document.createElement('div');
+      submenu.className = 'submenu';
       arrow.append(submenu);
 
-      const open = document.createElement('DIV');
-      open.classList = 'open right';
+      const open = document.createElement('div');
+      open.className = 'open right';
       submenu.append(open);
       open.append(...items.map((t) => new_item(t)));
 
@@ -114,7 +114,7 @@ export class ContextMenu extends EventTarget {
           return;
         }
 
-        for (const p of document.querySelectorAll('.submenu')) {
+        for (const p of root.querySelectorAll('.submenu')) {
           p.style.display = 'none';
         }
 
