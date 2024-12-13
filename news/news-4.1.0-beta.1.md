@@ -156,6 +156,7 @@ has major code changes relative to 4.0.x.
 * Use native file chooser dialogs (GTK client). ([#6545](https://github.com/transmission/transmission/pull/6545))
 * Fixed missing 'Remove torrent' tooltip. ([#5777](https://github.com/transmission/transmission/pull/5777))
 * If there was some disk error with torrent removal, fail with a user readable error message. ([#6055](https://github.com/transmission/transmission/pull/6055))
+* Setting default behaviour for GTK dialogs to add torrent from url and add tracker. ([#7102](https://github.com/transmission/transmission/pull/7102))
 * Fixed crash when opening torrent file from "Recently used" section in GTK 4. ([#6131](https://github.com/transmission/transmission/pull/6131))
 * Fix: Avoid ambiguous overload when calling Gdk::Cursor::create. ([#7070](https://github.com/transmission/transmission/pull/7070))
 * Fixed `4.0.0` regression causing GTK client to hang in some cases.
