@@ -7,10 +7,6 @@
 license: Apache-2.0 license
 
 - horizontal-rule.svg
-- pause-circle-active.svg
-- pause-circle-idle.svg
-- play-circle-active.svg
-- play-circle-idle.svg
 - router.svg
 
 ## [Feather Icons](https://github.com/feathericons/feather)
