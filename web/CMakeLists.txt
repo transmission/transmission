@@ -43,10 +43,6 @@ set(WEB_IMAGES
     assets/img/modern-tortoise.png
     assets/img/music.svg
     assets/img/package.svg
-    assets/img/pause-circle-active.svg
-    assets/img/pause-circle-idle.svg
-    assets/img/play-circle-active.svg
-    assets/img/play-circle-idle.svg
     assets/img/README.md
     assets/img/router.svg
     assets/img/type.svg)
