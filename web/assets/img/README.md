@@ -47,3 +47,5 @@ license: MIT
 - toolbar-info.png
 - toolbar-pause.png
 - toolbar-start.png
+- modern-tortoise.png
+- modern-tortoise-blue.png
