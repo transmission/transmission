@@ -332,6 +332,9 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 
         if (tr_strv_contains(subpath, ".."sv))
         {
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Rejected request from {host} (possible directory traversal attack)")),
+                fmt::arg("host", req->remote_host)));
             send_simple_response(req, HTTP_NOTFOUND);
         }
         else
@@ -476,12 +479,18 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
         {
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Rejected request from {host} (brute force protection active)")),
+                fmt::arg("host", req->remote_host)));
             send_simple_response(req, HttpErrorForbidden);
             return;
         }
 
         if (!is_address_allowed(server, req->remote_host))
         {
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Rejected request from {host} (IP not whitelisted)")),
+                fmt::arg("host", req->remote_host)));
             send_simple_response(req, HttpErrorForbidden);
             return;
         }
@@ -503,6 +512,9 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (!is_authorized(server, evhttp_find_header(req->input_headers, "Authorization")))
         {
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Rejected request from {host} (failed authentication)")),
+                fmt::arg("host", req->remote_host)));
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             if (server->is_anti_brute_force_enabled())
             {
@@ -541,6 +553,9 @@ void handle_request(struct evhttp_request* req, void* arg)
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
                 "attacks.</p>";
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Rejected request from {host} (Host not whitelisted)")),
+                fmt::arg("host", req->remote_host)));
             send_simple_response(req, 421, tmp);
         }
 #ifdef REQUIRE_SESSION_ID
@@ -571,6 +586,10 @@ void handle_request(struct evhttp_request* req, void* arg)
         }
         else
         {
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
+                fmt::arg("host", req->remote_host),
+                fmt::arg("uri", uri)));
             send_simple_response(req, HTTP_NOTFOUND, req->uri);
         }
     }
