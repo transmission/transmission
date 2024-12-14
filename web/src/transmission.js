@@ -1156,12 +1156,13 @@ TODO: fix this when notifications get fixed
   ///
 
   setCurrentPopup(popup, level = this.max_popups - 1) {
-    Array.from({ length: this.max_popups - level }, (_, n) => {
-      const pos = level + n;
+    let pos = level;
+    while (pos < this.max_popups) {
       if (this.popup[pos]) {
         this.popup[pos].close();
       }
-    });
+      pos++;
+    };
 
     this.popup[level] = popup;
 
