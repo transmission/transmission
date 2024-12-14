@@ -529,7 +529,7 @@ export class Transmission extends EventTarget {
     }
 
     const esc_key = keyCode === 27; // esc key pressed
-    if (esc_key && this.popup.some(Boolean) {
+    if (esc_key && this.popup.some(Boolean)) {
       this.setCurrentPopup(null, 0);
       event_.preventDefault();
       return;
