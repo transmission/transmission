@@ -34,7 +34,7 @@ export class Transmission extends EventTarget {
     this.max_popups = 2;
     this.notifications = notifications;
     this.prefs = prefs;
-    this.popup = Array(this.max_popups).fill(null);
+    this.popup = Array.from({ length: this.max_popups });
     this.remote = new Remote(this);
 
     this.addEventListener('torrent-selection-changed', (event_) =>
@@ -1156,12 +1156,12 @@ TODO: fix this when notifications get fixed
   ///
 
   setCurrentPopup(popup, level = this.max_popups - 1) {
-    for (const n of Array(this.max_popups - level).keys()) {
+    Array.from({ length: this.max_popups - level }, (_, n) => {
       const pos = level + n;
       if (this.popup[pos]) {
         this.popup[pos].close();
       }
-    }
+    });
 
     this.popup[level] = popup;
 
