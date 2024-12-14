@@ -126,7 +126,7 @@ export class Transmission extends EventTarget {
           break;
         case 'show-inspector':
           if (this.popup[0] instanceof Inspector) {
-            this.setCurrentPopup(null, 0);
+            this.popup[0].close();
           } else {
             this.setCurrentPopup(new Inspector(this), 0);
           }
@@ -136,7 +136,7 @@ export class Transmission extends EventTarget {
           break;
         case 'show-overflow-menu':
           if (this.popup[1] instanceof OverflowMenu) {
-            this.setCurrentPopup(null);
+            this.popup[1].close();
           } else {
             this.setCurrentPopup(
               new OverflowMenu(
@@ -195,7 +195,9 @@ export class Transmission extends EventTarget {
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.querySelector('#torrent-container');
     e.addEventListener('click', (e_) => {
-      this.setCurrentPopup(null);
+      if (this.popup[this.max_popups - 1]) {
+        this.setCurrentPopup(null);
+      }
       if (e_.target === e_.currentTarget) {
         this._deselectAll();
       }
