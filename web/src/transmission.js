@@ -529,7 +529,7 @@ export class Transmission extends EventTarget {
     }
 
     const esc_key = keyCode === 27; // esc key pressed
-    if (esc_key && this.popup.some((e) => e)) {
+    if (esc_key && this.popup.some(Boolean) {
       this.setCurrentPopup(null, 0);
       event_.preventDefault();
       return;
@@ -1156,13 +1156,13 @@ TODO: fix this when notifications get fixed
   ///
 
   setCurrentPopup(popup, level = this.max_popups - 1) {
-    let pos = level;
-    while (pos < this.max_popups) {
-      if (this.popup[pos]) {
-        this.popup[pos].close();
+    let index = level;
+    while (index < this.max_popups) {
+      if (this.popup[index]) {
+        this.popup[index].close();
       }
-      pos++;
-    };
+      index++;
+    }
 
     this.popup[level] = popup;
 
