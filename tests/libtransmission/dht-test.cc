@@ -46,7 +46,7 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/variant.h> // tr_variantDictAddRaw
+#include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
@@ -126,23 +126,22 @@ protected:
         {
             auto const dat_file = MockStateFile::filename(path);
 
-            auto dict = tr_variant{};
-            tr_variantInitDict(&dict, 3U);
-            tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(id_), std::size(id_));
-            tr_variantDictAddInt(&dict, TR_KEY_id_timestamp, id_timestamp_);
+            auto map = tr_variant::Map{ 3U };
+            map.try_emplace(TR_KEY_id, tr_variant::make_raw(id_));
+            map.try_emplace(TR_KEY_id_timestamp, id_timestamp_);
             auto compact = std::vector<std::byte>{};
             for (auto const& socket_address : ipv4_nodes_)
             {
                 socket_address.to_compact(std::back_inserter(compact));
             }
-            tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
+            map.try_emplace(TR_KEY_nodes, tr_variant::make_raw(compact));
             compact.clear();
             for (auto const& socket_address : ipv6_nodes_)
             {
                 socket_address.to_compact(std::back_inserter(compact));
             }
-            tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
-            tr_variant_serde::benc().to_file(dict, dat_file);
+            map.try_emplace(TR_KEY_nodes6, tr_variant::make_raw(compact));
+            tr_variant_serde::benc().to_file(tr_variant{ std::move(map) }, dat_file);
         }
     };
 

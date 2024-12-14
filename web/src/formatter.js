@@ -51,6 +51,11 @@ const fmt_MBps = new Intl.NumberFormat(current_locale, {
   style: 'unit',
   unit: 'megabyte-per-second',
 });
+const fmt_GBps = new Intl.NumberFormat(current_locale, {
+  maximumFractionDigits: 2,
+  style: 'unit',
+  unit: 'gigabyte-per-second',
+});
 
 export const Formatter = {
   /** Round a string of a number to a specified number of decimal places */
@@ -94,8 +99,8 @@ export const Formatter = {
   },
 
   // format a percentage to a string
-  percentString(x) {
-    const decimal_places = x < 100 ? 1 : 0;
+  percentString(x, decimal_places) {
+    decimal_places = x < 100 ? decimal_places : 0;
     return this._toTruncFixed(x, decimal_places);
   },
 
@@ -109,7 +114,7 @@ export const Formatter = {
     if (x === -2) {
       return '&infin;';
     }
-    return this.percentString(x);
+    return this.percentString(x, 1);
   },
 
   /**
@@ -122,7 +127,12 @@ export const Formatter = {
   },
 
   speed(KBps) {
-    return KBps < 999.95 ? fmt_kBps.format(KBps) : fmt_MBps.format(KBps / 1000);
+    if (KBps < 999.95) {
+      return fmt_kBps.format(KBps);
+    } else if (KBps < 999_950) {
+      return fmt_MBps.format(KBps / 1000);
+    }
+    return fmt_GBps.format(KBps / 1_000_000);
   },
 
   speedBps(Bps) {

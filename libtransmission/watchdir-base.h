@@ -82,9 +82,9 @@ private:
     struct Pending
     {
         size_t strikes = 0U;
-        Timestamp first_kick_at = {};
-        Timestamp last_kick_at = {};
-        Timestamp next_kick_at = {};
+        Timestamp first_kick_at;
+        Timestamp last_kick_at;
+        Timestamp next_kick_at;
     };
 
     void setNextKickTime(Pending& item)
