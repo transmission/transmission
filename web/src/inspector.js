@@ -293,7 +293,7 @@ export class Inspector extends EventTarget {
       const d =
         100 *
         (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
-      string = fmt.percentString(d);
+      string = fmt.percentString(d, 1);
 
       if (unverified) {
         string = `${fmt.size(verified)} of ${fmt.size(
@@ -320,7 +320,7 @@ export class Inspector extends EventTarget {
         (accumulator, t) => t.getHave() + t.getDesiredAvailable(),
         0,
       );
-      string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
+      string = `${fmt.percentString((100 * available) / sizeWhenDone, 1)}%`;
     }
     setTextContent(e.info.availability, fmt.stringSanitizer(string));
 

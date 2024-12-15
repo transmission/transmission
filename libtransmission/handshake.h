@@ -193,8 +193,6 @@ private:
 
     ReadState done(bool is_connected)
     {
-        peer_io_->clear_callbacks();
-
         // The responding client of a handshake usually starts sending BT messages immediately after
         // the handshake, so we need to return ReadState::Break to ensure those messages are processed.
         return fire_done(is_connected) ? ReadState::Break : ReadState::Err;
@@ -252,6 +250,7 @@ private:
     [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
 
     bool fire_done(bool is_connected);
+    void fire_timer();
 
     static constexpr auto DhPoolMaxSize = size_t{ 32 };
     static inline auto dh_pool = small::max_size_vector<DH, DhPoolMaxSize>{};

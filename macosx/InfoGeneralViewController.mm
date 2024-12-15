@@ -69,7 +69,7 @@
 
     self.fLastDataLabel.hidden = location ? YES : NO;
     self.fLastDataLocationField.hidden = location ? YES : NO;
-    self.fLastDataLocationField.stringValue = location ? @"" : lastKnownDataLocation.stringByAbbreviatingWithTildeInPath;
+    self.fLastDataLocationField.stringValue = location ? @"" : lastKnownDataLocation.stringByAbbreviatingWithTildeInPath ?: @"";
     self.fLastDataLocationField.toolTip = location ? @"" : lastKnownDataLocation;
 
     self.fRevealDataButton.hidden = location ? NO : YES;

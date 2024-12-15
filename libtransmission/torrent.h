@@ -76,6 +76,7 @@ struct tr_torrent
         void load_date_done(time_t when) noexcept;
         void load_download_dir(std::string_view dir) noexcept;
         void load_incomplete_dir(std::string_view dir) noexcept;
+        void load_queue_position(size_t pos) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
         void load_start_when_stable(bool val) noexcept;
@@ -327,7 +328,8 @@ struct tr_torrent
 
     [[nodiscard]] auto has_file(tr_file_index_t file) const
     {
-        return completion_.has_blocks(block_span_for_file(file));
+        auto const span = byte_span_for_file(file);
+        return completion_.count_has_bytes_in_span(span) == span.end - span.begin;
     }
 
     [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
@@ -338,6 +340,11 @@ struct tr_torrent
     [[nodiscard]] TR_CONSTEXPR20 auto has_block(tr_block_index_t block) const
     {
         return completion_.has_block(block);
+    }
+
+    [[nodiscard]] auto has_blocks(tr_block_span_t span) const
+    {
+        return completion_.has_blocks(span);
     }
 
     [[nodiscard]] auto count_missing_blocks_in_piece(tr_piece_index_t piece) const
@@ -831,7 +838,6 @@ struct tr_torrent
         {
             if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
-                TR_ASSERT(now >= latest);
                 return static_cast<size_t>(std::max(now - latest, time_t{ 0 }));
             }
         }
@@ -892,8 +898,6 @@ struct tr_torrent
 
     void do_idle_work()
     {
-        do_magnet_idle_work();
-
         if (needs_completeness_check_)
         {
             needs_completeness_check_ = false;
@@ -942,9 +946,9 @@ struct tr_torrent
         return queue_position_;
     }
 
-    void set_unique_queue_position(size_t const new_pos);
+    void set_unique_queue_position(size_t new_pos);
 
-    static inline constexpr struct
+    static constexpr struct
     {
         constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
         {
@@ -1081,7 +1085,7 @@ private:
         static auto constexpr MinUpdateMSec = 800U;
 
         uint64_t timestamp_msec_ = {};
-        Speed speed_ = {};
+        Speed speed_;
     };
 
     [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
@@ -1094,7 +1098,7 @@ private:
             {
                 n_secs += date_done_ - date_started_;
             }
-            else if (date_done_ == 0)
+            else if (date_done_ == time_t{})
             {
                 n_secs += now - date_started_;
             }
@@ -1113,7 +1117,7 @@ private:
             {
                 n_secs += now - date_done_;
             }
-            else if (date_done_ != 0)
+            else if (date_done_ != time_t{})
             {
                 n_secs += now - date_started_;
             }
@@ -1224,7 +1228,7 @@ private:
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
 
-    [[nodiscard]] TR_CONSTEXPR20 auto byte_span_for_file(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
     {
         return fpm_.byte_span_for_file(file);
     }
@@ -1264,7 +1268,6 @@ private:
     void create_empty_files() const;
     void recheck_completeness();
 
-    void do_magnet_idle_work();
     [[nodiscard]] bool use_new_metainfo(tr_error* error);
 
     void update_file_path(tr_file_index_t file, std::optional<bool> has_file) const;
@@ -1275,7 +1278,7 @@ private:
         std::string_view oldpath,
         std::string_view newname,
         tr_torrent_rename_done_func callback,
-        void* const callback_user_data);
+        void* callback_user_data);
 
     void start_in_session_thread();
 
