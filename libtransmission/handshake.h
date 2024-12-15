@@ -307,7 +307,7 @@ private:
         }
     }
 
-    std::optional<DH> dh_{};
+    std::optional<DH> dh_;
 
     // ---
 
