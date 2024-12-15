@@ -62,7 +62,7 @@ struct tr_popcnt
 #elif defined(TR_HAVE_BUILTIN_POPCOUNT)
     /* Use __builtin as opposed to straight assembly to avoid any
        strain the latter puts on the optimized. */
-    static inline unsigned count(T v)
+    static unsigned count(T v)
     {
         /* Make sure we know how to find that right __builtin_popcount. */
         static_assert(

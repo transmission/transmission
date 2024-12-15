@@ -134,11 +134,11 @@ template<>
         break;
 
     case StringIndex:
-        if (auto const val = *get_if<StringIndex>(); val == "true")
+        if (auto const val = *get_if<StringIndex>(); val == "true"sv)
         {
             return true;
         }
-        else if (val == "false")
+        else if (val == "false"sv)
         {
             return false;
         }

@@ -864,6 +864,7 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_logAddInfoTor(tor, _("Removing torrent"));
     }
 
+    tor->set_dirty(!tor->is_deleting_);
     tor->stop_now();
 
     if (tor->is_deleting_)
@@ -1600,17 +1601,18 @@ void tr_torrentStartNow(tr_torrent* tor)
 void tr_torrentVerify(tr_torrent* tor)
 {
     tor->session->run_in_session_thread(
-        [tor]()
+        [session = tor->session, tor_id = tor->id()]()
         {
-            TR_ASSERT(tor->session->am_in_session_thread());
-            auto const lock = tor->unique_lock();
+            TR_ASSERT(session->am_in_session_thread());
+            auto const lock = session->unique_lock();
 
-            if (tor->is_deleting_)
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
             {
                 return;
             }
 
-            tor->session->verify_remove(tor);
+            session->verify_remove(tor);
 
             if (!tor->has_metainfo())
             {
@@ -1630,7 +1632,7 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->start_when_stable_ = false;
             }
 
-            tor->session->verify_add(tor);
+            session->verify_add(tor);
         });
 }
 
@@ -2086,7 +2088,7 @@ void tr_torrent::on_announce_list_changed()
     if (auto const& error_url = error_.announce_url(); !std::empty(error_url))
     {
         auto const& ann = metainfo().announce_list();
-        if (std::any_of(
+        if (std::none_of(
                 std::begin(ann),
                 std::end(ann),
                 [error_url](auto const& tracker) { return tracker.announce == error_url; }))

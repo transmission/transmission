@@ -34,6 +34,16 @@ struct tr_peer;
 
 class tr_peer_event
 {
+    [[nodiscard]] constexpr static auto BlockEvent(tr_block_info const& block_info, tr_block_index_t block) noexcept
+    {
+        auto const loc = block_info.block_loc(block);
+        auto event = tr_peer_event{};
+        event.pieceIndex = loc.piece;
+        event.offset = loc.piece_offset;
+        event.length = block_info.block_size(block);
+        return event;
+    }
+
 public:
     enum class Type
     {
@@ -49,7 +59,9 @@ public:
         ClientGotHave,
         ClientGotHaveAll,
         ClientGotHaveNone,
+        ClientSentCancel,
         ClientSentPieceData,
+        ClientSentRequest,
         Error // generic
     };
 
@@ -60,16 +72,12 @@ public:
     uint32_t offset = 0; // for GotBlock
     uint32_t length = 0; // for GotBlock, GotPieceData
     int err = 0; // errno for GotError
-    tr_port port = {}; // for GotPort
+    tr_port port; // for GotPort
 
     [[nodiscard]] constexpr static auto GotBlock(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.block_loc(block);
-        auto event = tr_peer_event{};
+        auto event = BlockEvent(block_info, block);
         event.type = Type::ClientGotBlock;
-        event.pieceIndex = loc.piece;
-        event.offset = loc.piece_offset;
-        event.length = block_info.block_size(block);
         return event;
     }
 
@@ -144,12 +152,8 @@ public:
 
     [[nodiscard]] constexpr static auto GotRejected(tr_block_info const& block_info, tr_block_index_t block) noexcept
     {
-        auto const loc = block_info.block_loc(block);
-        auto event = tr_peer_event{};
+        auto event = BlockEvent(block_info, block);
         event.type = Type::ClientGotRej;
-        event.pieceIndex = loc.piece;
-        event.offset = loc.piece_offset;
-        event.length = block_info.block_size(block);
         return event;
     }
 
@@ -161,11 +165,30 @@ public:
         return event;
     }
 
+    [[nodiscard]] constexpr static auto SentCancel(tr_block_info const& block_info, tr_block_index_t block) noexcept
+    {
+        auto event = BlockEvent(block_info, block);
+        event.type = Type::ClientSentCancel;
+        return event;
+    }
+
     [[nodiscard]] constexpr static auto SentPieceData(uint32_t length) noexcept
     {
         auto event = tr_peer_event{};
         event.type = Type::ClientSentPieceData;
         event.length = length;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static auto SentRequest(tr_block_info const& block_info, tr_block_span_t block_span) noexcept
+    {
+        auto const loc_begin = block_info.block_loc(block_span.begin);
+        auto const loc_end = block_info.block_loc(block_span.end);
+        auto event = tr_peer_event{};
+        event.type = Type::ClientSentRequest;
+        event.pieceIndex = loc_begin.piece;
+        event.offset = loc_begin.piece_offset;
+        event.length = loc_end.byte - loc_begin.byte;
         return event;
     }
 };
@@ -183,7 +206,7 @@ struct tr_peer
     using Speed = libtransmission::Values::Speed;
 
     explicit tr_peer(tr_torrent const& tor);
-    virtual ~tr_peer();
+    virtual ~tr_peer() = default;
 
     [[nodiscard]] virtual Speed get_piece_speed(uint64_t now, tr_direction direction) const = 0;
 
@@ -211,7 +234,7 @@ struct tr_peer
 
     virtual void request_blocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    virtual void cancel_block_request(tr_block_index_t /*block*/)
+    virtual void maybe_cancel_block_request(tr_block_index_t /*block*/)
     {
     }
 
@@ -224,6 +247,8 @@ struct tr_peer
     tr_recentHistory<uint16_t> blocks_sent_to_peer;
 
     tr_recentHistory<uint16_t> cancels_sent_to_client;
+
+    tr_bitfield active_requests;
 
     /// The following fields are only to be used in peer-mgr.cc.
     /// TODO(ckerr): refactor them out of `tr_peer`

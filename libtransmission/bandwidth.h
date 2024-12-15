@@ -30,8 +30,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    libtransmission::Values::Speed up_limit = {};
-    libtransmission::Values::Speed down_limit = {};
+    libtransmission::Values::Speed up_limit;
+    libtransmission::Values::Speed down_limit;
     bool up_limited = false;
     bool down_limited = false;
 };
