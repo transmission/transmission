@@ -60,8 +60,8 @@ function namespace(tagname, attrs) {
 function renderIcon(...svgca) {
   // SVG Command Array
   const svg = namespace('svg', icon32);
-  for (const c of svgca) {
-    svg.append(namespace(c[0], c[1]));
+  for (const [tagname, attrs] of svgca) {
+    svg.append(namespace(tagname, attrs));
   }
   return svg;
 }
