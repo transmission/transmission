@@ -200,7 +200,7 @@ tr_peer_id_t tr_peerIdInit()
         total += val;
         *it++ = Pool[val];
     }
-    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - (total % std::size(Pool)) : 0;
     *it = Pool[val];
 
     return peer_id;
@@ -339,16 +339,6 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
 
     auto const* const tor = session_->torrents().get(torrent_id);
     return tor == nullptr ? 0U : tor->bandwidth().clamp(TR_DOWN, byte_count);
-}
-
-void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
-{
-    auto const lock = session_->unique_lock();
-
-    if (auto* const tor = session_->torrents().get(torrent_id); tor != nullptr)
-    {
-        tor->bandwidth().notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
-    }
 }
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const

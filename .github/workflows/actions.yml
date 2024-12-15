@@ -23,7 +23,7 @@ jobs:
       make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-web: 'false' # this is handled in the webapp workflow
+      make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
       test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
     steps:
       - name: Check Push to Main Branch
@@ -66,7 +66,7 @@ jobs:
           get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
           get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web        CMakeLists.txt cmake third-party libtransmission web
+          get_changes web        CMakeLists.txt cmake web
           get_changes ci-actions .github/workflows/actions.yml
           cat "$GITHUB_OUTPUT"
 
@@ -179,7 +179,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   sanitizer-tests-macos:
-    runs-on: macos-14
+    runs-on: macos-15
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
@@ -189,8 +189,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -309,10 +308,13 @@ jobs:
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
 
-  macos-14-project:
-     runs-on: macos-14
+  macos-15-project:
+     runs-on: macos-15
      needs: [ what-to-make ]
-     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+             needs.what-to-make.outputs.make-daemon == 'true' ||
+             needs.what-to-make.outputs.make-mac == 'true' ||
+             needs.what-to-make.outputs.make-utils == 'true' }}
      steps:
        - name: Show Configuration
          run: |
@@ -331,10 +333,16 @@ jobs:
            name: binaries-${{ github.job }}
            path: pfx/**/*
 
-  macos-14-arm64:
-    runs-on: macos-14
+  macos-15-arm64:
+    runs-on: macos-15
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+            needs.what-to-make.outputs.make-daemon == 'true' ||
+            needs.what-to-make.outputs.make-gtk == 'true' ||
+            needs.what-to-make.outputs.make-mac == 'true' ||
+            needs.what-to-make.outputs.make-qt == 'true' ||
+            needs.what-to-make.outputs.make-tests == 'true' ||
+            needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -342,14 +350,13 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install --formula gtkmm3
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install qt
+        run: brew install --formula qt
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -389,9 +396,9 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  # Only verify build support on older macOS and SDK
-  macos-12:
-    runs-on: macos-12
+  # oldest GitHub build support on macOS (Transmission supports macOS 11.0 and newer)
+  macos-13:
+    runs-on: macos-13
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
@@ -401,16 +408,17 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
-      - name: Set Xcode to 13.2.1
+      # oldest GitHub build support for Xcode (Transmission supports Xcode 12.5.1 and newer)
+      - name: Set Xcode to 14.1
         run: |
-          sudo xcode-select --switch /Applications/Xcode_13.2.1.app
+          # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#xcode
+          sudo xcode-select --switch /Applications/Xcode_14.1.app
       - name: Configure
         run: |
           cmake \
@@ -608,10 +616,10 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-14-universal-from-tarball:
+  macos-15-universal-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Show Configuration
         run: |
@@ -619,8 +627,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install cmake gettext ninja node pkg-config
+        run: brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -668,10 +675,17 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  macos-12-x86_64-from-tarball:
+  # Oldest GitHub support for CLI, GTK and QT on Mac
+  macos-13-x86_64-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: macos-12
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+            needs.what-to-make.outputs.make-daemon == 'true' ||
+            needs.what-to-make.outputs.make-gtk == 'true' ||
+            needs.what-to-make.outputs.make-mac == 'true' ||
+            needs.what-to-make.outputs.make-qt == 'true' ||
+            needs.what-to-make.outputs.make-tests == 'true' ||
+            needs.what-to-make.outputs.make-utils == 'true' }}
+    runs-on: macos-13
     steps:
       - name: Show Configuration
         run: |
@@ -679,14 +693,13 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew install cmake gettext ninja node pkg-config
+        run: brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install gtkmm3
+        run: brew install --formula gtkmm3
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: brew install qt
+        run: brew install --formula qt
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -707,7 +720,7 @@ jobs:
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
@@ -767,9 +780,12 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            npm \
             pkg-config \
             xz-utils
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
