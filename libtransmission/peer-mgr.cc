@@ -2617,8 +2617,8 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     using namespace handshake_helpers;
 
     auto const now = tr_time();
-    auto const utp = mgr->session->allowsUTP() && peer_info.supports_utp().value_or(true);
     auto* const session = mgr->session;
+    auto const utp = session->allowsUTP() && peer_info.supports_utp().value_or(true);
 
     if (tr_peer_socket::limit_reached(session) || (!utp && !session->allowsTCP()))
     {
