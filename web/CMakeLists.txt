@@ -39,8 +39,6 @@ set(WEB_IMAGES
     assets/img/lock-fill.svg
     assets/img/logo.png
     assets/img/magnet.svg
-    assets/img/modern-tortoise-blue.png
-    assets/img/modern-tortoise.png
     assets/img/music.svg
     assets/img/package.svg
     assets/img/pause-circle-active.svg
@@ -49,7 +47,8 @@ set(WEB_IMAGES
     assets/img/play-circle-idle.svg
     assets/img/README.md
     assets/img/router.svg
-    assets/img/type.svg)
+    assets/img/type.svg
+    assets/img/turtle.svg)
 
 add_custom_command(
     OUTPUT
