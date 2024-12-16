@@ -2157,7 +2157,12 @@ constexpr struct
             return a->is_disconnecting() ? 1 : -1;
         }
 
-        return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
+        if (auto val = a->peer_info->compare_by_piece_data_time(*b->peer_info); val != 0)
+        {
+            return -val;
+        }
+
+        return tr_compare_3way(a->swarm->tor->is_done(), b->swarm->tor->is_done());
     }
 
     [[nodiscard]] bool operator()(tr_peerMsgs const* a, tr_peerMsgs const* b) const // less than
