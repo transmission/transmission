@@ -2620,7 +2620,13 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     auto* const session = mgr->session;
     auto const utp = session->allowsUTP() && peer_info.supports_utp().value_or(true);
 
-    if (tr_peer_socket::limit_reached(session) || (!utp && !session->allowsTCP()))
+    // Allow downloading torrents to "steal" connection slots
+    if (tr_peer_socket::limit_reached(session) && s->tor->is_done())
+    {
+        return;
+    }
+
+    if (!utp && !session->allowsTCP())
     {
         return;
     }

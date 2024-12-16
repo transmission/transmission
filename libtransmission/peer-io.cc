@@ -119,7 +119,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool client_is_seed,
     bool utp)
 {
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
     TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
