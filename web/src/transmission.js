@@ -240,10 +240,7 @@ export class Transmission extends EventTarget {
     };
 
     const right_click = (event_) => {
-      if (
-        this.pointer_device.is_touch_device &&
-        event_.touches.length > 1
-      ) {
+      if (this.pointer_device.is_touch_device && event_.touches.length > 1) {
         return;
       }
 
@@ -271,8 +268,11 @@ export class Transmission extends EventTarget {
           clearTimeout(touch.long_press_callback);
           touch.long_press_callback = null;
         } else {
-          touch.long_press_callback =
-            setTimeout(right_click.bind(this), 500, event_);
+          touch.long_press_callback = setTimeout(
+            right_click.bind(this),
+            500,
+            event_,
+          );
         }
       });
       this.elements.torrent_list.addEventListener('touchend', () => {
