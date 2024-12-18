@@ -513,12 +513,14 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
         {
             --walk->queue_position_;
             walk->mark_changed();
+            walk->set_dirty();
         }
 
         if ((old_pos > new_pos) && (new_pos <= walk->queue_position_) && (walk->queue_position_ < old_pos))
         {
             ++walk->queue_position_;
             walk->mark_changed();
+            walk->set_dirty();
         }
 
         max_pos = std::max(max_pos, walk->queue_position_);
@@ -526,6 +528,7 @@ void tr_torrent::set_unique_queue_position(size_t const new_pos)
 
     queue_position_ = std::min(new_pos, max_pos + 1);
     mark_changed();
+    set_dirty();
 
     TR_ASSERT(torrents_are_sorted_by_queue_position(torrents.get_all()));
 }
@@ -709,7 +712,6 @@ void tr_torrent::start_in_session_thread()
     time_t const now = tr_time();
 
     is_running_ = true;
-    completeness_ = completion_.status();
     date_started_ = now;
     mark_changed();
     error().clear();
@@ -862,6 +864,7 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_logAddInfoTor(tor, _("Removing torrent"));
     }
 
+    tor->set_dirty(!tor->is_deleting_);
     tor->stop_now();
 
     if (tor->is_deleting_)
@@ -944,8 +947,8 @@ void tr_torrent::on_metainfo_completed()
     else
     {
         completion_.set_has_all();
-        date_done_ = date_added_;
         recheck_completeness();
+        date_done_ = date_added_; // Must be after recheck_completeness()
 
         if (start_when_stable_)
         {
@@ -963,6 +966,8 @@ void tr_torrent::init(tr_ctor const& ctor)
     session = ctor.session();
     TR_ASSERT(session != nullptr);
     auto const lock = unique_lock();
+
+    auto const now_sec = tr_time();
 
     queue_position_ = std::size(session->torrents());
 
@@ -997,7 +1002,7 @@ void tr_torrent::init(tr_ctor const& ctor)
 
     mark_changed();
 
-    date_added_ = tr_time(); // this is a default that will be overwritten by the resume file
+    date_added_ = now_sec; // this is a default that will be overwritten by the resume file
 
     tr_resume::fields_t loaded = {};
 
@@ -1096,6 +1101,12 @@ void tr_torrent::init(tr_ctor const& ctor)
     else
     {
         set_local_error_if_files_disappeared(this, has_any_local_data);
+    }
+
+    // Recover from the bug reported at https://github.com/transmission/transmission/issues/6899
+    if (is_done() && date_done_ == time_t{})
+    {
+        date_done_ = now_sec;
     }
 }
 
@@ -1590,17 +1601,18 @@ void tr_torrentStartNow(tr_torrent* tor)
 void tr_torrentVerify(tr_torrent* tor)
 {
     tor->session->run_in_session_thread(
-        [tor]()
+        [session = tor->session, tor_id = tor->id()]()
         {
-            TR_ASSERT(tor->session->am_in_session_thread());
-            auto const lock = tor->unique_lock();
+            TR_ASSERT(session->am_in_session_thread());
+            auto const lock = session->unique_lock();
 
-            if (tor->is_deleting_)
+            auto* const tor = session->torrents().get(tor_id);
+            if (tor == nullptr || tor->is_deleting_)
             {
                 return;
             }
 
-            tor->session->verify_remove(tor);
+            session->verify_remove(tor);
 
             if (!tor->has_metainfo())
             {
@@ -1620,7 +1632,7 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->start_when_stable_ = false;
             }
 
-            tor->session->verify_add(tor);
+            session->verify_add(tor);
         });
 }
 
@@ -1696,9 +1708,7 @@ void tr_torrent::VerifyMediator::on_verify_started()
 
 void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t const piece, bool const has_piece)
 {
-    auto const had_piece = tor_->has_piece(piece);
-
-    if (has_piece != had_piece)
+    if (auto const had_piece = tor_->has_piece(piece); !has_piece || !had_piece)
     {
         tor_->set_has_piece(piece, has_piece);
         tor_->set_dirty();
@@ -1852,15 +1862,12 @@ void tr_torrent::recheck_completeness()
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
 
-        if (recent_change)
-        {
-            tr_logAddTraceTor(
-                this,
-                fmt::format(
-                    "State changed from {} to {}",
-                    get_completion_string(completeness_),
-                    get_completion_string(new_completeness)));
-        }
+        tr_logAddTraceTor(
+            this,
+            fmt::format(
+                "State changed from {} to {}",
+                get_completion_string(completeness_),
+                get_completion_string(new_completeness)));
 
         completeness_ = new_completeness;
         session->close_torrent_files(id());
@@ -1869,10 +1876,12 @@ void tr_torrent::recheck_completeness()
         {
             if (recent_change)
             {
+                // https://www.bittorrent.org/beps/bep_0003.html
+                // ...and one using completed is sent when the download is complete.
+                // No completed is sent if the file was complete when started.
                 tr_announcerTorrentCompleted(this);
-                mark_changed();
-                date_done_ = tr_time();
             }
+            date_done_ = tr_time();
 
             if (current_dir() == incomplete_dir())
             {
@@ -1885,6 +1894,7 @@ void tr_torrent::recheck_completeness()
         session->onTorrentCompletenessChanged(this, completeness_, was_running);
 
         set_dirty();
+        mark_changed();
 
         if (is_done())
         {
@@ -2078,7 +2088,7 @@ void tr_torrent::on_announce_list_changed()
     if (auto const& error_url = error_.announce_url(); !std::empty(error_url))
     {
         auto const& ann = metainfo().announce_list();
-        if (std::any_of(
+        if (std::none_of(
                 std::begin(ann),
                 std::end(ann),
                 [error_url](auto const& tracker) { return tracker.announce == error_url; }))
@@ -2102,9 +2112,9 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
         break;
 
     case tr_tracker_event::Type::Counts:
-        if (is_private() && (event->leechers == 0))
+        if (is_private() && (event->leechers == 0 || event->downloaders == 0))
         {
-            swarm_is_all_seeds_.emit(this);
+            swarm_is_all_upload_only_.emit(this);
         }
 
         break;
@@ -2313,8 +2323,8 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
         else
         {
             completion_.set_has_all();
-            date_done_ = date_added_;
             recheck_completeness();
+            date_done_ = date_added_; // Must be after recheck_completeness()
         }
     }
     else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !set_local_error_if_files_disappeared(this))
@@ -2723,6 +2733,13 @@ void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) n
     {
         tor_.current_dir_ = tor_.incomplete_dir_;
     }
+}
+
+// ---
+
+void tr_torrent::ResumeHelper::load_queue_position(size_t pos) noexcept
+{
+    tor_.queue_position_ = pos;
 }
 
 // ---

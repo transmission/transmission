@@ -199,7 +199,7 @@ private:
     static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);
     static std::string fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url);
 
-    enum class BasenameFormat
+    enum class BasenameFormat : uint8_t
     {
         Hash,
         NameAndPartialHash

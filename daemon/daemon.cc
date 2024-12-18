@@ -379,11 +379,12 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
 tr_variant load_settings(char const* config_dir)
 {
     auto app_defaults = tr_variant::make_map();
-    tr_variantDictAddStr(&app_defaults, TR_KEY_watch_dir, ""sv);
+    tr_variantDictAddStrView(&app_defaults, TR_KEY_watch_dir, ""sv);
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
     tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
     tr_variantDictAddBool(&app_defaults, TR_KEY_start_paused, false);
+    tr_variantDictAddStrView(&app_defaults, TR_KEY_pidfile, ""sv);
     return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
 }
 
@@ -603,7 +604,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 953:
-            if (auto const ratio_limit = tr_num_parse<double>(optstr); optstr)
+            if (auto const ratio_limit = tr_num_parse<double>(optstr); ratio_limit)
             {
                 tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, *ratio_limit);
             }

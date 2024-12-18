@@ -134,11 +134,11 @@ template<>
         break;
 
     case StringIndex:
-        if (auto const val = *get_if<StringIndex>(); val == "true")
+        if (auto const val = *get_if<StringIndex>(); val == "true"sv)
         {
             return true;
         }
-        else if (val == "false")
+        else if (val == "false"sv)
         {
             return false;
         }
@@ -205,6 +205,10 @@ tr_variant::Merge::Merge(tr_variant& tgt)
 }
 
 void tr_variant::Merge::operator()(std::monostate const& src)
+{
+    tgt_ = src;
+}
+void tr_variant::Merge::operator()(std::nullptr_t const& src)
 {
     tgt_ = src;
 }
@@ -761,6 +765,10 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
 
         switch (variant_index(v))
         {
+        case tr_variant::NullIndex:
+            walk_funcs.null_func(*v, *v->get_if<tr_variant::NullIndex>(), user_data);
+            break;
+
         case tr_variant::BoolIndex:
             walk_funcs.bool_func(*v, *v->get_if<tr_variant::BoolIndex>(), user_data);
             break;

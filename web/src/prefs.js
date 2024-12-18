@@ -71,14 +71,20 @@ export class Prefs extends EventTarget {
     if (value === null) {
       return fallback;
     }
-    if (value === 'true') {
-      return true;
+
+    const type = typeof fallback;
+    if (type === 'boolean') {
+      if (value === 'true') {
+        return true;
+      }
+      if (value === 'false') {
+        return false;
+      }
+      return fallback;
     }
-    if (value === 'false') {
-      return false;
-    }
-    if (/^\d+$/.test(value)) {
-      return Number.parseInt(value, 10);
+    if (type === 'number') {
+      const f = Number.parseFloat(value);
+      return Number.isNaN(f) ? fallback : f;
     }
     return value;
   }
