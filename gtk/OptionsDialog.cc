@@ -73,7 +73,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
-    ~Impl() = default;
+    ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -101,6 +101,11 @@ private:
     Gtk::ComboBox* priority_combo_ = nullptr;
     FreeSpaceLabel* freespace_label_ = nullptr;
 };
+
+OptionsDialog::Impl::~Impl()
+{
+    removeOldTorrent();
+}
 
 void OptionsDialog::Impl::removeOldTorrent()
 {
@@ -133,10 +138,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
             }
 
             gtr_save_recent_dir("download", core_, downloadDir_);
-        }
-        else if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
-        {
-            removeOldTorrent();
+            tor_ = nullptr;
         }
     }
 
