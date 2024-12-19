@@ -219,5 +219,5 @@ struct tr_scrape_response
 
     /* minimum interval (in seconds) allowed between scrapes.
      * this is an unofficial extension that some trackers won't support. */
-    int min_request_interval;
+    int min_scrape_interval;
 };
