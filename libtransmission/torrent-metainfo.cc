@@ -219,7 +219,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.date_created_ = value;
         }
-        else if (pathIs(PrivateKey) || pathIs(InfoKey, PrivateKey))
+        else if (pathIs(InfoKey, PrivateKey))
         {
             tm_.is_private_ = value != 0;
         }
