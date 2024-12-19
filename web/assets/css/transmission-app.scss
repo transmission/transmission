@@ -810,9 +810,6 @@ a {
 #inspector {
   @include viewport-large {
     box-shadow: initial;
-  }
-
-  @include viewport-large {
     position: initial;
   }
 }
