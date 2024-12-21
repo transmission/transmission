@@ -310,6 +310,12 @@
                                                                         <outlet property="torrentCell" destination="ouH-H8-Otv" id="r2c-b8-jcH"/>
                                                                     </connections>
                                                                 </button>
+                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
+                                                                    <rect key="frame" x="45" y="2" width="452" height="18"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
+                                                                    </constraints>
+                                                                </customView>
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dPU-vz-fnz">
                                                                     <rect key="frame" x="45" y="4" width="41" height="15"/>
                                                                     <subviews>
@@ -339,12 +345,6 @@
                                                                         <real value="3.4028234663852886e+38"/>
                                                                     </customSpacing>
                                                                 </stackView>
-                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
-                                                                    <rect key="frame" x="45" y="2" width="452" height="18"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
-                                                                    </constraints>
-                                                                </customView>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ExW-pe-aKm">
                                                                     <rect key="frame" x="84" y="4" width="412" height="14"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" alignment="right" title="Status String" id="Zmj-A9-NPf">
