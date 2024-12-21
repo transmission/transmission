@@ -280,8 +280,15 @@ export class OverflowMenu extends EventTarget {
 
     // appearance
 
-    const appearance_text = this.action_manager.text('open-appearance-settings');
-    div = make_button(section, appearance_text, 'open-appearance-settings', on_click);
+    const appearance_text = this.action_manager.text(
+      'open-appearance-settings',
+    );
+    div = make_button(
+      section,
+      appearance_text,
+      'open-appearance-settings',
+      on_click,
+    );
     options.append(div);
 
     section = make_section('speed', 'Speed Limit');
