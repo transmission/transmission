@@ -57,14 +57,14 @@ export class Appearance extends EventTarget {
     div.classList.add('table-row');
     message.append(div);
 
-    let action = 'toggle-contrast';
-    let check = document.createElement('input');
+    const action = 'toggle-contrast';
+    const check = document.createElement('input');
     check.id = 'contrast-more-check';
     check.dataset.action = action;
     check.type = 'checkbox';
     check.classList.add('switch');
 
-    let label = document.createElement('label');
+    const label = document.createElement('label');
     label.id = 'contrast-more-label';
     label.for = check.id;
     label.setAttribute('for', check.id);
@@ -98,7 +98,8 @@ export class Appearance extends EventTarget {
       input.name = name;
       input.type = 'radio';
       input.value = style_value;
-      input.checked = document.body.classList.contains(style_value) || !style_value;
+      input.checked =
+        document.body.classList.contains(style_value) || !style_value;
       div.append(input);
 
       input.addEventListener('change', (event_) => {
@@ -113,7 +114,7 @@ export class Appearance extends EventTarget {
       style_label.setAttribute('for', input.id);
       style_label.textContent = text;
       div.append(style_label, document.createElement('BR'));
-    }
+    };
 
     highlight_style_option('accent-picker', 'Legacy', null);
     highlight_style_option('accent-picker', 'System', 'highlight-system');
