@@ -309,6 +309,12 @@ export class OverflowMenu extends EventTarget {
     label.textContent = 'Fullscreen';
     div.append(label);
 
+    // appearance
+
+    const appearance_text = this.action_manager.text('open-appearance-settings');
+    div = make_button(section, appearance_text, 'open-appearance-settings', on_click);
+    options.append(div);
+
     section = make_section('speed', 'Speed Limit');
     root.append(section);
 
