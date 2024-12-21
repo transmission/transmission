@@ -223,7 +223,7 @@ export class OverflowMenu extends EventTarget {
     div.classList.add('table-row');
     options.append(div);
 
-    let action = 'toggle-compact-rows';
+    const action = 'toggle-compact-rows';
     check = document.createElement('input');
     check.id = 'display-compact-check';
     check.dataset.action = action;
