@@ -104,7 +104,9 @@ export class Transmission extends EventTarget {
           ) {
             this.popup[Transmission.default_popup_level].close();
           } else {
-            this.setCurrentPopup(new Appearance(this.prefs, this.action_manager));
+            this.setCurrentPopup(
+              new Appearance(this.prefs, this.action_manager),
+            );
           }
           break;
         case 'open-torrent':
