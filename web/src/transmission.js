@@ -3,6 +3,7 @@
    License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
+import { Appearance } from './appearance-settings.js';
 import { ContextMenu } from './context-menu.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
@@ -96,6 +97,17 @@ export class Transmission extends EventTarget {
           break;
         case 'move-up':
           this._moveUp();
+          break;
+        case 'open-appearance-settings':
+          if (
+            this.popup[Transmission.default_popup_level] instanceof Appearance
+          ) {
+            this.popup[Transmission.default_popup_level].close();
+          } else {
+            this.setCurrentPopup(
+              new Appearance(this.prefs, this.action_manager),
+            );
+          }
           break;
         case 'open-torrent':
           this.setCurrentPopup(new OpenDialog(this, this.remote));
@@ -371,6 +383,14 @@ export class Transmission extends EventTarget {
       case Prefs.SortMode:
         this.refilterAllSoon();
         break;
+
+      case Prefs.Highlight: {
+        document.body.classList.remove('highlight-system');
+        if (value) {
+          document.body.classList.add(value);
+        }
+        break;
+      }
 
       case Prefs.RefreshRate: {
         clearInterval(this.refreshTorrentsInterval);
