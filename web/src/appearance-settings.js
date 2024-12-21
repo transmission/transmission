@@ -42,7 +42,7 @@ export class Appearance extends EventTarget {
 
   _create() {
     const elements = createDialogContainer('dis-appearance');
-    const { dismiss, heading, message, workarea } = elements;
+    const { dismiss, heading, message } = elements;
 
     heading.textContent = 'Appearance';
     dismiss.textContent = 'Close';
@@ -92,13 +92,13 @@ export class Appearance extends EventTarget {
     div.classList.add('table-row');
     message.append(div);
 
-    const highlight_style_option = (name, text, value) => {
+    const highlight_style_option = (name, text, style_value) => {
       const input = document.createElement('input');
-      input.id = value || 'highlight-default';
+      input.id = style_value || 'highlight-default';
       input.name = name;
       input.type = 'radio';
-      input.value = value;
-      input.checked = document.body.classList.contains(value) || !value;
+      input.value = style_value;
+      input.checked = document.body.classList.contains(style_value) || !style_value;
       div.append(input);
 
       input.addEventListener('change', (event_) => {
@@ -108,11 +108,11 @@ export class Appearance extends EventTarget {
         }
       });
 
-      const label = document.createElement('label');
-      label.for = input.id;
-      label.setAttribute('for', input.id);
-      label.textContent = text;
-      div.append(label, document.createElement('BR'));
+      const style_label = document.createElement('label');
+      style_label.for = input.id;
+      style_label.setAttribute('for', input.id);
+      style_label.textContent = text;
+      div.append(style_label, document.createElement('BR'));
     }
 
     highlight_style_option('accent-picker', 'Legacy', null);
