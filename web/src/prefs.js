@@ -110,6 +110,7 @@ Prefs.FilterFinished = 'finished';
 Prefs.FilterMode = 'filter-mode';
 Prefs.FilterPaused = 'paused';
 Prefs.FilterSeeding = 'seeding';
+Prefs.Highlight = 'highlight';
 Prefs.NotificationsEnabled = 'notifications-enabled';
 Prefs.RefreshRate = 'refresh-rate-sec';
 Prefs.SortAscending = 'ascending';
@@ -126,6 +127,7 @@ Prefs.SortDirection = 'sort-direction';
 Prefs.SortMode = 'sort-mode';
 
 Prefs._Defaults = {
+  [Prefs.Highlight]: null,
   [Prefs.AltSpeedEnabled]: false,
   [Prefs.DisplayMode]: Prefs.DisplayFull,
   [Prefs.ContrastMode]: window.matchMedia('(prefers-contrast: more)').matches
