@@ -247,37 +247,6 @@ export class OverflowMenu extends EventTarget {
         : Prefs.DisplayFull;
     });
 
-    // contrast
-
-    div = document.createElement('div');
-    div.classList.add('table-row');
-    options.append(div);
-
-    action = 'toggle-contrast';
-    check = document.createElement('input');
-    check.id = 'contrast-more-check';
-    check.dataset.action = action;
-    check.type = 'checkbox';
-    check.classList.add('switch');
-
-    label = document.createElement('label');
-    label.id = 'contrast-more-label';
-    label.for = check.id;
-    label.setAttribute('for', check.id);
-    label.textContent = this.action_manager.text(action);
-
-    check.checked = this.prefs.contrast_mode === Prefs.ContrastMore;
-
-    div.append(check);
-    div.append(label);
-
-    check.addEventListener('input', (event_) => {
-      const { checked } = event_.target;
-      this.prefs.contrast_mode = checked
-        ? Prefs.ContrastMore
-        : Prefs.ContrastLess;
-    });
-
     // fullscreen
 
     div = document.createElement('div');
