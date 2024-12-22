@@ -573,11 +573,9 @@ a {
 
       align-items: center;
       display: flex;
-      flex-direction: row-reverse;
 
       .icon {
         -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
-        flex-shrink: 0;
         height: var(--icon-size);
         mask-size: var(--icon-size), calc(var(--icon-size) / 2);
         width: var(--icon-size);

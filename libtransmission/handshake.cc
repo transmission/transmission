@@ -782,6 +782,7 @@ uint32_t tr_handshake::crypto_provide() const noexcept
 
 bool tr_handshake::fire_done(bool is_connected)
 {
+    peer_io_->clear_callbacks();
     maybe_recycle_dh();
 
     if (!on_done_)
@@ -796,6 +797,12 @@ bool tr_handshake::fire_done(bool is_connected)
     std::swap(cb, on_done_);
 
     return (cb)(Result{ peer_io_, peer_id_, have_read_anything_from_peer_, is_connected });
+}
+
+void tr_handshake::fire_timer()
+{
+    tr_logAddTraceHand(this, "timer expired");
+    fire_done(false);
 }
 
 std::string_view tr_handshake::state_string(State state) noexcept
@@ -834,7 +841,7 @@ std::string_view tr_handshake::state_string(State state) noexcept
 tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode, DoneFunc on_done)
     : on_done_{ std::move(on_done) }
     , peer_io_{ std::move(peer_io) }
-    , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
+    , timeout_timer_{ mediator->timer_maker().create([this]() { fire_timer(); }) }
     , mediator_{ mediator }
     , encryption_mode_{ mode }
 {

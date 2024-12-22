@@ -26,7 +26,6 @@
 
 #include <event2/buffer.h>
 #include <event2/http.h>
-#include <event2/http_struct.h> /* TODO: eventually remove this */
 #include <event2/listener.h>
 
 #include <fmt/core.h>
@@ -224,9 +223,10 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
 [[nodiscard]] evbuffer* make_response(struct evhttp_request* req, tr_rpc_server const* server, std::string_view content)
 {
     auto* const out = evbuffer_new();
+    auto const* const input_headers = evhttp_request_get_input_headers(req);
+    auto* const output_headers = evhttp_request_get_output_headers(req);
 
-    char const* key = "Accept-Encoding";
-    char const* encoding = evhttp_find_header(req->input_headers, key);
+    char const* encoding = evhttp_find_header(input_headers, "Accept-Encoding");
 
     if (bool const do_compress = encoding != nullptr && tr_strv_contains(encoding, "gzip"sv); !do_compress)
     {
@@ -248,7 +248,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
         if (0 < compressed_len && compressed_len < std::size(content))
         {
             iov.iov_len = compressed_len;
-            evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
+            evhttp_add_header(output_headers, "Content-Encoding", "gzip");
         }
         else
         {
@@ -270,9 +270,10 @@ void add_time_header(struct evkeyvalq* headers, char const* key, time_t now)
 
 void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::string_view filename)
 {
-    if (req->type != EVHTTP_REQ_GET)
+    auto* const output_headers = evhttp_request_get_output_headers(req);
+    if (auto const cmd = evhttp_request_get_command(req); cmd != EVHTTP_REQ_GET)
     {
-        evhttp_add_header(req->output_headers, "Allow", "GET");
+        evhttp_add_header(output_headers, "Allow", "GET");
         send_simple_response(req, HTTP_BADMETHOD);
         return;
     }
@@ -286,9 +287,9 @@ void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::st
     }
 
     auto const now = tr_time();
-    add_time_header(req->output_headers, "Date", now);
-    add_time_header(req->output_headers, "Expires", now + (24 * 60 * 60));
-    evhttp_add_header(req->output_headers, "Content-Type", mimetype_guess(filename));
+    add_time_header(output_headers, "Date", now);
+    add_time_header(output_headers, "Expires", now + (24 * 60 * 60));
+    evhttp_add_header(output_headers, "Content-Type", mimetype_guess(filename));
 
     auto* const response = make_response(req, server, std::string_view{ std::data(content), std::size(content) });
     evhttp_send_reply(req, HTTP_OK, "OK", response);
@@ -310,34 +311,42 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
             "<p>Package Builders: to set a custom default at compile time, "
             "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
             "or tweak tr_getClutchDir() by hand.</p>");
+        return;
+    }
+
+    // convert the URL path component (ex: "/transmission/web/images/favicon.png")
+    // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
+
+    // remove the "/transmission/web/" prefix
+    static auto constexpr Web = "web/"sv;
+    auto subpath = std::string_view{ evhttp_request_get_uri(req) }.substr(std::size(server->url()) + std::size(Web));
+
+    // remove any trailing query / fragment
+    subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
+
+    // if the query is empty, use the default
+    if (std::empty(subpath))
+    {
+        static auto constexpr DefaultPage = "index.html"sv;
+        subpath = DefaultPage;
+    }
+
+    if (tr_strv_contains(subpath, ".."sv))
+    {
+        if (auto* const con = evhttp_request_get_connection(req); con != nullptr)
+        {
+            char* remote_host = nullptr;
+            auto remote_port = ev_uint16_t{};
+            evhttp_connection_get_peer(con, &remote_host, &remote_port);
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("Rejected request from {host} (possible directory traversal attack)")),
+                fmt::arg("host", remote_host)));
+        }
+        send_simple_response(req, HTTP_NOTFOUND);
     }
     else
     {
-        // convert `req->uri` (ex: "/transmission/web/images/favicon.png")
-        // into a filesystem path (ex: "/usr/share/transmission/web/images/favicon.png")
-
-        // remove the "/transmission/web/" prefix
-        static auto constexpr Web = "web/"sv;
-        auto subpath = std::string_view{ req->uri }.substr(std::size(server->url()) + std::size(Web));
-
-        // remove any trailing query / fragment
-        subpath = subpath.substr(0, subpath.find_first_of("?#"sv));
-
-        // if the query is empty, use the default
-        static auto constexpr DefaultPage = "index.html"sv;
-        if (std::empty(subpath))
-        {
-            subpath = DefaultPage;
-        }
-
-        if (tr_strv_contains(subpath, ".."sv))
-        {
-            send_simple_response(req, HTTP_NOTFOUND);
-        }
-        else
-        {
-            serve_file(req, server, tr_pathbuf{ server->web_client_dir_, '/', subpath });
-        }
+        serve_file(req, server, tr_pathbuf{ server->web_client_dir_, '/', subpath });
     }
 }
 
@@ -350,8 +359,9 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
             *otop,
             [req, server](tr_session* /*session*/, tr_variant&& content)
             {
+                auto* const output_headers = evhttp_request_get_output_headers(req);
                 auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(content));
-                evhttp_add_header(req->output_headers, "Content-Type", "application/json; charset=UTF-8");
+                evhttp_add_header(output_headers, "Content-Type", "application/json; charset=UTF-8");
                 evhttp_send_reply(req, HTTP_OK, "OK", response);
                 evbuffer_free(response);
             });
@@ -360,10 +370,11 @@ void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std
 
 void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 {
-    if (req->type == EVHTTP_REQ_POST)
+    if (auto const cmd = evhttp_request_get_command(req); cmd == EVHTTP_REQ_POST)
     {
-        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(req->input_buffer, -1)),
-                                      evbuffer_get_length(req->input_buffer) };
+        auto* const input_buffer = evhttp_request_get_input_buffer(req);
+        auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(input_buffer, -1)),
+                                      evbuffer_get_length(input_buffer) };
         handle_rpc_from_json(req, server, json);
         return;
     }
@@ -391,7 +402,7 @@ bool isIPAddressWithOptionalPort(char const* host)
     return evutil_parse_sockaddr_port(host, reinterpret_cast<sockaddr*>(&address), &address_len) != -1;
 }
 
-bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
+bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
 {
     /* If password auth is enabled, any hostname is permitted. */
     if (server->is_password_enabled())
@@ -405,7 +416,7 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
         return true;
     }
 
-    char const* const host = evhttp_find_header(req->input_headers, "Host");
+    auto const* const host = evhttp_request_get_host(req);
 
     /* No host header, invalid request. */
     if (host == nullptr)
@@ -420,10 +431,10 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
     }
 
     /* Host header might include the port. */
-    auto const hostname = std::string(host, strcspn(host, ":"));
+    auto const hostname = std::string_view{ host, strcspn(host, ":") };
 
     /* localhost is always acceptable. */
-    if (hostname == "localhost" || hostname == "localhost.")
+    if (hostname == "localhost"sv || hostname == "localhost."sv)
     {
         return true;
     }
@@ -432,9 +443,10 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
     return std::any_of(std::begin(src), std::end(src), [&hostname](auto const& str) { return tr_wildmat(hostname, str); });
 }
 
-bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
+bool test_session_id(tr_rpc_server const* server, evhttp_request* const req)
 {
-    char const* const session_id = evhttp_find_header(req->input_headers, TR_RPC_SESSION_ID_HEADER);
+    auto const* const input_headers = evhttp_request_get_input_headers(req);
+    char const* const session_id = evhttp_find_header(input_headers, TR_RPC_SESSION_ID_HEADER);
     return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
@@ -468,111 +480,139 @@ void handle_request(struct evhttp_request* req, void* arg)
     auto constexpr HttpErrorUnauthorized = 401;
     auto constexpr HttpErrorForbidden = 403;
 
+    if (req == nullptr)
+    {
+        return;
+    }
+
+    auto* const con = evhttp_request_get_connection(req);
+    if (con == nullptr)
+    {
+        return;
+    }
+
     auto* server = static_cast<tr_rpc_server*>(arg);
 
-    if (req != nullptr && req->evcon != nullptr)
+    char* remote_host = nullptr;
+    auto remote_port = ev_uint16_t{};
+    evhttp_connection_get_peer(con, &remote_host, &remote_port);
+
+    auto* const output_headers = evhttp_request_get_output_headers(req);
+    evhttp_add_header(output_headers, "Server", MY_REALM);
+
+    if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
     {
-        evhttp_add_header(req->output_headers, "Server", MY_REALM);
+        tr_logAddWarn(fmt::format(
+            fmt::runtime(_("Rejected request from {host} (brute force protection active)")),
+            fmt::arg("host", remote_host)));
+        send_simple_response(req, HttpErrorForbidden);
+        return;
+    }
 
-        if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
+    if (!is_address_allowed(server, remote_host))
+    {
+        tr_logAddWarn(
+            fmt::format(fmt::runtime(_("Rejected request from {host} (IP not whitelisted)")), fmt::arg("host", remote_host)));
+        send_simple_response(req, HttpErrorForbidden);
+        return;
+    }
+
+    evhttp_add_header(output_headers, "Access-Control-Allow-Origin", "*");
+
+    auto const* const input_headers = evhttp_request_get_input_headers(req);
+    if (auto const cmd = evhttp_request_get_command(req); cmd == EVHTTP_REQ_OPTIONS)
+    {
+        if (char const* headers = evhttp_find_header(input_headers, "Access-Control-Request-Headers"); headers != nullptr)
         {
-            send_simple_response(req, HttpErrorForbidden);
-            return;
+            evhttp_add_header(output_headers, "Access-Control-Allow-Headers", headers);
         }
 
-        if (!is_address_allowed(server, req->remote_host))
+        evhttp_add_header(output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        send_simple_response(req, HTTP_OK);
+        return;
+    }
+
+    if (!is_authorized(server, evhttp_find_header(input_headers, "Authorization")))
+    {
+        tr_logAddWarn(fmt::format(
+            fmt::runtime(_("Rejected request from {host} (failed authentication)")),
+            fmt::arg("host", remote_host)));
+        evhttp_add_header(output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
+        if (server->is_anti_brute_force_enabled())
         {
-            send_simple_response(req, HttpErrorForbidden);
-            return;
+            ++server->login_attempts_;
         }
 
-        evhttp_add_header(req->output_headers, "Access-Control-Allow-Origin", "*");
+        send_simple_response(req, HttpErrorUnauthorized);
+        return;
+    }
 
-        if (req->type == EVHTTP_REQ_OPTIONS)
-        {
-            if (char const* headers = evhttp_find_header(req->input_headers, "Access-Control-Request-Headers");
-                headers != nullptr)
-            {
-                evhttp_add_header(req->output_headers, "Access-Control-Allow-Headers", headers);
-            }
+    server->login_attempts_ = 0;
 
-            evhttp_add_header(req->output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            send_simple_response(req, HTTP_OK);
-            return;
-        }
+    auto const* const uri = evhttp_request_get_uri(req);
+    auto const uri_sv = std::string_view{ uri };
+    auto const location = tr_strv_starts_with(uri_sv, server->url()) ? uri_sv.substr(std::size(server->url())) : ""sv;
 
-        if (!is_authorized(server, evhttp_find_header(req->input_headers, "Authorization")))
-        {
-            evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            if (server->is_anti_brute_force_enabled())
-            {
-                ++server->login_attempts_;
-            }
-
-            send_simple_response(req, HttpErrorUnauthorized);
-            return;
-        }
-
-        server->login_attempts_ = 0;
-
-        auto uri = std::string_view{ req->uri };
-        auto const location = tr_strv_starts_with(uri, server->url()) ? uri.substr(std::size(server->url())) : ""sv;
-
-        if (std::empty(location) || location == "web"sv)
-        {
-            auto const new_location = fmt::format("{:s}web/", server->url());
-            evhttp_add_header(req->output_headers, "Location", new_location.c_str());
-            send_simple_response(req, HTTP_MOVEPERM, nullptr);
-        }
-        else if (tr_strv_starts_with(location, "web/"sv))
-        {
-            handle_web_client(req, server);
-        }
-        else if (!isHostnameAllowed(server, req))
-        {
-            char const* const tmp =
-                "<p>Transmission received your request, but the hostname was unrecognized.</p>"
-                "<p>To fix this, choose one of the following options:"
-                "<ul>"
-                "<li>Enable password authentication, then any hostname is allowed.</li>"
-                "<li>Add the hostname you want to use to the whitelist in settings.</li>"
-                "</ul></p>"
-                "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
-                "<p>This requirement has been added to help prevent "
-                "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
-                "attacks.</p>";
-            send_simple_response(req, 421, tmp);
-        }
+    if (std::empty(location) || location == "web"sv)
+    {
+        auto const new_location = fmt::format("{:s}web/", server->url());
+        evhttp_add_header(output_headers, "Location", new_location.c_str());
+        send_simple_response(req, HTTP_MOVEPERM, nullptr);
+    }
+    else if (tr_strv_starts_with(location, "web/"sv))
+    {
+        handle_web_client(req, server);
+    }
+    else if (!isHostnameAllowed(server, req))
+    {
+        static auto constexpr Body =
+            "<p>Transmission received your request, but the hostname was unrecognized.</p>"
+            "<p>To fix this, choose one of the following options:"
+            "<ul>"
+            "<li>Enable password authentication, then any hostname is allowed.</li>"
+            "<li>Add the hostname you want to use to the whitelist in settings.</li>"
+            "</ul></p>"
+            "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
+            "<p>This requirement has been added to help prevent "
+            "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
+            "attacks.</p>";
+        tr_logAddWarn(
+            fmt::format(fmt::runtime(_("Rejected request from {host} (Host not whitelisted)")), fmt::arg("host", remote_host)));
+        send_simple_response(req, 421, Body);
+    }
 #ifdef REQUIRE_SESSION_ID
-        else if (!test_session_id(server, req))
-        {
-            auto const session_id = std::string{ server->session->sessionId() };
-            auto const tmp = fmt::format(
-                "<p>Your request had an invalid session-id header.</p>"
-                "<p>To fix this, follow these steps:"
-                "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
-                "<li> Add the updated header to your outgoing requests"
-                "<li> When you get this 409 error message, resend your request with the updated header"
-                "</ol></p>"
-                "<p>This requirement has been added to help prevent "
-                "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
-                "attacks.</p>"
-                "<p><code>{:s}: {:s}</code></p>",
-                TR_RPC_SESSION_ID_HEADER,
-                session_id);
-            evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
-            evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
-            send_simple_response(req, 409, tmp.c_str());
-        }
+    else if (!test_session_id(server, req))
+    {
+        auto const session_id = std::string{ server->session->sessionId() };
+        auto const body = fmt::format(
+            "<p>Your request had an invalid session-id header.</p>"
+            "<p>To fix this, follow these steps:"
+            "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
+            "<li> Add the updated header to your outgoing requests"
+            "<li> When you get this 409 error message, resend your request with the updated header"
+            "</ol></p>"
+            "<p>This requirement has been added to help prevent "
+            "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
+            "attacks.</p>"
+            "<p><code>{:s}: {:s}</code></p>",
+            TR_RPC_SESSION_ID_HEADER,
+            session_id);
+        evhttp_add_header(output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
+        evhttp_add_header(output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
+        send_simple_response(req, 409, body.c_str());
+    }
 #endif
-        else if (tr_strv_starts_with(location, "rpc"sv))
-        {
-            handle_rpc(req, server);
-        }
-        else
-        {
-            send_simple_response(req, HTTP_NOTFOUND, req->uri);
-        }
+    else if (tr_strv_starts_with(location, "rpc"sv))
+    {
+        handle_rpc(req, server);
+    }
+    else
+    {
+        tr_logAddWarn(fmt::format(
+            fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
+            fmt::arg("host", remote_host),
+            fmt::arg("uri", uri_sv)));
+        send_simple_response(req, HTTP_NOTFOUND, uri);
     }
 }
 
