@@ -384,10 +384,11 @@ export class Transmission extends EventTarget {
         this.refilterAllSoon();
         break;
 
-      case Prefs.Highlight: {
-        document.body.classList.remove('highlight-system');
-        if (value) {
-          document.body.classList.add(value);
+      case Prefs.HighlightColor: {
+        if (value === 'Highlight') {
+          document.body.classList.add('highlight-system');
+        } else {
+          document.body.classList.remove('highlight-system');
         }
         break;
       }
