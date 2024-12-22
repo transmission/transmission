@@ -82,7 +82,7 @@ export class Appearance extends EventTarget {
         : Prefs.ContrastLess;
     });
 
-    // accent
+    // highlight color
 
     legend = document.createElement('h4');
     message.append(legend);
@@ -92,20 +92,23 @@ export class Appearance extends EventTarget {
     div.classList.add('table-row');
     message.append(div);
 
-    const highlight_style_option = (name, text, style_value) => {
+    const highlight_color_option = (text, color) => {
       const input = document.createElement('input');
-      input.id = style_value || 'highlight-default';
-      input.name = name;
+      if (color === 'Highlight') {
+        input.id = 'highlight-system';
+      } else {
+        input.id = 'highlight-default';
+      }
+      input.name = 'highlight-color-picker';
       input.type = 'radio';
-      input.value = style_value;
-      input.checked =
-        document.body.classList.contains(style_value) || !style_value;
+      input.value = color;
+      input.checked = !color || document.body.classList.contains(input.id);
       div.append(input);
 
       input.addEventListener('change', (event_) => {
         const { checked, value } = event_.target;
         if (checked) {
-          this.prefs.highlight = value;
+          this.prefs.highlight_color = value;
         }
       });
 
@@ -116,8 +119,8 @@ export class Appearance extends EventTarget {
       div.append(style_label, document.createElement('BR'));
     };
 
-    highlight_style_option('accent-picker', 'Legacy', null);
-    highlight_style_option('accent-picker', 'System', 'highlight-system');
+    highlight_color_option('Legacy', null);
+    highlight_color_option('System', 'Highlight');
 
     elements.confirm.remove();
     delete elements.confirm;
