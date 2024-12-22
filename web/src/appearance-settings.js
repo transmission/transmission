@@ -94,11 +94,8 @@ export class Appearance extends EventTarget {
 
     const highlight_color_option = (text, color) => {
       const input = document.createElement('input');
-      if (color === 'Highlight') {
-        input.id = 'highlight-system';
-      } else {
-        input.id = 'highlight-default';
-      }
+      input.id =
+        color === 'Highlight' ? 'highlight-system' : 'highlight-default';
       input.name = 'highlight-color-picker';
       input.type = 'radio';
       input.value = color;
