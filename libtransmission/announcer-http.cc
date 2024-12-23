@@ -566,7 +566,19 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         {
             BasicHandler::Key(value, context);
 
-            if (auto needle = tr_sha1_digest_t{}; depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
+            if (auto cur_depth = depth(); cur_depth < 2U || !pathStartsWith("files"sv))
+            {
+                row_.reset();
+            }
+            else if (cur_depth > 2U)
+            {
+                // do nothing
+            }
+            else if (auto needle = tr_sha1_digest_t{}; std::size(value) != std::size(needle))
+            {
+                row_.reset();
+            }
+            else
             {
                 std::copy_n(reinterpret_cast<std::byte const*>(std::data(value)), std::size(value), std::data(needle));
                 auto const it = std::find_if(
@@ -589,29 +601,32 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool Int64(int64_t value, Context const& /*context*/) override
         {
-            if (auto const key = currentKey(); row_ && key == "complete"sv)
+            if (row_ && depth() == 3U)
             {
-                response_.rows[*row_].seeders = value;
+                if (auto const key = currentKey(); key == "complete"sv)
+                {
+                    response_.rows[*row_].seeders = value;
+                }
+                else if (key == "downloaded"sv)
+                {
+                    response_.rows[*row_].downloads = value;
+                }
+                else if (key == "incomplete"sv)
+                {
+                    response_.rows[*row_].leechers = value;
+                }
+                else if (key == "downloaders"sv)
+                {
+                    response_.rows[*row_].downloaders = value;
+                }
             }
-            else if (row_ && key == "downloaded"sv)
-            {
-                response_.rows[*row_].downloads = value;
-            }
-            else if (row_ && key == "incomplete"sv)
-            {
-                response_.rows[*row_].leechers = value;
-            }
-            else if (row_ && key == "downloaders"sv)
-            {
-                response_.rows[*row_].downloaders = value;
-            }
-            else if (key == "min_request_interval"sv)
+            else if (pathIs("flags"sv, "min_request_interval"sv))
             {
                 response_.min_request_interval = static_cast<int>(value);
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key.value_or(""sv), value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected path '{}' int '{}'", path(), value), log_name_);
             }
 
             return true;
@@ -619,13 +634,13 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool String(std::string_view value, Context const& /*context*/) override
         {
-            if (auto const key = currentKey(); depth() == 1 && key == "failure reason"sv)
+            if (pathIs("failure reason"sv))
             {
                 response_.errmsg = value;
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' str '{}'", key.value_or(""sv), value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected path '{}' str '{}'", path(), value), log_name_);
             }
 
             return true;
