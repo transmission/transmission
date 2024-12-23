@@ -605,9 +605,9 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 response_.rows[*row_].downloaders = value;
             }
-            else if (key == "min_request_interval"sv)
+            else if (key == "min interval"sv)
             {
-                response_.min_request_interval = static_cast<int>(value);
+                response_.min_scrape_interval = static_cast<int>(value);
             }
             else
             {
