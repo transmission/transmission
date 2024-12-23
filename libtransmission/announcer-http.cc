@@ -574,26 +574,26 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 // do nothing
             }
-            else if (auto needle = tr_sha1_digest_t{}; std::size(value) != std::size(needle))
+            else if (std::size(value) != std::tuple_size_v<tr_sha1_digest_t>)
+            {
+                row_.reset();
+            }
+            else if (auto const it = std::find_if(
+                         std::begin(response_.rows),
+                         std::end(response_.rows),
+                         [value](auto const& row)
+                         {
+                             auto const row_hash = std::string_view{ reinterpret_cast<char const*>(std::data(row.info_hash)),
+                                                                     std::size(row.info_hash) };
+                             return row_hash == value;
+                         });
+                     it == std::end(response_.rows))
             {
                 row_.reset();
             }
             else
             {
-                std::copy_n(reinterpret_cast<std::byte const*>(std::data(value)), std::size(value), std::data(needle));
-                auto const it = std::find_if(
-                    std::begin(response_.rows),
-                    std::end(response_.rows),
-                    [needle](auto const& row) { return row.info_hash == needle; });
-
-                if (it == std::end(response_.rows))
-                {
-                    row_.reset();
-                }
-                else
-                {
-                    row_ = std::distance(std::begin(response_.rows), it);
-                }
+                row_ = it - std::begin(response_.rows);
             }
 
             return true;
