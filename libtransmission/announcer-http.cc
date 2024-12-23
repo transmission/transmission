@@ -346,33 +346,33 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool Int64(int64_t value, Context const& /*context*/) override
         {
-            if (auto const key = currentKey(); key == "interval")
+            if (pathIs("interval"sv))
             {
                 response_.interval = static_cast<int>(value);
             }
-            else if (key == "min interval"sv)
+            else if (pathIs("min interval"sv))
             {
                 response_.min_interval = static_cast<int>(value);
             }
-            else if (key == "complete"sv)
+            else if (pathIs("complete"sv))
             {
                 response_.seeders = value;
             }
-            else if (key == "incomplete"sv)
+            else if (pathIs("incomplete"sv))
             {
                 response_.leechers = value;
             }
-            else if (key == "downloaded"sv)
+            else if (pathIs("downloaded"sv))
             {
                 response_.downloads = value;
             }
-            else if (key == "port"sv)
+            else if (pathIs("peers"sv, ArrayKey, "port"sv))
             {
                 pex_.socket_address.port_.set_host(static_cast<uint16_t>(value));
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key.value_or(""sv), value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected path '{}' int '{}'", path(), value), log_name_);
             }
 
             return true;
@@ -380,45 +380,45 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool String(std::string_view value, Context const& /*context*/) override
         {
-            if (auto const key = currentKey(); key == "failure reason"sv)
+            if (pathIs("failure reason"sv))
             {
                 response_.errmsg = value;
             }
-            else if (key == "warning message"sv)
+            else if (pathIs("warning message"sv))
             {
                 response_.warning = value;
             }
-            else if (key == "tracker id"sv)
+            else if (pathIs("tracker id"sv))
             {
                 response_.tracker_id = value;
             }
-            else if (key == "peers"sv)
+            else if (pathIs("peers"sv))
             {
                 response_.pex = tr_pex::from_compact_ipv4(std::data(value), std::size(value), nullptr, 0);
             }
-            else if (key == "peers6"sv)
+            else if (pathIs("peers6"sv))
             {
                 response_.pex6 = tr_pex::from_compact_ipv6(std::data(value), std::size(value), nullptr, 0);
             }
-            else if (key == "ip")
+            else if (pathIs("peers"sv, ArrayKey, "ip"sv))
             {
                 if (auto const addr = tr_address::from_string(value); addr)
                 {
                     pex_.socket_address.address_ = *addr;
                 }
             }
-            else if (key == "peer id")
+            else if (pathIs("peers"sv, ArrayKey, "peer id"sv))
             {
                 // unused
             }
-            else if (key == "external ip"sv && std::size(value) == 4)
+            else if (pathIs("external ip"sv) && std::size(value) == 4)
             {
                 auto const [addr, out] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte const*>(std::data(value)));
                 response_.external_ip = addr;
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key.value_or(""sv), value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected path '{}' int '{}'", path(), value), log_name_);
             }
 
             return true;
