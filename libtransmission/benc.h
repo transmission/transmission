@@ -147,6 +147,20 @@ protected:
         return ret;
     }
 
+    template<typename... Args>
+    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
+    }
+
+    template<typename... Args>
+    [[nodiscard]] bool pathIs(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() == sizeof...(args)) && ((key(i++) == args) && ...);
+    }
+
 private:
     constexpr void push() noexcept
     {

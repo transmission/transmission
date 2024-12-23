@@ -442,20 +442,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     }
 
 private:
-    template<typename... Args>
-    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
-    {
-        auto i = 1U;
-        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
-    }
-
-    template<typename... Args>
-    [[nodiscard]] bool pathIs(Args... args) const noexcept
-    {
-        auto i = 1U;
-        return (depth() == sizeof...(args)) && ((key(i++) == args) && ...);
-    }
-
     [[nodiscard]] bool addFile(Context const& context)
     {
         bool ok = true;
