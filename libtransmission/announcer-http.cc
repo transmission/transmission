@@ -372,7 +372,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key.value_or(""sv), value), log_name_);
             }
 
             return true;
@@ -418,7 +418,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key.value_or(""sv), value), log_name_);
             }
 
             return true;
@@ -611,7 +611,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key.value_or(""sv), value), log_name_);
             }
 
             return true;
@@ -625,7 +625,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             }
             else
             {
-                tr_logAddDebug(fmt::format("unexpected key '{}' str '{}'", key, value), log_name_);
+                tr_logAddDebug(fmt::format("unexpected key '{}' str '{}'", key.value_or(""sv), value), log_name_);
             }
 
             return true;
