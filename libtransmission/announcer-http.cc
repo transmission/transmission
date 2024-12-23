@@ -601,24 +601,22 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool Int64(int64_t value, Context const& /*context*/) override
         {
-            if (row_ && depth() == 3U)
+            auto const is_value = row_ && depth() == 3U;
+            if (auto const key = currentKey(); is_value && key == "complete"sv)
             {
-                if (auto const key = currentKey(); key == "complete"sv)
-                {
-                    response_.rows[*row_].seeders = value;
-                }
-                else if (key == "downloaded"sv)
-                {
-                    response_.rows[*row_].downloads = value;
-                }
-                else if (key == "incomplete"sv)
-                {
-                    response_.rows[*row_].leechers = value;
-                }
-                else if (key == "downloaders"sv)
-                {
-                    response_.rows[*row_].downloaders = value;
-                }
+                response_.rows[*row_].seeders = value;
+            }
+            else if (is_value && key == "downloaded"sv)
+            {
+                response_.rows[*row_].downloads = value;
+            }
+            else if (is_value && key == "incomplete"sv)
+            {
+                response_.rows[*row_].leechers = value;
+            }
+            else if (is_value && key == "downloaders"sv)
+            {
+                response_.rows[*row_].downloaders = value;
             }
             else if (pathIs("flags"sv, "min_request_interval"sv))
             {
