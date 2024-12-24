@@ -1,5 +1,3 @@
-include(UtilityFunctions.cmake)
-
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH x64)
 else()
@@ -57,66 +55,39 @@ else()
     set(TR_OPENSSL_SSL_NAME "ssleay32.dll")
 endif()
 
-file(
-    COPY "${SOURCE_ICONS_DIR}/transmission.ico"
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")
-set(TRQMSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/translations")
-set(QTQMSRCDIR "${TR_QT_DIR}/translations")
-
 configure_file(TransmissionConfig.wxi.in TransmissionConfig.wxi)
 
-wix_heat(WebUi.wxs "${WEBSRCDIR}" WebUiComponents WEBINSTALLDIR var.WebSrcDir)
-wix_heat(QtClientTranslations.wxs "${TRQMSRCDIR}" QtClientTranslationsComponents QMINSTALLDIR var.TrQmSrcDir)
-wix_heat(QtTranslations.wxs "${QTQMSRCDIR}" QtTranslationsComponents QMINSTALLDIR var.QtQmSrcDir
-    XSL_TRANSFORM QtTranslations.xsl)
-
-wix_candle(WIX_OBJS
-    ARCHITECTURE ${ARCH}
-    SOURCES
-        components/CliTools.wxs
-        components/CommonLibs.wxs
-        components/Daemon.wxs
-        components/QtClient.wxs
-        Transmission.wxs
-        "${CMAKE_CURRENT_BINARY_DIR}/WebUi.wxs"
-        "${CMAKE_CURRENT_BINARY_DIR}/QtClientTranslations.wxs"
-        "${CMAKE_CURRENT_BINARY_DIR}/QtTranslations.wxs"
-    EXTENSIONS
-        WixUIExtension
-        WixUtilExtension
-    DEFINITIONS
-        "SrcDir=${CMAKE_INSTALL_PREFIX}"
-        "ThirdPartyDir=${TR_THIRD_PARTY_DIR}"
-        "QtDir=${TR_QT_DIR}"
-        "QtMajorVer=${Qt_VERSION_MAJOR}"
-        "LicenseFile=${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
-        "WebSrcDir=${WEBSRCDIR}"
-        "TrQmSrcDir=${TRQMSRCDIR}"
-        "QtQmSrcDir=${QTQMSRCDIR}"
-        "MsvcCrtMsmFile=${TR_MSVC_CRT_MSM_FILE}"
-        "OpenSslCryptoName=${TR_OPENSSL_CRYPTO_NAME}"
-        "OpenSslSslName=${TR_OPENSSL_SSL_NAME}"
-    EXTRA_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
-
-wix_light(WIX_OUTPUT
-    NAME transmission-${MSI_FILENAME_VERSION}-${ARCH}
-    OBJECTS ${WIX_OBJS}
-    EXTENSIONS
-        WixUIExtension
-        WixUtilExtension
-    EXTRA_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
-        "${CMAKE_CURRENT_BINARY_DIR}/transmission.ico")
-
 add_custom_target(pack-msi
+    COMMAND wix build
+        -arch ${ARCH}
+        -define "SrcDir=${CMAKE_INSTALL_PREFIX}"
+        -define "ThirdPartyDir=${TR_THIRD_PARTY_DIR}"
+        -define "QtDir=${TR_QT_DIR}"
+        -define "QtMajorVer=${Qt_VERSION_MAJOR}"
+        -define "LicenseFile=${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
+        -define "IconFile=${SOURCE_ICONS_DIR}/transmission.ico"
+        -define "WebSrcDir=${CMAKE_INSTALL_PREFIX}/share/transmission/public_html"
+        -define "TrQmSrcDir=${CMAKE_INSTALL_PREFIX}/share/transmission/translations"
+        -define "QtQmSrcDir=${TR_QT_DIR}/translations"
+        -define "OpenSslCryptoName=${TR_OPENSSL_CRYPTO_NAME}"
+        -define "OpenSslSslName=${TR_OPENSSL_SSL_NAME}"
+        -includepath "${CMAKE_CURRENT_BINARY_DIR}"
+        -out "${CMAKE_CURRENT_BINARY_DIR}/transmission-${MSI_FILENAME_VERSION}-${ARCH}.msi"
+        -ext WixToolset.UI.wixext
+        -ext WixToolset.Util.wixext
+        "${CMAKE_CURRENT_SOURCE_DIR}/components/CliTools.wxs"
+        "${CMAKE_CURRENT_SOURCE_DIR}/components/CommonLibs.wxs"
+        "${CMAKE_CURRENT_SOURCE_DIR}/components/Daemon.wxs"
+        "${CMAKE_CURRENT_SOURCE_DIR}/components/QtClient.wxs"
+        "${CMAKE_CURRENT_SOURCE_DIR}/components/WebUi.wxs"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Transmission.wxs"
     SOURCES
         components/CliTools.wxs
         components/CommonLibs.wxs
         components/Daemon.wxs
         components/QtClient.wxs
-        QtTranslations.xsl
+        components/WebUi.wxs
+        GPLv2.rtf
         Transmission.wxs
         TransmissionConfig.wxi.in
-    DEPENDS "${WIX_OUTPUT}")
+        "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")

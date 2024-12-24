@@ -1,31 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <?include TransmissionConfig.wxi ?>
 
   <Fragment>
-    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SrcDir)\bin">
-      <Component Id="exe.transmission.remote">
-        <File DiskId="1" KeyPath="yes" Name="transmission-remote.exe" />
-      </Component>
-      <Component Id="exe.transmission.create">
-        <File DiskId="1" KeyPath="yes" Name="transmission-create.exe" />
-      </Component>
-      <Component Id="exe.transmission.edit">
-        <File DiskId="1" KeyPath="yes" Name="transmission-edit.exe" />
-      </Component>
-      <Component Id="exe.transmission.show">
-        <File DiskId="1" KeyPath="yes" Name="transmission-show.exe" />
-      </Component>
-    </DirectoryRef>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id="CliToolsComponents">
-      <ComponentRef Id="exe.transmission.remote" />
-      <ComponentRef Id="exe.transmission.create" />
-      <ComponentRef Id="exe.transmission.edit" />
-      <ComponentRef Id="exe.transmission.show" />
+    <ComponentGroup Id="CliToolsComponents" Directory="INSTALLDIR" Source="$(var.SrcDir)\bin">
+      <File Id="exe.transmission.remote" Name="transmission-remote.exe" />
+      <File Id="exe.transmission.create" Name="transmission-create.exe" />
+      <File Id="exe.transmission.edit" Name="transmission-edit.exe" />
+      <File Id="exe.transmission.show" Name="transmission-show.exe" />
     </ComponentGroup>
   </Fragment>
 

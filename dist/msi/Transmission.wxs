@@ -1,21 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
 
   <?include TransmissionConfig.wxi ?>
 
+  <?define ProductName = "Transmission $(var.TrVersionFull) ($(sys.BUILDARCH))" ?>
   <?if $(sys.BUILDARCH) = x64 ?>
-    <?define ProductName = "Transmission $(var.TrVersionFull) (x64)" ?>
-    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
     <?define PlatformSystemFolder = "System64Folder" ?>
   <?else ?>
-    <?define ProductName = "Transmission $(var.TrVersionFull)" ?>
-    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
     <?define PlatformSystemFolder = "SystemFolder" ?>
   <?endif ?>
 
-  <Product Name="$(var.ProductName)" Id="*" UpgradeCode="1FB3C295-9BD4-4248-8C8B-B85CD11FE7C4" Language="1033" Codepage="1252" Version="$(var.TrVersionMsi)" Manufacturer="Transmission Project">
-    <Package Id="*" Keywords="Installer" Description="Transmission $(var.TrVersion) Installer" Comments="A Fast, Easy, and Free BitTorrent Client" Manufacturer="Transmission Project" InstallerVersion="500" InstallScope="perMachine" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
-    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." AllowSameVersionUpgrades="yes" />
+  <Package Name="$(var.ProductName)" UpgradeCode="1FB3C295-9BD4-4248-8C8B-B85CD11FE7C4" Language="1033" Codepage="1252" Version="$(var.TrVersionMsi)" Manufacturer="Transmission Project">
+    <SummaryInformation Keywords="Installer" Description="Transmission $(var.TrVersion) Installer" Comments="A Fast, Easy, and Free BitTorrent Client" Manufacturer="Transmission Project" />
+    <MajorUpgrade DowngradeErrorMessage="A later version of Transmission is already installed. Setup will now exit." AllowSameVersionUpgrades="yes" />
 
     <?if $(var.QtMajorVer) = 5 ?>
       <?define MinSystemName = "Windows Vista, Windows Server 2008, or higher" ?>
@@ -29,49 +25,39 @@
       <?define MinSystemCondition = "WINDOWSBUILDNUM" ?>
     <?endif ?>
 
-    <Condition Message="This application is only supported on $(var.MinSystemName).">
-      <![CDATA[Installed OR $(var.MinSystemCondition)]]>
-    </Condition>
+    <Launch Condition="Installed OR $(var.MinSystemCondition)" Message="This application is only supported on $(var.MinSystemName)." />
 
     <Property Id="TRQTWINSTALLDIR" Secure="yes">
-      <RegistrySearch Id="TrQtWRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Win64="no"/>
-      <RegistrySearch Id="TrQtWRegSearch64" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Win64="yes"/>
+      <RegistrySearch Id="TrQtWRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Bitness="always32" />
+      <RegistrySearch Id="TrQtWRegSearch64" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Bitness="always64" />
     </Property>
-    <Condition Message="Another version of Transmission is already installed at &quot;[TRQTWINSTALLDIR]&quot;. Uninstall it first and then try again.">
-      NOT TRQTWINSTALLDIR
-    </Condition>
+    <Launch Condition="NOT TRQTWINSTALLDIR" Message="Another version of Transmission is already installed at &quot;[TRQTWINSTALLDIR]&quot;. Uninstall it first and then try again." />
 
     <Property Id="UCRTINSTALLED" Secure="yes">
       <DirectorySearch Id="UcrtDirSearch" Path="[$(var.PlatformSystemFolder)]" Depth="0">
         <FileSearch Id="UcrtFileSearch" Name="ucrtbase.dll" MinVersion="6.2.10585.0" />
       </DirectorySearch>
     </Property>
-    <Condition Message="The Universal C Runtime is not installed. Please run Windows Update and install all required Windows updates. You can download the UCRT separately from here: https://support.microsoft.com/en-us/kb/2999226">
-      UCRTINSTALLED
-    </Condition>
+    <Launch Condition="UCRTINSTALLED" Message="The Universal C Runtime is not installed. Please run Windows Update and install all required Windows updates. You can download the UCRT separately from here: https://support.microsoft.com/en-us/kb/2999226" />
 
     <Property Id="VCREDISTINSTALLED" Secure="yes">
-      <RegistrySearch Id="VcRedistInstalledRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\$(var.VcVerMajor).0\VC\Runtimes\$(sys.BUILDARCH)" Name="Installed" Type="raw"/>
+      <RegistrySearch Id="VcRedistInstalledRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\$(var.VcVerMajor).0\VC\Runtimes\$(sys.BUILDARCH)" Name="Installed" Type="raw" />
     </Property>
     <Property Id="VCREDISTVERSIONMINOR" Secure="yes">
-      <RegistrySearch Id="VcRedistVersionMinorRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\$(var.VcVerMajor).0\VC\Runtimes\$(sys.BUILDARCH)" Name="Minor" Type="raw"/>
+      <RegistrySearch Id="VcRedistVersionMinorRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\$(var.VcVerMajor).0\VC\Runtimes\$(sys.BUILDARCH)" Name="Minor" Type="raw" />
     </Property>
-    <Condition Message="The Visual C++ Runtime is not installed or is outdated. Please download and install the latest version from here: https://aka.ms/vs/$(var.VsVerMajor)/release/vc_redist.$(sys.BUILDARCH).exe">
-      VCREDISTINSTALLED = "#1" AND VCREDISTVERSIONMINOR &gt;= "#$(var.VcVerMinor)0"
-    </Condition>
+    <Launch Condition="VCREDISTINSTALLED = &quot;#1&quot; AND VCREDISTVERSIONMINOR &gt;= &quot;#$(var.VcVerMinor)0&quot;" Message="The Visual C++ Runtime is not installed or is outdated. Please download and install the latest version from here: https://aka.ms/vs/$(var.VsVerMajor)/release/vc_redist.$(sys.BUILDARCH).exe" />
 
     <Media Id="1" Cabinet="main.cab" EmbedCab="yes" DiskPrompt="CD-ROM #1" />
     <Property Id="DiskPrompt" Value="Transmission $(var.TrVersion) Installation [1]" />
 
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="$(var.PlatformProgramFilesFolder)" Name="PFiles">
-        <Directory Id="INSTALLDIR" Name="Transmission">
-          <Directory Id="WEBINSTALLDIR" Name="public_html" />
-        </Directory>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+       <Directory Id="INSTALLDIR" Name="Transmission">
+        <Directory Id="WEBINSTALLDIR" Name="public_html" />
       </Directory>
-      <Directory Id="ProgramMenuFolder" Name="Programs"/>
-      <Directory Id="DesktopFolder" Name="Desktop" />
-    </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+    <StandardDirectory Id="DesktopFolder" />
 
     <Feature Id="CompleteInstall" Title="Transmission" Level="1" AllowAdvertise="no" Display="expand" ConfigurableDirectory="INSTALLDIR">
       <Feature Id="CommonLibs" Level="1" AllowAdvertise="no" Display="hidden">
@@ -91,16 +77,16 @@
       </Feature>
     </Feature>
 
-    <UIRef Id="WixUI_FeatureTree" />
+    <ui:WixUI Id="WixUI_FeatureTree" />
     <UIRef Id="WixUI_ErrorProgressText" />
 
     <WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseFile)" />
 
-    <Icon Id="Tr.ico" SourceFile="transmission.ico" />
+    <Icon Id="Tr.ico" SourceFile="$(var.IconFile)" />
     <Property Id="ARPPRODUCTICON" Value="Tr.ico" />
 
     <Property Id="ARPURLINFOABOUT" Value="https://transmissionbt.com/" />
     <Property Id="ARPHELPLINK" Value="https://forum.transmissionbt.com/" />
-  </Product>
+  </Package>
 
 </Wix>
