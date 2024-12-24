@@ -63,7 +63,7 @@ for:
       choco install nasm
       choco install jom
       choco install wixtoolset --version 3.14.0
-      choco install ccache --version 4.8.3
+      choco install ccache
 
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -Recurse
