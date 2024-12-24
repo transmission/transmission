@@ -166,6 +166,11 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }];
 }
 
+- (BOOL)usesAlternatingRowBackgroundColors
+{
+    return ![self.fDefaults boolForKey:@"SmallView"];
+}
+
 - (BOOL)isGroupCollapsed:(NSInteger)value
 {
     if (value == -1)
