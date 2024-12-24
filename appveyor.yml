@@ -26,6 +26,7 @@ branches:
   only:
   - main
   - /^\d+\.\d+.*/
+  - wip/gh7291-wix-5-exe
 
 for:
 -
