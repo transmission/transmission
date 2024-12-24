@@ -9,15 +9,15 @@ environment:
     secure: Bf3x1Iruxg+l3tp+an+g9oE36EHxvyWrE8GTJzZh4Ss=
 
   matrix:
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-    TR_ARCH: x86
-    QT_VERSION: '5'
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-    TR_ARCH: x86
-    QT_VERSION: '6'
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-    TR_ARCH: x64
-    QT_VERSION: '5'
+  # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  #   TR_ARCH: x86
+  #   QT_VERSION: '5'
+  # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  #   TR_ARCH: x86
+  #   QT_VERSION: '6'
+  # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  #   TR_ARCH: x64
+  #   QT_VERSION: '5'
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x64
     QT_VERSION: '6'
