@@ -1,31 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <?include TransmissionConfig.wxi ?>
 
   <Fragment>
-    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.ThirdPartyDir)\bin">
-      <Component Id="dll.curl">
-        <File DiskId="1" KeyPath="yes" Name="libcurl.dll" />
-      </Component>
-      <Component Id="dll.openssl.crypto">
-        <File DiskId="1" KeyPath="yes" Name="$(var.OpenSslCryptoName)" />
-      </Component>
-      <Component Id="dll.openssl.ssl">
-        <File DiskId="1" KeyPath="yes" Name="$(var.OpenSslSslName)" />
-      </Component>
-      <Component Id="dll.zlib">
-        <File DiskId="1" KeyPath="yes" Name="zlib.dll" />
-      </Component>
-    </DirectoryRef>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id="CommonLibsComponents">
-      <ComponentRef Id="dll.curl" />
-      <ComponentRef Id="dll.openssl.crypto" />
-      <ComponentRef Id="dll.openssl.ssl" />
-      <ComponentRef Id="dll.zlib" />
+    <ComponentGroup Id="CommonLibsComponents" Directory="INSTALLDIR" Source="$(var.ThirdPartyDir)\bin">
+      <File Id="dll.curl" Name="libcurl.dll" />
+      <File Id="dll.openssl.crypto" Name="$(var.OpenSslCryptoName)" />
+      <File Id="dll.openssl.ssl" Name="$(var.OpenSslSslName)" />
+      <File Id="dll.zlib" Name="zlib.dll" />
     </ComponentGroup>
   </Fragment>
 

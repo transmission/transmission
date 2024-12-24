@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <?define TrVersion = "${VERSION}" ?>
   <?define TrVersionMsi = "${VERSION_MSI}" ?>

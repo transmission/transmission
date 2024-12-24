@@ -65,6 +65,8 @@ for:
       choco install ccache
 
       dotnet tool install --global wix --version 5.0.2
+      wix extension add --global WixToolset.UI.wixext WixToolset.Util.wixext
+      wix extension list --global
 
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -Recurse

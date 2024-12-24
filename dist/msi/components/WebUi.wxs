@@ -1,0 +1,10 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include TransmissionConfig.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="WebUiComponents" Directory="INSTALLDIR">
+      <Files Subdirectory="public_html" Include="$(var.WebSrcDir)\**" />
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>
