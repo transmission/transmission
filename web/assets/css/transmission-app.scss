@@ -26,7 +26,6 @@
   --dialog-logo-padding: calc(var(--dialog-padding) * 0.66);
   --dialog-padding: 20px;
   --logo-size: 64px;
-  --pauseresume-size: 20px;
   --popup-top: 82px; // TODO: ugly that this is hardcoded
   --toolbar-height: 50px;
 
@@ -65,10 +64,6 @@
   --image-chevron-up: url('../img/chevron-up.svg');
   --image-lock-fill: url('../img/lock-fill.svg');
   --image-magnet: url('../img/magnet.svg');
-  --image-pause-circle-active: url('../img/pause-circle-active.svg');
-  --image-pause-circle-idle: url('../img/pause-circle-idle.svg');
-  --image-play-circle-active: url('../img/play-circle-active.svg');
-  --image-play-circle-idle: url('../img/play-circle-idle.svg');
 
   --app-image-url: url('../img/box.svg');
   --audio-image-url: url('../img/music.svg');
@@ -622,7 +617,7 @@ a {
         grid-area: peers;
       }
 
-      .torrent-progress {
+      .torrent-progress-bar {
         display: flex;
         flex-direction: row;
         grid-area: progressbar;
@@ -662,32 +657,6 @@ a {
   .icon {
     background-position: center;
     background-repeat: no-repeat;
-  }
-
-  .torrent-pauseresume-button {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: var(--pauseresume-size);
-    margin-left: calc(var(--pauseresume-size) / 2);
-    width: var(--pauseresume-size);
-
-    &[data-action='pause'] {
-      background-image: var(--image-pause-circle-idle);
-
-      &:active,
-      &:hover {
-        background-image: var(--image-pause-circle-active);
-      }
-    }
-
-    &[data-action='resume'] {
-      background-image: var(--image-play-circle-idle);
-
-      &:active,
-      &:hover {
-        background-image: var(--image-play-circle-active);
-      }
-    }
   }
 
   .torrent-progress-bar {

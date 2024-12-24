@@ -781,20 +781,6 @@ TODO: fix this when notifications get fixed
       this.setCurrentPopup(null);
     }
 
-    // handle the per-row pause/resume button
-    if (event_.target.classList.contains('torrent-pauseresume-button')) {
-      switch (event_.target.dataset.action) {
-        case 'pause':
-          this._stopTorrents([row.getTorrent()]);
-          break;
-        case 'resume':
-          this._startTorrents([row.getTorrent()]);
-          break;
-        default:
-          break;
-      }
-    }
-
     // Prevents click carrying to parent element
     // which deselects all on click
     event_.stopPropagation();
