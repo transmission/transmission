@@ -57,6 +57,7 @@ endif()
 
 configure_file(TransmissionConfig.wxi.in TransmissionConfig.wxi)
 
+set(WIX_OUTPUT_BASE "${CMAKE_CURRENT_BINARY_DIR}/transmission-${MSI_FILENAME_VERSION}-${ARCH}")
 add_custom_target(pack-msi
     COMMAND wix build
         -arch ${ARCH}
@@ -72,7 +73,7 @@ add_custom_target(pack-msi
         -define "OpenSslCryptoName=${TR_OPENSSL_CRYPTO_NAME}"
         -define "OpenSslSslName=${TR_OPENSSL_SSL_NAME}"
         -includepath "${CMAKE_CURRENT_BINARY_DIR}"
-        -out "${CMAKE_CURRENT_BINARY_DIR}/transmission-${MSI_FILENAME_VERSION}-${ARCH}.msi"
+        -out "${WIX_OUTPUT_BASE}.msi"
         -ext WixToolset.UI.wixext
         -ext WixToolset.Util.wixext
         "${CMAKE_CURRENT_SOURCE_DIR}/components/CliTools.wxs"
@@ -89,5 +90,20 @@ add_custom_target(pack-msi
         components/WebUi.wxs
         GPLv2.rtf
         Transmission.wxs
+        TransmissionConfig.wxi.in
+        "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
+
+add_custom_target(pack-exe
+    COMMAND wix build
+        -arch ${ARCH}
+        -define "VcRedistFile=$ENV{VCINSTALLDIR}Redist/MSVC/v${MSVC_TOOLSET_VERSION}/vc_redist.${ARCH}.exe"
+        -define "MsiFile=${WIX_OUTPUT_BASE}.msi"
+        -define "SplashScreenFile=${CMAKE_CURRENT_SOURCE_DIR}/SplashScreen.bmp"
+        -includepath "${CMAKE_CURRENT_BINARY_DIR}"
+        -out "${WIX_OUTPUT_BASE}.exe"
+        -ext WixToolset.BootstrapperApplications.wixext
+        "${CMAKE_CURRENT_SOURCE_DIR}/Bundle.wxs"
+    SOURCES
+        Bundle.wxs
         TransmissionConfig.wxi.in
         "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")

@@ -1,0 +1,28 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+
+  <?include TransmissionConfig.wxi ?>
+
+  <?define ProductName = "Transmission $(var.TrVersionFull) ($(sys.BUILDARCH))" ?>
+  <?if $(sys.BUILDARCH) = x86 ?>
+    <?define VcRedistId = "{C2BB95AA-90F3-4891-81C1-A7E565BB836C}" ?>
+    <?define VcRedistWin64 = "no" ?>
+  <?elseif $(sys.BUILDARCH) = x64 ?>
+    <?define VcRedistId = "{382F1166-A409-4C5B-9B1E-85ED538B8291}" ?>
+    <?define VcRedistWin64 = "yes" ?>
+  <?endif ?>
+
+  <Bundle Name="$(var.ProductName)" UpgradeCode="D81AC143-1E07-47CB-B464-42DDDFF36A0D" Version="$(var.TrVersionMsi)" Manufacturer="Transmission Project" SplashScreenSourceFile="$(var.SplashScreenFile)">
+
+    <BootstrapperApplication>
+      <bal:WixInternalUIBootstrapperApplication />
+    </BootstrapperApplication>
+
+    <Chain>
+      <ExePackage Id="VcRedist" SourceFile="$(var.VcRedistFile)" InstallArguments="/install /passive /norestart" Permanent="yes" PerMachine="yes">
+        <ArpEntry Id="$(var.VcRedistId)" Version="!(bind.packageVersion.VcRedist)" Win64="$(var.VcRedistWin64)" />
+      </ExePackage>
+      <MsiPackage Id="MainApp" SourceFile="$(var.MsiFile)" />
+    </Chain>
+  </Bundle>
+
+</Wix>
