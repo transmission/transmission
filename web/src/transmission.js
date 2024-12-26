@@ -31,10 +31,8 @@ export class Transmission extends EventTarget {
 
     // Initialize the helper classes
     this.action_manager = action_manager;
-    this.max_popups = 2;
     this.notifications = notifications;
     this.prefs = prefs;
-    this.popup = Array.from({ length: this.max_popups });
     this.remote = new Remote(this);
 
     this.addEventListener('torrent-selection-changed', (event_) =>
@@ -50,6 +48,8 @@ export class Transmission extends EventTarget {
     this.changeStatus = false;
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
+
+    this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
 
     this.isTouch = 'ontouchstart' in window;
     this.busyclick = false;
@@ -135,8 +135,10 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
         case 'show-overflow-menu':
-          if (this.popup[1] instanceof OverflowMenu) {
-            this.popup[1].close();
+          if (
+            this.popup[Transmission.default_popup_level] instanceof OverflowMenu
+          ) {
+            this.popup[Transmission.default_popup_level].close();
           } else {
             this.setCurrentPopup(
               new OverflowMenu(
@@ -195,7 +197,7 @@ export class Transmission extends EventTarget {
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.querySelector('#torrent-container');
     e.addEventListener('click', (e_) => {
-      if (this.popup[this.max_popups - 1]) {
+      if (this.popup[Transmission.default_popup_level]) {
         this.setCurrentPopup(null);
       }
       if (e_.target === e_.currentTarget) {
@@ -263,8 +265,9 @@ export class Transmission extends EventTarget {
         clearTimeout(this.busyclick);
         this.busyclick = false;
         setTimeout(() => {
-          if (this.popup[1]) {
-            this.popup[1].root.style.pointerEvents = 'auto';
+          const popup = this.popup[Transmission.default_popup_level];
+          if (popup) {
+            popup.root.style.pointerEvents = 'auto';
           }
         }, 1);
       });
@@ -278,8 +281,9 @@ export class Transmission extends EventTarget {
     } else {
       this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
         rightc(event_);
-        if (this.popup[1]) {
-          this.popup[1].root.style.pointerEvents = 'auto';
+        const popup = this.popup[Transmission.default_popup_level];
+        if (popup) {
+          popup.root.style.pointerEvents = 'auto';
         }
       });
     }
@@ -388,6 +392,14 @@ export class Transmission extends EventTarget {
   }
 
   /// UTILITIES
+
+  static get max_popups() {
+    return 2;
+  }
+
+  static get default_popup_level() {
+    return Transmission.max_popups - 1;
+  }
 
   _getAllTorrents() {
     return Object.values(this._torrents);
@@ -777,7 +789,7 @@ TODO: fix this when notifications get fixed
     const meta_key = event_.metaKey || event_.ctrlKey,
       { row } = event_.currentTarget;
 
-    if (this.popup[this.max_popups - 1]) {
+    if (this.popup[Transmission.default_popup_level]) {
       this.setCurrentPopup(null);
     }
 
@@ -1143,13 +1155,11 @@ TODO: fix this when notifications get fixed
 
   ///
 
-  setCurrentPopup(popup, level = this.max_popups - 1) {
-    let index = level;
-    while (index < this.max_popups) {
+  setCurrentPopup(popup, level = Transmission.default_popup_level) {
+    for (let index = level; index < Transmission.max_popups; index++) {
       if (this.popup[index]) {
         this.popup[index].close();
       }
-      index++;
     }
 
     this.popup[level] = popup;
