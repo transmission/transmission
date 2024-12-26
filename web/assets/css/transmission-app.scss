@@ -452,7 +452,9 @@ a {
   -webkit-user-select: none;
 
   .torrent {
+    align-items: center;
     border-bottom: 1px solid var(--color-border-default);
+    display: grid;
 
     &:nth-child(even) {
       background-color: var(--color-bg-even);
@@ -519,6 +521,7 @@ a {
 
     .torrent-name {
       font-weight: bold;
+      grid-area: name;
       margin-bottom: 2px;
       margin-top: 2px;
       overflow: hidden;
@@ -534,6 +537,7 @@ a {
     .torrent-labels {
       font-size: small;
       font-weight: normal;
+      grid-area: labels;
       margin-bottom: 2px;
       margin-top: 2px;
       overflow: hidden;
@@ -554,8 +558,20 @@ a {
       border: 1px solid var(--color-border-default);
     }
 
-    .torrent-progress-details,
     .torrent-peer-details {
+      grid-area: peers;
+    }
+
+    .torrent-progress-bar {
+      grid-area: progressbar;
+    }
+
+    .torrent-progress-details {
+      grid-area: progress-text;
+    }
+
+    .torrent-peer-details,
+    .torrent-progress-details {
       font-size: small;
 
       &.error {
@@ -566,8 +582,8 @@ a {
     &.compact {
       --icon-size: 16px;
 
-      align-items: center;
-      display: flex;
+      grid-template-areas: 'icon name labels peers progressbar';
+      grid-template-columns: calc(var(--icon-size) + 10px) auto 1fr;
 
       .icon {
         -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
@@ -587,8 +603,7 @@ a {
 
     &:not(.compact) {
       --icon-size: 32px;
-      align-items: center;
-      display: grid;
+
       grid-column-gap: 12px;
       grid-template-areas:
         'icon name labels'
@@ -605,26 +620,9 @@ a {
         width: var(--icon-size);
       }
 
-      .torrent-name {
-        grid-area: name;
-      }
-
-      .torrent-labels {
-        grid-area: labels;
-      }
-
-      .torrent-peer-details {
-        grid-area: peers;
-      }
-
       .torrent-progress-bar {
         display: flex;
         flex-direction: row;
-        grid-area: progressbar;
-      }
-
-      .torrent-progress-details {
-        grid-area: progress-text;
       }
 
       > * {
