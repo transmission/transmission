@@ -49,7 +49,7 @@ export class Transmission extends EventTarget {
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
-    this.boundPopupCloseListener = this.popupCloseListener.bind(this);
+    this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
 
     this.isTouch = 'ontouchstart' in window;
     this.busyclick = false;
@@ -125,18 +125,20 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
         case 'show-inspector':
-          if (this.popup instanceof Inspector) {
-            this.setCurrentPopup(null);
+          if (this.popup[0] instanceof Inspector) {
+            this.popup[0].close();
           } else {
-            this.setCurrentPopup(new Inspector(this));
+            this.setCurrentPopup(new Inspector(this), 0);
           }
           break;
         case 'show-move-dialog':
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
         case 'show-overflow-menu':
-          if (this.popup instanceof OverflowMenu) {
-            this.setCurrentPopup(null);
+          if (
+            this.popup[Transmission.default_popup_level] instanceof OverflowMenu
+          ) {
+            this.popup[Transmission.default_popup_level].close();
           } else {
             this.setCurrentPopup(
               new OverflowMenu(
@@ -149,7 +151,7 @@ export class Transmission extends EventTarget {
           }
           break;
         case 'show-preferences-dialog':
-          this.setCurrentPopup(new PrefsDialog(this, this.remote));
+          this.setCurrentPopup(new PrefsDialog(this, this.remote), 0);
           break;
         case 'show-shortcuts-dialog':
           this.setCurrentPopup(new ShortcutsDialog(this.action_manager));
@@ -195,7 +197,7 @@ export class Transmission extends EventTarget {
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.querySelector('#torrent-container');
     e.addEventListener('click', (e_) => {
-      if (this.popup && this.popup.name !== 'inspector') {
+      if (this.popup[Transmission.default_popup_level]) {
         this.setCurrentPopup(null);
       }
       if (e_.target === e_.currentTarget) {
@@ -203,7 +205,7 @@ export class Transmission extends EventTarget {
       }
     });
     e.addEventListener('dblclick', () => {
-      if (!this.popup || this.popup.name !== 'inspector') {
+      if (!this.popup[0] || this.popup[0].name !== 'inspector') {
         this.action_manager.click('show-inspector');
       }
     });
@@ -263,8 +265,9 @@ export class Transmission extends EventTarget {
         clearTimeout(this.busyclick);
         this.busyclick = false;
         setTimeout(() => {
-          if (this.popup) {
-            this.popup.root.style.pointerEvents = 'auto';
+          const popup = this.popup[Transmission.default_popup_level];
+          if (popup) {
+            popup.root.style.pointerEvents = 'auto';
           }
         }, 1);
       });
@@ -278,8 +281,9 @@ export class Transmission extends EventTarget {
     } else {
       this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
         rightc(event_);
-        if (this.popup) {
-          this.popup.root.style.pointerEvents = 'auto';
+        const popup = this.popup[Transmission.default_popup_level];
+        if (popup) {
+          popup.root.style.pointerEvents = 'auto';
         }
       });
     }
@@ -375,7 +379,8 @@ export class Transmission extends EventTarget {
       case Prefs.RefreshRate: {
         clearInterval(this.refreshTorrentsInterval);
         const callback = this.refreshTorrents.bind(this);
-        const msec = Math.max(2, this.prefs.refresh_rate_sec) * 1000;
+        const pref = this.prefs.refresh_rate_sec;
+        const msec = pref > 0 ? pref * 1000 : 1000;
         this.refreshTorrentsInterval = setInterval(callback, msec);
         break;
       }
@@ -387,6 +392,14 @@ export class Transmission extends EventTarget {
   }
 
   /// UTILITIES
+
+  static get max_popups() {
+    return 2;
+  }
+
+  static get default_popup_level() {
+    return Transmission.max_popups - 1;
+  }
 
   _getAllTorrents() {
     return Object.values(this._torrents);
@@ -530,8 +543,8 @@ export class Transmission extends EventTarget {
     }
 
     const esc_key = keyCode === 27; // esc key pressed
-    if (esc_key && this.popup) {
-      this.setCurrentPopup(null);
+    if (esc_key && this.popup.some(Boolean)) {
+      this.setCurrentPopup(null, 0);
       event_.preventDefault();
       return;
     }
@@ -776,22 +789,8 @@ TODO: fix this when notifications get fixed
     const meta_key = event_.metaKey || event_.ctrlKey,
       { row } = event_.currentTarget;
 
-    if (this.popup && this.popup.name !== 'inspector') {
+    if (this.popup[Transmission.default_popup_level]) {
       this.setCurrentPopup(null);
-    }
-
-    // handle the per-row pause/resume button
-    if (event_.target.classList.contains('torrent-pauseresume-button')) {
-      switch (event_.target.dataset.action) {
-        case 'pause':
-          this._stopTorrents([row.getTorrent()]);
-          break;
-        case 'resume':
-          this._startTorrents([row.getTorrent()]);
-          break;
-        default:
-          break;
-      }
     }
 
     // Prevents click carrying to parent element
@@ -1156,23 +1155,23 @@ TODO: fix this when notifications get fixed
 
   ///
 
-  popupCloseListener(event_) {
-    if (event_.target !== this.popup) {
-      throw new Error(event_);
-    }
-    this.popup.removeEventListener('close', this.boundPopupCloseListener);
-    delete this.popup;
-  }
-
-  setCurrentPopup(popup) {
-    if (this.popup) {
-      this.popup.close();
+  setCurrentPopup(popup, level = Transmission.default_popup_level) {
+    for (let index = level; index < Transmission.max_popups; index++) {
+      if (this.popup[index]) {
+        this.popup[index].close();
+      }
     }
 
-    this.popup = popup;
+    this.popup[level] = popup;
 
-    if (this.popup) {
-      this.popup.addEventListener('close', this.boundPopupCloseListener);
+    if (this.popup[level]) {
+      const listener = () => {
+        if (this.popup[level]) {
+          this.popup[level].removeEventListener('close', listener);
+          this.popup[level] = null;
+        }
+      };
+      this.popup[level].addEventListener('close', listener);
     }
   }
 }

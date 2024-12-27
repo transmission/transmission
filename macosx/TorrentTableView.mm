@@ -123,8 +123,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSMutableIndexSet* visibleIndexSet = [[NSMutableIndexSet alloc] init];
 
         [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
-            id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
-            if ([rowView isGroupRowStyle])
+            id rowItem = [self itemAtRow:row];
+            if ([rowItem isKindOfClass:[TorrentGroup class]])
             {
                 [visibleIndexSet addIndex:row];
             }
@@ -149,8 +149,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     //redraw fControlButton
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
     [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL*) {
-        id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
-        if (![rowView isGroupRowStyle])
+        id rowItem = [self itemAtRow:row];
+        if (![rowItem isKindOfClass:[TorrentGroup class]])
         {
             if (minimal)
             {
@@ -164,6 +164,11 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             }
         }
     }];
+}
+
+- (BOOL)usesAlternatingRowBackgroundColors
+{
+    return ![self.fDefaults boolForKey:@"SmallView"];
 }
 
 - (BOOL)isGroupCollapsed:(NSInteger)value
@@ -199,11 +204,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
 {
-    if ([item isKindOfClass:[Torrent class]])
-    {
-        return NO;
-    }
-    return YES;
+    // We are implementing our own group styling.
+    // Apple's default group styling conflicts with this.
+    return NO;
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
