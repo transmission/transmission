@@ -275,9 +275,7 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 
     if (bytes_transferred > 0U)
     {
-        /* For µTP sockets, the overhead is computed in utp_on_overhead. */
-        auto const overhead = socket_.guess_packet_overhead(bytes_transferred);
-        bandwidth().notify_bandwidth_consumed(TR_UP, bytes_transferred + overhead, false, now);
+        bandwidth().notify_bandwidth_consumed(TR_UP, bytes_transferred, false, now);
     }
 
     while (bytes_transferred > 0U && !std::empty(outbuf_info_))
@@ -380,8 +378,7 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
 
     if (bytes_transferred > 0U)
     {
-        auto const overhead = socket_.guess_packet_overhead(bytes_transferred);
-        bandwidth().notify_bandwidth_consumed(TR_DOWN, bytes_transferred + overhead, false, now);
+        bandwidth().notify_bandwidth_consumed(TR_DOWN, bytes_transferred, false, now);
     }
 
     // In normal conditions, only continue processing if we still have bandwidth
