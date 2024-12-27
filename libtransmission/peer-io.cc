@@ -271,21 +271,23 @@ bool tr_peerIo::reconnect()
 void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 {
     auto const keep_alive = shared_from_this();
+    auto const now = tr_time_msec();
 
-    while (bytes_transferred != 0U && !std::empty(outbuf_info_))
+    if (bytes_transferred > 0U)
+    {
+        /* For µTP sockets, the overhead is computed in utp_on_overhead. */
+        auto const overhead = socket_.guess_packet_overhead(bytes_transferred);
+        bandwidth().notify_bandwidth_consumed(TR_UP, bytes_transferred + overhead, false, now);
+    }
+
+    while (bytes_transferred > 0U && !std::empty(outbuf_info_))
     {
         auto& [n_bytes_left, is_piece_data] = outbuf_info_.front();
+        auto const payload = std::min(n_bytes_left, bytes_transferred);
 
-        size_t const payload = std::min(uint64_t{ n_bytes_left }, uint64_t{ bytes_transferred });
-        /* For µTP sockets, the overhead is computed in utp_on_overhead. */
-        size_t const overhead = socket_.guess_packet_overhead(payload);
-        uint64_t const now = tr_time_msec();
-
-        bandwidth().notify_bandwidth_consumed(TR_UP, payload, is_piece_data, now);
-
-        if (overhead > 0U)
+        if (is_piece_data)
         {
-            bandwidth().notify_bandwidth_consumed(TR_UP, overhead, false, now);
+            bandwidth().notify_bandwidth_consumed(TR_UP, payload, true, now);
         }
 
         if (did_write_ != nullptr)
@@ -360,7 +362,7 @@ void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*even
 
 // ---
 
-void tr_peerIo::can_read_wrapper()
+void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
 {
     // try to consume the input buffer
 
@@ -376,6 +378,12 @@ void tr_peerIo::can_read_wrapper()
     auto done = false;
     auto err = false;
 
+    if (bytes_transferred > 0U)
+    {
+        auto const overhead = socket_.guess_packet_overhead(bytes_transferred);
+        bandwidth().notify_bandwidth_consumed(TR_DOWN, bytes_transferred + overhead, false, now);
+    }
+
     // In normal conditions, only continue processing if we still have bandwidth
     // quota for it.
     //
@@ -384,25 +392,12 @@ void tr_peerIo::can_read_wrapper()
     // processing if the read buffer is more than twice as large as the target size.
     while (!done && !err && (read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
     {
-        size_t piece = 0U;
-        auto const old_len = read_buffer_size();
+        auto piece = size_t{};
         auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : ReadState::Err;
-        auto const used = old_len - read_buffer_size();
-        auto const overhead = socket_.guess_packet_overhead(used);
 
-        if (piece != 0U)
+        if (piece > 0U)
         {
             bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
-        }
-
-        if (used != piece)
-        {
-            bandwidth().notify_bandwidth_consumed(TR_DOWN, used - piece, false, now);
-        }
-
-        if (overhead > 0U)
-        {
-            bandwidth().notify_bandwidth_consumed(TR_DOWN, overhead, false, now);
         }
 
         switch (read_state)
@@ -459,7 +454,7 @@ size_t tr_peerIo::try_read(size_t max)
     }
     else if (!std::empty(buf))
     {
-        can_read_wrapper();
+        can_read_wrapper(n_read);
     }
 
     return n_read;
@@ -749,7 +744,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
 
                 io->inbuf_.add(args->buf, args->len);
                 io->set_enabled(TR_DOWN, true);
-                io->can_read_wrapper();
+                io->can_read_wrapper(args->len);
 
                 // utp_read_drained() notifies libutp that we read a packet from them.
                 // It opens up the congestion window by sending an ACK (soonish) if
