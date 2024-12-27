@@ -588,6 +588,11 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
 
 void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
 {
+    if (n_bytes == 0U)
+    {
+        return;
+    }
+
     outbuf_info_.emplace_back(n_bytes, is_piece_data);
 
     auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
