@@ -782,19 +782,6 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
 
     utp_set_callback(
         ctx,
-        UTP_ON_OVERHEAD_STATISTICS,
-        [](utp_callback_arguments* args) -> uint64
-        {
-            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
-            {
-                tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
-                io->bandwidth().notify_bandwidth_consumed(args->send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
-            }
-            return {};
-        });
-
-    utp_set_callback(
-        ctx,
         UTP_ON_STATE_CHANGE,
         [](utp_callback_arguments* args) -> uint64
         {
