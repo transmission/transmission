@@ -583,7 +583,7 @@ a {
       --icon-size: 16px;
 
       grid-template-areas: 'icon name labels peers progressbar';
-      grid-template-columns: calc(var(--icon-size) + 10px) auto 1fr;
+      grid-template-columns: calc(var(--icon-size) + 10px) auto 1fr auto auto;
 
       .icon {
         -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
@@ -594,6 +594,10 @@ a {
         &[data-icon-multifile='true'] {
           --mime-icon-url: var(--folder-image-url);
         }
+      }
+
+      .torrent-peer-details {
+        white-space: nowrap;
       }
 
       > * {
