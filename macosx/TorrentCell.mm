@@ -29,14 +29,12 @@
                 imageWithColor:priorityColor];
 
             self.fTorrentPriorityView.image = priorityImage;
-            
-            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityMustHold
-                                           forView:self.fTorrentPriorityView];
+
+            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityMustHold forView:self.fTorrentPriorityView];
         }
         else
         {
-            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityNotVisible
-                                           forView:self.fTorrentPriorityView];
+            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityNotVisible forView:self.fTorrentPriorityView];
         }
     }
 
