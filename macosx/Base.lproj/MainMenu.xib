@@ -330,6 +330,7 @@
                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PriorityHighTemplate" id="LI6-cz-gYa"/>
                                                                         </imageView>
                                                                     </subviews>
+                                                                    <edgeInsets key="edgeInsets" left="0.0" right="4" top="0.0" bottom="0.0"/>
                                                                     <visibilityPriorities>
                                                                         <integer value="1000"/>
                                                                         <integer value="1000"/>
