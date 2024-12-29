@@ -71,9 +71,11 @@ public:
         std::future<tr_error> future,
         std::string_view target,
         Glib::RefPtr<Session> const& core);
+    MakeProgressDialog(MakeProgressDialog&&) = delete;
+    MakeProgressDialog(MakeProgressDialog const&) = delete;
+    MakeProgressDialog& operator=(MakeProgressDialog&&) = delete;
+    MakeProgressDialog& operator=(MakeProgressDialog const&) = delete;
     ~MakeProgressDialog() override;
-
-    TR_DISABLE_COPY_MOVE(MakeProgressDialog)
 
     static std::unique_ptr<MakeProgressDialog> create(
         std::string_view target,
@@ -110,9 +112,11 @@ class MakeDialog::Impl
 {
 public:
     Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onSourceToggled(Gtk::CheckButton* tb, PathButton* chooser);

@@ -7,12 +7,9 @@
 
 #include <QComboBox>
 
-#include <libtransmission/tr-macros.h>
-
 class FilterBarComboBox : public QComboBox
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FilterBarComboBox)
 
 public:
     enum
@@ -23,6 +20,10 @@ public:
     };
 
     explicit FilterBarComboBox(QWidget* parent = nullptr);
+    FilterBarComboBox(FilterBarComboBox&&) = delete;
+    FilterBarComboBox(FilterBarComboBox const&) = delete;
+    FilterBarComboBox& operator=(FilterBarComboBox&&) = delete;
+    FilterBarComboBox& operator=(FilterBarComboBox const&) = delete;
 
     // QWidget
     QSize minimumSizeHint() const override;

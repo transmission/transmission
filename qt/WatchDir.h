@@ -12,17 +12,18 @@
 #include <QFileSystemWatcher>
 #include <QString>
 
-#include <libtransmission/tr-macros.h>
-
 class TorrentModel;
 
 class WatchDir : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(WatchDir)
 
 public:
     explicit WatchDir(TorrentModel const&);
+    WatchDir(WatchDir&&) = delete;
+    WatchDir(WatchDir const&) = delete;
+    WatchDir& operator=(WatchDir&&) = delete;
+    WatchDir& operator=(WatchDir const&) = delete;
 
     void setPath(QString const& path, bool is_enabled);
 

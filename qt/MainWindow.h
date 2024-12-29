@@ -17,8 +17,6 @@
 #include <QTimer>
 #include <QWidgetList>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Filters.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
@@ -50,10 +48,13 @@ extern "C"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(MainWindow)
 
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minimized);
+    MainWindow(MainWindow&&) = delete;
+    MainWindow(MainWindow const&) = delete;
+    MainWindow& operator=(MainWindow&&) = delete;
+    MainWindow& operator=(MainWindow const&) = delete;
 
     [[nodiscard]] constexpr QSystemTrayIcon& trayIcon() noexcept
     {

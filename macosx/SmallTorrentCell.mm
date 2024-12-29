@@ -45,16 +45,14 @@
 
 - (void)updateTrackingAreas
 {
+    [super updateTrackingAreas];
+
     if (self.fTrackingArea != nil)
     {
         [self removeTrackingArea:self.fTrackingArea];
     }
 
-    //tracking rect should not be entire row, but start at fGroupDownloadView
-    NSRect titleRect = self.fTorrentTitleField.frame;
-    CGFloat maxX = NSMaxX(titleRect);
     NSRect rect = self.bounds;
-    rect.origin.x = maxX;
 
     NSTrackingAreaOptions opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow);
     self.fTrackingArea = [[NSTrackingArea alloc] initWithRect:rect options:opts owner:self userInfo:nil];

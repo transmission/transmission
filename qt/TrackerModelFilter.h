@@ -7,15 +7,16 @@
 
 #include <QSortFilterProxyModel>
 
-#include <libtransmission/tr-macros.h>
-
 class TrackerModelFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TrackerModelFilter)
 
 public:
     explicit TrackerModelFilter(QObject* parent = nullptr);
+    TrackerModelFilter(TrackerModelFilter&&) = delete;
+    TrackerModelFilter(TrackerModelFilter const&) = delete;
+    TrackerModelFilter& operator=(TrackerModelFilter&&) = delete;
+    TrackerModelFilter& operator=(TrackerModelFilter const&) = delete;
 
     void setShowBackupTrackers(bool);
 

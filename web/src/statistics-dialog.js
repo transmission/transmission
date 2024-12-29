@@ -33,6 +33,7 @@ export class StatisticsDialog extends EventTarget {
     if (!this.closed) {
       clearInterval(this.interval);
       this.elements.root.remove();
+      this.dispatchEvent(new Event('close'));
       for (const key of Object.keys(this)) {
         delete this[key];
       }
