@@ -170,6 +170,8 @@ export class PrefsDialog extends EventTarget {
               break;
           }
         }
+
+        element.dispatchEvent(new Event('session-change'));
       }
     }
   }
@@ -204,6 +206,7 @@ export class PrefsDialog extends EventTarget {
       }
     };
     check.addEventListener('change', callback);
+    check.addEventListener('session-change', callback);
     callback();
   }
 
