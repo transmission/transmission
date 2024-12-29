@@ -240,15 +240,15 @@ export class Transmission extends EventTarget {
       const boundingElement = document.querySelector('#torrent-container');
       const bounds = boundingElement.getBoundingClientRect();
       const x = Math.min(
-        this.isTouch ? event_.touches[0].clientX : event_.x,
-        bounds.x + bounds.width - popup.root.clientWidth,
+        this.isTouch ? event_.touches[0].pageX : event_.pageX,
+        bounds.right + globalThis.scrollX - popup.root.clientWidth,
       );
       const y = Math.min(
-        this.isTouch ? event_.touches[0].clientY : event_.y,
-        bounds.y + bounds.height - popup.root.clientHeight,
+        this.isTouch ? event_.touches[0].pageY : event_.pageY,
+        bounds.bottom + globalThis.scrollY - popup.root.clientHeight,
       );
-      popup.root.style.left = `${x > 0 ? x : 0}px`;
-      popup.root.style.top = `${y > 0 ? y : 0}px`;
+      popup.root.style.left = `${Math.max(x, 0)}px`;
+      popup.root.style.top = `${Math.max(y, 0)}px`;
       event_.preventDefault();
     };
 
