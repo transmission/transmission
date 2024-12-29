@@ -18,6 +18,7 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 
 // Asserts in this file are expensive, so hide them in #ifdef

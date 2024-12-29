@@ -10,8 +10,6 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Filters.h"
 
 class QString;
@@ -23,7 +21,6 @@ class Torrent;
 class TorrentFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TorrentFilter)
 
 public:
     enum TextMode
@@ -34,6 +31,11 @@ public:
     };
 
     explicit TorrentFilter(Prefs const& prefs);
+    TorrentFilter(TorrentFilter&&) = delete;
+    TorrentFilter(TorrentFilter const&) = delete;
+    TorrentFilter& operator=(TorrentFilter&&) = delete;
+    TorrentFilter& operator=(TorrentFilter const&) = delete;
+
     [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
 protected:

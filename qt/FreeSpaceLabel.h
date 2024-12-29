@@ -9,8 +9,6 @@
 #include <QString>
 #include <QTimer>
 
-#include <libtransmission/tr-macros.h>
-
 class Session;
 
 extern "C"
@@ -21,10 +19,13 @@ extern "C"
 class FreeSpaceLabel : public QLabel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
 public:
     explicit FreeSpaceLabel(QWidget* parent = nullptr);
+    FreeSpaceLabel(FreeSpaceLabel&&) = delete;
+    FreeSpaceLabel(FreeSpaceLabel const&) = delete;
+    FreeSpaceLabel& operator=(FreeSpaceLabel&&) = delete;
+    FreeSpaceLabel& operator=(FreeSpaceLabel const&) = delete;
 
     void setSession(Session& session);
     void setPath(QString const& path);

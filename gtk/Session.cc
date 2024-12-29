@@ -62,9 +62,11 @@ class Session::Impl
 {
 public:
     Impl(Session& core, tr_session* session);
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     tr_session* close();
 

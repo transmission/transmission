@@ -23,6 +23,7 @@
 #include <small/map.hpp>
 
 #include "libtransmission/transmission.h"
+#include "libtransmission/tr-macros.h"
 
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
