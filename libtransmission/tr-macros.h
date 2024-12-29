@@ -64,12 +64,6 @@
 #define TR_UNLIKELY(x) (x)
 #endif
 
-#define TR_DISABLE_COPY_MOVE(Class) \
-    Class& operator=(Class const&) = delete; \
-    Class& operator=(Class&&) = delete; \
-    Class(Class const&) = delete; \
-    Class(Class&&) = delete;
-
 // ---
 
 #define TR_INET6_ADDRSTRLEN 46

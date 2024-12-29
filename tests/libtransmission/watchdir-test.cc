@@ -25,7 +25,6 @@
 #include <libtransmission/file.h>
 #include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/watchdir.h>

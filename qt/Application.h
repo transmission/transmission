@@ -17,7 +17,6 @@
 #include <QTranslator>
 #include <QWeakPointer>
 
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/favicon-cache.h>
 
 #include "AddData.h"
@@ -35,7 +34,6 @@ class WatchDir;
 class Application : public QApplication
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(Application)
 
 public:
     Application(
@@ -45,6 +43,10 @@ public:
         QStringList const& filenames,
         int& argc,
         char** argv);
+    Application(Application&&) = delete;
+    Application(Application const&) = delete;
+    Application& operator=(Application&&) = delete;
+    Application& operator=(Application const&) = delete;
     ~Application() override;
 
     void raise() const;

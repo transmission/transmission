@@ -7,7 +7,6 @@
 
 #include <optional>
 
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/makemeta.h>
 
 #include "BaseDialog.h"
@@ -19,10 +18,13 @@ class Session;
 class MakeDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(MakeDialog)
 
 public:
     MakeDialog(Session&, QWidget* parent = nullptr);
+    MakeDialog(MakeDialog&&) = delete;
+    MakeDialog(MakeDialog const&) = delete;
+    MakeDialog& operator=(MakeDialog&&) = delete;
+    MakeDialog& operator=(MakeDialog const&) = delete;
 
 protected:
     // QWidget

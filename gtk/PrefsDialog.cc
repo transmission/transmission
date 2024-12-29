@@ -61,9 +61,11 @@ class PrefsDialog::Impl
 {
 public:
     Impl(PrefsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void response_cb(int response);
@@ -97,9 +99,11 @@ class PageBase : public Gtk::Box
 {
 public:
     PageBase(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    PageBase(PageBase&&) = delete;
+    PageBase(PageBase const&) = delete;
+    PageBase& operator=(PageBase&&) = delete;
+    PageBase& operator=(PageBase const&) = delete;
     ~PageBase() override;
-
-    TR_DISABLE_COPY_MOVE(PageBase)
 
     Gtk::CheckButton* init_check_button(Glib::ustring const& name, tr_quark key);
     Gtk::SpinButton* init_spin_button(Glib::ustring const& name, tr_quark key, int low, int high, int step);
@@ -399,9 +403,11 @@ class DownloadingPage : public PageBase
 {
 public:
     DownloadingPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    DownloadingPage(DownloadingPage&&) = delete;
+    DownloadingPage(DownloadingPage const&) = delete;
+    DownloadingPage& operator=(DownloadingPage&&) = delete;
+    DownloadingPage& operator=(DownloadingPage const&) = delete;
     ~DownloadingPage() override;
-
-    TR_DISABLE_COPY_MOVE(DownloadingPage)
 
 private:
     void on_core_prefs_changed(tr_quark key);
@@ -463,9 +469,11 @@ class SeedingPage : public PageBase
 {
 public:
     SeedingPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    SeedingPage(SeedingPage&&) = delete;
+    SeedingPage(SeedingPage const&) = delete;
+    SeedingPage& operator=(SeedingPage&&) = delete;
+    SeedingPage& operator=(SeedingPage const&) = delete;
     ~SeedingPage() override = default;
-
-    TR_DISABLE_COPY_MOVE(SeedingPage)
 };
 
 SeedingPage::SeedingPage(
@@ -490,9 +498,11 @@ class DesktopPage : public PageBase
 {
 public:
     DesktopPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    DesktopPage(DesktopPage&&) = delete;
+    DesktopPage(DesktopPage const&) = delete;
+    DesktopPage& operator=(DesktopPage&&) = delete;
+    DesktopPage& operator=(DesktopPage const&) = delete;
     ~DesktopPage() override = default;
-
-    TR_DISABLE_COPY_MOVE(DesktopPage)
 };
 
 DesktopPage::DesktopPage(
@@ -527,9 +537,11 @@ class PrivacyPage : public PageBase
 
 public:
     PrivacyPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    PrivacyPage(PrivacyPage&&) = delete;
+    PrivacyPage(PrivacyPage const&) = delete;
+    PrivacyPage& operator=(PrivacyPage&&) = delete;
+    PrivacyPage& operator=(PrivacyPage const&) = delete;
     ~PrivacyPage() override;
-
-    TR_DISABLE_COPY_MOVE(PrivacyPage)
 
 private:
     void updateBlocklistText();
@@ -639,9 +651,11 @@ class RemotePage : public PageBase
 
 public:
     RemotePage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    RemotePage(RemotePage&&) = delete;
+    RemotePage(RemotePage const&) = delete;
+    RemotePage& operator=(RemotePage&&) = delete;
+    RemotePage& operator=(RemotePage const&) = delete;
     ~RemotePage() override = default;
-
-    TR_DISABLE_COPY_MOVE(RemotePage)
 
 private:
     void refreshWhitelist();
@@ -836,9 +850,11 @@ class SpeedPage : public PageBase
 {
 public:
     SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    SpeedPage(SpeedPage&&) = delete;
+    SpeedPage(SpeedPage const&) = delete;
+    SpeedPage& operator=(SpeedPage&&) = delete;
+    SpeedPage& operator=(SpeedPage const&) = delete;
     ~SpeedPage() override = default;
-
-    TR_DISABLE_COPY_MOVE(SpeedPage)
 };
 
 SpeedPage::SpeedPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
@@ -876,9 +892,11 @@ class NetworkPage : public PageBase
 {
 public:
     NetworkPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    NetworkPage(NetworkPage&&) = delete;
+    NetworkPage(NetworkPage const&) = delete;
+    NetworkPage& operator=(NetworkPage&&) = delete;
+    NetworkPage& operator=(NetworkPage const&) = delete;
     ~NetworkPage() override;
-
-    TR_DISABLE_COPY_MOVE(NetworkPage)
 
 private:
     enum PortTestStatus : uint8_t

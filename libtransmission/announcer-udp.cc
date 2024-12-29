@@ -42,6 +42,7 @@
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"

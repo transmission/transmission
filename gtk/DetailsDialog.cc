@@ -79,9 +79,11 @@ class DetailsDialog::Impl
 {
 public:
     Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_torrents(std::vector<tr_torrent_id_t> const& torrent_ids);
     void refresh();
@@ -2188,9 +2190,11 @@ public:
         DetailsDialog& parent,
         Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
+    EditTrackersDialog(EditTrackersDialog&&) = delete;
+    EditTrackersDialog(EditTrackersDialog const&) = delete;
+    EditTrackersDialog& operator=(EditTrackersDialog&&) = delete;
+    EditTrackersDialog& operator=(EditTrackersDialog const&) = delete;
     ~EditTrackersDialog() override = default;
-
-    TR_DISABLE_COPY_MOVE(EditTrackersDialog)
 
     static std::unique_ptr<EditTrackersDialog> create(
         DetailsDialog& parent,
@@ -2307,9 +2311,11 @@ public:
         DetailsDialog& parent,
         Glib::RefPtr<Session> const& core,
         tr_torrent const* torrent);
+    AddTrackerDialog(AddTrackerDialog&&) = delete;
+    AddTrackerDialog(AddTrackerDialog const&) = delete;
+    AddTrackerDialog& operator=(AddTrackerDialog&&) = delete;
+    AddTrackerDialog& operator=(AddTrackerDialog const&) = delete;
     ~AddTrackerDialog() override = default;
-
-    TR_DISABLE_COPY_MOVE(AddTrackerDialog)
 
     static std::unique_ptr<AddTrackerDialog> create(
         DetailsDialog& parent,

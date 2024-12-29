@@ -9,8 +9,6 @@
 
 #include <QAbstractListModel>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -27,7 +25,6 @@ Q_DECLARE_METATYPE(TrackerInfo)
 class TrackerModel : public QAbstractListModel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TrackerModel)
 
 public:
     enum Role
@@ -36,6 +33,10 @@ public:
     };
 
     TrackerModel() = default;
+    TrackerModel(TrackerModel&&) = delete;
+    TrackerModel(TrackerModel const&) = delete;
+    TrackerModel& operator=(TrackerModel&&) = delete;
+    TrackerModel& operator=(TrackerModel const&) = delete;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
     int find(int torrent_id, QString const& url) const;
