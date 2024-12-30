@@ -194,7 +194,10 @@ tr_peerIo::~tr_peerIo()
     auto const lock = session_->unique_lock();
 
     clear_callbacks();
-    tr_logAddTraceIo(this, "in tr_peerIo destructor");
+    if (socket_.is_valid()) // only print if set_socket() has been called
+    {
+        tr_logAddTraceIo(this, "in tr_peerIo destructor");
+    }
     event_disable(EV_READ | EV_WRITE);
     close();
 }
