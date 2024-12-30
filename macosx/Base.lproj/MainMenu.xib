@@ -280,6 +280,12 @@
                                                             <rect key="frame" x="11" y="87" width="502" height="22"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
+                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
+                                                                    <rect key="frame" x="45" y="2" width="452" height="18"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
+                                                                    </constraints>
+                                                                </customView>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4yg-IA-aOF">
                                                                     <rect key="frame" x="0.0" y="8" width="6" height="6"/>
                                                                     <constraints>
@@ -340,12 +346,6 @@
                                                                         <real value="3.4028234663852886e+38"/>
                                                                     </customSpacing>
                                                                 </stackView>
-                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
-                                                                    <rect key="frame" x="45" y="2" width="452" height="18"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
-                                                                    </constraints>
-                                                                </customView>
                                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ExW-pe-aKm">
                                                                     <rect key="frame" x="84" y="4" width="412" height="14"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" alignment="right" title="Status String" id="Zmj-A9-NPf">
