@@ -205,7 +205,6 @@ export class PrefsDialog extends EventTarget {
         element.classList.toggle('disabled', !check.checked);
       }
     };
-    check.addEventListener('change', callback);
     check.addEventListener('session-change', callback);
     callback();
   }
