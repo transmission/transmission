@@ -35,12 +35,19 @@ public:
 
     tr_strbuf(tr_strbuf const& other)
     {
-        assign(other.sv());
+        if (this != &other)
+        {
+            assign(other.sv());
+        }
     }
 
     tr_strbuf& operator=(tr_strbuf const& other)
     {
-        assign(other.sv());
+        if (this != &other)
+        {
+            assign(other.sv());
+        }
+
         return *this;
     }
 
