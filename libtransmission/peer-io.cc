@@ -160,13 +160,10 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         { TR_PREFER_TCP,
           [&]()
           {
-              if (!peer_io->socket_.is_valid())
+              if (auto sock = tr_netOpenPeerSocket(session, socket_address, client_is_seed); sock.is_valid())
               {
-                  if (auto sock = tr_netOpenPeerSocket(session, socket_address, client_is_seed); sock.is_valid())
-                  {
-                      peer_io->set_socket(std::move(sock));
-                      return true;
-                  }
+                  peer_io->set_socket(std::move(sock));
+                  return true;
               }
               return false;
           } }
