@@ -141,7 +141,7 @@ auto make_event_base()
 
     struct event_base* b = event_base_new();
     event_base_priority_init(b, 3);
-    return b;
+    return libtransmission::evhelpers::evbase_unique_ptr{ b };
 }
 
 } // namespace
