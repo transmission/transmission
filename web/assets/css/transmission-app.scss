@@ -592,7 +592,8 @@ a {
         width: var(--icon-size);
 
         &[data-icon-multifile='true'] {
-          --mime-icon-url: var(--folder-image-url);
+          -webkit-mask-image: var(--folder-image-url);
+          mask-image: var(--folder-image-url);
         }
       }
 
