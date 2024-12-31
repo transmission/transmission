@@ -9,8 +9,6 @@
 #include <map>
 #include <optional>
 
-#include <libtransmission/tr-macros.h>
-
 #include "BaseDialog.h"
 #include "Prefs.h"
 #include "Session.h"
@@ -23,10 +21,13 @@ class QString;
 class PrefsDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
+    PrefsDialog& operator=(PrefsDialog&&) = delete;
+    PrefsDialog& operator=(PrefsDialog const&) = delete;
+    PrefsDialog(PrefsDialog&&) = delete;
+    PrefsDialog(PrefsDialog const&) = delete;
 
 private slots:
     void focusChanged(QWidget* old, QWidget* cur);

@@ -60,9 +60,11 @@ class TorrentCellRenderer::Impl
 {
 public:
     explicit Impl(TorrentCellRenderer& renderer);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     Gtk::Requisition get_size_compact(Gtk::Widget& widget) const;
     Gtk::Requisition get_size_full(Gtk::Widget& widget) const;

@@ -7,15 +7,16 @@
 
 #include <QToolButton>
 
-#include <libtransmission/tr-macros.h>
-
 class IconToolButton : public QToolButton
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(IconToolButton)
 
 public:
     explicit IconToolButton(QWidget* parent = nullptr);
+    IconToolButton(IconToolButton&&) = delete;
+    IconToolButton(IconToolButton const&) = delete;
+    IconToolButton& operator=(IconToolButton&&) = delete;
+    IconToolButton& operator=(IconToolButton const&) = delete;
 
     // QWidget
     QSize sizeHint() const override;

@@ -7,12 +7,9 @@
 
 #include <QToolButton>
 
-#include <libtransmission/tr-macros.h>
-
 class PathButton : public QToolButton
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(PathButton)
 
 public:
     enum Mode
@@ -22,6 +19,10 @@ public:
     };
 
     explicit PathButton(QWidget* parent = nullptr);
+    PathButton(PathButton&&) = delete;
+    PathButton(PathButton const&) = delete;
+    PathButton& operator=(PathButton&&) = delete;
+    PathButton& operator=(PathButton const&) = delete;
 
     void setMode(Mode mode);
     void setTitle(QString const& title);

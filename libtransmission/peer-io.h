@@ -343,7 +343,7 @@ private:
     void event_enable(short event);
     void event_disable(short event);
 
-    void can_read_wrapper();
+    void can_read_wrapper(size_t bytes_transferred);
     void did_write_wrapper(size_t bytes_transferred);
 
     size_t try_read(size_t max);

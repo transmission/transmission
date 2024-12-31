@@ -3,7 +3,7 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
-import { setEnabled } from './utils.js';
+import { OutsideClickListener, setEnabled } from './utils.js';
 
 export class ContextMenu extends EventTarget {
   constructor(action_manager) {
@@ -14,6 +14,10 @@ export class ContextMenu extends EventTarget {
     this.action_manager.addEventListener('change', this.action_listener);
 
     Object.assign(this, this._create());
+
+    this.outside = new OutsideClickListener(this.root);
+    this.outside.addEventListener('click', () => this.close());
+
     this.show();
   }
 
@@ -26,6 +30,7 @@ export class ContextMenu extends EventTarget {
 
   close() {
     if (!this.closed) {
+      this.outside.stop();
       this.action_manager.removeEventListener('change', this.action_listener);
       this.root.remove();
       this.dispatchEvent(new Event('close'));

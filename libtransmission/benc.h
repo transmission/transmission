@@ -134,6 +134,8 @@ struct BasicHandler : public Handler
         return key(depth());
     }
 
+    static auto constexpr ArrayKey = std::nullopt;
+
 protected:
     [[nodiscard]] std::string path() const
     {
@@ -141,10 +143,24 @@ protected:
         for (size_t i = 0; i <= depth(); ++i)
         {
             ret += '[';
-            ret += key(i);
+            ret += key(i).value_or(std::string_view{});
             ret += ']';
         }
         return ret;
+    }
+
+    template<typename... Args>
+    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
+    }
+
+    template<typename... Args>
+    [[nodiscard]] bool pathIs(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() == sizeof...(args)) && ((key(i++) == args) && ...);
     }
 
 private:
@@ -160,7 +176,7 @@ private:
     }
 
     size_t depth_ = 0;
-    std::array<std::string_view, MaxDepth> keys_;
+    std::array<std::optional<std::string_view>, MaxDepth> keys_;
 };
 
 template<std::size_t MaxDepth>

@@ -302,23 +302,5 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 
 // ---
 
-class tr_net_init_mgr
-{
-public:
-    ~tr_net_init_mgr();
-    tr_net_init_mgr(tr_net_init_mgr&&) = delete;
-    tr_net_init_mgr(tr_net_init_mgr const&) = delete;
-    tr_net_init_mgr& operator=(tr_net_init_mgr&&) = delete;
-    tr_net_init_mgr& operator=(tr_net_init_mgr const&) = delete;
-
-    static std::unique_ptr<tr_net_init_mgr> create();
-
-private:
-    tr_net_init_mgr();
-
-    static bool initialised;
-};
-
-/** @brief Initialise libtransmission for each app
- *  @return A manager object to be kept in scope of main() */
-std::unique_ptr<tr_net_init_mgr> tr_lib_init();
+/** @brief Initialise libtransmission for each app */
+void tr_lib_init();
