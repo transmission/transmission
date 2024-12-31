@@ -418,34 +418,34 @@ TEST_F(SettingsTest, canSaveVerify)
 TEST_F(SettingsTest, canLoadPreferredTransport)
 {
     static auto constexpr Key = TR_KEY_preferred_transport;
-    auto constexpr ExpectedValue = TR_PREFER_TCP;
+    auto const expected_value = std::array{ TR_PREFER_TCP, TR_PREFER_UTP };
 
     auto settings = std::make_unique<tr_session::Settings>();
-    auto const default_value = settings->preferred_transport;
-    ASSERT_NE(ExpectedValue, default_value);
+    auto const& default_value = settings->preferred_transport;
+    ASSERT_NE(expected_value, default_value);
 
     auto map = tr_variant::Map{ 1U };
-    map.try_emplace(Key, ExpectedValue);
+    map.try_emplace(Key, expected_value.front());
     settings->load(tr_variant{ std::move(map) });
-    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    EXPECT_EQ(expected_value, settings->preferred_transport);
 
     settings = std::make_unique<tr_session::Settings>();
     map = tr_variant::Map{ 1U };
     map.try_emplace(Key, "tcp"sv);
     settings->load(tr_variant{ std::move(map) });
-    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    EXPECT_EQ(expected_value, settings->preferred_transport);
 }
 
 TEST_F(SettingsTest, canSavePreferredTransport)
 {
     static auto constexpr Key = TR_KEY_preferred_transport;
-    static auto constexpr ExpectedValue = TR_PREFER_TCP;
+    auto const expected_value = std::array{ TR_PREFER_TCP, TR_PREFER_UTP };
 
     auto settings = tr_session::Settings{};
-    auto const default_value = settings.preferred_transport;
-    ASSERT_NE(ExpectedValue, default_value);
+    auto const& default_value = settings.preferred_transport;
+    ASSERT_NE(expected_value, default_value);
 
-    settings.preferred_transport = ExpectedValue;
+    settings.preferred_transport = expected_value;
     auto var = settings.save();
     auto* const map = var.get_if<tr_variant::Map>();
     ASSERT_NE(map, nullptr);
