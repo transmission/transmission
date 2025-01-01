@@ -45,7 +45,7 @@
 "41.title" = "Torrent informatie";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "7YU-bS-UkI"; */
-/* "7YU-bS-UkI.placeholderString" = ""; */
+"7YU-bS-UkI.placeholderString" = "Niet beschikbaar";
 
 /* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
 /* "uaW-NM-PTU.title" = ""; */

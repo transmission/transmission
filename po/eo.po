@@ -2606,9 +2606,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "Ne povus establi konekton"
-
-#~ msgid "Status unknown"
-#~ msgstr "Stato nekonata"

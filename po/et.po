@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Priit Uring, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Priit Uring, 2024
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Priit Uring, 2024\n"
 "Language-Team: Estonian (https://app.transifex.com/transmissionbt/teams/33778/et/)\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
@@ -883,7 +883,7 @@ msgstr ""
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "Teisaldatakse '{torrent_name}'"
 
 #: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
@@ -940,7 +940,7 @@ msgstr ""
 #: ../gtk/Torrent.cc:439
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr ""
+msgstr "Kontrollitakse lokaalseid andmeid ({percent_done}% kontrollitud)"
 
 #: ../gtk/Torrent.cc:466
 msgid "{current_size} of {complete_size} ({percent_done}%)"
@@ -1179,7 +1179,7 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1199,7 +1199,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2600,12 +2600,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "Ühendamine nurjus"
-
-#~ msgid "Status unknown"
-#~ msgstr "Olek teadmata"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Testin TCP porti…"

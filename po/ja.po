@@ -6,7 +6,7 @@
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# maboroshin, 2023
+# maboroshin, 2024
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: maboroshin, 2023\n"
+"Last-Translator: maboroshin, 2024\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -889,7 +889,7 @@ msgstr "デスクトップの休止状態を許可中"
 
 #: ../gtk/Session.cc:1227
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "タグ {tag} 用の待機中のRPC要求はありません"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
@@ -1133,27 +1133,27 @@ msgstr "「{program} --help」の実行で、コマンドラインのオプシ�
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "バイト/秒"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
-msgstr "GB/s"
+msgstr "GB/秒"
 
 #: ../gtk/main.cc:120
 msgid "MB/s"
-msgstr "MB/s"
+msgstr "MB/秒"
 
 #: ../gtk/main.cc:120
 msgid "TB/s"
-msgstr "TB/s"
+msgstr "TB/秒"
 
 #: ../gtk/main.cc:120
 msgid "kB/s"
-msgstr "kB/s"
+msgstr "kB/秒"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "バイト"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2094,12 +2094,12 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "アナウンスのエラー: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
+msgstr[0] "アナウンスのエラー: {error} (再試行まで{count}秒) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2141,7 +2141,7 @@ msgstr ""
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr " この端末は{protocol}に未対応"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
@@ -2379,7 +2379,7 @@ msgstr "「{path}」からのメタ情報が使用できません。 「{magnet}
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "データなし。ドライブの接続を確認したり「場所の設定」をお使いください。再ダウンロードには「取得データの検証」の後、トレントを開始します。"
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2419,11 +2419,11 @@ msgstr "移動できません。「{old_path}」から「{path}」へ: {error} (
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "データがないためトレントを停止しました。ドライブの接続を確認したり「場所の設定」の後、「取得データの検証」を行います。再ダウンロードするにはトレントを開始します。"
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "トラッカーの警告: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2519,7 +2519,7 @@ msgstr "注: 無効な証明書では、多くのほかのエラーのように�
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "以下から取得できません {url} : 期待する応答コード {expected_code}、実際は {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2550,27 +2550,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid "Connection failed"
-#~ msgstr "接続に失敗"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "LPDを初期化できません: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "ポートは {markup_begin}閉じています{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "ポートは {markup_begin}開いています{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "ポート {port} は転送されています"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "ポート {port} は転送されていません"
-
-#~ msgid "Status unknown"
-#~ msgstr "状態は不明"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "TCP ポートのテスト…"

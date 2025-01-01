@@ -2591,9 +2591,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "اتّصال شکست خورد"
-
-#~ msgid "Status unknown"
-#~ msgstr "وضعیّت نامشخّص"

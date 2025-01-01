@@ -7,7 +7,7 @@
 # Otto Koskelah <otto@nise.fi>, 2017
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2023
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2023\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2024\n"
 "Language-Team: Finnish (https://app.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -1192,7 +1192,7 @@ msgstr "Suorita '{program} --help' nähdäksesi kaikki komentorivivalitsimet.\n"
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1212,7 +1212,7 @@ msgstr "kt/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2153,13 +2153,13 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Ilmoitus virheestä: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Announce error: {error} (uudelleen {count} sek) ({url})"
+msgstr[1] "Announce error: {error} (uudelleen {count} sek) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2198,15 +2198,15 @@ msgstr "Ei saatu '{path}': {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Lähteen päivitys onnistui {protocol} osoitteeseen {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Tietokoneesi ei tue {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Päivitetty onnistuneesti {type} osoitteeseen {ip} käyttäen {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2442,7 +2442,7 @@ msgstr "Metatietoa ei voitu käyttää '{path}' kohteesta '{magnet}': {error} ({
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Dataa ei löytynyt! Varmista, että asema on kytketty tai käytä \"Aseta sijainti\". Lataa uudelleen käyttämällä \"Vahvista paikallinen data\" ja käynnistä torrentti uudelleen."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2482,11 +2482,11 @@ msgstr "Ei voitu siirtää '{old_path}' polkuun '{path}': {error} ({error_code})
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Torrentti on keskeytetty, koska dataa ei löytynyt! Varmista, että asemasi on kytketty, tai käytä \"Aseta sijainti\" ja valitse \"Vahvista paikallinen data\". Käynnistä ohjelma ja lataa torrentit uudelleen."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Varoitus: \"{warning}\" ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2582,7 +2582,7 @@ msgstr "HUOM: Virheelliset varmenteet näkyvät muodossa 'Ei saatu yhteyttä jä
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Ei voi hakea \"{url}\": odotettu HTTP-vastauskoodi {expected_code}, saatiin {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2619,27 +2619,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
-
-#~ msgid "Connection failed"
-#~ msgstr "Yhteys epäonnistui"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Ei voitu alustaa LPD:tä: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Portti on {markup_begin}suljettu{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Portti on {markup_begin}avoinna{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Portti {port} on välitetty"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Portti {port} ei lähetä eteenpäin"
-
-#~ msgid "Status unknown"
-#~ msgstr "Tuntematon tila"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Testataan TCP-porttia…"

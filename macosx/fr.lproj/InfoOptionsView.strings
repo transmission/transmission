@@ -3,7 +3,7 @@
 "22.title" = "Limites de propagation";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
-"23.title" = "Bande-passante";
+"23.title" = "Bande passante en transfert";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
 "26.title" = "Ko/s";
@@ -12,13 +12,13 @@
 "29.title" = "Ko/s";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
-"30.title" = "Ratio :";
+"30.title" = "Ratio :";
 
 /* Class = "NSTextFieldCell"; title = "Advanced"; ObjectID = "31"; */
 "31.title" = "Avancé";
 
 /* Class = "NSTextFieldCell"; title = "Maximum connections:"; ObjectID = "32"; */
-"32.title" = "Connections maximum :";
+"32.title" = "Maximum de connexions :";
 
 /* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "35"; */
 "35.title" = "pairs";
@@ -27,7 +27,7 @@
 "40.title" = "Illimité";
 
 /* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "41"; */
-"41.title" = "Réglage global";
+"41.title" = "Paramètre global";
 
 /* Class = "NSMenuItem"; title = "Stop at Ratio"; ObjectID = "42"; */
 "42.title" = "Arrêter au ratio";
@@ -39,13 +39,13 @@
 "44.title" = "Limiter le téléchargement :";
 
 /* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
-"45.title" = "Respecter les limites globales de bande-passante";
+"45.title" = "Respecter les limites globales de bande passante";
 
 /* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
 "46.title" = "Priorité";
 
 /* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
-"47.title" = "Priorité du transfert :";
+"47.title" = "Priorité de transfert :";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
 "50.title" = "Basse";
@@ -60,13 +60,13 @@
 "86.title" = "Arrêter si inactif";
 
 /* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "87"; */
-"87.title" = "Réglage global";
+"87.title" = "Paramètre global";
 
 /* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "88"; */
 "88.title" = "Illimité";
 
 /* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
-"89.title" = "Inactivité :";
+"89.title" = "Inactivité :";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
 "98.title" = "minutes";

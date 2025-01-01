@@ -2586,9 +2586,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "jorn"
 msgstr[1] "jorns"
-
-#~ msgid "Connection failed"
-#~ msgstr "Fracàs de la connexion"
-
-#~ msgid "Status unknown"
-#~ msgstr "Estat desconegut"

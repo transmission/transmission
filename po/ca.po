@@ -7,6 +7,7 @@
 # Joan Montané, 2020
 # Robert Antoni Buj i Gelonch <rbuj@fedoraproject.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Carlos Sánchez López <erielkhan@gmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Carlos Sánchez López <erielkhan@gmail.com>, 2024\n"
 "Language-Team: Catalan (https://app.transifex.com/transmissionbt/teams/33778/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +30,7 @@ msgstr "Res"
 
 #: ../cli/cli.cc:94
 msgid "Inf"
-msgstr ""
+msgstr "Inf"
 
 #: ../daemon/daemon.cc:197 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:240 ../libtransmission/blocklist.cc:338 ../libtransmission/blocklist.cc:353 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
@@ -41,7 +42,7 @@ msgstr ""
 
 #: ../daemon/daemon.cc:231
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Eliminant fitxer torrent '{path}'"
 
 #: ../daemon/daemon.cc:236 ../gtk/Utils.cc:555 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
@@ -73,15 +74,15 @@ msgstr ""
 
 #: ../daemon/daemon.cc:761 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:473 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1084 ../libtransmission/torrent.cc:2073 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "No s'ha pogut guardar '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:770
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Sol·licitant autenticació"
 
 #: ../daemon/daemon.cc:792
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Revisant '{path}' per nous fitxers torrent"
 
 #: ../daemon/daemon.cc:837 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
@@ -117,7 +118,7 @@ msgstr "Hi estic d'_acord"
 
 #: ../gtk/Application.cc:1020
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Tancant Connexions..."
 
 #: ../gtk/Application.cc:1025
 msgid "Sending upload/download totals to tracker…"
@@ -145,7 +146,7 @@ msgstr "Un client de BitTorrent ràpid i senzill"
 
 #: ../gtk/Application.cc:1421
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © El Projecte Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -2600,9 +2601,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "La connexió ha fallat"
-
-#~ msgid "Status unknown"
-#~ msgstr "Estat desconegut"

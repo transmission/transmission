@@ -4,14 +4,13 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017
 # Stas Solovey <whats_up@tut.by>, 2022
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
 # hlm hlmfn, 2022
-# Victor, 2023
 # Темак, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# Andrei Stepanov, 2023
+# Victor, 2024
+# Andrei Stepanov, 2024
 #
 #, fuzzy
 msgid ""
@@ -20,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andrei Stepanov, 2023\n"
+"Last-Translator: Andrei Stepanov, 2024\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -130,7 +129,7 @@ msgstr "Отправляется сводка отдачи/загрузки на
 
 #: ../gtk/Application.cc:1030
 msgid "_Quit Now"
-msgstr "_Завершить сейчас"
+msgstr "_Выйти сейчас"
 
 #: ../gtk/Application.cc:1092
 msgid "Couldn't add corrupt torrent"
@@ -168,7 +167,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:524 ../gtk/DetailsDialog.cc:542
 msgid "Use global settings"
-msgstr "Использовать глобальные настройки"
+msgstr "Использовать общие настройки"
 
 #: ../gtk/DetailsDialog.cc:525
 msgid "Seed regardless of ratio"
@@ -304,7 +303,7 @@ msgstr "Никогда"
 
 #: ../gtk/DetailsDialog.cc:1084
 msgid "Active now"
-msgstr "Сейчас активен"
+msgstr "Активен сейчас"
 
 #: ../gtk/DetailsDialog.cc:1498
 msgid "Optimistic unchoke"
@@ -320,11 +319,11 @@ msgstr "Возможна загрузка данных от этого учас�
 
 #: ../gtk/DetailsDialog.cc:1510
 msgid "Uploading to peer"
-msgstr "Раздача участнику"
+msgstr "Отдаётся участнику"
 
 #: ../gtk/DetailsDialog.cc:1514
 msgid "We would upload to this peer if they asked"
-msgstr "Возможна раздача данных этому участнику, если он будет заинтересован"
+msgstr "Возможна отдача этому участнику, если он будет заинтересован"
 
 #: ../gtk/DetailsDialog.cc:1518
 msgid "Peer has unchoked us, but we're not interested"
@@ -531,10 +530,10 @@ msgstr[3] "Удалить эти {count:L} загруженных файлов �
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "После удаления, для возобновления передачи потребуется торрент-файл или магнет-ссылка."
-msgstr[1] "После удаления, для возобновления передач потребуются торрент-файлы или магнет-ссылки."
-msgstr[2] "После удаления, для возобновления передач потребуются торрент-файлы или магнет-ссылки."
-msgstr[3] "После удаления, для возобновления передач потребуются торрент-файлы или магнет-ссылки."
+msgstr[0] "После удаления, для возобновления передачи потребуется торрент-файл или магнит-ссылка."
+msgstr[1] "После удаления, для возобновления передач потребуются торрент-файлы или магнит-ссылки."
+msgstr[2] "После удаления, для возобновления передач потребуются торрент-файлы или магнит-ссылки."
+msgstr[3] "После удаления, для возобновления передач потребуются торрент-файлы или магнит-ссылки."
 
 #: ../gtk/Dialogs.cc:72
 msgid "This torrent has not finished downloading."
@@ -1146,7 +1145,7 @@ msgstr[3] "{hours:L} часов"
 #: ../gtk/Utils.cc:210
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] "{minutes:L} минута"
+msgstr[0] "{minutes:L} мин."
 msgstr[1] "{minutes:L} минуты"
 msgstr[2] "{minutes:L} минут"
 msgstr[3] "{minutes:L} минут"
@@ -1205,7 +1204,7 @@ msgstr "Не удалось убрать «{path}» в корзину: {error} (
 
 #: ../gtk/Utils.cc:644
 msgid "Couldn't open '{url}'"
-msgstr "Не удалось открыть \"{url}\""
+msgstr "Не удалось открыть «{url}»"
 
 #: ../gtk/Utils.cc:855 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
@@ -1218,7 +1217,7 @@ msgstr "Transmission не знает, как использовать «{url}»"
 
 #: ../gtk/Utils.cc:866
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr "Вероятно, эта магнет-ссылка предназначена не для BitTorrent."
+msgstr "Вероятно, эта магнит-ссылка предназначена не для BitTorrent."
 
 #: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1251,7 +1250,7 @@ msgstr "Выполните «{program} --help», чтобы увидеть сп�
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "Б/с"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1271,7 +1270,7 @@ msgstr "КБ/с"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "Б"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1316,7 +1315,7 @@ msgstr "Загружайте и обменивайтесь файлами с п�
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../gtk/transmission-gtk.desktop.in:7
 msgid "torrents;downloading;uploading;share;sharing;"
-msgstr "торренты;скачивание;загрузка;раздать;раздача;"
+msgstr "torrent;торренты;скачивание;загрузка;раздать;раздача;обмен;передача;"
 
 #: ../gtk/transmission-gtk.desktop.in:21
 msgid "Start Transmission with All Torrents Paused"
@@ -1324,7 +1323,7 @@ msgstr "Запустить Transmission с приостановленными т
 
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
-msgstr "Запустить Transmission в свернутом виде"
+msgstr "Запустить Transmission в свёрнутом виде"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
@@ -1364,7 +1363,7 @@ msgstr "Приостановить все торренты"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr "_Завершить"
+msgstr "_Выход"
 
 #: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
 msgid "_Edit"
@@ -1416,7 +1415,7 @@ msgstr "Запустить торрент сейчас"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr "Зап_росить у трекера больше участников"
+msgstr "Позват_ь ещё участников с трекера"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
@@ -1456,7 +1455,7 @@ msgstr "Про_верить локальные данные"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "Копироват_ь магнет-ссылку в буфер обмена"
+msgstr "Копироват_ь магнит-ссылку в буфер обмена"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:67 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
@@ -1544,7 +1543,7 @@ msgstr "_Пожертвовать"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr "_Содержание"
+msgstr "Со_держание"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
@@ -1604,7 +1603,7 @@ msgstr "Состояние:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:134 ../gtk/ui/gtk4/DetailsDialog.ui:88
 msgid "Running time:"
-msgstr "Длительность:"
+msgstr "Время работы:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:146 ../gtk/ui/gtk4/DetailsDialog.ui:98
 msgid "Remaining time:"
@@ -1632,7 +1631,7 @@ msgstr "Хеш:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:392 ../gtk/ui/gtk4/DetailsDialog.ui:306
 msgid "Privacy:"
-msgstr "Конфиденциальность:"
+msgstr "Приватность:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:404 ../gtk/ui/gtk4/DetailsDialog.ui:316
 msgid "Origin:"
@@ -1640,7 +1639,7 @@ msgstr "Источник:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:326
 msgid "Added:"
-msgstr "Добавлено:"
+msgstr "Добавлен:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:430 ../gtk/ui/gtk4/DetailsDialog.ui:338
 msgid "Comment:"
@@ -1676,7 +1675,7 @@ msgstr "Скорость"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:887 ../gtk/ui/gtk4/DetailsDialog.ui:663
 msgid "Honor global _limits"
-msgstr "Учитывать глобальные о_граничения"
+msgstr "Учитывать общие _ограничения"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:903 ../gtk/ui/gtk4/DetailsDialog.ui:676
 msgid "Limit _download speed ({speed_units}):"
@@ -1828,7 +1827,7 @@ msgstr "Выберите папку назначения"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:166 ../gtk/ui/gtk4/OptionsDialog.ui:108
 msgid "_Start when added"
-msgstr "Н_ачать загрузку после добавления"
+msgstr "_Запустить после добавления"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
@@ -1930,7 +1929,7 @@ msgstr "Сохранять _незавершённые торренты в:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
-msgstr "Выполнить сц_енарий по окончании загрузки:"
+msgstr "Выполнять сц_енарий по окончании загрузки:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:740 ../gtk/ui/gtk4/PrefsDialog.ui:528
 msgctxt "Gerund"
@@ -1951,7 +1950,7 @@ msgstr "Прекратить раздачу при простое _N минут:
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:806 ../gtk/ui/gtk4/PrefsDialog.ui:581
 msgid "Call scrip_t when done seeding:"
-msgstr "Выполнить сц_енарий по окончании раздачи:"
+msgstr "Выполнять сц_енарий по окончании раздачи:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:874 ../gtk/ui/gtk4/PrefsDialog.ui:631
 msgctxt "Gerund"
@@ -1960,7 +1959,7 @@ msgstr "Раздача"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:896 ../gtk/ui/gtk3/PrefsDialog.ui:1083 ../gtk/ui/gtk4/PrefsDialog.ui:648 ../gtk/ui/gtk4/PrefsDialog.ui:783
 msgid "Privacy"
-msgstr "Конфиденциальность"
+msgstr "Приватность"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:912 ../gtk/ui/gtk4/PrefsDialog.ui:660
 msgid "_Encryption mode:"
@@ -2076,7 +2075,7 @@ msgstr "_Запрещать переход в спящий режим при а�
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1540 ../gtk/ui/gtk4/PrefsDialog.ui:1138
 msgid "Show Transmission icon in the _notification area"
-msgstr "Показывать значок Transmission в области уведомлений"
+msgstr "Показыва_ть значок Transmission в области уведомлений"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1572 ../gtk/ui/gtk4/PrefsDialog.ui:1158
 msgid "Notification"
@@ -2176,7 +2175,7 @@ msgstr "Длительность:"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:215 ../gtk/ui/gtk4/StatsDialog.ui:138
 msgid "Total"
-msgstr "Суммарно"
+msgstr "Всего"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:7 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
 msgid "Open URL"
@@ -2212,15 +2211,15 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Ошибка анонса: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Ошибка анонса: {error} (повторная попытка через {count} секунду) ({url})"
+msgstr[1] "Ошибка анонса: {error} (повторная попытка через {count} секунды) ({url})"
+msgstr[2] "Ошибка анонса: {error} (повторная попытка через {count} секунд) ({url})"
+msgstr[3] "АнонсОшибка анонса: {error} (повторная попытка через {count} секунд) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2261,15 +2260,15 @@ msgstr "Не удалось получить «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Успешно изменён адрес источника {protocol} на {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Ваша машина не поддерживает {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Успешно изменён общий адрес {type} на {ip} через {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2509,7 +2508,7 @@ msgstr "Не удалось использовать метаинформаци�
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Нет данных! Убедитесь, что ваши диски подключены или используйте \"Указать расположение\". Чтобы загрузить повторно, используйте \"Проверить локальные данные\" и запустите торрент после этого."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2549,11 +2548,11 @@ msgstr "Не удалось переместить «{old_path}» в «{path}»:
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Приостановлен торрент, так как данные не были найдены! Убедитесь, что ваши диски подключены или используйте \"Указать расположение\", затем снова используйте \"Проверить локальные данные\". Чтобы загрузить повторно, запустите торрент."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Предупреждение трекера: «{warning}» ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2649,7 +2648,7 @@ msgstr "NB: Недействительные сертификаты будут �
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Не удалось получить «{url}»: ожидаемый код ответа HTTP {expected_code}, получен {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2678,7 +2677,7 @@ msgstr[3] "часов"
 #: ../utils/remote.cc:141
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "минута"
+msgstr[0] "мин."
 msgstr[1] "минуты"
 msgstr[2] "минут"
 msgstr[3] "минут"
@@ -2698,27 +2697,3 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
-
-#~ msgid "Connection failed"
-#~ msgstr "Сбой подключения"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Не удалось инициализировать LPD: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Порт {markup_begin}закрыт{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Порт {markup_begin}открыт{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Порт {port} перенаправлен"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Порт {port} не перенаправлен"
-
-#~ msgid "Status unknown"
-#~ msgstr "Статус неизвестен"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Проверка TCP-порта…"

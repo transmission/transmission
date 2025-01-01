@@ -268,9 +268,9 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 Minute(n)</numerusform>
+            <numerusform>%1 Minute(n)</numerusform>
         </translation>
     </message>
     <message>
@@ -427,7 +427,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschriftungen:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -778,7 +778,7 @@
     <message>
         <location line="+30"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Editieren</translation>
+        <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -943,7 +943,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Preferences</source>
-        <translation>&amp;Eigenschaften</translation>
+        <translation>&amp;Einstellungen</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1242,14 +1242,14 @@
         <location line="+444"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Klicken um temporäre Geschwindigkeitsbegrenzungen zu deaktivieren
+        <translation>Klicken, um temporäre Geschwindigkeitsbegrenzungen zu deaktivieren
 (%1 runter, %2 hoch)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Klicken um temporäre Geschwindigkeitsbegrenzungen zu aktivieren
+        <translation>Klicken, um temporäre Geschwindigkeitsbegrenzungen zu aktivieren
 (%1 runter, %2 hoch)</translation>
     </message>
     <message>
@@ -1403,7 +1403,7 @@
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>Quellen O&amp;rdner:</translation>
+        <translation>Quellen-O&amp;rdner:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1659,18 +1659,18 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 Minute(n)</numerusform>
+            <numerusform>%1 Minute(n)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>vor %1 Minute(n)</numerusform>
+            <numerusform>vor %1 Minute(n)</numerusform>
         </translation>
     </message>
     <message>
@@ -1721,7 +1721,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+17"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>&amp;Verschiebe die .Torrent-Datei in den Müll</translation>
+        <translation>&amp;Verschiebe die .Torrent-Datei in den Papierkorb</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -1878,7 +1878,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+20"/>
         <source>&amp;Download:</source>
-        <translation>&amp;Runterladen:</translation>
+        <translation>&amp;Herunterladen:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1893,7 +1893,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+20"/>
         <source>Do&amp;wnload:</source>
-        <translation>Ru&amp;nterladen:</translation>
+        <translation>Heru&amp;nterladen:</translation>
     </message>
     <message>
         <location line="+142"/>
@@ -1918,17 +1918,17 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+254"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP ist ein Hilfsprogramm, um die Netzwerküberlastung zu reduzieren.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>µ&amp;TP aktivieren für Peer-Kommunikation</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Default Public Trackers</source>
-        <translation>Standard öffentliche Tracker</translation>
+        <translation>Standardmäßige öffentliche Tracker</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -1943,17 +1943,17 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Zeige eine Benachrichtigung an wenn Torrents h&amp;inzugefügt werden</translation>
+        <translation>Zeige eine Benachrichtigung an, wenn Torrents h&amp;inzugefügt werden</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Zeige eine Benachrichtigung wenn Torrents &amp;beendet sind</translation>
+        <translation>Zeige eine Benachrichtigung, wenn Torrents &amp;beendet sind</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>Ton ab&amp;spielen wenn Torrents abgeschlossen sind</translation>
+        <translation>Ton ab&amp;spielen, wenn Torrents abgeschlossen sind</translation>
     </message>
     <message>
         <location line="-195"/>
@@ -2043,15 +2043,15 @@ To add a new primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Aktualisierung erfolgreich!&lt;/b&gt;&lt;p&gt;Sperrliste hat nun %Ln Regel.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Aktualisierung erfolgreich!&lt;/b&gt;&lt;p&gt;Sperrliste hat nun %Ln Regeln.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Aktualisiere Sperrliste&lt;/b&gt;&lt;p&gt;Neue Sperrliste wird empfangen…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2257,9 +2257,9 @@ To add a new primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Doppelte Torrentdatei</numerusform>
+            <numerusform>Doppelte Torrentdateien</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2325,7 +2325,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2373,8 +2373,8 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../StatsDialog.cc" line="+63"/>
         <source>Started %Ln time(s)</source>
         <translation>
-            <numerusform>%Ln mal gestartet</numerusform>
-            <numerusform>%Ln mal gestartet</numerusform>
+            <numerusform>%Ln Mal gestartet</numerusform>
+            <numerusform>%Ln Mal gestartet</numerusform>
         </translation>
     </message>
 </context>
@@ -2495,13 +2495,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 verbleibend</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Verbleibende Zeit unbekannt</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
@@ -2608,7 +2608,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Frage nach Anzahl der Peers… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-37"/>
@@ -2644,7 +2644,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="-20"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Frage nach mehr Peers… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -2683,7 +2683,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+14"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation>Siehe auch Standard öffentliche Tracker in Editieren &gt; Eigenschaften &gt; Netzwerk</translation>
+        <translation>Siehe auch Standardmäßige öffentliche Tracker in Bearbeiten &gt; Einstellungen &gt; Netzwerk</translation>
     </message>
 </context>
 </TS>

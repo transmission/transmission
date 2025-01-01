@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>על Transmission</translation>
+        <translation>על אודות Transmission</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -31,7 +31,7 @@
     <message>
         <location line="+4"/>
         <source>C&amp;redits</source>
-        <translation>&amp;תודות</translation>
+        <translation>&amp;מזכים</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -41,7 +41,7 @@
     <message>
         <location line="+10"/>
         <source>Credits</source>
-        <translation>תודות</translation>
+        <translation>מזכים</translation>
     </message>
 </context>
 <context>
@@ -2125,73 +2125,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished">בתים/שנ׳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished">ק״ב/שנ׳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">מ״ב/שנ׳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished">ג״ב/שנ׳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished">ט״ב/שנ׳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished">ב׳</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished">ק״ב</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">מ״ב</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished">ג״ב</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished">ט״ב</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+276"/>

@@ -272,7 +272,7 @@
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
-            <numerusform>%1 minutę</numerusform>
+            <numerusform>%1 minuta</numerusform>
             <numerusform>%1 minuty</numerusform>
             <numerusform>%1 minut</numerusform>
         </translation>
@@ -911,7 +911,7 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>Usuwa torrent</translation>
+        <translation>Usuń torrent</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1673,7 +1673,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation>
-            <numerusform>%1 minutę</numerusform>
+            <numerusform>%1 minuta</numerusform>
             <numerusform>%1 minuty</numerusform>
             <numerusform>%1 minut</numerusform>
         </translation>
@@ -1683,7 +1683,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
         <translation>
-            <numerusform>%1 minutę temu</numerusform>
+            <numerusform>%1 minuta temu</numerusform>
             <numerusform>%1 minuty temu</numerusform>
             <numerusform>%1 minut temu</numerusform>
         </translation>
@@ -2142,73 +2142,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished">B/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished">kB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished">MB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished">GB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished">TB/s</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished">KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished">MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished">GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished">TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished">kB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished">MB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished">GB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished">TB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+276"/>
@@ -2521,7 +2521,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation>Pozostały czas jest nieznany</translation>
+        <translation>pozostały czas jest nieznany</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

@@ -5,8 +5,8 @@
 #
 # Translators:
 # Björn Þór Björnsson, 2022
-# Sveinn í Felli <sv1@fellsnet.is>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Sveinn í Felli <sv1@fellsnet.is>, 2024
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2024\n"
 "Language-Team: Icelandic (https://app.transifex.com/transmissionbt/teams/33778/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -1177,7 +1177,7 @@ msgstr "Keyrðu '{program} --help' til að sjá lista með öllum mögulegum val
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/sek"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1197,7 +1197,7 @@ msgstr "kB/sek"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2138,13 +2138,13 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Tilkynning um villu: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Villa í tilkynningu: {error} (reyni aftur eftir {count} sekúndu) ({url})"
+msgstr[1] "Tilkynning um villu: {error} (reyni aftur eftir {count} sekúndur) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2183,15 +2183,15 @@ msgstr "Gat ekki sótt '{path}': {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Tókst að uppfæra upprunalegt {protocol} vistfang í {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Vélin þín styður ekki {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Tókst að uppfæra víðværa {type} vistfangið í {ip} með {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2427,7 +2427,7 @@ msgstr "Gat ekki notað lýsigagnaupplýsingar úr '{path}' fyrir '{magnet}': {e
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Engin gögn fundust! Gakktu úr skugga um að allir gagnamiðlar séu tengdir eða notaðu \"Stilla staðsetningu\". Til að ná aftur í gögnin, skaltu nota \"Athuga þau gögn sem eru komin\" og ræsa svo aftur torrent-streymið."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2467,11 +2467,11 @@ msgstr "Gat ekki fært '{old_path}' yfir í '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Setti streymið í bið því engin gögn fundust! Gakktu úr skugga um að allir gagnamiðlar séu tengdir eða notaðu \"Stilla staðsetningu\" og síðan \"Athuga þau gögn sem eru komin\". Til að ná aftur í gögnin, skaltu ræsa aftur torrent-streymið."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Aðvörun frá rekjara: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2567,7 +2567,7 @@ msgstr "ATH: Ógild skilríki munu birtast sem 'Get ekki tengst rekjara' rétt e
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Gat ekki sótt '{url}': átti von á HTTP-svarkóða {expected_code}, en fékk {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2604,27 +2604,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dagur"
 msgstr[1] "dagar"
-
-#~ msgid "Connection failed"
-#~ msgstr "Tenging mistókst"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Gat ekki frumstillt LPD: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Gátt er {markup_begin}closed{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Gátt er {markup_begin}open{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Gáttinni {port} er endurbeint"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Gáttinni {port} er ekki endurbeint"
-
-#~ msgid "Status unknown"
-#~ msgstr "Staða óþekkt"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Prófa TCP gátt…"

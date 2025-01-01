@@ -6,6 +6,7 @@
 # Translators:
 # Moo, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Evaldas Granickas, 2024
 #
 #, fuzzy
 msgid ""
@@ -14,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Evaldas Granickas, 2024\n"
 "Language-Team: Lithuanian (https://app.transifex.com/transmissionbt/teams/33778/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -116,7 +117,7 @@ msgstr "Aš _sutinku"
 
 #: ../gtk/Application.cc:1020
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Užveriami ryšiai…"
 
 #: ../gtk/Application.cc:1025
 msgid "Sending upload/download totals to tracker…"
@@ -156,6 +157,7 @@ msgstr ""
 #: ../gtk/Application.cc:1427
 msgid "translator-credits"
 msgstr ""
+"Evaldas Granickas\n"
 "Žygimantas Beručka\n"
 "\n"
 "Launchpad Contributions:\n"
@@ -250,15 +252,15 @@ msgstr "viešas torentas"
 
 #: ../gtk/DetailsDialog.cc:721
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "sukurtas {date} naudojant {creator}"
 
 #: ../gtk/DetailsDialog.cc:725
 msgid "Created by {creator}"
-msgstr ""
+msgstr "sukurtas naudojant {creator}"
 
 #: ../gtk/DetailsDialog.cc:729
 msgid "Created on {date}"
-msgstr ""
+msgstr "sukurtas {date}"
 
 #: ../gtk/DetailsDialog.cc:843
 msgid "Unknown"
@@ -275,10 +277,10 @@ msgstr[3] ""
 #: ../gtk/DetailsDialog.cc:895 ../gtk/MakeDialog.cc:398
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "({piece_count} „BitTorrent“ dalis po {piece_size})"
+msgstr[1] "({piece_count} „BitTorrent“ dalys po {piece_size})"
+msgstr[2] "({piece_count} „BitTorrent“ dalių po {piece_size})"
+msgstr[3] "({piece_count} „BitTorrent“ dalių po {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:939
 msgid "{current_size} ({percent_done}%)"
@@ -287,12 +289,12 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:947
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% iš {percent_available}% pasiekiama)"
 
 #: ../gtk/DetailsDialog.cc:956
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% iš {percent_available}% pasiekiama; {unverified_size} nepatikrinta)"
 
 #: ../gtk/DetailsDialog.cc:989
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
@@ -300,7 +302,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1019
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (santykis: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1060
 msgid "No errors"
@@ -439,7 +441,7 @@ msgstr "Nėra suplanuotų atnaujinimų"
 
 #: ../gtk/DetailsDialog.cc:1857
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Paprašoma daugiau siuntėjų {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Queued to ask for more peers"
@@ -448,7 +450,7 @@ msgstr "Suplanuota paprašyti daugiau siuntėjų"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1872
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Paprašyta daugiau siuntėjų {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1897
@@ -614,7 +616,7 @@ msgstr "Turima"
 
 #: ../gtk/FileList.cc:1013
 msgid "Download"
-msgstr "Atsiuntimas"
+msgstr "Atsiųsti"
 
 #: ../gtk/FileList.cc:1024
 msgid "Priority"
@@ -643,23 +645,27 @@ msgstr "Ro_dyti:"
 
 #: ../gtk/FilterBar.cc:588
 msgid "_Show {count:L} of:"
-msgstr ""
+msgstr "Ro_dyti {count:L}:"
 
 #: ../gtk/FreeSpaceLabel.cc:56
 msgid "{disk_space} free"
-msgstr ""
+msgstr "{disk_space} laisva"
 
 #: ../gtk/MainWindow.cc:383
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Išjungti alternatyvius greičio apribojimus\n"
+" ({download_speed} ats., {upload_speed} išs.)"
 
 #: ../gtk/MainWindow.cc:384
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Įjungti alternatyvius greičio apribojimus\n"
+" ({download_speed} ats., {upload_speed} išs.)"
 
 #: ../gtk/MainWindow.cc:436
 msgid "Unlimited"
@@ -683,7 +689,7 @@ msgstr "Nebeskleisti esant santykiui"
 
 #: ../gtk/MainWindow.cc:582
 msgid "Stop at Ratio ({ratio})"
-msgstr ""
+msgstr "Nebeskleisti esant santykiui ({ratio})"
 
 #: ../gtk/MainWindow.cc:595
 msgid "Total Ratio"
@@ -703,17 +709,17 @@ msgstr "Seanso siuntimas"
 
 #: ../gtk/MainWindow.cc:763 ../gtk/MainWindow.cc:784 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
-msgstr ""
+msgstr "Santykis: {ratio}"
 
 #: ../gtk/MainWindow.cc:769
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Ats.: {downloaded_size}, Išs.: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:777
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Ats.: {downloaded_size}, Išs.: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:811
 msgid "{download_speed} ▼"
@@ -826,7 +832,7 @@ msgstr "_Atverti"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
-msgstr ""
+msgstr "Rodyti parametrų dialogą"
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
@@ -863,22 +869,22 @@ msgstr "savaitgaliais"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Blokavimo sąraše yra {count:L} įrašas"
+msgstr[1] "Blokavimo sąraše yra {count:L} įrašai"
+msgstr[2] "Blokavimo sąraše yra {count:L} įrašų"
+msgstr[3] "Blokavimo sąraše yra {count:L} įrašų"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "Blokavimo sąrašas atnaujintas!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "Blokavimo sąrašo atnaujinti nepavyko"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
-msgstr "Gaunami nauji blokų sąrašai…"
+msgstr "Gaunamas naujas blokavimo sąrašas…"
 
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
@@ -978,25 +984,25 @@ msgstr ""
 
 #: ../gtk/Torrent.cc:466
 msgid "{current_size} of {complete_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} iš {complete_size} ({percent_done}%)"
 
 #: ../gtk/Torrent.cc:476
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{current_size} iš {complete_size} ({percent_complete}%), išsiųsta {uploaded_size} (santykis: {ratio}, tikslas: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:488
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{current_size} iš {complete_size} ({percent_complete}%), išsiųsta {uploaded_size} (santykis: {ratio})"
 
 #: ../gtk/Torrent.cc:498
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{complete_size}, išsiųsta {uploaded_size} (santykis: {ratio}, tikslas: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:507
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{complete_size}, išsiųsta {uploaded_size} (santykis: {ratio})"
 
 #: ../gtk/Torrent.cc:520
 msgid "Remaining time unknown"
@@ -1020,7 +1026,7 @@ msgstr ""
 
 #: ../gtk/Torrent.cc:646
 msgid "Local error: '{error}'"
-msgstr ""
+msgstr "Vietinė klaida: '{error}'"
 
 #: ../gtk/Torrent.cc:670
 #, no-c-format
@@ -1034,34 +1040,34 @@ msgstr[3] ""
 #: ../gtk/Torrent.cc:681
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusio siuntėjo ir saityno skleidėjo"
+msgstr[1] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusių siuntėjų ir saityno skleidėjų"
+msgstr[2] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusių siuntėjų ir saityno skleidėjų"
+msgstr[3] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusių siuntėjų ir saityno skleidėjų"
 
 #: ../gtk/Torrent.cc:692
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Atsiunčiama iš {active_count} saityno skleidėjo"
+msgstr[1] "Atsiunčiama iš {active_count} saityno skleidėjų"
+msgstr[2] "Atsiunčiama iš {active_count} saityno skleidėjų"
+msgstr[3] "Atsiunčiama iš {active_count} saityno skleidėjų"
 
 #: ../gtk/Torrent.cc:700
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusio siuntėjo"
+msgstr[1] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusių siuntėjų"
+msgstr[2] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusių siuntėjų"
+msgstr[3] "Atsiunčiama iš {active_count} iš {connected_count} prisijungusių siuntėjų"
 
 #: ../gtk/Torrent.cc:709
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Skleidžiama {active_count} iš {connected_count} prisijungusio siuntėjo"
+msgstr[1] "Skleidžiama {active_count} iš {connected_count} prisijungusių siuntėjų"
+msgstr[2] "Skleidžiama {active_count} iš {connected_count} prisijungusių siuntėjų"
+msgstr[3] "Skleidžiama {active_count} iš {connected_count} prisijungusių siuntėjų"
 
 #: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
@@ -1384,7 +1390,7 @@ msgstr "_Panaikinti žymėjimą"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr "_Nuostatos"
+msgstr "_Nustatymai"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
@@ -1644,7 +1650,7 @@ msgstr "Kilmė:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:326
 msgid "Added:"
-msgstr ""
+msgstr "Pridėtas:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:430 ../gtk/ui/gtk4/DetailsDialog.ui:338
 msgid "Comment:"
@@ -1696,7 +1702,7 @@ msgstr "Torento p_rioritetas:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:997 ../gtk/ui/gtk4/DetailsDialog.ui:749
 msgid "Seeding Limits"
-msgstr "Sklaidos apribojimai"
+msgstr "Skleidimo apribojimai"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1013 ../gtk/ui/gtk4/DetailsDialog.ui:761
 msgid "_Ratio:"
@@ -1834,7 +1840,7 @@ msgstr "P_radėti pridėjus"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr ""
+msgstr "Per_kelti torento failą į šiukšlinę"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -1847,12 +1853,12 @@ msgstr "Greičio ribojimai"
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:90 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
-msgstr ""
+msgstr "I_šsiuntimas ({speed_units}):"
 
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr ""
+msgstr "_Atsiuntimas ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"
@@ -1865,12 +1871,12 @@ msgstr "Taikomi vietoje įprastų greičio ribojimų rankiniu būdu arba numatyt
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:130
 msgid "U_pload ({speed_units}):"
-msgstr ""
+msgstr "Iš_siuntimas ({speed_units}):"
 
 #. Labels a spinbutton for alternate download speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:230 ../gtk/ui/gtk4/PrefsDialog.ui:142
 msgid "Do_wnload ({speed_units}):"
-msgstr ""
+msgstr "A_tsiuntimas ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:242 ../gtk/ui/gtk4/PrefsDialog.ui:154
 msgid "_Scheduled times:"
@@ -1888,11 +1894,11 @@ msgstr "i_ki"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:395 ../gtk/ui/gtk4/PrefsDialog.ui:262
 msgctxt "Gerund"
 msgid "Adding"
-msgstr "Pridedama"
+msgstr "Pridėjimas"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
-msgstr ""
+msgstr "Automatiškai pridėti torentų failus _iš:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
@@ -1916,11 +1922,11 @@ msgstr "Dau_giausia aktyvių atsiuntimų:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:587 ../gtk/ui/gtk4/PrefsDialog.ui:413
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "Atsiuntimai, per pastarąsias N minučių keitęsi duomenimis, laikomi _aktyviais:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:636 ../gtk/ui/gtk4/PrefsDialog.ui:451
 msgid "Incomplete"
-msgstr "Nebaigta"
+msgstr "Nebaigti"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:650 ../gtk/ui/gtk4/PrefsDialog.ui:463
 msgid "Append \"._part\" to incomplete files' names"
@@ -1932,12 +1938,12 @@ msgstr "Įrašyti _nebaigtus torentus į:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Baigus siųsti torentą, vykdyti s_cenarijų:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:740 ../gtk/ui/gtk4/PrefsDialog.ui:528
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr "Atsiunčiama"
+msgstr "Atsiuntimas"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:762 ../gtk/ui/gtk4/PrefsDialog.ui:545
 msgid "Limits"
@@ -1953,12 +1959,12 @@ msgstr "Nebeskleisti jei neaktyvus N _minučių:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:806 ../gtk/ui/gtk4/PrefsDialog.ui:581
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Baigus skleisti torentą, vykdyti s_cenarijų:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:874 ../gtk/ui/gtk4/PrefsDialog.ui:631
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr "Skleidžiama"
+msgstr "Skleidimas"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:896 ../gtk/ui/gtk3/PrefsDialog.ui:1083 ../gtk/ui/gtk4/PrefsDialog.ui:648 ../gtk/ui/gtk4/PrefsDialog.ui:783
 msgid "Privacy"
@@ -2018,11 +2024,11 @@ msgstr "_Daugiausiai galimų siuntėjų iš viso:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1342 ../gtk/ui/gtk4/PrefsDialog.ui:985
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Ryšiams su _siuntėjais naudoti µTP"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:987
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP – tai priemonė, padedanti mažinti tinklo apkrovas."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:1000
 msgid "Use PE_X to find more peers"
@@ -2050,7 +2056,7 @@ msgstr "VSA – tai priemonė, skirta siuntėjams Jūsų vietiniame tinkle rasti
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1429 ../gtk/ui/gtk4/PrefsDialog.ui:1051
 msgid "Default Public Trackers"
-msgstr ""
+msgstr "Numatytieji viešieji sekikliai"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1073
 msgid ""
@@ -2142,7 +2148,7 @@ msgstr "Torento vietos nustatymas"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:35 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
-msgstr ""
+msgstr "P_ritaikyti"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:69 ../gtk/ui/gtk4/RelocateDialog.ui:20
 msgid "Location"
@@ -2696,9 +2702,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "Ryšys patyrė nesėkmę"
-
-#~ msgid "Status unknown"
-#~ msgstr "Būsena nežinoma"

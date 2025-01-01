@@ -52,7 +52,7 @@
 "%lu IP address rules in list" = "%lu IP cím szabály a listában";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu Ismert:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu helyi felfedezés";
@@ -217,7 +217,7 @@
 "Available" = "Elérhető";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Sávszélesség";
@@ -486,7 +486,7 @@
 "KB/s" = "KB/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Ismert:";
 
 /* Tracker last announce */
 "Last Announce" = "Utolsó bejelentés";
@@ -690,7 +690,7 @@
 "Port is open" = "A port nyitva van";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "Port: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "PrefWindowSize";
@@ -890,7 +890,7 @@
 "Show the data file in Finder" = "Adatfájl megjelenítése Finderben";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Eszköztár mutatása";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -994,7 +994,7 @@
 "This folder contains no files." = "Ez a mappa nem tartalmaz fájlokat.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Ez az opció nem elérhető, ha az Alapértelmezett hely Ugyanaz mint a torrent fájl-ra van állítva.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Ez az átvitel aktív. Az eltávolítás után az átvitel folytatásához torrent fájl vagy magnet link szükséges.";

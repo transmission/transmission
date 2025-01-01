@@ -268,9 +268,9 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minuto</numerusform>
+            <numerusform>%1 minutos</numerusform>
         </translation>
     </message>
     <message>
@@ -427,7 +427,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiquetas:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -1659,18 +1659,18 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minuto</numerusform>
+            <numerusform>%1 minutos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>hace %1 minuto</numerusform>
+            <numerusform>hace %1 minutos</numerusform>
         </translation>
     </message>
     <message>
@@ -2325,7 +2325,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%2</translation>
     </message>
 </context>
 <context>

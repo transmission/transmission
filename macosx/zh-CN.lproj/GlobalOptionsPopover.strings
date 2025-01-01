@@ -6,7 +6,7 @@
 "23.title" = "传输带宽";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
-"26.title" = "KB/s";
+"26.title" = "KB/秒";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
 "43.title" = "上传限制：";
@@ -30,4 +30,4 @@
 "130.title" = "剩余时间";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "180"; */
-"180.title" = "KB/s";
+"180.title" = "KB/秒";

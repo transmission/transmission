@@ -6,9 +6,9 @@
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
-# Josef Andersson <josef.andersson@fripost.org>, 2022
+# Josef Andersson <janderssonse@proton.me>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Jonatan Nyberg, 2023
+# Jonatan Nyberg, 2024
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jonatan Nyberg, 2023\n"
+"Last-Translator: Jonatan Nyberg, 2024\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -482,7 +482,7 @@ msgstr "Spårare"
 
 #: ../gtk/DetailsDialog.cc:2642
 msgid "{torrent_name} Properties"
-msgstr "Egenskaper för {torrent_name}"
+msgstr "{torrent_name}-egenskaper"
 
 #: ../gtk/DetailsDialog.cc:2647
 msgid "Properties - {torrent_count:L} Torrent"
@@ -1145,7 +1145,7 @@ msgstr "Transmission"
 #. parse the command line
 #: ../gtk/main.cc:79
 msgid "Where to look for configuration files"
-msgstr "Plats för konfigurationsfiler"
+msgstr "Var man ska leta efter konfigurationsfiler"
 
 #: ../gtk/main.cc:80
 msgid "Start with all torrents paused"
@@ -1169,7 +1169,7 @@ msgstr "Kör '{program} --help' för att se en fullständig lista över tillgän
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1189,7 +1189,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1310,7 +1310,7 @@ msgstr "_Egenskaper"
 
 #: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:78
 msgid "Torrent properties"
-msgstr "Egenskaper för torrent"
+msgstr "Torrent-egenskaper"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
@@ -1812,7 +1812,7 @@ msgstr "Lägg automatiskt till torrentfiler _från:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
-msgstr "Visa _dialogrutan för torrentalternativ"
+msgstr "Visa torrentalternativ_dialogrutan"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:441 ../gtk/ui/gtk4/PrefsDialog.ui:300
 msgid "_Start added torrents"
@@ -1836,7 +1836,7 @@ msgstr "Hämtningar som delar data under senaste _N minuterna är aktiva:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:636 ../gtk/ui/gtk4/PrefsDialog.ui:451
 msgid "Incomplete"
-msgstr "Ofullständig"
+msgstr "Ofullständiga"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:650 ../gtk/ui/gtk4/PrefsDialog.ui:463
 msgid "Append \"._part\" to incomplete files' names"
@@ -2130,13 +2130,13 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Annonseringsfel: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Annonseringsfel: {error} (försöker igen om {count} sekund) ({url})"
+msgstr[1] "Annonseringsfel: {error} (försöker igen om {count} sekunder) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2175,15 +2175,15 @@ msgstr "Det gick inte att få '{path}': {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Uppdaterade källans {protocol}-adress till {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Din maskin stöder inte {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Den globala {type}-adressen har uppdaterats till {ip} med {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2419,7 +2419,7 @@ msgstr "Det gick inte att använda metainfo från '{path}' for '{magnet}': {erro
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Inga data hittades! Se till att dina enheter är anslutna eller använd \"Ange plats\". För att hämta igen, använd \"Verifiera lokala data\" och starta torrenten efteråt."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2459,11 +2459,11 @@ msgstr "Det gick inte att flytta '{old_path}' till '{path}': {error} ({error_cod
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Pausade torrent eftersom inga data hittades! Se till att dina enheter är anslutna eller använd \"Ange plats\" och använd sedan \"Verifiera lokala data\" igen. För att hämta igen, starta torrent."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Spårarvarning: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2559,7 +2559,7 @@ msgstr "OBS: Ogiltiga certifikat kommer att visas som \"Det gick inte att anslut
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Det gick inte att hämta '{url}': förväntad HTTP-svarskod {expected_code}, fick {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2596,27 +2596,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#~ msgid "Connection failed"
-#~ msgstr "Anslutning misslyckades"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Det gick inte att initiera LPD: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Porten är {markup_begin}stängd{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Porten är {markup_begin}öppen{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Porten {port} vidarebefordras"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Porten {port} vidarebefordras inte"
-
-#~ msgid "Status unknown"
-#~ msgstr "Status okänd"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Testar TCP-port…"

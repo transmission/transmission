@@ -6,8 +6,8 @@
 # Translators:
 # jrthsr700tmax <jrthsr700tmax@gmail.com>, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# abc0922001 <abc0922001@hotmail.com>, 2023
 # Meng Pang Wang, 2023
+# abc0922001 <abc0922001@hotmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Meng Pang Wang, 2023\n"
+"Last-Translator: abc0922001 <abc0922001@hotmail.com>, 2024\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -1155,7 +1155,7 @@ msgstr "請執行 '{program} --help' 以檢視所有可用的命令列選項。\
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1175,7 +1175,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2116,12 +2116,12 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "公告錯誤：{error}（{url}）"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
+msgstr[0] "公告錯誤：{error}（{count} 秒後重試）（{url}）"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2159,15 +2159,15 @@ msgstr "無法取得 '{path}'：{error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "成功更新來源 {protocol} 位址為 {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "您的裝置不支援 {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "成功使用 {url} 更新全域 {type} 位址為 {ip}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2401,7 +2401,7 @@ msgstr "無法將 '{path}' 的後設資料使用於 '{magnet}'：{error} ({error
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "找不到資料！請確保您的硬碟已連接或使用「設定位置」。若要重新下載，請使用「驗證本機資料」後開始下載 torrent。"
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2441,11 +2441,11 @@ msgstr "無法移動 '{old_path}' 到 '{path}'：{error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "因為找不到資料，已暫停 torrent！請確保您的硬碟已連接或使用「設定位置」，然後再次使用「驗證本機資料」。若要重新下載，開始下載 torrent。"
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "追蹤器警告：'{warning}'（{url}）"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2541,7 +2541,7 @@ msgstr "註：無效的憑證會和其他錯誤一樣顯示為「無法連線到
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "無法取得'{url}'：預期的HTTP回應碼為 {expected_code}，實際獲得 {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2572,27 +2572,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Connection failed"
-#~ msgstr "連線失敗"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "無法初始化 LPD：{error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "連接埠 {markup_begin}已關閉{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "連接埠 {markup_begin}已開啟{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "連接埠 {port} 已轉送"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "連接埠 {port} 沒有轉送"
-
-#~ msgid "Status unknown"
-#~ msgstr "未知狀態"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "正在測試 TCP 連接埠…"

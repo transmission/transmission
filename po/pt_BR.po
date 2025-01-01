@@ -12,9 +12,10 @@
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
-# Alex Wender, 2023
+# Alex, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # luquita39, 2023
+# Fúlvio Alves <fga.fulvio@gmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -23,7 +24,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: luquita39, 2023\n"
+"Last-Translator: Fúlvio Alves <fga.fulvio@gmail.com>, 2024\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +110,7 @@ msgstr "Não foi posível registrar Transmission como um manipulador {content_ty
 
 #: ../gtk/Application.cc:558
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Recebido sinal de término, tentando desligar de forma limpa. Faça novamente se ficar preso."
 
 #: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -466,9 +467,9 @@ msgstr "Sementes da Web"
 #: ../gtk/DetailsDialog.cc:1816
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Uma lista de {markup_begin} {peer_count} fonte{markup_end} {time_span_ago}"
+msgstr[1] "Uma lista de {markup_begin} {peer_count} fontes{markup_end} {time_span_ago}"
+msgstr[2] "Uma lista de {markup_begin} {peer_count} fontes{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1828
@@ -555,7 +556,7 @@ msgstr "Rastreadores"
 
 #: ../gtk/DetailsDialog.cc:2642
 msgid "{torrent_name} Properties"
-msgstr "{torrent_name} Propriedades"
+msgstr " Propriedades de {torrent_name}"
 
 #: ../gtk/DetailsDialog.cc:2647
 msgid "Properties - {torrent_count:L} Torrent"
@@ -567,16 +568,16 @@ msgstr[2] "Propriedades - {torrent_count:L}Torrents"
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Remover torrent?"
+msgstr[1] "Remover {count:L} torrents?"
+msgstr[2] "Remover {count:L} torrent(s)?"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Excluir esse {count:L} arquivo baixado do torrent?"
+msgstr[1] "Excluir esses {count:L} arquivos baixados do torrent?"
+msgstr[2] "Excluir esse(s) {count:L} arquivo(s) baixado(s) do torrent?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -792,22 +793,22 @@ msgstr "Crítico"
 #: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: ../gtk/MessageLogWindow.cc:106
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Aviso"
 
 #: ../gtk/MessageLogWindow.cc:107
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Informação"
 
 #: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Depurar"
 
 #: ../gtk/MessageLogWindow.cc:271
 msgid "Save Log"
@@ -867,15 +868,15 @@ msgstr "_Abrir"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
-msgstr ""
+msgstr "Mostrar diálogo de opções"
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "Selecione um Arquivo"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
-msgstr ""
+msgstr "(Nenhum)"
 
 #: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
@@ -1065,9 +1066,9 @@ msgstr "Erro local: '{error}'"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Baixando metadados de {active_count} peer conectado ({percent_done}% concluído)"
+msgstr[1] "Baixando metadados de {active_count} peers conectados ({percent_done}% concluído)"
+msgstr[2] "Baixando metadados de {active_count} peer(s) conectado(s) ({percent_done}% concluído)"
 
 #: ../gtk/Torrent.cc:681
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -1100,62 +1101,62 @@ msgstr[2] "Enviando para {active_count} de {connected_count} peers conectados"
 #: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Daqui a {days_from_now:L} dia"
+msgstr[1] "Daqui a {days_from_now:L} dias"
+msgstr[2] "Daqui a {days_from_now:L} dias"
 
 #: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Daqui a {hours_from_now:L} hora"
+msgstr[1] "Daqui a {hours_from_now:L} horas"
+msgstr[2] "Daqui a {hours_from_now:L} horas"
 
 #: ../gtk/Utils.cc:149
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Daqui a {minutes_from_now:L} minuto"
+msgstr[1] "Daqui a {minutes_from_now:L} minutos"
+msgstr[2] "Daqui a {minutes_from_now:L} minutos"
 
 #: ../gtk/Utils.cc:156
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Daqui a {seconds_from_now:L} segundo"
+msgstr[1] "Daqui a {seconds_from_now:L} segundos"
+msgstr[2] "Daqui a {seconds_from_now:L} segundos"
 
 #: ../gtk/Utils.cc:160 ../gtk/Utils.cc:191 ../gtk/Utils.cc:218 ../gtk/Utils.cc:251
 msgid "now"
-msgstr ""
+msgstr "agora"
 
 #: ../gtk/Utils.cc:167
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{days_ago:L} dia atrás"
+msgstr[1] "{days_ago:L} dias atrás"
+msgstr[2] "{days_ago:L} dias atrás"
 
 #: ../gtk/Utils.cc:173
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{hours_ago:L} hora atrás"
+msgstr[1] "{hours_ago:L} horas atrás"
+msgstr[2] "{hours_ago:L} horas atrás"
 
 #: ../gtk/Utils.cc:180
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{minutes_ago:L} minuto atrás"
+msgstr[1] "{minutes_ago:L} minutos atrás"
+msgstr[2] "{minutes_ago:L} minutos atrás"
 
 #: ../gtk/Utils.cc:187
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{seconds_ago:L} segundo atrás"
+msgstr[1] "{seconds_ago:L} segundos atrás"
+msgstr[2] "{seconds_ago:L} segundos atrás"
 
 #: ../gtk/Utils.cc:200
 msgid "{days:L} day"
@@ -1167,51 +1168,51 @@ msgstr[2] "{days:L} dias"
 #: ../gtk/Utils.cc:205
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{hours:L} hora"
+msgstr[1] "{hours:L} horas"
+msgstr[2] "{hours:L} horas"
 
 #: ../gtk/Utils.cc:210
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{minutes:L} minuto"
+msgstr[1] "{minutes:L} minutos"
+msgstr[2] "{minutes:L} minutos"
 
 #: ../gtk/Utils.cc:215
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{seconds:L} segundo"
+msgstr[1] "{seconds:L} segundos"
+msgstr[2] "{seconds:L} segundos"
 
 #: ../gtk/Utils.cc:226
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Falta {days_left:L} dia"
+msgstr[1] "Faltam {days_left:L} dias"
+msgstr[2] "Faltam {days_left:L} dias"
 
 #: ../gtk/Utils.cc:233
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Falta {hours_left:L} hora"
+msgstr[1] "Faltam {hours_left:L} horas"
+msgstr[2] "Faltam {hours_left:L} horas"
 
 #: ../gtk/Utils.cc:240
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Falta {minutes_left:L} minuto"
+msgstr[1] "Faltam {minutes_left:L} minutos"
+msgstr[2] "Faltam {minutes_left:L} minutos"
 
 #: ../gtk/Utils.cc:247
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Falta {seconds_left:L} segundo"
+msgstr[1] "Faltam {seconds_left:L} segundos"
+msgstr[2] "Faltam {seconds_left:L} segundos"
 
 #: ../gtk/Utils.cc:266
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -1273,7 +1274,7 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1293,7 +1294,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2507,7 +2508,7 @@ msgstr ""
 
 #: ../libtransmission/session.cc:1411
 msgid "Transmission version {version} shutting down"
-msgstr ""
+msgstr "Transmission versão {version} desligando"
 
 #: ../libtransmission/session.cc:1458
 msgid "Loaded {count} torrent"
@@ -2709,18 +2710,3 @@ msgid_plural "days"
 msgstr[0] "dia"
 msgstr[1] "dias"
 msgstr[2] "dias"
-
-#~ msgid "Connection failed"
-#~ msgstr "Falha ao conectar"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "A porta está {markup_begin}fechada{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "A porta está {markup_begin}aberta{markup_end}"
-
-#~ msgid "Status unknown"
-#~ msgstr "Status desconhecido"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Testando porta TCP…"

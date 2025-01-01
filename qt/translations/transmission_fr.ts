@@ -64,9 +64,9 @@
     <message numerus="yes">
         <location line="+107"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent terminé</numerusform>
+            <numerusform>Torrents terminés</numerusform>
         </translation>
     </message>
     <message>
@@ -218,7 +218,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation>Le pair est connecté via µTP</translation>
+        <translation>Le pair est connecté par µTP</translation>
     </message>
     <message>
         <location line="+161"/>
@@ -268,15 +268,15 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1&#xa0;minute</numerusform>
+            <numerusform>%1 de minutes</numerusform>
         </translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation>Ajouter une/des URL(s)</translation>
+        <translation>Ajouter une ou des URL</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Étiquettes&#xa0;:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -788,7 +788,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>&amp;Afficher</translation>
+        <translation>&amp;Affichage</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -853,7 +853,7 @@
     <message>
         <location line="+22"/>
         <source>Open Fold&amp;er</source>
-        <translation>&amp;Ouvrir une dossier</translation>
+        <translation>&amp;Ouvrir un dossier</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -948,13 +948,13 @@
     <message>
         <location line="+11"/>
         <source>&amp;Compact View</source>
-        <translation>&amp;Vue compacte</translation>
+        <translation>&amp;Mode compact</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+3"/>
         <source>Compact View</source>
-        <translation>Vue compacte</translation>
+        <translation>Mode compact</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1094,7 +1094,7 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir l’_&amp;emplacement…</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1242,14 +1242,14 @@
         <location line="+444"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Cliquez pour désactiver les limitations de vitesse temporaires
+        <translation>Cliquez pour désactiver les limites de vitesse temporaires
  (%1 aval, %2 amont)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Cliquez pour activer les limitations de vitesse temporaires
+        <translation>Cliquez pour activer les limites de vitesse temporaires
  (%1 aval, %2 amont)</translation>
     </message>
     <message>
@@ -1413,7 +1413,7 @@
     <message>
         <location line="+20"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta&amp;ille du morceau&#xa0;:</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1468,7 +1468,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation>Impossible de créer «&#xa0;%1$s&#xa0;»&#xa0;: %2$s</translation>
+        <translation>Impossible de créer «&#xa0;%1&#xa0;»&#xa0;: %2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1659,18 +1659,18 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1&#xa0;minute</numerusform>
+            <numerusform>%1 de minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>il y a %1&#xa0;minute</numerusform>
+            <numerusform>il y a %1 de minutes</numerusform>
         </translation>
     </message>
     <message>
@@ -1918,12 +1918,12 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+254"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP est un outil pour réduire la congestion du réseau.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer µ&amp;TP pour les connexions aux pairs</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -2043,15 +2043,15 @@ To add a new primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;La mise à jour est réussie. &lt;/b&gt;&lt;p&gt;La liste de blocage comporte maintenant %Ln&#xa0;règle.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;La mise à jour est réussie. &lt;/b&gt;&lt;p&gt;La liste de blocage comporte maintenant %Ln de règles.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Mise à jour de la liste de blocage&lt;/b&gt;&lt;p&gt;Récupération de la nouvelle liste…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2257,17 +2257,17 @@ To add a new primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent dupliqué</numerusform>
+            <numerusform>Torrents dupliqués</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Impossible d’ajouter %n&#xa0;torrent dupliqué</numerusform>
+            <numerusform>Impossible d’ajouter %n de torrents dupliqués</numerusform>
         </translation>
     </message>
 </context>
@@ -2325,7 +2325,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2495,13 +2495,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation>%1 restant</translation>
+        <translation>il reste %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation>Temps restant inconnu</translation>
+        <translation>Le temps restant est inconnu</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
@@ -2608,7 +2608,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Demande de décompte des pairs… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-37"/>
@@ -2644,7 +2644,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="-20"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Demande d’autres pairs…&lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

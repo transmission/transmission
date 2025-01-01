@@ -21,7 +21,7 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Kliënt</translation>
+        <translation>Kliënt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -72,7 +72,7 @@
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation>Torrent Toegevoeg</translation>
+        <translation>Torrent toegevoeg</translation>
     </message>
 </context>
 <context>
@@ -106,7 +106,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 weggegooi na mislukte kontrolesom)</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -223,7 +223,7 @@
     <message>
         <location line="+161"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg spoorderaankondig-URL’s toe, een per reël:</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -269,8 +269,8 @@
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 minuut(e)</numerusform>
+            <numerusform>%1 minuut(e)</numerusform>
         </translation>
     </message>
     <message>
@@ -432,7 +432,7 @@
     <message>
         <location line="+108"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysig spoorders</translation>
     </message>
     <message>
         <location line="-230"/>
@@ -1659,18 +1659,18 @@ Voeg nog ’n primêre URL na ’n skoon lyn toe.</translation>
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minuut(e)</numerusform>
+            <numerusform>%1 minuut(e)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minuut(e) gelede</numerusform>
+            <numerusform>%1 minuut(e) gelede</numerusform>
         </translation>
     </message>
     <message>
@@ -1898,22 +1898,22 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+142"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Lees gebruikerknipbordinhoud vir torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Bespeur nuwe torrents vanaf knipbord</translation>
     </message>
     <message>
         <location line="+136"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Roep skri&amp;p op wanneer klaar afgelaai is:</translation>
     </message>
     <message>
         <location line="+97"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Roep skri&amp;p op wanneer klaar gesaai is:</translation>
     </message>
     <message>
         <location line="+254"/>
@@ -1928,7 +1928,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+40"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Verstek- openbare spoorders</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2043,15 +2043,15 @@ To add a new primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Bywerking suksesvol!&lt;/b&gt;&lt;p&gt;Bloklys het nou %Ln reël.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Bywerking suksesvol!&lt;/b&gt;&lt;p&gt;Bloklys het nou %Ln reëls.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Werk Bloklys By&lt;/b&gt;&lt;p&gt;Kry tans nuwe bloklys…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2325,7 +2325,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2495,13 +2495,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 oor</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Oorblywende tyd onbekend</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
@@ -2608,7 +2608,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Vra tans vir eweknietellings… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-37"/>
@@ -2644,7 +2644,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="-20"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Vra tans vir meer eweknieë… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -2663,12 +2663,12 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysig spoorders</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Spoorderaankondig-URL’s</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2683,7 +2683,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+14"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Sien oop Verstek openbare spoorders in Wysig &gt; Voorkeure &gt; Netwerk</translation>
     </message>
 </context>
 </TS>

@@ -2543,6 +2543,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Status unknown"
-#~ msgstr "狀態未知"

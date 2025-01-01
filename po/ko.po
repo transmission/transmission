@@ -9,6 +9,8 @@
 # Hugo Blackwood, 2022
 # Apparatus_Zero <aLOVEforMEDnCSnSYD@protonmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# VenusGirl❤ <venusgirl@outlook.com>, 2023
+# Tony Kim, 2024
 #
 #, fuzzy
 msgid ""
@@ -17,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Tony Kim, 2024\n"
 "Language-Team: Korean (https://app.transifex.com/transmissionbt/teams/33778/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +33,7 @@ msgstr "없음"
 
 #: ../cli/cli.cc:94
 msgid "Inf"
-msgstr ""
+msgstr "Inf"
 
 #: ../daemon/daemon.cc:197 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:240 ../libtransmission/blocklist.cc:338 ../libtransmission/blocklist.cc:353 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
@@ -71,7 +73,7 @@ msgstr "'{path}' 경로에서 설정 불러오는 중"
 
 #: ../daemon/daemon.cc:755
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "저장된 pidfile '{path}'"
 
 #: ../daemon/daemon.cc:761 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:473 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1084 ../libtransmission/torrent.cc:2073 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
@@ -103,7 +105,7 @@ msgstr "트랜스미션을 {content_type} 연결 프로그램에 등록할 수 �
 
 #: ../gtk/Application.cc:558
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "정상 종료 신호를 받았습니다. 완전하게 종료하려고 합니다. 만약에 멈추면 다시 시도해주세요."
 
 #: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -289,11 +291,11 @@ msgstr "{current_size} (이용 가능한 {percent_available}% 중 {percent_done}
 
 #: ../gtk/DetailsDialog.cc:989
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
-msgstr ""
+msgstr "{downloaded_size} (+{discarded_size} 체크섬 실패 후 폐기됨)"
 
 #: ../gtk/DetailsDialog.cc:1019
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (비율: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1060
 msgid "No errors"
@@ -448,12 +450,12 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:1899
 msgid "seeder"
 msgid_plural "seeders"
-msgstr[0] ""
+msgstr[0] "배포자"
 
 #: ../gtk/DetailsDialog.cc:1901
 msgid "leecher"
 msgid_plural "leechers"
-msgstr[0] ""
+msgstr[0] "다운로더"
 
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1910
@@ -486,7 +488,7 @@ msgstr "오류를 정정하신 후 다시 시도해주십시오."
 
 #: ../gtk/DetailsDialog.cc:2347
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - 트래커 추가"
 
 #: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
@@ -538,7 +540,7 @@ msgstr[0] "이 토렌트 중 하나는 다운로드가 끝나지 않았습니다
 
 #: ../gtk/Dialogs.cc:118
 msgid "_Delete"
-msgstr ""
+msgstr "삭제(_D)"
 
 #: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:729 ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/DetailsDialog.ui:567 ../gtk/ui/gtk4/PrefsDialog.ui:1411
 msgid "_Remove"
@@ -599,7 +601,7 @@ msgstr "오류"
 
 #: ../gtk/FilterBar.cc:587 ../gtk/ui/gtk3/FilterBar.ui:13 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
-msgstr "보이기(_S):"
+msgstr "표시(_S):"
 
 #: ../gtk/FilterBar.cc:588
 msgid "_Show {count:L} of:"
@@ -706,27 +708,27 @@ msgstr "선택된 소스 없음"
 #: ../gtk/MessageLogWindow.cc:104
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "중요"
 
 #: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "오류"
 
 #: ../gtk/MessageLogWindow.cc:106
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "경고"
 
 #: ../gtk/MessageLogWindow.cc:107
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "정보"
 
 #: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "디버그"
 
 #: ../gtk/MessageLogWindow.cc:271
 msgid "Save Log"
@@ -734,7 +736,7 @@ msgstr "저장 로그"
 
 #: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
-msgstr ""
+msgstr "저장(_S)"
 
 #: ../gtk/MessageLogWindow.cc:351
 msgid "Message"
@@ -762,7 +764,7 @@ msgstr "토렌트 완료"
 
 #: ../gtk/Notify.cc:274
 msgid "Start Now"
-msgstr ""
+msgstr "지금 시작"
 
 #: ../gtk/Notify.cc:286
 msgid "Torrent Added"
@@ -782,19 +784,19 @@ msgstr "토렌트 열기"
 
 #: ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:154 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:24 ../gtk/ui/gtk3/OptionsDialog.ui:35 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:34 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:75
 msgid "_Open"
-msgstr ""
+msgstr "열기(_O)"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
-msgstr ""
+msgstr "옵션 표시 대화 상자"
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "파일 선택"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
-msgstr ""
+msgstr "(없음)"
 
 #: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
@@ -827,11 +829,11 @@ msgstr[0] ""
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "차단 목록이 업데이트 되었습니다!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "차단 목록을 업데이트할 수 없습니다"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
@@ -872,7 +874,7 @@ msgstr ""
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "'{torrent_name}' 이동 중"
 
 #: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
@@ -1146,7 +1148,7 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/초"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1166,7 +1168,7 @@ msgstr "kB/초"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1443,7 +1445,7 @@ msgstr "차례(_C)"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "정보(_A)"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
@@ -1471,7 +1473,7 @@ msgstr "알림 주소(_A):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:20 ../gtk/ui/gtk3/MakeDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:36 ../gtk/ui/gtk3/PrefsDialog.ui:37 ../gtk/ui/gtk3/StatsDialog.ui:36 ../gtk/ui/gtk4/DetailsDialog.ui:886 ../gtk/ui/gtk4/MakeDialog.ui:277 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1484 ../gtk/ui/gtk4/StatsDialog.ui:284
 msgid "_Close"
-msgstr ""
+msgstr "닫기(_C)"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:58 ../gtk/ui/gtk4/DetailsDialog.ui:26
 msgid "Activity"
@@ -1515,7 +1517,7 @@ msgstr "오류:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:352 ../gtk/ui/gtk4/DetailsDialog.ui:274
 msgid "Details"
-msgstr "자세한 내용"
+msgstr "세부 사항"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:368 ../gtk/ui/gtk4/DetailsDialog.ui:286
 msgid "Location:"
@@ -1618,10 +1620,12 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"백업 URL을 추가하려면 기본 URL 다음 줄에 추가합니다.\n"
+"새 기본 URL을 추가하려면 빈 줄 뒤에 추가합니다."
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:118 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "편집 > 환경설정 > 네트워크의 기본 공개 트래커도 참조"
 
 #: ../gtk/ui/gtk3/MainWindow.ui:143
 msgid "Torrent"
@@ -1637,7 +1641,7 @@ msgstr "새 토렌트"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:35 ../gtk/ui/gtk4/MakeDialog.ui:285
 msgid "_New"
-msgstr ""
+msgstr "새로 만들기(_N)"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:85 ../gtk/ui/gtk4/MakeDialog.ui:32
 msgid "Sa_ve to:"
@@ -1653,7 +1657,7 @@ msgstr "공유할 파일(_F):"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:187 ../gtk/ui/gtk4/MakeDialog.ui:113
 msgid "Piece size:"
-msgstr ""
+msgstr "조각 크기:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:231 ../gtk/ui/gtk4/MakeDialog.ui:146
 msgid "Properties"
@@ -1669,7 +1673,7 @@ msgstr "설명(_M):"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:339 ../gtk/ui/gtk4/MakeDialog.ui:229
 msgid "_Source:"
-msgstr ""
+msgstr "소스(_S):"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:366 ../gtk/ui/gtk4/MakeDialog.ui:252
 msgid "_Private torrent"
@@ -1685,15 +1689,15 @@ msgstr "메시지 로그"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:26 ../gtk/ui/gtk4/MessageLogWindow.ui:31
 msgid "Save _As"
-msgstr ""
+msgstr "다른 이름으로 저장(_A)"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:41 ../gtk/ui/gtk4/MessageLogWindow.ui:55
 msgid "Clear"
-msgstr "비우기"
+msgstr "지우기"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:66 ../gtk/ui/gtk4/MessageLogWindow.ui:84
 msgid "P_ause"
-msgstr ""
+msgstr "일시 중지(_A)"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:96 ../gtk/ui/gtk4/MessageLogWindow.ui:100
 msgid "Level"
@@ -1725,11 +1729,11 @@ msgstr "추가하면 시작하기(_S)"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr ""
+msgstr "토렌트 파일을 휴지통으로 이동(_V)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
-msgstr "트랜스미션 기본 설정"
+msgstr "Transmission 환경 설정"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
@@ -1783,7 +1787,7 @@ msgstr "추가"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
-msgstr ""
+msgstr "토렌트 파일을 자동으로 추가합니다:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
@@ -1807,11 +1811,11 @@ msgstr "최대 활성화된 다운로드들 (_x) :"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:587 ../gtk/ui/gtk4/PrefsDialog.ui:413
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "마지막 N분 동안 데이터를 공유하는 다운로드가 활성화됩니다(_N):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:636 ../gtk/ui/gtk4/PrefsDialog.ui:451
 msgid "Incomplete"
-msgstr "미 완료"
+msgstr "미완료"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:650 ../gtk/ui/gtk4/PrefsDialog.ui:463
 msgid "Append \"._part\" to incomplete files' names"
@@ -1819,11 +1823,11 @@ msgstr "완료되지 않은 파일 이름에 \"._part\"를 붙임"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:667 ../gtk/ui/gtk4/PrefsDialog.ui:477
 msgid "Keep _incomplete torrents in:"
-msgstr "미 완료 토렌트 다음 위치에 보관(_I):"
+msgstr "미완료 토렌트 다음 위치에 보관(_I):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "다운로드가 완료되면 호출 스크립트(_T):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:740 ../gtk/ui/gtk4/PrefsDialog.ui:528
 msgctxt "Gerund"
@@ -1844,7 +1848,7 @@ msgstr "N 분 대기 상태에 있으면 배포를 중지(_N):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:806 ../gtk/ui/gtk4/PrefsDialog.ui:581
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "시드가 완료되면 호출 스크립트(_T):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:874 ../gtk/ui/gtk4/PrefsDialog.ui:631
 msgctxt "Gerund"
@@ -2557,9 +2561,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "연결 오류"
-
-#~ msgid "Status unknown"
-#~ msgstr "상태 알 수 없음"

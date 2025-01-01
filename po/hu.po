@@ -9,8 +9,8 @@
 # c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
 # Béla Bajza, 2022
 # Balázs Meskó <meskobalazs@mailbox.org>, 2022
-# Anon, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Anon, 2024
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Anon, 2024\n"
 "Language-Team: Hungarian (https://app.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -1204,7 +1204,7 @@ msgstr "A parancssori kapcsolók teljes listájáért futtassa a '{program} --he
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1224,7 +1224,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2165,13 +2165,13 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Bejelentési hiba: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc múlva) ({url})"
+msgstr[1] "Bejelentési hiba: {error} (Újrapróbálkozás {count} másodperc múlva) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2210,15 +2210,15 @@ msgstr "Nem sikerült '{path}' lekérése: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Sikeresen frissítette a forrás {protocol} címet {ip}-re"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Az ön gépe nem támogatja a következőt: {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Sikeresen frissítette a globális {type} címet {ip}-re a {url} használatával"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2454,7 +2454,7 @@ msgstr "Nem lehetett használni a metainfót innen: '{path}' ami a következőh�
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Nem található adat! Győződjön meg róla, hogy a meghajtói csatlakoztatva vannak, vagy használja a \"Hely megadása\" lehetőséget. Az újbóli letöltéshez használja a \"Helyi adatok ellenőrzése\" opciót, és indítsa el a torrentet utána."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2494,11 +2494,11 @@ msgstr "'{old_path}' áthelyezése nem sikerült ide: '{path}': {error} ({error_
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Torrent szüneteltetésre került, mert nem található adat! Győződjön meg róla, hogy a meghajtói csatlakoztatva vannak, aztán használja a \"Hely megadása\" lehetőséget. Végül az újbóli letöltéshez használja a \"Helyi adatok ellenőrzése\" opciót, és indítsa el a torrentet utána."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Tracker figyelmeztetés: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2594,7 +2594,7 @@ msgstr "NB: az érvénytelen tanúsítványok (más hibákhoz hasonlóan) 'Nem s
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Nem sikerült letölteni '{url}': várt HTTP válasz kód {expected_code}, kapott kód {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2631,27 +2631,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "Connection failed"
-#~ msgstr "Csatlakozás sikertelen"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Nem sikerült az LPD előkészítése: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "A port {markup_begin}zárva van{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "A port {markup_begin}nyitva van{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "{port} port továbbítva van"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Port {port} nincs továbbítva"
-
-#~ msgid "Status unknown"
-#~ msgstr "Állapot ismeretlen"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "TCP-port tesztelése…"

@@ -12,7 +12,9 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Petro Bilyi <whitipet@gmail.com>, 2023
 # Oleksii Lysenko, 2023
-# Gordon Freeman, 2023
+# Sirius961, 2024
+# Gordon Freeman, 2024
+# Виталик Саенко, 2024
 #
 #, fuzzy
 msgid ""
@@ -21,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Gordon Freeman, 2023\n"
+"Last-Translator: Виталик Саенко, 2024\n"
 "Language-Team: Ukrainian (https://app.transifex.com/transmissionbt/teams/33778/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -1273,7 +1275,7 @@ msgstr "Виконайте '{program} --help', щоб побачити повн�
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "Б/с"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1293,7 +1295,7 @@ msgstr "кБ/с"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "Б"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1470,7 +1472,7 @@ msgstr "Призупинити торент"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Вказати _місце…"
+msgstr "Встановити _місце…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1738,7 +1740,7 @@ msgstr "Параметри"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:20
 msgid "Tracker Announce URLs"
-msgstr "Посилання на повідомлення трекерів"
+msgstr "Посилання на оголошення трекерів"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:83 ../gtk/ui/gtk3/MakeDialog.ui:294 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:193
 msgid ""
@@ -2162,7 +2164,7 @@ msgstr "Віддалений"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:7 ../gtk/ui/gtk4/RelocateDialog.ui:5
 msgid "Set Torrent Location"
-msgstr "Вибрати місце розташування для торенту"
+msgstr "Встановити розташування торрента"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:35 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
@@ -2214,7 +2216,7 @@ msgstr "_Адреса"
 
 #: ../libtransmission/announcer-http.cc:436
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr "Не вдалося розпізнати відповідь анонсу: {error} ({error_code})"
+msgstr "Не вдалося розпізнати відповідь оголошення: {error} ({error_code})"
 
 #: ../libtransmission/announcer-http.cc:656
 msgid "Couldn't parse scrape response: {error} ({error_code})"
@@ -2234,15 +2236,15 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Помилка оголошення: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Помилка оголошення: {error} (Повторна спроба через {count} секунду) ({url})"
+msgstr[1] "Помилка оголошення: {error} (Повторна спроба через {count} секунди) ({url})"
+msgstr[2] "Помилка оголошення: {error} (Повторна спроба через {count} секунд) ({url})"
+msgstr[3] "Помилка оголошення: {error} (Повторна спроба через {count} секунд) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2283,15 +2285,15 @@ msgstr "Не вдалося отримати «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Успішно оновлено джерело{protocol}за адресою {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Ваш пристрій не підтримує {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Успішно оновлено глобальну  {type} за адресою {ip} за допомогою{url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2531,7 +2533,7 @@ msgstr "Не вдалося використати метаінформацію 
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr " Дані не знайдено! Переконайтеся, що ваші диски підключено, або скористайтеся «Встановити розташування». Щоб завантажити повторно, скористайтеся \"Перевірити локальні дані\" і запустіть торрент після цього."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2571,11 +2573,11 @@ msgstr "Не вдалося пересунути «{old_path}» до «{path}»:
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr " Торрент призупинено, оскільки не знайдено жодних даних!Переконайтеся, що ваші диски підключено, або скористайтеся «Встановити місцезнаходження», а потім знову скористайтеся «Перевірити локальні дані». Щоб завантажити повторно, запустіть торрент."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr " Попередження відстеження: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2671,7 +2673,7 @@ msgstr "Примітка: Недійсні сертифікати відобра
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Не вдалося отримати '{url}': очікуваний код відповіді HTTP {expected_code}, отримано {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2720,27 +2722,3 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
-
-#~ msgid "Connection failed"
-#~ msgstr "Помилка з’єднання"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Не вдалося ініціалізувати LPD: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Порт {markup_begin}закрито{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Порт {markup_begin}відкрито{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Порт {port} переадресовується"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Порт {port} не переадресовується"
-
-#~ msgid "Status unknown"
-#~ msgstr "Невідомий статус"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Перевірка TCP-порту"

@@ -2620,9 +2620,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "Η σύνδεση απέτυχε"
-
-#~ msgid "Status unknown"
-#~ msgstr "Άγνωστη κατάσταση"

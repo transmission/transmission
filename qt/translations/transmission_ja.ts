@@ -265,8 +265,8 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1分</numerusform>
         </translation>
     </message>
     <message>
@@ -423,7 +423,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>ラベル:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -709,14 +709,14 @@
         <location line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
-            <numerusform>%Ln 日</numerusform>
+            <numerusform>%Ln日</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
-            <numerusform>%Ln 時間</numerusform>
+            <numerusform>%Ln時間</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1646,16 +1646,16 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1分</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1分前</numerusform>
         </translation>
     </message>
     <message>
@@ -2306,7 +2306,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2383,7 +2383,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+0"/>
         <source>Paused</source>
-        <translation>中断</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2475,13 +2475,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1残り</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>残り時間不明</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

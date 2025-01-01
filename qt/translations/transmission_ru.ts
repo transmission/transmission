@@ -112,7 +112,7 @@
     <message>
         <location line="+130"/>
         <source>Active now</source>
-        <translation>Сейчас активен</translation>
+        <translation>Активен сейчас</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -186,12 +186,12 @@
     <message>
         <location line="+4"/>
         <source>Uploading to peer</source>
-        <translation>Раздача участнику</translation>
+        <translation>Отдаётся участнику</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Возможна раздача данных этому участнику, если он будет заинтересован</translation>
+        <translation>Возможна отдача этому участнику, если он будет заинтересован</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -271,10 +271,10 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 мин.</numerusform>
+            <numerusform>%1 минуты</numerusform>
+            <numerusform>%1 минут</numerusform>
         </translation>
     </message>
     <message>
@@ -396,7 +396,7 @@
     <message>
         <location line="+32"/>
         <source>Running time:</source>
-        <translation>Длительность:</translation>
+        <translation>Время работы:</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -431,7 +431,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Метки:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -446,7 +446,7 @@
     <message>
         <location line="+32"/>
         <source>Privacy:</source>
-        <translation>Конфиденциальность:</translation>
+        <translation>Приватность:</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -456,7 +456,7 @@
     <message>
         <location line="+32"/>
         <source>Added:</source>
-        <translation>Добавлено:</translation>
+        <translation>Добавлен:</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -511,7 +511,7 @@
     <message>
         <location line="+6"/>
         <source>Honor global &amp;limits</source>
-        <translation>Учитывать глобальные ограничени&amp;я</translation>
+        <translation>Учитывать общие &amp;ограничения</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -735,7 +735,7 @@
         <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
-            <numerusform>%Ln минута</numerusform>
+            <numerusform>%Ln мин.</numerusform>
             <numerusform>%Ln минуты</numerusform>
             <numerusform>%Ln минут</numerusform>
         </translation>
@@ -876,12 +876,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Запросить у трекера &amp;больше участников</translation>
+        <translation>Позват&amp;ь ещё участников с трекера</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Запросить у трекера больше участников</translation>
+        <translation>Позвать ещё участников с трекера</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1118,7 +1118,7 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>Копировать магнет-&amp;ссылку в буфер</translation>
+        <translation>Копировать магнит-&amp;ссылку в буфер</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1300,12 +1300,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>После удаления для продолжения раздачи потребуется торрент-файл или магнет-ссылка.</translation>
+        <translation>После удаления для продолжения раздачи потребуется торрент-файл или магнит-ссылка.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>После удаления для продолжения раздачи потребуются торрент-файлы или магнет-ссылки.</translation>
+        <translation>После удаления для продолжения раздачи потребуются торрент-файлы или магнит-ссылки.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1499,7 +1499,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Открыть торрент по адресу или магнет-ссылке</translation>
+        <translation>Открыть торрент по адресу или магнит-ссылке</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1534,7 +1534,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation>Запустить по добавлении</translation>
+        <translation>Запустить после добавл&amp;ения</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1672,20 +1672,20 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 мин.</numerusform>
+            <numerusform>%1 минуты</numerusform>
+            <numerusform>%1 минут</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 минуту назад</numerusform>
+            <numerusform>%1 минуты назад</numerusform>
+            <numerusform>%1 минут назад</numerusform>
         </translation>
     </message>
     <message>
@@ -1828,7 +1828,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-64"/>
         <source>Privacy</source>
-        <translation>Конфиденциальность</translation>
+        <translation>Приватность</translation>
     </message>
     <message>
         <location line="-372"/>
@@ -1844,7 +1844,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>Показать значок Transmission в о&amp;бласти уведомлений</translation>
+        <translation>Показыва&amp;ть значок Transmission в области уведомлений</translation>
     </message>
     <message>
         <location line="-192"/>
@@ -1919,17 +1919,17 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation>Обнаруживать новые торренты в буфере обмена</translation>
+        <translation>Искать новые торренты в буфере обмена</translation>
     </message>
     <message>
         <location line="+136"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation>Выполнить скрип&amp;т по завершении загрузки:</translation>
+        <translation>Выполнять сц&amp;енарий по окончании загрузки:</translation>
     </message>
     <message>
         <location line="+97"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation>Выполнить скрип&amp;т по завершении раздачи:</translation>
+        <translation>Выполнять сц&amp;енарий по окончании раздачи:</translation>
     </message>
     <message>
         <location line="+254"/>
@@ -2084,7 +2084,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+117"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
-        <translation>Загрузка неак&amp;тивна, если обмен данными прекращён:</translation>
+        <translation>Загрузка неак&amp;тивна, если передача прекращена:</translation>
     </message>
     <message>
         <location line="-123"/>
@@ -2295,7 +2295,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../SessionDialog.ui" line="+14"/>
         <source>Change Session</source>
-        <translation>Изменить сеанс</translation>
+        <translation>Сменить сеанс</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2310,7 +2310,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Подключиться к &amp;удалённому сеансу</translation>
+        <translation>Подключить к &amp;удалённому сеансу</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2344,7 +2344,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2462,7 +2462,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>Магнетизированая передача — получение метаданных (%1%)</translation>
+        <translation>Магнит-передача — получение метаданных (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2537,9 +2537,9 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>Раздача к %Ln участнику</numerusform>
-            <numerusform>Раздача к %Ln участникам</numerusform>
-            <numerusform>Раздача к %Ln участникам</numerusform>
+            <numerusform>Раздаётся %Ln участнику</numerusform>
+            <numerusform>Раздаётся %Ln участникам</numerusform>
+            <numerusform>Раздаётся %Ln участникам</numerusform>
         </translation>
     </message>
     <message>
@@ -2580,9 +2580,9 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>Раздача к %1 из %Ln подключённого участника</numerusform>
-            <numerusform>Раздача к %1 из %Ln подключённых участников</numerusform>
-            <numerusform>Раздача к %1 из %Ln подключённых участников</numerusform>
+            <numerusform>Раздаётся %1 из %Ln подключённого участника</numerusform>
+            <numerusform>Раздаётся %1 из %Ln подключённых участников</numerusform>
+            <numerusform>Раздаётся %1 из %Ln подключённых участников</numerusform>
         </translation>
     </message>
     <message>

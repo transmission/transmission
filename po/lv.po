@@ -2642,6 +2642,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "Status unknown"
-#~ msgstr "Statuss nav zināms"

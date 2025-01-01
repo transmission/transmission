@@ -52,7 +52,7 @@
 "%lu IP address rules in list" = "%lu reguł(y) adresów IP na liście";
 
 /* Inspector -> Peers tab -> peers */
-"%lu Known:" = "Znanych %lu:";
+"%lu Known:" = "%lu znanych:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu wykrywanie lokalnych";
@@ -890,7 +890,7 @@
 "Show the data file in Finder" = "Wyświetl plik danych w programie Finder";
 
 /* View menu -> Toolbar */
-"Show Toolbar" = "Pokaż pasek narzędzi";
+"Show Toolbar" = "Wyświetl pasek narzędzi";
 
 /* Dock item
    Status Bar -> speed tooltip */

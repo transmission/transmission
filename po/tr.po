@@ -12,6 +12,7 @@
 # Serdar Sağlam <teknomobil@msn.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Emin Tufan Çetin <etcetin@gmail.com>, 2023
+# b83946de5835331df42b9ffcc43e6a33_05e65cd <73a30e0a984b2291d4915f37112ad292_814039>, 2023
 #
 #, fuzzy
 msgid ""
@@ -20,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>, 2023\n"
+"Last-Translator: b83946de5835331df42b9ffcc43e6a33_05e65cd <73a30e0a984b2291d4915f37112ad292_814039>, 2023\n"
 "Language-Team: Turkish (https://app.transifex.com/transmissionbt/teams/33778/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -1174,7 +1175,7 @@ msgstr "Kullanılabilir komut satırı seçeneklerinin tam listesini görmek iç
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1194,7 +1195,7 @@ msgstr "kB/sn"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2135,7 +2136,7 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Duyuru hatası: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
@@ -2184,7 +2185,7 @@ msgstr ""
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Makineniz {protocol} protokolünü desteklemiyor"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
@@ -2468,7 +2469,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "İzleyici uyarısı: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2601,27 +2602,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "gün"
 msgstr[1] "gün"
-
-#~ msgid "Connection failed"
-#~ msgstr "Bağlantı başarısız oldu"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "LPD başlatılamadı: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Bağlantı noktası {markup_begin}kapalı{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Bağlantı noktası {markup_begin}açık{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "{port} bağlantı noktası yönlendirildi"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "{port} bağlantı noktası yönlendirilmedi"
-
-#~ msgid "Status unknown"
-#~ msgstr "Durum bilinmiyor"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "TCP bağlantı noktası sınanıyor…"

@@ -9,7 +9,8 @@
 # Julvenzor <adrlopgal@disroot.org>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# picodotdev <pico.dev@gmail.com>, 2023
+# Héctor Cortés, 2024
+# picodotdev <pico.dev@gmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -18,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: picodotdev <pico.dev@gmail.com>, 2023\n"
+"Last-Translator: picodotdev <pico.dev@gmail.com>, 2024\n"
 "Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -1292,7 +1293,7 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1312,7 +1313,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1501,11 +1502,11 @@ msgstr "Copiar enlace _magnet al portapapeles"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:67 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
-msgstr "Eliminar el torrent"
+msgstr "Eliminar torrent"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr "_Eliminar archivos y quitar el torrent"
+msgstr "_Eliminar archivos y quitar torrent"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
@@ -1725,7 +1726,7 @@ msgstr "Limitar velocidad de _bajada ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:918 ../gtk/ui/gtk4/DetailsDialog.ui:688
 msgid "Limit _upload speed ({speed_units}):"
-msgstr "Limita velocidad de _subida ({speed_units}):"
+msgstr "Limitar velocidad de _subida ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:935 ../gtk/ui/gtk3/OptionsDialog.ui:143 ../gtk/ui/gtk4/DetailsDialog.ui:700 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
@@ -2253,14 +2254,14 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Error de anuncio: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Error de anuncio: {error}(Reintentando en {count} segundo) ({url})"
+msgstr[1] "Error de anuncio: {error}(Reintentando en {count} segundos) ({url})"
+msgstr[2] "Error de anuncio: {error}(Reintentando en {count} segundos) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2300,15 +2301,15 @@ msgstr "No se pudo obtener «{path}»:  {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Dirección de fuente {protocol} actualizada correctamente a {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Su máquina no soporta {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Dirección global {type} actualizada correctamente a {ip} usando {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2546,7 +2547,7 @@ msgstr "No se pudo usar metainformación de «{path}» para «{magnet}»: {error
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "¡No se han encontrado datos! Asegúrese de que sus unidades están conectadas o use «Cambiar ubicación». Para volver a descargar, use «Verificar datos locales» e inicie el torrent a continuación."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2586,11 +2587,11 @@ msgstr "No se pudo mover «{old_path}» a «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "¡Torrent pausado debido a que no se han encotrado datos! Asegurése de que sus unidades están conectadas o use «Cambiar ubicación», luego use «Verificar datos»  de nuevo. Para volver a descargar, inicie el torrent."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Advertencia de rastreador: «{warning}» ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2686,7 +2687,7 @@ msgstr "NB: certificados inválidos aparecerán como «No se pudo conectar al ra
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "No se pudo obtener «{url}»: código de respuesta esperado {expected_code}, obtenido {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2729,27 +2730,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgid "Connection failed"
-#~ msgstr "Conexión fallida"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "No se pudo inicializar LPD: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "El puerto está {markup_begin}cerrado{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "El puerto está {markup_begin}abierto{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "El puerto {port} está reenviado"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "El puerto {port} no está reenviado"
-
-#~ msgid "Status unknown"
-#~ msgstr "Estado desconocido"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Probando puerto TCP…"

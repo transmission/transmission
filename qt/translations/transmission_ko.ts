@@ -65,8 +65,8 @@
     <message numerus="yes">
         <location line="+107"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent 완료됨</numerusform>
         </translation>
     </message>
     <message>

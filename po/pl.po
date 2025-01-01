@@ -5,8 +5,8 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Piotr Drąg <piotrdrag@gmail.com>, 2023
 # Marek Adamski, 2023
+# Piotr Drąg <piotrdrag@gmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2023\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2024\n"
 "Language-Team: Polish (https://app.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -159,7 +159,7 @@ msgid "translator-credits"
 msgstr ""
 "Tomasz Dominikowski <dominikowski@gmail.com>, 2006, 2007\n"
 "Marek Adamski, 2022\n"
-"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2023\n"
+"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2024\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Account Deactivated https://launchpad.net/~accountdeactivated\n"
@@ -2301,11 +2301,11 @@ msgstr "Pomyślnie zaktualizowano adres źródłowy {protocol} na {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr "Ta maszyna nie obsługuje {protocol}"
+msgstr "Ten komputer nie obsługuje {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr "Pomyślnie zaktualizowano globalny adres {type} na {ip} przy użyciu {url}"
+msgstr "Pomyślnie zaktualizowano globalny adres {type} na {ip} przy za pomocą {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2545,7 +2545,7 @@ msgstr "Nie można użyć metainformacji z „{path}” dla „{magnet}”: {er
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr "Nie znaleziono danych! Upewnij się, że dyski są podłączone lub użyj opcji „Ustaw położenie”. Aby pobrać ponownie, użyj opcji „Sprawdź pobrane dane”, a następnie uruchom torrent."
+msgstr "Nie odnaleziono żadnych danych. Proszę się upewnić, że dyski są podłączone lub użyć opcji „Ustaw położenie”. Aby ponownie pobrać, należy użyć opcji „Sprawdź pobrane dane”, a następnie uruchomić torrent."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2585,7 +2585,7 @@ msgstr "Nie można przenieść „{old_path}” do „{path}”: {error} ({error
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr "Wstrzymano torrent, ponieważ nie znaleziono żadnych danych! Upewnij się, że dyski są podłączone lub użyj opcji „Ustaw położenie”, a następnie ponownie użyj opcji „Sprawdź pobrane dane”. Aby pobrać ponownie, uruchom torrent."
+msgstr "Wstrzymano torrent, ponieważ nie odnaleziono żadnych danych. Proszę się upewnić, że dyski są podłączone lub użyć opcji „Ustaw położenie”, a następnie ponownie użyć opcji „Sprawdź pobrane dane”. Aby ponownie pobrać, rozpocznij torrent."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
@@ -2685,7 +2685,7 @@ msgstr "Uwaga: nieprawidłowe certyfikaty będą wyświetlane jako „Nie można
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr "Nie można pobrać „{url}”: oczekiwano kodu odpowiedzi HTTP {expected_code}, otrzymano {actual_code} "
+msgstr "Nie można pobrać „{url}”: oczekiwano kodu odpowiedzi HTTP {expected_code}, otrzymano {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2734,27 +2734,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#~ msgid "Connection failed"
-#~ msgstr "Połączenie się nie powiodło"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Nie można zainicjować LPD: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Port jest {markup_begin}zamknięty{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Port jest {markup_begin}otwarty{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Port {port} jest przekierowywany"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Port {port} nie jest przekierowywany"
-
-#~ msgid "Status unknown"
-#~ msgstr "Nieznany stan"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Testowanie portu TCP…"

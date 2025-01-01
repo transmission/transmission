@@ -2696,9 +2696,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "Не атрымалася злучыцца"
-
-#~ msgid "Status unknown"
-#~ msgstr "Стан невядомы"

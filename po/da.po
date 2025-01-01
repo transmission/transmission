@@ -2610,15 +2610,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "døgn"
 msgstr[1] "døgn"
-
-#~ msgid "Connection failed"
-#~ msgstr "Forbindelsen mislykkedes"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Porten er {markup_begin}åben{markup_end}"
-
-#~ msgid "Status unknown"
-#~ msgstr "Status ukendt"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Tester TCP-port …"

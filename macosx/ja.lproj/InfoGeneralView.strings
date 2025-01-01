@@ -45,7 +45,7 @@
 "41.title" = "トレントの情報";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "7YU-bS-UkI"; */
-/* "7YU-bS-UkI.placeholderString" = ""; */
+"7YU-bS-UkI.placeholderString" = "なし";
 
 /* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
 /* "uaW-NM-PTU.title" = ""; */

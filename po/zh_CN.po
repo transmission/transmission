@@ -9,9 +9,10 @@
 # 玉堂白鹤 <yjwork@qq.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Dingzhong Chen <wsxy162@gmail.com>, 2023
-# pluwen <pluwen@gmail.com>, 2023
 # LIN, 2023
 # Wenbin Lv <wenbin816@gmail.com>, 2023
+# 普鲁文 <pluwen@gmail.com>, 2024
+# YFdyh000 <yfdyh000@gmail.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -20,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Wenbin Lv <wenbin816@gmail.com>, 2023\n"
+"Last-Translator: YFdyh000 <yfdyh000@gmail.com>, 2024\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -106,7 +107,7 @@ msgstr "无法将 Transmission 注册为 {content_type} 处理程序：{error}�
 
 #: ../gtk/Application.cc:558
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr "收到终止信号，正在尝试彻底关闭。如果卡住了请再试一次。"
+msgstr "已收到终止信号，正在尝试完全关闭。如果卡住请再试一次。"
 
 #: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -440,7 +441,7 @@ msgstr "Web 种子"
 #: ../gtk/DetailsDialog.cc:1816
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] "在 {time_span_ago}获得了载有 {markup_begin}{peer_count} 个节点{markup_end}的列表"
+msgstr[0] "{time_span_ago}获得了载有 {markup_begin}{peer_count} 个节点{markup_end}的列表"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1828
@@ -450,7 +451,7 @@ msgstr "节点列表请求{markup_begin}超时 {time_span_ago}{markup_end}，将
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1837
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "在 {time_span_ago}遇到错误“{markup_begin}{error}{markup_end}”"
+msgstr "{time_span_ago}遇到错误“{markup_begin}{error}{markup_end}”"
 
 #: ../gtk/DetailsDialog.cc:1850
 msgid "No updates scheduled"
@@ -462,7 +463,7 @@ msgstr "将在 {time_span_from_now}请求更多节点"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Queued to ask for more peers"
-msgstr "已排队请求更多节点"
+msgstr "已准备请求更多节点"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1872
@@ -487,7 +488,7 @@ msgstr[0] "下载用户"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1910
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "在 {time_span_ago}遇到抓取错误“{markup_begin}{error}{markup_end}”"
+msgstr "{time_span_ago}遇到抓取错误“{markup_begin}{error}{markup_end}”"
 
 #: ../gtk/DetailsDialog.cc:1927
 msgid "Asking for peer counts in {time_span_from_now}"
@@ -495,7 +496,7 @@ msgstr "将在 {time_span_from_now}询问节点数量"
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Queued to ask for peer counts"
-msgstr "已准备询问节点数量"
+msgstr "已准备请求节点数量"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
@@ -511,7 +512,7 @@ msgstr "列表包含无效的网址"
 
 #: ../gtk/DetailsDialog.cc:2265 ../gtk/FileList.cc:866
 msgid "Please correct the errors and try again."
-msgstr "请修正错误后重试。"
+msgstr "请修正问题后重试。"
 
 #: ../gtk/DetailsDialog.cc:2347
 msgid "{torrent_name} - Add Tracker"
@@ -1179,27 +1180,27 @@ msgstr "运行“{program} --help”以查看完整的可用的命令行选项�
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "字节/秒"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
-msgstr "GB/s"
+msgstr "GB/秒"
 
 #: ../gtk/main.cc:120
 msgid "MB/s"
-msgstr "MB/s"
+msgstr "MB/秒"
 
 #: ../gtk/main.cc:120
 msgid "TB/s"
-msgstr "TB/s"
+msgstr "TB/秒"
 
 #: ../gtk/main.cc:120
 msgid "kB/s"
-msgstr "kB/s"
+msgstr "kB/秒"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1420,7 +1421,7 @@ msgstr "按活跃度排列(_A)"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr "按存在时间排列(_G)"
+msgstr "按创建时间排列(_G)"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
@@ -1500,7 +1501,7 @@ msgstr "Tracker"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:84 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
-msgstr "公告网址(_A)："
+msgstr "宣告网址(_A)："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:20 ../gtk/ui/gtk3/MakeDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:36 ../gtk/ui/gtk3/PrefsDialog.ui:37 ../gtk/ui/gtk3/StatsDialog.ui:36 ../gtk/ui/gtk4/DetailsDialog.ui:886 ../gtk/ui/gtk4/MakeDialog.ui:277 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1484 ../gtk/ui/gtk4/StatsDialog.ui:284
 msgid "_Close"
@@ -1644,7 +1645,7 @@ msgstr "选项"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:20
 msgid "Tracker Announce URLs"
-msgstr "Tracker 公告网址"
+msgstr "Tracker 宣告网址"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:83 ../gtk/ui/gtk3/MakeDialog.ui:294 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:193
 msgid ""
@@ -2120,7 +2121,7 @@ msgstr "网址(_U)"
 
 #: ../libtransmission/announcer-http.cc:436
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr "无法解析公告响应：{error}（{error_code}）"
+msgstr "无法解析宣告响应：{error}（{error_code}）"
 
 #: ../libtransmission/announcer-http.cc:656
 msgid "Couldn't parse scrape response: {error} ({error_code})"
@@ -2140,12 +2141,12 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "宣告错误：{error}（{url}）"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
+msgstr[0] "宣告错误：{error}（{count}后重试）（{url}）"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2183,15 +2184,15 @@ msgstr "无法获取“{path}”：{error}（{error_code}）"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "成功更新源{protocol}地址到{ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "你的机器不支持{protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "使用{url}成功更新全局{type}地址到{ip}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2425,7 +2426,7 @@ msgstr "无法为 {magnet} 使用“{path}”的元信息：{error}（{error_cod
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "未找到数据！确保硬盘已连接或使用“设置位置”。要重新下载，请使用“验证本地数据”，然后启动种子。"
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2465,11 +2466,11 @@ msgstr "无法将“{old_path}”移至“{path}”：{error}（{error_code}）"
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "种子已暂停，因为无法找到数据！请确保您的硬盘已连接或使用“设置位置”。然后，再次使用“验证本地数据”。要重新下载，请开始种子。"
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Tracker 警告：“{warning}”（{url}）"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2561,11 +2562,11 @@ msgstr "特别注意：此选项仅适用于使用 libcurl 同 openssl 或 gnutl
 
 #: ../libtransmission/web.cc:187
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr "特别注意：无效证书会像其他很多错误一样显示为“无法连接至 tracker”"
+msgstr "注意：证书无效会同其他许多错误一样显示为“无法连接至 tracker”"
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "无法获取“{url}”：预期 HTTP 响应代码为 {expected_code}，但收到 {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2596,27 +2597,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Connection failed"
-#~ msgstr "连接失败"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "无法初始化 LPD：{error}（{error_code}）"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "端口{markup_begin}已关闭{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "端口{markup_begin}已打开{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "端口 {port} 已转发"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "未转发端口 {port}"
-
-#~ msgid "Status unknown"
-#~ msgstr "状态未知"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "正在测试 TCP 端口…"

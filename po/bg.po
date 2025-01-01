@@ -7,6 +7,8 @@
 # Ala Bala, 2018
 # Kiril Kirilov <cybercop_montana@abv.bg>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Avel Pavlov, 2024
+# Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -15,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2024\n"
 "Language-Team: Bulgarian (https://app.transifex.com/transmissionbt/teams/33778/bg/)\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -25,83 +27,83 @@ msgstr ""
 
 #: ../cli/cli.cc:89 ../gtk/Utils.cc:119 ../libtransmission/utils.cc:568
 msgid "None"
-msgstr "Няма данни"
+msgstr "Няма"
 
 #: ../cli/cli.cc:94
 msgid "Inf"
-msgstr ""
+msgstr "Информация"
 
 #: ../daemon/daemon.cc:197 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:240 ../libtransmission/blocklist.cc:338 ../libtransmission/blocklist.cc:353 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно прочитане на '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:222 ../gtk/Session.cc:862 ../gtk/Utils.cc:272 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Неуспешно добавяне на торент файлове '{path}'"
 
 #: ../daemon/daemon.cc:231
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Премахване на торент файл '{path}'"
 
 #: ../daemon/daemon.cc:236 ../gtk/Utils.cc:555 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно премахване на '{path}':{error} ({error_code})"
 
 #: ../daemon/daemon.cc:637
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Нивото '{level}' на лог файла не можа да бъде анализирано"
 
 #: ../daemon/daemon.cc:684
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Отлагане на презареждането, докато сесията е изцяло стартирана."
 
 #: ../daemon/daemon.cc:698
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Презареждане на настройки от '{path}'"
 
 #: ../daemon/daemon.cc:722
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно инициализиране на фонов процес: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:734
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Зареждане на настройки от '{path}'"
 
 #: ../daemon/daemon.cc:755
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "PID файлът е запазен в '{path}'"
 
 #: ../daemon/daemon.cc:761 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:473 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1084 ../libtransmission/torrent.cc:2073 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно запазване на '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:770
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Изисква удостоверение"
 
 #: ../daemon/daemon.cc:792
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Наблюдаване не '{path}' за нови торент файлове"
 
 #: ../daemon/daemon.cc:837 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно създаване на събитие: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:847 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно добавяне на събитие: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:861
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно стартиране на цикъл на събития на фонов процес: {error} ({error_code})"
 
 #: ../gtk/Application.cc:400
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно регистриране на Transmission като управител на {content_type}: {error} ({error_code})"
 
 #: ../gtk/Application.cc:558
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Получен е сигнал за терминиране, прави се опит за чисто изключване. Опитайте отново, ако блокира."
 
 #: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -117,7 +119,7 @@ msgstr "_Съгласен съм"
 
 #: ../gtk/Application.cc:1020
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Прекъсване на връзки..."
 
 #: ../gtk/Application.cc:1025
 msgid "Sending upload/download totals to tracker…"
@@ -137,7 +139,7 @@ msgstr[1] "Не могат да се добавят повредени торе�
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Не може да со добави дублиран торент"
-msgstr[1] "Не могат да се добавят дублирани торенти"
+msgstr[1] "Не могат да се добавят повторни торенти"
 
 #: ../gtk/Application.cc:1420
 msgid "A fast and easy BitTorrent client"
@@ -145,7 +147,7 @@ msgstr "Бърз и лесен за ползване BitTorrent клиент"
 
 #: ../gtk/Application.cc:1421
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -253,15 +255,15 @@ msgstr "Публичен торент"
 
 #: ../gtk/DetailsDialog.cc:721
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "Създадено от {creator} на {date}"
 
 #: ../gtk/DetailsDialog.cc:725
 msgid "Created by {creator}"
-msgstr ""
+msgstr "Създадено от {creator}"
 
 #: ../gtk/DetailsDialog.cc:729
 msgid "Created on {date}"
-msgstr ""
+msgstr "Съдадено на {date}"
 
 #: ../gtk/DetailsDialog.cc:843
 msgid "Unknown"
@@ -270,36 +272,36 @@ msgstr "Неизвестен"
 #: ../gtk/DetailsDialog.cc:880 ../gtk/MakeDialog.cc:392
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{total_size} в {file_count:L} файл"
+msgstr[1] "{total_size} в {file_count:L} файл"
 
 #: ../gtk/DetailsDialog.cc:895 ../gtk/MakeDialog.cc:398
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "({piece_count} BitTorrent парче с размер {piece_size})"
+msgstr[1] "({piece_count} BitTorrent парчета с размер {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:939
 msgid "{current_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:947
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} (завършено {percent_done}% от {percent_available}%)"
 
 #: ../gtk/DetailsDialog.cc:956
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} (завършено {percent_done}% от {percent_available}%; {unverified_size} непотвърдени)"
 
 #: ../gtk/DetailsDialog.cc:989
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
-msgstr ""
+msgstr "{downloaded_size} (+{discarded_size} отказано след неуспешна проверка/checksum/)"
 
 #: ../gtk/DetailsDialog.cc:1019
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (Коефицент: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1060
 msgid "No errors"
@@ -376,7 +378,7 @@ msgstr "Заявки за сваляне"
 
 #: ../gtk/DetailsDialog.cc:1643
 msgid "Up Reqs"
-msgstr "Заявки за качв."
+msgstr "Заявки за качване"
 
 #: ../gtk/DetailsDialog.cc:1650
 msgid "Dn Blocks"
@@ -417,18 +419,18 @@ msgstr "Уеб участници"
 #: ../gtk/DetailsDialog.cc:1816
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Получен е лист с {markup_begin}{peer_count} участник{markup_end} преди {time_span_ago}"
+msgstr[1] "Получен е лист с {markup_begin}{peer_count} участници{markup_end} преди{time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1828
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Поискан е лист с участници преди {markup_begin}изтекло време{time_span_ago}{markup_end}; ще се опита отново"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1837
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Получена е грешка '{markup_begin}{error}{markup_end}' преди {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1850
 msgid "No updates scheduled"
@@ -436,7 +438,7 @@ msgstr "Няма планувани актуализации"
 
 #: ../gtk/DetailsDialog.cc:1857
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Пита се за още участници {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Queued to ask for more peers"
@@ -445,33 +447,33 @@ msgstr "Заявката за допълнителни участници е п�
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1872
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Попита за още участници преди {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1897
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "тракера имаше {markup_begin}{seeder_count}{seeder_or_seeders} и {leecher_count}{leecher_or_leechers}{markup_end} преди {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1899
 msgid "seeder"
 msgid_plural "seeders"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "сийдър"
+msgstr[1] "сийдъри"
 
 #: ../gtk/DetailsDialog.cc:1901
 msgid "leecher"
 msgid_plural "leechers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "лийчър"
+msgstr[1] "лийчъри"
 
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1910
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Получена е грешка '{markup_begin}{error}{markup_end}' преди {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1927
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Портовно питане за участници след {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Queued to ask for peer counts"
@@ -479,11 +481,11 @@ msgstr "Поставяне на заявка за броя на участниц
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Пита за участници преди {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2226
 msgid "{torrent_name} - Edit Trackers"
-msgstr ""
+msgstr "{torrent_name} - Редактирай Тракерите"
 
 #: ../gtk/DetailsDialog.cc:2260
 msgid "List contains invalid URLs"
@@ -495,7 +497,7 @@ msgstr "Моля, поправете грешките е опитайте отн
 
 #: ../gtk/DetailsDialog.cc:2347
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - Добави Тракер"
 
 #: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
@@ -503,25 +505,25 @@ msgstr "Тракери"
 
 #: ../gtk/DetailsDialog.cc:2642
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "{torrent_name} Свойства"
 
 #: ../gtk/DetailsDialog.cc:2647
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Свойства - {torrent_count:L} Торент"
+msgstr[1] "Свойства - {torrent_count:L} Торенти"
 
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Премахни торент?"
+msgstr[1] "Премахни {count:L} торента?"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Изтрий свалените файлове на торента?"
+msgstr[1] "Изтрий свалените файлове на {count:L} торента?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -575,7 +577,7 @@ msgstr "Нисък"
 
 #: ../gtk/FileList.cc:857 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно преименуване на '{old_path}' на '{path}': {error} ({error_code})"
 
 #: ../gtk/FileList.cc:962 ../gtk/MessageLogWindow.cc:342
 msgid "Name"
@@ -620,23 +622,27 @@ msgstr "_Покажи:"
 
 #: ../gtk/FilterBar.cc:588
 msgid "_Show {count:L} of:"
-msgstr ""
+msgstr "_Покажи {count:L} на:"
 
 #: ../gtk/FreeSpaceLabel.cc:56
 msgid "{disk_space} free"
-msgstr ""
+msgstr "Празно място {disk_space}"
 
 #: ../gtk/MainWindow.cc:383
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Цъкни, за да изключиш Алтернативните Ограничения на Скоростта\n"
+"({download_speed} сваляне, {upload_speed} качване)"
 
 #: ../gtk/MainWindow.cc:384
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Цъкни, за да включиш Алтернативните Ограничения на Скоростта\n"
+"({download_speed} сваляне, {upload_speed} качване)"
 
 #: ../gtk/MainWindow.cc:436
 msgid "Unlimited"
@@ -660,7 +666,7 @@ msgstr "Спри разпространяването при коефициен�
 
 #: ../gtk/MainWindow.cc:582
 msgid "Stop at Ratio ({ratio})"
-msgstr ""
+msgstr "Спри при коефицент ({ratio})"
 
 #: ../gtk/MainWindow.cc:595
 msgid "Total Ratio"
@@ -680,41 +686,41 @@ msgstr "Трансфер в сесията"
 
 #: ../gtk/MainWindow.cc:763 ../gtk/MainWindow.cc:784 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
-msgstr ""
+msgstr "Коефицент: {ratio}"
 
 #: ../gtk/MainWindow.cc:769
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Свалени: {downloaded_size}, качени: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:777
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Свалени: {downloaded_size}, качени: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:811
 msgid "{download_speed} ▼"
-msgstr ""
+msgstr "{download_speed} ▼"
 
 #: ../gtk/MainWindow.cc:814 ../gtk/Torrent.cc:624
 msgid "{upload_speed} ▲"
-msgstr ""
+msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:194
 msgid "Creating '{path}'"
-msgstr ""
+msgstr "Създаване на '{path}'"
 
 #: ../gtk/MakeDialog.cc:207
 msgid "Created '{path}'"
-msgstr ""
+msgstr "Създаден: '{path}'"
 
 #: ../gtk/MakeDialog.cc:213 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
 msgid "Couldn't create '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно прочитане на '{path}': {error} ({error_code})"
 
 #: ../gtk/MakeDialog.cc:231
 msgid "Scanned {file_size}"
-msgstr ""
+msgstr "Сканирани {file_size}"
 
 #: ../gtk/MakeDialog.cc:386 ../gtk/MakeDialog.cc:549 ../gtk/ui/gtk3/MakeDialog.ui:172 ../gtk/ui/gtk4/MakeDialog.ui:100
 msgid "No source selected"
@@ -723,27 +729,27 @@ msgstr "Не е избран източник"
 #: ../gtk/MessageLogWindow.cc:104
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Критична"
 
 #: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Грешка"
 
 #: ../gtk/MessageLogWindow.cc:106
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Предупреждение"
 
 #: ../gtk/MessageLogWindow.cc:107
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Информация"
 
 #: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "отстраняване на грешки"
 
 #: ../gtk/MessageLogWindow.cc:271
 msgid "Save Log"
@@ -763,7 +769,7 @@ msgstr "Време"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Неуспешно създаване на прокси за '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -779,7 +785,7 @@ msgstr "Торентът е завършен"
 
 #: ../gtk/Notify.cc:274
 msgid "Start Now"
-msgstr ""
+msgstr "Започни Сега"
 
 #: ../gtk/Notify.cc:286
 msgid "Torrent Added"
@@ -803,15 +809,15 @@ msgstr "_Отваряне"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
-msgstr ""
+msgstr "Покажи диалоговия прозорец с опциите"
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "Избери файл"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
-msgstr ""
+msgstr "(Няма)"
 
 #: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
@@ -840,20 +846,20 @@ msgstr "Уикендите"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Черният списък съдържа {count:L} запис"
+msgstr[1] "Черният списък съдържа {count:L} записа"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "Черният списък е актуализиран!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "Неуспешно актуализиране на черния списък"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
-msgstr "Получаване на нов «черен списък»…"
+msgstr "Получаване на нов черен списък…"
 
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
@@ -890,7 +896,7 @@ msgstr ""
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "Премества се '{torrent_name}'"
 
 #: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
@@ -902,7 +908,7 @@ msgstr "Това може да отнеме известно време…"
 
 #: ../gtk/Session.cc:797 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
-msgstr ""
+msgstr "Неуспешно прочитане на '{path}'"
 
 #. logging
 #: ../gtk/Session.cc:1082
@@ -911,7 +917,7 @@ msgstr "Изключи прехода към спящ режим"
 
 #: ../gtk/Session.cc:1088 ../gtk/Session.cc:1113
 msgid "Couldn't inhibit desktop hibernation: {error}"
-msgstr ""
+msgstr "Неуспешно изключване на прехода към спящ режим: {error}"
 
 #. logging
 #: ../gtk/Session.cc:1109
@@ -920,13 +926,13 @@ msgstr "Разрешаване на преминавато в спящ режи�
 
 #: ../gtk/Session.cc:1227
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Неуспешно откриване на чакаща RPC заявка с етикет {tag}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Започнато {count:L} път"
+msgstr[1] "Започнато {count:L} пъти"
 
 #: ../gtk/StatsDialog.cc:107
 msgid "Reset your statistics?"
@@ -942,34 +948,34 @@ msgstr "Тези статистики са само за ваша информа
 
 #: ../gtk/SystemTrayIcon.cc:207
 msgid "{upload_speed} ▲ {download_speed} ▼"
-msgstr ""
+msgstr "{upload_speed} ▲ {download_speed} ▼"
 
 #: ../gtk/Torrent.cc:439
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr ""
+msgstr "Проверяване на локални данни ({percent_done}% проверени)"
 
 #: ../gtk/Torrent.cc:466
 msgid "{current_size} of {complete_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} от {complete_size} ({percent_done}%)"
 
 #: ../gtk/Torrent.cc:476
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{current_size} от {complete_size} ({percent_complete}%), качени {uploaded_size} (Коефицент: {ratio}, Цел: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:488
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{current_size} от {complete_size} ({percent_complete}%), качени {uploaded_size} (Коефицент: {ratio})"
 
 #: ../gtk/Torrent.cc:498
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{complete_size}, качени {uploaded_size} (Коефицент: {ratio}, Цел: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:507
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{complete_size}, качени {uploaded_size} (Коефицент: {ratio})"
 
 #: ../gtk/Torrent.cc:520
 msgid "Remaining time unknown"
@@ -977,7 +983,7 @@ msgstr "Оставащото време е неизвестно"
 
 #: ../gtk/Torrent.cc:617
 msgid "{download_speed} ▼  {upload_speed} ▲"
-msgstr ""
+msgstr "{download_speed} ▼ {upload_speed} ▲"
 
 #: ../gtk/Torrent.cc:629
 msgid "Stalled"
@@ -985,15 +991,15 @@ msgstr "В застой"
 
 #: ../gtk/Torrent.cc:640
 msgid "Tracker warning: '{warning}'"
-msgstr ""
+msgstr "Предупреждение от тракера: {%s}"
 
 #: ../gtk/Torrent.cc:643
 msgid "Tracker Error: '{error}'"
-msgstr ""
+msgstr "Грешка на тракера:{error}"
 
 #: ../gtk/Torrent.cc:646
 msgid "Local error: '{error}'"
-msgstr ""
+msgstr "Локална грешка:{error}"
 
 #: ../gtk/Torrent.cc:670
 #, no-c-format
@@ -2607,9 +2613,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Connection failed"
-#~ msgstr "Свързването е неуспешно"
-
-#~ msgid "Status unknown"
-#~ msgstr "Състоянието е неизвестно"

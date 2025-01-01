@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>O Transmissionu</translation>
+        <translation>O programu</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -31,12 +31,12 @@
     <message>
         <location line="+4"/>
         <source>C&amp;redits</source>
-        <translation>Zasluge</translation>
+        <translation>&amp;Zasluge</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;License</source>
-        <translation>&amp;Licenca</translation>
+        <translation>&amp;Dovoljenje</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -49,7 +49,7 @@
     <message>
         <location filename="../Application.cc" line="+228"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Transmission je program za deljenje datotek&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Transmission je program za izmenjavo datotek.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -59,7 +59,7 @@
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
-        <translation>Strinjam se</translation>
+        <translation>&amp;Se strinjam</translation>
     </message>
     <message numerus="yes">
         <location line="+107"/>
@@ -108,12 +108,12 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation>%1 (+%2 zavrženih po spodleteli nadzorni vsoti)</translation>
+        <translation>%1 (+%2 zavrženih po spodletelem preverjanju nadzorne vsote)</translation>
     </message>
     <message>
         <location line="+130"/>
         <source>Active now</source>
-        <translation>Trenutno aktivno</translation>
+        <translation>Trenutno dejavno</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -274,11 +274,11 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minuta</numerusform>
+            <numerusform>%1 minuti</numerusform>
+            <numerusform>%1 minute</numerusform>
+            <numerusform>%1 minut</numerusform>
         </translation>
     </message>
     <message>
@@ -435,7 +435,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Oznake:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -1684,22 +1684,22 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minuta</numerusform>
+            <numerusform>%1 minuti</numerusform>
+            <numerusform>%1 minute</numerusform>
+            <numerusform>%1 minut</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>pred %1 minuto</numerusform>
+            <numerusform>pred %1 minutama</numerusform>
+            <numerusform>pred %1 minutami</numerusform>
+            <numerusform>pred %1 minutami</numerusform>
         </translation>
     </message>
     <message>
@@ -2362,7 +2362,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2534,13 +2534,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>preostalo %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Preostali čas neznan</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

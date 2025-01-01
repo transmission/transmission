@@ -7,8 +7,8 @@
 # Dirk van Donkelaar <dirk@vdde.nl>, 2017
 # Nathan Follens, 2020
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2022
-# Gideon van Melle <translations@gvmelle.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Gideon van Melle <translations@gvmelle.com>, 2024
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Gideon van Melle <translations@gvmelle.com>, 2024\n"
 "Language-Team: Dutch (https://app.transifex.com/transmissionbt/teams/33778/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -1202,7 +1202,7 @@ msgstr "Voer '{program} --help' uit om een volledige lijst met beschikbare opdra
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1222,7 +1222,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -2163,13 +2163,13 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Aankondigingsfout: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Aankondigingsfout: {error} (Opnieuw proberen over {count} seconde) ({url})"
+msgstr[1] "Aankondigingsfout: {error} (Opnieuw proberen over {count} seconden) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2208,15 +2208,15 @@ msgstr "Kon '{path}' niet verkrijgen: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Succesvol geüpdatete bron {protocol} naar adres {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Uw machine ondersteunt  {protocol} niet"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Globaal {type} met succes geüpdate naar adres {ip} met gebruik van {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2452,7 +2452,7 @@ msgstr "Kon metainfo van '{path}' niet gebruiken voor '{magnet}': {error} ({erro
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Geen gegevens gevonden! Zorg ervoor dat uw schijven zijn aangesloten of gebruik \"Locatie instellen\". Om opnieuw te downloaden, gebruik je \"Lokale gegevens verifiëren\" en start daarna de torrent."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2492,11 +2492,11 @@ msgstr "Kon '{old_path}' niet verplaatsen naar '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Torrent gepauzeerd omdat er geen gegevens zijn gevonden! Zorg ervoor dat uw schijven zijn aangesloten of gebruik \"Locatie instellen\" en gebruik vervolgens opnieuw \"Lokale gegevens verifiëren\". Start de torrent om opnieuw te downloaden."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Tracker waarschuwing: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
@@ -2592,7 +2592,7 @@ msgstr "NB: Ongeldige certificaten worden weergegeven als 'Kan geen verbinding m
 
 #: ../libtransmission/web.cc:463
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Kon niet  '{url}' ophalen: verwachtte HTTP-antwoordcode {expected_code}, kreeg {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
@@ -2629,27 +2629,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dg"
 msgstr[1] "dagen"
-
-#~ msgid "Connection failed"
-#~ msgstr "Verbinding mislukt"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Kon LPD niet initialiseren: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "Poort is {markup_begin}gesloten{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr "Poort is {markup_begin}open{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "Poort {port} wordt doorgestuurd"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "Poort {port} wordt niet doorgestuurd"
-
-#~ msgid "Status unknown"
-#~ msgstr "Status onbekend"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "Testen van TCP poort…"

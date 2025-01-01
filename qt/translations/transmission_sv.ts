@@ -268,9 +268,9 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minut</numerusform>
+            <numerusform>%1 minuter</numerusform>
         </translation>
     </message>
     <message>
@@ -352,7 +352,7 @@
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Egenskaper för torrent</translation>
+        <translation>Torrent-egenskaper</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiketter:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -1659,18 +1659,18 @@ För att lägga till ytterligare en primär URL, lägg till den efter en tom rad
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minut</numerusform>
+            <numerusform>%1 minuter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minut sedan</numerusform>
+            <numerusform>%1 minuter sedan</numerusform>
         </translation>
     </message>
     <message>
@@ -2325,7 +2325,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2442,7 +2442,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>Magnetöverföring - hämtar metadata (%1%)</translation>
+        <translation>Magnetiserad överföring - hämtar metadata (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2495,13 +2495,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 kvar</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Återstående tid är okänd</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>

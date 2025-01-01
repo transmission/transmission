@@ -2672,9 +2672,3 @@ msgid_plural "days"
 msgstr[0] "giorno"
 msgstr[1] "giorni"
 msgstr[2] "giorni"
-
-#~ msgid "Connection failed"
-#~ msgstr "Connessione non riuscita"
-
-#~ msgid "Status unknown"
-#~ msgstr "Stato sconosciuto"

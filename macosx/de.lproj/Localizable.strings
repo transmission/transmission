@@ -52,7 +52,7 @@
 "%lu IP address rules in list" = "%lu IP-Adressen in der Blockliste";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu bekannt:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu lokal entdeckt";
@@ -217,7 +217,7 @@
 "Available" = "Verfügbar";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Durchsatz";
@@ -486,7 +486,7 @@
 "KB/s" = "KB/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Bekannt:";
 
 /* Tracker last announce */
 "Last Announce" = "Letzte Meldung";
@@ -890,7 +890,7 @@
 "Show the data file in Finder" = "Empfangene Daten im Finder zeigen";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Symbolleiste einblenden";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -994,7 +994,7 @@
 "This folder contains no files." = "Der Ordner enthält keine Dateien.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Diese Option ist nicht verfügbar, wenn der Standardort gleich ist wie die Torrentdatei.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Diese Übertragung ist aktiv. Nach dem Entfernen wird erneut die Torrent-Datei oder der magnet-Link benötigt, um sie fortzusetzen.";

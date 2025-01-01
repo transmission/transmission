@@ -2539,6 +2539,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "Status unknown"
-#~ msgstr "Status tidak diketahui"

@@ -2608,27 +2608,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#~ msgid "Connection failed"
-#~ msgstr "Konexioak huts egin du"
-
-#~ msgid "Couldn't initialize LPD: {error} ({error_code})"
-#~ msgstr "Ezin izan da LPDa abiarazi: {error} ({error_code})"
-
-#~ msgid "Port is {markup_begin}closed{markup_end}"
-#~ msgstr "{markup_begin}ataka itxita dago{markup_end}"
-
-#~ msgid "Port is {markup_begin}open{markup_end}"
-#~ msgstr " {markup_begin}ataka irekita dago{markup_end}"
-
-#~ msgid "Port {port} is forwarded"
-#~ msgstr "{port} ataka berbidalita dago"
-
-#~ msgid "Port {port} is not forwarded"
-#~ msgstr "{port} ataka ez dago berbidalita"
-
-#~ msgid "Status unknown"
-#~ msgstr "Egoera ezezaguna"
-
-#~ msgid "Testing TCP port…"
-#~ msgstr "TCP ataka probatzen…"

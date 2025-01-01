@@ -2588,6 +2588,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "Status unknown"
-#~ msgstr "Hindi alam ang katayuan"
