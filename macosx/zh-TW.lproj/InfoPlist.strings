@@ -1,3 +1,4 @@
 /* Localized versions of Info.plist keys */
 
 NSHumanReadableCopyright = "Copyright © 2005-2025 The Transmission Project";
+MDItemKeywords = "torrent,torrents,magnet,magnets,tor,bt,bit";

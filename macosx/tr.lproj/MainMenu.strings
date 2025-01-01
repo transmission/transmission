@@ -12,7 +12,7 @@
 "58.title" = "Transmission Hakkında";
 
 /* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "72"; */
-"72.title" = "Torrent Dosyası Aç...";
+"72.title" = "Torrent Dosyası Aç…";
 
 /* Class = "NSMenuItem"; title = "Close Window"; ObjectID = "73"; */
 "73.title" = "Pencereyi Kapat";
@@ -39,10 +39,10 @@
 "131.title" = "Servisler";
 
 /* Class = "NSMenuItem"; title = "Hide Transmission"; ObjectID = "134"; */
-"134.title" = "Transmission'u Gizle";
+"134.title" = "Transmission’u Gizle";
 
 /* Class = "NSMenuItem"; title = "Quit Transmission"; ObjectID = "136"; */
-"136.title" = "Transmission'dan Çık";
+"136.title" = "Transmission’dan Çık";
 
 /* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
 "145.title" = "Diğerlerini Gizle";
@@ -87,10 +87,10 @@
 "459.title" = "Denetçiyi Göster";
 
 /* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "516"; */
-"516.title" = "Finder'da Göster";
+"516.title" = "Finder’da Göster";
 
 /* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "545"; */
-"545.title" = "Araç Çubuğunu Özelleştir...";
+"545.title" = "Araç Çubuğunu Özelleştir…";
 
 /* Class = "NSMenuItem"; title = "Hide Status Bar"; ObjectID = "547"; */
 "547.title" = "Durum Çubuğunu Gizle";
@@ -102,7 +102,7 @@
 "598.title" = "Denetçiyi Göster";
 
 /* Class = "NSMenuItem"; title = "Open Torrent File…"; ObjectID = "611"; */
-"611.title" = "Torrent Dosyası Aç...";
+"611.title" = "Torrent Dosyası Aç…";
 
 /* Class = "NSMenuItem"; title = "Check for Update…"; ObjectID = "975"; */
 "975.title" = "Güncellemeleri Denetle…";
@@ -138,13 +138,13 @@
 "1516.title" = "Dizelgeden Kaldır";
 
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "1533"; */
-"1533.title" = "Torrent Dosyasını Farklı Kaydet...";
+"1533.title" = "Torrent Dosyasını Farklı Kaydet…";
 
 /* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "1536"; */
 "1536.title" = "Denetçiyi Göster";
 
 /* Class = "NSMenuItem"; title = "Show in Finder"; ObjectID = "1539"; */
-"1539.title" = "Finder'da Göster";
+"1539.title" = "Finder’da Göster";
 
 /* Class = "NSMenuItem"; title = "Remove From List"; ObjectID = "1550"; */
 "1550.title" = "Dizelgeden Kaldır";
@@ -174,7 +174,7 @@
 "1678.title" = "Seçiliyi Hemen Sürdür";
 
 /* Class = "NSMenuItem"; title = "Open With Options Window…"; ObjectID = "1680"; */
-"1680.title" = "Seçenekler Penceresi ile Aç...";
+"1680.title" = "Seçenekler Penceresi ile Aç…";
 
 /* Class = "NSMenuItem"; title = "Window"; ObjectID = "1683"; */
 "1683.title" = "Pencere";
@@ -219,10 +219,10 @@
 "1808.title" = "Seçiliyi Hemen Sürdür";
 
 /* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1846"; */
-"1846.title" = "Torrent Konumu Aç...";
+"1846.title" = "Torrent Konumu Aç…";
 
 /* Class = "NSMenuItem"; title = "Open Torrent Address…"; ObjectID = "1858"; */
-"1858.title" = "Torrent Konumu Aç...";
+"1858.title" = "Torrent Konumu Aç…";
 
 /* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "1860"; */
 "1860.title" = "İzleyiciyi Güncelle";
@@ -231,7 +231,7 @@
 "1877.title" = "Yerel Veriyi Doğrula";
 
 /* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "1891"; */
-"1891.title" = "Veri Dosyasını Taşı...";
+"1891.title" = "Veri Dosyasını Taşı…";
 
 /* Class = "NSMenuItem"; title = "Sort Transfers By"; ObjectID = "1894"; */
 "1894.title" = "Aktarımları Sırala";
@@ -258,55 +258,13 @@
 "1902.title" = "Ad";
 
 /* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1921"; */
-"1921.title" = "Torrent Dosyası Oluştur...";
+"1921.title" = "Torrent Dosyası Oluştur…";
 
 /* Class = "NSMenuItem"; title = "Create Torrent File…"; ObjectID = "1923"; */
-"1923.title" = "Torrent Dosyası Oluştur...";
+"1923.title" = "Torrent Dosyası Oluştur…";
 
 /* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
 "1933.title" = "İzleyici";
-
-/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
-"1936.title" = "Menü";
-
-/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "İndirme Bant Genişliği Sınırı";
-
-/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "İndirme Bant Genişliği Sınırı";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
-"1946.title" = "Sınırsız";
-
-/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Karşıya Yükleme Bant Genişliği Sınırı";
-
-/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Karşıya Yükleme Bant Genişliği Sınırı";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
-"1960.title" = "sınır";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
-"1963.title" = "Sınırsız";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
-"1964.title" = "sınır";
-
-/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
-"2017.title" = "Beslemenin Duracağı Oran";
-
-/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
-"2018.title" = "Beslemenin Duracağı Oran";
-
-/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
-"2024.title" = "Sürekli Besle";
-
-/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
-"2025.title" = "durma oranı";
-
-/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
-"2031.title" = "Genel";
 
 /* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
 "2122.title" = "İzleyiciyi Güncelle";
@@ -339,7 +297,7 @@
 "3078.title" = "Öbekleri Kullan";
 
 /* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
-/* "3093.headerCell.title" = ""; */
+"3093.headerCell.title" = "Torrent";
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
 "3166.title" = "Göz At";
@@ -347,32 +305,14 @@
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
 "3170.title" = "Destek ve Geliştirme";
 
-/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
-"3190.title" = "Genel Bant Genişliği Limiti İçinde Kal";
-
-/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
-"3196.title" = "Öncelik";
-
-/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
-"3197.title" = "Öncelik";
-
-/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
-"3198.title" = "Yüksek";
-
-/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
-"3199.title" = "Olağan";
-
-/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
-"3200.title" = "Düşük";
-
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
-"3207.title" = "Farklı Kaydet...";
+"3207.title" = "Farklı Kaydet…";
 
 /* Class = "NSMenuItem"; title = "Move Data File To…"; ObjectID = "3209"; */
-"3209.title" = "Veri Dosyasını Taşı...";
+"3209.title" = "Veri Dosyasını Taşı…";
 
 /* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "3212"; */
-"3212.title" = "Bağış Yap...";
+"3212.title" = "Bağış Yap…";
 
 /* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3216"; */
 "3216.title" = "Mıknatıs Bağlantıyı Panoya Kopyala";
@@ -399,10 +339,10 @@
 "3430.title" = "Boyut";
 
 /* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3445"; */
-"3445.title" = "Yeniden Adlandır...";
+"3445.title" = "Yeniden Adlandır…";
 
 /* Class = "NSMenuItem"; title = "Rename File…"; ObjectID = "3448"; */
-"3448.title" = "Yeniden Adlandır...";
+"3448.title" = "Yeniden Adlandır…";
 
 /* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "8t6-wh-5UW"; */
 "8t6-wh-5UW.title" = "Torrent Dosyasını Paylaş";
@@ -411,34 +351,34 @@
 "Cay-iU-bH4.title" = "Torrent Dosyasını Paylaş";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
-/* "HmT-FI-amY.title" = ""; */
+"HmT-FI-amY.title" = "0,0 KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
-/* "Zmj-A9-NPf.title" = ""; */
+"Zmj-A9-NPf.title" = "Durum Dizisi";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
-/* "kbX-Av-eP4.title" = ""; */
+"kbX-Av-eP4.title" = "Başlık";
 
 /* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
-/* "lmp-Y3-ZQO.title" = ""; */
+"lmp-Y3-ZQO.title" = "Durum";
 
 /* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
 "lvU-Va-GzM.title" = "Torrent Dosyasını Paylaş";
 
 /* Class = "NSTextFieldCell"; title = "Progress"; ObjectID = "oSz-TE-8jj"; */
-"oSz-TE-8jj.title" = "İndirme Durumu";
+"oSz-TE-8jj.title" = "İlerleme";
 
 /* Class = "NSMenuItem"; title = "Share Torrent File"; ObjectID = "s5v-VO-G2y"; */
 "s5v-VO-G2y.title" = "Torrent Dosyasını Paylaş";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
-/* "x8g-Nv-jcD.title" = ""; */
+"x8g-Nv-jcD.title" = "0,0 KB/sn";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
-/* "y9O-gd-sXA.title" = ""; */
+"y9O-gd-sXA.title" = "Başlık";
 
 /* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
-/* "zIM-6D-jsa.title" = ""; */
+"zIM-6D-jsa.title" = "Öbek Başlığı";
 
 /* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
-/* "zLF-YR-Oq6.title" = ""; */
+"zLF-YR-Oq6.title" = "Kalan Süre";

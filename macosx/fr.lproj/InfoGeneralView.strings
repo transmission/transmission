@@ -1,18 +1,18 @@
 
 /* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
-"21.title" = "Pièces :";
+"21.title" = "Morceaux :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
 "22.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
-"24.title" = "Privé :";
+"24.title" = "Sécurisé :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
 "25.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
-"26.title" = "Données :";
+"26.title" = "Fichier de données :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
 "27.placeholderString" = "N/A";
@@ -20,29 +20,32 @@
 /* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
 "28.title" = "Emplacement";
 
-/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
-"29.title" = "RevealDataFile";
-
 /* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
-"30.title" = "Créateur :";
+"30.title" = "Créateur :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
 "31.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
-"32.title" = "Créé le :";
+"32.title" = "Créé le :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
 "33.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
-"35.title" = "Comment. :";
+"35.title" = "Commentaire :";
 
 /* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
-"36.title" = "Hash :";
+"36.title" = "Hachage :";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
 "37.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
-"41.title" = "Informations";
+"41.title" = "Renseignements sur le torrent :";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "7YU-bS-UkI"; */
+"7YU-bS-UkI.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
+/* "uaW-NM-PTU.title" = ""; */

@@ -3,13 +3,13 @@
 "23.title" = "Ayarlar";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
-"53.title" = "Diğer...";
+"53.title" = "Diğer…";
 
 /* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
 "55.title" = "Torrent ile aynı yer";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
-"219.title" = "Diğer...";
+"219.title" = "Diğer…";
 
 /* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
 "253.label" = "Ekle";
@@ -18,7 +18,7 @@
 "254.label" = "Yönet";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
-"542.title" = "Diğer...";
+"542.title" = "Diğer…";
 
 /* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
 "1201.title" = "Etkin aktarım sırasında çıkarken";
@@ -195,7 +195,7 @@
 "1438.title" = "kara dizelge yüklü/yüklü değil";
 
 /* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
-"1439.title" = "Kara Dizelge:";
+"1439.title" = "Kara dizelge:";
 
 /* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
 "1440.title" = "Kara dizelgedeki kullanıcıların bağlanmasına izin verme";
@@ -279,7 +279,7 @@
 "1796.title" = "Öbek adı:";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
-"1813.title" = "Diğer...";
+"1813.title" = "Diğer…";
 
 /* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
 "1815.title" = "Konum belirt:";
@@ -294,7 +294,7 @@
 "1831.title" = "Öbeği yeni aktarımlara şu kriterlere göre ekle:";
 
 /* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
-"1833.title" = "Düzenle...";
+"1833.title" = "Düzenle…";
 
 /* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
 "1835.title" = "Aktarımlar tüm kriterlerin sağlandığı ilk gruba atanacaklardır";
@@ -372,7 +372,7 @@
 "2047.title" = "Betikler:";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
-"2053.title" = "Diğer...";
+"2053.title" = "Diğer…";
 
 /* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
 "2078.title" = "Mikro İletişim Protokolünü etkinleştir (µTP)";
@@ -393,7 +393,7 @@
 "2123.title" = "Yeni eklenen aktarımlar için";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "Torrent dosyalarını aç:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "Saptanmış Uygulamayı Belirle";
