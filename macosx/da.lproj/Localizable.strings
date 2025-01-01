@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ kontrolleret";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "Licens";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Begræns (%ld KB/s)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Log filen kunne ikke gemmes";
 
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statistikker";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Stop ved delingsforhold (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Stop ventende for at starte";

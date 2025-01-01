@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ перевірено";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld КБ/с";
 
 /* Info options -> global setting */
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "Ліцензія";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Обмеження (%ld КБ/с)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Журнал не може бути збережений";
 
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Статистика";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Зупинити за Рейтингу (%.2f) ";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Не очікувати на початок";

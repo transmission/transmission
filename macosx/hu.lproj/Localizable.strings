@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ ellenőrizve";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "Licensz";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Korlát (%ld KB/s)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Naplófájl nem menthető";
 
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statisztika";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Leállítás arány elérésekor (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Várakozás elkezdésének leállítása";

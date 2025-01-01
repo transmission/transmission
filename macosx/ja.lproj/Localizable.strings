@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ 検証済み";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "ライセンス";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "制限 (%ld KB/s)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "ログを保存できません";
 
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "統計情報";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "この共有比で停止 (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "開始の待機を停止";

@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ verificados";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "Licença";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limite (%ld KB/s)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Não foi possível guardar o registo";
 
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Estatísticas";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Parar no rácio (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Parar de aguardar para iniciar";
