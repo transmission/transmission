@@ -15,6 +15,7 @@ Categories=Network;FileTransfer;P2P;GTK;
 X-Ubuntu-Gettext-Domain=transmission
 X-AppInstall-Keywords=torrent
 Actions=Pause;Minimize;
+StartupWMClass=com.transmissionbt.transmission_2049_1344295
 
 [Desktop Action Pause]
 Name=Start Transmission with All Torrents Paused
