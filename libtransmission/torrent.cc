@@ -1126,6 +1126,47 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     this->on_announce_list_changed();
 }
 
+std::string tr_torrent::getFirstFilenameConflict() const
+{
+    auto const our_current_dir = current_dir();
+    auto const our_files = metainfo_.files().sorted_by_path();
+
+    // Build list of filenames from this torrent
+    std::set<std::string_view> our_filenames;
+    for (auto const& [path, size] : our_files)
+    {
+        our_filenames.insert(path);
+    }
+
+    // Check against all other torrents in the session
+    for (auto const* const other : session->torrents())
+    {
+        // Skip comparing against self
+        if (other == this)
+        {
+            continue;
+        }
+
+        // Only check torrents in the same directory
+        if (other->current_dir() != our_current_dir)
+        {
+            continue;
+        }
+
+        // Check each filename from the other torrent against our list
+        auto const their_files = other->metainfo_.files().sorted_by_path();
+        for (auto const& [path, size] : their_files)
+        {
+            if (our_filenames.count(path) != 0)
+            {
+                return other->name(); // Return name of conflicting torrent
+            }
+        }
+    }
+
+    return {}; // No conflict found
+}
+
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
@@ -1153,6 +1194,30 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
     auto* const tor = new tr_torrent{ std::move(metainfo) };
     tor->verify_done_callback_ = ctor->steal_verify_done_callback();
     tor->init(*ctor);
+
+    // Check for filename conflicts
+    if (auto const conflicting_name = tor->getFirstFilenameConflict(); !std::empty(conflicting_name))
+    {
+        // Find the conflicting torrent to report back to caller
+        for (auto* const other : tor->session->torrents())
+        {
+            if (other->name() == conflicting_name)
+            {
+                if (setme_duplicate_of != nullptr)
+                {
+                    *setme_duplicate_of = other;
+                }
+                break;
+            }
+        }
+
+        tor->error().set_local_error(fmt::format(
+            _("Files in torrent '{new_torrent}' would conflict with files in the already-running '{existing_torrent}' torrent. Multiple torrents cannot share the same download location and filename."),
+            fmt::arg("new_torrent", tor->name()),
+            fmt::arg("existing_torrent", conflicting_name)));
+        tr_torrentStop(tor);
+    }
+
     return tor;
 }
 

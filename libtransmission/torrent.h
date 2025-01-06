@@ -1186,6 +1186,11 @@ private:
         return true;
     }
 
+    /** Get the name of the first torrent that has filename conflicts with this torrent
+        in the same download directory.
+        @return name of conflicting torrent, or empty string if no conflicts */
+    [[nodiscard]] std::string getFirstFilenameConflict() const;
+
     constexpr void set_needs_completeness_check() noexcept
     {
         needs_completeness_check_ = true;
