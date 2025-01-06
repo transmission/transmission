@@ -314,6 +314,7 @@ a {
     background-repeat: no-repeat;
     border: 0;
     border-radius: 5px;
+    color: var(--color-fg-primary);
     cursor: pointer;
     height: var(--toolbar-height);
     margin-right: 6px;
@@ -330,6 +331,7 @@ a {
     }
 
     &:disabled {
+      color: var(--color-fg-disabled);
       cursor: default;
 
       svg {
@@ -339,6 +341,26 @@ a {
           fill: var(--color-fg-disabled);
         }
       }
+    }
+  }
+
+  #toolbar-inspector {
+    &::before {
+      content: 'i';
+      border: 4px solid transparent;
+      border-radius: 17px;
+      box-shadow: inset 0 0 0 2.6px var(--color-fg-primary);
+      display: inline-block;
+      font-family: monospace;
+      font-size: 18px;
+      height: 22px;
+      margin-bottom: 2px;
+      padding: 2px;
+      width: 22px;
+    }
+
+    &:disabled::before {
+      box-shadow: inset 0 0 0 2.6px var(--color-fg-disabled);
     }
   }
 
