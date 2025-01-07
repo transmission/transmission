@@ -787,8 +787,7 @@ a {
       height: 20px;
       position: relative;
 
-      &::before,
-      &::after {
+      &::before {
         border-radius: 3px;
         content: '';
         height: 100%;
