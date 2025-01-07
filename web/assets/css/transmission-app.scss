@@ -564,6 +564,7 @@ a {
 
     .torrent-progress-bar {
       grid-area: progressbar;
+      position: relative;
     }
 
     .torrent-progress-details {
@@ -624,11 +625,6 @@ a {
         width: var(--icon-size);
       }
 
-      .torrent-progress-bar {
-        display: flex;
-        flex-direction: row;
-      }
-
       > * {
         margin: 1px 0;
       }
@@ -636,10 +632,6 @@ a {
 
     &.paused {
       color: var(--color-fg-disabled);
-
-      &:not(.selected) .torrent-progress-bar {
-        color: var(--color-fg-primary);
-      }
 
       .icon {
         background-color: var(--color-fg-disabled);
@@ -662,14 +654,7 @@ a {
   }
 
   .torrent-progress-bar {
-    font-size: 14px;
-    position: relative;
-    border: 1px solid var(--color-border-starkest);
-    border-radius: 3px;
-    height: 18px;
-
     &.full {
-      flex-grow: 1;
       margin: 2px 0;
     }
 
@@ -678,76 +663,107 @@ a {
     }
 
     &.leech {
-      &.queued::before {
-        background: var(--color-progressbar-queued);
-      }
-
       &::before {
-        background: var(--color-progressbar-leech);
         color: var(--color-progressbar-fg-2);
         text-shadow: var(--progress-bar-shadow-2);
       }
+
+      &.queued .progress::before {
+        background: var(--color-progressbar-queued);
+      }
+
+      .progress::before {
+        background: var(--color-progressbar-leech);
+      }
     }
 
-    &.magnet::before {
-      background: var(--color-progressbar-magnet);
-      color: #000;
+    &.magnet {
+      &::before {
+        color: #000;
+      }
+
+      .progress::before {
+        background: var(--color-progressbar-magnet);
+      }
     }
 
     &.seed {
       &.paused::before {
-        background: var(--color-progressbar-seed-paused);
         color: var(--color-progressbar-fg-1);
         text-shadow: var(--progress-bar-shadow-1);
       }
 
+      .progress {
+        background: var(--color-progressbar-seed-paused);
+      }
+
       &:not(.paused) {
         &::before {
-          background: var(--color-progressbar-seed-1);
           color: var(--color-progressbar-fg-2);
           text-shadow: var(--progress-bar-shadow-2);
         }
 
         &::after {
-          background: var(--color-progressbar-seed-2);
           color: var(--color-progressbar-fg-3);
           text-shadow: var(--progress-bar-shadow-3);
         }
       }
 
-      &.queued::before {
+      &.queued .progress::before {
         background-color: var(--color-progressbar-seed-1);
       }
 
       &::before {
-        background-color: var(--color-progressbar-seed-1);
         color: var(--color-progressbar-fg-2);
         text-shadow: var(--progress-bar-shadow-2);
       }
+
+      .progress {
+        &::before {
+          background: var(--color-progressbar-seed-1);
+        }
+
+        background: var(--color-progressbar-seed-2);
+      }
     }
 
-    &.verify::before {
-      background: var(--color-progressbar-verify);
-      color: #000;
+    &.verify {
+      &::before {
+        color: #000;
+      }
+
+      .progress::before {
+        background: var(--color-progressbar-verify);
+      }
     }
 
-    &.paused::before {
-      background: var(--color-progressbar-paused);
-      color: var(--color-progressbar-fg-1);
-      text-shadow: var(--progress-bar-shadow-1);
+    &.paused {
+      &::before {
+        color: var(--color-progressbar-fg-1);
+        text-shadow: var(--progress-bar-shadow-1);
+      }
+
+      .progress::before {
+        background: var(--color-progressbar-paused);
+      }
     }
 
     &::before,
     &::after {
+      align-content: center;
+      border-radius: 3px;
       content: attr(data-progress);
+      font-size: 14px;
       height: 100%;
-      width: 100%;
       position: absolute;
-      border-radius: 2px;
       text-align: center;
+      top: 0;
+      width: 100%;
+      z-index: 1;
     }
 
-    &::before {
+    &::before,
+    .progress::before {
       clip-path: polygon(
         0 0,
         var(--progress, 30%) 0,
@@ -763,6 +779,26 @@ a {
         100% 100%,
         var(--progress, 30%) 100%
       );
+    }
+
+    .progress {
+      border-radius: 3px;
+      box-shadow: inset 0 0 0 1px var(--color-border-starkest);
+      height: 20px;
+      position: relative;
+
+      &::before,
+      &::after {
+        border-radius: 3px;
+        content: '';
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+
+      &::before {
+        box-shadow: inset 0 0 0 1px var(--color-border-starkest);
+      }
     }
   }
 }
