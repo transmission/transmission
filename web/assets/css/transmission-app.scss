@@ -344,26 +344,6 @@ a {
     }
   }
 
-  #toolbar-inspector {
-    &::before {
-      content: 'i';
-      border: 4px solid transparent;
-      border-radius: 17px;
-      box-shadow: inset 0 0 0 2.6px var(--color-fg-primary);
-      display: inline-block;
-      font-family: monospace;
-      font-size: 18px;
-      height: 22px;
-      margin-bottom: 2px;
-      padding: 2px;
-      width: 22px;
-    }
-
-    &:disabled::before {
-      box-shadow: inset 0 0 0 2.6px var(--color-fg-disabled);
-    }
-  }
-
   > .toolbar-separator {
     border-left: 1px solid var(--color-border-default);
     height: 25px;
