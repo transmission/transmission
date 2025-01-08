@@ -633,6 +633,10 @@ a {
     &.paused {
       color: var(--color-fg-disabled);
 
+      &:not(.selected) .torrent-progress-bar {
+        color: var(--color-fg-primary);
+      }
+
       .icon {
         background-color: var(--color-fg-disabled);
       }
