@@ -564,7 +564,6 @@ a {
 
     .torrent-progress-bar {
       grid-area: progressbar;
-      position: relative;
     }
 
     .torrent-progress-details {
@@ -658,6 +657,10 @@ a {
   }
 
   .torrent-progress-bar {
+    border: 1px solid var(--color-border-starkest);
+    border-radius: 3px;
+    position: relative;
+
     &.full {
       margin: 2px 0;
     }
@@ -754,7 +757,6 @@ a {
 
     &::before,
     &::after {
-      align-content: center;
       border-radius: 3px;
       content: attr(data-progress);
       font-size: 14px;
@@ -786,18 +788,14 @@ a {
     }
 
     .progress {
-      border-radius: 3px;
-      box-shadow: inset 0 0 0 1px var(--color-border-starkest);
-      height: 20px;
-      position: relative;
+      height: 18px;
 
       &::before {
-        border-radius: 3px;
-        box-shadow: inset 0 0 0 1px var(--color-border-starkest);
+        border-radius: 2px;
         content: '';
         height: 100%;
-        width: 100%;
         position: absolute;
+        width: 100%;
       }
     }
   }
