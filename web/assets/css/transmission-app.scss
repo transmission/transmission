@@ -789,14 +789,11 @@ a {
 
       &::before {
         border-radius: 3px;
+        box-shadow: inset 0 0 0 1px var(--color-border-starkest);
         content: '';
         height: 100%;
         width: 100%;
         position: absolute;
-      }
-
-      &::before {
-        box-shadow: inset 0 0 0 1px var(--color-border-starkest);
       }
     }
   }
