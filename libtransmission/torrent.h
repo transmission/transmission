@@ -62,6 +62,12 @@ class RenameTest_singleFilenameTorrent_Test;
 
 } // namespace libtransmission::test
 
+struct tr_file_conflict
+{
+    std::string filename;
+    std::string torrent_name;
+};
+
 /** @brief Torrent object */
 struct tr_torrent
 {
@@ -946,6 +952,21 @@ struct tr_torrent
         return queue_position_;
     }
 
+    [[nodiscard]] tr_sha256_digest_t calculateFileHash(tr_file_index_t file_index) const;
+    [[nodiscard]] constexpr bool hasFileConflicts() const noexcept
+    {
+        return has_file_conflicts_;
+    }
+    [[nodiscard]] constexpr auto const& conflictingTorrent() const noexcept
+    {
+        return conflicting_torrent_name_;
+    }
+    void setFileConflicted(bool has_conflicts, std::string_view conflicting_name = {});
+
+    // start the torrent after all the startup scaffolding is done,
+    // e.g. fetching metadata from peers and/or verifying the torrent
+    bool start_when_stable_ = false;
+
     void set_unique_queue_position(size_t new_pos);
 
     static constexpr struct
@@ -1186,11 +1207,6 @@ private:
         return true;
     }
 
-    /** Get the name of the first torrent that has filename conflicts with this torrent
-        in the same download directory.
-        @return name of conflicting torrent, or empty string if no conflicts */
-    [[nodiscard]] std::string getFirstFilenameConflict() const;
-
     constexpr void set_needs_completeness_check() noexcept
     {
         needs_completeness_check_ = true;
@@ -1392,9 +1408,8 @@ private:
 
     bool sequential_download_ = false;
 
-    // start the torrent after all the startup scaffolding is done,
-    // e.g. fetching metadata from peers and/or verifying the torrent
-    bool start_when_stable_ = false;
+    bool has_file_conflicts_ = false;
+    std::string conflicting_torrent_name_;
 };
 
 // ---
