@@ -665,7 +665,7 @@ std::optional<tr_address> tr_address::from_ipv4_mapped() const noexcept
 
 // --- tr_socket_addrses
 
-std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
+std::string tr_socket_address::display_name(tr_address const& address, tr_port port)
 {
     return fmt::format(fmt::runtime(address.is_ipv6() ? "[{:s}]:{:d}" : "{:s}:{:d}"), address.display_name(), port.host());
 }

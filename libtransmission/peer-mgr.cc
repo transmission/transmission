@@ -307,8 +307,8 @@ void tr_peer_info::update_canonical_priority()
     // FFFF:FFFF:FFFF:FFFF:5555:5555:5555:5555, etc...
     static auto constexpr MaskStartBaseOffset = std::array{ 2U, 6U };
     auto const base_idx = MaskStartBaseOffset[type];
-    auto const mismatch_idx = std::mismatch(first, second, second).first - first;
-    for (auto i = mismatch_idx >= base_idx ? mismatch_idx + 1 : base_idx; i < address_size; ++i)
+    auto const mismatch_idx = static_cast<size_t>(std::mismatch(first, second, second).first - first);
+    for (auto i = mismatch_idx >= base_idx ? mismatch_idx + 1U : base_idx; i < address_size; ++i)
     {
         first[i] &= std::byte{ 0x55 };
         second[i] &= std::byte{ 0x55 };
