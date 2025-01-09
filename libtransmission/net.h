@@ -472,8 +472,8 @@ struct tr_socket_address
         return port_;
     }
 
-    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port) noexcept;
-    [[nodiscard]] auto display_name() const noexcept
+    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port);
+    [[nodiscard]] auto display_name() const
     {
         return display_name(address_, port_);
     }
