@@ -50,10 +50,13 @@ using RpcResponseFuture = QFuture<RpcResponse>;
 class RpcClient : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(RpcClient)
 
 public:
     explicit RpcClient(QObject* parent = nullptr);
+    RpcClient(RpcClient&&) = delete;
+    RpcClient(RpcClient const&) = delete;
+    RpcClient& operator=(RpcClient&&) = delete;
+    RpcClient& operator=(RpcClient const&) = delete;
 
     [[nodiscard]] constexpr auto const& url() const noexcept
     {

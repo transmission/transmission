@@ -1,7 +1,7 @@
 /* file size string
    Inspector -> Files tab -> file status string
    Status bar transfer count */
-"%@ of %@" = "%1$@ - %2$@";
+"%@ of %@" = "%1$@/%2$@";
 
 /* Torrent -> progress string */
 "%@ of torrent metadata retrieved" = "%@ torrent üst verisi alındı";
@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ doğrulanmış";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/sn";
 
 /* Info options -> global setting */
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "Dizelgede %lu IP adresi kuralı";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu bilinen:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu yerel bulum";
@@ -117,13 +116,13 @@
 "1 transfer" = "1 aktarım";
 
 /* Open invalid alert -> title */
-"\"%@\" is not a valid torrent file." = "\"%@\" geçerli bir torrent dosyası değil.";
+"\"%@\" is not a valid torrent file." = "“%@” geçerli bir torrent dosyası değil.";
 
 /* Prefs -> blocklist -> message */
 "A blocklist must first be downloaded" = "Önce bir kara dizelge indirilmeli";
 
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "\"%1$@\" adında bir dosya \"%2$@\" dizininde zaten var. Torrent dosyasını oluşturmak için yeni bir ad veya dizin seçin.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "“%1$@” adında bir dosya “%2$@” dizininde halihazırda var. Torrent dosyasını oluşturmak için yeni bir ad veya dizin seçin.";
 
 /* Move inside itself alert -> title */
 "A folder cannot be moved to inside itself." = "Bir klasör kendi içine taşınamaz.";
@@ -139,7 +138,7 @@
 
 /* Open duplicate alert -> title
    Open duplicate magnet alert -> title */
-"A transfer of \"%@\" already exists." = "\"%@\" dosyasının bir aktarımı zaten var.";
+"A transfer of \"%@\" already exists." = "“%@” dosyasının bir aktarımı halihazırda var.";
 
 /* Filter Bar -> filter button */
 "Active" = "Etkin";
@@ -196,17 +195,17 @@
 "Are you sure you want to remove %lu trackers?" = "%lu izleyiciyi kaldırmak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "%lu aktarımı aktarımlar dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinize emin misiniz?";
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "%lu aktarımı aktarımlar dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti’ne taşımak istediğinizden emin misiniz?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list?" = "%lu aktarımı aktarımlar dizelgesinden çıkarmak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "\"%@\" aktarımını aktarım dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinize emin misiniz?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "“%@” aktarımını aktarım dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti’ne taşımak istediğinizden emin misiniz?";
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list?" = "\"%@\" aktarımını aktarım dizelgesinden çıkarmak istedinizden emin misiniz?";
+"Are you sure you want to remove \"%@\" from the transfer list?" = "“%@” aktarımını aktarım dizelgesinden kaldırmak istedinizden emin misiniz?";
 
 /* Remove trackers alert -> title */
 "Are you sure you want to remove this tracker?" = "Bu izleyiciyi kaldırmak istediğinize emin misiniz?";
@@ -218,7 +217,7 @@
 "Available" = "Kullanılabilir";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/sn";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bant Genişliği";
@@ -257,13 +256,13 @@
 "Client" = "İstemci";
 
 /* View menu -> Quick Look */
-"Close Quick Look" = "Göz At'ı Kapat";
+"Close Quick Look" = "Göz At’ı Kapat";
 
 /* Blocklist -> message */
 "Connecting to site" = "Alana bağlanıyor";
 
 /* Torrent file copy alert -> title */
-"Copy of \"%@\" Cannot Be Created" = "\"%@\" Kopyası Oluşturulamadı";
+"Copy of \"%@\" Cannot Be Created" = "“%@” Kopyası Oluşturulamadı";
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
@@ -280,7 +279,7 @@
 "Create Torrent File" = "Torrent Dosyası Oluştur";
 
 /* Create torrent -> failed -> title */
-"Creation of \"%@\" failed." = "\"%@\" oluşturulamadı.";
+"Creation of \"%@\" failed." = "“%@” oluşturulamadı.";
 
 /* Inspector -> peer -> status */
 "Currently downloading (interested and not choked)" = "Şu an indiriliyor (ilgili ve izinli)";
@@ -481,13 +480,13 @@
 "IP Address" = "IP Adresi";
 
 /* Download not a torrent -> message */
-"It appears that the file \"%@\" from %@ is not a torrent file." = "Görünen o ki %2$@ konumundan \"%1$@\" bir torrent dosyası değil.";
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Görünen o ki %2$@ konumundaki “%1$@” bir torrent dosyası değil.";
 
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/sn";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Bilinen:";
 
 /* Tracker last announce */
 "Last Announce" = "Son Duyuru";
@@ -503,9 +502,6 @@
 
 /* About window -> license button */
 "License" = "Lisans";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Sınır (%ld KB/sn)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Günlük Kaydedilemedi";
@@ -579,7 +575,7 @@
 "Normal Priority" = "Olağan Öncelik";
 
 /* Torrent disk space alert -> title */
-"Not enough remaining disk space to download \"%@\" completely." = "\"%@\" aktarımını tamamlamak için yeterli disk alanı yok.";
+"Not enough remaining disk space to download \"%@\" completely." = "“%@” aktarımını tamamlamak için yeterli disk alanı yok.";
 
 /* About window -> license close button
    Blocklist -> button
@@ -781,7 +777,7 @@
 "Rename File" = "Dosyayı Yeniden Adlandır";
 
 /* rename sheet label */
-"Rename the file \"%@\":" = "\"%@\" dosyasını yeniden adlandır:";
+"Rename the file \"%@\":" = "“%@” dosyasını yeniden adlandır:";
 
 /* Stats reset -> button
    Stats window -> reset button */
@@ -848,7 +844,7 @@
 "Select a file or folder for the torrent file." = "Torrent dosyası için bir ad veya konum seç.";
 
 /* Add -> select destination folder */
-"Select the download folder for \"%@\"" = "\"%@\" için indirme klasörü seç";
+"Select the download folder for \"%@\"" = "“%@” için indirme klasörü seç";
 
 /* Create torrent -> location sheet -> message */
 "Select the name and location for the torrent file." = "Torrent dosyası için ad ve konum seç.";
@@ -857,7 +853,7 @@
 "Select the new folder for %lu data files." = "%lu veri dosyaları için yeni klasör seç.";
 
 /* Move torrent -> select destination folder */
-"Select the new folder for \"%@\"." = "\"%@\" için yeni klasör seç.";
+"Select the new folder for \"%@\"." = "“%@” için yeni klasörü seçin.";
 
 /* Status Bar -> status menu */
 "Session Ratio" = "Oturum Oranı";
@@ -882,7 +878,7 @@
 "Show Filter Bar" = "Süzgeç Çubuğunu Göster";
 
 /* File Outline -> Menu */
-"Show in Finder" = "Finder'da Göster";
+"Show in Finder" = "Finder’da Göster";
 
 /* View menu -> Inspector */
 "Show Inspector" = "Denetçiyi Göster";
@@ -891,10 +887,10 @@
 "Show Status Bar" = "Durum Çubuğunu Göster";
 
 /* Torrent cell -> button info */
-"Show the data file in Finder" = "Veri dosyasını Finder'da Göster";
+"Show the data file in Finder" = "Veri dosyasını Finder’da Göster";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Araç Çubuğunu Göster";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -915,9 +911,6 @@
 /* Stats window -> title */
 "Statistics" = "İstatistikler";
 
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Oranda Dur (%.2f)";
-
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Başlatılmayı bekleme";
 
@@ -934,14 +927,14 @@
 "The destination directory and root data directory have the same name." = "Hedef dizin ve kök veri dizini aynı ada sahip.";
 
 /* Create torrent -> directory doesn't exist warning -> warning */
-"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "\"%@\" dizini şu anda bulunmuyor. Bu dizini oluşturun veya torrent dosyasını oluşturmak için bir başka dizin seçin.";
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "“%@” dizini şu anda bulunmuyor. Bu dizini oluşturun veya torrent dosyasını oluşturmak için bir başka dizin seçin.";
 
 /* Open duplicate magnet alert -> message */
-"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "\"%@\" mıknatıs bağı eklenemedi, çünkü var olan bir aktarımın aynısı.";
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "“%@” mıknatıs bağı eklenemedi; çünkü var olan bir aktarımın aynısı.";
 
 /* Move error alert -> message
    Move inside itself alert -> message */
-"The move operation of \"%@\" cannot be done." = "\"%@\" için taşıma işlemi yapılamadı.";
+"The move operation of \"%@\" cannot be done." = "“%@\" için taşıma işlemi yapılamadı.";
 
 /* blocklist fail message */
 "The specified blocklist file did not contain any valid rules." = "Belirtilen kara dizelge geçerli bir kural içermiyor.";
@@ -980,7 +973,7 @@
 "There are no tracker addresses." = "İzleyici adresi yok.";
 
 /* Transmission already running alert -> message */
-"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Transmission'ın bir kopyası zaten açık. Var olan oturum kapatılmadan bu kopyayı açamazsınız.";
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Transmission’ın bir kopyası halihazırda açık. Var olan oturum kapatılmadan bu kopyayı açamazsınız.";
 
 /* Confirm Quit panel -> message */
 "There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Uygulamadan çıkarken duraklatılacak bir etkin aktarım var. Uygulamayı yeniden açtığınızda aktarım kendiliğinden sürecektir.";
@@ -989,19 +982,19 @@
 "There must be at least one file in a folder to create a torrent file." = "Torrent dosyası oluşturmak için bir klasörde en az bir dosya olmalıdır.";
 
 /* Save log alert panel -> message */
-"There was a problem creating the file \"%@\"." = "\"%@\" dosyasını oluştururken hata oluştu.";
+"There was a problem creating the file \"%@\"." = "“%@\" dosyasını oluştururken hata oluştu.";
 
 /* Move error alert -> title */
 "There was an error moving the data file." = "Veri dosyasını taşırken hata oluştu.";
 
 /* Magnet link failed -> message */
-"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "\"%@\" mıknatıs bağını eklerken bir hata oluştu. Aktarım gerçekleşmeyecek.";
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "“%@\" mıknatıs bağını eklerken bir hata oluştu. Aktarım gerçekleşmeyecek.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Bu klasörde dosya yok.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Saptanmış konum torrent dosyasıyla aynı ise bu seçenek kullanılamaz.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Bu aktarım şu anda etkin. Kaldırıldıktan sonra yeniden başlatmak için torrent dosyası veya mıknatıs bağı gerekecek.";
@@ -1139,7 +1132,7 @@
 "Web Seeds" = "Web Beslemeleri";
 
 /* Legal alert -> title */
-"Welcome to Transmission" = "Transmission'a hoş geldiniz";
+"Welcome to Transmission" = "Transmission’a hoş geldiniz";
 
 /* Groups -> Name */
 "Yellow" = "Sarı";

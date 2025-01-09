@@ -42,7 +42,13 @@
 namespace
 {
 
-auto const ConfigName = QLatin1String("transmission");
+auto const ConfigName = QStringLiteral("transmission");
+
+#ifdef QT_DBUS_LIB
+auto const FDONotificationsServiceName = QStringLiteral("org.freedesktop.Notifications");
+auto const FDONotificationsPath = QStringLiteral("/org/freedesktop/Notifications");
+auto const FDONotificationsInterfaceName = QStringLiteral("org.freedesktop.Notifications");
+#endif
 
 auto constexpr StatsRefreshIntervalMsec = 3000;
 auto constexpr SessionRefreshIntervalMsec = 3000;
@@ -59,6 +65,32 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     }
 
     return false;
+}
+
+void initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    Config::Speed = { Config::Base::Kilo,
+                      QObject::tr("B/s").toStdString(),
+                      QObject::tr("kB/s").toStdString(),
+                      QObject::tr("MB/s").toStdString(),
+                      QObject::tr("GB/s").toStdString(),
+                      QObject::tr("TB/s").toStdString() };
+
+    Config::Memory = { Config::Base::Kibi,
+                       QObject::tr("B").toStdString(),
+                       QObject::tr("KiB").toStdString(),
+                       QObject::tr("MiB").toStdString(),
+                       QObject::tr("GiB").toStdString(),
+                       QObject::tr("TiB").toStdString() };
+
+    Config::Storage = { Config::Base::Kilo,
+                        QObject::tr("B").toStdString(),
+                        QObject::tr("kB").toStdString(),
+                        QObject::tr("MB").toStdString(),
+                        QObject::tr("GB").toStdString(),
+                        QObject::tr("TB").toStdString() };
 }
 
 [[nodiscard]] auto makeWindowIcon()
@@ -221,10 +253,10 @@ Application::Application(
     if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         bus.connect(
-            fdo_notifications_service_name_,
-            fdo_notifications_path_,
-            fdo_notifications_interface_name_,
-            QLatin1String("ActionInvoked"),
+            FDONotificationsServiceName,
+            FDONotificationsPath,
+            FDONotificationsInterfaceName,
+            QStringLiteral("ActionInvoked"),
             this,
             SLOT(onNotificationActionInvoked(quint32, QString)));
     }
@@ -269,25 +301,6 @@ void Application::loadTranslations()
     {
         installTranslator(&app_translator_);
     }
-}
-
-void Application::initUnits()
-{
-    using Config = libtransmission::Values::Config;
-
-    Config::Speed = { Config::Base::Kilo,       tr("B/s").toStdString(),  tr("kB/s").toStdString(),
-                      tr("MB/s").toStdString(), tr("GB/s").toStdString(), tr("TB/s").toStdString() };
-
-    Config::Memory = { Config::Base::Kibi,      tr("B").toStdString(),   tr("KiB").toStdString(),
-                       tr("MiB").toStdString(), tr("GiB").toStdString(), tr("TiB").toStdString() };
-
-    Config::Storage = { Config::Base::Kilo,     tr("B").toStdString(),  tr("kB").toStdString(),
-                        tr("MB").toStdString(), tr("GB").toStdString(), tr("TB").toStdString() };
-}
-
-void Application::quitLater() const
-{
-    QTimer::singleShot(0, this, SLOT(quit()));
 }
 
 void Application::onTorrentsEdited(torrent_ids_t const& torrent_ids) const
@@ -353,7 +366,7 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const
 void Application::notifyTorrentAdded(Torrent const* tor) const
 {
     QStringList actions;
-    actions << QString{ QLatin1String("start-now(%1)") }.arg(tor->id()) << QObject::tr("Start Now");
+    actions << QString{ QStringLiteral("start-now(%1)") }.arg(tor->id()) << QObject::tr("Start Now");
     notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
@@ -505,9 +518,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
     if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         QDBusMessage m = QDBusMessage::createMethodCall(
-            fdo_notifications_service_name_,
-            fdo_notifications_path_,
-            fdo_notifications_interface_name_,
+            FDONotificationsServiceName,
+            FDONotificationsPath,
+            FDONotificationsInterfaceName,
             QStringLiteral("Notify"));
         QVariantList args;
         args.append(QStringLiteral("Transmission")); // app_name
@@ -538,7 +551,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 #ifdef QT_DBUS_LIB
 void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
 {
-    auto const match = start_now_regex_.match(action_key);
+    static QRegularExpression const start_now_regex{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
+
+    auto const match = start_now_regex.match(action_key);
     if (match.hasMatch())
     {
         int const torrent_id = match.captured(1).toInt();

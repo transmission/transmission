@@ -7,18 +7,19 @@
 
 #include <QItemDelegate>
 
-#include <libtransmission/tr-macros.h>
-
 class QAbstractItemModel;
 class QComboBox;
 
 class FilterBarComboBoxDelegate : public QItemDelegate
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FilterBarComboBoxDelegate)
 
 public:
     FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo);
+    FilterBarComboBoxDelegate(FilterBarComboBoxDelegate&&) = delete;
+    FilterBarComboBoxDelegate(FilterBarComboBoxDelegate const&) = delete;
+    FilterBarComboBoxDelegate& operator=(FilterBarComboBoxDelegate&&) = delete;
+    FilterBarComboBoxDelegate& operator=(FilterBarComboBoxDelegate const&) = delete;
 
     static bool isSeparator(QModelIndex const& index);
     static void setSeparator(QAbstractItemModel* model, QModelIndex const& index);

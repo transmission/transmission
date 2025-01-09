@@ -23,6 +23,7 @@
 #include <small/map.hpp>
 
 #include "libtransmission/transmission.h"
+#include "libtransmission/tr-macros.h"
 
 #include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
@@ -1601,13 +1602,12 @@ void tr_torrentStartNow(tr_torrent* tor)
 void tr_torrentVerify(tr_torrent* tor)
 {
     tor->session->run_in_session_thread(
-        [session = tor->session, tor_id = tor->id()]()
+        [tor, session = tor->session, tor_id = tor->id()]()
         {
             TR_ASSERT(session->am_in_session_thread());
             auto const lock = session->unique_lock();
 
-            auto* const tor = session->torrents().get(tor_id);
-            if (tor == nullptr || tor->is_deleting_)
+            if (tor != session->torrents().get(tor_id) || tor->is_deleting_)
             {
                 return;
             }
