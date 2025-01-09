@@ -887,7 +887,7 @@ private:
                 auto* const tor = s->tor;
                 auto const loc_begin = tor->piece_loc(event.pieceIndex, event.offset);
                 auto const loc_end = tor->piece_loc(event.pieceIndex, event.offset, event.length);
-                s->sent_request.emit(tor, peer, { loc_begin.block, loc_end.block });
+                s->sent_request.emit(tor, peer, { .begin = loc_begin.block, .end = loc_end.block });
             }
             break;
 

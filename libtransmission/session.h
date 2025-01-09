@@ -1334,11 +1334,21 @@ public:
     };
 
     static constexpr std::array<ScriptInfo, 3U> Scripts{ {
-        { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
-        { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
-        { TR_KEY_script_torrent_done_seeding_enabled,
-          TR_KEY_script_torrent_done_seeding_filename,
-          TR_SCRIPT_ON_TORRENT_DONE_SEEDING },
+        {
+            .enabled_key = TR_KEY_script_torrent_added_enabled,
+            .filename_key = TR_KEY_script_torrent_added_filename,
+            .script = TR_SCRIPT_ON_TORRENT_ADDED,
+        },
+        {
+            .enabled_key = TR_KEY_script_torrent_done_enabled,
+            .filename_key = TR_KEY_script_torrent_done_filename,
+            .script = TR_SCRIPT_ON_TORRENT_DONE,
+        },
+        {
+            .enabled_key = TR_KEY_script_torrent_done_seeding_enabled,
+            .filename_key = TR_KEY_script_torrent_done_seeding_filename,
+            .script = TR_SCRIPT_ON_TORRENT_DONE_SEEDING,
+        },
     } };
 
 private:
