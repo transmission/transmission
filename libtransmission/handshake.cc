@@ -75,6 +75,15 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
     get_dh().setPeerPublicKey(peer_public_key);
 
+    // everything received so far is Yb+PadB; peer has not yet sent VC for resync.
+    // so throw away buffer, and do early exit check: we know it's not legit MSE if > max PadB
+    pad_b_recv_len_ = peer_io->read_buffer_size();
+    if (pad_b_recv_len_ > PadbMaxlen)
+    {
+        return done(false);
+    }
+    peer_io->read_buffer_discard(pad_b_recv_len_);
+
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
     static auto constexpr BufSize = (std::tuple_size_v<tr_sha1_digest_t> * 2U) + std::size(VC) + sizeof(crypto_provide_) +
@@ -121,9 +130,11 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     }
 
     /* send it */
-    set_state(State::AwaitingVc);
     peer_io->write(outbuf, false);
-    return ReadState::Now;
+
+    set_state(State::AwaitingVc);
+    // LATER, not NOW: recv buffer was just drained and peer was blocking
+    return ReadState::Later;
 }
 
 // MSE spec: "Since the length of [PadB is] unknown,
@@ -369,12 +380,22 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
     get_dh().setPeerPublicKey(peer_public_key);
 
+    // everything received so far is Ya+PadA; haven't sent Yb and peer has not yet sent HASH('req1').
+    // so throw away buffer, and do early exit check: we know it's not legit MSE if > max PadA
+    pad_a_recv_len_ = peer_io->read_buffer_size();
+    if (pad_a_recv_len_ > PadaMaxlen)
+    {
+        return done(false);
+    }
+    peer_io->read_buffer_discard(pad_a_recv_len_);
+
     // send our public key to the peer
     tr_logAddTraceHand(this, "sending B->A: Diffie Hellman Yb, PadB");
     send_public_key_and_pad<PadbMaxlen>(peer_io);
 
     set_state(State::AwaitingPadA);
-    return ReadState::Now;
+    // LATER, not NOW: recv buffer was just drained and peer was blocking
+    return ReadState::Later;
 }
 
 ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
