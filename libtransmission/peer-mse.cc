@@ -31,8 +31,14 @@ namespace
 {
 namespace wi
 {
+// clang-format off
 using key_t = math::wide_integer::uintwide_t<
-    tr_message_stream_encryption::DH::KeySize * std::numeric_limits<unsigned char>::digits>;
+    tr_message_stream_encryption::DH::KeySize * std::numeric_limits<unsigned char>::digits
+#ifdef WIDE_INTEGER_HAS_LIMB_TYPE_UINT64
+    , uint64_t
+#endif
+    >;
+// clang-format on
 
 using private_key_t = math::wide_integer::uintwide_t<
     tr_message_stream_encryption::DH::PrivateKeySize * std::numeric_limits<unsigned char>::digits>;
