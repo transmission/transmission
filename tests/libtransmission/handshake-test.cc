@@ -42,11 +42,7 @@
 
 using namespace std::literals;
 
-#ifdef _WIN32
-#define LOCAL_SOCKETPAIR_AF AF_INET
-#else
-#define LOCAL_SOCKETPAIR_AF AF_UNIX
-#endif
+#define LOCAL_SOCKETPAIR_AF TR_IF_WIN32(AF_INET, AF_UNIX)
 
 namespace libtransmission::test
 {
