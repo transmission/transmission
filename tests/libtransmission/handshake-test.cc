@@ -140,11 +140,7 @@ public:
 
         while (len > 0)
         {
-#if defined(_WIN32)
             auto const n = send(sock, reinterpret_cast<char const*>(walk), len, 0);
-#else
-            auto const n = write(sock, walk, len);
-#endif
             TR_ASSERT(n >= 0);
             len -= n;
             walk += n;
@@ -348,7 +344,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
     ASSERT_TRUE(waitFor(
         [&s = std::as_const(sock), buf = std::array<char, 16>{}, n_read = size_t{}]() mutable
         {
-            if (auto ret = read(s, std::data(buf), std::size(buf)); ret > 0)
+            if (auto ret = recv(s, std::data(buf), std::size(buf), 0); ret > 0)
             {
                 n_read += ret;
             }
@@ -404,7 +400,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     ASSERT_TRUE(waitFor(
         [&s = std::as_const(sock), buf = std::array<char, 16>{}, n_read = size_t{}]() mutable
         {
-            if (auto ret = read(s, std::data(buf), std::size(buf)); ret >= 0)
+            if (auto ret = recv(s, std::data(buf), std::size(buf), 0); ret >= 0)
             {
                 n_read += ret;
             }
@@ -450,7 +446,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     ASSERT_TRUE(waitFor(
         [&s = std::as_const(sock), buf = std::array<char, 16>{}, n_read = size_t{}]() mutable
         {
-            if (auto ret = read(s, std::data(buf), std::size(buf)); ret >= 0)
+            if (auto ret = recv(s, std::data(buf), std::size(buf), 0); ret >= 0)
             {
                 n_read += ret;
             }
@@ -478,7 +474,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
             while (n_read < WantedLen)
             {
                 auto const [cur, curlen] = buf.reserve_space(StepSize);
-                auto const ret = read(s, cur, curlen);
+                auto const ret = recv(s, cur, curlen, 0);
                 if (ret <= 0)
                 {
                     return false;
