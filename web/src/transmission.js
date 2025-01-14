@@ -49,10 +49,13 @@ export class Transmission extends EventTarget {
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
+    this.pointer_device = Object.seal({
+      is_touch_device: 'ontouchstart' in window,
+      long_press_callback: null,
+      x: 0,
+      y: 0,
+    });
     this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
-
-    this.isTouch = 'ontouchstart' in window;
-    this.busyclick = false;
 
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
@@ -218,8 +221,27 @@ export class Transmission extends EventTarget {
       torrent_list: document.querySelector('#torrent-list'),
     };
 
-    const rightc = (event_) => {
-      if (this.isTouch && event_.touches.length > 1) {
+    const context_menu = () => {
+      // open context menu
+      const popup = new ContextMenu(this.action_manager);
+      this.setCurrentPopup(popup);
+
+      const boundingElement = document.querySelector('#torrent-container');
+      const bounds = boundingElement.getBoundingClientRect();
+      const x = Math.min(
+        this.pointer_device.x,
+        bounds.right + globalThis.scrollX - popup.root.clientWidth,
+      );
+      const y = Math.min(
+        this.pointer_device.y,
+        bounds.bottom + globalThis.scrollY - popup.root.clientHeight,
+      );
+      popup.root.style.left = `${Math.max(x, 0)}px`;
+      popup.root.style.top = `${Math.max(y, 0)}px`;
+    };
+
+    const right_click = (event_) => {
+      if (this.pointer_device.is_touch_device && event_.touches.length > 1) {
         return;
       }
 
@@ -233,37 +255,30 @@ export class Transmission extends EventTarget {
         this._setSelectedRow(row);
       }
 
-      // open context menu
-      const popup = new ContextMenu(this.action_manager);
-      this.setCurrentPopup(popup);
-
-      const boundingElement = document.querySelector('#torrent-container');
-      const bounds = boundingElement.getBoundingClientRect();
-      const x = Math.min(
-        this.isTouch ? event_.touches[0].clientX : event_.x,
-        bounds.x + bounds.width - popup.root.clientWidth,
-      );
-      const y = Math.min(
-        this.isTouch ? event_.touches[0].clientY : event_.y,
-        bounds.y + bounds.height - popup.root.clientHeight,
-      );
-      popup.root.style.left = `${x > 0 ? x : 0}px`;
-      popup.root.style.top = `${y > 0 ? y : 0}px`;
+      context_menu();
       event_.preventDefault();
     };
 
-    if (this.isTouch) {
+    if (this.pointer_device.is_touch_device) {
+      const touch = this.pointer_device;
       this.elements.torrent_list.addEventListener('touchstart', (event_) => {
-        if (this.busyclick) {
-          clearTimeout(this.busyclick);
-          this.busyclick = false;
+        touch.x = event_.touches[0].pageX;
+        touch.y = event_.touches[0].pageY;
+
+        if (touch.long_press_callback) {
+          clearTimeout(touch.long_press_callback);
+          touch.long_press_callback = null;
         } else {
-          this.busyclick = setTimeout(rightc.bind(this), 500, event_);
+          touch.long_press_callback = setTimeout(
+            right_click.bind(this),
+            500,
+            event_,
+          );
         }
       });
       this.elements.torrent_list.addEventListener('touchend', () => {
-        clearTimeout(this.busyclick);
-        this.busyclick = false;
+        clearTimeout(touch.long_press_callback);
+        touch.long_press_callback = null;
         setTimeout(() => {
           const popup = this.popup[Transmission.default_popup_level];
           if (popup) {
@@ -271,16 +286,23 @@ export class Transmission extends EventTarget {
           }
         }, 1);
       });
-      this.elements.torrent_list.addEventListener('touchmove', () => {
-        clearTimeout(this.busyclick);
-        this.busyclick = false;
+      this.elements.torrent_list.addEventListener('touchmove', (event_) => {
+        touch.x = event_.touches[0].pageX;
+        touch.y = event_.touches[0].pageY;
+
+        clearTimeout(touch.long_press_callback);
+        touch.long_press_callback = null;
       });
       this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
         event_.preventDefault();
       });
     } else {
+      this.elements.torrent_list.addEventListener('mousemove', (event_) => {
+        this.pointer_device.x = event_.pageX;
+        this.pointer_device.y = event_.pageY;
+      });
       this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
-        rightc(event_);
+        right_click(event_);
         const popup = this.popup[Transmission.default_popup_level];
         if (popup) {
           popup.root.style.pointerEvents = 'auto';

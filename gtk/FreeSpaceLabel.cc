@@ -23,9 +23,11 @@ class FreeSpaceLabel::Impl
 {
 public:
     Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_dir(std::string_view dir);
 

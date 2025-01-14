@@ -94,32 +94,6 @@ public:
 #endif
     }
 
-    [[nodiscard]] constexpr size_t guess_packet_overhead(size_t n_bytes) const noexcept
-    {
-        if (is_tcp())
-        {
-            // https://web.archive.org/web/20140912230020/http://sd.wareonearth.com:80/~phil/net/overhead/
-            // TCP over Ethernet:
-            // Assuming no header compression (e.g. not PPP)
-            // Add 20 IPv4 header or 40 IPv6 header (no options)
-            // Add 20 TCP header
-            // Add 12 bytes optional TCP timestamps
-            // Max TCP Payload data rates over ethernet are thus:
-            // (1500-40)/ (38+1500) = 94.9285 %  IPv4, minimal headers
-            // (1500-52)/ (38+1500) = 94.1482 %  IPv4, TCP timestamps
-            // (1500-52)/ (42+1500) = 93.9040 %  802.1q, IPv4, TCP timestamps
-            // (1500-60)/ (38+1500) = 93.6281 %  IPv6, minimal headers
-            // (1500-72)/ (38+1500) = 92.8479 %  IPv6, TCP timestamps
-            // (1500-72)/ (42+1500) = 92.6070 %  802.1q, IPv6, TCP timestamps
-
-            // So, let's guess around 7% overhead
-            return n_bytes / 14U;
-        }
-
-        // We only guess for TCP; uTP tracks its overhead via UTP_ON_OVERHEAD_STATISTICS
-        return {};
-    }
-
     union
     {
         tr_socket_t tcp;

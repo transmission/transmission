@@ -12,8 +12,6 @@
 
 #include <QAbstractItemModel>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Typedefs.h" // file_indices_t
 
 class FileTreeItem;
@@ -21,7 +19,6 @@ class FileTreeItem;
 class FileTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FileTreeModel)
 
 public:
     enum
@@ -44,6 +41,10 @@ public:
     };
 
     FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
+    FileTreeModel& operator=(FileTreeModel&&) = delete;
+    FileTreeModel& operator=(FileTreeModel const&) = delete;
+    FileTreeModel(FileTreeModel&&) = delete;
+    FileTreeModel(FileTreeModel const&) = delete;
     ~FileTreeModel() override;
 
     void setEditable(bool editable);

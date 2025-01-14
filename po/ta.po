@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 23:43+0000\n"
+"POT-Creation-Date: 2025-01-01 14:06+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Tamil (https://app.transifex.com/transmissionbt/teams/33778/ta/)\n"
@@ -21,469 +21,469 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.cc:87 ../gtk/Utils.cc:118 ../libtransmission/utils.cc:545
+#: ../cli/cli.cc:89 ../gtk/Utils.cc:119 ../libtransmission/utils.cc:568
 msgid "None"
 msgstr ""
 
-#: ../cli/cli.cc:92
+#: ../cli/cli.cc:94
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:229 ../gtk/Session.cc:793 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:238 ../libtransmission/blocklist.cc:336 ../libtransmission/blocklist.cc:351 ../libtransmission/inout.cc:160 ../libtransmission/utils.cc:125 ../libtransmission/utils.cc:144 ../libtransmission/utils.cc:155 ../libtransmission/watchdir.cc:118
+#: ../daemon/daemon.cc:197 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:240 ../libtransmission/blocklist.cc:338 ../libtransmission/blocklist.cc:353 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:254 ../gtk/Session.cc:844 ../gtk/Utils.cc:271 ../libtransmission/watchdir.cc:91
+#: ../daemon/daemon.cc:222 ../gtk/Session.cc:862 ../gtk/Utils.cc:272 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:263
+#: ../daemon/daemon.cc:231
 msgid "Removing torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:268 ../gtk/Utils.cc:554 ../libtransmission/utils.cc:607
+#: ../daemon/daemon.cc:236 ../gtk/Utils.cc:555 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:603
+#: ../daemon/daemon.cc:637
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:650
+#: ../daemon/daemon.cc:684
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:664
+#: ../daemon/daemon.cc:698
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:699
+#: ../daemon/daemon.cc:722
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:710
+#: ../daemon/daemon.cc:734
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:730
+#: ../daemon/daemon.cc:755
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:736 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:471 ../libtransmission/inout.cc:155 ../libtransmission/rpcimpl.cc:1306 ../libtransmission/torrent.cc:1029 ../libtransmission/torrent.cc:1990 ../libtransmission/variant.cc:855
+#: ../daemon/daemon.cc:761 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:473 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1084 ../libtransmission/torrent.cc:2073 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:770
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:792
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:181
+#: ../daemon/daemon.cc:837 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:847 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:861
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:398
+#: ../gtk/Application.cc:400
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:554
+#: ../gtk/Application.cc:558
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/Application.cc:780
+#: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr ""
 
-#: ../gtk/Application.cc:786 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:372 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+#: ../gtk/Application.cc:790 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr ""
 
-#: ../gtk/Application.cc:787
+#: ../gtk/Application.cc:791
 msgid "I _Agree"
 msgstr ""
 
-#: ../gtk/Application.cc:1016
+#: ../gtk/Application.cc:1020
 msgid "Closing Connections…"
 msgstr ""
 
-#: ../gtk/Application.cc:1021
+#: ../gtk/Application.cc:1025
 msgid "Sending upload/download totals to tracker…"
 msgstr ""
 
-#: ../gtk/Application.cc:1026
+#: ../gtk/Application.cc:1030
 msgid "_Quit Now"
 msgstr ""
 
-#: ../gtk/Application.cc:1088
+#: ../gtk/Application.cc:1092
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Application.cc:1095
+#: ../gtk/Application.cc:1099
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1420
 msgid "A fast and easy BitTorrent client"
 msgstr ""
 
-#: ../gtk/Application.cc:1417
+#: ../gtk/Application.cc:1421
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1423
+#: ../gtk/Application.cc:1427
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Jeyaranjan Yogaraj https://launchpad.net/~yogaraj-ubuntu\n"
 "  Keerthy https://launchpad.net/~pkeerthy"
 
-#: ../gtk/DetailsDialog.cc:520 ../gtk/DetailsDialog.cc:538
+#: ../gtk/DetailsDialog.cc:524 ../gtk/DetailsDialog.cc:542
 msgid "Use global settings"
 msgstr "முழுமை அளாவிய அமைவுகளை பயன்படுத்து"
 
-#: ../gtk/DetailsDialog.cc:521
+#: ../gtk/DetailsDialog.cc:525
 msgid "Seed regardless of ratio"
 msgstr "விகிதத்தை பாராது வழங்கு"
 
-#: ../gtk/DetailsDialog.cc:522
+#: ../gtk/DetailsDialog.cc:526
 msgid "Stop seeding at ratio:"
 msgstr "விகிதத்தின் படி வழங்கு"
 
-#: ../gtk/DetailsDialog.cc:539
+#: ../gtk/DetailsDialog.cc:543
 msgid "Seed regardless of activity"
 msgstr "செயற்பாட்டை பாராது வழங்கு"
 
-#: ../gtk/DetailsDialog.cc:540
+#: ../gtk/DetailsDialog.cc:544
 msgid "Stop seeding if idle for N minutes:"
 msgstr "N நிமிடங்களுக்கு முடங்கி இருப்பின் வழங்குவதை நிறுத்து"
 
-#: ../gtk/DetailsDialog.cc:571 ../gtk/Torrent.cc:428
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:428
 msgid "Queued for verification"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:574
+#: ../gtk/DetailsDialog.cc:578
 msgid "Verifying local data"
 msgstr "உள்ளமை தகவல்களை சரிபார்க்கின்றது"
 
-#: ../gtk/DetailsDialog.cc:577 ../gtk/Torrent.cc:431
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:431
 msgid "Queued for download"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:580 ../gtk/FilterBar.cc:473
+#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:474
 msgctxt "Verb"
 msgid "Downloading"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:583 ../gtk/Torrent.cc:434
+#: ../gtk/DetailsDialog.cc:587 ../gtk/Torrent.cc:434
 msgid "Queued for seeding"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:586 ../gtk/FilterBar.cc:474
+#: ../gtk/DetailsDialog.cc:590 ../gtk/FilterBar.cc:475
 msgctxt "Verb"
 msgid "Seeding"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:589 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:425
+#: ../gtk/DetailsDialog.cc:593 ../gtk/FilterBar.cc:477 ../gtk/Torrent.cc:425
 msgid "Finished"
 msgstr "நிறைவுபெற்றுவிட்டது"
 
-#: ../gtk/DetailsDialog.cc:589 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:425
+#: ../gtk/DetailsDialog.cc:593 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:425
 msgid "Paused"
 msgstr "இடைநிறுத்தப்பட்டுள்ளது"
 
-#: ../gtk/DetailsDialog.cc:610 ../gtk/DetailsDialog.cc:615 ../gtk/DetailsDialog.cc:729
+#: ../gtk/DetailsDialog.cc:614 ../gtk/DetailsDialog.cc:619 ../gtk/DetailsDialog.cc:733
 msgid "N/A"
 msgstr "N/A"
 
-#: ../gtk/DetailsDialog.cc:624 ../gtk/FileList.cc:654
+#: ../gtk/DetailsDialog.cc:628 ../gtk/FileList.cc:655
 msgid "Mixed"
 msgstr "கலப்பு"
 
-#: ../gtk/DetailsDialog.cc:625
+#: ../gtk/DetailsDialog.cc:629
 msgid "No Torrents Selected"
 msgstr "டொராண்ட் எதுவும் தெரிவுசெய்யப்படவில்லை"
 
-#: ../gtk/DetailsDialog.cc:654
+#: ../gtk/DetailsDialog.cc:658
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "இந்த தொடர்விக்கு மட்டும் சொந்தமானது -- DHT யும் PEX உம் முடக்கப்பட்டுள்ளது"
 
-#: ../gtk/DetailsDialog.cc:654
+#: ../gtk/DetailsDialog.cc:658
 msgid "Public torrent"
 msgstr "பொதுவான டொராண்ட்"
 
-#: ../gtk/DetailsDialog.cc:717
+#: ../gtk/DetailsDialog.cc:721
 msgid "Created by {creator} on {date}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:721
+#: ../gtk/DetailsDialog.cc:725
 msgid "Created by {creator}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:725
+#: ../gtk/DetailsDialog.cc:729
 msgid "Created on {date}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:839
+#: ../gtk/DetailsDialog.cc:843
 msgid "Unknown"
 msgstr "அறியப்படவில்லை"
 
-#: ../gtk/DetailsDialog.cc:876 ../gtk/MakeDialog.cc:388
+#: ../gtk/DetailsDialog.cc:880 ../gtk/MakeDialog.cc:392
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:891 ../gtk/MakeDialog.cc:394
+#: ../gtk/DetailsDialog.cc:895 ../gtk/MakeDialog.cc:398
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:935
+#: ../gtk/DetailsDialog.cc:939
 msgid "{current_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:943
+#: ../gtk/DetailsDialog.cc:947
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:952
+#: ../gtk/DetailsDialog.cc:956
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:985
+#: ../gtk/DetailsDialog.cc:989
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1015
+#: ../gtk/DetailsDialog.cc:1019
 msgid "{uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1056
+#: ../gtk/DetailsDialog.cc:1060
 msgid "No errors"
 msgstr "பிழைகள் இல்லை"
 
-#: ../gtk/DetailsDialog.cc:1076
+#: ../gtk/DetailsDialog.cc:1080
 msgid "Never"
 msgstr "எப்போதும் இல்லை"
 
-#: ../gtk/DetailsDialog.cc:1080
+#: ../gtk/DetailsDialog.cc:1084
 msgid "Active now"
 msgstr "தற்போது செயற்படுகின்றது"
 
-#: ../gtk/DetailsDialog.cc:1494
+#: ../gtk/DetailsDialog.cc:1498
 msgid "Optimistic unchoke"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1498
+#: ../gtk/DetailsDialog.cc:1502
 msgid "Downloading from this peer"
 msgstr "இந்த சகாவிடம் இருந்து பதிவிறக்கப்படுகின்றது"
 
-#: ../gtk/DetailsDialog.cc:1502
+#: ../gtk/DetailsDialog.cc:1506
 msgid "We would download from this peer if they would let us"
 msgstr "இவர்கள் அனுமதிப்பார்களாயின் இந்த சகாவிடமிருந்து நங்கள் பதிவிறக்குவோம்"
 
-#: ../gtk/DetailsDialog.cc:1506
+#: ../gtk/DetailsDialog.cc:1510
 msgid "Uploading to peer"
 msgstr "சகாவுக்கு மேலேற்றப்படுகின்றது"
 
-#: ../gtk/DetailsDialog.cc:1510
+#: ../gtk/DetailsDialog.cc:1514
 msgid "We would upload to this peer if they asked"
 msgstr "இவர்கள் கேட்பார்களாயின் இந்த சகாவுக்கு பதிவேற்றுவோம்"
 
-#: ../gtk/DetailsDialog.cc:1514
+#: ../gtk/DetailsDialog.cc:1518
 msgid "Peer has unchoked us, but we're not interested"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1518
+#: ../gtk/DetailsDialog.cc:1522
 msgid "We unchoked this peer, but they're not interested"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1522
+#: ../gtk/DetailsDialog.cc:1526
 msgid "Encrypted connection"
 msgstr "மறைகுறியீடாக்கப்பட்ட இணைப்பு"
 
-#: ../gtk/DetailsDialog.cc:1526
+#: ../gtk/DetailsDialog.cc:1530
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "சகா பரிமாற்றத்தின் (PEX) மூலம் பெறப்பட்ட சகா"
 
-#: ../gtk/DetailsDialog.cc:1530
+#: ../gtk/DetailsDialog.cc:1534
 msgid "Peer was found through DHT"
 msgstr "DHT மூலம் பெறப்பட்ட சகா"
 
-#: ../gtk/DetailsDialog.cc:1534
+#: ../gtk/DetailsDialog.cc:1538
 msgid "Peer is an incoming connection"
 msgstr "சகா உள்வரும் இணைப்புக்கானது"
 
-#: ../gtk/DetailsDialog.cc:1538
+#: ../gtk/DetailsDialog.cc:1542
 msgid "Peer is connected over µTP"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1608
+#: ../gtk/DetailsDialog.cc:1612
 msgid "Address"
 msgstr "முகவரி"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1616
+#: ../gtk/DetailsDialog.cc:1620
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1632
+#: ../gtk/DetailsDialog.cc:1636
 msgid "Dn Reqs"
 msgstr "பதிவிறக்க கேள்விகள்"
 
-#: ../gtk/DetailsDialog.cc:1639
+#: ../gtk/DetailsDialog.cc:1643
 msgid "Up Reqs"
 msgstr "மேலேற்ற கேள்விகள்"
 
-#: ../gtk/DetailsDialog.cc:1646
+#: ../gtk/DetailsDialog.cc:1650
 msgid "Dn Blocks"
 msgstr "பதிவிறக்க தொகுதிகள்"
 
-#: ../gtk/DetailsDialog.cc:1653
+#: ../gtk/DetailsDialog.cc:1657
 msgid "Up Blocks"
 msgstr "மேலேற்ற தொகுதிகள்"
 
-#: ../gtk/DetailsDialog.cc:1660
+#: ../gtk/DetailsDialog.cc:1664
 msgid "We Cancelled"
 msgstr "நாங்கள் இரத்துச்செய்துவிட்டோம்"
 
-#: ../gtk/DetailsDialog.cc:1667
+#: ../gtk/DetailsDialog.cc:1671
 msgid "They Cancelled"
 msgstr "அவர்கள் இரத்துச்செய்துவிட்டர்கள்"
 
-#: ../gtk/DetailsDialog.cc:1675 ../gtk/DetailsDialog.cc:1753
+#: ../gtk/DetailsDialog.cc:1679 ../gtk/DetailsDialog.cc:1757
 msgid "Down"
 msgstr "கீழே"
 
-#: ../gtk/DetailsDialog.cc:1683
+#: ../gtk/DetailsDialog.cc:1687
 msgid "Up"
 msgstr "மேலே"
 
-#: ../gtk/DetailsDialog.cc:1690
+#: ../gtk/DetailsDialog.cc:1694
 msgid "Client"
 msgstr "நுகர்வி"
 
-#: ../gtk/DetailsDialog.cc:1696
+#: ../gtk/DetailsDialog.cc:1700
 msgid "Flags"
 msgstr "கொடி"
 
-#: ../gtk/DetailsDialog.cc:1744
+#: ../gtk/DetailsDialog.cc:1748
 msgid "Web Seeds"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1812
+#: ../gtk/DetailsDialog.cc:1816
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1824
+#: ../gtk/DetailsDialog.cc:1828
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1833
+#: ../gtk/DetailsDialog.cc:1837
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1846
+#: ../gtk/DetailsDialog.cc:1850
 msgid "No updates scheduled"
 msgstr "இற்றப்படுத்தல்கள் ஒன்றும் திட்டமிடப்படவில்லை"
 
-#: ../gtk/DetailsDialog.cc:1853
+#: ../gtk/DetailsDialog.cc:1857
 msgid "Asking for more peers {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1860
+#: ../gtk/DetailsDialog.cc:1864
 msgid "Queued to ask for more peers"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
-#: ../gtk/DetailsDialog.cc:1868
+#: ../gtk/DetailsDialog.cc:1872
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
-#: ../gtk/DetailsDialog.cc:1893
+#: ../gtk/DetailsDialog.cc:1897
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1895
+#: ../gtk/DetailsDialog.cc:1899
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:1897
+#: ../gtk/DetailsDialog.cc:1901
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:1906
+#: ../gtk/DetailsDialog.cc:1910
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1923
+#: ../gtk/DetailsDialog.cc:1927
 msgid "Asking for peer counts in {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1930
+#: ../gtk/DetailsDialog.cc:1934
 msgid "Queued to ask for peer counts"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1937
+#: ../gtk/DetailsDialog.cc:1941
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2220
+#: ../gtk/DetailsDialog.cc:2226
 msgid "{torrent_name} - Edit Trackers"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2254
+#: ../gtk/DetailsDialog.cc:2260
 msgid "List contains invalid URLs"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2259 ../gtk/FileList.cc:850
+#: ../gtk/DetailsDialog.cc:2265 ../gtk/FileList.cc:866
 msgid "Please correct the errors and try again."
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2339
+#: ../gtk/DetailsDialog.cc:2347
 msgid "{torrent_name} - Add Tracker"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2448 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
+#: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2627
+#: ../gtk/DetailsDialog.cc:2642
 msgid "{torrent_name} Properties"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2632
+#: ../gtk/DetailsDialog.cc:2647
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] ""
@@ -535,211 +535,208 @@ msgstr[1] ""
 msgid "_Delete"
 msgstr ""
 
-#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2025 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1424
+#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:729 ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/DetailsDialog.ui:567 ../gtk/ui/gtk4/PrefsDialog.ui:1411
 msgid "_Remove"
 msgstr ""
 
-#: ../gtk/FileList.cc:642 ../gtk/Utils.cc:732
+#: ../gtk/FileList.cc:643 ../gtk/Utils.cc:731
 msgid "High"
 msgstr ""
 
-#: ../gtk/FileList.cc:646 ../gtk/Utils.cc:733
+#: ../gtk/FileList.cc:647 ../gtk/Utils.cc:732
 msgid "Normal"
 msgstr ""
 
-#: ../gtk/FileList.cc:650 ../gtk/Utils.cc:734
+#: ../gtk/FileList.cc:651 ../gtk/Utils.cc:733
 msgid "Low"
 msgstr ""
 
-#: ../gtk/FileList.cc:841 ../gtk/Session.cc:311
+#: ../gtk/FileList.cc:857 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/FileList.cc:954 ../gtk/MessageLogWindow.cc:327
+#: ../gtk/FileList.cc:962 ../gtk/MessageLogWindow.cc:342
 msgid "Name"
 msgstr ""
 
-#: ../gtk/FileList.cc:984
+#: ../gtk/FileList.cc:992
 msgid "Size"
 msgstr ""
 
-#. add "progress" column
-#: ../gtk/FileList.cc:993
+#: ../gtk/FileList.cc:1002
 msgid "Have"
 msgstr ""
 
-#. add "enabled" column
-#: ../gtk/FileList.cc:1010
+#: ../gtk/FileList.cc:1013
 msgid "Download"
 msgstr ""
 
-#. add priority column
-#: ../gtk/FileList.cc:1026
+#: ../gtk/FileList.cc:1024
 msgid "Priority"
 msgstr ""
 
-#: ../gtk/FilterBar.cc:324 ../gtk/FilterBar.cc:470
+#: ../gtk/FilterBar.cc:325 ../gtk/FilterBar.cc:471
 msgid "All"
 msgstr ""
 
-#: ../gtk/FilterBar.cc:472
+#: ../gtk/FilterBar.cc:473
 msgid "Active"
 msgstr ""
 
-#: ../gtk/FilterBar.cc:477
+#: ../gtk/FilterBar.cc:478
 msgctxt "Verb"
 msgid "Verifying"
 msgstr ""
 
-#: ../gtk/FilterBar.cc:478 ../gtk/FreeSpaceLabel.cc:55
+#: ../gtk/FilterBar.cc:479 ../gtk/FreeSpaceLabel.cc:57
 msgid "Error"
 msgstr ""
 
-#: ../gtk/FilterBar.cc:586 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
+#: ../gtk/FilterBar.cc:587 ../gtk/ui/gtk3/FilterBar.ui:13 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
 msgstr ""
 
-#: ../gtk/FilterBar.cc:587
+#: ../gtk/FilterBar.cc:588
 msgid "_Show {count:L} of:"
 msgstr ""
 
-#: ../gtk/FreeSpaceLabel.cc:54
+#: ../gtk/FreeSpaceLabel.cc:56
 msgid "{disk_space} free"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:381
+#: ../gtk/MainWindow.cc:383
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:382
+#: ../gtk/MainWindow.cc:384
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:434
+#: ../gtk/MainWindow.cc:436
 msgid "Unlimited"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:497
+#: ../gtk/MainWindow.cc:499
 msgid "Seed Forever"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:536
+#: ../gtk/MainWindow.cc:538
 msgid "Limit Download Speed"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:537
+#: ../gtk/MainWindow.cc:539
 msgid "Limit Upload Speed"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:541
+#: ../gtk/MainWindow.cc:543
 msgid "Stop Seeding at Ratio"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:580
+#: ../gtk/MainWindow.cc:582
 msgid "Stop at Ratio ({ratio})"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:593
+#: ../gtk/MainWindow.cc:595
 msgid "Total Ratio"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:594
+#: ../gtk/MainWindow.cc:596
 msgid "Session Ratio"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:595
+#: ../gtk/MainWindow.cc:597
 msgid "Total Transfer"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:596
+#: ../gtk/MainWindow.cc:598
 msgid "Session Transfer"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:761 ../gtk/MainWindow.cc:782 ../gtk/Torrent.cc:447
+#: ../gtk/MainWindow.cc:763 ../gtk/MainWindow.cc:784 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:767
+#: ../gtk/MainWindow.cc:769
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:775
+#: ../gtk/MainWindow.cc:777
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:809
+#: ../gtk/MainWindow.cc:811
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:812 ../gtk/Torrent.cc:624
+#: ../gtk/MainWindow.cc:814 ../gtk/Torrent.cc:624
 msgid "{upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:190
+#: ../gtk/MakeDialog.cc:194
 msgid "Creating '{path}'"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:203
+#: ../gtk/MakeDialog.cc:207
 msgid "Created '{path}'"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:209 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
+#: ../gtk/MakeDialog.cc:213 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:227
+#: ../gtk/MakeDialog.cc:231
 msgid "Scanned {file_size}"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:382 ../gtk/MakeDialog.cc:545 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
+#: ../gtk/MakeDialog.cc:386 ../gtk/MakeDialog.cc:549 ../gtk/ui/gtk3/MakeDialog.ui:172 ../gtk/ui/gtk4/MakeDialog.ui:100
 msgid "No source selected"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:253
-msgid "Save Log"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.cc:255 ../gtk/ui/gtk3/EditTrackersDialog.ui:35 ../gtk/ui/gtk4/EditTrackersDialog.ui:92
-msgid "_Save"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.cc:336
-msgid "Message"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.cc:345
-msgid "Time"
-msgstr ""
-
-#: ../gtk/MessageLogWindow.cc:483
+#: ../gtk/MessageLogWindow.cc:104
 msgctxt "Logging level"
 msgid "Critical"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:484
+#: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
 msgid "Error"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:485
+#: ../gtk/MessageLogWindow.cc:106
 msgctxt "Logging level"
 msgid "Warning"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:486
+#: ../gtk/MessageLogWindow.cc:107
 msgctxt "Logging level"
 msgid "Information"
 msgstr ""
 
-#: ../gtk/MessageLogWindow.cc:487
+#: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
 msgid "Debug"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:271
+msgid "Save Log"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
+msgid "_Save"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:351
+msgid "Message"
+msgstr ""
+
+#: ../gtk/MessageLogWindow.cc:360
+msgid "Time"
 msgstr ""
 
 #: ../gtk/Notify.cc:148
@@ -766,145 +763,162 @@ msgstr ""
 msgid "Torrent Added"
 msgstr ""
 
-#: ../gtk/OptionsDialog.cc:227
+#: ../gtk/OptionsDialog.cc:231
 msgid "Torrent files"
 msgstr ""
 
-#: ../gtk/OptionsDialog.cc:232
+#: ../gtk/OptionsDialog.cc:236
 msgid "All files"
 msgstr ""
 
-#: ../gtk/OptionsDialog.cc:368
+#: ../gtk/OptionsDialog.cc:370
 msgid "Open a Torrent"
 msgstr ""
 
-#: ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:148 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
+#: ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:154 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:24 ../gtk/ui/gtk3/OptionsDialog.ui:35 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:34 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:75
 msgid "_Open"
 msgstr ""
 
-#: ../gtk/OptionsDialog.cc:384
+#: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
 msgstr ""
 
-#: ../gtk/PathButton.cc:145
+#: ../gtk/PathButton.cc:152
 msgid "Select a File"
 msgstr ""
 
-#: ../gtk/PathButton.cc:202
+#: ../gtk/PathButton.cc:210
 msgid "(None)"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:308
+#: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:309
+#: ../gtk/PrefsDialog.cc:315
 msgid "Prefer encryption"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:310
+#: ../gtk/PrefsDialog.cc:316
 msgid "Require encryption"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:376
+#: ../gtk/PrefsDialog.cc:382
 msgid "Every Day"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:377
+#: ../gtk/PrefsDialog.cc:383
 msgid "Weekdays"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:378
+#: ../gtk/PrefsDialog.cc:384
 msgid "Weekends"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:553
+#: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/PrefsDialog.cc:569
+#: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:569
+#: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:581
+#: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:901 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
-msgid "Status unknown"
+#: ../gtk/PrefsDialog.cc:954
+msgctxt "Port test status"
+msgid "unknown"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:916
-msgid "Port is {markup_begin}closed{markup_end}"
+#: ../gtk/PrefsDialog.cc:956
+msgctxt "Port test status"
+msgid "checking…"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:916
-msgid "Port is {markup_begin}open{markup_end}"
+#: ../gtk/PrefsDialog.cc:958
+msgctxt "Port test status"
+msgid "open"
 msgstr ""
 
-#: ../gtk/PrefsDialog.cc:927
-msgid "Testing TCP port…"
+#: ../gtk/PrefsDialog.cc:960
+msgctxt "Port test status"
+msgid "closed"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:84
+#: ../gtk/PrefsDialog.cc:962
+msgctxt "Port test status"
+msgid "error"
+msgstr ""
+
+#: ../gtk/PrefsDialog.cc:975
+msgid "Status: <b>{status}</b>"
+msgstr ""
+
+#: ../gtk/PrefsDialog.cc:977
+msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
+msgstr ""
+
+#: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:96
+#: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:147
+#: ../gtk/RelocateDialog.cc:149
 msgid "This may take a moment…"
 msgstr ""
 
-#: ../gtk/Session.cc:779 ../libtransmission/watchdir-win32.cc:154 ../libtransmission/watchdir-win32.cc:162
+#: ../gtk/Session.cc:797 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
 msgstr ""
 
 #. logging
-#: ../gtk/Session.cc:1037
+#: ../gtk/Session.cc:1082
 msgid "Inhibiting desktop hibernation"
 msgstr ""
 
-#: ../gtk/Session.cc:1043 ../gtk/Session.cc:1068
+#: ../gtk/Session.cc:1088 ../gtk/Session.cc:1113
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr ""
 
 #. logging
-#: ../gtk/Session.cc:1064
+#: ../gtk/Session.cc:1109
 msgid "Allowing desktop hibernation"
 msgstr ""
 
-#: ../gtk/Session.cc:1182
+#: ../gtk/Session.cc:1227
 msgid "Couldn't find pending RPC request for tag {tag}"
 msgstr ""
 
-#: ../gtk/StatsDialog.cc:71
+#: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/StatsDialog.cc:105
+#: ../gtk/StatsDialog.cc:107
 msgid "Reset your statistics?"
 msgstr ""
 
-#: ../gtk/StatsDialog.cc:111 ../gtk/ui/gtk3/StatsDialog.ui:22 ../gtk/ui/gtk4/StatsDialog.ui:245
+#: ../gtk/StatsDialog.cc:113 ../gtk/ui/gtk3/StatsDialog.ui:21 ../gtk/ui/gtk4/StatsDialog.ui:276
 msgid "_Reset"
 msgstr ""
 
-#: ../gtk/StatsDialog.cc:113
+#: ../gtk/StatsDialog.cc:115
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
 msgstr ""
 
-#: ../gtk/SystemTrayIcon.cc:217
+#: ../gtk/SystemTrayIcon.cc:207
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
@@ -990,132 +1004,132 @@ msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:134
+#: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:141
+#: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:148
+#: ../gtk/Utils.cc:149
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:155
+#: ../gtk/Utils.cc:156
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:159 ../gtk/Utils.cc:190 ../gtk/Utils.cc:217 ../gtk/Utils.cc:250
+#: ../gtk/Utils.cc:160 ../gtk/Utils.cc:191 ../gtk/Utils.cc:218 ../gtk/Utils.cc:251
 msgid "now"
 msgstr ""
 
-#: ../gtk/Utils.cc:166
+#: ../gtk/Utils.cc:167
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:172
+#: ../gtk/Utils.cc:173
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:179
+#: ../gtk/Utils.cc:180
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:186
+#: ../gtk/Utils.cc:187
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:199
+#: ../gtk/Utils.cc:200
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:204
+#: ../gtk/Utils.cc:205
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:209
+#: ../gtk/Utils.cc:210
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:214
+#: ../gtk/Utils.cc:215
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:225
+#: ../gtk/Utils.cc:226
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:232
+#: ../gtk/Utils.cc:233
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:239
+#: ../gtk/Utils.cc:240
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:246
+#: ../gtk/Utils.cc:247
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:265
+#: ../gtk/Utils.cc:266
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr ""
 
-#: ../gtk/Utils.cc:276
+#: ../gtk/Utils.cc:277
 msgid "Couldn't open torrent"
 msgstr ""
 
-#: ../gtk/Utils.cc:536
+#: ../gtk/Utils.cc:537
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Utils.cc:643
+#: ../gtk/Utils.cc:644
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:860 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
+#: ../gtk/Utils.cc:855 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:866
+#: ../gtk/Utils.cc:861
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:871
+#: ../gtk/Utils.cc:866
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1229,7 +1243,7 @@ msgstr ""
 msgid "_File"
 msgstr "கோப்பு (_F)"
 
-#: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:22 ../gtk/ui/gtk4/MainWindow.ui:16
+#: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:21 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
 msgstr "டொராண்டை திற"
 
@@ -1265,7 +1279,7 @@ msgstr "அனைத்து டொராண்ட்களையும் இ�
 msgid "_Quit"
 msgstr "வெளியேற (_)"
 
-#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:680 ../gtk/ui/gtk4/DetailsDialog.ui:508
+#: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:715 ../gtk/ui/gtk4/DetailsDialog.ui:559
 msgid "_Edit"
 msgstr "தொகு (_E)"
 
@@ -1285,11 +1299,11 @@ msgstr ""
 msgid "_Torrent"
 msgstr "டொராண்ட் (_T)"
 
-#: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:96 ../gtk/ui/gtk4/MainWindow.ui:92
+#: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
 msgstr ""
 
-#: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:93 ../gtk/ui/gtk4/MainWindow.ui:78
+#: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:78
 msgid "Torrent properties"
 msgstr "டொராண்டின் பண்புகள்"
 
@@ -1297,11 +1311,11 @@ msgstr "டொராண்டின் பண்புகள்"
 msgid "Open Fold_er"
 msgstr "உறையை திற (_E)"
 
-#: ../gtk/transmission.ui:97 ../gtk/transmission.ui:366 ../gtk/ui/gtk3/MainWindow.ui:40 ../gtk/ui/gtk4/MainWindow.ui:44
+#: ../gtk/transmission.ui:97 ../gtk/transmission.ui:366 ../gtk/ui/gtk3/MainWindow.ui:39 ../gtk/ui/gtk4/MainWindow.ui:44
 msgid "_Start"
 msgstr "தொடக்கு (_S)"
 
-#: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:38 ../gtk/ui/gtk4/MainWindow.ui:42
+#: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:37 ../gtk/ui/gtk4/MainWindow.ui:42
 msgid "Start torrent"
 msgstr "டொராண்டை தொடக்கு"
 
@@ -1337,11 +1351,11 @@ msgstr ""
 msgid "Move to _Bottom"
 msgstr ""
 
-#: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:55 ../gtk/ui/gtk4/MainWindow.ui:54
+#: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:54 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
 msgstr "இடைநிறுத்து (_P)"
 
-#: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:53 ../gtk/ui/gtk4/MainWindow.ui:52
+#: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:52 ../gtk/ui/gtk4/MainWindow.ui:52
 msgid "Pause torrent"
 msgstr "டொராண்டை இடைநிறுத்து"
 
@@ -1357,7 +1371,7 @@ msgstr "உள்ளமை தகவலை சரிபார் (_V)"
 msgid "Copy _Magnet Link to Clipboard"
 msgstr "மக்நெட் தொடர்பை பிடிப்பு பலகைக்கு பிரதி செய் (_M)"
 
-#: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:68 ../gtk/ui/gtk3/MainWindow.ui:70 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
+#: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:67 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
 msgstr "டொராண்டை நீக்கு"
 
@@ -1425,7 +1439,7 @@ msgstr "மீதம் இருக்கும் நேரம் படி �
 msgid "Re_verse Sort Order"
 msgstr "நிகர் மறு ஒழுங்கு முறை (_V)"
 
-#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1482
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:22 ../gtk/ui/gtk4/PrefsDialog.ui:1471
 msgid "_Help"
 msgstr "உதவி (_H)"
 
@@ -1461,493 +1475,493 @@ msgstr "பரிமாற்றத்தை காட்டு (_S)"
 msgid "Enable Alternative Speed _Limits"
 msgstr "மாற்று வேக எல்லையை செயற்படுத்து (_L)"
 
-#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2010 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1416
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:34 ../gtk/ui/gtk3/DetailsDialog.ui:701 ../gtk/ui/gtk3/MakeProgressDialog.ui:51 ../gtk/ui/gtk3/PrefsDialog.ui:1882 ../gtk/ui/gtk4/AddTrackerDialog.ui:75 ../gtk/ui/gtk4/DetailsDialog.ui:551 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1403
 msgid "_Add"
 msgstr ""
 
-#: ../gtk/ui/gtk3/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/AddTrackerDialog.ui:18
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:68 ../gtk/ui/gtk4/AddTrackerDialog.ui:20
 msgid "Tracker"
 msgstr ""
 
-#: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:84 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
+#: ../gtk/ui/gtk3/DetailsDialog.ui:20 ../gtk/ui/gtk3/MakeDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:36 ../gtk/ui/gtk3/PrefsDialog.ui:37 ../gtk/ui/gtk3/StatsDialog.ui:36 ../gtk/ui/gtk4/DetailsDialog.ui:886 ../gtk/ui/gtk4/MakeDialog.ui:277 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1484 ../gtk/ui/gtk4/StatsDialog.ui:284
 msgid "_Close"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:56 ../gtk/ui/gtk4/DetailsDialog.ui:25
+#: ../gtk/ui/gtk3/DetailsDialog.ui:58 ../gtk/ui/gtk4/DetailsDialog.ui:26
 msgid "Activity"
 msgstr "செயற்ப்பாடு"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:80 ../gtk/ui/gtk4/DetailsDialog.ui:39
+#: ../gtk/ui/gtk3/DetailsDialog.ui:74 ../gtk/ui/gtk4/DetailsDialog.ui:38
 msgid "Torrent size:"
 msgstr "டொராண்ட்டின் அளவு:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:92 ../gtk/ui/gtk4/DetailsDialog.ui:49
+#: ../gtk/ui/gtk3/DetailsDialog.ui:86 ../gtk/ui/gtk4/DetailsDialog.ui:48
 msgid "Have:"
 msgstr "கொண்டுள்ளது:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:104 ../gtk/ui/gtk3/StatsDialog.ui:92 ../gtk/ui/gtk3/StatsDialog.ui:250 ../gtk/ui/gtk4/DetailsDialog.ui:59 ../gtk/ui/gtk4/StatsDialog.ui:33 ../gtk/ui/gtk4/StatsDialog.ui:151
+#: ../gtk/ui/gtk3/DetailsDialog.ui:98 ../gtk/ui/gtk3/StatsDialog.ui:86 ../gtk/ui/gtk3/StatsDialog.ui:246 ../gtk/ui/gtk4/DetailsDialog.ui:58 ../gtk/ui/gtk4/StatsDialog.ui:32 ../gtk/ui/gtk4/StatsDialog.ui:164
 msgid "Uploaded:"
 msgstr "மேலேற்றப்பட்டுள்ளது:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
+#: ../gtk/ui/gtk3/DetailsDialog.ui:110 ../gtk/ui/gtk3/StatsDialog.ui:115 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:68 ../gtk/ui/gtk4/StatsDialog.ui:57 ../gtk/ui/gtk4/StatsDialog.ui:189
 msgid "Downloaded:"
 msgstr "பதிவிறக்கப்பட்டுள்ளது:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:128 ../gtk/ui/gtk4/DetailsDialog.ui:79
+#: ../gtk/ui/gtk3/DetailsDialog.ui:122 ../gtk/ui/gtk4/DetailsDialog.ui:78
 msgid "State:"
 msgstr "நிலை:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:140 ../gtk/ui/gtk4/DetailsDialog.ui:89
+#: ../gtk/ui/gtk3/DetailsDialog.ui:134 ../gtk/ui/gtk4/DetailsDialog.ui:88
 msgid "Running time:"
 msgstr "இயங்கிக்கொண்டிருக்கும் நேரம்:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:152 ../gtk/ui/gtk4/DetailsDialog.ui:99
+#: ../gtk/ui/gtk3/DetailsDialog.ui:146 ../gtk/ui/gtk4/DetailsDialog.ui:98
 msgid "Remaining time:"
 msgstr "மீதமுள்ள நேரம்:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:164 ../gtk/ui/gtk4/DetailsDialog.ui:109
+#: ../gtk/ui/gtk3/DetailsDialog.ui:158 ../gtk/ui/gtk4/DetailsDialog.ui:108
 msgid "Last activity:"
 msgstr "இறுதி செயற்பாடு:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:176 ../gtk/ui/gtk4/DetailsDialog.ui:119
+#: ../gtk/ui/gtk3/DetailsDialog.ui:170 ../gtk/ui/gtk4/DetailsDialog.ui:118
 msgid "Error:"
 msgstr "பிழை:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:330 ../gtk/ui/gtk4/DetailsDialog.ui:242
+#: ../gtk/ui/gtk3/DetailsDialog.ui:352 ../gtk/ui/gtk4/DetailsDialog.ui:274
 msgid "Details"
 msgstr "விபரங்கள்"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:354 ../gtk/ui/gtk4/DetailsDialog.ui:256
+#: ../gtk/ui/gtk3/DetailsDialog.ui:368 ../gtk/ui/gtk4/DetailsDialog.ui:286
 msgid "Location:"
 msgstr "இடம்:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:366 ../gtk/ui/gtk4/DetailsDialog.ui:266
+#: ../gtk/ui/gtk3/DetailsDialog.ui:380 ../gtk/ui/gtk4/DetailsDialog.ui:296
 msgid "Hash:"
 msgstr "தற்சார்பு முகவரியாக்கம்"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:378 ../gtk/ui/gtk4/DetailsDialog.ui:276
+#: ../gtk/ui/gtk3/DetailsDialog.ui:392 ../gtk/ui/gtk4/DetailsDialog.ui:306
 msgid "Privacy:"
 msgstr "அந்தரங்கம்"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:286
+#: ../gtk/ui/gtk3/DetailsDialog.ui:404 ../gtk/ui/gtk4/DetailsDialog.ui:316
 msgid "Origin:"
 msgstr "பிறப்பிடம் அல்லது மூலம்"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:402 ../gtk/ui/gtk4/DetailsDialog.ui:296
+#: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:326
 msgid "Added:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
+#: ../gtk/ui/gtk3/DetailsDialog.ui:430 ../gtk/ui/gtk4/DetailsDialog.ui:338
 msgid "Comment:"
 msgstr "குறிப்புரை:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:527 ../gtk/ui/gtk4/DetailsDialog.ui:400
+#: ../gtk/ui/gtk3/DetailsDialog.ui:562 ../gtk/ui/gtk4/DetailsDialog.ui:451
 msgid "Information"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:594 ../gtk/ui/gtk3/DetailsDialog.ui:722 ../gtk/ui/gtk4/DetailsDialog.ui:451 ../gtk/ui/gtk4/DetailsDialog.ui:528
+#: ../gtk/ui/gtk3/DetailsDialog.ui:629 ../gtk/ui/gtk3/DetailsDialog.ui:757 ../gtk/ui/gtk4/DetailsDialog.ui:502 ../gtk/ui/gtk4/DetailsDialog.ui:579
 msgid "Show _more details"
 msgstr "மேலதிக விபரங்களை காட்டு(_M)"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:617 ../gtk/ui/gtk4/DetailsDialog.ui:461
+#: ../gtk/ui/gtk3/DetailsDialog.ui:652 ../gtk/ui/gtk4/DetailsDialog.ui:512
 msgid "Peers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:738 ../gtk/ui/gtk4/DetailsDialog.ui:536
+#: ../gtk/ui/gtk3/DetailsDialog.ui:773 ../gtk/ui/gtk4/DetailsDialog.ui:587
 msgid "Show _backup trackers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:799 ../gtk/ui/gtk4/DetailsDialog.ui:576
+#: ../gtk/ui/gtk3/DetailsDialog.ui:834 ../gtk/ui/gtk4/DetailsDialog.ui:627
 msgid "File listing not available for combined torrent properties"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:816 ../gtk/ui/gtk3/MakeDialog.ui:67 ../gtk/ui/gtk4/DetailsDialog.ui:583 ../gtk/ui/gtk4/MakeDialog.ui:19
+#: ../gtk/ui/gtk3/DetailsDialog.ui:851 ../gtk/ui/gtk3/MakeDialog.ui:69 ../gtk/ui/gtk4/DetailsDialog.ui:634 ../gtk/ui/gtk4/MakeDialog.ui:20
 msgid "Files"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:391 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:246
+#: ../gtk/ui/gtk3/DetailsDialog.ui:873 ../gtk/ui/gtk3/PrefsDialog.ui:374 ../gtk/ui/gtk4/DetailsDialog.ui:651 ../gtk/ui/gtk4/PrefsDialog.ui:245
 msgid "Speed"
 msgstr "வேகம்"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:857 ../gtk/ui/gtk4/DetailsDialog.ui:613
+#: ../gtk/ui/gtk3/DetailsDialog.ui:887 ../gtk/ui/gtk4/DetailsDialog.ui:663
 msgid "Honor global _limits"
 msgstr "முழுமை அளாவிய வரையறைகளை மதி"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:873 ../gtk/ui/gtk4/DetailsDialog.ui:626
+#: ../gtk/ui/gtk3/DetailsDialog.ui:903 ../gtk/ui/gtk4/DetailsDialog.ui:676
 msgid "Limit _download speed ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:888 ../gtk/ui/gtk4/DetailsDialog.ui:638
+#: ../gtk/ui/gtk3/DetailsDialog.ui:918 ../gtk/ui/gtk4/DetailsDialog.ui:688
 msgid "Limit _upload speed ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:905 ../gtk/ui/gtk3/OptionsDialog.ui:145 ../gtk/ui/gtk4/DetailsDialog.ui:650 ../gtk/ui/gtk4/OptionsDialog.ui:87
+#: ../gtk/ui/gtk3/DetailsDialog.ui:935 ../gtk/ui/gtk3/OptionsDialog.ui:143 ../gtk/ui/gtk4/DetailsDialog.ui:700 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
 msgstr "டொராண்டின் முக்கியத்துவம் (_P):"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:974 ../gtk/ui/gtk4/DetailsDialog.ui:701
+#: ../gtk/ui/gtk3/DetailsDialog.ui:997 ../gtk/ui/gtk4/DetailsDialog.ui:749
 msgid "Seeding Limits"
 msgstr "வழங்கும் எல்லை"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:998 ../gtk/ui/gtk4/DetailsDialog.ui:715
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1013 ../gtk/ui/gtk4/DetailsDialog.ui:761
 msgid "_Ratio:"
 msgstr "விகிதம்(_R):"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1012 ../gtk/ui/gtk4/DetailsDialog.ui:727
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1027 ../gtk/ui/gtk4/DetailsDialog.ui:773
 msgid "_Idle:"
 msgstr "முடங்கு(_I):"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1117 ../gtk/ui/gtk4/DetailsDialog.ui:787
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1125 ../gtk/ui/gtk4/DetailsDialog.ui:831
 msgid "Peer Connections"
 msgstr "சகாக்களின் இணைப்பு"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1141 ../gtk/ui/gtk4/DetailsDialog.ui:801
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1141 ../gtk/ui/gtk4/DetailsDialog.ui:843
 msgid "_Maximum peers:"
 msgstr "அதிகபட்ச்ச சகாக்கள்(_M):"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:170 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:136 ../gtk/ui/gtk4/PrefsDialog.ui:982
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1180 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1328 ../gtk/ui/gtk4/DetailsDialog.ui:871 ../gtk/ui/gtk4/MainWindow.ui:136 ../gtk/ui/gtk4/PrefsDialog.ui:973
 msgid "Options"
 msgstr ""
 
-#: ../gtk/ui/gtk3/EditTrackersDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:18
+#: ../gtk/ui/gtk3/EditTrackersDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:20
 msgid "Tracker Announce URLs"
 msgstr ""
 
-#: ../gtk/ui/gtk3/EditTrackersDialog.ui:88 ../gtk/ui/gtk3/MakeDialog.ui:315 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:199
+#: ../gtk/ui/gtk3/EditTrackersDialog.ui:83 ../gtk/ui/gtk3/MakeDialog.ui:294 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:193
 msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/ui/gtk3/EditTrackersDialog.ui:123 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
+#: ../gtk/ui/gtk3/EditTrackersDialog.ui:118 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MainWindow.ui:144
+#: ../gtk/ui/gtk3/MainWindow.ui:143
 msgid "Torrent"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MainWindow.ui:252 ../gtk/ui/gtk3/StatsDialog.ui:8 ../gtk/ui/gtk4/MainWindow.ui:190 ../gtk/ui/gtk4/StatsDialog.ui:5
+#: ../gtk/ui/gtk3/MainWindow.ui:251 ../gtk/ui/gtk3/StatsDialog.ui:7 ../gtk/ui/gtk4/MainWindow.ui:190 ../gtk/ui/gtk4/StatsDialog.ui:5
 msgid "Statistics"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:8 ../gtk/ui/gtk3/MakeProgressDialog.ui:8 ../gtk/ui/gtk4/MakeDialog.ui:5 ../gtk/ui/gtk4/MakeProgressDialog.ui:5
+#: ../gtk/ui/gtk3/MakeDialog.ui:7 ../gtk/ui/gtk3/MakeProgressDialog.ui:7 ../gtk/ui/gtk4/MakeDialog.ui:5 ../gtk/ui/gtk4/MakeProgressDialog.ui:5
 msgid "New Torrent"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:36 ../gtk/ui/gtk4/MakeDialog.ui:289
+#: ../gtk/ui/gtk3/MakeDialog.ui:35 ../gtk/ui/gtk4/MakeDialog.ui:285
 msgid "_New"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
+#: ../gtk/ui/gtk3/MakeDialog.ui:85 ../gtk/ui/gtk4/MakeDialog.ui:32
 msgid "Sa_ve to:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:116 ../gtk/ui/gtk4/MakeDialog.ui:55
+#: ../gtk/ui/gtk3/MakeDialog.ui:110 ../gtk/ui/gtk4/MakeDialog.ui:54
 msgid "Source F_older:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:145 ../gtk/ui/gtk4/MakeDialog.ui:77
+#: ../gtk/ui/gtk3/MakeDialog.ui:140 ../gtk/ui/gtk4/MakeDialog.ui:77
 msgid "Source _File:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:193 ../gtk/ui/gtk4/MakeDialog.ui:115
+#: ../gtk/ui/gtk3/MakeDialog.ui:187 ../gtk/ui/gtk4/MakeDialog.ui:113
 msgid "Piece size:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:244 ../gtk/ui/gtk4/MakeDialog.ui:150
+#: ../gtk/ui/gtk3/MakeDialog.ui:231 ../gtk/ui/gtk4/MakeDialog.ui:146
 msgid "Properties"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:270 ../gtk/ui/gtk4/MakeDialog.ui:165
+#: ../gtk/ui/gtk3/MakeDialog.ui:249 ../gtk/ui/gtk4/MakeDialog.ui:159
 msgid "_Trackers:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:333 ../gtk/ui/gtk4/MakeDialog.ui:212
+#: ../gtk/ui/gtk3/MakeDialog.ui:312 ../gtk/ui/gtk4/MakeDialog.ui:206
 msgid "Co_mment:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:360 ../gtk/ui/gtk4/MakeDialog.ui:235
+#: ../gtk/ui/gtk3/MakeDialog.ui:339 ../gtk/ui/gtk4/MakeDialog.ui:229
 msgid "_Source:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeDialog.ui:387 ../gtk/ui/gtk4/MakeDialog.ui:258
+#: ../gtk/ui/gtk3/MakeDialog.ui:366 ../gtk/ui/gtk4/MakeDialog.ui:252
 msgid "_Private torrent"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
+#: ../gtk/ui/gtk3/MakeProgressDialog.ui:81 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:6 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MessageLogWindow.ui:27 ../gtk/ui/gtk4/MessageLogWindow.ui:31
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:26 ../gtk/ui/gtk4/MessageLogWindow.ui:31
 msgid "Save _As"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MessageLogWindow.ui:42 ../gtk/ui/gtk4/MessageLogWindow.ui:55
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:41 ../gtk/ui/gtk4/MessageLogWindow.ui:55
 msgid "Clear"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MessageLogWindow.ui:67 ../gtk/ui/gtk4/MessageLogWindow.ui:84
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:66 ../gtk/ui/gtk4/MessageLogWindow.ui:84
 msgid "P_ause"
 msgstr ""
 
-#: ../gtk/ui/gtk3/MessageLogWindow.ui:97 ../gtk/ui/gtk4/MessageLogWindow.ui:100
+#: ../gtk/ui/gtk3/MessageLogWindow.ui:96 ../gtk/ui/gtk4/MessageLogWindow.ui:100
 msgid "Level"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:8 ../gtk/ui/gtk4/OptionsDialog.ui:5
+#: ../gtk/ui/gtk3/OptionsDialog.ui:7 ../gtk/ui/gtk4/OptionsDialog.ui:5
 msgid "Torrent Options"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:67 ../gtk/ui/gtk4/OptionsDialog.ui:19
+#: ../gtk/ui/gtk3/OptionsDialog.ui:65 ../gtk/ui/gtk4/OptionsDialog.ui:19
 msgid "_Torrent file:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:82 ../gtk/ui/gtk4/OptionsDialog.ui:32
+#: ../gtk/ui/gtk3/OptionsDialog.ui:80 ../gtk/ui/gtk4/OptionsDialog.ui:32
 msgid "Select Source File"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:93 ../gtk/ui/gtk4/OptionsDialog.ui:41
+#: ../gtk/ui/gtk3/OptionsDialog.ui:91 ../gtk/ui/gtk4/OptionsDialog.ui:41
 msgid "_Destination folder:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:109 ../gtk/ui/gtk4/OptionsDialog.ui:55
+#: ../gtk/ui/gtk3/OptionsDialog.ui:107 ../gtk/ui/gtk4/OptionsDialog.ui:55
 msgid "Select Destination Folder"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:168 ../gtk/ui/gtk4/OptionsDialog.ui:108
+#: ../gtk/ui/gtk3/OptionsDialog.ui:166 ../gtk/ui/gtk4/OptionsDialog.ui:108
 msgid "_Start when added"
 msgstr ""
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:479 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:315
+#: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:8 ../gtk/ui/gtk4/PrefsDialog.ui:5
+#: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:73 ../gtk/ui/gtk4/PrefsDialog.ui:27
+#: ../gtk/ui/gtk3/PrefsDialog.ui:76 ../gtk/ui/gtk4/PrefsDialog.ui:29
 msgid "Speed Limits"
 msgstr ""
 
 #. Checkbox to limit upload speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:95 ../gtk/ui/gtk4/PrefsDialog.ui:41
+#: ../gtk/ui/gtk3/PrefsDialog.ui:90 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
 msgstr ""
 
 #. Checkbox to limit download speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:110 ../gtk/ui/gtk4/PrefsDialog.ui:53
+#: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:175 ../gtk/ui/gtk4/PrefsDialog.ui:97
+#: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:219 ../gtk/ui/gtk4/PrefsDialog.ui:119
+#: ../gtk/ui/gtk3/PrefsDialog.ui:193 ../gtk/ui/gtk4/PrefsDialog.ui:114
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr ""
 
 #. Labels a spinbutton for alternate upload speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:235 ../gtk/ui/gtk4/PrefsDialog.ui:133
+#: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:130
 msgid "U_pload ({speed_units}):"
 msgstr ""
 
 #. Labels a spinbutton for alternate download speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:249 ../gtk/ui/gtk4/PrefsDialog.ui:145
+#: ../gtk/ui/gtk3/PrefsDialog.ui:230 ../gtk/ui/gtk4/PrefsDialog.ui:142
 msgid "Do_wnload ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:261 ../gtk/ui/gtk4/PrefsDialog.ui:157
+#: ../gtk/ui/gtk3/PrefsDialog.ui:242 ../gtk/ui/gtk4/PrefsDialog.ui:154
 msgid "_Scheduled times:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:279 ../gtk/ui/gtk4/PrefsDialog.ui:170
+#: ../gtk/ui/gtk3/PrefsDialog.ui:260 ../gtk/ui/gtk4/PrefsDialog.ui:167
 msgid "_On days:"
 msgstr ""
 
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
-#: ../gtk/ui/gtk3/PrefsDialog.ui:336 ../gtk/ui/gtk4/PrefsDialog.ui:213
+#: ../gtk/ui/gtk3/PrefsDialog.ui:317 ../gtk/ui/gtk4/PrefsDialog.ui:210
 msgid "_to"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:408 ../gtk/ui/gtk4/PrefsDialog.ui:261
+#: ../gtk/ui/gtk3/PrefsDialog.ui:395 ../gtk/ui/gtk4/PrefsDialog.ui:262
 msgctxt "Gerund"
 msgid "Adding"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:430 ../gtk/ui/gtk4/PrefsDialog.ui:275
+#: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:445 ../gtk/ui/gtk4/PrefsDialog.ui:287
+#: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:462 ../gtk/ui/gtk4/PrefsDialog.ui:301
+#: ../gtk/ui/gtk3/PrefsDialog.ui:441 ../gtk/ui/gtk4/PrefsDialog.ui:300
 msgid "_Start added torrents"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:498 ../gtk/ui/gtk4/PrefsDialog.ui:329
+#: ../gtk/ui/gtk3/PrefsDialog.ui:477 ../gtk/ui/gtk4/PrefsDialog.ui:328
 msgid "Save to _Location:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:584 ../gtk/ui/gtk4/PrefsDialog.ui:393
+#: ../gtk/ui/gtk3/PrefsDialog.ui:557 ../gtk/ui/gtk4/PrefsDialog.ui:389
 msgid "Download Queue"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:608 ../gtk/ui/gtk4/PrefsDialog.ui:407
+#: ../gtk/ui/gtk3/PrefsDialog.ui:573 ../gtk/ui/gtk4/PrefsDialog.ui:401
 msgid "Ma_ximum active downloads:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:622 ../gtk/ui/gtk4/PrefsDialog.ui:419
+#: ../gtk/ui/gtk3/PrefsDialog.ui:587 ../gtk/ui/gtk4/PrefsDialog.ui:413
 msgid "Downloads sharing data in the last _N minutes are active:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:677 ../gtk/ui/gtk4/PrefsDialog.ui:458
+#: ../gtk/ui/gtk3/PrefsDialog.ui:636 ../gtk/ui/gtk4/PrefsDialog.ui:451
 msgid "Incomplete"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:699 ../gtk/ui/gtk4/PrefsDialog.ui:472
+#: ../gtk/ui/gtk3/PrefsDialog.ui:650 ../gtk/ui/gtk4/PrefsDialog.ui:463
 msgid "Append \"._part\" to incomplete files' names"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:716 ../gtk/ui/gtk4/PrefsDialog.ui:486
+#: ../gtk/ui/gtk3/PrefsDialog.ui:667 ../gtk/ui/gtk4/PrefsDialog.ui:477
 msgid "Keep _incomplete torrents in:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:731 ../gtk/ui/gtk4/PrefsDialog.ui:498
+#: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:787 ../gtk/ui/gtk4/PrefsDialog.ui:537
+#: ../gtk/ui/gtk3/PrefsDialog.ui:740 ../gtk/ui/gtk4/PrefsDialog.ui:528
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:805 ../gtk/ui/gtk4/PrefsDialog.ui:552
+#: ../gtk/ui/gtk3/PrefsDialog.ui:762 ../gtk/ui/gtk4/PrefsDialog.ui:545
 msgid "Limits"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:827 ../gtk/ui/gtk4/PrefsDialog.ui:566
+#: ../gtk/ui/gtk3/PrefsDialog.ui:776 ../gtk/ui/gtk4/PrefsDialog.ui:557
 msgid "Stop seeding at _ratio:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:842 ../gtk/ui/gtk4/PrefsDialog.ui:578
+#: ../gtk/ui/gtk3/PrefsDialog.ui:791 ../gtk/ui/gtk4/PrefsDialog.ui:569
 msgid "Stop seeding if idle for _N minutes:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:857 ../gtk/ui/gtk4/PrefsDialog.ui:590
+#: ../gtk/ui/gtk3/PrefsDialog.ui:806 ../gtk/ui/gtk4/PrefsDialog.ui:581
 msgid "Call scrip_t when done seeding:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:923 ../gtk/ui/gtk4/PrefsDialog.ui:639
+#: ../gtk/ui/gtk3/PrefsDialog.ui:874 ../gtk/ui/gtk4/PrefsDialog.ui:631
 msgctxt "Gerund"
 msgid "Seeding"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:941 ../gtk/ui/gtk3/PrefsDialog.ui:1148 ../gtk/ui/gtk4/PrefsDialog.ui:654 ../gtk/ui/gtk4/PrefsDialog.ui:792
+#: ../gtk/ui/gtk3/PrefsDialog.ui:896 ../gtk/ui/gtk3/PrefsDialog.ui:1083 ../gtk/ui/gtk4/PrefsDialog.ui:648 ../gtk/ui/gtk4/PrefsDialog.ui:783
 msgid "Privacy"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:965 ../gtk/ui/gtk4/PrefsDialog.ui:668
+#: ../gtk/ui/gtk3/PrefsDialog.ui:912 ../gtk/ui/gtk4/PrefsDialog.ui:660
 msgid "_Encryption mode:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1009 ../gtk/ui/gtk4/PrefsDialog.ui:696
+#: ../gtk/ui/gtk3/PrefsDialog.ui:950 ../gtk/ui/gtk4/PrefsDialog.ui:687
 msgid "Blocklist"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1031 ../gtk/ui/gtk4/PrefsDialog.ui:710
+#: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:699
 msgid "Enable _blocklist:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1046 ../gtk/ui/gtk4/PrefsDialog.ui:723
+#: ../gtk/ui/gtk3/PrefsDialog.ui:979 ../gtk/ui/gtk4/PrefsDialog.ui:712
 msgid "Enable _automatic updates"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1101 ../gtk/ui/gtk4/PrefsDialog.ui:764
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1034 ../gtk/ui/gtk4/PrefsDialog.ui:753
 msgid "_Update"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1167 ../gtk/ui/gtk4/PrefsDialog.ui:808
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1106 ../gtk/ui/gtk4/PrefsDialog.ui:801
 msgid "Listening Port"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1191 ../gtk/ui/gtk4/PrefsDialog.ui:822
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1122 ../gtk/ui/gtk4/PrefsDialog.ui:813
 msgid "_Port used for incoming connections:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1203 ../gtk/ui/gtk4/PrefsDialog.ui:834
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1134 ../gtk/ui/gtk4/PrefsDialog.ui:825
 msgid "Pick a _random port every time Transmission is started"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1220 ../gtk/ui/gtk4/PrefsDialog.ui:848
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1151 ../gtk/ui/gtk4/PrefsDialog.ui:839
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1282 ../gtk/ui/gtk4/PrefsDialog.ui:896
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1213 ../gtk/ui/gtk4/PrefsDialog.ui:891
 msgid "Te_st Port"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1324 ../gtk/ui/gtk4/PrefsDialog.ui:917
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1249 ../gtk/ui/gtk4/PrefsDialog.ui:911
 msgid "Peer Limits"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1348 ../gtk/ui/gtk4/PrefsDialog.ui:931
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1265 ../gtk/ui/gtk4/PrefsDialog.ui:923
 msgid "Maximum peers per _torrent:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1362 ../gtk/ui/gtk4/PrefsDialog.ui:943
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1279 ../gtk/ui/gtk4/PrefsDialog.ui:935
 msgid "Maximum peers _overall:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1342 ../gtk/ui/gtk4/PrefsDialog.ui:985
 msgid "Enable µ_TP for peer communication"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:987
 msgid "µTP is a tool for reducing network congestion."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:1000
 msgid "Use PE_X to find more peers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1461 ../gtk/ui/gtk4/PrefsDialog.ui:1013
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1364 ../gtk/ui/gtk4/PrefsDialog.ui:1002
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1475 ../gtk/ui/gtk4/PrefsDialog.ui:1026
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1378 ../gtk/ui/gtk4/PrefsDialog.ui:1015
 msgid "Use _DHT to find more peers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1479 ../gtk/ui/gtk4/PrefsDialog.ui:1028
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1382 ../gtk/ui/gtk4/PrefsDialog.ui:1017
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1493 ../gtk/ui/gtk4/PrefsDialog.ui:1041
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1396 ../gtk/ui/gtk4/PrefsDialog.ui:1030
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1497 ../gtk/ui/gtk4/PrefsDialog.ui:1043
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1400 ../gtk/ui/gtk4/PrefsDialog.ui:1032
 msgid "LPD is a tool for finding peers on your local network."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1429 ../gtk/ui/gtk4/PrefsDialog.ui:1051
 msgid "Default Public Trackers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1565 ../gtk/ui/gtk4/PrefsDialog.ui:1087
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1073
 msgid ""
 "Trackers to use on all public torrents.\n"
 "\n"
@@ -1955,212 +1969,212 @@ msgid ""
 "To add a new primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1487 ../gtk/ui/gtk4/PrefsDialog.ui:1095
 msgid "Network"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1613 ../gtk/ui/gtk3/PrefsDialog.ui:1777 ../gtk/ui/gtk4/PrefsDialog.ui:1122 ../gtk/ui/gtk4/PrefsDialog.ui:1231
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1509 ../gtk/ui/gtk3/PrefsDialog.ui:1653 ../gtk/ui/gtk4/PrefsDialog.ui:1112 ../gtk/ui/gtk4/PrefsDialog.ui:1218
 msgid "Desktop"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1635 ../gtk/ui/gtk4/PrefsDialog.ui:1136
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1523 ../gtk/ui/gtk4/PrefsDialog.ui:1124
 msgid "_Inhibit hibernation when torrents are active"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1652 ../gtk/ui/gtk4/PrefsDialog.ui:1150
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1540 ../gtk/ui/gtk4/PrefsDialog.ui:1138
 msgid "Show Transmission icon in the _notification area"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1690 ../gtk/ui/gtk4/PrefsDialog.ui:1171
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1572 ../gtk/ui/gtk4/PrefsDialog.ui:1158
 msgid "Notification"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1712 ../gtk/ui/gtk4/PrefsDialog.ui:1185
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1586 ../gtk/ui/gtk4/PrefsDialog.ui:1170
 msgid "Show a notification when torrents are a_dded"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1729 ../gtk/ui/gtk4/PrefsDialog.ui:1199
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1603 ../gtk/ui/gtk4/PrefsDialog.ui:1184
 msgid "Show a notification when torrents _finish"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1746 ../gtk/ui/gtk4/PrefsDialog.ui:1213
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1620 ../gtk/ui/gtk4/PrefsDialog.ui:1198
 msgid "Play a _sound when torrents finish"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1246
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1675 ../gtk/ui/gtk4/PrefsDialog.ui:1235
 msgid "Remote Control"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1823 ../gtk/ui/gtk4/PrefsDialog.ui:1265
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1695 ../gtk/ui/gtk4/PrefsDialog.ui:1252
 msgid "Allow _remote access"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1839 ../gtk/ui/gtk4/PrefsDialog.ui:1274
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1711 ../gtk/ui/gtk4/PrefsDialog.ui:1261
 msgid "_Open web client"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1865 ../gtk/ui/gtk4/PrefsDialog.ui:1290
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1737 ../gtk/ui/gtk4/PrefsDialog.ui:1277
 msgid "HTTP _port:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1877 ../gtk/ui/gtk4/PrefsDialog.ui:1303
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1749 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "Use _authentication"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/PrefsDialog.ui:1317
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1769 ../gtk/ui/gtk4/PrefsDialog.ui:1304
 msgid "_Username:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1911 ../gtk/ui/gtk4/PrefsDialog.ui:1329
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1783 ../gtk/ui/gtk4/PrefsDialog.ui:1316
 msgid "Pass_word:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1923 ../gtk/ui/gtk4/PrefsDialog.ui:1342
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1329
 msgid "Only allow these IP a_ddresses:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1945 ../gtk/ui/gtk4/PrefsDialog.ui:1358
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1817 ../gtk/ui/gtk4/PrefsDialog.ui:1345
 msgid "Addresses:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2056 ../gtk/ui/gtk4/PrefsDialog.ui:1446
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1928 ../gtk/ui/gtk4/PrefsDialog.ui:1433
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2085 ../gtk/ui/gtk4/PrefsDialog.ui:1465
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1959 ../gtk/ui/gtk4/PrefsDialog.ui:1454
 msgid "Remote"
 msgstr ""
 
-#: ../gtk/ui/gtk3/RelocateDialog.ui:8 ../gtk/ui/gtk4/RelocateDialog.ui:5
+#: ../gtk/ui/gtk3/RelocateDialog.ui:7 ../gtk/ui/gtk4/RelocateDialog.ui:5
 msgid "Set Torrent Location"
 msgstr ""
 
-#: ../gtk/ui/gtk3/RelocateDialog.ui:36 ../gtk/ui/gtk4/RelocateDialog.ui:101
+#: ../gtk/ui/gtk3/RelocateDialog.ui:35 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
 msgstr ""
 
-#: ../gtk/ui/gtk3/RelocateDialog.ui:67 ../gtk/ui/gtk4/RelocateDialog.ui:19
+#: ../gtk/ui/gtk3/RelocateDialog.ui:69 ../gtk/ui/gtk4/RelocateDialog.ui:20
 msgid "Location"
 msgstr ""
 
-#: ../gtk/ui/gtk3/RelocateDialog.ui:92 ../gtk/ui/gtk4/RelocateDialog.ui:34
+#: ../gtk/ui/gtk3/RelocateDialog.ui:86 ../gtk/ui/gtk4/RelocateDialog.ui:33
 msgid "Torrent _location:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/RelocateDialog.ui:117 ../gtk/ui/gtk4/RelocateDialog.ui:57
+#: ../gtk/ui/gtk3/RelocateDialog.ui:111 ../gtk/ui/gtk4/RelocateDialog.ui:55
 msgid "_Move from the current folder"
 msgstr ""
 
-#: ../gtk/ui/gtk3/RelocateDialog.ui:134 ../gtk/ui/gtk4/RelocateDialog.ui:70
+#: ../gtk/ui/gtk3/RelocateDialog.ui:128 ../gtk/ui/gtk4/RelocateDialog.ui:68
 msgid "Local data is _already there"
 msgstr ""
 
-#: ../gtk/ui/gtk3/StatsDialog.ui:68 ../gtk/ui/gtk4/StatsDialog.ui:19
+#: ../gtk/ui/gtk3/StatsDialog.ui:70 ../gtk/ui/gtk4/StatsDialog.ui:20
 msgid "Current Session"
 msgstr ""
 
-#: ../gtk/ui/gtk3/StatsDialog.ui:142 ../gtk/ui/gtk3/StatsDialog.ui:300 ../gtk/ui/gtk4/StatsDialog.ui:75 ../gtk/ui/gtk4/StatsDialog.ui:193
+#: ../gtk/ui/gtk3/StatsDialog.ui:144 ../gtk/ui/gtk3/StatsDialog.ui:304 ../gtk/ui/gtk4/StatsDialog.ui:82 ../gtk/ui/gtk4/StatsDialog.ui:214
 msgid "Ratio:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/StatsDialog.ui:167 ../gtk/ui/gtk3/StatsDialog.ui:325 ../gtk/ui/gtk4/StatsDialog.ui:96 ../gtk/ui/gtk4/StatsDialog.ui:214
+#: ../gtk/ui/gtk3/StatsDialog.ui:173 ../gtk/ui/gtk3/StatsDialog.ui:333 ../gtk/ui/gtk4/StatsDialog.ui:107 ../gtk/ui/gtk4/StatsDialog.ui:239
 msgid "Duration:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/StatsDialog.ui:212 ../gtk/ui/gtk4/StatsDialog.ui:125
+#: ../gtk/ui/gtk3/StatsDialog.ui:215 ../gtk/ui/gtk4/StatsDialog.ui:138
 msgid "Total"
 msgstr ""
 
-#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:8 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
+#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:7 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
 msgid "Open URL"
 msgstr ""
 
-#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:64 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:18
+#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:68 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:20
 msgid "Open torrent from URL"
 msgstr ""
 
-#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:88 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
+#: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:84 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
 msgid "_URL"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:441
+#: ../libtransmission/announcer-http.cc:436
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:648
+#: ../libtransmission/announcer-http.cc:656
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:146 ../libtransmission/announcer-udp.cc:247
+#: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:261
 msgid "Unknown error"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:341
-msgid "Connection failed"
+#: ../libtransmission/announcer-udp.cc:376
+msgid "{ip_protocol} connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:444 ../libtransmission/tr-dht.cc:566
-msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
+#: ../libtransmission/announcer-udp.cc:508
+msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:884
+#: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:894
+#: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1019 ../libtransmission/announcer.cc:1347
+#: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1023 ../libtransmission/announcer.cc:1351
+#: ../libtransmission/announcer.cc:1032 ../libtransmission/announcer.cc:1360
 msgid "Tracker did not respond"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1079
+#: ../libtransmission/announcer.cc:1088
 msgid "Success"
 msgstr ""
 
-#: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:401
+#: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:403
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] ""
 msgstr[1] ""
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.cc:257
+#: ../libtransmission/blocklist.cc:259
 msgid "Couldn't parse line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/blocklist.cc:385
+#: ../libtransmission/blocklist.cc:387
 msgid "Rewriting old blocklist file format to new format"
 msgstr ""
 
-#: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:42 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:45
+#: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:45 ../libtransmission/crypto-utils-openssl.cc:64 ../libtransmission/crypto-utils-wolfssl.cc:48
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/global-ip-cache.cc:277
-msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
-
-#: ../libtransmission/global-ip-cache.cc:291
-msgid "Your machine does not support {protocol}"
-msgstr ""
-
-#: ../libtransmission/global-ip-cache.cc:315
-msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
-
-#: ../libtransmission/inout.cc:119
+#: ../libtransmission/inout.cc:118
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:274
+#: ../libtransmission/ip-cache.cc:274
+msgid "Successfully updated source {protocol} address to {ip}"
+msgstr ""
+
+#: ../libtransmission/ip-cache.cc:288
+msgid "Your machine does not support {protocol}"
+msgstr ""
+
+#: ../libtransmission/ip-cache.cc:313
+msgid "Successfully updated global {type} address to {ip} using {url}"
+msgstr ""
+
+#: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2168,15 +2182,15 @@ msgstr ""
 msgid "Skipping '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:186
+#: ../libtransmission/net.cc:192
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:262
+#: ../libtransmission/net.cc:269
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:282
+#: ../libtransmission/net.cc:288
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr ""
 
@@ -2200,7 +2214,7 @@ msgstr ""
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:675
+#: ../libtransmission/peer-io.cc:692
 msgid "Unknown state: {state}"
 msgstr ""
 
@@ -2212,35 +2226,35 @@ msgstr ""
 msgid "Port {port} is no longer forwarded"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-natpmp.cc:181
+#: ../libtransmission/port-forwarding-natpmp.cc:175
 msgid "Port {port} forwarded successfully"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:281
+#: ../libtransmission/port-forwarding-upnp.cc:272
 msgid "Found Internet Gateway Device '{url}'"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:282
+#: ../libtransmission/port-forwarding-upnp.cc:273
 msgid "Local Address is '{address}'"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:306
-msgid "Port {port} is not forwarded"
+#: ../libtransmission/port-forwarding-upnp.cc:298
+msgid "Local port {local_port} is not forwarded to {advertised_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:316
+#: ../libtransmission/port-forwarding-upnp.cc:310
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:348
+#: ../libtransmission/port-forwarding-upnp.cc:343
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:356
-msgid "Port {port} is forwarded"
+#: ../libtransmission/port-forwarding-upnp.cc:352
+msgid "Forwarded local port {local_port} to {advertised_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:362
+#: ../libtransmission/port-forwarding-upnp.cc:360
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr ""
 
@@ -2264,7 +2278,7 @@ msgstr ""
 msgid "Mapped private port {private_port} to public port {public_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding.cc:216
+#: ../libtransmission/port-forwarding.cc:217
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr ""
 
@@ -2272,69 +2286,93 @@ msgstr ""
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:598
+#: ../libtransmission/rpc-server.cc:342
+msgid "Rejected request from {host} (possible directory traversal attack)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.cc:506
+msgid "Rejected request from {host} (brute force protection active)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.cc:515
+msgid "Rejected request from {host} (IP not whitelisted)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.cc:538
+msgid "Rejected request from {host} (failed authentication)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.cc:580
+msgid "Rejected request from {host} (Host not whitelisted)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.cc:612
+msgid "Unknown URI from {host}: '{uri}'"
+msgstr ""
+
+#: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:625
+#: ../libtransmission/rpc-server.cc:658
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:688
+#: ../libtransmission/rpc-server.cc:721
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/rpc-server.cc:699
+#: ../libtransmission/rpc-server.cc:732
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:727
+#: ../libtransmission/rpc-server.cc:760
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:749
+#: ../libtransmission/rpc-server.cc:782
 msgid "Added '{entry}' to host whitelist"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:883
+#: ../libtransmission/rpc-server.cc:902
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:896
+#: ../libtransmission/rpc-server.cc:915
 msgid "Serving RPC and Web requests on {address}"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:901
+#: ../libtransmission/rpc-server.cc:920
 msgid "Whitelist enabled"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:906
+#: ../libtransmission/rpc-server.cc:925
 msgid "Password required"
 msgstr ""
 
-#: ../libtransmission/rpc-server.cc:912
+#: ../libtransmission/rpc-server.cc:931
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1199
+#: ../libtransmission/rpcimpl.cc:1158
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1261
+#: ../libtransmission/rpcimpl.cc:1213
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1399
+#: ../libtransmission/rpcimpl.cc:1340
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/session-alt-speeds.cc:98
+#: ../libtransmission/session-alt-speeds.cc:64
 msgid "Time to turn off turtle mode"
 msgstr ""
 
-#: ../libtransmission/session-alt-speeds.cc:98
+#: ../libtransmission/session-alt-speeds.cc:64
 msgid "Time to turn on turtle mode"
 msgstr ""
 
@@ -2342,141 +2380,157 @@ msgstr ""
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/session.cc:418
+#: ../libtransmission/session.cc:407
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr ""
 
-#: ../libtransmission/session.cc:730
+#: ../libtransmission/session.cc:725
 msgid "Transmission version {version} starting"
 msgstr ""
 
-#: ../libtransmission/session.cc:1410
+#: ../libtransmission/session.cc:1411
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1457
+#: ../libtransmission/session.cc:1458
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-metainfo.cc:713
+#: ../libtransmission/torrent-metainfo.cc:705
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:138
+#: ../libtransmission/torrent.cc:139
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:167
+#: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:400
+#: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:408
+#: ../libtransmission/torrent.cc:411
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:442
+#: ../libtransmission/torrent.cc:445
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:449
+#: ../libtransmission/torrent.cc:452
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:707
+#: ../libtransmission/torrent.cc:690
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:760
+#: ../libtransmission/torrent.cc:746
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:813
+#: ../libtransmission/torrent.cc:799
+msgid "Couldn't remove all torrent files: {error} ({error_code})"
+msgstr ""
+
+#: ../libtransmission/torrent.cc:865
 msgid "Removing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1121 ../libtransmission/torrent.cc:2159
+#: ../libtransmission/torrent.cc:1182 ../libtransmission/torrent.cc:1688
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1569
+#: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2043
+#: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr ""
 
-#: ../libtransmission/tr-dht.cc:540
+#: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/tr-lpd.cc:255
-msgid "Couldn't initialize LPD: {error} ({error_code})"
+#: ../libtransmission/tr-dht.cc:577
+msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-udp.cc:165
+#: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
+msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
+msgstr ""
+
+#: ../libtransmission/tr-udp.cc:180
+msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
+msgstr ""
+
+#: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-udp.cc:199
+#: ../libtransmission/tr-udp.cc:225
+msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
+msgstr ""
+
+#: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-utp.cc:98
+#: ../libtransmission/tr-utp.cc:99
 msgid "Unknown socket family"
 msgstr ""
 
-#: ../libtransmission/utils.cc:134
+#: ../libtransmission/utils.cc:147
 msgid "Couldn't read '{path}': Not a regular file"
 msgstr ""
 
-#: ../libtransmission/variant-json.cc:236
+#: ../libtransmission/variant-json.cc:241
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
+#: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:75 ../libtransmission/watchdir-kqueue.cc:88 ../libtransmission/watchdir-kqueue.cc:103
 msgid "Couldn't watch '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:270
+#: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:146 ../libtransmission/watchdir-win32.cc:294
 msgid "Couldn't read event: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/watchdir-inotify.cc:151 ../libtransmission/watchdir-win32.cc:279
+#: ../libtransmission/watchdir-inotify.cc:151 ../libtransmission/watchdir-win32.cc:303
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
 msgstr ""
 
-#: ../libtransmission/watchdir-inotify.cc:168 ../libtransmission/watchdir-win32.cc:304
+#: ../libtransmission/watchdir-inotify.cc:168 ../libtransmission/watchdir-win32.cc:328
 msgid "Couldn't read filename: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/watchdir-inotify.cc:177 ../libtransmission/watchdir-win32.cc:313
+#: ../libtransmission/watchdir-inotify.cc:177 ../libtransmission/watchdir-win32.cc:337
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
 msgstr ""
 
-#: ../libtransmission/watchdir-win32.cc:141
+#: ../libtransmission/watchdir-win32.cc:146
 msgid "Couldn't convert '{path}' to native path"
 msgstr ""
 
-#: ../libtransmission/watchdir-win32.cc:170
+#: ../libtransmission/watchdir-win32.cc:184
 msgid "Couldn't create pipe: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/watchdir-win32.cc:194
+#: ../libtransmission/watchdir-win32.cc:209
 msgid "Couldn't create thread"
 msgstr ""
 
-#: ../libtransmission/watchdir-win32.cc:223
+#: ../libtransmission/watchdir-win32.cc:247
 msgid "Couldn't read directory changes"
 msgstr ""
 
-#: ../libtransmission/watchdir-win32.cc:230
+#: ../libtransmission/watchdir-win32.cc:254
 msgid "Couldn't wait for directory changes"
 msgstr ""
 
@@ -2508,25 +2562,25 @@ msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:143
+#: ../utils/remote.cc:140
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:144
+#: ../utils/remote.cc:141
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:145 ../utils/remote.cc:165
+#: ../utils/remote.cc:142 ../utils/remote.cc:162
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:149
+#: ../utils/remote.cc:146
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""

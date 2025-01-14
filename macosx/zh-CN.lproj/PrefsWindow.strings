@@ -135,19 +135,19 @@
 "1267.title" = "下载速度：";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
-"1268.title" = "KB/s";
+"1268.title" = "KB/秒";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
-"1269.title" = "KB/s";
+"1269.title" = "KB/秒";
 
 /* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
 "1270.title" = "全局带宽限制：";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
-"1273.title" = "KB/s";
+"1273.title" = "KB/秒";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
-"1274.title" = "KB/s";
+"1274.title" = "KB/秒";
 
 /* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
 "1275.title" = "限速模式：";
@@ -393,7 +393,7 @@
 "2123.title" = "适用于新添加的传输";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "打开种子文件:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "设置默认应用程序";

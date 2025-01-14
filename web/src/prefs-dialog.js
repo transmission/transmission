@@ -170,6 +170,8 @@ export class PrefsDialog extends EventTarget {
               break;
           }
         }
+
+        element.dispatchEvent(new Event('session-change'));
       }
     }
   }
@@ -203,7 +205,7 @@ export class PrefsDialog extends EventTarget {
         element.classList.toggle('disabled', !check.checked);
       }
     };
-    check.addEventListener('change', callback);
+    check.addEventListener('session-change', callback);
     callback();
   }
 
@@ -856,7 +858,7 @@ export class PrefsDialog extends EventTarget {
         this.update_from_session,
       );
       this.elements.root.remove();
-      dispatchEvent(new Event('close'));
+      this.dispatchEvent(new Event('close'));
       for (const key of Object.keys(this)) {
         this[key] = null;
       }

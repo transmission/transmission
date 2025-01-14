@@ -69,7 +69,7 @@
 "89.title" = "Неактивности:";
 
 /* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
-"98.title" = "мин";
+"98.title" = "мин.";
 
 /* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
 "114.title" = "Удалить из списка раздач после завершения раздачи";
