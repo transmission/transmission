@@ -1094,7 +1094,7 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Définir l’_&amp;emplacement…</translation>
+        <translation>Définir l’&amp;emplacement…</translation>
     </message>
     <message>
         <location line="+10"/>
