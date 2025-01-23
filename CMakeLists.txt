@@ -56,6 +56,8 @@ set(NPM_MINIMUM 8.1.307) # Node.js 14
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
 
+option(ALLOW_UNSAFE_LIBCURL "Allow unsafe libcurl versions" OFF)
+mark_as_advanced(ALLOW_UNSAFE_LIBCURL)
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
@@ -249,7 +251,12 @@ find_package(PkgConfig QUIET)
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
 if(CURL_VERSION VERSION_GREATER_EQUAL 7.87.0 AND CURL_VERSION VERSION_LESS_EQUAL 8.5.0)
-    message(FATAL_ERROR "Please don't use libcurl 7.87.0 to 8.5.0. https://github.com/curl/curl/issues/10936")
+    if(NOT ALLOW_UNSAFE_LIBCURL)
+        message(FATAL_ERROR
+            "Please don't use libcurl 7.87.0 to 8.5.0. https://github.com/curl/curl/issues/10936\n"
+            "If you know what you are doing, you may bypass this error by setting ALLOW_UNSAFE_LIBCURL=ON.")
+    endif()
+    message(WARNING "You are explicitly allowing unsafe libcurl version ${CURL_VERSION}. https://github.com/curl/curl/issues/10936")
 endif()
 
 if(ENABLE_DEPRECATED STREQUAL "AUTO")
