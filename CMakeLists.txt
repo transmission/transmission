@@ -248,6 +248,10 @@ find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
+if(CURL_VERSION VERSION_GREATER_EQUAL 7.87.0 AND CURL_VERSION VERSION_LESS_EQUAL 8.5.0)
+    message(FATAL_ERROR "Please don't use libcurl 7.87.0 to 8.5.0. https://github.com/curl/curl/issues/10936")
+endif()
+
 if(ENABLE_DEPRECATED STREQUAL "AUTO")
     if(DEFINED ENV{CI})
         set(ENABLE_DEPRECATED OFF)
