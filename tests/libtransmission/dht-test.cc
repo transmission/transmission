@@ -382,36 +382,6 @@ protected:
         MockTimerMaker mock_timer_maker_;
     };
 
-    [[nodiscard]] static tr_socket_address getSockaddr(std::string_view name, tr_port port)
-    {
-        auto hints = addrinfo{};
-        hints.ai_socktype = SOCK_DGRAM;
-        hints.ai_family = AF_UNSPEC;
-
-        auto const szname = tr_urlbuf{ name };
-        auto const port_str = std::to_string(port.host());
-        addrinfo* info = nullptr;
-        if (int const rc = getaddrinfo(szname.c_str(), std::data(port_str), &hints, &info); rc != 0)
-        {
-            tr_logAddWarn(fmt::format(
-                _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
-                fmt::arg("address", name),
-                fmt::arg("port", port.host()),
-                fmt::arg("error", gai_strerror(rc)),
-                fmt::arg("error_code", rc)));
-            return {};
-        }
-
-        auto opt = tr_socket_address::from_sockaddr(info->ai_addr);
-        freeaddrinfo(info);
-        if (opt)
-        {
-            return *opt;
-        }
-
-        return {};
-    }
-
     void SetUp() override
     {
         SandboxedTest::SetUp();
@@ -615,7 +585,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     // Make the 'dht.bootstrap' file.
     // This a file with each line holding `${host} ${port}`
     // which tr-dht will try to ping as nodes
-    static auto constexpr BootstrapNodeName = "example.com"sv;
+    static auto constexpr BootstrapNodeName = "91.121.74.28"sv;
     static auto constexpr BootstrapNodePort = tr_port::from_host(8080);
     if (auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } }; ofs)
     {
@@ -631,7 +601,8 @@ TEST_F(DhtTest, usesBootstrapFile)
     // We didn't create a 'dht.dat' file to load state from,
     // so 'dht.bootstrap' should be the first nodes in the bootstrap list.
     // Confirm that BootstrapNodeName gets pinged first.
-    auto const expected = getSockaddr(BootstrapNodeName, BootstrapNodePort);
+    auto const expected = tr_socket_address{ tr_address::from_string(BootstrapNodeName).value_or(tr_address{}),
+                                             BootstrapNodePort };
     auto& pinged = mediator.mock_dht_.pinged_;
     waitFor( //
         event_base_,
