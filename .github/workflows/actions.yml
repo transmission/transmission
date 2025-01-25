@@ -264,7 +264,8 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DRUN_CLANG_TIDY=ON
+            -DRUN_CLANG_TIDY=ON \
+            -DALLOW_UNSAFE_LIBCURL=ON # Remove this line if curl >= 8.6.0
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
       - name: Test for warnings
@@ -299,7 +300,8 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DRUN_CLANG_TIDY=ON
+            -DRUN_CLANG_TIDY=ON `
+            -DALLOW_UNSAFE_LIBCURL=ON # Remove this line if curl >= 8.6.0
       - name: Make
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
@@ -554,7 +556,8 @@ jobs:
             -DENABLE_UTILS=ON `
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF `
+            -DALLOW_UNSAFE_LIBCURL=ON # Remove this line if curl >= 8.6.0
       - name: Make
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
@@ -733,7 +736,8 @@ jobs:
             -DUSE_SYSTEM_NATPMP=OFF \
             -DUSE_SYSTEM_UTP=OFF \
             -DUSE_SYSTEM_B64=OFF \
-            -DUSE_SYSTEM_PSL=OFF
+            -DUSE_SYSTEM_PSL=OFF \
+            -DALLOW_UNSAFE_LIBCURL=ON # Remove this line if curl >= 8.6.0
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -828,14 +832,14 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  fedora-39-from-tarball:
+  fedora-41-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
-      image: fedora:39
+      image: fedora:41
     steps:
       - name: Show Configuration
         run: |

@@ -65,7 +65,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DENABLE_TESTS=OFF \
             -DENABLE_NLS=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DALLOW_UNSAFE_LIBCURL=ON # Remove this line if curl >= 8.6.0
 
     - name: Build Dependencies
       if: ${{ matrix.language == 'cpp' }}
