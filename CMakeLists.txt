@@ -250,13 +250,13 @@ find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
-if(CURL_VERSION VERSION_GREATER_EQUAL 7.87.0 AND CURL_VERSION VERSION_LESS_EQUAL 8.5.0)
+if(CURL_VERSION_STRING VERSION_GREATER_EQUAL 7.87.0 AND CURL_VERSION_STRING VERSION_LESS_EQUAL 8.5.0)
     if(NOT ALLOW_UNSAFE_LIBCURL)
         message(FATAL_ERROR
             "Please don't use libcurl 7.87.0 to 8.5.0. https://github.com/curl/curl/issues/10936\n"
             "If you know what you are doing, you may bypass this error by setting ALLOW_UNSAFE_LIBCURL=ON.")
     endif()
-    message(WARNING "You are explicitly allowing unsafe libcurl version ${CURL_VERSION}. https://github.com/curl/curl/issues/10936")
+    message(WARNING "You are explicitly allowing unsafe libcurl version ${CURL_VERSION_STRING}. https://github.com/curl/curl/issues/10936")
 endif()
 
 if(ENABLE_DEPRECATED STREQUAL "AUTO")
