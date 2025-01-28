@@ -124,6 +124,8 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
+    // N.B. This array needs to be kept in the same order as
+    // the tr_preferred_transport enum.
     auto const get_socket = std::array<std::function<tr_peer_socket()>, TR_NUM_PREFERRED_TRANSPORT>{
         [&]() -> tr_peer_socket
         {
