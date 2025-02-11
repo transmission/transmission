@@ -386,6 +386,13 @@ public:
         CURL* easy_;
     };
 
+    // https://github.com/curl/curl/issues/10936
+    [[nodiscard]] static bool check_curl_gh10936() noexcept
+    {
+        auto const version = curl_version_info(CURLVERSION_NOW)->version_num;
+        return version >= 0x075700 /* 7.87.0 */ && version <= 0x080500 /* 8.5.0 */;
+    }
+
     static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
     static auto constexpr MaxRedirects = long{ 10 };
@@ -393,6 +400,7 @@ public:
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
+    bool const curl_gh10936 = check_curl_gh10936();
 
     Mediator& mediator;
 
@@ -598,6 +606,11 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
             (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+        }
+
+        if (curl_gh10936)
+        {
+            (void)curl_easy_setopt(e, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
         }
     }
 
