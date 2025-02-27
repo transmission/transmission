@@ -171,6 +171,22 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
+        auto const curl_version_num = curl_version_info(CURLVERSION_NOW)->version_num;
+        if (curl_version_num == 0x080901)
+        {
+            tr_logAddWarn(_("Consider upgrading your curl installation."));
+            tr_logAddWarn(
+                _("curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"));
+        }
+
+        if (curl_version_num == 0x080B01)
+        {
+            tr_logAddWarn(_("Consider upgrading your curl installation."));
+            tr_logAddWarn(
+                _("curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT "
+                  "crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"));
+        }
+
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
             curl_ca_bundle = std::move(bundle);
