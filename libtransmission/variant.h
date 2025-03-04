@@ -204,7 +204,7 @@ public:
         *this = std::forward<Val>(value);
     }
 
-    [[nodiscard]] static auto make_map(size_t const n_reserve = 0U) noexcept
+    [[nodiscard]] static auto make_map(size_t const n_reserve = 0U)
     {
         auto ret = tr_variant{};
         ret.val_.emplace<Map>(n_reserve);
