@@ -171,7 +171,7 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
-        auto const curl_version_num = curl_version_info(CURLVERSION_NOW)->version_num;
+        auto const curl_version_num = get_curl_version();
         if (curl_version_num == 0x080901)
         {
             tr_logAddWarn(_("Consider upgrading your curl installation."));
@@ -402,18 +402,24 @@ public:
         CURL* easy_;
     };
 
+    [[nodiscard]] static unsigned int get_curl_version() noexcept
+    {
+        static auto const ver = curl_version_info(CURLVERSION_NOW)->version_num;
+        return ver;
+    }
+
     // https://github.com/curl/curl/issues/10936
     [[nodiscard]] static bool check_curl_gh10936() noexcept
     {
-        auto const version = curl_version_info(CURLVERSION_NOW)->version_num;
-        return version >= 0x075700 /* 7.87.0 */ && version <= 0x080500 /* 8.5.0 */;
+        static bool const in_range = 0x075700 /* 7.87.0 */ <= get_curl_version() && get_curl_version() <= 0x080500 /* 8.5.0 */;
+        return in_range;
     }
 
     // https://github.com/curl/curl/issues/6312
     [[nodiscard]] static bool check_curl_gh6312() noexcept
     {
-        auto const version = curl_version_info(CURLVERSION_NOW)->version_num;
-        return version >= 0x074700 /* 7.71.0 */ && version <= 0x074a00 /* 7.74.0 */;
+        static bool const in_range = 0x074700 /* 7.71.0 */ <= get_curl_version() && get_curl_version() <= 0x074a00 /* 7.74.0 */;
+        return in_range;
     }
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
