@@ -140,7 +140,7 @@ int tr_main(int argc, char** argv)
             break;
 
         case 'v':
-            fmt::print("{:s} {:s}\n", DisplayName, LONG_VERSION_STRING);
+            fmt::print("{:s} {:s}\n", DisplayName, TR_LONG_VERSION_STRING);
             return 0;
 
         case TR_OPT_ERR:

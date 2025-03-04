@@ -54,7 +54,7 @@ char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
 char constexpr MyName[] = "transmission-remote";
-char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
+char constexpr Usage[] = "transmission-remote " TR_LONG_VERSION_STRING
                          "\n"
                          "A fast and easy BitTorrent client\n"
                          "https://transmissionbt.com/\n"
@@ -2304,7 +2304,7 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
 CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
-    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, LONG_VERSION_STRING).c_str());
+    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, TR_LONG_VERSION_STRING).c_str());
     (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_func);
     (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     (void)curl_easy_setopt(curl, CURLOPT_HEADERDATA, &config);
@@ -2596,7 +2596,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 'V': /* show version number */
-                fmt::print(stderr, "{:s} {:s}\n", MyName, LONG_VERSION_STRING);
+                fmt::print(stderr, "{:s} {:s}\n", MyName, TR_LONG_VERSION_STRING);
                 exit(0);
 
             case 944:

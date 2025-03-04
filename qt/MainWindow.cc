@@ -714,7 +714,7 @@ void MainWindow::openAbout()
 void MainWindow::openHelp() const
 {
     QDesktopServices::openUrl(
-        QUrl{ QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10) });
+        QUrl{ QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(TR_MAJOR_VERSION).arg(TR_MINOR_VERSION / 10) });
 }
 
 /****

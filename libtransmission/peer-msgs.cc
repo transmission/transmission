@@ -1180,7 +1180,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
-    tr_variantDictAddStrView(&val, TR_KEY_v, TR_NAME " " USERAGENT_PREFIX);
+    tr_variantDictAddStrView(&val, TR_KEY_v, TR_NAME " " TR_USERAGENT_PREFIX);
 
     // https://www.bittorrent.org/beps/bep_0021.html
     // A peer that is a partial seed SHOULD include an extra header in

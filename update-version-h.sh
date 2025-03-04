@@ -86,13 +86,13 @@ vcs_revision=$(echo $vcs_revision | head -c10)
 cat > libtransmission/version.h.new << EOF
 #pragma once
 
-#define PEERID_PREFIX             "${peer_id_prefix}"
-#define USERAGENT_PREFIX          "${user_agent_prefix}"
-#define SHORT_VERSION_STRING      "${user_agent_prefix}"
-#define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
-#define MAJOR_VERSION             ${major_version}
-#define MINOR_VERSION             ${minor_version}
-#define PATCH_VERSION             ${patch_version}
+#define TR_PEERID_PREFIX             "${peer_id_prefix}"
+#define TR_USERAGENT_PREFIX          "${user_agent_prefix}"
+#define TR_SHORT_VERSION_STRING      "${user_agent_prefix}"
+#define TR_LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
+#define TR_MAJOR_VERSION             ${major_version}
+#define TR_MINOR_VERSION             ${minor_version}
+#define TR_PATCH_VERSION             ${patch_version}
 EOF
 
 replace_if_differs libtransmission/version.h.new libtransmission/version.h

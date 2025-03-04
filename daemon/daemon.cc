@@ -66,7 +66,7 @@ using libtransmission::Watchdir;
 namespace
 {
 char constexpr MyName[] = "transmission-daemon";
-char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
+char constexpr Usage[] = "Transmission " TR_LONG_VERSION_STRING
                          "  https://transmissionbt.com/\n"
                          "A fast and easy BitTorrent client\n"
                          "\n"
@@ -507,7 +507,7 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 'V': /* version */
-            fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
+            fprintf(stderr, "%s %s\n", MyName, TR_LONG_VERSION_STRING);
             *exit_code = 0;
             return false;
 

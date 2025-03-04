@@ -111,7 +111,7 @@ int main(int argc, char** argv)
     /* handle the trivial "version" option */
     if (show_version)
     {
-        fmt::print(stderr, "{} {}\n", AppName, LONG_VERSION_STRING);
+        fmt::print(stderr, "{} {}\n", AppName, TR_LONG_VERSION_STRING);
         return 0;
     }
 
