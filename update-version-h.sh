@@ -88,7 +88,6 @@ cat > libtransmission/version.h.new << EOF
 
 #define PEERID_PREFIX             "${peer_id_prefix}"
 #define USERAGENT_PREFIX          "${user_agent_prefix}"
-#define VCS_REVISION              "${vcs_revision}"
 #define SHORT_VERSION_STRING      "${user_agent_prefix}"
 #define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
 #define BUILD_STRING_INFOPLIST    $((major_version + 14714)).${minor_version}.$((patch_version * 100 + release_number * 99 + beta_number))
