@@ -49,10 +49,6 @@
 
 using namespace std::literals;
 
-#if LIBCURL_VERSION_NUM >= 0x070F06 // CURLOPT_SOCKOPT* was added in 7.15.6
-#define USE_LIBCURL_SOCKOPT
-#endif
-
 // ---
 
 namespace
@@ -526,7 +522,6 @@ public:
         return bytes_used;
     }
 
-#ifdef USE_LIBCURL_SOCKOPT
     static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
     {
         auto const* const task = static_cast<Task const*>(vtask);
@@ -547,7 +542,6 @@ public:
         // return nonzero if this function encountered an error
         return 0;
     }
-#endif
 
     void initEasy(Task& task)
     {
@@ -563,11 +557,8 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
-
-#ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);
-#endif
 
         if (!curl_ssl_verify)
         {
