@@ -7,7 +7,3 @@
 #define MAJOR_VERSION             ${TR_VERSION_MAJOR}
 #define MINOR_VERSION             ${TR_VERSION_MINOR}
 #define PATCH_VERSION             ${TR_VERSION_PATCH}
-
-#cmakedefine TR_BETA_RELEASE 1
-#cmakedefine TR_NIGHTLY_RELEASE 1
-#cmakedefine TR_STABLE_RELEASE 1

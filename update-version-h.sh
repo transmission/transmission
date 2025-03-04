@@ -95,11 +95,4 @@ cat > libtransmission/version.h.new << EOF
 #define PATCH_VERSION             ${patch_version}
 EOF
 
-# Add a release definition
-case "${peer_id_prefix}" in
-  *X-) echo '#define TR_BETA_RELEASE           1' ;;
-  *Z-) echo '#define TR_NIGHTLY_RELEASE        1' ;;
-  *)   echo '#define TR_STABLE_RELEASE         1' ;;
-esac >> "libtransmission/version.h.new"
-
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
