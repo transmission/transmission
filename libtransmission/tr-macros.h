@@ -11,14 +11,7 @@
 
 // ---
 
-#ifdef _MSVC_LANG
-#define TR_CPLUSPLUS _MSVC_LANG
-#else
-#define TR_CPLUSPLUS __cplusplus
-#endif
-
-#if ((TR_CPLUSPLUS >= 202002L) && (!defined(_GLIBCXX_RELEASE) || _GLIBCXX_RELEASE > 9)) || \
-    (TR_CPLUSPLUS >= 201709L && TR_GCC_VERSION >= 1002)
+#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
 #define TR_CONSTEXPR20 constexpr
 #else
 #define TR_CONSTEXPR20
