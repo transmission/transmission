@@ -30,20 +30,10 @@
 
 // ---
 
-#ifndef __has_builtin
-#define __has_builtin(x) 0
-#endif
-
 #ifdef _WIN32
 #define TR_IF_WIN32(ThenValue, ElseValue) ThenValue
 #else
 #define TR_IF_WIN32(ThenValue, ElseValue) ElseValue
-#endif
-
-#ifdef __GNUC__
-#define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#define TR_GNUC_CHECK_VERSION(major, minor) 0
 #endif
 
 #ifdef __UCLIBC__
@@ -52,16 +42,6 @@
      (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
 #else
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) 0
-#endif
-
-// ---
-
-#if __has_builtin(__builtin_expect) || TR_GNUC_CHECK_VERSION(3, 0)
-#define TR_LIKELY(x) __builtin_expect((x) ? 1L : 0L, 1L)
-#define TR_UNLIKELY(x) __builtin_expect((x) ? 1L : 0L, 0L)
-#else
-#define TR_LIKELY(x) (x)
-#define TR_UNLIKELY(x) (x)
 #endif
 
 // ---
