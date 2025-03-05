@@ -17,7 +17,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -1427,10 +1426,21 @@ namespace
 {
 namespace load_torrents_helpers
 {
-auto get_remaining_files(std::string_view folder, std::vector<std::string> const& queue_order)
+auto get_remaining_files(std::string_view folder, std::vector<std::string>& queue_order)
 {
-    auto const queued_set = std::unordered_set<std::string_view>{ std::begin(queue_order), std::end(queue_order) };
-    return tr_sys_dir_get_files(folder, [&queued_set](auto name) { return queued_set.count(name) == 0U; });
+    auto files = tr_sys_dir_get_files(folder);
+    auto ret = std::vector<std::string>{};
+    ret.reserve(std::size(files));
+    std::sort(std::begin(queue_order), std::end(queue_order));
+    std::sort(std::begin(files), std::end(files));
+
+    std::set_difference(
+        std::begin(files),
+        std::end(files),
+        std::begin(queue_order),
+        std::end(queue_order),
+        std::back_inserter(ret));
+    return ret;
 }
 
 void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
@@ -1460,7 +1470,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
         }
     };
 
-    auto const queue_order = session->torrent_queue().from_file();
+    auto queue_order = session->torrent_queue().from_file();
     for (auto const& filename : queue_order)
     {
         load_func(filename);
