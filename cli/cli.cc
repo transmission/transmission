@@ -450,7 +450,7 @@ int tr_main(int argc, char* argv[])
         }
 
         auto const status_str = getStatusStr(st);
-        printf("\r%-*s", TR_ARG_TUPLE(LineWidth, status_str.c_str()));
+        printf("\r%-*s", LineWidth, status_str.c_str());
 
         if (messageName[st->error])
         {
