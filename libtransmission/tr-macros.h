@@ -30,10 +30,6 @@
 
 // ---
 
-#ifndef __has_builtin
-#define __has_builtin(x) 0
-#endif
-
 #ifdef _WIN32
 #define TR_IF_WIN32(ThenValue, ElseValue) ThenValue
 #else
