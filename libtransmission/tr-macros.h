@@ -70,9 +70,6 @@
 
 #define TR_ADDRSTRLEN 64
 
-// Mostly to enforce better formatting
-#define TR_ARG_TUPLE(...) __VA_ARGS__
-
 // https://www.bittorrent.org/beps/bep_0007.html
 // "The client SHOULD include a key parameter in its announces. The key
 // should remain the same for a particular infohash during a torrent
