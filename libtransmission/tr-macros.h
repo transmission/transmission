@@ -56,14 +56,6 @@
 
 // ---
 
-#if __has_builtin(__builtin_expect) || TR_GNUC_CHECK_VERSION(3, 0)
-#define TR_LIKELY(x) __builtin_expect((x) ? 1L : 0L, 1L)
-#else
-#define TR_LIKELY(x) (x)
-#endif
-
-// ---
-
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_ADDRSTRLEN 64
