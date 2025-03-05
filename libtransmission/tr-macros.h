@@ -58,10 +58,8 @@
 
 #if __has_builtin(__builtin_expect) || TR_GNUC_CHECK_VERSION(3, 0)
 #define TR_LIKELY(x) __builtin_expect((x) ? 1L : 0L, 1L)
-#define TR_UNLIKELY(x) __builtin_expect((x) ? 1L : 0L, 0L)
 #else
 #define TR_LIKELY(x) (x)
-#define TR_UNLIKELY(x) (x)
 #endif
 
 // ---
