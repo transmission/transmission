@@ -180,7 +180,7 @@ TEST_F(SessionTest, propertiesApi)
 
 TEST_F(SessionTest, peerId)
 {
-    auto const peer_id_prefix = std::string{ PEERID_PREFIX };
+    auto const peer_id_prefix = std::string{ TR_PEERID_PREFIX };
 
     for (int i = 0; i < 100000; ++i)
     {

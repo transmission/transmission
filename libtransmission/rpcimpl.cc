@@ -1984,7 +1984,7 @@ char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/
     case TR_KEY_trash_original_torrent_files: return session.shouldDeleteSource();
     case TR_KEY_units: return values_get_units();
     case TR_KEY_utp_enabled: return session.allowsUTP();
-    case TR_KEY_version: return LONG_VERSION_STRING;
+    case TR_KEY_version: return TR_LONG_VERSION_STRING;
     default: return tr_variant{};
     }
     // clang-format on

@@ -388,7 +388,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const priority_str = std::to_string(tor->get_priority());
 
     auto const env = std::map<std::string_view, std::string_view>{
-        { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
+        { "TR_APP_VERSION"sv, TR_SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, localtime_str },
         { "TR_TORRENT_BYTES_DOWNLOADED"sv, bytes_downloaded_str },
         { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },

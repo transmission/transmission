@@ -86,24 +86,13 @@ vcs_revision=$(echo $vcs_revision | head -c10)
 cat > libtransmission/version.h.new << EOF
 #pragma once
 
-#define PEERID_PREFIX             "${peer_id_prefix}"
-#define USERAGENT_PREFIX          "${user_agent_prefix}"
-#define VCS_REVISION              "${vcs_revision}"
-#define VCS_REVISION_NUM          ${vcs_revision}
-#define SHORT_VERSION_STRING      "${user_agent_prefix}"
-#define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
-#define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
-#define BUILD_STRING_INFOPLIST    $((major_version + 14714)).${minor_version}.$((patch_version * 100 + release_number * 99 + beta_number))
-#define MAJOR_VERSION             ${major_version}
-#define MINOR_VERSION             ${minor_version}
-#define PATCH_VERSION             ${patch_version}
+#define TR_PEERID_PREFIX             "${peer_id_prefix}"
+#define TR_USERAGENT_PREFIX          "${user_agent_prefix}"
+#define TR_SHORT_VERSION_STRING      "${user_agent_prefix}"
+#define TR_LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
+#define TR_MAJOR_VERSION             ${major_version}
+#define TR_MINOR_VERSION             ${minor_version}
+#define TR_PATCH_VERSION             ${patch_version}
 EOF
-
-# Add a release definition
-case "${peer_id_prefix}" in
-  *X-) echo '#define TR_BETA_RELEASE           1' ;;
-  *Z-) echo '#define TR_NIGHTLY_RELEASE        1' ;;
-  *)   echo '#define TR_STABLE_RELEASE         1' ;;
-esac >> "libtransmission/version.h.new"
 
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
