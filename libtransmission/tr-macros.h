@@ -40,12 +40,6 @@
 #define TR_IF_WIN32(ThenValue, ElseValue) ElseValue
 #endif
 
-#ifdef __GNUC__
-#define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#define TR_GNUC_CHECK_VERSION(major, minor) 0
-#endif
-
 #ifdef __UCLIBC__
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) \
     (__UCLIBC_MAJOR__ > (major) || (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
