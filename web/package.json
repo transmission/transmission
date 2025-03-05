@@ -34,6 +34,6 @@
     "stylelint-config-sass-guidelines": "^12.1.0"
   },
   "dependencies": {
-    "lodash.isequal": "^4.5.0"
+    "fast-deep-equal": "^3.1.3"
   }
 }
