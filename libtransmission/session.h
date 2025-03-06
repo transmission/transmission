@@ -1000,6 +1000,18 @@ public:
         return settings().preferred_transports;
     }
 
+    [[nodiscard]] auto save_preferred_transports() const
+    {
+        auto var = settings().save_single(TR_KEY_preferred_transports);
+        TR_ASSERT(var.has_value());
+        return var;
+    }
+
+    bool load_preferred_transports(tr_variant const& var) noexcept
+    {
+        return settings_.load_single(TR_KEY_preferred_transports, var);
+    }
+
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
     {
         return settings().idle_seeding_limit_enabled;

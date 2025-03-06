@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstddef> // size_t
@@ -14,6 +15,7 @@
 
 #include <fmt/format.h>
 
+#include <small/set.hpp>
 #include <small/vector.hpp>
 
 #include "libtransmission/transmission.h"
@@ -320,17 +322,16 @@ bool load_preferred_transport(
 
     if (auto* const l = src.get_if<tr_variant::Vector>(); l != nullptr)
     {
-        auto tmp = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{};
+        auto tmp = small::max_size_unordered_set<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{};
         tmp.reserve(tmp.max_size());
 
         for (size_t i = 0, n = std::min(std::size(*l), tmp.max_size()); i < n; ++i)
         {
             auto const value = LoadSingle((*l)[i]);
-            if (value >= TR_NUM_PREFERRED_TRANSPORT)
+            if (value >= TR_NUM_PREFERRED_TRANSPORT || !tmp.insert(value).second)
             {
                 return false;
             }
-            tmp.emplace_back(value);
         }
 
         // N.B. As of small 0.2.2, small::max_size_unordered_set preserves insertion order,
@@ -554,10 +555,65 @@ void Settings::load(tr_variant const& src)
     }
 }
 
-tr_variant::Map Settings::save() const
+bool Settings::load_single(tr_quark const key, tr_variant const& src)
 {
-    auto const fields = const_cast<Settings*>(this)->fields();
+    auto const fields = this->fields();
+    auto const field_it = std::lower_bound(
+        std::begin(fields),
+        std::end(fields),
+        key,
+        [](Field const& f, tr_quark k) { return f.key < k; });
+    if (field_it == std::end(fields) || field_it->key != key)
+    {
+        return false;
+    }
 
+    auto const type_index = std::type_index{ field_it->type };
+    TR_ASSERT(load_.count(type_index) == 1U);
+    return load_.at(type_index)(src, field_it->ptr);
+}
+
+tr_variant::Map Settings::save_partial(std::vector<tr_quark> quarks) const
+{
+    static constexpr struct
+    {
+        constexpr bool operator()(Field const& lhs, tr_quark const rhs) const noexcept
+        {
+            return lhs.key < rhs;
+        }
+
+        constexpr bool operator()(tr_quark const lhs, Field const& rhs) const noexcept
+        {
+            return lhs < rhs.key;
+        }
+    } Compare;
+
+    auto const fields = const_cast<Settings*>(this)->fields();
+    auto to_save = Fields{};
+    to_save.reserve(std::min(std::size(quarks), std::size(fields)));
+
+    // N.B. `fields` is supposed to be unique and sorted, so we don't need to sort it,
+    // and we don't need to worry about duplicates in `to_save`
+    std::sort(std::begin(quarks), std::end(quarks));
+    std::set_intersection(
+        std::begin(fields),
+        std::end(fields),
+        std::begin(quarks),
+        std::end(quarks),
+        std::back_inserter(to_save),
+        Compare);
+
+    return save_impl(to_save);
+}
+
+tr_variant Settings::save_single(tr_quark quark) const
+{
+    auto map = save_partial({ quark });
+    return std::empty(map) ? tr_variant{} : std::move(std::begin(map)->second);
+}
+
+tr_variant::Map Settings::save_impl(libtransmission::Settings::Fields const& fields) const
+{
     auto map = tr_variant::Map{ std::size(fields) };
 
     for (auto const& field : fields)
