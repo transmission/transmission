@@ -35,6 +35,8 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
@@ -429,7 +431,10 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
-        std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
+        small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transports = {
+            TR_PREFER_UTP,
+            TR_PREFER_TCP,
+        };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::optional<std::string> proxy_url;
         std::string announce_ip;
@@ -487,7 +492,7 @@ public:
                 { TR_KEY_pex_enabled, &pex_enabled },
                 { TR_KEY_port_forwarding_enabled, &port_forwarding_enabled },
                 { TR_KEY_preallocation, &preallocation_mode },
-                { TR_KEY_preferred_transport, &preferred_transport },
+                { TR_KEY_preferred_transports, &preferred_transports },
                 { TR_KEY_proxy_url, &proxy_url },
                 { TR_KEY_queue_stalled_enabled, &queue_stalled_enabled },
                 { TR_KEY_queue_stalled_minutes, &queue_stalled_minutes },
@@ -990,9 +995,9 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
-    [[nodiscard]] constexpr auto const& preferred_transport() const noexcept
+    [[nodiscard]] constexpr auto const& preferred_transports() const noexcept
     {
-        return settings().preferred_transport;
+        return settings().preferred_transports;
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
