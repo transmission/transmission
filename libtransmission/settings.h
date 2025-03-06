@@ -27,8 +27,14 @@ public:
     Settings& operator=(Settings&& other) noexcept = default;
 
     void load(tr_variant const& src);
+    bool load_single(tr_quark key, tr_variant const& src);
 
-    [[nodiscard]] tr_variant::Map save() const;
+    [[nodiscard]] tr_variant::Map save() const
+    {
+        return save_impl(const_cast<Settings*>(this)->fields());
+    }
+    [[nodiscard]] tr_variant::Map save_partial(std::vector<tr_quark> quarks) const;
+    [[nodiscard]] tr_variant save_single(tr_quark quark) const;
 
 protected:
     Settings();
@@ -74,6 +80,8 @@ protected:
     [[nodiscard]] virtual Fields fields() = 0;
 
 private:
+    [[nodiscard]] tr_variant::Map save_impl(Fields const& fields) const;
+
     std::unordered_map<std::type_index, std::function<tr_variant(void const* src)>> save_;
     std::unordered_map<std::type_index, std::function<bool(tr_variant const& src, void* tgt)>> load_;
 };
