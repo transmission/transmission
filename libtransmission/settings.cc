@@ -14,6 +14,8 @@
 
 #include <fmt/format.h>
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h" // for tr_log_level
@@ -284,66 +286,92 @@ auto constexpr PreferredTransportKeys = Lookup<tr_preferred_transport, TR_NUM_PR
     { "tcp", TR_PREFER_TCP },
 } };
 
-bool load_preferred_transport(tr_variant const& src, std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>* tgt)
+bool load_preferred_transport(
+    tr_variant const& src,
+    small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>* tgt)
 {
-    static constexpr auto& Keys = PreferredTransportKeys;
-
-    auto preferred = TR_NUM_PREFERRED_TRANSPORT;
-    if (auto const val = src.value_if<std::string_view>())
+    static auto constexpr LoadSingle = [](tr_variant const& var)
     {
-        auto const needle = tr_strlower(tr_strv_strip(*val));
+        static constexpr auto& Keys = PreferredTransportKeys;
 
-        for (auto const& [name, value] : Keys)
+        if (auto const val = var.value_if<std::string_view>())
         {
-            if (name == needle)
+            auto const needle = tr_strlower(tr_strv_strip(*val));
+
+            for (auto const& [name, value] : Keys)
             {
-                preferred = value;
-                break;
+                if (name == needle)
+                {
+                    return value;
+                }
             }
         }
-    }
 
-    if (auto const val = src.value_if<int64_t>())
-    {
-        for (auto const& [name, value] : Keys)
+        if (auto const val = var.value_if<int64_t>())
         {
-            if (value == *val)
+            if (auto const i = *val; i >= 0 && i < TR_NUM_PREFERRED_TRANSPORT)
             {
-                preferred = value;
-                break;
+                return static_cast<tr_preferred_transport>(i);
             }
         }
+
+        return TR_NUM_PREFERRED_TRANSPORT;
+    };
+
+    if (auto* const l = src.get_if<tr_variant::Vector>(); l != nullptr)
+    {
+        auto tmp = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{};
+        tmp.reserve(tmp.max_size());
+
+        for (size_t i = 0, n = std::min(std::size(*l), tmp.max_size()); i < n; ++i)
+        {
+            auto const value = LoadSingle((*l)[i]);
+            if (value >= TR_NUM_PREFERRED_TRANSPORT)
+            {
+                return false;
+            }
+            tmp.emplace_back(value);
+        }
+
+        // N.B. As of small 0.2.2, small::max_size_unordered_set preserves insertion order,
+        // so we can directly copy the elements
+        tgt->assign(std::begin(tmp), std::end(tmp));
+        return true;
     }
 
+    auto const preferred = LoadSingle(src);
     if (preferred >= TR_NUM_PREFERRED_TRANSPORT)
     {
         return false;
     }
 
-    tgt->front() = preferred;
-    for (size_t i = 0U; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
-    {
-        if (i != preferred)
-        {
-            (*tgt)[i + (i < preferred ? 1U : 0U)] = static_cast<tr_preferred_transport>(i);
-        }
-    }
-
+    tgt->assign(1U, preferred);
     return true;
 }
 
-tr_variant save_preferred_transport(std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> const& val)
+tr_variant save_preferred_transport(small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> const& val)
 {
-    auto const& preferred = val.front();
-    for (auto const& [key, value] : PreferredTransportKeys)
+    static auto constexpr SaveSingle = [](tr_preferred_transport const ele) -> tr_variant
     {
-        if (value == preferred)
+        for (auto const& [key, value] : PreferredTransportKeys)
         {
-            return key;
+            if (value == ele)
+            {
+                return key;
+            }
         }
+
+        return ele;
+    };
+
+    auto ret = tr_variant::Vector{};
+    ret.reserve(std::size(val));
+    for (auto const ele : val)
+    {
+        ret.emplace_back(SaveSingle(ele));
     }
 
-    return static_cast<int64_t>(preferred);
+    return ret;
 }
 
 // ---
