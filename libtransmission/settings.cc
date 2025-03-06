@@ -554,7 +554,7 @@ void Settings::load(tr_variant const& src)
     }
 }
 
-tr_variant Settings::save() const
+tr_variant::Map Settings::save() const
 {
     auto const fields = const_cast<Settings*>(this)->fields();
 
