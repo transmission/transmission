@@ -28,7 +28,7 @@ public:
 
     void load(tr_variant const& src);
 
-    [[nodiscard]] tr_variant save() const;
+    [[nodiscard]] tr_variant::Map save() const;
 
 protected:
     Settings();
