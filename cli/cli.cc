@@ -310,7 +310,7 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    printf("%s %s\n", MyReadableName, LONG_VERSION_STRING);
+    printf("%s %s\n", MyReadableName, TR_LONG_VERSION_STRING);
 
     /* user needs to pass in at least one argument */
     if (argc < 2)

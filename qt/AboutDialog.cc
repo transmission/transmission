@@ -26,7 +26,7 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent)
     if (session.isServer())
     {
         auto const title = QStringLiteral("<b style='font-size:x-large'>Transmission %1</b>")
-                               .arg(QStringLiteral(LONG_VERSION_STRING));
+                               .arg(QStringLiteral(TR_LONG_VERSION_STRING));
         ui_.titleLabel->setText(title);
     }
     else
@@ -35,7 +35,7 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent)
             "<div style='font-size:x-large; font-weight: bold; text-align: center'>Transmission</div>");
         title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
                      .arg(tr("Client"))
-                     .arg(QStringLiteral(LONG_VERSION_STRING));
+                     .arg(QStringLiteral(TR_LONG_VERSION_STRING));
         title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Server")).arg(session.sessionVersion());
         ui_.titleLabel->setText(title);
     }

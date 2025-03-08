@@ -186,7 +186,7 @@ tr_peer_id_t tr_peerIdInit()
     auto* it = std::data(peer_id);
 
     // starts with -TRXXXX-
-    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
+    auto constexpr Prefix = std::string_view{ TR_PEERID_PREFIX };
     auto const* const end = it + std::size(peer_id);
     it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
 
@@ -310,7 +310,7 @@ std::optional<std::string> tr_session::WebMediator::cookieFile() const
 
 std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 {
-    return TR_NAME "/" SHORT_VERSION_STRING;
+    return TR_NAME "/" TR_SHORT_VERSION_STRING;
 }
 
 std::optional<std::string> tr_session::WebMediator::bind_address_V4() const
@@ -722,7 +722,7 @@ void tr_session::initImpl(init_data& data)
 
     blocklists_.load(blocklist_dir_, blocklist_enabled());
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", TR_LONG_VERSION_STRING)));
 
     setSettings(settings, true);
 
@@ -1408,7 +1408,7 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->am_in_session_thread());
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", TR_LONG_VERSION_STRING)));
 
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
