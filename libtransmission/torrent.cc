@@ -488,8 +488,10 @@ void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
-        auto const pos = tor->queue_position();
-        tor->set_queue_position(pos - 1U);
+        if (auto const pos = tor->queue_position(); pos > tr_torrent_queue::MinQueuePosition)
+        {
+            tor->set_queue_position(pos - 1U);
+        }
     }
 }
 
@@ -499,8 +501,10 @@ void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_cou
     std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
-        auto const pos = tor->queue_position();
-        tor->set_queue_position(pos + 1U);
+        if (auto const pos = tor->queue_position(); pos < tr_torrent_queue::MaxQueuePosition)
+        {
+            tor->set_queue_position(pos + 1U);
+        }
     }
 }
 
