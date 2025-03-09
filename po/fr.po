@@ -10,7 +10,7 @@
 # Jean de la Mouche, 2022
 # Charles Monzat <c.monzat@laposte.net>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# AO <ao@localizationlab.org>, 2024
+# AO <ao@localizationlab.org>, 2025
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: AO <ao@localizationlab.org>, 2024\n"
+"Last-Translator: AO <ao@localizationlab.org>, 2025\n"
 "Language-Team: French (https://app.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -834,11 +834,11 @@ msgstr "Tous les jours"
 
 #: ../gtk/PrefsDialog.cc:383
 msgid "Weekdays"
-msgstr "Jour de semaine"
+msgstr "En semaine"
 
 #: ../gtk/PrefsDialog.cc:384
 msgid "Weekends"
-msgstr "Fins de semaine"
+msgstr "En fin de semaine"
 
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
@@ -862,35 +862,35 @@ msgstr "Récupération de la nouvelle liste de blocage…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "Inconnu"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "vérification…"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "ouvert"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "fermé"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "erreur"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "État : <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "État : <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -1212,27 +1212,27 @@ msgstr "Exécutez « {program} --help » pour afficher une liste complète d�
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr "o/s"
+msgstr "b/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
-msgstr "Go/s"
+msgstr "Gb/s"
 
 #: ../gtk/main.cc:120
 msgid "MB/s"
-msgstr "Mo/s"
+msgstr "Mb/s"
 
 #: ../gtk/main.cc:120
 msgid "TB/s"
-msgstr "To/s"
+msgstr "Tb/s"
 
 #: ../gtk/main.cc:120
 msgid "kB/s"
-msgstr "ko/s"
+msgstr "kb/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr "o"
+msgstr "b"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1819,7 +1819,7 @@ msgstr "Limites de vitesse possibles"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:193 ../gtk/ui/gtk4/PrefsDialog.ui:114
 msgid "Override normal speed limits manually or at scheduled times"
-msgstr "Outrepasser les limites de vitesse manuellement ou aux heures programmées"
+msgstr "Remplacer manuellement les limites de vitesse ou aux heures programmées"
 
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:130
@@ -1863,7 +1863,7 @@ msgstr "_Démarrer les torrents ajoutés"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:477 ../gtk/ui/gtk4/PrefsDialog.ui:328
 msgid "Save to _Location:"
-msgstr "Enregistrer dans cet emp_lacements :"
+msgstr "Enregistrer dans cet emp_lacement :"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:557 ../gtk/ui/gtk4/PrefsDialog.ui:389
 msgid "Download Queue"
@@ -2165,11 +2165,11 @@ msgstr "Erreur inconnue"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "Échec de la connexion {ip_protocol}"
 
 #: ../libtransmission/announcer-udp.cc:508
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Impossible de trouver « {address}:{port} » dans {ip_protocol} : {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
@@ -2296,7 +2296,7 @@ msgstr "L’adresse locale est « {address} »"
 
 #: ../libtransmission/port-forwarding-upnp.cc:298
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "Le port local {local_port} n’est pas réacheminé vers {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:310
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2308,7 +2308,7 @@ msgstr "Réacheminement de port par « {url} », service « {type} ». (adre
 
 #: ../libtransmission/port-forwarding-upnp.cc:352
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "Le port local {local_port} est réacheminé vers {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:360
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2344,27 +2344,27 @@ msgstr "Le chemin du connecteur Unix doit comporter moins de {count} caractère
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "La demande de {host} a été refusée (attaque possible par traversée de dossier)"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "La demande de {host} a été refusée (la protection contre les attaques par force brute est active)"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "La demande de {host} a été refusée (l’adresse IP n’est pas autorisée)"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "La demande de {host} a été refusée (échec d’authentification)"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "La demande de {host} a été refusée (l’hôte n’est pas autorisé)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "URI inconnue de {host} : « {uri} »"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2494,7 +2494,7 @@ msgstr "Mise en pause du torrent"
 
 #: ../libtransmission/torrent.cc:799
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Impossible de supprimer tous les torrents : {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:865
 msgid "Removing torrent"
@@ -2522,11 +2522,11 @@ msgstr "Impossible de trouver « {address}:{port} » : {error} ({error_code})
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Impossible d’initialiser la découverte des pairs locaux {ip_protocol} : {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Impossible de rendre le connecteur IPv4 non bloquant {address} : {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2534,7 +2534,7 @@ msgstr "Impossible de lier le connecteur IPv4 {address} : {error} ({error_code}
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Impossible de rendre le connecteur IPv6 non bloquant {address} : {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"

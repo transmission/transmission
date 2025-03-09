@@ -351,7 +351,7 @@
 "Cay-iU-bH4.title" = "Partagez le fichier torrent";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
-"HmT-FI-amY.title" = "0,0 ko/s";
+"HmT-FI-amY.title" = "0,0 kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
 "Zmj-A9-NPf.title" = "Chaîne d’état";
@@ -372,7 +372,7 @@
 "s5v-VO-G2y.title" = "Partagez le fichier torrent";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
-"x8g-Nv-jcD.title" = "0,0 ko/s";
+"x8g-Nv-jcD.title" = "0,0 kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
 "y9O-gd-sXA.title" = "Titre";

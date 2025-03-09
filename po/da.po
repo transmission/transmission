@@ -6,7 +6,7 @@
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Lim Karsen, 2023
-# scootergrisen, 2023
+# scootergrisen, 2025
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: scootergrisen, 2023\n"
+"Last-Translator: scootergrisen, 2025\n"
 "Language-Team: Danish (https://app.transifex.com/transmissionbt/teams/33778/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -33,75 +33,75 @@ msgstr "∞"
 
 #: ../daemon/daemon.cc:197 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:240 ../libtransmission/blocklist.cc:338 ../libtransmission/blocklist.cc:353 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke læse '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:222 ../gtk/Session.cc:862 ../gtk/Utils.cc:272 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Kunne ikke tilføje torrent-filen '{path}'"
 
 #: ../daemon/daemon.cc:231
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Fjerner torrent-filen '{path}'"
 
 #: ../daemon/daemon.cc:236 ../gtk/Utils.cc:555 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fjerne '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:637
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Kunne ikke fortolke logniveauet '{level}'"
 
 #: ../daemon/daemon.cc:684
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Udsættelse genindlæsning indtil sessionen er startet helt."
 
 #: ../daemon/daemon.cc:698
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Genindlæser indstillinger fra '{path}'"
 
 #: ../daemon/daemon.cc:722
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke initiere dæmon: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:734
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Indlæser indstillinger fra '{path}'"
 
 #: ../daemon/daemon.cc:755
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Gemte pid-filen '{path}'"
 
 #: ../daemon/daemon.cc:761 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:473 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1084 ../libtransmission/torrent.cc:2073 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke gemme '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:770
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Kræver godkendelse"
 
 #: ../daemon/daemon.cc:792
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Holder øje med '{path}' for nye torrent-filer"
 
 #: ../daemon/daemon.cc:837 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke oprette begivenhed: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:847 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke tilføje begivenhed: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:861
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke starte dæmonens begivenhedsløkke: {error} ({error_code})"
 
 #: ../gtk/Application.cc:400
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke registrere Transmission som en {content_type}-handler: {error} ({error_code})"
 
 #: ../gtk/Application.cc:558
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Fik afslutningssignal, prøver at lukke ned rent. Gør det igen hvis den sidder fast."
 
 #: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -117,7 +117,7 @@ msgstr "Jeg _accepterer"
 
 #: ../gtk/Application.cc:1020
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Lukker forbindelser …"
 
 #: ../gtk/Application.cc:1025
 msgid "Sending upload/download totals to tracker…"
@@ -141,11 +141,11 @@ msgstr[1] "Kunne ikke tilføje kopier af torrents"
 
 #: ../gtk/Application.cc:1420
 msgid "A fast and easy BitTorrent client"
-msgstr "En hurtig og nem BitTorrent-klient"
+msgstr "En hurtig BitTorrent-klient der er let at bruge"
 
 #: ../gtk/Application.cc:1421
 msgid "Copyright © The Transmission Project"
-msgstr "Copyright © Transmission-projektet"
+msgstr "Ophavsret © Transmission-projektet"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -178,7 +178,8 @@ msgstr ""
 "  Soren Hauberg https://launchpad.net/~hauberg\n"
 "  Søren Vind https://launchpad.net/~sorenvind\n"
 "  nanker https://launchpad.net/~nanker\n"
-"  theoras https://launchpad.net/~theoras"
+"  theoras https://launchpad.net/~theoras\n"
+"scootergrisen"
 
 #: ../gtk/DetailsDialog.cc:524 ../gtk/DetailsDialog.cc:542
 msgid "Use global settings"
@@ -202,11 +203,11 @@ msgstr "Stop med at seede efter X minutters inaktivitet:"
 
 #: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:428
 msgid "Queued for verification"
-msgstr "Venter på verifikation"
+msgstr "Sat i kø til bekræftelse"
 
 #: ../gtk/DetailsDialog.cc:578
 msgid "Verifying local data"
-msgstr "Verificerer lokale data"
+msgstr "Bekræfter lokale data"
 
 #: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:431
 msgid "Queued for download"
@@ -256,15 +257,15 @@ msgstr "Offentlig torrent"
 
 #: ../gtk/DetailsDialog.cc:721
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "Oprettet af {creator} {date}"
 
 #: ../gtk/DetailsDialog.cc:725
 msgid "Created by {creator}"
-msgstr ""
+msgstr "Oprettet af {creator}"
 
 #: ../gtk/DetailsDialog.cc:729
 msgid "Created on {date}"
-msgstr ""
+msgstr "Oprettet {date}"
 
 #: ../gtk/DetailsDialog.cc:843
 msgid "Unknown"
@@ -273,36 +274,36 @@ msgstr "Ukendt"
 #: ../gtk/DetailsDialog.cc:880 ../gtk/MakeDialog.cc:392
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{total_size} i {file_count:L} fil"
+msgstr[1] "{total_size} i {file_count:L} filer"
 
 #: ../gtk/DetailsDialog.cc:895 ../gtk/MakeDialog.cc:398
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "({piece_count} BitTorrent-stykke @ {piece_size})"
+msgstr[1] "({piece_count} BitTorrent-stykker @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:939
 msgid "{current_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:947
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% af {percent_available}% tilgængelig)"
 
 #: ../gtk/DetailsDialog.cc:956
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% af {percent_available}% tilgængelig; {unverified_size} ubekræftet)"
 
 #: ../gtk/DetailsDialog.cc:989
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
-msgstr ""
+msgstr "{downloaded_size} (+{discarded_size} afskaffet efter mislykkede tjeksum)"
 
 #: ../gtk/DetailsDialog.cc:1019
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (forhold: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1060
 msgid "No errors"
@@ -420,18 +421,18 @@ msgstr "Webseeds"
 #: ../gtk/DetailsDialog.cc:1816
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Fik en liste med {markup_begin}{peer_count} modpart{markup_end} {time_span_ago}"
+msgstr[1] "Fik en liste med {markup_begin}{peer_count} modparter{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1828
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Modpartliste anmodet {markup_begin}fik timeout {time_span_ago}{markup_end}; prøver igen"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1837
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Fik en fejl '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1850
 msgid "No updates scheduled"
@@ -439,21 +440,21 @@ msgstr "Ingen planlagte opdateringer"
 
 #: ../gtk/DetailsDialog.cc:1857
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Spørger om flere modparter {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Queued to ask for more peers"
-msgstr "Sat i kø for at efterspørge flere modparter"
+msgstr "Sat i kø til at spørge om flere modparter"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1872
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Spørger om flere modparter {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1897
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "Tracker havde{markup_begin}{seeder_count} {seeder_or_seeders} og {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1899
 msgid "seeder"
@@ -470,23 +471,23 @@ msgstr[1] "leechere"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1910
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Fik en scrape-fejl '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1927
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Spørger om modpartsantal i {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Queued to ask for peer counts"
-msgstr "Sat i kø for at bede om modpartsantal"
+msgstr "Sat i kø til at spørge om modpartsantal"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Spørger om modpartantal {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2226
 msgid "{torrent_name} - Edit Trackers"
-msgstr ""
+msgstr "{torrent_name} - Rediger trackere"
 
 #: ../gtk/DetailsDialog.cc:2260
 msgid "List contains invalid URLs"
@@ -494,11 +495,11 @@ msgstr "Listen indeholder ugyldige URL'er"
 
 #: ../gtk/DetailsDialog.cc:2265 ../gtk/FileList.cc:866
 msgid "Please correct the errors and try again."
-msgstr "Vær venlig at afhjælpe fejlen og prøv igen."
+msgstr "Ret venligst fejlene og prøv igen."
 
 #: ../gtk/DetailsDialog.cc:2347
 msgid "{torrent_name} - Add Tracker"
-msgstr ""
+msgstr "{torrent_name} - Tilføj trackere"
 
 #: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
@@ -506,25 +507,25 @@ msgstr "Trackere"
 
 #: ../gtk/DetailsDialog.cc:2642
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "Egenskaber for {torrent_name}"
 
 #: ../gtk/DetailsDialog.cc:2647
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Egenskaber - {torrent_count:L} torrent"
+msgstr[1] "Egenskaber - {torrent_count:L} torrents"
 
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Fjern torrent?"
+msgstr[1] "Fjern {count:L} torrents?"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Slet denne torrents downloadede filer?"
+msgstr[1] "Slet de downloadede filer fra disse {count:L} torrents?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -578,7 +579,7 @@ msgstr "Lav"
 
 #: ../gtk/FileList.cc:857 ../gtk/Session.cc:322
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke omdøbe '{old_path}' som '{path}': {error} ({error_code})"
 
 #: ../gtk/FileList.cc:962 ../gtk/MessageLogWindow.cc:342
 msgid "Name"
@@ -611,7 +612,7 @@ msgstr "Aktiv"
 #: ../gtk/FilterBar.cc:478
 msgctxt "Verb"
 msgid "Verifying"
-msgstr "Verificerer"
+msgstr "Bekræfter"
 
 #: ../gtk/FilterBar.cc:479 ../gtk/FreeSpaceLabel.cc:57
 msgid "Error"
@@ -623,23 +624,27 @@ msgstr "V_is:"
 
 #: ../gtk/FilterBar.cc:588
 msgid "_Show {count:L} of:"
-msgstr ""
+msgstr "_Vis {count:L} af:"
 
 #: ../gtk/FreeSpaceLabel.cc:56
 msgid "{disk_space} free"
-msgstr "{disk_space} ledig plads"
+msgstr "{disk_space} ledig"
 
 #: ../gtk/MainWindow.cc:383
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Klik for at deaktivere alternative hastighedsgrænser\n"
+" ({download_speed} ned, {upload_speed} op)"
 
 #: ../gtk/MainWindow.cc:384
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
+"Klik for at aktivere alternative hastighedsgrænser\n"
+" ({download_speed} ned, {upload_speed} op)"
 
 #: ../gtk/MainWindow.cc:436
 msgid "Unlimited"
@@ -663,37 +668,37 @@ msgstr "Stop med at seede ved forhold"
 
 #: ../gtk/MainWindow.cc:582
 msgid "Stop at Ratio ({ratio})"
-msgstr "Stop ved ratio ({ratio})"
+msgstr "Stop ved forhold ({ratio})"
 
 #: ../gtk/MainWindow.cc:595
 msgid "Total Ratio"
-msgstr "Samlet forhold"
+msgstr "Forhold (samlet)"
 
 #: ../gtk/MainWindow.cc:596
 msgid "Session Ratio"
-msgstr "Sessionsforhold"
+msgstr "Forhold (session)"
 
 #: ../gtk/MainWindow.cc:597
 msgid "Total Transfer"
-msgstr "Samlet overførsel"
+msgstr "Overførsel (samlet)"
 
 #: ../gtk/MainWindow.cc:598
 msgid "Session Transfer"
-msgstr "Sessionsoverførsel"
+msgstr "Overførsel (session)"
 
 #: ../gtk/MainWindow.cc:763 ../gtk/MainWindow.cc:784 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
-msgstr "Ratio: {ratio}"
+msgstr "Forhold: {ratio}"
 
 #: ../gtk/MainWindow.cc:769
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Ned: {downloaded_size}, op: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:777
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr ""
+msgstr "Ned: {downloaded_size}, op: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:811
 msgid "{download_speed} ▼"
@@ -705,19 +710,19 @@ msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:194
 msgid "Creating '{path}'"
-msgstr ""
+msgstr "Opretter '{path}'"
 
 #: ../gtk/MakeDialog.cc:207
 msgid "Created '{path}'"
-msgstr ""
+msgstr "Oprettede '{path}'"
 
 #: ../gtk/MakeDialog.cc:213 ../libtransmission/open-files.cc:170 ../libtransmission/session-id.cc:68
 msgid "Couldn't create '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke oprette '{path}': {error} ({error_code})"
 
 #: ../gtk/MakeDialog.cc:231
 msgid "Scanned {file_size}"
-msgstr ""
+msgstr "Skannede {file_size}"
 
 #: ../gtk/MakeDialog.cc:386 ../gtk/MakeDialog.cc:549 ../gtk/ui/gtk3/MakeDialog.ui:172 ../gtk/ui/gtk4/MakeDialog.ui:100
 msgid "No source selected"
@@ -726,7 +731,7 @@ msgstr "Ingen kilde valgt"
 #: ../gtk/MessageLogWindow.cc:104
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Kritisk"
 
 #: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
@@ -746,7 +751,7 @@ msgstr "Information"
 #: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Fejlfinding"
 
 #: ../gtk/MessageLogWindow.cc:271
 msgid "Save Log"
@@ -766,7 +771,7 @@ msgstr "Tid"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke oprette proxy for '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -806,15 +811,15 @@ msgstr "_Åbn"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
-msgstr ""
+msgstr "Vis indstillingsdialog"
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "Vælg en fil"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
-msgstr ""
+msgstr "(ingen)"
 
 #: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
@@ -843,16 +848,16 @@ msgstr "Weekender"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Blokeringslisten har {count:L} post"
+msgstr[1] "Blokeringslisten har {count:L} poster"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr "Blokeringsliste ajourført!"
+msgstr "Blokeringsliste opdateret!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr "Kunne ikke ajourføre blokeringslisten."
+msgstr "Kunne ikke opdatere blokeringsliste."
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
@@ -861,39 +866,39 @@ msgstr "Downloader ny blokeringsliste …"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "ukendt"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "tjekker …"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "åben"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "lukket"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "fejl"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Status: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "Flytter '{torrent_name}'"
 
 #: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
@@ -905,16 +910,16 @@ msgstr "Dette kan tage et øjeblik …"
 
 #: ../gtk/Session.cc:797 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
-msgstr ""
+msgstr "Kunne ikke læse '{path}'"
 
 #. logging
 #: ../gtk/Session.cc:1082
 msgid "Inhibiting desktop hibernation"
-msgstr "Forhindrer desktop dvaletilstand"
+msgstr "Forhindrer dvaletilstand for skrivebord"
 
 #: ../gtk/Session.cc:1088 ../gtk/Session.cc:1113
 msgid "Couldn't inhibit desktop hibernation: {error}"
-msgstr ""
+msgstr "Kunne ikke forhindre dvaletilstand for skrivebord: {error}"
 
 #. logging
 #: ../gtk/Session.cc:1109
@@ -923,13 +928,13 @@ msgstr "Tillader dvaletilstand for skrivebord"
 
 #: ../gtk/Session.cc:1227
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Kunne ikke finde afventende RPC-anmodning for mærkatet {tag}"
 
 #: ../gtk/StatsDialog.cc:73
 msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Startet {count:L} gang"
+msgstr[1] "Startet {count:L} gange"
 
 #: ../gtk/StatsDialog.cc:107
 msgid "Reset your statistics?"
@@ -945,34 +950,34 @@ msgstr "Disse statistikker er udelukkende til information. Nulstilling påvirker
 
 #: ../gtk/SystemTrayIcon.cc:207
 msgid "{upload_speed} ▲ {download_speed} ▼"
-msgstr ""
+msgstr "{upload_speed} ▲ {download_speed} ▼"
 
 #: ../gtk/Torrent.cc:439
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr ""
+msgstr "Bekræfter lokale data ({percent_done}% testet)"
 
 #: ../gtk/Torrent.cc:466
 msgid "{current_size} of {complete_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} af {complete_size} ({percent_done}%)"
 
 #: ../gtk/Torrent.cc:476
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{current_size} af {complete_size} ({percent_complete}%), uploadet {uploaded_size} (forhold: {ratio}, mål: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:488
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{current_size} af {complete_size} ({percent_complete}%), uploadet {uploaded_size} (forhold: {ratio})"
 
 #: ../gtk/Torrent.cc:498
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr ""
+msgstr "{complete_size}, uploadet {uploaded_size} (forhold: {ratio}, mål: {seed_ratio})"
 
 #: ../gtk/Torrent.cc:507
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{complete_size}, uploadet {uploaded_size} (forhold: {ratio})"
 
 #: ../gtk/Torrent.cc:520
 msgid "Remaining time unknown"
@@ -980,7 +985,7 @@ msgstr "Tilbageværende tid ukendt"
 
 #: ../gtk/Torrent.cc:617
 msgid "{download_speed} ▼  {upload_speed} ▲"
-msgstr ""
+msgstr "{download_speed} ▼  {upload_speed} ▲"
 
 #: ../gtk/Torrent.cc:629
 msgid "Stalled"
@@ -988,150 +993,150 @@ msgstr "Hænger"
 
 #: ../gtk/Torrent.cc:640
 msgid "Tracker warning: '{warning}'"
-msgstr ""
+msgstr "Tracker-advarsel: '{warning}'"
 
 #: ../gtk/Torrent.cc:643
 msgid "Tracker Error: '{error}'"
-msgstr ""
+msgstr "Tracker-fejl: '{error}'"
 
 #: ../gtk/Torrent.cc:646
 msgid "Local error: '{error}'"
-msgstr ""
+msgstr "Lokal-fejl: '{error}'"
 
 #: ../gtk/Torrent.cc:670
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Downloader metadata fra {active_count} tilsluttede modpart ({percent_done}% færdig)"
+msgstr[1] "Downloader metadata fra {active_count} tilsluttede modparter ({percent_done}% færdig)"
 
 #: ../gtk/Torrent.cc:681
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Downloader fra {active_count} af {connected_count} tilsluttede modpart og webseed"
+msgstr[1] "Downloader fra {active_count} af {connected_count} tilsluttede modparter og webseeds"
 
 #: ../gtk/Torrent.cc:692
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Downloader fra {active_count} webseed"
+msgstr[1] "Downloader fra {active_count} webseeds"
 
 #: ../gtk/Torrent.cc:700
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Downloader fra {active_count} af {connected_count} tilsluttede modpart"
+msgstr[1] "Downloader fra {active_count} af {connected_count} tilsluttede modparter"
 
 #: ../gtk/Torrent.cc:709
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Seeder til {active_count} af {connected_count} tilsluttede modpart"
+msgstr[1] "Seeder til {active_count} af {connected_count} tilsluttede modparter"
 
 #: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_from_now:L} dag fra nu"
+msgstr[1] "{days_from_now:L} dage fra nu"
 
 #: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_from_now:L} time fra nu"
+msgstr[1] "{hours_from_now:L} timer fra nu"
 
 #: ../gtk/Utils.cc:149
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_from_now:L} minut fra nu"
+msgstr[1] "{minutes_from_now:L} minutter fra nu"
 
 #: ../gtk/Utils.cc:156
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_from_now:L} sekund fra nu"
+msgstr[1] "{seconds_from_now:L} sekunder fra nu"
 
 #: ../gtk/Utils.cc:160 ../gtk/Utils.cc:191 ../gtk/Utils.cc:218 ../gtk/Utils.cc:251
 msgid "now"
-msgstr ""
+msgstr "nu"
 
 #: ../gtk/Utils.cc:167
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_ago:L} dag siden"
+msgstr[1] "{days_ago:L} dage siden"
 
 #: ../gtk/Utils.cc:173
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_ago:L} time siden"
+msgstr[1] "{hours_ago:L} timer siden"
 
 #: ../gtk/Utils.cc:180
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_ago:L} minut siden"
+msgstr[1] "{minutes_ago:L} minutter siden"
 
 #: ../gtk/Utils.cc:187
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_ago:L} sekund siden"
+msgstr[1] "{seconds_ago:L} sekunder siden"
 
 #: ../gtk/Utils.cc:200
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days:L} dag"
+msgstr[1] "{days:L} dage"
 
 #: ../gtk/Utils.cc:205
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} time"
+msgstr[1] "{hours:L} timer"
 
 #: ../gtk/Utils.cc:210
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} minut"
+msgstr[1] "{minutes:L} minutter"
 
 #: ../gtk/Utils.cc:215
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} sekund"
+msgstr[1] "{seconds:L} sekunder"
 
 #: ../gtk/Utils.cc:226
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_left:L} dag tilbage"
+msgstr[1] "{days_left:L} dage tilbage"
 
 #: ../gtk/Utils.cc:233
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_left:L} time tilbage"
+msgstr[1] "{hours_left:L} timer tilbage"
 
 #: ../gtk/Utils.cc:240
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_left:L} minut tilbage"
+msgstr[1] "{minutes_left:L} minutter tilbage"
 
 #: ../gtk/Utils.cc:247
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_left:L} sekund tilbage"
+msgstr[1] "{seconds_left:L} sekunder tilbage"
 
 #: ../gtk/Utils.cc:266
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
-msgstr ""
+msgstr "Torrent-filen '{path}' bruges allerede af '{torrent_name}'."
 
 #: ../gtk/Utils.cc:277
 msgid "Couldn't open torrent"
@@ -1139,7 +1144,7 @@ msgstr "Kunne ikke åbne torrent"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke flytte '{path}' til papirkurv: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:644
 msgid "Couldn't open '{url}'"
@@ -1147,16 +1152,16 @@ msgstr "Kunne ikke åbne '{url}'"
 
 #: ../gtk/Utils.cc:855 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
-msgstr ""
+msgstr "Ikke-understøttede URL: '{url}'"
 
 #. modal
 #: ../gtk/Utils.cc:861
 msgid "Transmission doesn't know how to use '{url}'"
-msgstr ""
+msgstr "Transmission ved ikke hvordan den skal bruge '{url}'"
 
 #: ../gtk/Utils.cc:866
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Magnet-linket ser ud til at være beregnet til noget andet end BitTorrent."
 
 #: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1185,11 +1190,11 @@ msgstr "[torrent-filer eller url'er]"
 
 #: ../gtk/main.cc:106
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Kør '{program} --help' for at se en fuld liste med tilgængelige kommandolinjetilvalg.\n"
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/s"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
@@ -1209,7 +1214,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1318,7 +1323,7 @@ msgstr "_Fravælg alle"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "_Præferencer"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
@@ -1326,11 +1331,11 @@ msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:92
 msgid "_Properties"
-msgstr ""
+msgstr "_Egenskaber"
 
 #: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:78
 msgid "Torrent properties"
-msgstr "Torrent-egenskaber"
+msgstr "Egenskaber for torrent"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
@@ -1338,7 +1343,7 @@ msgstr "Åbn mapp_e"
 
 #: ../gtk/transmission.ui:97 ../gtk/transmission.ui:366 ../gtk/ui/gtk3/MainWindow.ui:39 ../gtk/ui/gtk4/MainWindow.ui:44
 msgid "_Start"
-msgstr "_Start"
+msgstr "S_tart"
 
 #: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:37 ../gtk/ui/gtk4/MainWindow.ui:42
 msgid "Start torrent"
@@ -1354,7 +1359,7 @@ msgstr "Start torrent nu"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr "Efterspørg _flere modparter fra tracker"
+msgstr "Spørg om flere modparter fra _tracker"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
@@ -1374,7 +1379,7 @@ msgstr "Flyt ne_d"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr "Flyt _nederst"
+msgstr "Flyt n_ederst"
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:54 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
@@ -1394,7 +1399,7 @@ msgstr "_Bekræft lokale data"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "Kopiér _magnet-link til udklipsholder"
+msgstr "_Kopiér magnet-link til udklipsholder"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:67 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
@@ -1486,7 +1491,7 @@ msgstr "_Indhold"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_Om"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
@@ -1510,7 +1515,7 @@ msgstr "Tracker"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:84 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
-msgstr "_Annoncerings-URL:"
+msgstr "_Bekendtgør-URL:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:20 ../gtk/ui/gtk3/MakeDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:36 ../gtk/ui/gtk3/PrefsDialog.ui:37 ../gtk/ui/gtk3/StatsDialog.ui:36 ../gtk/ui/gtk4/DetailsDialog.ui:886 ../gtk/ui/gtk4/MakeDialog.ui:277 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1484 ../gtk/ui/gtk4/StatsDialog.ui:284
 msgid "_Close"
@@ -1578,7 +1583,7 @@ msgstr "Oprindelse:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:326
 msgid "Added:"
-msgstr ""
+msgstr "Tilføjet:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:430 ../gtk/ui/gtk4/DetailsDialog.ui:338
 msgid "Comment:"
@@ -1602,7 +1607,7 @@ msgstr "Vis _reservetrackere"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:834 ../gtk/ui/gtk4/DetailsDialog.ui:627
 msgid "File listing not available for combined torrent properties"
-msgstr "Filvisning er ikke tilgængelig for kombinerede torrent-egenskaber"
+msgstr "Filvisning er ikke tilgængelig for kombinerede egenskaber for torrent"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:851 ../gtk/ui/gtk3/MakeDialog.ui:69 ../gtk/ui/gtk4/DetailsDialog.ui:634 ../gtk/ui/gtk4/MakeDialog.ui:20
 msgid "Files"
@@ -1618,11 +1623,11 @@ msgstr "Overhold globale _grænser"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:903 ../gtk/ui/gtk4/DetailsDialog.ui:676
 msgid "Limit _download speed ({speed_units}):"
-msgstr ""
+msgstr "Begræns _downloadhastighed ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:918 ../gtk/ui/gtk4/DetailsDialog.ui:688
 msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
+msgstr "Begræns _uploadhastighed ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:935 ../gtk/ui/gtk3/OptionsDialog.ui:143 ../gtk/ui/gtk4/DetailsDialog.ui:700 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
@@ -1654,17 +1659,19 @@ msgstr "Indstillinger"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:20
 msgid "Tracker Announce URLs"
-msgstr "Tracker-annoncerings-URL'er"
+msgstr "Tracker-bekendtgør-URL'er"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:83 ../gtk/ui/gtk3/MakeDialog.ui:294 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:193
 msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"For at tilføje en reserve-URL, skal du tilføje den på den næste linje efter en primær-URL.\n"
+"For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje."
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:118 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "Se også Offentlige trackere (standard) i Rediger > Præferencer > Netværk"
 
 #: ../gtk/ui/gtk3/MainWindow.ui:143
 msgid "Torrent"
@@ -1768,7 +1775,7 @@ msgstr "_Start efter tilføjelse"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr ""
+msgstr "Flyt torrent-fil til _papirkurven"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -1781,12 +1788,12 @@ msgstr "Hastighedsgrænser"
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:90 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
-msgstr ""
+msgstr "_Upload ({speed_units}):"
 
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr ""
+msgstr "_Download ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"
@@ -1799,12 +1806,12 @@ msgstr "Tilsidesæt normale hastighedsgrænser manuelt eller på planlagte tidsp
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:130
 msgid "U_pload ({speed_units}):"
-msgstr ""
+msgstr "U_pload ({speed_units}):"
 
 #. Labels a spinbutton for alternate download speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:230 ../gtk/ui/gtk4/PrefsDialog.ui:142
 msgid "Do_wnload ({speed_units}):"
-msgstr ""
+msgstr "Do_wnload ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:242 ../gtk/ui/gtk4/PrefsDialog.ui:154
 msgid "_Scheduled times:"
@@ -1826,7 +1833,7 @@ msgstr "Tilføjer"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
-msgstr ""
+msgstr "Tilføj automatisk torrent-filer _fra:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
@@ -1932,7 +1939,7 @@ msgstr "Vælg en _tilfældig port hver gang Transmission startes"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1151 ../gtk/ui/gtk4/PrefsDialog.ui:839
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Brug port-_videresendelse med UPnP eller NAT-PMP fra min router"
+msgstr "Brug port-_viderestilling med UPnP eller NAT-PMP fra min router"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1213 ../gtk/ui/gtk4/PrefsDialog.ui:891
 msgid "Te_st Port"
@@ -1956,7 +1963,7 @@ msgstr "Aktivér µ_TP for modpartskommunikation"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:987
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP er et værktøj til at reducere ophobning i netværk."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:1000
 msgid "Use PE_X to find more peers"
@@ -1993,6 +2000,10 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Trackere som skal bruges på alle offentlige torrents.\n"
+"\n"
+"For at tilføje en reserve-URL, skal du tilføje den på næste linje efter en primær-URL.\n"
+"For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1487 ../gtk/ui/gtk4/PrefsDialog.ui:1095
 msgid "Network"
@@ -2020,11 +2031,11 @@ msgstr "Vis en _underretning når der tilføjes torrents"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1603 ../gtk/ui/gtk4/PrefsDialog.ui:1184
 msgid "Show a notification when torrents _finish"
-msgstr "Vis en underretning når torrents bliver _færdige"
+msgstr "Vis en underretning når torrents er _færdige"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1620 ../gtk/ui/gtk4/PrefsDialog.ui:1198
 msgid "Play a _sound when torrents finish"
-msgstr "Afspil en _lyd når torrents bliver færdige"
+msgstr "Afspil en _lyd når torrents er færdige"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1675 ../gtk/ui/gtk4/PrefsDialog.ui:1235
 msgid "Remote Control"
@@ -2044,7 +2055,7 @@ msgstr "HTTP-port:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1749 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "Use _authentication"
-msgstr "Brug _autentifikation"
+msgstr "Brug _godkendelse"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1769 ../gtk/ui/gtk4/PrefsDialog.ui:1304
 msgid "_Username:"
@@ -2124,11 +2135,11 @@ msgstr "_URL"
 
 #: ../libtransmission/announcer-http.cc:436
 msgid "Couldn't parse announce response: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fortolke bekendtgør-svar: {error} ({error_code})"
 
 #: ../libtransmission/announcer-http.cc:656
 msgid "Couldn't parse scrape response: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fortolke scrape-svar: {error} ({error_code})"
 
 #: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:261
 msgid "Unknown error"
@@ -2136,21 +2147,21 @@ msgstr "Ukendt fejl"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol}-forbindelsen mislykkedes"
 
 #: ../libtransmission/announcer-udp.cc:508
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke opslå '{address}:{port}' i {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
-msgstr ""
+msgstr "Bekendtgør-fejl: {error} ({url})"
 
 #: ../libtransmission/announcer.cc:903
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bekendtgør-fejl: {error} (prøver igen om {count} sekund) ({url})"
+msgstr[1] "Bekendtgør-fejl: {error} (prøver igen om {count} sekunder) ({url})"
 
 #: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
 msgid "Could not connect to tracker"
@@ -2167,65 +2178,65 @@ msgstr "Succes"
 #: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:403
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Blokeringslisten '{path}' har {count} post"
+msgstr[1] "Blokeringslisten '{path}' har {count} poster"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:259
 msgid "Couldn't parse line: '{line}'"
-msgstr ""
+msgstr "Kunne ikke fortolke linje: '{line}'"
 
 #: ../libtransmission/blocklist.cc:387
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Genskriver gamle filformat for blokeringsliste til nyt format"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:45 ../libtransmission/crypto-utils-openssl.cc:64 ../libtransmission/crypto-utils-wolfssl.cc:48
 msgid "{crypto_library} error: {error} ({error_code})"
-msgstr ""
+msgstr "{crypto_library} fejl: {error} ({error_code})"
 
 #: ../libtransmission/inout.cc:118
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke hente '{path}': {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Det lykkedes at opdatere kilde {protocol}-adresse til {ip}"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
-msgstr ""
+msgstr "Din maskine understøtter ikke {protocol}"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Det lykkedes at opdatere global {type}-adresse til {ip} med {url}"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
-msgstr ""
+msgstr "Der er for mange meddelelser som denne! Jeg logger ikke længere meddelelsen i denne session."
 
 #: ../libtransmission/makemeta.cc:80 ../libtransmission/watchdir.cc:52
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Springer over '{path}': {error} ({error_code})"
 
 #: ../libtransmission/net.cc:192
 msgid "Couldn't create socket: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke oprette sokkel: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:269
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke indstille adressen {address} på {socket}: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:288
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke tilslutte soklen {socket} til {address}:{port}: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:347
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Kunne ikke binde port {port} på {address}: {error} ({error_code}) -- kører der allerede en anden kopi af Transmission?"
 
 #: ../libtransmission/net.cc:348
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke binde port {port} på {address}: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:192
 msgid "Couldn't open '{path}': {error} ({error_code})"
@@ -2233,55 +2244,55 @@ msgstr "Kunne ikke åbne '{path}': {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:220
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke præallokere  '{path}': {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:239
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke afkorte '{path}': {error} ({error_code})"
 
 #: ../libtransmission/peer-io.cc:666
 msgid "Unknown state: {state}"
-msgstr ""
+msgstr "Ukendt tilstand: {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:90
 msgid "Found public address '{address}'"
-msgstr ""
+msgstr "Fandt offentlig adresse '{address}'"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:127
 msgid "Port {port} is no longer forwarded"
-msgstr ""
+msgstr "Port {port} viderestilles ikke længere"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:175
 msgid "Port {port} forwarded successfully"
-msgstr ""
+msgstr "Viderestilling af port {port} gennemført"
 
 #: ../libtransmission/port-forwarding-upnp.cc:272
 msgid "Found Internet Gateway Device '{url}'"
-msgstr ""
+msgstr "Fandt internet-gateway-enheden '{url}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:273
 msgid "Local Address is '{address}'"
-msgstr ""
+msgstr "Lokal adresse er '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:298
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "Lokal port {local_port} er ikke viderestillet til {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:310
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr ""
+msgstr "Stopper port-viderestilling gennem '{url}', tjeneste '{type}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:343
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr ""
+msgstr "Port-viderestilling gennem '{url}', tjeneste '{type}'. (lokal adresse: {address}:{port})"
 
 #: ../libtransmission/port-forwarding-upnp.cc:352
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "Viderestillede lokal port {local_port} til {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:360
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-msgstr ""
+msgstr "Hvis din router understøtter UPnP, så sørg venligst for at UPnP er aktiveret!"
 
 #: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
@@ -2289,7 +2300,7 @@ msgstr "Starter"
 
 #: ../libtransmission/port-forwarding.cc:166
 msgid "Forwarded"
-msgstr "Videresendt"
+msgstr "Viderestillet"
 
 #: ../libtransmission/port-forwarding.cc:169
 msgid "Stopping"
@@ -2297,77 +2308,77 @@ msgstr "Stopper"
 
 #: ../libtransmission/port-forwarding.cc:172
 msgid "Not forwarded"
-msgstr "Ikke videresendt"
+msgstr "Ikke viderestillet"
 
 #: ../libtransmission/port-forwarding.cc:201
 msgid "Mapped private port {private_port} to public port {public_port}"
-msgstr ""
+msgstr "Kortlage privat port {private_port} til offentlig port {public_port}"
 
 #: ../libtransmission/port-forwarding.cc:217
 msgid "State changed from '{old_state}' to '{state}'"
-msgstr ""
+msgstr "Tilstand ændret fra '{old_state}' til '{state}'"
 
 #: ../libtransmission/rpc-server.cc:104
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
-msgstr ""
+msgstr "Stien til Unix-sokkel skal være færre end {count} tegn (inklusiv '{prefix}' præfiks)"
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "Afviste forespørgsel fra {host} (muligt mappegennemgang angreb)"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "Afviste forespørgsel fra {host} (brute force beskyttelse aktiv)"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "Afviste forespørgsel fra {host} (IP ikke hvidlistet)"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "Afviste forespørgsel fra {host} (mislykkede godkendelse)"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "Afviste forespørgsel fra {host} (vært ikke hvidlistet)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "Ukendt URI fra {host}: '{uri}'"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
-msgstr ""
+msgstr "Unix-sokler understøttes ikke på Windows. Ændr venligst '{key}' i dine indstillinger."
 
 #: ../libtransmission/rpc-server.cc:658
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
-msgstr ""
+msgstr "Kunne ikke indstille RPC-sokkeltilstand til {mode:#o}, bruger standardværdien 0755"
 
 #: ../libtransmission/rpc-server.cc:721
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kunne ikke binde til {address} efter {count} forsøg, giver op"
+msgstr[1] "Kunne ikke binde til {address} efter {count} forsøg, giver op"
 
 #: ../libtransmission/rpc-server.cc:732
 msgid "Listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "Lytter efter RPC- og web-anmodninger på '{address}'"
 
 #: ../libtransmission/rpc-server.cc:760
 msgid "Stopped listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "Stoppede med at lytte efter RPC- og web-anmodninger på '{address}'"
 
 #: ../libtransmission/rpc-server.cc:782
 msgid "Added '{entry}' to host whitelist"
-msgstr ""
+msgstr "Tilføjede '{entry}' til værtens hvidliste"
 
 #: ../libtransmission/rpc-server.cc:902
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
-msgstr ""
+msgstr "Indstillingen '{key}' er '{value}' men den skal være en IPv4- eller IPv6-adresse, eller en Unix-sokkelsti. Bruger standardværdien '0.0.0.0'"
 
 #: ../libtransmission/rpc-server.cc:915
 msgid "Serving RPC and Web requests on {address}"
-msgstr ""
+msgstr "Serverer RPC- og web-anmodninger på {address}"
 
 #: ../libtransmission/rpc-server.cc:920
 msgid "Whitelist enabled"
@@ -2379,61 +2390,61 @@ msgstr "Adgangskode krævet"
 
 #: ../libtransmission/rpc-server.cc:931
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr ""
+msgstr "Serverer RPC- og web-anmodninger fra '{path}'"
 
 #: ../libtransmission/rpcimpl.cc:1158
 msgid "Couldn't test port: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke teste port: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1213
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke hente blokeringsliste: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1340
 msgid "Couldn't fetch torrent: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke hente torrent: {error} ({error_code})"
 
 #: ../libtransmission/session-alt-speeds.cc:64
 msgid "Time to turn off turtle mode"
-msgstr ""
+msgstr "Tidspunkt som skildpaddetilstand skal slås fra"
 
 #: ../libtransmission/session-alt-speeds.cc:64
 msgid "Time to turn on turtle mode"
-msgstr ""
+msgstr "Tidspunkt som skildpaddetilstand skal slås til"
 
 #: ../libtransmission/session-id.cc:150
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke åbne sessionens låsefil '{path}': {error} ({error_code})"
 
 #: ../libtransmission/session.cc:407
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Lytter efter indkommende modpartsforbindelser på {hostport}"
 
 #: ../libtransmission/session.cc:725
 msgid "Transmission version {version} starting"
-msgstr ""
+msgstr "Transmission version {version} starter"
 
 #: ../libtransmission/session.cc:1411
 msgid "Transmission version {version} shutting down"
-msgstr ""
+msgstr "Transmission version {version} lukker ned"
 
 #: ../libtransmission/session.cc:1458
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Indlæste {count} torrent"
+msgstr[1] "Indlæste {count} torrents"
 
 #: ../libtransmission/torrent-metainfo.cc:705
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr ""
+msgstr "Flytter torrent-fil fra '{old_path}' til '{path}'"
 
 #: ../libtransmission/torrent.cc:139
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke bruge metainfo fra '{path}' for '{magnet}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:168
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Ingen data fundet! Sørg for at dine drev er tilsluttet eller bruge \"Angiv placering\". Brug \"Bekræft lokale data\" og start torrenten bagefter, for at downloade den igen."
 
 #: ../libtransmission/torrent.cc:403
 msgid "Calling script '{path}'"
@@ -2441,15 +2452,15 @@ msgstr "Kalder scriptet '{path}'"
 
 #: ../libtransmission/torrent.cc:411
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke kalde scriptet '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:445
 msgid "Seed ratio reached; pausing torrent"
-msgstr ""
+msgstr "Seedforhold nået; sætter torrent på pause"
 
 #: ../libtransmission/torrent.cc:452
 msgid "Seeding idle limit reached; pausing torrent"
-msgstr ""
+msgstr "Grænse for inaktivitet af seeding nået; sætter torrent på pause"
 
 #: ../libtransmission/torrent.cc:690
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2461,7 +2472,7 @@ msgstr "Sætter torrent på pause"
 
 #: ../libtransmission/torrent.cc:799
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fjerne alle torrent-filer: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:865
 msgid "Removing torrent"
@@ -2469,95 +2480,95 @@ msgstr "Fjerner torrent"
 
 #: ../libtransmission/torrent.cc:1182 ../libtransmission/torrent.cc:1688
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke flytte '{old_path}' til '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:1630
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Satte torrenten på pause da ingen data blev fundet! Sørg for at dine drev er tilsluttet eller brug \"Angiv placering\", efterfulgt af \"Bekræft lokale data\". Start torrenten, for at downloade den igen."
 
 #: ../libtransmission/torrent.cc:2126
 msgid "Tracker warning: '{warning}' ({url})"
-msgstr ""
+msgstr "Tracker-advarsel: '{warning}' ({url})"
 
 #: ../libtransmission/tr-dht.cc:553
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Kunne ikke fortolke '{filename}' linje: '{line}'"
 
 #: ../libtransmission/tr-dht.cc:577
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke opslå '{address}:{port}': {error} ({error_code})"
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke initiere {ip_protocol} LPD: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke gøre IPv4-sokkel ikke-blokerende {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke binde IPv4-sokkel {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke gøre IPv6-sokkel ikke-blokerende {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke binde IPv6-sokkel {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:99
 msgid "Unknown socket family"
-msgstr ""
+msgstr "Ukendt sokkelfamilje"
 
 #: ../libtransmission/utils.cc:147
 msgid "Couldn't read '{path}': Not a regular file"
-msgstr ""
+msgstr "Kunne ikke læse '{path}': Ikke en almindelig fil"
 
 #: ../libtransmission/variant-json.cc:241
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke fortolke JSON på position {position} '{text}': {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:86 ../libtransmission/watchdir-inotify.cc:98 ../libtransmission/watchdir-inotify.cc:110 ../libtransmission/watchdir-kqueue.cc:75 ../libtransmission/watchdir-kqueue.cc:88 ../libtransmission/watchdir-kqueue.cc:103
 msgid "Couldn't watch '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke holde øje med '{path}': {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:142 ../libtransmission/watchdir-kqueue.cc:146 ../libtransmission/watchdir-win32.cc:294
 msgid "Couldn't read event: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke læse begivenhed: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:151 ../libtransmission/watchdir-win32.cc:303
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Kunne ikke læse hændelse: forventede {expected_size}, fik {actual_size}"
 
 #: ../libtransmission/watchdir-inotify.cc:168 ../libtransmission/watchdir-win32.cc:328
 msgid "Couldn't read filename: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke læse filnavn: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:177 ../libtransmission/watchdir-win32.cc:337
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Kunne ikke læse filnavn: forventede {expected_size}, fik {actual_size}"
 
 #: ../libtransmission/watchdir-win32.cc:146
 msgid "Couldn't convert '{path}' to native path"
-msgstr ""
+msgstr "Kunne ikke konvertere '{path}' til egen sti"
 
 #: ../libtransmission/watchdir-win32.cc:184
 msgid "Couldn't create pipe: {error} ({error_code})"
-msgstr ""
+msgstr "Kunne ikke oprette pipe: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-win32.cc:209
 msgid "Couldn't create thread"
-msgstr ""
+msgstr "Kunne ikke oprette tråd"
 
 #: ../libtransmission/watchdir-win32.cc:247
 msgid "Couldn't read directory changes"
-msgstr ""
+msgstr "Kunne ikke læse ændringer af mappe"
 
 #: ../libtransmission/watchdir-win32.cc:254
 msgid "Couldn't wait for directory changes"
-msgstr ""
+msgstr "Kunne ikke vente på ændringer af mappe"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:180
 msgid "Consider upgrading your curl installation."
@@ -2573,31 +2584,31 @@ msgstr ""
 
 #: ../libtransmission/web.cc:197
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
-msgstr ""
+msgstr "Vil bekræfte trackercertifikater med miljøvariablen CURL_CA_BUNDLE: {bundle}"
 
 #: ../libtransmission/web.cc:198
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
-msgstr ""
+msgstr "OBS: det virker kun hvis du byggede mod libcurl med openssl eller gnutls, IKKE nss"
 
 #: ../libtransmission/web.cc:199
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr ""
+msgstr "OBS: Ugyldige certifikater vises som 'Kunne ikke oprette forbindelse til tracker' som så mange andre fejl"
 
 #: ../libtransmission/web.cc:496
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "Kunne ikke hente '{url}': forventede HTTP-svarkode {expected_code}, fik {actual_code}"
 
 #: ../utils/create.cc:235
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} fil, {total_size}\n"
+msgstr[1] "{file_count:L} filer {total_size}\n"
 
 #: ../utils/create.cc:241
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} stykke, {piece_size}\n"
+msgstr[1] "{piece_count:L} stykker, {piece_size} hver\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2620,5 +2631,5 @@ msgstr[1] "sekunder"
 #: ../utils/remote.cc:146
 msgid "day"
 msgid_plural "days"
-msgstr[0] "døgn"
-msgstr[1] "døgn"
+msgstr[0] "dag"
+msgstr[1] "dage"

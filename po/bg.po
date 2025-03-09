@@ -8,7 +8,7 @@
 # Kiril Kirilov <cybercop_montana@abv.bg>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Avel Pavlov, 2024
-# Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2024
+# Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2024\n"
+"Last-Translator: Miroslav Dragoev <miroslav.dragoev@icloud.com>, 2025\n"
 "Language-Team: Bulgarian (https://app.transifex.com/transmissionbt/teams/33778/bg/)\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -864,27 +864,27 @@ msgstr "Получаване на нов черен списък…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "непознат/o"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "проверяване..."
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "отворен/o"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "затворен/о"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "грешка"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
@@ -1005,8 +1005,8 @@ msgstr "Локална грешка:{error}"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Сваляне на метаданни от {active_count} свързан участник ({percent_done}% готови)"
+msgstr[1] "Сваляне на метаданни от {active_count} свързани участника ({percent_done}% готови)"
 
 #: ../gtk/Torrent.cc:681
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -1035,14 +1035,14 @@ msgstr[1] ""
 #: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_from_now:L} ден от сега"
+msgstr[1] "{days_from_now:L} дни от сега"
 
 #: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_from_now:L} час от сега"
+msgstr[1] "{hours_from_now:L} часа от сега"
 
 #: ../gtk/Utils.cc:149
 msgid "{minutes_from_now:L} minute from now"
@@ -1058,19 +1058,19 @@ msgstr[1] ""
 
 #: ../gtk/Utils.cc:160 ../gtk/Utils.cc:191 ../gtk/Utils.cc:218 ../gtk/Utils.cc:251
 msgid "now"
-msgstr ""
+msgstr "сега"
 
 #: ../gtk/Utils.cc:167
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Преди {days_ago:L} ден"
+msgstr[1] "Преди {days_ago:L} дни"
 
 #: ../gtk/Utils.cc:173
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Преди {hours_ago:L} час"
+msgstr[1] "Преди {hours_ago:L} часа"
 
 #: ../gtk/Utils.cc:180
 msgid "{minutes_ago:L} minute ago"

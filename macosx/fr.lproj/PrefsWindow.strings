@@ -135,19 +135,19 @@
 "1267.title" = "Débit de téléchargement :";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
-"1268.title" = "Ko/s";
+"1268.title" = "Kb/s";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1269"; */
-"1269.title" = "Ko/s";
+"1269.title" = "Kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Global bandwidth limits:"; ObjectID = "1270"; */
 "1270.title" = "Limites globales de bande passante :";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1273"; */
-"1273.title" = "Ko/s";
+"1273.title" = "Kb/s";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1274"; */
-"1274.title" = "Ko/s";
+"1274.title" = "Kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
 "1275.title" = "Mode à vitesse limitée :";
@@ -315,7 +315,7 @@
 "1911.title" = "En semaine";
 
 /* Class = "NSMenuItem"; title = "Weekends"; ObjectID = "1912"; */
-"1912.title" = "Fins de semaine";
+"1912.title" = "En fin de semaine";
 
 /* Class = "NSMenuItem"; title = "Monday"; ObjectID = "1914"; */
 "1914.title" = "Lundi";

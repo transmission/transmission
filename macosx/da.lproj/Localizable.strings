@@ -52,7 +52,7 @@
 "%lu IP address rules in list" = "%lu IP-adresseregler i listen";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu ukendte:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu lokal opdagelse";
@@ -195,13 +195,13 @@
 "Are you sure you want to remove %lu trackers?" = "Er du sikker på, at du vil fjerne %lu trackere?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Er du sikker på, at du vil fjerne %lu overførsler fra listen og flytte data til papirkurven?";
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Er du sikker på, at du vil fjerne %lu overførsler fra overførselslisten og flytte slette datafilerne?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list?" = "Er du sikker på, at du vil fjerne %lu overførsler fra listen?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Er du sikker på, at du vil fjerne \"%@\" fra listen og flytte data til papirkurven?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Er du sikker på, at du vil fjerne \"%@\" fra overførselslisten og slette datafilen?";
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
@@ -217,7 +217,7 @@
 "Available" = "Tilgængelig";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Båndbredde";
@@ -486,7 +486,7 @@
 "KB/s" = "KB/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Kendte:";
 
 /* Tracker last announce */
 "Last Announce" = "Sidste annoncering";
@@ -774,10 +774,10 @@
 "Rename" = "Omdøb";
 
 /* File Outline -> Menu */
-"Rename File" = "Omdøb";
+"Rename File" = "Omdøb fil";
 
 /* rename sheet label */
-"Rename the file \"%@\":" = "Omdøb \"%@\":";
+"Rename the file \"%@\":" = "Omdøb filen \"%@\":";
 
 /* Stats reset -> button
    Stats window -> reset button */
@@ -850,7 +850,7 @@
 "Select the name and location for the torrent file." = "Vælg navn og placering til torrent-filen.";
 
 /* Move torrent -> select destination folder */
-"Select the new folder for %lu data files." = "Vælg ny mappe til %lu data filer.";
+"Select the new folder for %lu data files." = "Vælg den ny mappe til %lu datafiler.";
 
 /* Move torrent -> select destination folder */
 "Select the new folder for \"%@\"." = "Vælg ny mappe til \"%@\".";
@@ -887,10 +887,10 @@
 "Show Status Bar" = "Vis statuslinje";
 
 /* Torrent cell -> button info */
-"Show the data file in Finder" = "Vis data i Finder";
+"Show the data file in Finder" = "Vis datafilen i Finder";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Vis værktøjslinje";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -937,7 +937,7 @@
 "The move operation of \"%@\" cannot be done." = "Kan ikke flytte \"%@\"";
 
 /* blocklist fail message */
-"The specified blocklist file did not contain any valid rules." = "Den angivede blokeringsliste indeholdte ingen gyldige regler.";
+"The specified blocklist file did not contain any valid rules." = "Den angivede blokeringslistefil indeholdte ingen gyldige regler.";
 
 /* Torrent download failed -> message */
 "The torrent could not be downloaded from %@: %@." = "Torrent kunne ikke hentes fra %1$@: %2$@.";
@@ -982,10 +982,10 @@
 "There must be at least one file in a folder to create a torrent file." = "Der skal være mindst én fil i en mappe for at oprette en torrent-fil.";
 
 /* Save log alert panel -> message */
-"There was a problem creating the file \"%@\"." = "Der opstod et problem med at oprette \"%@\".";
+"There was a problem creating the file \"%@\"." = "Der opstod et problem med at oprette filen \"%@\".";
 
 /* Move error alert -> title */
-"There was an error moving the data file." = "Data kan ikke flyttes.";
+"There was an error moving the data file." = "Der opstod en fejl ved flytning af datafilen.";
 
 /* Magnet link failed -> message */
 "There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Magnet-linket \"%@\" kunne ikke tilføjes. Overførslen startes ikke.";
@@ -994,7 +994,7 @@
 "This folder contains no files." = "Ingen filer i mappe.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Valgmuligheden er ikke tilgængelig hvis Standardplacering er indstillet til Samme som torrent-fil.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Denne overførsel er aktiv. Hvis den fjernes, kræves torrent-filen eller magnet-linket for at fortsætte.";
