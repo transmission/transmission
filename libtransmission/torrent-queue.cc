@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "libtransmission/torrent-queue.h"
-#include "libtransmission/torrent.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/variant.h"
 
 namespace
@@ -22,36 +22,36 @@ using namespace std::literals;
 }
 } // namespace
 
-size_t tr_torrent_queue::add(tr_torrent const& tor)
+size_t tr_torrent_queue::add(tr_torrent_id_t const id)
 {
-    queue_.push_back(&tor);
+    queue_.push_back(id);
     return std::size(queue_) - 1U;
 }
 
-void tr_torrent_queue::remove(tr_torrent const& tor)
+void tr_torrent_queue::remove(tr_torrent_id_t const id)
 {
-    auto const uid = static_cast<size_t>(tor.id());
+    auto const uid = static_cast<size_t>(id);
     auto const pos = uid < std::size(pos_cache_) ? pos_cache_[uid] : 0U;
-    if (pos < std::size(queue_) && queue_[pos] == &tor)
+    if (pos < std::size(queue_) && queue_[pos] == id)
     {
         queue_.erase(std::begin(queue_) + pos);
     }
     else
     {
-        auto const remove_it = std::remove(std::begin(queue_), std::end(queue_), &tor);
+        auto const remove_it = std::remove(std::begin(queue_), std::end(queue_), id);
         queue_.erase(remove_it, std::end(queue_));
     }
 }
 
-size_t tr_torrent_queue::get_pos(tr_torrent const& tor)
+size_t tr_torrent_queue::get_pos(tr_torrent_id_t const id)
 {
-    auto const uid = static_cast<size_t>(tor.id());
+    auto const uid = static_cast<size_t>(id);
     if (auto n_cache = std::size(pos_cache_);
-        uid >= n_cache || pos_cache_[uid] >= std::size(queue_) || &tor != queue_[pos_cache_[uid]])
+        uid >= n_cache || pos_cache_[uid] >= std::size(queue_) || id != queue_[pos_cache_[uid]])
     {
         auto const begin = std::begin(queue_);
         auto const end = std::end(queue_);
-        auto it = std::find(begin, end, &tor);
+        auto it = std::find(begin, end, id);
         if (it == end)
         {
             return MaxQueuePosition;
@@ -64,11 +64,11 @@ size_t tr_torrent_queue::get_pos(tr_torrent const& tor)
     return pos_cache_[uid];
 }
 
-void tr_torrent_queue::set_pos(tr_torrent const& tor, size_t new_pos)
+void tr_torrent_queue::set_pos(tr_torrent_id_t const id, size_t new_pos)
 {
-    auto const old_pos = get_pos(tor);
+    auto const old_pos = get_pos(id);
     auto const n_queue = std::size(queue_);
-    if (old_pos >= n_queue || queue_[old_pos] != &tor)
+    if (old_pos >= n_queue || queue_[old_pos] != id)
     {
         return;
     }
@@ -98,17 +98,17 @@ bool tr_torrent_queue::to_file() const
 {
     auto vec = tr_variant::Vector{};
     vec.reserve(std::size(queue_));
-    for (auto const tor : queue_)
+    for (auto const id : queue_)
     {
-        vec.emplace_back(tor->store_filename());
+        vec.emplace_back(mediator_.store_filename(id));
     }
 
-    return tr_variant_serde::json().to_file(std::move(vec), get_file_path(config_dir_));
+    return tr_variant_serde::json().to_file(std::move(vec), get_file_path(mediator_.config_dir()));
 }
 
 std::vector<std::string> tr_torrent_queue::from_file()
 {
-    auto top = tr_variant_serde::json().parse_file(get_file_path(config_dir_));
+    auto top = tr_variant_serde::json().parse_file(get_file_path(mediator_.config_dir()));
     if (!top)
     {
         return {};

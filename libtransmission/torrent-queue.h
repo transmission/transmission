@@ -14,13 +14,21 @@
 #include <string_view>
 #include <vector>
 
-struct tr_torrent;
+#include "libtransmission/transmission.h"
 
 class tr_torrent_queue
 {
 public:
-    explicit tr_torrent_queue(std::string_view config_dir)
-        : config_dir_{ config_dir }
+    struct Mediator
+    {
+        virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual std::string config_dir() const = 0;
+        [[nodiscard]] virtual std::string store_filename(tr_torrent_id_t id) const = 0;
+    };
+
+    explicit tr_torrent_queue(Mediator const& mediator)
+        : mediator_{ mediator }
     {
     }
     tr_torrent_queue(tr_torrent_queue const&) = delete;
@@ -28,11 +36,11 @@ public:
     tr_torrent_queue& operator=(tr_torrent_queue const&) = delete;
     tr_torrent_queue& operator=(tr_torrent_queue&&) = delete;
 
-    size_t add(tr_torrent const& tor);
-    void remove(tr_torrent const& tor);
+    size_t add(tr_torrent_id_t id);
+    void remove(tr_torrent_id_t id);
 
-    [[nodiscard]] size_t get_pos(tr_torrent const& tor);
-    void set_pos(tr_torrent const& tor, size_t new_pos);
+    [[nodiscard]] size_t get_pos(tr_torrent_id_t id);
+    void set_pos(tr_torrent_id_t id, size_t new_pos);
 
     bool to_file() const;
     [[nodiscard]] std::vector<std::string> from_file();
@@ -41,8 +49,8 @@ public:
     static auto constexpr MaxQueuePosition = ~size_t{};
 
 private:
-    std::vector<tr_torrent const*> queue_;
+    std::vector<tr_torrent_id_t> queue_;
     std::vector<size_t> pos_cache_;
 
-    std::string config_dir_;
+    Mediator const& mediator_;
 };

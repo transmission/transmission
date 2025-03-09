@@ -548,7 +548,7 @@ void freeTorrent(tr_torrent* tor)
 
     if (!session->isClosing())
     {
-        session->torrent_queue().remove(*tor);
+        session->torrent_queue().remove(tor->id());
     }
 
     delete tor;

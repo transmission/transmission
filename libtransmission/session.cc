@@ -245,6 +245,14 @@ void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, tr_pex 
 
 // ---
 
+std::string tr_session::QueueMediator::store_filename(tr_torrent_id_t id) const
+{
+    auto const* const tor = session_.torrents().get(id);
+    return tor != nullptr ? tor->store_filename() : std::string{};
+}
+
+// ---
+
 bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port)
 {
     auto const digest = tr_sha1_from_string(info_hash_str);
@@ -2158,7 +2166,7 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 void tr_session::addTorrent(tr_torrent* tor)
 {
     tor->init_id(torrents().add(tor));
-    torrent_queue_.add(*tor);
+    torrent_queue_.add(tor->id());
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }

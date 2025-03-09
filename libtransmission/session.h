@@ -231,6 +231,25 @@ private:
         tr_session& session_;
     };
 
+    class QueueMediator final : public tr_torrent_queue::Mediator
+    {
+    public:
+        explicit QueueMediator(tr_session& session) noexcept
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] std::string config_dir() const override
+        {
+            return session_.configDir();
+        }
+
+        [[nodiscard]] std::string store_filename(tr_torrent_id_t id) const override;
+
+    private:
+        tr_session& session_;
+    };
+
     class WebMediator final : public tr_web::Mediator
     {
     public:
@@ -526,12 +545,12 @@ public:
         return session_thread_->event_base();
     }
 
-    [[nodiscard]] constexpr auto& torrents()
+    [[nodiscard]] constexpr tr_torrents& torrents()
     {
         return torrents_;
     }
 
-    [[nodiscard]] constexpr auto const& torrents() const
+    [[nodiscard]] constexpr tr_torrents const& torrents() const
     {
         return torrents_;
     }
@@ -558,7 +577,7 @@ public:
 
     // paths
 
-    [[nodiscard]] constexpr auto const& configDir() const noexcept
+    [[nodiscard]] constexpr std::string const& configDir() const noexcept
     {
         return config_dir_;
     }
@@ -1274,7 +1293,8 @@ private:
 
     libtransmission::Blocklists blocklists_;
 
-    tr_torrent_queue torrent_queue_{ config_dir_ };
+    QueueMediator torrent_queue_mediator_{ *this };
+    tr_torrent_queue torrent_queue_{ torrent_queue_mediator_ };
 
 private:
     /// other fields

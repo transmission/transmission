@@ -962,12 +962,12 @@ struct tr_torrent
 
     [[nodiscard]] auto queue_position() const noexcept
     {
-        return session->torrent_queue().get_pos(*this);
+        return session->torrent_queue().get_pos(id());
     }
 
     void set_queue_position(size_t new_pos)
     {
-        session->torrent_queue().set_pos(*this, new_pos);
+        session->torrent_queue().set_pos(id(), new_pos);
     }
 
     static constexpr struct
