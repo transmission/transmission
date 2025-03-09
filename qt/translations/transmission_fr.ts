@@ -1094,7 +1094,7 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Définir l’_&amp;emplacement…</translation>
+        <translation>Définir l’&amp;emplacement…</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1593,7 +1593,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+64"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;Outrepasser manuellement les limites de vitesse ou aux heures programmées&lt;/small&gt;</translation>
+        <translation>&lt;small&gt;Remplacer manuellement les limites de vitesse ou aux heures programmées&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+49"/>
@@ -1613,12 +1613,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+1"/>
         <source>Weekdays</source>
-        <translation>Jour de semaine</translation>
+        <translation>En semaine</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weekends</source>
-        <translation>Fins de semaines</translation>
+        <translation>En fin de semaine</translation>
     </message>
     <message>
         <location line="-235"/>
@@ -1749,7 +1749,10 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Traceurs à utiliser sur tous les torrents publics.
+
+Pour ajouter une URL de secours, placez-la sur la prochaine ligne après une URL primaire.
+Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -1903,7 +1906,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation>Détecter de nouveaux torrents dans le presse-papiers</translation>
+        <translation>Détecter les nouveaux torrents du presse-papiers</translation>
     </message>
     <message>
         <location line="+136"/>
@@ -1988,7 +1991,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-3"/>
         <source>LPD is a tool for finding peers on your local network.</source>
-        <translation>La découverte de pairs locaux (LPD) est un outil pour trouver des pairs sur votre réseau local.</translation>
+        <translation>La découverte des pairs locaux (LPD) est un outil pour trouver des pairs sur votre réseau local.</translation>
     </message>
     <message>
         <location line="-239"/>
@@ -2008,37 +2011,37 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>vérification…</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>ouvert</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>closed</source>
-        <translation type="unfinished"></translation>
+        <translation>fermé</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>erreur</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>État&#xa0;: &lt;b&gt;{status}&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
-        <translation type="unfinished"></translation>
+        <translation>État&#xa0;: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
     </message>
     <message numerus="yes">
         <location line="+96"/>
@@ -2087,7 +2090,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-100"/>
         <source>Save to &amp;Location:</source>
-        <translation>Enregistrer dans cet emp&amp;lacements&#xa0;:</translation>
+        <translation>Enregistrer dans cet emp&amp;lacement&#xa0;:</translation>
     </message>
     <message>
         <location line="+173"/>
@@ -2125,73 +2128,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>b/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kb/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Mb/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Gb/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Tb/s</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>o</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>kio</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>Mio</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>Gio</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>Tio</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>ko</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Mo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>Go</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>To</translation>
     </message>
     <message>
         <location line="+276"/>
@@ -2673,7 +2676,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour ajouter une URL de secours, ajoutez-la sur la prochaine ligne après une URL primaire.</translation>
     </message>
     <message>
         <location line="+7"/>
