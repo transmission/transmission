@@ -60,6 +60,13 @@ void savePeers(tr_variant* dict, tr_torrent const* tor)
     {
         map->try_emplace(TR_KEY_peers2_6, tr_pex::to_variant(std::data(pex), std::size(pex)));
     }
+
+    // Save file conflict state
+    if (tor->hasFileConflicts())
+    {
+        tr_variantDictAddBool(dict, TR_KEY_has_file_conflicts, true);
+        tr_variantDictAddStr(dict, TR_KEY_conflicting_torrent, tor->conflictingTorrent());
+    }
 }
 
 size_t addPeers(tr_torrent* tor, tr_variant const* l)
@@ -677,7 +684,32 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
     auto& top = *otop;
 
     tr_logAddDebugTor(tor, fmt::format("Read resume file '{}'", filename));
+
     auto fields_loaded = tr_resume::fields_t{};
+
+    // Load run state first since other operations may need to stop the torrent temporarily
+    if (auto val = bool{}; (fields_to_load & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
+    {
+        tor->start_when_stable_ = !val;
+        fields_loaded |= tr_resume::Run;
+    }
+
+    if ((fields_to_load & tr_resume::FileConflicts) != 0)
+    {
+        if (auto has_conflicts = bool{}; tr_variantDictFindBool(&top, TR_KEY_has_file_conflicts, &has_conflicts))
+        {
+            if (has_conflicts)
+            {
+                auto conflicting_name = std::string_view{};
+                if (tr_variantDictFindStrView(&top, TR_KEY_conflicting_torrent, &conflicting_name))
+                {
+                    tor->setFileConflicted(true, conflicting_name);
+                    fields_loaded |= tr_resume::FileConflicts;
+                }
+            }
+        }
+    }
+
     auto i = int64_t{};
     auto sv = std::string_view{};
 
@@ -928,6 +960,12 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->bytes_corrupt_.ever());
     tr_variantDictAddInt(&top, TR_KEY_done_date, helper.date_done());
     tr_variantDictAddStrView(&top, TR_KEY_destination, tor->download_dir().sv());
+
+    if (tor->hasFileConflicts())
+    {
+        tr_variantDictAddBool(&top, TR_KEY_has_file_conflicts, true);
+        tr_variantDictAddStr(&top, TR_KEY_conflicting_torrent, tor->conflictingTorrent());
+    }
 
     if (!std::empty(tor->incomplete_dir()))
     {
