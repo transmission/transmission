@@ -230,7 +230,7 @@ TEST_F(IPCacheTest, onResponseIPQuery)
 
     struct LocalMockMediator final : public MockMediator
     {
-        void fetch(tr_web::FetchOptions&& options) override
+        void fetch(tr_web::FetchOptions&& options) override // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
         {
             auto response = tr_web::FetchResponse{ http_code, std::string{ AddrStr[k_] }, std::string{}, true,
                                                    false,     options.done_func_user_data };
