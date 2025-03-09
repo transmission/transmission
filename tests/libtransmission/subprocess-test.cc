@@ -34,7 +34,7 @@ namespace
 
 std::string getTestProgramPath(std::string_view const filename)
 {
-    auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front().data());
+    auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front());
     auto const exe_dir = tr_sys_path_dirname(exe_path);
     return fmt::format("{:s}/{:s}", exe_dir, filename);
 }
