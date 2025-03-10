@@ -551,10 +551,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 #ifdef QT_DBUS_LIB
 void Application::onNotificationActionInvoked(quint32 /* notification_id */, QString action_key)
 {
-    static QRegularExpression const start_now_regex{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
+    static QRegularExpression const StartNowRegex{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
 
-    auto const match = start_now_regex.match(action_key);
-    if (match.hasMatch())
+    if (auto const match = StartNowRegex.match(action_key); match.hasMatch())
     {
         int const torrent_id = match.captured(1).toInt();
         session_->startTorrentsNow({ torrent_id });
