@@ -1600,6 +1600,14 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         return "incomplete torrents directory path is not absolute";
     }
 
+    if (auto const iter = args_in.find(TR_KEY_preferred_transports); iter != std::end(args_in))
+    {
+        if (!session->load_preferred_transports(iter->second))
+        {
+            return R"(the list must be unique with the values "utp" or "tcp")";
+        }
+    }
+
     if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mb))
     {
         tr_sessionSetCacheLimit_MB(session, *val);
@@ -1967,6 +1975,7 @@ char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/
     case TR_KEY_peer_port_random_on_start: return session.isPortRandom();
     case TR_KEY_pex_enabled: return session.allows_pex();
     case TR_KEY_port_forwarding_enabled: return tr_sessionIsPortForwardingEnabled(&session);
+    case TR_KEY_preferred_transports: return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled: return session.queueStalledEnabled();
     case TR_KEY_queue_stalled_minutes: return session.queueStalledMinutes();
     case TR_KEY_rename_partial_files: return session.isIncompleteFileNamingEnabled();
