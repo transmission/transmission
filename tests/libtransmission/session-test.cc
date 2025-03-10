@@ -208,8 +208,8 @@ namespace current_time_mock
 {
 namespace
 {
+
 auto value = time_t{};
-}
 
 time_t get()
 {
@@ -221,6 +221,7 @@ void set(time_t now)
     value = now;
 }
 
+} // unnamed namespace
 } // namespace current_time_mock
 
 TEST_F(SessionTest, sessionId)
