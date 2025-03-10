@@ -3,7 +3,7 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
-import isEqual from 'lodash.isequal';
+import equal from 'fast-deep-equal/es6';
 
 export const Utils = {
   /** Given a numerator and denominator, return a ratio string */
@@ -207,7 +207,7 @@ export function debounce(callback, wait = 100) {
 }
 
 export function deepEqual(a, b) {
-  return isEqual(a, b);
+  return equal(a, b);
 }
 
 function setOrDeleteAttribute(element, attribute, b) {
