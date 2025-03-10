@@ -297,7 +297,7 @@ The 'source' column here corresponds to the data structure there.
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
-| `beginPiece` | number | tr_file_view
+| `begin_piece` | number | tr_file_view
 | `endPiece` | number | tr_file_view
 
 Files are returned in the order they are laid out in the torrent. References to "file indices" throughout this specification should be interpreted as the position of the file within this ordering, with the first file bearing index 0.
@@ -1034,6 +1034,6 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-add` | new arg `sequential_download`
 | `torrent-get` | new arg `sequential_download`
 | `torrent-set` | new arg `sequential_download`
-| `torrent-get` | new arg `files.beginPiece`
+| `torrent-get` | new arg `files.begin_piece`
 | `torrent-get` | new arg `files.endPiece`
 | `port-test` | new arg `ipProtocol`
