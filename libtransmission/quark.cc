@@ -158,7 +158,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "incomplete-dir-enabled"sv,
     "info"sv,
     "inhibit-desktop-hibernation"sv,
-    "ipProtocol"sv,
+    "ip_protocol"sv,
     "ipv4"sv,
     "ipv6"sv,
     "isBackup"sv,
