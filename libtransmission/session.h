@@ -496,7 +496,7 @@ public:
                 { TR_KEY_script_torrent_done_seeding_filename, &script_torrent_done_seeding_filename },
                 { TR_KEY_seed_queue_enabled, &seed_queue_enabled },
                 { TR_KEY_seed_queue_size, &seed_queue_size },
-                { TR_KEY_sequentialDownload, &sequential_download },
+                { TR_KEY_sequential_download, &sequential_download },
                 { TR_KEY_sleep_per_seconds_during_verify, &sleep_per_seconds_during_verify },
                 { TR_KEY_speed_limit_down, &speed_limit_down },
                 { TR_KEY_speed_limit_down_enabled, &speed_limit_down_enabled },

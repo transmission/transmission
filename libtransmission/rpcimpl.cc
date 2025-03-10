@@ -563,7 +563,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode:
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
-    case TR_KEY_sequentialDownload:
+    case TR_KEY_sequential_download:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
     case TR_KEY_startDate:
@@ -657,7 +657,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode: return tor.idle_limit_mode();
     case TR_KEY_seedRatioLimit: return tor.seed_ratio();
     case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
-    case TR_KEY_sequentialDownload: return tor.is_sequential_download();
+    case TR_KEY_sequential_download: return tor.is_sequential_download();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
@@ -1008,7 +1008,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>(TR_KEY_sequentialDownload))
+        if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download))
         {
             tor->set_sequential_download(*val);
         }
@@ -1452,7 +1452,7 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
         ctor.set_labels(std::move(labels));
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_sequentialDownload); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
     {
         ctor.set_sequential_download(TR_FORCE, *val);
     }
@@ -1844,7 +1844,7 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         tr_sessionSetAntiBruteForceEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>(TR_KEY_sequentialDownload); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
     {
         session->set_sequential_download(*val);
     }
@@ -1984,7 +1984,7 @@ char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/
     case TR_KEY_seedRatioLimited: return session.isRatioLimited();
     case TR_KEY_seed_queue_enabled: return session.queueEnabled(TR_UP);
     case TR_KEY_seed_queue_size: return session.queueSize(TR_UP);
-    case TR_KEY_sequentialDownload: return session.sequential_download();
+    case TR_KEY_sequential_download: return session.sequential_download();
     case TR_KEY_session_id: return session.sessionId();
     case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_down_enabled: return session.is_speed_limited(TR_DOWN);
