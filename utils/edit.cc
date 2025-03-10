@@ -339,7 +339,7 @@ int tr_main(int argc, char* argv[])
 
     if (options.show_version)
     {
-        fmt::print(stderr, "{:s} {:s}\n", MyName, LONG_VERSION_STRING);
+        fmt::print(stderr, "{:s} {:s}\n", MyName, TR_LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 

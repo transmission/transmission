@@ -302,7 +302,7 @@ std::string tr_metainfo_builder::benc(tr_error* error) const
     // maybe add some optional metainfo
     if (!anonymize)
     {
-        top.try_emplace(TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
+        top.try_emplace(TR_KEY_created_by, TR_NAME "/" TR_LONG_VERSION_STRING);
         top.try_emplace(TR_KEY_creation_date, time(nullptr));
     }
 

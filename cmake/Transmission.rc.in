@@ -12,8 +12,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #endif
 
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION    MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION, 0
-    PRODUCTVERSION MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION, 0
+    FILEVERSION    TR_MAJOR_VERSION, TR_MINOR_VERSION, TR_PATCH_VERSION, 0
+    PRODUCTVERSION TR_MAJOR_VERSION, TR_MINOR_VERSION, TR_PATCH_VERSION, 0
     FILEFLAGSMASK  VS_FF_DEBUG | TR_FF_PRERELEASE
 #ifdef _DEBUG
     FILEFLAGS      VS_FF_DEBUG | TR_FF_PRERELEASE
@@ -30,12 +30,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Transmission Project"
             VALUE "FileDescription",  "${TR_FILE_DESCRIPTION}"
-            VALUE "FileVersion",      LONG_VERSION_STRING
+            VALUE "FileVersion",      TR_LONG_VERSION_STRING
             VALUE "InternalName",     "${TR_INTERNAL_NAME}"
             VALUE "LegalCopyright",   "2005-2025 Transmission Project"
             VALUE "OriginalFilename", "${TR_ORIGINAL_FILENAME}"
             VALUE "ProductName",      "Transmission"
-            VALUE "ProductVersion",   LONG_VERSION_STRING
+            VALUE "ProductVersion",   TR_LONG_VERSION_STRING
         END
     END
     BLOCK "VarFileInfo"
