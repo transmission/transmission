@@ -13,6 +13,7 @@ performance improvements.
 
 ### All Platforms
 
+* Added support for using a proxy server for web connections. ([#5038](https://github.com/transmission/transmission/pull/5038))
 * Added optional sequential downloading. ([#6893](https://github.com/transmission/transmission/pull/6893), [#7047](https://github.com/transmission/transmission/pull/7047))
 * Disconnect blocklisted peers immediately upon blocklist update. ([#7167](https://github.com/transmission/transmission/pull/7167))
 * New files are assigned a file mode per the process _umask_ defined in `settings.json`. ([#7195](https://github.com/transmission/transmission/pull/7195))
@@ -65,18 +66,19 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 * @killemov:
   * Code review. ([#7047](https://github.com/transmission/transmission/pull/7047))
 * @nevack ([Dzmitry Neviadomski](https://github.com/nevack)):
-  * Code review. ([#7195](https://github.com/transmission/transmission/pull/7195), [#7383](https://github.com/transmission/transmission/pull/7383))
+  * Code review. ([#5038](https://github.com/transmission/transmission/pull/5038), [#7195](https://github.com/transmission/transmission/pull/7195), [#7383](https://github.com/transmission/transmission/pull/7383))
 * @reardonia ([reardonia](https://github.com/reardonia)):
   * Code review. ([#6892](https://github.com/transmission/transmission/pull/6892), [#7167](https://github.com/transmission/transmission/pull/7167), [#7177](https://github.com/transmission/transmission/pull/7177), [#7195](https://github.com/transmission/transmission/pull/7195), [#7355](https://github.com/transmission/transmission/pull/7355))
   * Handshake: add fire_timer() explicitly instead of overloading fire_done(). ([#6966](https://github.com/transmission/transmission/pull/6966))
   * Consume early pad a/b, improve handshake tests. ([#6987](https://github.com/transmission/transmission/pull/6987))
 * @tearfur ([Yat Ho](https://github.com/tearfur)):
-  * Code review. ([#6966](https://github.com/transmission/transmission/pull/6966), [#6987](https://github.com/transmission/transmission/pull/6987), [#7167](https://github.com/transmission/transmission/pull/7167), [#7195](https://github.com/transmission/transmission/pull/7195), [#7313](https://github.com/transmission/transmission/pull/7313), [#7447](https://github.com/transmission/transmission/pull/7447), [#7461](https://github.com/transmission/transmission/pull/7461), [#7462](https://github.com/transmission/transmission/pull/7462), [#7469](https://github.com/transmission/transmission/pull/7469), [#7470](https://github.com/transmission/transmission/pull/7470), [#7471](https://github.com/transmission/transmission/pull/7471))
+  * Code review. ([#5038](https://github.com/transmission/transmission/pull/5038), [#6966](https://github.com/transmission/transmission/pull/6966), [#6987](https://github.com/transmission/transmission/pull/6987), [#7167](https://github.com/transmission/transmission/pull/7167), [#7195](https://github.com/transmission/transmission/pull/7195), [#7313](https://github.com/transmission/transmission/pull/7313), [#7447](https://github.com/transmission/transmission/pull/7447), [#7461](https://github.com/transmission/transmission/pull/7461), [#7462](https://github.com/transmission/transmission/pull/7462), [#7469](https://github.com/transmission/transmission/pull/7469), [#7470](https://github.com/transmission/transmission/pull/7470), [#7471](https://github.com/transmission/transmission/pull/7471))
   * Refactor: store peers as benc in resume file. ([#6892](https://github.com/transmission/transmission/pull/6892))
   * Added optional sequential downloading. ([#6893](https://github.com/transmission/transmission/pull/6893), [#7047](https://github.com/transmission/transmission/pull/7047))
   * Fix: abort handshake if the torrent is stopped. ([#6947](https://github.com/transmission/transmission/pull/6947))
   * Refactor: save outgoing `len(PadA)`, `len(PadB)` and `len(IA)`. ([#6973](https://github.com/transmission/transmission/pull/6973))
   * Better utilize high Internet bandwidth. ([#7029](https://github.com/transmission/transmission/pull/7029))
+  * Refactor: use new `tr_variant` API for resume. ([#7069](https://github.com/transmission/transmission/pull/7069))
   * Refactor: use evhttp public accessors in rpc server. ([#7112](https://github.com/transmission/transmission/pull/7112))
   * Fix: use message id to check for pex and metadata xfer support. ([#7177](https://github.com/transmission/transmission/pull/7177))
   * Feat: support the JSON `null` type in `tr_variant`. ([#7255](https://github.com/transmission/transmission/pull/7255))
@@ -90,6 +92,11 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
   * Experimental fix for frequent corrupt pieces and stuck progress. ([#7443](https://github.com/transmission/transmission/pull/7443))
   * Feat: warn about problematic curl versions. ([#7457](https://github.com/transmission/transmission/pull/7457))
   * Support trackers that only support the old BEP-7 with `&ipv4=` and `&ipv6=`. ([#7481](https://github.com/transmission/transmission/pull/7481))
+  * Refactor: rename unreleased quarks to snake_case. ([#7483](https://github.com/transmission/transmission/pull/7483))
+* @Terentyev ([Alexander Terentyev](https://github.com/Terentyev)):
+  * Added support for using a proxy server for web connections. ([#5038](https://github.com/transmission/transmission/pull/5038))
+* @ThinkChaos:
+  * Code review. ([#5038](https://github.com/transmission/transmission/pull/5038))
 * @userwiths ([Bark](https://github.com/userwiths)):
   * Fix: Take into account only the private that is inside info. ([#7313](https://github.com/transmission/transmission/pull/7313))
 * @wegood9 ([pathC](https://github.com/wegood9)):
