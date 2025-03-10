@@ -1425,7 +1425,7 @@ void Application::Impl::show_about_dialog()
        to have it appear in the credits in the "About"
        dialog */
     d->set_translator_credits(_("translator-credits"));
-    d->set_version(LONG_VERSION_STRING);
+    d->set_version(TR_LONG_VERSION_STRING);
     d->set_website(uri);
     d->set_website_label(uri);
 #ifdef SHOW_LICENSE

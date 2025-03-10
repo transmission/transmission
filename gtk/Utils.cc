@@ -601,7 +601,7 @@ void gtr_object_notify_emit(Glib::ObjectBase& object)
 
 Glib::ustring gtr_get_help_uri()
 {
-    static auto const uri = fmt::format("https://transmissionbt.com/help/gtk/{}.{}x", MAJOR_VERSION, MINOR_VERSION / 10);
+    static auto const uri = fmt::format("https://transmissionbt.com/help/gtk/{}.{}x", TR_MAJOR_VERSION, TR_MINOR_VERSION / 10);
     return uri;
 }
 

@@ -149,7 +149,7 @@ int tr_main(int argc, char* argv[])
 
     if (options.show_version)
     {
-        fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
+        fprintf(stderr, "%s %s\n", MyName, TR_LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
