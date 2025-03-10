@@ -27,8 +27,7 @@ performance improvements.
 ### macOS Client
 
 * Fixed the context menu's appearance in compact mode. ([#7350](https://github.com/transmission/transmission/pull/7350))
-* Added Afrikaans and Greek translations.
-Fixes: #7444. ([#7477](https://github.com/transmission/transmission/pull/7477))
+* Added Afrikaans and Greek translations. ([#7477](https://github.com/transmission/transmission/pull/7477))
 
 ### GTK Client
 
