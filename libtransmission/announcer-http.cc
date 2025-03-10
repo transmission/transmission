@@ -454,7 +454,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     {
         tr_logAddWarn(
             fmt::format(
-                _("Couldn't parse announce response: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse announce response: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())),
             log_name);
@@ -674,7 +674,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     {
         tr_logAddWarn(
             fmt::format(
-                _("Couldn't parse scrape response: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse scrape response: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())),
             log_name);
