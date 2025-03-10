@@ -122,6 +122,11 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
 
     tr_announcerParseHttpAnnounceResponse(response, body, log_name);
 
+    if (!std::empty(response.errmsg))
+    {
+        return false;
+    }
+
     if (!std::empty(response.pex6))
     {
         tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response.pex6)), log_name);
@@ -229,6 +234,22 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     {
         fmt::format_to(out, "&trackerid={}", req.tracker_id);
     }
+
+    if (auto ipv4_addr = session->global_address(TR_AF_INET); ipv4_addr)
+    {
+        auto buf = std::array<char, INET_ADDRSTRLEN>{};
+        auto const display_name = ipv4_addr->display_name(std::data(buf), std::size(buf));
+        fmt::format_to(out, "&ipv4=");
+        tr_urlPercentEncode(out, display_name);
+    }
+
+    if (auto ipv6_addr = session->global_address(TR_AF_INET6); ipv6_addr)
+    {
+        auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+        auto const display_name = ipv6_addr->display_name(std::data(buf), std::size(buf));
+        fmt::format_to(out, "&ipv6=");
+        tr_urlPercentEncode(out, display_name);
+    }
 }
 
 [[nodiscard]] std::string format_ip_arg(std::string_view ip)
@@ -255,8 +276,8 @@ void tr_tracker_http_announce(
        public address they want to use.
 
        We should ensure that we send the announce both via IPv6 and IPv4,
-       but no longer use the "ipv4=" and "ipv6=" parameters. So, we no
-       longer need to compute the global IPv4 and IPv6 addresses.
+       and to be safe we also add the "ipv4=" and "ipv6=" parameters, if
+       we already have them.
      */
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
@@ -433,7 +454,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     {
         tr_logAddWarn(
             fmt::format(
-                _("Couldn't parse announce response: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse announce response: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())),
             log_name);
@@ -653,7 +674,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     {
         tr_logAddWarn(
             fmt::format(
-                _("Couldn't parse scrape response: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse scrape response: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())),
             log_name);
