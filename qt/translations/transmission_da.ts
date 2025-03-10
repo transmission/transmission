@@ -11,12 +11,12 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation>Copyright © Transmission-projektet</translation>
+        <translation>Ophavsret © Transmission-projektet</translation>
     </message>
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>En hurtig og nem BitTorrent-klient</translation>
+        <translation>En hurtig BitTorrent-klient der er let at bruge</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -31,7 +31,7 @@
     <message>
         <location line="+4"/>
         <source>C&amp;redits</source>
-        <translation>&amp;Anerkendelse</translation>
+        <translation>&amp;Anerkendelser</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -41,7 +41,7 @@
     <message>
         <location line="+10"/>
         <source>Credits</source>
-        <translation>Anerkendelse</translation>
+        <translation>Anerkendelser</translation>
     </message>
 </context>
 <context>
@@ -64,9 +64,9 @@
     <message numerus="yes">
         <location line="+107"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent fuldført</numerusform>
+            <numerusform>Torrents fuldført</numerusform>
         </translation>
     </message>
     <message>
@@ -106,7 +106,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 afskaffet efter mislykkede tjeksum)</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -218,12 +218,12 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Modpart er forbundet over µTP</translation>
     </message>
     <message>
         <location line="+161"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj annoncerings-URL for tracker, én pr. linje:</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -256,7 +256,7 @@
     <message>
         <location line="+70"/>
         <source>%1 (Ratio: %2)</source>
-        <translation>%1 (Forhold: %2)</translation>
+        <translation>%1 (forhold: %2)</translation>
     </message>
     <message>
         <location line="+303"/>
@@ -268,15 +268,15 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minut</numerusform>
+            <numerusform>%1 minutter</numerusform>
         </translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj URL&apos;er</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -352,7 +352,7 @@
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Torrent-egenskaber</translation>
+        <translation>Egenskaber for torrent</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiketter:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -677,7 +677,7 @@
     <message>
         <location line="+4"/>
         <source>Verifying</source>
-        <translation>Verificerer</translation>
+        <translation>Bekræftet</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -808,7 +808,7 @@
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>Vis torrent-egenskaber</translation>
+        <translation>Vis egenskaber for torrent</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -858,7 +858,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Start</source>
-        <translation>&amp;Start</translation>
+        <translation>S&amp;tart</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -868,12 +868,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Efterspørg &amp;flere modparter fra tracker</translation>
+        <translation>Spørg om flere modparter fra &amp;tracker</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Efterspørg flere modparter fra tracker</translation>
+        <translation>Spørg om flere modparter fra tracker</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -979,12 +979,12 @@
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>Sortér efter &amp;alder</translation>
+        <translation>Sortér efter a&amp;lder</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>Sortér efter &amp;tilbageværende tid</translation>
+        <translation>Sortér efter til&amp;bageværende tid</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -994,22 +994,22 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Sortér efter &amp;fremgang</translation>
+        <translation>Sortér efter f&amp;remgang</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>Sortér efter &amp;forhold</translation>
+        <translation>Sortér efter f&amp;orhold</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>Sortér efter &amp;størrelse</translation>
+        <translation>Sortér efter s&amp;tørrelse</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>Sortér efter &amp;tilstand</translation>
+        <translation>Sortér efter t&amp;ilstand</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1059,7 +1059,7 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Samlet forhold</translation>
+        <translation>Forhold (samlet)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1069,12 +1069,12 @@
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Samlet overførsel</translation>
+        <translation>Overførsel (samlet)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Transfer</source>
-        <translation>Sessionsoverførsel</translation>
+        <translation>Overførsel (session)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1110,7 +1110,7 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>Kopiér &amp;magnet-link til udklipsholder</translation>
+        <translation>&amp;Kopiér magnet-link til udklipsholder</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1145,12 +1145,12 @@
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>Flyt &amp;nederst</translation>
+        <translation>Flyt n&amp;ederst</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Sortér efter &amp;kø</translation>
+        <translation>Sortér efter k&amp;ø</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+468"/>
@@ -1430,7 +1430,7 @@
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>For at tilføje en reserve-URL, skal du tilføje den på linjen efter den primær-URL.
-For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.</translation>
+For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1468,7 +1468,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke oprette &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1545,7 +1545,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location filename="../PathButton.cc" line="+23"/>
         <location line="+67"/>
         <source>(None)</source>
-        <translation>(Ingen)</translation>
+        <translation>(ingen)</translation>
     </message>
     <message>
         <location line="+96"/>
@@ -1563,7 +1563,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location filename="../PrefsDialog.ui" line="+971"/>
         <source>Use &amp;authentication</source>
-        <translation>Brug &amp;autentifikation</translation>
+        <translation>Brug &amp;godkendelse</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1659,24 +1659,24 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minut</numerusform>
+            <numerusform>%1 minutter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 minut siden</numerusform>
+            <numerusform>%1 minutter siden</numerusform>
         </translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg &quot;Torrent færdig med at downloade&quot;-script</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+447"/>
@@ -1701,7 +1701,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location filename="../PrefsDialog.cc" line="-35"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg &quot;Torrent færdig med at seede&quot;-script</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-520"/>
@@ -1749,7 +1749,10 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trackere som skal bruges på alle offentlige torrents.
+
+For at tilføje en reserve-URL, skal du tilføje den på næste linje efter en primær-URL.
+For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -1898,7 +1901,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+142"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Læser indholdet af brugerens udklipsholder for torrents</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1918,7 +1921,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+254"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP er et værktøj til at reducere ophobning i netværk.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1948,12 +1951,12 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Vis en underretning når torrents bliver &amp;færdige</translation>
+        <translation>Vis en underretning når torrents er &amp;færdige</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>Afspil en &amp;lyd når torrents bliver færdige</translation>
+        <translation>Afspil en &amp;lyd når torrents er færdige</translation>
     </message>
     <message>
         <location line="-195"/>
@@ -2003,55 +2006,55 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>Vælg overvågelsemappe</translation>
+        <translation>Vælg mappe som der skal holdes øje med</translation>
     </message>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>ukendt</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>tjekker …</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>åben</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>closed</source>
-        <translation type="unfinished"></translation>
+        <translation>lukket</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>fejl</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Status: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
     </message>
     <message numerus="yes">
         <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Opdatering lykkedes!&lt;/b&gt;&lt;p&gt;Blokeringsliste har nu %Ln regel.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Opdatering lykkedes!&lt;/b&gt;&lt;p&gt;Blokeringsliste har nu %Ln regler.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Opdater blokeringsliste&lt;/b&gt;&lt;p&gt;Henter ny blokeringsliste …&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2125,73 +2128,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>KiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>MiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>GiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>TiB</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>kB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message>
         <location line="+276"/>
@@ -2252,22 +2255,22 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+38"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (kopi af %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrentdublet</numerusform>
+            <numerusform>Torrentdubletter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kunne ikke tilføje %n torrentdublet</numerusform>
+            <numerusform>Kunne ikke tilføje %n torrentdubletter</numerusform>
         </translation>
     </message>
 </context>
@@ -2306,7 +2309,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+20"/>
         <source>&amp;Authentication required</source>
-        <translation>&amp;Autentifikation kræves</translation>
+        <translation>&amp;Godkendelse kræves</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2325,7 +2328,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2383,7 +2386,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Torrent.cc" line="+307"/>
         <source>Verifying local data</source>
-        <translation>Verificerer lokale data</translation>
+        <translation>Bekræfter lokale data</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2408,7 +2411,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+3"/>
         <source>Queued for verification</source>
-        <translation>Venter på verifikation</translation>
+        <translation>Sat i kø til bekræftelse</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2495,13 +2498,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 tilbage</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tilbageværende tid ukendt</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
@@ -2562,7 +2565,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-95"/>
         <source>Verifying local data (%1% tested)</source>
-        <translation>Verificerer lokale data (%1% testet)</translation>
+        <translation>Bekræfter lokale data (%1% testet)</translation>
     </message>
 </context>
 <context>
@@ -2597,18 +2600,18 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Forespørger flere modparter om %1</translation>
+        <translation>Spørger om flere modparter om %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for more peers</source>
-        <translation>Sat i kø for at efterspørge flere modparter</translation>
+        <translation>Sat i kø til at spørge om flere modparter</translation>
     </message>
     <message>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Spørger om modpartsantal nu … &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-37"/>
@@ -2644,18 +2647,18 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="-20"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Spørger om flere modparter nu … &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Efterspørger modpartsantal om %1</translation>
+        <translation>Spørger om modpartsantal om %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
-        <translation>Sat i kø for at bede om modpartsantal</translation>
+        <translation>Sat i kø til spørge om modpartsantal</translation>
     </message>
 </context>
 <context>
@@ -2663,27 +2666,27 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished">Rediger trackere</translation>
+        <translation>Rediger trackere</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Annoncerings-URL&apos;er for tracker</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>For at tilføje en reserve-URL, skal du tilføje den på næste linje efter en primær-URL.</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Se også Offentlige trackere (standard) i Rediger &gt; Præferencer &gt; Netværk</translation>
     </message>
 </context>
 </TS>

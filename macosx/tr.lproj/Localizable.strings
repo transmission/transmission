@@ -934,7 +934,7 @@
 
 /* Move error alert -> message
    Move inside itself alert -> message */
-"The move operation of \"%@\" cannot be done." = "“%@\" için taşıma işlemi yapılamadı.";
+"The move operation of \"%@\" cannot be done." = "“%@” için taşıma işlemi yapılamadı.";
 
 /* blocklist fail message */
 "The specified blocklist file did not contain any valid rules." = "Belirtilen kara dizelge geçerli bir kural içermiyor.";
@@ -982,13 +982,13 @@
 "There must be at least one file in a folder to create a torrent file." = "Torrent dosyası oluşturmak için bir klasörde en az bir dosya olmalıdır.";
 
 /* Save log alert panel -> message */
-"There was a problem creating the file \"%@\"." = "“%@\" dosyasını oluştururken hata oluştu.";
+"There was a problem creating the file \"%@\"." = "“%@” dosyasını oluştururken hata oluştu.";
 
 /* Move error alert -> title */
 "There was an error moving the data file." = "Veri dosyasını taşırken hata oluştu.";
 
 /* Magnet link failed -> message */
-"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "“%@\" mıknatıs bağını eklerken bir hata oluştu. Aktarım gerçekleşmeyecek.";
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "“%@” mıknatıs bağını eklerken bir hata oluştu. Aktarım gerçekleşmeyecek.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Bu klasörde dosya yok.";

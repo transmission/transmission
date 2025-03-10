@@ -19,7 +19,7 @@
 "%@ verified" = "%@ vérifié";
 
 /* Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld ko/s";
+"%ld KB/s" = "%ld kb/s";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld minutes";
@@ -217,7 +217,7 @@
 "Available" = "Disponible";
 
 /* Transfer speed (bytes per second) */
-"B/s" = "o/s";
+"B/s" = "b/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bande passante";
@@ -406,7 +406,7 @@
 "From: tracker" = "De : traceur";
 
 /* Transfer speed (gigabytes per second) */
-"GB/s" = "Go/s";
+"GB/s" = "Gb/s";
 
 /* Preferences -> toolbar item title */
 "General" = "Général";
@@ -483,7 +483,7 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Il semble que le ficher « %1$@ » de %2$@ n’est pas un fichier torrent.";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "ko/s";
+"KB/s" = "kb/s";
 
 /* Inspector -> Peers tab -> peers */
 "Known:" = "Connus :";
@@ -520,7 +520,7 @@
 "Magnetized transfer" = "Transfert magnétisé";
 
 /* Transfer speed (megabytes per second) */
-"MB/s" = "Mo/s";
+"MB/s" = "Mb/s";
 
 /* Message window -> table column */
 "Message" = "Message";
@@ -918,7 +918,7 @@
 "Support open-source indie software" = "Soutenez les logiciels indépendants à code source ouvert";
 
 /* Transfer speed (terabytes per second) */
-"TB/s" = "To/s";
+"TB/s" = "Tb/s";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "La destination du fichier n’existe pas.";

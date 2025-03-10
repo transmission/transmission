@@ -4,18 +4,18 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Moo, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Evaldas Granickas, 2024
+# Moo, 2025
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 14:06+0000\n"
+"POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Evaldas Granickas, 2024\n"
+"Last-Translator: Moo, 2025\n"
 "Language-Team: Lithuanian (https://app.transifex.com/transmissionbt/teams/33778/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -1103,7 +1103,7 @@ msgstr[3] ""
 
 #: ../gtk/Utils.cc:160 ../gtk/Utils.cc:191 ../gtk/Utils.cc:218 ../gtk/Utils.cc:251
 msgid "now"
-msgstr ""
+msgstr "dabar"
 
 #: ../gtk/Utils.cc:167
 msgid "{days_ago:L} day ago"
@@ -1281,7 +1281,7 @@ msgstr "kB/s"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1690,11 +1690,11 @@ msgstr "Paisyti _visuotinių apribojimų"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:903 ../gtk/ui/gtk4/DetailsDialog.ui:676
 msgid "Limit _download speed ({speed_units}):"
-msgstr ""
+msgstr "Riboti _atsiuntimo greitį ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:918 ../gtk/ui/gtk4/DetailsDialog.ui:688
 msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
+msgstr "Riboti _išsiuntimo greitį ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:935 ../gtk/ui/gtk3/OptionsDialog.ui:143 ../gtk/ui/gtk4/DetailsDialog.ui:700 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
@@ -1800,15 +1800,15 @@ msgstr "Pranešimų žurnalas"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:26 ../gtk/ui/gtk4/MessageLogWindow.ui:31
 msgid "Save _As"
-msgstr ""
+msgstr "Įrašyti k_aip"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:41 ../gtk/ui/gtk4/MessageLogWindow.ui:55
 msgid "Clear"
-msgstr ""
+msgstr "Išvalyti"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:66 ../gtk/ui/gtk4/MessageLogWindow.ui:84
 msgid "P_ause"
-msgstr ""
+msgstr "Prist_abdyti"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:96 ../gtk/ui/gtk4/MessageLogWindow.ui:100
 msgid "Level"
@@ -2315,7 +2315,7 @@ msgstr ""
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:692
+#: ../libtransmission/peer-io.cc:666
 msgid "Unknown state: {state}"
 msgstr ""
 
@@ -2639,19 +2639,31 @@ msgstr ""
 msgid "Couldn't wait for directory changes"
 msgstr ""
 
-#: ../libtransmission/web.cc:185
+#: ../libtransmission/web.cc:173 ../libtransmission/web.cc:180
+msgid "Consider upgrading your curl installation."
+msgstr ""
+
+#: ../libtransmission/web.cc:175
+msgid "curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"
+msgstr ""
+
+#: ../libtransmission/web.cc:182
+msgid "curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"
+msgstr ""
+
+#: ../libtransmission/web.cc:197
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr ""
 
-#: ../libtransmission/web.cc:186
+#: ../libtransmission/web.cc:198
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr ""
 
-#: ../libtransmission/web.cc:187
+#: ../libtransmission/web.cc:199
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:463
+#: ../libtransmission/web.cc:496
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
