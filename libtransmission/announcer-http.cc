@@ -122,6 +122,11 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
 
     tr_announcerParseHttpAnnounceResponse(response, body, log_name);
 
+    if (!std::empty(response.errmsg))
+    {
+        return false;
+    }
+
     if (!std::empty(response.pex6))
     {
         tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response.pex6)), log_name);
