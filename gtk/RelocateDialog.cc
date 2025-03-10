@@ -37,9 +37,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::vector<tr_torrent_id_t> const& torrent_ids);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onResponse(int response);
@@ -81,7 +83,7 @@ void RelocateDialog::Impl::startMovingNextTorrent()
     torrent_ids_.pop_back();
 
     message_dialog_->set_message(
-        fmt::format(_("Moving '{torrent_name}'"), fmt::arg("torrent_name", tr_torrentName(tor))),
+        fmt::format(fmt::runtime(_("Moving '{torrent_name}'")), fmt::arg("torrent_name", tr_torrentName(tor))),
         true);
 }
 

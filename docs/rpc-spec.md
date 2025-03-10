@@ -160,7 +160,7 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `sequentialDownload`  | boolean  | download torrent pieces sequentially
+| `sequential_download` | boolean  | download torrent pieces sequentially
 | `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
 | `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
@@ -271,7 +271,7 @@ The 'source' column here corresponds to the data structure there.
 | `seedIdleMode`| number| tr_inactivelimit
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
-| `sequentialDownload`| boolean| tr_torrent
+| `sequential_download`| boolean| tr_torrent
 | `sizeWhenDone`| number| tr_stat
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
@@ -297,8 +297,8 @@ The 'source' column here corresponds to the data structure there.
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
-| `beginPiece` | number | tr_file_view
-| `endPiece` | number | tr_file_view
+| `begin_piece` | number | tr_file_view
+| `end_piece` | number | tr_file_view
 
 Files are returned in the order they are laid out in the torrent. References to "file indices" throughout this specification should be interpreted as the position of the file within this ordering, with the first file bearing index 0.
 
@@ -456,19 +456,20 @@ Request arguments:
 
 | Key | Value Type | Description
 |:--|:--|:--
-| `cookies`            | string    | pointer to a string of one or more cookies.
-| `download-dir`       | string    | path to download the torrent to
-| `filename`           | string    | filename or URL of the .torrent file
-| `labels`             | array     | array of string labels
-| `metainfo`           | string    | base64-encoded .torrent content
-| `paused`             | boolean   | if true, don't start the torrent
-| `peer-limit`         | number    | maximum number of peers
-| `bandwidthPriority`  | number    | torrent's bandwidth tr_priority_t
-| `files-wanted`       | array     | indices of file(s) to download
-| `files-unwanted`     | array     | indices of file(s) to not download
-| `priority-high`      | array     | indices of high-priority file(s)
-| `priority-low`       | array     | indices of low-priority file(s)
-| `priority-normal`    | array     | indices of normal-priority file(s)
+| `cookies`             | string    | pointer to a string of one or more cookies.
+| `download-dir`        | string    | path to download the torrent to
+| `filename`            | string    | filename or URL of the .torrent file
+| `labels`              | array     | array of string labels
+| `metainfo`            | string    | base64-encoded .torrent content
+| `paused`              | boolean   | if true, don't start the torrent
+| `peer-limit`          | number    | maximum number of peers
+| `bandwidthPriority`   | number    | torrent's bandwidth tr_priority_t
+| `files-wanted`        | array     | indices of file(s) to download
+| `files-unwanted`      | array     | indices of file(s) to not download
+| `priority-high`       | array     | indices of high-priority file(s)
+| `priority-low`        | array     | indices of low-priority file(s)
+| `priority-normal`     | array     | indices of normal-priority file(s)
+| `sequential_download` | boolean   | download torrent pieces sequentially
 
 Either `filename` **or** `metainfo` **must** be included. All other arguments are optional.
 
@@ -572,6 +573,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
 | `seedRatioLimit` | double | the default seed ratio for torrents to use
 | `seedRatioLimited` | boolean | true if seedRatioLimit is honored by default
+| `sequential_download` | boolean | true means sequential download is enabled by default for added torrents
 | `session-id` | string | the current `X-Transmission-Session-Id` value
 | `speed-limit-down-enabled` | boolean | true means enabled
 | `speed-limit-down` | number | max global download speed (KBps)
@@ -668,8 +670,8 @@ from the outside world.
 
 Method name: `port-test`
 
-Request arguments: an optional argument `ipProtocol`.
-`ipProtocol` is a string specifying the IP protocol version to be used for the port test.
+Request arguments: an optional argument `ip_protocol`.
+`ip_protocol` is a string specifying the IP protocol version to be used for the port test.
 Set to `ipv4` to check IPv4, or set to `ipv6` to check IPv6.
 For backwards compatibility, it is allowed to omit this argument to get the behaviour before Transmission `4.1.0`,
 which is to check whichever IP protocol the OS happened to use to connect to our port test service,
@@ -680,7 +682,7 @@ Response arguments:
 | Key | Value Type | Description
 | :-- | :-- | :--
 | `port-is-open` | boolean | true if port is open, false if port is closed
-| `ipProtocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if it cannot be determined
+| `ip_protocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if it cannot be determined
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
@@ -950,7 +952,7 @@ Transmission 2.30 (`rpc-version-semver` 4.0.0, `rpc-version`: 13)
 | Method | Description
 |:---|:---
 | `torrent-get` | :bomb: removed arg `peersKnown`
-| `session-get` | new arg `isUTP` to the `peers` list
+| `torrent-get` | new arg `isUTP` to the `peers` list
 | `torrent-add` | new arg `cookies`
 
 Transmission 2.40 (`rpc-version-semver` 5.0.0, `rpc-version`: 14)
@@ -1027,8 +1029,11 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | Method | Description
 |:---|:---
-| `torrent-get` | new arg `sequentialDownload`
-| `torrent-set` | new arg `sequentialDownload`
-| `torrent-get` | new arg `files.beginPiece`
-| `torrent-get` | new arg `files.endPiece`
-| `port-test` | new arg `ipProtocol`
+| `session-get` | new arg `sequential_download`
+| `session-set` | new arg `sequential_download`
+| `torrent-add` | new arg `sequential_download`
+| `torrent-get` | new arg `sequential_download`
+| `torrent-set` | new arg `sequential_download`
+| `torrent-get` | new arg `files.begin_piece`
+| `torrent-get` | new arg `files.end_piece`
+| `port-test` | new arg `ip_protocol`

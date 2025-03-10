@@ -66,7 +66,7 @@ jobs:
           get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
           get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web        CMakeLists.txt cmake third-party libtransmission web
+          get_changes web        CMakeLists.txt cmake web
           get_changes ci-actions .github/workflows/actions.yml
           cat "$GITHUB_OUTPUT"
 
@@ -189,9 +189,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew uninstall -f pkg-config pkg-config@0.29.2 # https://github.com/actions/runner-images/issues/10984
-          brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -313,7 +311,10 @@ jobs:
   macos-15-project:
      runs-on: macos-15
      needs: [ what-to-make ]
-     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+             needs.what-to-make.outputs.make-daemon == 'true' ||
+             needs.what-to-make.outputs.make-mac == 'true' ||
+             needs.what-to-make.outputs.make-utils == 'true' }}
      steps:
        - name: Show Configuration
          run: |
@@ -335,7 +336,13 @@ jobs:
   macos-15-arm64:
     runs-on: macos-15
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+            needs.what-to-make.outputs.make-daemon == 'true' ||
+            needs.what-to-make.outputs.make-gtk == 'true' ||
+            needs.what-to-make.outputs.make-mac == 'true' ||
+            needs.what-to-make.outputs.make-qt == 'true' ||
+            needs.what-to-make.outputs.make-tests == 'true' ||
+            needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -343,9 +350,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew uninstall -f pkg-config pkg-config@0.29.2 # https://github.com/actions/runner-images/issues/10984
-          brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -391,9 +396,9 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  # Only verify build support on older macOS and SDK
-  macos-12:
-    runs-on: macos-12
+  # oldest GitHub build support on macOS (Transmission supports macOS 11.0 and newer)
+  macos-13:
+    runs-on: macos-13
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
@@ -403,17 +408,17 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew unlink pkg-config # https://github.com/actions/runner-images/issues/10984
-          brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
           path: src
           submodules: recursive
-      - name: Set Xcode to 13.2.1
+      # oldest GitHub build support for Xcode (Transmission supports Xcode 12.5.1 and newer)
+      - name: Set Xcode to 14.1
         run: |
-          sudo xcode-select --switch /Applications/Xcode_13.2.1.app
+          # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#xcode
+          sudo xcode-select --switch /Applications/Xcode_14.1.app
       - name: Configure
         run: |
           cmake \
@@ -622,9 +627,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew uninstall -f pkg-config pkg-config@0.29.2 # https://github.com/actions/runner-images/issues/10984
-          brew install --formulae cmake gettext ninja node pkgconf
+        run: brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -672,10 +675,16 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  # Oldest GitHub support for QT on Mac
+  # Oldest GitHub support for CLI, GTK and QT on Mac
   macos-13-x86_64-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+            needs.what-to-make.outputs.make-daemon == 'true' ||
+            needs.what-to-make.outputs.make-gtk == 'true' ||
+            needs.what-to-make.outputs.make-mac == 'true' ||
+            needs.what-to-make.outputs.make-qt == 'true' ||
+            needs.what-to-make.outputs.make-tests == 'true' ||
+            needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: macos-13
     steps:
       - name: Show Configuration
@@ -684,9 +693,10 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: |
-          brew unlink pkg-config # https://github.com/actions/runner-images/issues/10984
-          brew install --formulae cmake gettext ninja node pkgconf
+        run: brew install --formulae cmake gettext ninja node pkgconf
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: brew install --formula gtkmm3
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: brew install --formula qt
@@ -706,76 +716,11 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
-            -DENABLE_CLI=OFF \
-            -DENABLE_DAEMON=OFF \
-            -DENABLE_GTK=OFF \
-            -DENABLE_MAC=OFF  \
-            -DENABLE_QT=ON \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=OFF \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_EVENT2=OFF \
-            -DUSE_SYSTEM_DEFLATE=OFF \
-            -DUSE_SYSTEM_DHT=OFF \
-            -DUSE_SYSTEM_MINIUPNPC=OFF \
-            -DUSE_SYSTEM_NATPMP=OFF \
-            -DUSE_SYSTEM_UTP=OFF \
-            -DUSE_SYSTEM_B64=OFF \
-            -DUSE_SYSTEM_PSL=OFF
-      - name: Make
-        run: cmake --build obj --config RelWithDebInfo
-      - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        env:
-          TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
-      - name: Install
-        run: cmake --build obj --config RelWithDebInfo --target install/strip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: binaries-${{ github.job }}
-          path: pfx/**/*
-
-  # Oldest GitHub support for CLI and GTK on Mac
-  macos-12-x86_64-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: macos-12
-    steps:
-      - name: Show Configuration
-        run: |
-          echo '${{ toJSON(needs) }}'
-          echo '${{ toJSON(runner) }}'
-          sw_vers
-      - name: Get Dependencies
-        run: |
-          brew unlink pkg-config # https://github.com/actions/runner-images/issues/10984
-          brew install --formulae cmake gettext ninja node pkgconf
-      - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: brew install --formula gtkmm3
-      - name: Get Source
-        uses: actions/download-artifact@v4
-        with:
-          name: source-tarball
-      - name: Extract Source
-        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
-      - name: Configure
-        run: |
-          cmake \
-            -S src \
-            -B obj \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCMAKE_INSTALL_PREFIX=pfx \
-            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
@@ -835,9 +780,12 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            npm \
             pkg-config \
             xz-utils
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
@@ -957,10 +905,10 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  ubuntu-20-04-from-tarball:
+  ubuntu-22-04-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Show Configuration
         run: |
@@ -1080,3 +1028,67 @@ jobs:
       working-directory: ./android
       run: |
         gradle build
+
+  ubuntu-24-04-cxx-23:
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            appstream \
+            ca-certificates \
+            clang \
+            cmake \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: sudo apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+      - name: Get Source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: src
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_CXX_STANDARD=23 \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=OFF \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo -- "-k 0"

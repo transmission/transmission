@@ -1,0 +1,51 @@
+
+/* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
+"21.title" = "Stukke:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
+"22.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Secure:"; ObjectID = "24"; */
+"24.title" = "Beveilig:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "25"; */
+"25.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Data File:"; ObjectID = "26"; */
+"26.title" = "Datalêer:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "27"; */
+"27.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
+"28.title" = "Waar";
+
+/* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
+"30.title" = "Skepper:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
+"31.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Created On:"; ObjectID = "32"; */
+"32.title" = "Geskep op:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
+"33.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "35"; */
+"35.title" = "Kommentaar:";
+
+/* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
+"36.title" = "Huts:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
+"37.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
+"41.title" = "Torrentinligting";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "7YU-bS-UkI"; */
+"7YU-bS-UkI.placeholderString" = "NVT";
+
+/* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
+/* "uaW-NM-PTU.title" = ""; */

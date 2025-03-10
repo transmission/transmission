@@ -1,13 +1,19 @@
 /// MIXINS
 
-@mixin for-phone-only {
+@mixin viewport-small {
   @media (width < 600px) {
     @content;
   }
 }
 
-@mixin for-tablet-portrait-up {
+@mixin viewport-medium {
   @media (width >= 600px) {
+    @content;
+  }
+}
+
+@mixin viewport-large {
+  @media (width >= 950px) {
     @content;
   }
 }
@@ -20,8 +26,7 @@
   --dialog-logo-padding: calc(var(--dialog-padding) * 0.66);
   --dialog-padding: 20px;
   --logo-size: 64px;
-  --pauseresume-size: 20px;
-  --popup-top: 51px; // TODO: ugly that this is hardcoded
+  --popup-top: 82px; // TODO: ugly that this is hardcoded
   --toolbar-height: 50px;
 
   /* colors related to torrent status */
@@ -59,10 +64,6 @@
   --image-chevron-up: url('../img/chevron-up.svg');
   --image-lock-fill: url('../img/lock-fill.svg');
   --image-magnet: url('../img/magnet.svg');
-  --image-pause-circle-active: url('../img/pause-circle-active.svg');
-  --image-pause-circle-idle: url('../img/pause-circle-idle.svg');
-  --image-play-circle-active: url('../img/play-circle-active.svg');
-  --image-play-circle-idle: url('../img/play-circle-idle.svg');
 
   --app-image-url: url('../img/box.svg');
   --audio-image-url: url('../img/music.svg');
@@ -385,7 +386,7 @@ a {
   height: 30px;
   padding-left: 5px;
 
-  @include for-phone-only {
+  @include viewport-small {
     :not(select):not(input):not(option):not(.flexible-space) {
       display: none;
     }
@@ -409,8 +410,8 @@ a {
     align-items: inherit;
     flex-direction: inherit;
 
-    &:not(:nth-child(1 of #mainwin-statusbar .speed-container)) {
-      width: 100px;
+    + .speed-container {
+      min-width: 100px;
     }
   }
 
@@ -451,7 +452,9 @@ a {
   -webkit-user-select: none;
 
   .torrent {
+    align-items: center;
     border-bottom: 1px solid var(--color-border-default);
+    display: grid;
 
     &:nth-child(even) {
       background-color: var(--color-bg-even);
@@ -518,6 +521,7 @@ a {
 
     .torrent-name {
       font-weight: bold;
+      grid-area: name;
       margin-bottom: 2px;
       margin-top: 2px;
       overflow: hidden;
@@ -533,6 +537,7 @@ a {
     .torrent-labels {
       font-size: small;
       font-weight: normal;
+      grid-area: labels;
       margin-bottom: 2px;
       margin-top: 2px;
       overflow: hidden;
@@ -553,28 +558,35 @@ a {
       border: 1px solid var(--color-border-default);
     }
 
-    .torrent-progress-details,
     .torrent-peer-details {
+      grid-area: peers;
+    }
+
+    .torrent-progress-bar {
+      grid-area: progressbar;
+    }
+
+    .torrent-progress-details {
+      grid-area: progress-text;
+    }
+
+    .torrent-peer-details,
+    .torrent-progress-details {
+      font-size: small;
+
       &.error {
         color: var(--color-fg-error);
       }
     }
 
-    .torrent-progress-details,
-    .torrent-peer-details {
-      font-size: small;
-    }
-
     &.compact {
       --icon-size: 16px;
 
-      align-items: center;
-      display: flex;
-      flex-direction: row-reverse;
+      grid-template-areas: 'icon name labels peers progressbar';
+      grid-template-columns: calc(var(--icon-size) + 10px) auto 1fr auto auto;
 
       .icon {
         -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
-        flex-shrink: 0;
         height: var(--icon-size);
         mask-size: var(--icon-size), calc(var(--icon-size) / 2);
         width: var(--icon-size);
@@ -584,6 +596,10 @@ a {
         }
       }
 
+      .torrent-peer-details {
+        white-space: nowrap;
+      }
+
       > * {
         margin: 5px;
       }
@@ -591,8 +607,7 @@ a {
 
     &:not(.compact) {
       --icon-size: 32px;
-      align-items: center;
-      display: grid;
+
       grid-column-gap: 12px;
       grid-template-areas:
         'icon name labels'
@@ -609,26 +624,9 @@ a {
         width: var(--icon-size);
       }
 
-      .torrent-name {
-        grid-area: name;
-      }
-
-      .torrent-labels {
-        grid-area: labels;
-      }
-
-      .torrent-peer-details {
-        grid-area: peers;
-      }
-
-      .torrent-progress {
+      .torrent-progress-bar {
         display: flex;
         flex-direction: row;
-        grid-area: progressbar;
-      }
-
-      .torrent-progress-details {
-        grid-area: progress-text;
       }
 
       > * {
@@ -663,32 +661,6 @@ a {
     background-repeat: no-repeat;
   }
 
-  .torrent-pauseresume-button {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: var(--pauseresume-size);
-    margin-left: calc(var(--pauseresume-size) / 2);
-    width: var(--pauseresume-size);
-
-    &[data-action='pause'] {
-      background-image: var(--image-pause-circle-idle);
-
-      &:active,
-      &:hover {
-        background-image: var(--image-pause-circle-active);
-      }
-    }
-
-    &[data-action='resume'] {
-      background-image: var(--image-play-circle-idle);
-
-      &:active,
-      &:hover {
-        background-image: var(--image-play-circle-active);
-      }
-    }
-  }
-
   .torrent-progress-bar {
     font-size: 14px;
     position: relative;
@@ -696,14 +668,13 @@ a {
     border-radius: 3px;
     height: 18px;
 
-    &.full {
+    &:not(.compact) {
       flex-grow: 1;
       margin: 2px 0;
     }
 
     &.compact {
       min-width: 100px;
-      width: 10vw;
     }
 
     &.leech {
@@ -798,21 +769,17 @@ a {
 
 /// PREFERENCES DIALOG
 
-@include for-phone-only {
+@include viewport-small {
   input[type='checkbox'] {
     height: 20px;
     width: 20px;
   }
 }
 
-#inspector,
-#prefs-dialog {
-  @include for-phone-only {
-    left: 0;
-  }
-  @include for-tablet-portrait-up {
-    border-left: 1px solid var(--color-border-default);
-    width: 570px;
+#inspector {
+  @include viewport-large {
+    box-shadow: initial;
+    position: initial;
   }
 }
 
@@ -821,7 +788,6 @@ a {
   background: $background-color;
   bottom: 0;
   right: 0;
-  top: var(--popup-top);
   z-index: var(--z-index-popup);
 
   .tabs-page {
@@ -936,11 +902,14 @@ a {
   top: var(--popup-top);
   z-index: var(--z-index-popup);
 
-  @include for-phone-only {
+  @include viewport-small {
+    top: 0;
     left: 0;
   }
-  @include for-tablet-portrait-up {
-    width: 550px;
+  @include viewport-medium {
+    border-left: 1px solid var(--color-border-default);
+    min-width: 570px;
+    width: 570px;
   }
 }
 
@@ -977,10 +946,10 @@ a {
   overflow-x: hidden;
   overflow-y: auto;
 
-  @include for-phone-only {
+  @include viewport-small {
     padding: 0 8px 20px;
   }
-  @include for-tablet-portrait-up {
+  @include viewport-medium {
     padding: 0 20px 20px;
   }
 }
@@ -1231,7 +1200,7 @@ a {
   .percent-done {
     width: 10%;
 
-    @include for-phone-only {
+    @include viewport-small {
       width: 12%;
     }
   }
@@ -1246,7 +1215,7 @@ a {
     overflow-x: hidden;
     text-overflow: ellipsis;
 
-    @include for-phone-only {
+    @include viewport-small {
       text-align: left;
       width: 20%;
     }
@@ -1256,7 +1225,7 @@ a {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @include for-tablet-portrait-up {
+    @include viewport-medium {
       width: 20%;
     }
   }
@@ -1363,7 +1332,7 @@ a {
   top: 50px;
   z-index: var(--z-index-popup);
 
-  @include for-phone-only {
+  @include viewport-small {
     height: 80vh;
   }
 
@@ -1492,7 +1461,7 @@ a {
 
 /// DIALOGS
 
-@include for-phone-only {
+@include viewport-small {
   .dialog-buttons {
     padding-top: var(--dialog-logo-padding);
   }
@@ -1515,7 +1484,7 @@ a {
   }
 }
 
-@include for-tablet-portrait-up {
+@include viewport-medium {
   .dialog-container {
     min-width: 500px;
     position: absolute;
@@ -1583,7 +1552,7 @@ dialog {
   padding: 0;
   z-index: var(--z-index-popup);
 
-  @include for-tablet-portrait-up {
+  @include viewport-medium {
     border: 0;
     border-radius: 8px;
     max-width: 50%;
@@ -1703,10 +1672,10 @@ dialog {
     grid-template-columns: auto 1fr;
     margin-top: 4px;
 
-    @include for-phone-only {
+    @include viewport-small {
       margin: 4px 0 16px;
     }
-    @include for-tablet-portrait-up {
+    @include viewport-medium {
       margin: 4px 16px 16px;
     }
 

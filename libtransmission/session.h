@@ -57,6 +57,7 @@
 #include "libtransmission/settings.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
+#include "libtransmission/torrent-queue.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
@@ -230,6 +231,25 @@ private:
         tr_session& session_;
     };
 
+    class QueueMediator final : public tr_torrent_queue::Mediator
+    {
+    public:
+        explicit QueueMediator(tr_session& session) noexcept
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] std::string config_dir() const override
+        {
+            return session_.configDir();
+        }
+
+        [[nodiscard]] std::string store_filename(tr_torrent_id_t id) const override;
+
+    private:
+        tr_session& session_;
+    };
+
     class WebMediator final : public tr_web::Mediator
     {
     public:
@@ -384,6 +404,7 @@ public:
         bool script_torrent_done_enabled = false;
         bool script_torrent_done_seeding_enabled = false;
         bool seed_queue_enabled = false;
+        bool sequential_download = false;
         bool should_delete_source_torrents = false;
         bool should_scrape_paused_torrents = true;
         bool should_start_added_torrents = true;
@@ -403,6 +424,7 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
+        std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::string announce_ip;
         std::string bind_address_ipv4;
@@ -423,7 +445,6 @@ public:
         tr_port peer_port_random_high = tr_port::from_host(65535);
         tr_port peer_port_random_low = tr_port::from_host(49152);
         tr_port peer_port = tr_port::from_host(TR_DEFAULT_PEER_PORT);
-        tr_preferred_transport preferred_transport = TR_PREFER_UTP;
         tr_tos_t peer_socket_tos{ 0x04 };
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
 
@@ -478,6 +499,7 @@ public:
                 { TR_KEY_script_torrent_done_seeding_filename, &script_torrent_done_seeding_filename },
                 { TR_KEY_seed_queue_enabled, &seed_queue_enabled },
                 { TR_KEY_seed_queue_size, &seed_queue_size },
+                { TR_KEY_sequential_download, &sequential_download },
                 { TR_KEY_sleep_per_seconds_during_verify, &sleep_per_seconds_during_verify },
                 { TR_KEY_speed_limit_down, &speed_limit_down },
                 { TR_KEY_speed_limit_down_enabled, &speed_limit_down_enabled },
@@ -528,14 +550,24 @@ public:
         return session_thread_->event_base();
     }
 
-    [[nodiscard]] constexpr auto& torrents()
+    [[nodiscard]] constexpr tr_torrents& torrents()
     {
         return torrents_;
     }
 
-    [[nodiscard]] constexpr auto const& torrents() const
+    [[nodiscard]] constexpr tr_torrents const& torrents() const
     {
         return torrents_;
+    }
+
+    [[nodiscard]] constexpr auto& torrent_queue()
+    {
+        return torrent_queue_;
+    }
+
+    [[nodiscard]] constexpr auto const& torrent_queue() const
+    {
+        return torrent_queue_;
     }
 
     [[nodiscard]] auto unique_lock() const
@@ -550,7 +582,7 @@ public:
 
     // paths
 
-    [[nodiscard]] constexpr auto const& configDir() const noexcept
+    [[nodiscard]] constexpr std::string const& configDir() const noexcept
     {
         return config_dir_;
     }
@@ -705,6 +737,16 @@ public:
     constexpr void set_reqq(size_t reqq) noexcept
     {
         settings_.reqq = reqq;
+    }
+
+    [[nodiscard]] constexpr auto sequential_download() const noexcept
+    {
+        return settings().sequential_download;
+    }
+
+    void set_sequential_download(bool seq) noexcept
+    {
+        settings_.sequential_download = seq;
     }
 
     // bandwidth
@@ -942,7 +984,7 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
-    [[nodiscard]] constexpr auto preferred_transport() const noexcept
+    [[nodiscard]] constexpr auto const& preferred_transport() const noexcept
     {
         return settings().preferred_transport;
     }
@@ -1265,6 +1307,9 @@ private:
     tr_open_files open_files_;
 
     libtransmission::Blocklists blocklists_;
+
+    QueueMediator torrent_queue_mediator_{ *this };
+    tr_torrent_queue torrent_queue_{ torrent_queue_mediator_ };
 
 private:
     /// other fields
