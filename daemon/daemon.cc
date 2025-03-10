@@ -491,11 +491,11 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             break;
 
         case 994:
-            tr_variantDictAddBool(&settings_, TR_KEY_sequentialDownload, true);
+            tr_variantDictAddBool(&settings_, TR_KEY_sequential_download, true);
             break;
 
         case 995:
-            tr_variantDictAddBool(&settings_, TR_KEY_sequentialDownload, false);
+            tr_variantDictAddBool(&settings_, TR_KEY_sequential_download, false);
             break;
 
         case 'd':

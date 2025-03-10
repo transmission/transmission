@@ -737,7 +737,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_seedIdleLimit,
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
-    TR_KEY_sequentialDownload,
+    TR_KEY_sequential_download,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -963,7 +963,7 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Location: {:s}\n", *sv);
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_sequentialDownload); b)
+        if (auto b = t->value_if<bool>(TR_KEY_sequential_download); b)
         {
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
         }
@@ -1837,7 +1837,7 @@ void print_session(tr_variant::Map const& map)
         fmt::print("  Maximum memory cache size: {:s}\n", Memory{ *i, Memory::Units::MBytes }.to_string());
     }
 
-    if (auto b = args->value_if<bool>(TR_KEY_sequentialDownload); b)
+    if (auto b = args->value_if<bool>(TR_KEY_sequential_download); b)
     {
         fmt::print("  Sequential download: {:s}\n", *b ? "Yes" : "No");
     }
@@ -3140,11 +3140,11 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             switch (c)
             {
             case 994:
-                args.insert_or_assign(TR_KEY_sequentialDownload, true);
+                args.insert_or_assign(TR_KEY_sequential_download, true);
                 break;
 
             case 995:
-                args.insert_or_assign(TR_KEY_sequentialDownload, false);
+                args.insert_or_assign(TR_KEY_sequential_download, false);
                 break;
 
             default:
