@@ -57,6 +57,7 @@
 #include "libtransmission/settings.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
+#include "libtransmission/torrent-queue.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
@@ -225,6 +226,25 @@ private:
                 session_.onAdvertisedPeerPortChanged();
             }
         }
+
+    private:
+        tr_session& session_;
+    };
+
+    class QueueMediator final : public tr_torrent_queue::Mediator
+    {
+    public:
+        explicit QueueMediator(tr_session& session) noexcept
+            : session_{ session }
+        {
+        }
+
+        [[nodiscard]] std::string config_dir() const override
+        {
+            return session_.configDir();
+        }
+
+        [[nodiscard]] std::string store_filename(tr_torrent_id_t id) const override;
 
     private:
         tr_session& session_;
@@ -525,14 +545,24 @@ public:
         return session_thread_->event_base();
     }
 
-    [[nodiscard]] constexpr auto& torrents()
+    [[nodiscard]] constexpr tr_torrents& torrents()
     {
         return torrents_;
     }
 
-    [[nodiscard]] constexpr auto const& torrents() const
+    [[nodiscard]] constexpr tr_torrents const& torrents() const
     {
         return torrents_;
+    }
+
+    [[nodiscard]] constexpr auto& torrent_queue()
+    {
+        return torrent_queue_;
+    }
+
+    [[nodiscard]] constexpr auto const& torrent_queue() const
+    {
+        return torrent_queue_;
     }
 
     [[nodiscard]] auto unique_lock() const
@@ -547,7 +577,7 @@ public:
 
     // paths
 
-    [[nodiscard]] constexpr auto const& configDir() const noexcept
+    [[nodiscard]] constexpr std::string const& configDir() const noexcept
     {
         return config_dir_;
     }
@@ -1262,6 +1292,9 @@ private:
     tr_open_files open_files_;
 
     libtransmission::Blocklists blocklists_;
+
+    QueueMediator torrent_queue_mediator_{ *this };
+    tr_torrent_queue torrent_queue_{ torrent_queue_mediator_ };
 
 private:
     /// other fields
