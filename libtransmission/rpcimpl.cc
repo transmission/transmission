@@ -1449,7 +1449,7 @@ namespace make_torrent_field_helpers
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download))
+        if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
         {
             tor->set_sequential_download(*val);
         }
@@ -1655,7 +1655,7 @@ void portTest(tr_session* session, tr_variant::Map const& args_in, DoneCb&& done
     auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
     auto ip_proto = std::optional<tr_web::FetchOptions::IPProtocol>{};
 
-    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ip_protocol))
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ip_protocol); val)
     {
         if (*val == "ipv4"sv)
         {
