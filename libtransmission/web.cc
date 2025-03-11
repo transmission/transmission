@@ -621,9 +621,9 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
         }
 
-        if (auto const& proxyUrl = mediator.proxyUrl().value_or(""); !std::empty(proxyUrl))
+        if (auto const& proxy_url = mediator.proxyUrl().value_or(""); !std::empty(proxy_url))
         {
-            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxyUrl.data());
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url.data());
         }
 
         if (auto const& range = task.range(); range)
