@@ -150,7 +150,7 @@ public:
         }
 
         // Return the preferred proxy url
-        [[nodiscard]] virtual std::optional<std::string_view> proxyUrl() const
+        [[nodiscard]] virtual std::optional<std::string> proxyUrl() const
         {
             return std::nullopt;
         }
