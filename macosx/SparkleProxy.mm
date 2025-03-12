@@ -2,8 +2,13 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#if __has_feature(modules)
 @import ObjectiveC;
 @import AppKit;
+#else
+#import <objc/runtime.h>
+#import <AppKit/AppKit.h>
+#endif
 #import "NSStringAdditions.h"
 
 // Development-only proxy when app is not signed for running Sparkle
