@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-09 12:32+0000\n"
+"POT-Creation-Date: 2025-03-10 22:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: abc0922001 <abc0922001@hotmail.com>, 2024\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
@@ -32,67 +32,67 @@ msgstr "無"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:197 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:240 ../libtransmission/blocklist.cc:338 ../libtransmission/blocklist.cc:353 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
+#: ../daemon/daemon.cc:200 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "無法讀取 '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:222 ../gtk/Session.cc:862 ../gtk/Utils.cc:272 ../libtransmission/watchdir.cc:91
+#: ../daemon/daemon.cc:225 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
 msgstr "無法加入 torrent 檔案 '{path}'"
 
-#: ../daemon/daemon.cc:231
+#: ../daemon/daemon.cc:234
 msgid "Removing torrent file '{path}'"
 msgstr "正在移除 torrent 檔案 '{path}'"
 
-#: ../daemon/daemon.cc:236 ../gtk/Utils.cc:555 ../libtransmission/utils.cc:636
+#: ../daemon/daemon.cc:239 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "無法移除 '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:637
+#: ../daemon/daemon.cc:648
 msgid "Couldn't parse log level '{level}'"
 msgstr "無法解析記錄層級 '{level}'"
 
-#: ../daemon/daemon.cc:684
+#: ../daemon/daemon.cc:696
 msgid "Deferring reload until session is fully started."
 msgstr "在工作階段啟動完成前，延遲重新載入。"
 
-#: ../daemon/daemon.cc:698
+#: ../daemon/daemon.cc:710
 msgid "Reloading settings from '{path}'"
 msgstr "正在從 '{path}' 重新載入設定"
 
-#: ../daemon/daemon.cc:722
+#: ../daemon/daemon.cc:734
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "無法初始化常駐程式：{error} ({error_code})"
 
-#: ../daemon/daemon.cc:734
+#: ../daemon/daemon.cc:746
 msgid "Loading settings from '{path}'"
 msgstr "正在從 '{path}' 讀取設定"
 
-#: ../daemon/daemon.cc:755
+#: ../daemon/daemon.cc:767
 msgid "Saved pidfile '{path}'"
 msgstr "已儲存 pidfile 於 '{path}'"
 
-#: ../daemon/daemon.cc:761 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:473 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1084 ../libtransmission/torrent.cc:2073 ../libtransmission/variant.cc:876
+#: ../daemon/daemon.cc:773 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1005 ../libtransmission/torrent.cc:1994 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "無法儲存 '{path}'：{error} ({error_code})"
 
-#: ../daemon/daemon.cc:770
+#: ../daemon/daemon.cc:782
 msgid "Requiring authentication"
 msgstr "需要認證"
 
-#: ../daemon/daemon.cc:792
+#: ../daemon/daemon.cc:804
 msgid "Watching '{path}' for new torrent files"
 msgstr "正在監看 '{path}' 以取得新 torrent 檔案"
 
-#: ../daemon/daemon.cc:837 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
+#: ../daemon/daemon.cc:849 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr "無法建立事件：{error} ({error_code})"
 
-#: ../daemon/daemon.cc:847 ../libtransmission/watchdir-kqueue.cc:126
+#: ../daemon/daemon.cc:859 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "無法加入事件：{error} ({error_code})"
 
-#: ../daemon/daemon.cc:861
+#: ../daemon/daemon.cc:873
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "無法啟動常駐程式事件迴圈：{error} ({error_code})"
 
@@ -108,7 +108,7 @@ msgstr "收到終止信號，正在嘗試正常關閉。如果卡住了，請再
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr "Transmission 是一個檔案分享程式。當您執行 torrent 時，其資料將以上傳的方式提供給其他人。您必須為自己分享的內容負起所有責任。"
 
-#: ../gtk/Application.cc:790 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
+#: ../gtk/Application.cc:790 ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
 msgstr "取消 (_C)"
 
@@ -232,7 +232,7 @@ msgstr "已完成"
 msgid "Paused"
 msgstr "已暫停"
 
-#: ../gtk/DetailsDialog.cc:614 ../gtk/DetailsDialog.cc:619 ../gtk/DetailsDialog.cc:733
+#: ../gtk/DetailsDialog.cc:614 ../gtk/DetailsDialog.cc:619 ../gtk/DetailsDialog.cc:736
 msgid "N/A"
 msgstr "不明"
 
@@ -252,256 +252,255 @@ msgstr "指定為此追蹤器私有 -- 已停用 DHT 與 PEX"
 msgid "Public torrent"
 msgstr "公開 torrent"
 
-#: ../gtk/DetailsDialog.cc:721
+#: ../gtk/DetailsDialog.cc:722
 msgid "Created by {creator} on {date}"
 msgstr "由 {creator} 於 {date} 建立"
 
-#: ../gtk/DetailsDialog.cc:725
+#: ../gtk/DetailsDialog.cc:728
 msgid "Created by {creator}"
 msgstr "由 {creator} 建立"
 
-#: ../gtk/DetailsDialog.cc:729
+#: ../gtk/DetailsDialog.cc:732
 msgid "Created on {date}"
 msgstr "建立於 {date}"
 
-#: ../gtk/DetailsDialog.cc:843
+#: ../gtk/DetailsDialog.cc:846
 msgid "Unknown"
 msgstr "未知"
 
-#: ../gtk/DetailsDialog.cc:880 ../gtk/MakeDialog.cc:392
+#: ../gtk/DetailsDialog.cc:884 ../gtk/MakeDialog.cc:393
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] "總計 {file_count:L} 個檔案，大小為 {total_size}"
 
-#: ../gtk/DetailsDialog.cc:895 ../gtk/MakeDialog.cc:398
+#: ../gtk/DetailsDialog.cc:899 ../gtk/MakeDialog.cc:401
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] "(總計 {piece_count} 個 BitTorrent 區塊，區塊大小為 {piece_size})"
 
-#: ../gtk/DetailsDialog.cc:939
+#: ../gtk/DetailsDialog.cc:943
 msgid "{current_size} ({percent_done}%)"
 msgstr "{current_size} ({percent_done}%)"
 
-#: ../gtk/DetailsDialog.cc:947
+#: ../gtk/DetailsDialog.cc:951
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} ({percent_available}% 中的 {percent_done}% 可用)"
 
-#: ../gtk/DetailsDialog.cc:956
-#, no-c-format
+#: ../gtk/DetailsDialog.cc:961
+#, fuzzy, c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} ({percent_available}% 中的 {percent_done}% 可用，{unverified_size} 未驗證)"
 
-#: ../gtk/DetailsDialog.cc:989
+#: ../gtk/DetailsDialog.cc:994
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
 msgstr "{downloaded_size} (+{discarded_size} 於校驗失敗後捨棄)"
 
-#: ../gtk/DetailsDialog.cc:1019
+#: ../gtk/DetailsDialog.cc:1024
 msgid "{uploaded_size} (Ratio: {ratio})"
 msgstr "{uploaded_size} (分享率：{ratio})"
 
-#: ../gtk/DetailsDialog.cc:1060
+#: ../gtk/DetailsDialog.cc:1065
 msgid "No errors"
 msgstr "沒有錯誤"
 
-#: ../gtk/DetailsDialog.cc:1080
+#: ../gtk/DetailsDialog.cc:1085
 msgid "Never"
 msgstr "永不"
 
-#: ../gtk/DetailsDialog.cc:1084
+#: ../gtk/DetailsDialog.cc:1089
 msgid "Active now"
 msgstr "活躍中"
 
-#: ../gtk/DetailsDialog.cc:1498
+#: ../gtk/DetailsDialog.cc:1503
 msgid "Optimistic unchoke"
 msgstr "積極性禮尚往來 (Optimistic unchoke)"
 
-#: ../gtk/DetailsDialog.cc:1502
+#: ../gtk/DetailsDialog.cc:1507
 msgid "Downloading from this peer"
 msgstr "正在從該節點下載"
 
-#: ../gtk/DetailsDialog.cc:1506
+#: ../gtk/DetailsDialog.cc:1511
 msgid "We would download from this peer if they would let us"
 msgstr "如果對方允許，我們將從該節點下載"
 
-#: ../gtk/DetailsDialog.cc:1510
+#: ../gtk/DetailsDialog.cc:1515
 msgid "Uploading to peer"
 msgstr "正在上傳到該節點"
 
-#: ../gtk/DetailsDialog.cc:1514
+#: ../gtk/DetailsDialog.cc:1519
 msgid "We would upload to this peer if they asked"
 msgstr "如果對方請求，我們將上傳到該節點"
 
-#: ../gtk/DetailsDialog.cc:1518
+#: ../gtk/DetailsDialog.cc:1523
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "該節點已宣告暢通，但我們不感興趣"
 
-#: ../gtk/DetailsDialog.cc:1522
+#: ../gtk/DetailsDialog.cc:1527
 msgid "We unchoked this peer, but they're not interested"
 msgstr "我們已向該節點宣告暢通，但對方不感興趣"
 
-#: ../gtk/DetailsDialog.cc:1526
+#: ../gtk/DetailsDialog.cc:1531
 msgid "Encrypted connection"
 msgstr "加密的連線"
 
-#: ../gtk/DetailsDialog.cc:1530
+#: ../gtk/DetailsDialog.cc:1535
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "透過節點交換 (PEX) 探索到的節點"
 
-#: ../gtk/DetailsDialog.cc:1534
+#: ../gtk/DetailsDialog.cc:1539
 msgid "Peer was found through DHT"
 msgstr "透過 DHT 探索到的節點"
 
-#: ../gtk/DetailsDialog.cc:1538
+#: ../gtk/DetailsDialog.cc:1543
 msgid "Peer is an incoming connection"
 msgstr "該節點為傳入連線"
 
-#: ../gtk/DetailsDialog.cc:1542
+#: ../gtk/DetailsDialog.cc:1547
 msgid "Peer is connected over µTP"
 msgstr "透過 µTP 連線的節點"
 
-#: ../gtk/DetailsDialog.cc:1612
+#: ../gtk/DetailsDialog.cc:1617
 msgid "Address"
 msgstr "位址"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1620
+#: ../gtk/DetailsDialog.cc:1625
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1636
+#: ../gtk/DetailsDialog.cc:1641
 msgid "Dn Reqs"
 msgstr "下載請求"
 
-#: ../gtk/DetailsDialog.cc:1643
+#: ../gtk/DetailsDialog.cc:1648
 msgid "Up Reqs"
 msgstr "上傳請求"
 
-#: ../gtk/DetailsDialog.cc:1650
+#: ../gtk/DetailsDialog.cc:1655
 msgid "Dn Blocks"
 msgstr "下載區塊"
 
-#: ../gtk/DetailsDialog.cc:1657
+#: ../gtk/DetailsDialog.cc:1662
 msgid "Up Blocks"
 msgstr "上傳區塊"
 
-#: ../gtk/DetailsDialog.cc:1664
+#: ../gtk/DetailsDialog.cc:1669
 msgid "We Cancelled"
 msgstr "我們已取消"
 
-#: ../gtk/DetailsDialog.cc:1671
+#: ../gtk/DetailsDialog.cc:1676
 msgid "They Cancelled"
 msgstr "他們已取消"
 
-#: ../gtk/DetailsDialog.cc:1679 ../gtk/DetailsDialog.cc:1757
+#: ../gtk/DetailsDialog.cc:1684 ../gtk/DetailsDialog.cc:1762
 msgid "Down"
 msgstr "下載"
 
-#: ../gtk/DetailsDialog.cc:1687
+#: ../gtk/DetailsDialog.cc:1692
 msgid "Up"
 msgstr "上傳"
 
-#: ../gtk/DetailsDialog.cc:1694
+#: ../gtk/DetailsDialog.cc:1699
 msgid "Client"
 msgstr "用戶端"
 
-#: ../gtk/DetailsDialog.cc:1700
+#: ../gtk/DetailsDialog.cc:1705
 msgid "Flags"
 msgstr "旗標"
 
-#: ../gtk/DetailsDialog.cc:1748
+#: ../gtk/DetailsDialog.cc:1753
 msgid "Web Seeds"
 msgstr "網路種子"
 
-#: ../gtk/DetailsDialog.cc:1816
+#: ../gtk/DetailsDialog.cc:1821
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] "已於 {time_span_ago} 之前取得{markup_begin}{peer_count} 個節點{markup_end}的清單"
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1828
+#: ../gtk/DetailsDialog.cc:1833
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr "在 {time_span_ago} 之前請求節點清單{markup_begin}逾時{markup_end}，正在重試。"
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1837
+#: ../gtk/DetailsDialog.cc:1842
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr "在 {time_span_ago} 之前發生錯誤 '{markup_begin}{error}{markup_end}'"
 
-#: ../gtk/DetailsDialog.cc:1850
+#: ../gtk/DetailsDialog.cc:1855
 msgid "No updates scheduled"
 msgstr "沒有已排定的更新"
 
-#: ../gtk/DetailsDialog.cc:1857
+#: ../gtk/DetailsDialog.cc:1862
 msgid "Asking for more peers {time_span_from_now}"
 msgstr "將於 {time_span_from_now} 請求更多節點"
 
-#: ../gtk/DetailsDialog.cc:1864
+#: ../gtk/DetailsDialog.cc:1869
 msgid "Queued to ask for more peers"
 msgstr "已排程請求更多節點"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
-#: ../gtk/DetailsDialog.cc:1872
+#: ../gtk/DetailsDialog.cc:1877
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr "已於 {markup_begin}{time_span_ago}{markup_end} 之前請求更多節點"
 
-#. {markup_begin} and {markup_end} should surround the seeder/leecher text
-#: ../gtk/DetailsDialog.cc:1897
+#: ../gtk/DetailsDialog.cc:1903
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr "該追蹤器在 {time_span_ago} 前有 {markup_begin}{seeder_count} 個 {seeder_or_seeders} 及 {leecher_count} 個 {leecher_or_leechers}{markup_end} "
 
-#: ../gtk/DetailsDialog.cc:1899
+#: ../gtk/DetailsDialog.cc:1905
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] "做種者"
 
-#: ../gtk/DetailsDialog.cc:1901
+#: ../gtk/DetailsDialog.cc:1907
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] "下載者"
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:1910
+#: ../gtk/DetailsDialog.cc:1916
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr "擷取時發生錯誤 '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
-#: ../gtk/DetailsDialog.cc:1927
+#: ../gtk/DetailsDialog.cc:1933
 msgid "Asking for peer counts in {time_span_from_now}"
 msgstr "將於 {time_span_from_now} 請求節點數量"
 
-#: ../gtk/DetailsDialog.cc:1934
+#: ../gtk/DetailsDialog.cc:1940
 msgid "Queued to ask for peer counts"
 msgstr "已排程請求節點數量"
 
-#: ../gtk/DetailsDialog.cc:1941
+#: ../gtk/DetailsDialog.cc:1947
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr "已於 {markup_begin}{time_span_ago}{markup_end} 之前請求節點數量"
 
-#: ../gtk/DetailsDialog.cc:2226
+#: ../gtk/DetailsDialog.cc:2233
 msgid "{torrent_name} - Edit Trackers"
 msgstr "{torrent_name} - 編輯追蹤器"
 
-#: ../gtk/DetailsDialog.cc:2260
+#: ../gtk/DetailsDialog.cc:2267
 msgid "List contains invalid URLs"
 msgstr "清單包含無效的網址"
 
-#: ../gtk/DetailsDialog.cc:2265 ../gtk/FileList.cc:866
+#: ../gtk/DetailsDialog.cc:2272 ../gtk/FileList.cc:866
 msgid "Please correct the errors and try again."
 msgstr "請修正錯誤並重試。"
 
-#: ../gtk/DetailsDialog.cc:2347
+#: ../gtk/DetailsDialog.cc:2354
 msgid "{torrent_name} - Add Tracker"
 msgstr "{torrent_name} - 加入追蹤器"
 
-#: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
+#: ../gtk/DetailsDialog.cc:2470 ../gtk/ui/gtk3/DetailsDialog.ui:796 ../gtk/ui/gtk4/DetailsDialog.ui:597
 msgid "Trackers"
 msgstr "追蹤器"
 
-#: ../gtk/DetailsDialog.cc:2642
+#: ../gtk/DetailsDialog.cc:2649
 msgid "{torrent_name} Properties"
 msgstr "{torrent_name} 內容"
 
-#: ../gtk/DetailsDialog.cc:2647
+#: ../gtk/DetailsDialog.cc:2654
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] "內容 - {torrent_count:L} 個 Torrents"
@@ -511,53 +510,53 @@ msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
 msgstr[0] "移除 {count:L} 個 torrents？"
 
-#: ../gtk/Dialogs.cc:58
+#: ../gtk/Dialogs.cc:59
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
 msgstr[0] "刪除這些 {count:L} torrents 已下載的檔案？"
 
-#: ../gtk/Dialogs.cc:65
+#: ../gtk/Dialogs.cc:68
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。"
 
-#: ../gtk/Dialogs.cc:72
+#: ../gtk/Dialogs.cc:75
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "這些 torrents 尚未完成下載。"
 
-#: ../gtk/Dialogs.cc:78
+#: ../gtk/Dialogs.cc:81
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "這些 torrents 已連線到節點。"
 
-#: ../gtk/Dialogs.cc:85
+#: ../gtk/Dialogs.cc:88
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "這些 torrents 其中有一些已連線到節點。"
 
-#: ../gtk/Dialogs.cc:98
+#: ../gtk/Dialogs.cc:101
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "這些 torrents 其中有一些尚未完成下載。"
 
-#: ../gtk/Dialogs.cc:118
+#: ../gtk/Dialogs.cc:121
 msgid "_Delete"
 msgstr "刪除 (_D)"
 
-#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:729 ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/DetailsDialog.ui:567 ../gtk/ui/gtk4/PrefsDialog.ui:1411
+#: ../gtk/Dialogs.cc:121 ../gtk/ui/gtk3/DetailsDialog.ui:729 ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/DetailsDialog.ui:567 ../gtk/ui/gtk4/PrefsDialog.ui:1411
 msgid "_Remove"
 msgstr "移除 (_R)"
 
-#: ../gtk/FileList.cc:643 ../gtk/Utils.cc:731
+#: ../gtk/FileList.cc:643 ../gtk/Utils.cc:739
 msgid "High"
 msgstr "高"
 
-#: ../gtk/FileList.cc:647 ../gtk/Utils.cc:732
+#: ../gtk/FileList.cc:647 ../gtk/Utils.cc:740
 msgid "Normal"
 msgstr "中"
 
-#: ../gtk/FileList.cc:651 ../gtk/Utils.cc:733
+#: ../gtk/FileList.cc:651 ../gtk/Utils.cc:741
 msgid "Low"
 msgstr "低"
 
@@ -598,7 +597,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "正在驗證"
 
-#: ../gtk/FilterBar.cc:479 ../gtk/FreeSpaceLabel.cc:57
+#: ../gtk/FilterBar.cc:479 ../gtk/FreeSpaceLabel.cc:58
 msgid "Error"
 msgstr "錯誤"
 
@@ -610,11 +609,11 @@ msgstr "顯示 (_S)："
 msgid "_Show {count:L} of:"
 msgstr "顯示 {count:L} 個，總計：(_S)"
 
-#: ../gtk/FreeSpaceLabel.cc:56
+#: ../gtk/FreeSpaceLabel.cc:57
 msgid "{disk_space} free"
 msgstr "{disk_space} 可用"
 
-#: ../gtk/MainWindow.cc:383
+#: ../gtk/MainWindow.cc:384
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -622,7 +621,7 @@ msgstr ""
 "點選以停用替代速度限制\n"
 " ({download_speed} 下載，{upload_speed} 上傳)"
 
-#: ../gtk/MainWindow.cc:384
+#: ../gtk/MainWindow.cc:385
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " ({download_speed} down, {upload_speed} up)"
@@ -630,65 +629,65 @@ msgstr ""
 "點選以啟用替代速度限制\n"
 " ({download_speed} 下載，{upload_speed} 上傳)"
 
-#: ../gtk/MainWindow.cc:436
+#: ../gtk/MainWindow.cc:437
 msgid "Unlimited"
 msgstr "無限制"
 
-#: ../gtk/MainWindow.cc:499
+#: ../gtk/MainWindow.cc:500
 msgid "Seed Forever"
 msgstr "永遠做種"
 
-#: ../gtk/MainWindow.cc:538
+#: ../gtk/MainWindow.cc:539
 msgid "Limit Download Speed"
 msgstr "限制下載速度"
 
-#: ../gtk/MainWindow.cc:539
+#: ../gtk/MainWindow.cc:540
 msgid "Limit Upload Speed"
 msgstr "限制上傳速度"
 
-#: ../gtk/MainWindow.cc:543
+#: ../gtk/MainWindow.cc:544
 msgid "Stop Seeding at Ratio"
 msgstr "達到以下分享率時，停止做種"
 
-#: ../gtk/MainWindow.cc:582
+#: ../gtk/MainWindow.cc:584
 msgid "Stop at Ratio ({ratio})"
 msgstr "達到分享率時停止 ({ratio})"
 
-#: ../gtk/MainWindow.cc:595
+#: ../gtk/MainWindow.cc:598
 msgid "Total Ratio"
 msgstr "總分享率"
 
-#: ../gtk/MainWindow.cc:596
+#: ../gtk/MainWindow.cc:599
 msgid "Session Ratio"
 msgstr "工作階段分享率"
 
-#: ../gtk/MainWindow.cc:597
+#: ../gtk/MainWindow.cc:600
 msgid "Total Transfer"
 msgstr "總傳輸"
 
-#: ../gtk/MainWindow.cc:598
+#: ../gtk/MainWindow.cc:601
 msgid "Session Transfer"
 msgstr "工作階段傳輸"
 
-#: ../gtk/MainWindow.cc:763 ../gtk/MainWindow.cc:784 ../gtk/Torrent.cc:447
+#: ../gtk/MainWindow.cc:766 ../gtk/MainWindow.cc:787 ../gtk/Torrent.cc:447
 msgid "Ratio: {ratio}"
 msgstr "分享率：{ratio}"
 
-#: ../gtk/MainWindow.cc:769
+#: ../gtk/MainWindow.cc:772
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "下載：{downloaded_size}，上傳：{uploaded_size}"
 
-#: ../gtk/MainWindow.cc:777
+#: ../gtk/MainWindow.cc:780
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
 msgstr "下載：{downloaded_size}上傳：{uploaded_size}"
 
-#: ../gtk/MainWindow.cc:811
+#: ../gtk/MainWindow.cc:814
 msgid "{download_speed} ▼"
 msgstr "{download_speed} ▼"
 
-#: ../gtk/MainWindow.cc:814 ../gtk/Torrent.cc:624
+#: ../gtk/MainWindow.cc:817 ../gtk/Torrent.cc:626
 msgid "{upload_speed} ▲"
 msgstr "{upload_speed} ▲"
 
@@ -708,7 +707,7 @@ msgstr "無法建立 '{path}'：{error} ({error_code})"
 msgid "Scanned {file_size}"
 msgstr "已掃描 {file_size}"
 
-#: ../gtk/MakeDialog.cc:386 ../gtk/MakeDialog.cc:549 ../gtk/ui/gtk3/MakeDialog.ui:172 ../gtk/ui/gtk4/MakeDialog.ui:100
+#: ../gtk/MakeDialog.cc:386 ../gtk/MakeDialog.cc:552 ../gtk/ui/gtk3/MakeDialog.ui:172 ../gtk/ui/gtk4/MakeDialog.ui:100
 msgid "No source selected"
 msgstr "未選擇來源"
 
@@ -896,20 +895,20 @@ msgid "Couldn't read '{path}'"
 msgstr "無法讀取 '{path}'"
 
 #. logging
-#: ../gtk/Session.cc:1082
+#: ../gtk/Session.cc:1085
 msgid "Inhibiting desktop hibernation"
 msgstr "禁止桌面休眠"
 
-#: ../gtk/Session.cc:1088 ../gtk/Session.cc:1113
+#: ../gtk/Session.cc:1092 ../gtk/Session.cc:1118
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "無法禁止桌面休眠：{error}"
 
 #. logging
-#: ../gtk/Session.cc:1109
+#: ../gtk/Session.cc:1113
 msgid "Allowing desktop hibernation"
 msgstr "允許桌面休眠"
 
-#: ../gtk/Session.cc:1227
+#: ../gtk/Session.cc:1232
 msgid "Couldn't find pending RPC request for tag {tag}"
 msgstr "無法找到標記為 {tag} 的待處理 RPC 請求"
 
@@ -943,70 +942,68 @@ msgstr "正在驗證本機資料 (已測試 {percent_done}%)"
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr "{complete_size}中的 {current_size} (已完成{percent_done}%)"
 
-#: ../gtk/Torrent.cc:476
-#, no-c-format
+#: ../gtk/Torrent.cc:477
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr "已下載 {complete_size} 中的 {current_size} ({percent_complete}%)，已上傳 {uploaded_size} (分享率：{ratio}，目標：{seed_ratio})"
 
-#: ../gtk/Torrent.cc:488
-#, no-c-format
+#: ../gtk/Torrent.cc:490
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr "已下載 {complete_size} 中的 {current_size} ({percent_complete}%)，已上傳 {uploaded_size} (分享率：{ratio})"
 
-#: ../gtk/Torrent.cc:498
+#: ../gtk/Torrent.cc:500
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr "已下載 {complete_size}，已上傳 {uploaded_size} (分享率：{ratio}，目標：{seed_ratio})"
 
-#: ../gtk/Torrent.cc:507
+#: ../gtk/Torrent.cc:509
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr "已下載 {complete_size}，已上傳 {uploaded_size} (分享率：{ratio})"
 
-#: ../gtk/Torrent.cc:520
+#: ../gtk/Torrent.cc:522
 msgid "Remaining time unknown"
 msgstr "剩餘時間未知"
 
-#: ../gtk/Torrent.cc:617
+#: ../gtk/Torrent.cc:619
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr "{download_speed} ▼  {upload_speed} ▲"
 
-#: ../gtk/Torrent.cc:629
+#: ../gtk/Torrent.cc:631
 msgid "Stalled"
 msgstr "已停滯"
 
-#: ../gtk/Torrent.cc:640
+#: ../gtk/Torrent.cc:642
 msgid "Tracker warning: '{warning}'"
 msgstr "追蹤器警告：'{warning}'"
 
-#: ../gtk/Torrent.cc:643
+#: ../gtk/Torrent.cc:645
 msgid "Tracker Error: '{error}'"
 msgstr "追蹤器錯誤：'{error}'"
 
-#: ../gtk/Torrent.cc:646
+#: ../gtk/Torrent.cc:648
 msgid "Local error: '{error}'"
 msgstr "本機錯誤：'{error}'"
 
-#: ../gtk/Torrent.cc:670
+#: ../gtk/Torrent.cc:672
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] "正在從 {active_count} 個已連線的節點下載後設資料 (已完成 {percent_done}%)"
 
-#: ../gtk/Torrent.cc:681
+#: ../gtk/Torrent.cc:683
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] "正在從 {connected_count} 中的 {active_count} 個已連線的節點及網路種子下載"
 
-#: ../gtk/Torrent.cc:692
+#: ../gtk/Torrent.cc:694
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] "正在從 {active_count} 個網路種子下載"
 
-#: ../gtk/Torrent.cc:700
+#: ../gtk/Torrent.cc:702
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] "正在從 {connected_count} 中的 {active_count} 個已連線的節點下載"
 
-#: ../gtk/Torrent.cc:709
+#: ../gtk/Torrent.cc:711
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] "正在為{connected_count} 中的 {active_count} 個已連線的節點做種"
@@ -1021,110 +1018,110 @@ msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
 msgstr[0] "{hours_from_now:L} 小時後"
 
-#: ../gtk/Utils.cc:149
+#: ../gtk/Utils.cc:150
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
 msgstr[0] "{minutes_from_now:L} 分鐘後"
 
-#: ../gtk/Utils.cc:156
+#: ../gtk/Utils.cc:158
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
 msgstr[0] "{seconds_from_now:L} 秒後"
 
-#: ../gtk/Utils.cc:160 ../gtk/Utils.cc:191 ../gtk/Utils.cc:218 ../gtk/Utils.cc:251
+#: ../gtk/Utils.cc:162 ../gtk/Utils.cc:195 ../gtk/Utils.cc:226 ../gtk/Utils.cc:259
 msgid "now"
 msgstr "現在"
 
-#: ../gtk/Utils.cc:167
+#: ../gtk/Utils.cc:170
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
 msgstr[0] "{days_ago:L} 天前"
 
-#: ../gtk/Utils.cc:173
+#: ../gtk/Utils.cc:177
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
 msgstr[0] "{hours_ago:L} 小時前"
 
-#: ../gtk/Utils.cc:180
+#: ../gtk/Utils.cc:184
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
 msgstr[0] "{minutes_ago:L} 分鐘前"
 
-#: ../gtk/Utils.cc:187
+#: ../gtk/Utils.cc:191
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
 msgstr[0] "{seconds_ago:L} 秒前"
 
-#: ../gtk/Utils.cc:200
+#: ../gtk/Utils.cc:204
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] "{days:L} 天"
 
-#: ../gtk/Utils.cc:205
+#: ../gtk/Utils.cc:209
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
 msgstr[0] "{hours:L} 小時"
 
-#: ../gtk/Utils.cc:210
+#: ../gtk/Utils.cc:215
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
 msgstr[0] "{minutes:L} 分鐘"
 
-#: ../gtk/Utils.cc:215
+#: ../gtk/Utils.cc:222
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
 msgstr[0] "{seconds:L} 秒"
 
-#: ../gtk/Utils.cc:226
+#: ../gtk/Utils.cc:234
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] "剩 {days_left:L} 天"
 
-#: ../gtk/Utils.cc:233
+#: ../gtk/Utils.cc:241
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] "剩 {hours_left:L} 小時"
 
-#: ../gtk/Utils.cc:240
+#: ../gtk/Utils.cc:248
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
 msgstr[0] "剩 {minutes_left:L} 分鐘"
 
-#: ../gtk/Utils.cc:247
+#: ../gtk/Utils.cc:255
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] "剩 {seconds_left:L} 秒"
 
-#: ../gtk/Utils.cc:266
+#: ../gtk/Utils.cc:274
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr "該 torrent 檔案 '{path}' 已被 '{torrent_name}' 使用中。"
 
-#: ../gtk/Utils.cc:277
+#: ../gtk/Utils.cc:285
 msgid "Couldn't open torrent"
 msgstr "無法開啟 torrent"
 
-#: ../gtk/Utils.cc:537
+#: ../gtk/Utils.cc:545
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
 msgstr "無法移動 '{path}' 到垃圾桶：{error} ({error_code})"
 
-#: ../gtk/Utils.cc:644
+#: ../gtk/Utils.cc:652
 msgid "Couldn't open '{url}'"
 msgstr "無法開啟 '{url}'"
 
-#: ../gtk/Utils.cc:855 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
+#: ../gtk/Utils.cc:863 ../libtransmission/announcer.cc:182 ../libtransmission/announcer.cc:201
 msgid "Unsupported URL: '{url}'"
 msgstr "不支援的 URL：'{url}'"
 
 #. modal
-#: ../gtk/Utils.cc:861
+#: ../gtk/Utils.cc:869
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr "Transmission 不知道要如何使用 '{url}'"
 
-#: ../gtk/Utils.cc:866
+#: ../gtk/Utils.cc:874
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr "該磁力連結可能使用了 BitTorrent 以外的其他協定。"
 
-#: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:3
+#: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:2
 msgid "Transmission"
 msgstr "Transmission"
 
@@ -1209,24 +1206,24 @@ msgstr "TB"
 msgid "kB"
 msgstr "kB"
 
-#: ../gtk/transmission-gtk.desktop.in:4
+#: ../gtk/transmission-gtk.desktop.in:3
 msgid "BitTorrent Client"
 msgstr "BitTorrent 用戶端"
 
-#: ../gtk/transmission-gtk.desktop.in:5
+#: ../gtk/transmission-gtk.desktop.in:4
 msgid "Download and share files over BitTorrent"
 msgstr "透過 BitTorrent 協定來下載及分享檔案"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: ../gtk/transmission-gtk.desktop.in:7
+#: ../gtk/transmission-gtk.desktop.in:6
 msgid "torrents;downloading;uploading;share;sharing;"
 msgstr "torrents;正在下載;正在上傳;分享;正在分享;"
 
-#: ../gtk/transmission-gtk.desktop.in:21
+#: ../gtk/transmission-gtk.desktop.in:20
 msgid "Start Transmission with All Torrents Paused"
 msgstr "啟動 Transmission 時暫停所有 Torrents"
 
-#: ../gtk/transmission-gtk.desktop.in:25
+#: ../gtk/transmission-gtk.desktop.in:24
 msgid "Start Transmission Minimized"
 msgstr "啟動 Transmission 時最小化"
 
@@ -2094,11 +2091,11 @@ msgstr "從網址開啟 torrent"
 msgid "_URL"
 msgstr "URL (_U)"
 
-#: ../libtransmission/announcer-http.cc:436
+#: ../libtransmission/announcer-http.cc:457
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "無法解析傳回的宣告：{error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:656
+#: ../libtransmission/announcer-http.cc:677
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "無法解析傳回的擷取：{error} ({error_code})"
 
@@ -2110,42 +2107,42 @@ msgstr "未知的錯誤"
 msgid "{ip_protocol} connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:508
+#: ../libtransmission/announcer-udp.cc:509
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:893
+#: ../libtransmission/announcer.cc:894
 msgid "Announce error: {error} ({url})"
 msgstr "公告錯誤：{error}（{url}）"
 
-#: ../libtransmission/announcer.cc:903
+#: ../libtransmission/announcer.cc:906
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
 msgstr[0] "公告錯誤：{error}（{count} 秒後重試）（{url}）"
 
-#: ../libtransmission/announcer.cc:1028 ../libtransmission/announcer.cc:1356
+#: ../libtransmission/announcer.cc:1031 ../libtransmission/announcer.cc:1359
 msgid "Could not connect to tracker"
 msgstr "無法連線到追蹤器"
 
-#: ../libtransmission/announcer.cc:1032 ../libtransmission/announcer.cc:1360
+#: ../libtransmission/announcer.cc:1035 ../libtransmission/announcer.cc:1363
 msgid "Tracker did not respond"
 msgstr "追蹤器沒有回應"
 
-#: ../libtransmission/announcer.cc:1088
+#: ../libtransmission/announcer.cc:1091
 msgid "Success"
 msgstr "成功"
 
-#: ../libtransmission/blocklist.cc:81 ../libtransmission/blocklist.cc:403
+#: ../libtransmission/blocklist.cc:82 ../libtransmission/blocklist.cc:405
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] "黑名單 '{path}' 有 {count} 個項目"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.cc:259
+#: ../libtransmission/blocklist.cc:260
 msgid "Couldn't parse line: '{line}'"
 msgstr "無法解析該行：'{line}'"
 
-#: ../libtransmission/blocklist.cc:387
+#: ../libtransmission/blocklist.cc:388
 msgid "Rewriting old blocklist file format to new format"
 msgstr "將舊版黑名單重寫為新版的檔案格式"
 
@@ -2161,11 +2158,11 @@ msgstr "無法取得 '{path}'：{error} ({error_code})"
 msgid "Successfully updated source {protocol} address to {ip}"
 msgstr "成功更新來源 {protocol} 位址為 {ip}"
 
-#: ../libtransmission/ip-cache.cc:288
+#: ../libtransmission/ip-cache.cc:289
 msgid "Your machine does not support {protocol}"
 msgstr "您的裝置不支援 {protocol}"
 
-#: ../libtransmission/ip-cache.cc:313
+#: ../libtransmission/ip-cache.cc:314
 msgid "Successfully updated global {type} address to {ip} using {url}"
 msgstr "成功使用 {url} 更新全域 {type} 位址為 {ip}"
 
@@ -2189,11 +2186,11 @@ msgstr "無法在 {socket} 設定來源位址 {address}：{error} ({error_code})
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr "無法將 socket {socket} 連線到 {address}:{port}：{error} ({error_code})"
 
-#: ../libtransmission/net.cc:347
+#: ../libtransmission/net.cc:348
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "無法在 {address} 繫結 {port} 連接埠：{error} ({error_code}) -- 是否有另一個執行中的 Transmission 程式？"
 
-#: ../libtransmission/net.cc:348
+#: ../libtransmission/net.cc:349
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "無法在 {address} 繫結連接埠 {port}：{error} ({error_code})"
 
@@ -2213,43 +2210,43 @@ msgstr "無法截斷 '{path}'：{error} ({error_code})"
 msgid "Unknown state: {state}"
 msgstr "未知狀態：{state}"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:90
+#: ../libtransmission/port-forwarding-natpmp.cc:91
 msgid "Found public address '{address}'"
 msgstr "找到公開位址 '{address}'"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:127
+#: ../libtransmission/port-forwarding-natpmp.cc:129
 msgid "Port {port} is no longer forwarded"
 msgstr "不再轉送 {port} 連接埠"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:175
+#: ../libtransmission/port-forwarding-natpmp.cc:178
 msgid "Port {port} forwarded successfully"
 msgstr "已成功轉送 {port} 連接埠"
 
-#: ../libtransmission/port-forwarding-upnp.cc:272
+#: ../libtransmission/port-forwarding-upnp.cc:273
 msgid "Found Internet Gateway Device '{url}'"
 msgstr "找到網際網路閘道裝置 '{url}'"
 
-#: ../libtransmission/port-forwarding-upnp.cc:273
+#: ../libtransmission/port-forwarding-upnp.cc:275
 msgid "Local Address is '{address}'"
 msgstr "本機位址為 '{address}'"
 
-#: ../libtransmission/port-forwarding-upnp.cc:298
+#: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:310
+#: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr "正在停止 '{url}' ，服務 '{type}' 的通訊埠轉送"
 
-#: ../libtransmission/port-forwarding-upnp.cc:343
+#: ../libtransmission/port-forwarding-upnp.cc:345
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr "正在從 '{url}'，服務 '{type}' 通訊埠轉送。(本機位址：{address}:{port})"
 
-#: ../libtransmission/port-forwarding-upnp.cc:352
+#: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
 msgstr ""
 
-#: ../libtransmission/port-forwarding-upnp.cc:360
+#: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr "若您的路由器支援 UPnP，請確認 UPnP 已啟用！"
 
@@ -2313,40 +2310,40 @@ msgstr "Windows 系統不支援 Unix sockets。請在設定中變更 '{key}'。"
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "無法將 RPC socket 模式設定為 {mode:#o}，已使用預設值 0755"
 
-#: ../libtransmission/rpc-server.cc:721
+#: ../libtransmission/rpc-server.cc:722
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "已重試 {count} 次繫結到 {address} 失敗，已停止重試"
 
-#: ../libtransmission/rpc-server.cc:732
+#: ../libtransmission/rpc-server.cc:734
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "正在監聽 '{address}' 的 RPC 及網路請求"
 
-#: ../libtransmission/rpc-server.cc:760
+#: ../libtransmission/rpc-server.cc:763
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "已停止監聽 '{address}' 的 RPC 及網路請求"
 
-#: ../libtransmission/rpc-server.cc:782
+#: ../libtransmission/rpc-server.cc:785
 msgid "Added '{entry}' to host whitelist"
 msgstr "已將 '{entry}' 加入主機白名單"
 
-#: ../libtransmission/rpc-server.cc:902
+#: ../libtransmission/rpc-server.cc:906
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "'{key}' 目前設定為 '{value}'，但該值必須是 IPv4 或 IPv6 位址，或是 Unix socket 路徑。已使用預設值 '0.0.0.0'"
 
-#: ../libtransmission/rpc-server.cc:915
+#: ../libtransmission/rpc-server.cc:919
 msgid "Serving RPC and Web requests on {address}"
 msgstr "正在為 {address} 的 RPC 及網路請求提供服務"
 
-#: ../libtransmission/rpc-server.cc:920
+#: ../libtransmission/rpc-server.cc:924
 msgid "Whitelist enabled"
 msgstr "啟用白名單"
 
-#: ../libtransmission/rpc-server.cc:925
+#: ../libtransmission/rpc-server.cc:929
 msgid "Password required"
 msgstr "需要密碼"
 
-#: ../libtransmission/rpc-server.cc:931
+#: ../libtransmission/rpc-server.cc:936
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "正在從 '{path}' 提供服務給 RPC 及網路請求"
 
@@ -2374,19 +2371,19 @@ msgstr "開啟龜速模式的時間"
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "無法開啟工作階段鎖定檔案 '{path}'：{error} ({error_code})"
 
-#: ../libtransmission/session.cc:407
+#: ../libtransmission/session.cc:420
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "正在監聽通訊埠 {hostport} 傳入的節點連線"
 
-#: ../libtransmission/session.cc:725
+#: ../libtransmission/session.cc:739
 msgid "Transmission version {version} starting"
 msgstr "Transmission 版本 {version} 正在啟動"
 
-#: ../libtransmission/session.cc:1411
+#: ../libtransmission/session.cc:1428
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission 版本 {version} 正在結束"
 
-#: ../libtransmission/session.cc:1458
+#: ../libtransmission/session.cc:1501
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "已載入 {count} 個 torrents"
@@ -2395,55 +2392,55 @@ msgstr[0] "已載入 {count} 個 torrents"
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "已將 torrent 檔案從 '{old_path}' 移轉到 '{path}'"
 
-#: ../libtransmission/torrent.cc:139
+#: ../libtransmission/torrent.cc:137
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "無法將 '{path}' 的後設資料使用於 '{magnet}'：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:168
+#: ../libtransmission/torrent.cc:166
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
 msgstr "找不到資料！請確保您的硬碟已連接或使用「設定位置」。若要重新下載，請使用「驗證本機資料」後開始下載 torrent。"
 
-#: ../libtransmission/torrent.cc:403
+#: ../libtransmission/torrent.cc:401
 msgid "Calling script '{path}'"
 msgstr "正在呼叫腳本 '{path}'"
 
-#: ../libtransmission/torrent.cc:411
+#: ../libtransmission/torrent.cc:409
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "無法呼叫腳本 '{path}'：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:445
+#: ../libtransmission/torrent.cc:443
 msgid "Seed ratio reached; pausing torrent"
 msgstr "已達到做種分享率，正在暫停 torrent"
 
-#: ../libtransmission/torrent.cc:452
+#: ../libtransmission/torrent.cc:450
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "已達到做種閒置時間，正在暫停 torrent"
 
-#: ../libtransmission/torrent.cc:690
+#: ../libtransmission/torrent.cc:611
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "已手動重新啟動 -- 正在停用做種分享率限制"
 
-#: ../libtransmission/torrent.cc:746
+#: ../libtransmission/torrent.cc:667
 msgid "Pausing torrent"
 msgstr "正在暫停 torrent"
 
-#: ../libtransmission/torrent.cc:799
+#: ../libtransmission/torrent.cc:720
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:865
+#: ../libtransmission/torrent.cc:786
 msgid "Removing torrent"
 msgstr "正在移除 torrent"
 
-#: ../libtransmission/torrent.cc:1182 ../libtransmission/torrent.cc:1688
+#: ../libtransmission/torrent.cc:1103 ../libtransmission/torrent.cc:1609
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "無法移動 '{old_path}' 到 '{path}'：{error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:1630
+#: ../libtransmission/torrent.cc:1551
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
 msgstr "因為找不到資料，已暫停 torrent！請確保您的硬碟已連接或使用「設定位置」，然後再次使用「驗證本機資料」。若要重新下載，開始下載 torrent。"
 
-#: ../libtransmission/torrent.cc:2126
+#: ../libtransmission/torrent.cc:2047
 msgid "Tracker warning: '{warning}' ({url})"
 msgstr "追蹤器警告：'{warning}'（{url}）"
 
@@ -2543,44 +2540,44 @@ msgstr ""
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "使用環境變數 CURL_CA_BUNDLE 驗證追蹤器憑證：{bundle}"
 
-#: ../libtransmission/web.cc:198
+#: ../libtransmission/web.cc:199
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "註：這僅適用於使用 openssl 或 gnutls 建立的 libcurl，而不是 nss"
 
-#: ../libtransmission/web.cc:199
+#: ../libtransmission/web.cc:200
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "註：無效的憑證會和其他錯誤一樣顯示為「無法連線到追蹤器」。"
 
-#: ../libtransmission/web.cc:496
+#: ../libtransmission/web.cc:497
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr "無法取得'{url}'：預期的HTTP回應碼為 {expected_code}，實際獲得 {actual_code}"
 
-#: ../utils/create.cc:235
+#: ../utils/create.cc:236
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
 msgstr[0] "{file_count:L} 個檔案，大小為 {total_size}\n"
 
-#: ../utils/create.cc:241
+#: ../utils/create.cc:242
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] "總計 {piece_count:L} 個區塊，區塊大小為 {piece_size}\n"
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:139
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "小時"
 
-#: ../utils/remote.cc:141
+#: ../utils/remote.cc:140
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "分鐘"
 
-#: ../utils/remote.cc:142 ../utils/remote.cc:162
+#: ../utils/remote.cc:141 ../utils/remote.cc:161
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] "秒"
 
-#: ../utils/remote.cc:146
+#: ../utils/remote.cc:145
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
