@@ -313,7 +313,7 @@ msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size}（{percent_done}% /{percent_available}% 可用）"
 
 #: ../gtk/DetailsDialog.cc:961
-#, fuzzy, c-format
+#, c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size}（{percent_done}% / {percent_available}% 可用；{unverified_size} 未校验）"
 

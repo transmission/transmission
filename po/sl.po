@@ -5,7 +5,7 @@
 #
 # Translators:
 # Nejc Bertoncelj, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-10 22:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Slovenian (https://app.transifex.com/transmissionbt/teams/33778/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"

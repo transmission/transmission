@@ -318,7 +318,7 @@ msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} ({percent_done}% z {percent_available}% dostępnych)"
 
 #: ../gtk/DetailsDialog.cc:961
-#, fuzzy, c-format
+#, c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} ({percent_done}% z {percent_available}% dostępnych, {unverified_size} niesprawdzone)"
 

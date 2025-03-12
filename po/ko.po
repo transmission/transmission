@@ -285,7 +285,7 @@ msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} (이용 가능한 {percent_available}% 중 {percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:961
-#, fuzzy, c-format
+#, c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} (이용 가능한 {percent_available}% 중 {percent_done}%; {unverified_size} 검증되지 않음)"
 

@@ -13,6 +13,7 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Emin Tufan Çetin <etcetin@gmail.com>, 2023
 # b83946de5835331df42b9ffcc43e6a33_05e65cd <73a30e0a984b2291d4915f37112ad292_814039>, 2023
+# x x, 2025
 #
 #, fuzzy
 msgid ""
@@ -21,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-10 22:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: b83946de5835331df42b9ffcc43e6a33_05e65cd <73a30e0a984b2291d4915f37112ad292_814039>, 2023\n"
+"Last-Translator: x x, 2025\n"
 "Language-Team: Turkish (https://app.transifex.com/transmissionbt/teams/33778/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -274,7 +275,7 @@ msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} ({percent_done} / %{percent_available} uygun)"
 
 #: ../gtk/DetailsDialog.cc:961
-#, fuzzy, c-format
+#, c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} (%{percent_done} / %{percent_available} uygun; {unverified_size} doğrulanmamış)"
 
@@ -846,35 +847,35 @@ msgstr "Yeni engel listesi alınıyor…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "bilinmeyen"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "kontrol ediliyor…"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "açık"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "kapalı"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "hata"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Durum: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Durum: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2125,11 +2126,11 @@ msgstr "Bilinmeyen hata"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} bağlantı başarısız"
 
 #: ../libtransmission/announcer-udp.cc:509
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "{address}:{port}' de yukarı bakılamadı {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:894
 msgid "Announce error: {error} ({url})"
@@ -2138,8 +2139,8 @@ msgstr "Duyuru hatası: {error} ({url})"
 #: ../libtransmission/announcer.cc:906
 msgid "Announce error: {error} (Retrying in {count} second) ({url})"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Duyuru hatası: {error} ({count} saniye içinde yeniden deneniyor) ({url})"
+msgstr[1] "Duyuru hatası: {error} ({count} saniye içinde yeniden deneniyor) ({url})"
 
 #: ../libtransmission/announcer.cc:1031 ../libtransmission/announcer.cc:1359
 msgid "Could not connect to tracker"
@@ -2178,7 +2179,7 @@ msgstr "'{path}' alınamadı: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "Kaynak {protocol} adresi başarıyla {ip} olarak güncellendi"
 
 #: ../libtransmission/ip-cache.cc:289
 msgid "Your machine does not support {protocol}"
@@ -2186,7 +2187,7 @@ msgstr "Makineniz {protocol} protokolünü desteklemiyor"
 
 #: ../libtransmission/ip-cache.cc:314
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "Küresel {type} adresi {url} kullanılarak {ip} olarak başarıyla güncellendi"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2254,7 +2255,7 @@ msgstr "Yerel Adres şudur: '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "Yerel bağlantı noktası {local_port}, {advertised_port}'a yönlendirilmiyor"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2266,7 +2267,7 @@ msgstr "Bağlantı noktası '{url}', '{type}' servisi üzerinden yönlendiriliyo
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "Yerel bağlantı noktası {local_port} {advertised_port} adresine yönlendirildi"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2302,27 +2303,27 @@ msgstr "Unix yuva yolu {count} karakterden ('{prefix}' ön eki ile) az olmalıd�
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "{host} tarafından reddedilen istek (olası dizin geçiş saldırısı)"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "{host} tarafından reddedilen istek (kaba kuvvet koruması etkin)"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "{host} tarafından reddedilen istek (IP beyaz listeye eklenmemiş)"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "{host} tarafından reddedilen istek (kimlik doğrulaması başarısız oldu)"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "{host} tarafından reddedilen istek (Ana makine beyaz listede değil)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "{host} adresinden bilinmeyen URI: '{uri}'"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2422,7 +2423,7 @@ msgstr "'{magnet}' için '{path}' yolundan üst veri bilgisi kullanılamadı: {e
 
 #: ../libtransmission/torrent.cc:166
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, use \"Verify Local Data\" and start the torrent afterwards."
-msgstr ""
+msgstr "Veri bulunamadı! Sürücülerinizin bağlı olduğundan emin olun veya \"Konumu Ayarla\"yı kullanın. Yeniden indirmek için \"Yerel Verileri Doğrula\"yı kullanın ve ardından torrent'i başlatın."
 
 #: ../libtransmission/torrent.cc:401
 msgid "Calling script '{path}'"
@@ -2450,7 +2451,7 @@ msgstr "Torrent duraklatılıyor"
 
 #: ../libtransmission/torrent.cc:720
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Tüm torrent dosyaları kaldırılamadı: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:786
 msgid "Removing torrent"
@@ -2462,7 +2463,7 @@ msgstr "'{old_path}' yolundan '{path}' yoluna taşınamadı: {error} ({error_cod
 
 #: ../libtransmission/torrent.cc:1551
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr ""
+msgstr "Veri bulunamadığından torrent duraklatıldı! Sürücülerinizin bağlı olduğundan emin olun veya \"Konumu Ayarla\"yı kullanın, ardından \"Yerel Verileri Doğrula\"yı tekrar kullanın. Yeniden indirmek için torrent'i başlatın."
 
 #: ../libtransmission/torrent.cc:2047
 msgid "Tracker warning: '{warning}' ({url})"
@@ -2478,11 +2479,11 @@ msgstr "'{address}:{port}' adresine bakılamadı: {error} ({error_code})"
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "{ip_protocol} LPD başlatılamadı: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "IPv4 soketi engellenemez hale getirilemedi {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2490,7 +2491,7 @@ msgstr "{address} IPv4 yuvası sarılamadı: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "IPv6 soketi engellenemez hale getirilemedi {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
@@ -2574,7 +2575,7 @@ msgstr "NB: Geçersiz sertifikalar diğer birçok hata gibi 'İzleyiciye bağlan
 
 #: ../libtransmission/web.cc:497
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
-msgstr ""
+msgstr "'{url}' alınamadı: HTTP yanıt kodu bekleniyordu {expected_code}, {actual_code} alındı"
 
 #: ../utils/create.cc:236
 msgid "{file_count:L} file, {total_size}\n"

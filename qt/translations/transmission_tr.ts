@@ -265,8 +265,8 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 dakika</numerusform>
         </translation>
     </message>
     <message>
@@ -423,7 +423,7 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiketler:</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -1646,16 +1646,16 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 dakika</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 dakika önce</numerusform>
         </translation>
     </message>
     <message>
@@ -1734,7 +1734,10 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm genel torrentlerde kullanılacak izleyiciler.
+
+Yedek URL eklemek için, birincil URL&apos;den sonraki satıra ekleyin.
+Yeni bir birincil URL eklemek için, bunu boş bir satırdan sonra ekleyin.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -1992,37 +1995,37 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>bilinmeyen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>kontrol ediliyor…</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>açık</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>closed</source>
-        <translation type="unfinished"></translation>
+        <translation>kapalı</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>hata</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Durum: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Durum: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
     </message>
     <message numerus="yes">
         <location line="+96"/>
@@ -2108,73 +2111,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>KiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>MiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>GiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>TiB</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>kB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message>
         <location line="+276"/>
@@ -2306,7 +2309,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2475,13 +2478,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 kaldı</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Kalan süre bilinmiyor</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
@@ -2644,7 +2647,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedek URL eklemek için, birincil URL&apos;nin hemen ardından gelen satıra yedek URL ekleyin.</translation>
     </message>
     <message>
         <location line="+7"/>

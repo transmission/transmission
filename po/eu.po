@@ -280,7 +280,7 @@ msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr "{current_size} (%{percent_done} eskuragarri dagoen %{percent_available}(e)tik)"
 
 #: ../gtk/DetailsDialog.cc:961
-#, fuzzy, c-format
+#, c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr "{current_size} (%{percent_done}eskuragarri dagoen %{percent_available}(e)tik; {unverified_size} egiaztatu gabe)"
 
