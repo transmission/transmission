@@ -9,7 +9,7 @@
       <file alias="list-remove.svg">icons/Win11/actions/24/list-remove.svg</file>
       <file alias="hamburger-menu.svg">icons/hamburger-menu.svg</file>
       <file alias="ratio.svg">icons/yin-yang.svg</file>
-      <file alias="transmission.svg">icons/transmission.svg</file>
+      <file alias="transmission.svg">../icons/hicolor_apps_scalable_transmission.svg</file>
       <file alias="transmission.ico">icons/transmission.ico</file>
       <file alias="transmission-tray.svg">icons/transmission-tray.svg</file>
       <file alias="transmission-tray.ico">icons/transmission-tray.ico</file>
