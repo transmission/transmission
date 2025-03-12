@@ -344,7 +344,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `fromTracker`  | number     | tr_stat
 
 
-`pieces`: A bitfield holding pieceCount flags which are set to 'true' if we have the piece matching that position. JSON doesn't allow raw binary data, so this is a base64-encoded string. (Source: tr_torrent)
+`pieces`: A bitfield holding pieceCount flags which are set to 'true' if we have the piece matching that position. JSON doesn't allow raw binary data, so this is a base64-encoded string. Pieces are guaranteed to be written on disk if sequential download is enabled. Otherwise, data might still be in cache only. (Source: tr_torrent)
 
 `priorities`: An array of `tr_torrentFileCount()` numbers. Each is the `tr_priority_t` mode for the corresponding file.
 
