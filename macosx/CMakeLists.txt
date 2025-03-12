@@ -9,8 +9,10 @@ find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
 set(MAC_BUNDLE_NAME Transmission)
 
 add_compile_options(
-    $<$<COMPILE_LANGUAGE:C,CXX>:-fmodules>
-    $<$<COMPILE_LANGUAGE:C,CXX>:-fcxx-modules>
+    $<$<COMPILE_LANGUAGE:C>:-fmodules>
+
+    # https://github.com/llvm/llvm-project/issues/57432
+    "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:-fno-modules;-Xclang;-fno-cxx-modules>"
 
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
     $<$<COMPILE_LANGUAGE:C,CXX>:-fobjc-arc>
@@ -415,6 +417,7 @@ target_link_libraries(${TR_NAME}-mac
         "-framework Quartz"
         "-framework Security"
         "-weak_framework Sparkle"
+        "-weak_framework UniformTypeIdentifiers"
         "-weak_framework UserNotifications")
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)

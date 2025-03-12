@@ -2,10 +2,17 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#if __has_feature(modules)
 @import Carbon;
 @import UserNotifications;
 
 @import Sparkle;
+#else
+#import <Carbon/Carbon.h>
+#import <UserNotifications/UserNotifications.h>
+
+#import <Sparkle/Sparkle.h>
+#endif
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
