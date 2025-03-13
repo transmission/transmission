@@ -480,12 +480,12 @@ struct tr_torrent
         return metainfo_.file_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& file_subpath(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& file_subpath(tr_file_index_t i) const
     {
         return metainfo_.file_subpath(i);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const
     {
         return metainfo_.file_size(i);
     }
@@ -517,7 +517,7 @@ struct tr_torrent
         return metainfo_.webseed_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR_VEC auto const& webseed(size_t i) const
     {
         return metainfo_.webseed(i);
     }
@@ -1272,7 +1272,7 @@ private:
     // must be called after the torrent's announce list changes.
     void on_announce_list_changed();
 
-    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR_VEC tr_byte_span_t byte_span_for_file(tr_file_index_t file) const
     {
         return fpm_.byte_span_for_file(file);
     }

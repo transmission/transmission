@@ -48,7 +48,7 @@ public:
         return metadata_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 std::string_view log_name() const noexcept
+    [[nodiscard]] TR_CONSTEXPR_STR std::string_view log_name() const noexcept
     {
         return log_name_;
     }
