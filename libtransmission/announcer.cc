@@ -1019,6 +1019,17 @@ void tr_announcer_impl::onAnnounceDone(
             (!std::empty(response.errmsg) ? response.errmsg.c_str() : "none"),
             (!std::empty(response.warning) ? response.warning.c_str() : "none")));
 
+    // https://github.com/arvidn/libtorrent/issues/5084#issuecomment-688516452
+    if (response.min_interval != 0)
+    {
+        tier->announceMinIntervalSec = response.min_interval;
+    }
+
+    if (response.interval != 0)
+    {
+        tier->announceIntervalSec = response.interval;
+    }
+
     tier->lastAnnounceTime = now;
     tier->lastAnnounceTimedOut = response.did_timeout;
     tier->lastAnnounceSucceeded = false;
@@ -1093,16 +1104,6 @@ void tr_announcer_impl::onAnnounceDone(
         else
         {
             tier->last_announce_str = _("Success");
-        }
-
-        if (response.min_interval != 0)
-        {
-            tier->announceMinIntervalSec = response.min_interval;
-        }
-
-        if (response.interval != 0)
-        {
-            tier->announceIntervalSec = response.interval;
         }
 
         if (!std::empty(response.pex))
