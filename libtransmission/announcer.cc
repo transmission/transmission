@@ -871,7 +871,7 @@ bool isUnregistered(char const* errmsg)
     return std::any_of(std::begin(Keys), std::end(Keys), [&lower](auto const& key) { return tr_strv_contains(lower, key); });
 }
 
-void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
+void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e, time_t interval = {})
 {
     using namespace announce_helpers;
 
@@ -902,7 +902,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     else
     {
         /* schedule a reannounce */
-        auto const interval = current_tracker->getRetryInterval();
+        interval = std::max(interval, current_tracker->getRetryInterval());
         tr_logAddWarnTier(
             tier,
             fmt::format(
@@ -1060,7 +1060,11 @@ void tr_announcer_impl::onAnnounceDone(
             publishError(tier, response.errmsg);
         }
 
-        on_announce_error(tier, response.errmsg.c_str(), event);
+        on_announce_error(
+            tier,
+            response.errmsg.c_str(),
+            event,
+            response.interval > time_t{} ? response.interval : response.min_interval);
     }
     else
     {
