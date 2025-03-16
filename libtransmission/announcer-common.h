@@ -12,6 +12,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint> // uint64_t
+#include <ctime>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -110,11 +111,11 @@ struct tr_announce_response
 
     /* preferred interval between announces.
      * transmission treats this as the interval for periodic announces */
-    int interval = 0;
+    time_t interval = 0;
 
     /* minimum interval between announces. (optional)
      * transmission treats this as the min interval for manual announces */
-    int min_interval = 0;
+    time_t min_interval = 0;
 
     /* how many peers are seeding this torrent */
     std::optional<int64_t> seeders;
@@ -219,5 +220,5 @@ struct tr_scrape_response
 
     /* minimum interval (in seconds) allowed between scrapes.
      * this is an unofficial extension that some trackers won't support. */
-    int min_request_interval;
+    time_t min_request_interval;
 };

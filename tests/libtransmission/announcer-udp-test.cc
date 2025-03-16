@@ -627,7 +627,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
 
 TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
 {
-    static auto constexpr Interval = uint32_t{ 3600 };
+    static auto constexpr Interval = time_t{ 3600 };
     static auto constexpr Leechers = uint32_t{ 10 };
     static auto constexpr Seeders = uint32_t{ 20 };
     auto const addresses = std::array<tr_socket_address, 3>{ {
@@ -715,7 +715,7 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv4)
 
 TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
 {
-    static auto constexpr Interval = uint32_t{ 3600 };
+    static auto constexpr Interval = time_t{ 3600 };
     static auto constexpr Leechers = uint32_t{ 10 };
     static auto constexpr Seeders = uint32_t{ 20 };
     auto const addresses = std::array<tr_socket_address, 3>{ {

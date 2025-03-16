@@ -7,6 +7,7 @@
 #include <cctype>
 #include <cstddef> // std::byte, size_t
 #include <cstdint> // int64_t, uint8_t, uint...
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -369,11 +370,11 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             if (pathIs("interval"sv))
             {
-                response_.interval = static_cast<int>(value);
+                response_.interval = static_cast<time_t>(value);
             }
             else if (pathIs("min interval"sv))
             {
-                response_.min_interval = static_cast<int>(value);
+                response_.min_interval = static_cast<time_t>(value);
             }
             else if (pathIs("complete"sv))
             {
@@ -641,7 +642,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             }
             else if (pathIs("flags"sv, "min_request_interval"sv))
             {
-                response_.min_request_interval = static_cast<int>(value);
+                response_.min_request_interval = static_cast<time_t>(value);
             }
             else
             {

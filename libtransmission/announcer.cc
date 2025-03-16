@@ -51,7 +51,7 @@ using namespace std::literals;
 namespace
 {
 /* unless the tracker says otherwise, rescrape this frequently */
-auto constexpr DefaultScrapeIntervalSec = 60 * 30;
+auto constexpr DefaultScrapeIntervalSec = time_t{ 60 * 30 };
 
 /* the value of the 'numwant' argument passed in tracker requests. */
 auto constexpr Numwant = 80;
@@ -506,9 +506,9 @@ struct tr_tier
 
     int announce_event_priority = 0;
 
-    int scrapeIntervalSec = DefaultScrapeIntervalSec;
-    int announceIntervalSec = DefaultAnnounceIntervalSec;
-    int announceMinIntervalSec = DefaultAnnounceMinIntervalSec;
+    time_t scrapeIntervalSec = DefaultScrapeIntervalSec;
+    time_t announceIntervalSec = DefaultAnnounceIntervalSec;
+    time_t announceMinIntervalSec = DefaultAnnounceMinIntervalSec;
 
     size_t lastAnnouncePeerCount = 0;
 
@@ -524,10 +524,10 @@ struct tr_tier
 
 private:
     // unless the tracker says otherwise, this is the announce interval
-    static auto constexpr DefaultAnnounceIntervalSec = 60 * 10;
+    static auto constexpr DefaultAnnounceIntervalSec = time_t{ 60 * 10 };
 
     // unless the tracker says otherwise, this is the announce min_interval
-    static auto constexpr DefaultAnnounceMinIntervalSec = 60 * 2;
+    static auto constexpr DefaultAnnounceMinIntervalSec = time_t{ 60 * 2 };
 
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, time_t interval_secs)
     {
@@ -1369,7 +1369,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
         else
         {
             tier->lastScrapeSucceeded = true;
-            tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response.min_request_interval);
+            tier->scrapeIntervalSec = std::max(DefaultScrapeIntervalSec, response.min_request_interval);
             tier->scheduleNextScrape();
             tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
 
