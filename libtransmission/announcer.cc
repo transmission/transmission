@@ -829,11 +829,11 @@ void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announc
          * dump everything leading up to it except "completed" */
         if (e == TR_ANNOUNCE_EVENT_STOPPED)
         {
-            bool const has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) != 0;
-            events.clear();
+            auto const has_completed = std::find(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) !=
+                std::end(events);
             if (has_completed)
             {
-                events.push_back(TR_ANNOUNCE_EVENT_COMPLETED);
+                events.assign(1U, TR_ANNOUNCE_EVENT_COMPLETED);
             }
         }
 
