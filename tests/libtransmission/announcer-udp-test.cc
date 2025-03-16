@@ -117,7 +117,7 @@ protected:
         EXPECT_EQ(expected.scrape_url, actual.scrape_url);
 
         EXPECT_EQ(expected.row_count, actual.row_count);
-        for (int i = 0; i < std::min(expected.row_count, actual.row_count); ++i)
+        for (size_t i = 0; i < std::min(expected.row_count, actual.row_count); ++i)
         {
             EXPECT_EQ(expected.rows[i].info_hash, actual.rows[i].info_hash);
             EXPECT_EQ(expected.rows[i].seeders, actual.rows[i].seeders);
@@ -130,7 +130,7 @@ protected:
     static void expectEqual(tr_scrape_request const& expected, std::vector<tr_sha1_digest_t> const& actual)
     {
         EXPECT_EQ(expected.info_hash_count, std::size(actual));
-        for (size_t i = 0; i < std::min(static_cast<size_t>(expected.info_hash_count), std::size(actual)); ++i)
+        for (size_t i = 0; i < std::min(expected.info_hash_count, std::size(actual)); ++i)
         {
             EXPECT_EQ(expected.info_hash[i], actual[i]);
         }
@@ -149,7 +149,7 @@ protected:
         auto request = tr_scrape_request{};
         request.scrape_url = response.scrape_url;
         request.info_hash_count = response.row_count;
-        for (int i = 0; i < request.info_hash_count; ++i)
+        for (size_t i = 0; i < request.info_hash_count; ++i)
         {
             request.info_hash[i] = response.rows[i].info_hash;
         }
@@ -161,7 +161,7 @@ protected:
         auto response = tr_scrape_response{};
         response.did_connect = true;
         response.did_timeout = false;
-        response.row_count = 1;
+        response.row_count = 1U;
         response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
         response.rows[0].seeders = 1;
         response.rows[0].leechers = 2;
@@ -265,7 +265,7 @@ protected:
         // EXPECT_EQ(foo, actual.event); ; // 0: none; 1: completed; 2: started; 3: stopped // FIXME
         // EXPECT_EQ(foo, actual.ip_address); // FIXME
         EXPECT_EQ(expected.key, static_cast<int>(actual.key));
-        EXPECT_EQ(expected.numwant, static_cast<int>(actual.num_want));
+        EXPECT_EQ(expected.numwant, static_cast<int64_t>(actual.num_want));
         EXPECT_EQ(expected.port.host(), actual.port);
     }
 
@@ -433,7 +433,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
-    expected_response.row_count = 2;
+    expected_response.row_count = 2U;
     expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, std::nullopt };
     expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, std::nullopt };
     expected_response.scrape_url = DefaultScrapeUrl;
@@ -460,7 +460,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     auto buf = MessageBuffer{};
     buf.add_uint32(ScrapeAction);
     buf.add_uint32(scrape_transaction_id);
-    for (int i = 0; i < expected_response.row_count; ++i)
+    for (size_t i = 0; i < expected_response.row_count; ++i)
     {
         buf.add_uint32(expected_response.rows[i].seeders.value_or(-1));
         buf.add_uint32(expected_response.rows[i].downloads.value_or(-1));
@@ -483,7 +483,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
-    expected_response.row_count = 1;
+    expected_response.row_count = 1U;
     expected_response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
     expected_response.rows[0].seeders = std::nullopt;
     expected_response.rows[0].leechers = std::nullopt;
@@ -537,7 +537,7 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
-    expected_response.row_count = 1;
+    expected_response.row_count = 1U;
     expected_response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
     expected_response.rows[0].seeders = std::nullopt; // empty optional here & on next lines means error
     expected_response.rows[0].leechers = std::nullopt;
@@ -580,7 +580,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     // build a simple scrape request
     auto request = tr_scrape_request{};
     request.scrape_url = DefaultScrapeUrl;
-    request.info_hash_count = 1;
+    request.info_hash_count = 1U;
     request.info_hash[0] = tr_rand_obj<tr_sha1_digest_t>();
 
     // Obtain the source socket address from tracker url

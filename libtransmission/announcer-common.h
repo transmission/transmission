@@ -66,7 +66,7 @@ struct tr_announce_request
     tr_announce_key_t key;
 
     /* the number of peers we'd like to get back in the response */
-    int numwant = 0;
+    int64_t numwant = 0;
 
     /* the number of bytes we uploaded since the last 'started' event */
     uint64_t up = 0;
@@ -158,7 +158,7 @@ struct tr_announce_response
  * This is only an upper bound: if the tracker complains about
  * length, announcer will incrementally lower the batch size.
  */
-auto inline constexpr TrMultiscrapeMax = 60;
+auto inline constexpr TrMultiscrapeMax = 60U;
 
 auto inline constexpr TrAnnounceTimeoutSec = std::chrono::seconds{ 45 };
 auto inline constexpr TrScrapeTimeoutSec = std::chrono::seconds{ 30 };
@@ -175,7 +175,7 @@ struct tr_scrape_request
     std::array<tr_sha1_digest_t, TrMultiscrapeMax> info_hash;
 
     /* how many hashes to use in the info_hash field */
-    int info_hash_count = 0;
+    size_t info_hash_count = 0U;
 };
 
 struct tr_scrape_response_row
@@ -207,7 +207,7 @@ struct tr_scrape_response
     bool did_timeout = false;
 
     /* how many info hashes are in the 'rows' field */
-    int row_count;
+    size_t row_count;
 
     /* the individual torrents' scrape results */
     std::array<tr_scrape_response_row, TrMultiscrapeMax> rows;

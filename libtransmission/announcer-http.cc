@@ -532,7 +532,7 @@ void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const& req)
     scrape_url = req.scrape_url.sv();
     char delimiter = tr_strv_contains(scrape_url, '?') ? '&' : '?';
 
-    for (int i = 0; i < req.info_hash_count; ++i)
+    for (size_t i = 0; i < req.info_hash_count; ++i)
     {
         scrape_url.append(delimiter, "info_hash=");
         tr_urlPercentEncode(std::back_inserter(scrape_url), req.info_hash[i]);
@@ -551,7 +551,7 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     auto& response = d->response();
     response.scrape_url = request.scrape_url;
     response.row_count = request.info_hash_count;
-    for (int i = 0; i < response.row_count; ++i)
+    for (size_t i = 0; i < response.row_count; ++i)
     {
         response.rows[i].info_hash = request.info_hash[i];
     }
