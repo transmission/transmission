@@ -76,7 +76,7 @@ struct StopsCompare
         }
 
         // secondary key: the torrent's info_hash
-        for (size_t i = 0, n = sizeof(tr_sha1_digest_t); i < n; ++i)
+        for (size_t i = 0; i < sizeof(tr_sha1_digest_t); ++i)
         {
             if (auto const val = tr_compare_3way(one.info_hash[i], two.info_hash[i]); val != 0)
             {
@@ -809,7 +809,7 @@ void tier_announce_remove_trailing(tr_tier* tier, tr_announce_event e)
 {
     while (!std::empty(tier->announce_events) && tier->announce_events.back() == e)
     {
-        tier->announce_events.resize(std::size(tier->announce_events) - 1);
+        tier->announce_events.pop_back();
     }
 
     tier_update_announce_priority(tier);
@@ -875,8 +875,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     using namespace announce_helpers;
 
     auto* current_tracker = tier->currentTracker();
-    std::string const announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) :
-                                                                  "nullptr";
+    auto const announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) : "nullptr"s;
 
     /* increment the error count */
     if (current_tracker != nullptr)
