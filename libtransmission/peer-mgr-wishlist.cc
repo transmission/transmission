@@ -276,7 +276,8 @@ private:
         tr_piece_index_t const piece,
         tr_piece_index_t const n_pieces,
         tr_piece_index_t const random_salt,
-        bool const is_sequential)
+        bool const is_sequential,
+        tr_piece_index_t const sequential_download_from_piece)
     {
         if (!is_sequential)
         {
@@ -294,7 +295,19 @@ private:
             return 1U;
         }
 
-        return piece + 1U;
+        if (sequential_download_from_piece <= 1)
+        {
+            return piece + 1U;
+        }
+
+        // Rotate remaining pieces
+        // 1 2 3 4 5 -> 3 4 5 1 2 if sequential_download_from_piece is 3
+        if (piece < sequential_download_from_piece)
+        {
+            return n_pieces - (sequential_download_from_piece - piece);
+        }
+
+        return piece - sequential_download_from_piece + 2U;
     }
 
     // ---
@@ -304,6 +317,7 @@ private:
         auto n_old_c = std::size(candidates_);
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
+        auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
 
         std::sort(
@@ -322,7 +336,7 @@ private:
                 }
                 else
                 {
-                    auto const salt = get_salt(piece, n_pieces, salter(), is_sequential);
+                    auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
                     candidates_.emplace_back(piece, salt, &mediator_);
                 }
             }
@@ -352,10 +366,11 @@ private:
     {
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
+        auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
         for (auto& candidate : candidates_)
         {
-            candidate.salt = get_salt(candidate.piece, n_pieces, salter(), is_sequential);
+            candidate.salt = get_salt(candidate.piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
         }
 
         std::sort(std::begin(candidates_), std::end(candidates_));
@@ -431,11 +446,13 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
           mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { requested_block_span(bs); }),
           // salt
           mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { recalculate_salt(); }),
+          mediator_in.observe_sequential_download_from_piece_changed([this](tr_torrent*, tr_piece_index_t) { recalculate_salt(); }),
       } }
     , mediator_{ mediator_in }
 {
     auto salter = tr_salt_shaker<tr_piece_index_t>{};
     auto const is_sequential = mediator_.is_sequential_download();
+    auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
     auto const n_pieces = mediator_.piece_count();
     candidates_.reserve(n_pieces);
     for (tr_piece_index_t piece = 0U; piece < n_pieces; ++piece)
@@ -445,7 +462,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
             continue;
         }
 
-        auto const salt = get_salt(piece, n_pieces, salter(), is_sequential);
+        auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
         candidates_.emplace_back(piece, salt, &mediator_);
     }
     std::sort(std::begin(candidates_), std::end(candidates_));

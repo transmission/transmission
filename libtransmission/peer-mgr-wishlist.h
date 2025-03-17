@@ -34,6 +34,7 @@ public:
         [[nodiscard]] virtual bool client_has_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool client_wants_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool is_sequential_download() const = 0;
+        [[nodiscard]] virtual tr_piece_index_t sequential_download_from_piece() const = 0;
         [[nodiscard]] virtual size_t count_piece_replication(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_block_span_t block_span(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_piece_index_t piece_count() const = 0;
@@ -65,6 +66,8 @@ public:
         [[nodiscard]] virtual libtransmission::ObserverTag observe_sent_request(
             libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_sequential_download_changed(
+            libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) = 0;
+        [[nodiscard]] virtual libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
             libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) = 0;
 
         virtual ~Mediator() = default;

@@ -773,6 +773,22 @@ struct tr_torrent
         return sequential_download_;
     }
 
+    void set_sequential_download_from_piece(tr_piece_index_t piece) noexcept
+    {
+        auto const is_valid = piece < piece_count();
+        TR_ASSERT(is_valid);
+        if (is_valid)
+        {
+            sequential_download_from_piece_ = piece;
+            sequential_download_from_piece_changed_.emit(this, piece);
+        }
+    }
+
+    [[nodiscard]] constexpr auto sequential_download_from_piece() const noexcept
+    {
+        return sequential_download_from_piece_;
+    }
+
     [[nodiscard]] constexpr bool is_running() const noexcept
     {
         return is_running_;
@@ -995,6 +1011,7 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
+    libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
@@ -1412,6 +1429,8 @@ private:
     bool needs_completeness_check_ = true;
 
     bool sequential_download_ = false;
+
+    tr_piece_index_t sequential_download_from_piece_ = 0;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
