@@ -831,9 +831,10 @@ void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announc
         {
             auto const has_completed = std::find(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) !=
                 std::end(events);
+            events.clear();
             if (has_completed)
             {
-                events.assign(1U, TR_ANNOUNCE_EVENT_COMPLETED);
+                events.push_back(TR_ANNOUNCE_EVENT_COMPLETED);
             }
         }
 
