@@ -379,7 +379,7 @@ void MainWindow::Impl::syncAltSpeedButton()
 {
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
     alt_speed_button_->set_active(b);
-    alt_speed_button_->set_tooltip_text(
+    alt_speed_button_->set_tooltip_text( //
         fmt::format(
             fmt::runtime(
                 b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :

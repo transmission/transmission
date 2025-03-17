@@ -144,7 +144,7 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
     }
     catch (Glib::Error const& e)
     {
-        gtr_warning(
+        gtr_warning( //
             fmt::format(
                 fmt::runtime(_("Couldn't create proxy for '{bus}': {error} ({error_code})")),
                 fmt::arg("bus", NotificationsDbusName),

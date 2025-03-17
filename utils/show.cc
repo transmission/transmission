@@ -345,7 +345,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto response_mutex = std::mutex{};
         auto response_cv = std::condition_variable{};
         auto lock = std::unique_lock(response_mutex);
-        web->fetch(
+        web->fetch( //
             { scrape_url,
               [&response, &response_cv](tr_web::FetchResponse const& resp)
               {

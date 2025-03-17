@@ -821,7 +821,7 @@ struct rename_data
 
 void FileList::Impl::on_rename_done(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
 {
-    rename_done_tags_.push(
+    rename_done_tags_.push( //
         Glib::signal_idle().connect(
             [this, path_string, newname, error]()
             {

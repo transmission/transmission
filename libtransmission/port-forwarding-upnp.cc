@@ -269,7 +269,7 @@ tr_port_forwarding_state tr_upnpPulse(
 #endif
             == UPNP_IGD_VALID_CONNECTED)
         {
-            tr_logAddInfo(
+            tr_logAddInfo( //
                 fmt::format(
                     fmt::runtime(_("Found Internet Gateway Device '{url}'")),
                     fmt::arg("url", handle->urls.controlURL)));
@@ -297,7 +297,7 @@ tr_port_forwarding_state tr_upnpPulse(
         (get_specific_port_mapping_entry(handle, "TCP") != UPNPCOMMAND_SUCCESS ||
          get_specific_port_mapping_entry(handle, "UDP") != UPNPCOMMAND_SUCCESS))
     {
-        tr_logAddInfo(
+        tr_logAddInfo( //
             fmt::format(
                 fmt::runtime(_("Local port {local_port} is not forwarded to {advertised_port}")),
                 fmt::arg("local_port", handle->local_port.host()),
@@ -310,7 +310,7 @@ tr_port_forwarding_state tr_upnpPulse(
         tr_upnpDeletePortMapping(handle, "TCP", handle->advertised_port);
         tr_upnpDeletePortMapping(handle, "UDP", handle->advertised_port);
 
-        tr_logAddInfo(
+        tr_logAddInfo( //
             fmt::format(
                 fmt::runtime(_("Stopping port forwarding through '{url}', service '{type}'")),
                 fmt::arg("url", handle->urls.controlURL),
@@ -344,7 +344,7 @@ tr_port_forwarding_state tr_upnpPulse(
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
-        tr_logAddDebug(
+        tr_logAddDebug( //
             fmt::format(
                 fmt::runtime(_("Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})")),
                 fmt::arg("url", handle->urls.controlURL),
@@ -354,7 +354,7 @@ tr_port_forwarding_state tr_upnpPulse(
 
         if (handle->isMapped)
         {
-            tr_logAddInfo(
+            tr_logAddInfo( //
                 fmt::format(
                     fmt::runtime(_("Forwarded local port {local_port} to {advertised_port}")),
                     fmt::arg("local_port", local_port.host()),

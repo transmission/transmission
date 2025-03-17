@@ -1339,7 +1339,7 @@ void onMetadataFetched(tr_web::FetchResponse const& web_response)
     auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
-    tr_logAddTrace(
+    tr_logAddTrace( //
         fmt::format(
             "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
             status,

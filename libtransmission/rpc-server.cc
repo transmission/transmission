@@ -100,7 +100,7 @@ public:
 
         if (std::size(src) >= TrUnixAddrStrLen)
         {
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)")),
                     fmt::arg("count", TrUnixAddrStrLen - 1),
@@ -343,7 +343,7 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 #endif
             auto remote_port = ev_uint16_t{};
             evhttp_connection_get_peer(con, &remote_host, &remote_port);
-            tr_logAddWarn(
+            tr_logAddWarn( //
                 fmt::format(
                     fmt::runtime(_("Rejected request from {host} (possible directory traversal attack)")),
                     fmt::arg("host", remote_host)));
@@ -528,7 +528,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 
     if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->settings().anti_brute_force_limit)
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Rejected request from {host} (brute force protection active)")),
                 fmt::arg("host", remote_host)));
@@ -561,7 +561,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 
     if (!is_authorized(server, evhttp_find_header(input_headers, "Authorization")))
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Rejected request from {host} (failed authentication)")),
                 fmt::arg("host", remote_host)));
@@ -636,7 +636,7 @@ void handle_request(struct evhttp_request* req, void* arg)
     }
     else
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Unknown URI from {host}: '{uri}'")),
                 fmt::arg("host", remote_host),
@@ -656,7 +656,7 @@ bool bindUnixSocket(
     [[maybe_unused]] tr_mode_t socket_mode)
 {
 #ifdef _WIN32
-    tr_logAddError(
+    tr_logAddError( //
         fmt::format(
             _("Unix sockets are unsupported on Windows. Please change '{key}' in your settings."),
             fmt::arg("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address))));
@@ -684,7 +684,7 @@ bool bindUnixSocket(
 
     if (chmod(addr.sun_path, socket_mode) != 0)
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755")),
                 fmt::arg("mode", socket_mode)));
@@ -800,7 +800,7 @@ void start_server(tr_rpc_server* server)
             return;
         }
 
-        tr_logAddError(
+        tr_logAddError( //
             fmt::format(
                 fmt::runtime(tr_ngettext(
                     "Couldn't bind to {address} after {count} attempt, giving up",
@@ -814,7 +814,7 @@ void start_server(tr_rpc_server* server)
         evhttp_set_gencb(httpd, handle_request, server);
         server->httpd.reset(httpd);
 
-        tr_logAddInfo(
+        tr_logAddInfo( //
             fmt::format(
                 fmt::runtime(_("Listening for RPC and Web requests on '{address}'")),
                 fmt::arg("address", addr_port_str)));
@@ -844,7 +844,7 @@ void stop_server(tr_rpc_server* server)
         unlink(address.c_str() + std::size(TrUnixSocketPrefix));
     }
 
-    tr_logAddInfo(
+    tr_logAddInfo( //
         fmt::format(
             fmt::runtime(_("Stopped listening for RPC and Web requests on '{address}'")),
             fmt::arg("address", server->bind_address_->to_string(server->port()))));
@@ -989,7 +989,7 @@ void tr_rpc_server::load(Settings&& settings)
     if (!bind_address_->from_string(settings_.bind_address_str))
     {
         // NOTE: bind_address_ is default initialized to INADDR_ANY
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_(
                     "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'")),

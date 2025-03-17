@@ -58,7 +58,7 @@ void save(std::string_view filename, address_range_t const* ranges, size_t n_ran
     auto out = std::ofstream{ tr_pathbuf{ filename }, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary };
     if (!out.is_open())
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
@@ -70,7 +70,7 @@ void save(std::string_view filename, address_range_t const* ranges, size_t n_ran
     if (!out.write(std::data(BinContentsPrefix), std::size(BinContentsPrefix)) ||
         !out.write(reinterpret_cast<char const*>(ranges), n_ranges * sizeof(*ranges)))
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
@@ -79,7 +79,7 @@ void save(std::string_view filename, address_range_t const* ranges, size_t n_ran
     }
     else
     {
-        tr_logAddInfo(
+        tr_logAddInfo( //
             fmt::format(
                 fmt::runtime(
                     tr_ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", n_ranges)),
@@ -240,7 +240,7 @@ auto parseFile(std::string_view filename)
     auto in = std::ifstream{ tr_pathbuf{ filename } };
     if (!in.is_open())
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
@@ -339,7 +339,7 @@ void Blocklists::Blocklist::ensureLoaded() const
     auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
     if (error)
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
                 fmt::arg("path", bin_file_),
@@ -355,7 +355,7 @@ void Blocklists::Blocklist::ensureLoaded() const
     auto in = std::ifstream{ bin_file_, std::ios_base::in | std::ios_base::binary };
     if (!in)
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
                 fmt::arg("path", bin_file_),
@@ -406,7 +406,7 @@ void Blocklists::Blocklist::ensureLoaded() const
         rules_.emplace_back(range);
     }
 
-    tr_logAddInfo(
+    tr_logAddInfo( //
         fmt::format(
             fmt::runtime(tr_ngettext(
                 "Blocklist '{path}' has {count} entry",
@@ -480,7 +480,7 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
     auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
     if (error)
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
                 fmt::arg("path", src_file),

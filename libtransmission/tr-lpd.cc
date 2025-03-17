@@ -266,7 +266,7 @@ private:
             auto const err = sockerrno;
             tr_net_close_socket(mcast_sockets_[TR_AF_INET]);
             mcast_sockets_[TR_AF_INET] = TR_BAD_SOCKET;
-            tr_logAddWarn(
+            tr_logAddWarn( //
                 fmt::format(
                     fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
                     fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET)),
@@ -280,7 +280,7 @@ private:
             auto const err = sockerrno;
             tr_net_close_socket(mcast_sockets_[TR_AF_INET6]);
             mcast_sockets_[TR_AF_INET6] = TR_BAD_SOCKET;
-            tr_logAddWarn(
+            tr_logAddWarn( //
                 fmt::format(
                     fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
                     fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET6)),
@@ -606,7 +606,7 @@ private:
     {
         if (messages_received_since_upkeep_ > MaxIncomingPerUpkeep)
         {
-            tr_logAddTrace(
+            tr_logAddTrace( //
                 fmt::format(
                     "Dropped {} announces in the last interval (max. {} allowed)",
                     messages_received_since_upkeep_ - MaxIncomingPerUpkeep,

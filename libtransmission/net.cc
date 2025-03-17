@@ -197,7 +197,7 @@ tr_socket_t createSocket(int domain, int type)
     {
         if (sockerrno != EAFNOSUPPORT)
         {
-            tr_logAddWarn(
+            tr_logAddWarn( //
                 fmt::format(
                     fmt::runtime(_("Couldn't create socket: {error} ({error_code})")),
                     fmt::arg("error", tr_net_strerror(sockerrno)),
@@ -274,7 +274,7 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
-        tr_logAddWarn(
+        tr_logAddWarn( //
             fmt::format(
                 fmt::runtime(_("Couldn't set source address {address} on {socket}: {error} ({error_code})")),
                 fmt::arg("address", source_addr.display_name()),
@@ -294,7 +294,7 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
         if (auto const tmperrno = sockerrno;
             (tmperrno != ECONNREFUSED && tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
         {
-            tr_logAddWarn(
+            tr_logAddWarn( //
                 fmt::format(
                     fmt::runtime(_("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})")),
                     fmt::arg("socket", s),
@@ -353,7 +353,7 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
 
         if (!suppress_msgs)
         {
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(
                         err == EADDRINUSE ?

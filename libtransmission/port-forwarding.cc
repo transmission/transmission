@@ -197,7 +197,7 @@ private:
         if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
         {
             mediator_.on_port_forwarded(result.advertised_port);
-            tr_logAddInfo(
+            tr_logAddInfo( //
                 fmt::format(
                     fmt::runtime(_("Mapped private port {private_port} to public port {public_port}")),
                     fmt::arg("private_port", result.local_port.host()),
@@ -214,7 +214,7 @@ private:
 
         if (auto const new_state = state(); new_state != old_state)
         {
-            tr_logAddInfo(
+            tr_logAddInfo( //
                 fmt::format(
                     fmt::runtime(_("State changed from '{old_state}' to '{state}'")),
                     fmt::arg("old_state", getNatStateStr(old_state)),

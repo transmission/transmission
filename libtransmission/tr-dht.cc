@@ -549,7 +549,7 @@ private:
 
             if (line_stream.bad() || std::empty(addrstr))
             {
-                tr_logAddWarn(
+                tr_logAddWarn( //
                     fmt::format(
                         fmt::runtime(_("Couldn't parse '{filename}' line: '{line}'")),
                         fmt::arg("filename", filename),
@@ -574,7 +574,7 @@ private:
         addrinfo* info = nullptr;
         if (int const rc = getaddrinfo(name, port_str.c_str(), &hints, &info); rc != 0)
         {
-            tr_logAddWarn(
+            tr_logAddWarn( //
                 fmt::format(
                     fmt::runtime(_("Couldn't look up '{address}:{port}': {error} ({error_code})")),
                     fmt::arg("address", name),

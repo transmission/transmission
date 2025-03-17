@@ -529,7 +529,7 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(
+        args.append( //
             QVariantMap{ {
                 std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
             } }); // hints

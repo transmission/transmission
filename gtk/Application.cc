@@ -396,7 +396,7 @@ void register_magnet_link_handler()
     }
     catch (Gio::Error const& e)
     {
-        gtr_warning(
+        gtr_warning( //
             fmt::format(
                 fmt::runtime(_("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})")),
                 fmt::arg("content_type", content_type),

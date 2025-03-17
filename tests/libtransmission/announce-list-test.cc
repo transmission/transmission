@@ -402,7 +402,7 @@ TEST_F(AnnounceListTest, save)
     EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
 
     // test that the saved version has the updated announce list
-    EXPECT_TRUE(
+    EXPECT_TRUE( //
         std::equal(
             std::begin(announce_list),
             std::end(announce_list),

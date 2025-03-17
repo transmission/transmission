@@ -541,7 +541,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
         catch (Glib::Error const& e)
         {
             error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            gtr_message(
+            gtr_message( //
                 fmt::format(
                     fmt::runtime(_("Couldn't move '{path}' to trash: {error} ({error_code})")),
                     fmt::arg("path", filename),
@@ -560,7 +560,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
         catch (Glib::Error const& e)
         {
             error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            gtr_message(
+            gtr_message( //
                 fmt::format(
                     fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
                     fmt::arg("path", filename),

@@ -71,7 +71,7 @@ private:
         if (kq_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
                     fmt::arg("error", tr_strerror(error_code)),
@@ -85,7 +85,7 @@ private:
         if (dirfd_ == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
                     fmt::arg("path", dirname()),
@@ -101,7 +101,7 @@ private:
         if (kevent(kq_, &ke, 1, nullptr, 0, nullptr) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Couldn't watch '{path}': {error} ({error_code})")),
                     fmt::arg("path", dirname()),
@@ -115,7 +115,7 @@ private:
         if (!event_)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
                     fmt::arg("error", tr_strerror(error_code)),
@@ -126,7 +126,7 @@ private:
         if (event_add(event_.get(), nullptr) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
                     fmt::arg("error", tr_strerror(error_code)),
@@ -147,7 +147,7 @@ private:
         if (kevent(kq_, nullptr, 0, &ke, 1, &ts) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     fmt::runtime(_("Couldn't read event: {error} ({error_code})")),
                     fmt::arg("error", tr_strerror(error_code)),

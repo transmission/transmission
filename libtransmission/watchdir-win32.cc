@@ -180,7 +180,7 @@ private:
         if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, std::data(notify_pipe_)) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     _("Couldn't create pipe: {error} ({error_code})"),
                     fmt::arg("error", tr_strerror(error_code)),
@@ -192,7 +192,7 @@ private:
         if (event_ == nullptr)
         {
             auto const error_code = errno;
-            tr_logAddError(
+            tr_logAddError( //
                 fmt::format(
                     _("Couldn't create event: {error} ({error_code})"),
                     fmt::arg("error", tr_strerror(error_code)),
@@ -292,7 +292,7 @@ private:
             if (nread == static_cast<size_t>(-1))
             {
                 auto const error_code = errno;
-                tr_logAddError(
+                tr_logAddError( //
                     fmt::format(
                         _("Couldn't read event: {error} ({error_code})"),
                         fmt::arg("error", tr_strerror(error_code)),
@@ -302,7 +302,7 @@ private:
 
             if (nread != header_size)
             {
-                tr_logAddError(
+                tr_logAddError( //
                     fmt::format(
                         _("Couldn't read event: expected {expected_size}, got {actual_size}"),
                         fmt::arg("expected_size", header_size),
@@ -328,7 +328,7 @@ private:
             if (nread == static_cast<size_t>(-1))
             {
                 auto const error_code = errno;
-                tr_logAddError(
+                tr_logAddError( //
                     fmt::format(
                         _("Couldn't read filename: {error} ({error_code})"),
                         fmt::arg("error", tr_strerror(error_code)),
@@ -338,7 +338,7 @@ private:
 
             if (nread != nleft)
             {
-                tr_logAddError(
+                tr_logAddError( //
                     fmt::format(
                         _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
                         fmt::arg("expected_size", nleft),
