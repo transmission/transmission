@@ -872,11 +872,12 @@ bool tr_variant_serde::to_file(tr_variant const& var, std::string_view filename)
 
     if (error_)
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error_.message()),
-            fmt::arg("error_code", error_.code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error_.message()),
+                fmt::arg("error_code", error_.code())));
         return false;
     }
 
