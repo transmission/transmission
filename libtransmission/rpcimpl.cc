@@ -887,14 +887,14 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
     return nullptr; // no error
 }
 
-char const* set_sequential_download_from_piece(tr_torrent* tor, tr_piece_index_t piece)
+char const* set_sequential_download_from_piece(tr_torrent& tor, tr_piece_index_t piece)
 {
-    if (piece >= tor->piece_count())
+    if (piece >= tor.piece_count())
     {
         return "piece to sequentially download from is outside pieces range";
     }
 
-    tor->set_sequential_download_from_piece(piece);
+    tor.set_sequential_download_from_piece(piece);
     return nullptr; // no error
 }
 
@@ -1042,9 +1042,9 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             tor->set_sequential_download(*val);
         }
 
-        if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); errmsg == nullptr)
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val && errmsg == nullptr)
         {
-            errmsg = set_sequential_download_from_piece(tor, *val);
+            errmsg = set_sequential_download_from_piece(*tor, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_downloadLimited))

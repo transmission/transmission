@@ -167,7 +167,7 @@ protected:
         }
 
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
-            libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override
         {
             return parent_.sequential_download_from_piece_changed_.observe(std::move(observer));
         }

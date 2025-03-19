@@ -419,7 +419,7 @@ public:
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
             libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
-            libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
 
     private:
         tr_torrent& tor_;
@@ -1142,7 +1142,7 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_down
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_from_piece_changed(
-    libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer)
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
 {
     return tor_.sequential_download_from_piece_changed_.observe(std::move(observer));
 }

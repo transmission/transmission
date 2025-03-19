@@ -773,15 +773,17 @@ struct tr_torrent
         return sequential_download_;
     }
 
-    void set_sequential_download_from_piece(tr_piece_index_t piece) noexcept
+    bool set_sequential_download_from_piece(tr_piece_index_t piece) noexcept
     {
         auto const is_valid = piece < piece_count();
         TR_ASSERT(is_valid);
-        if (is_valid)
+        if (is_valid && piece != sequential_download_from_piece_)
         {
             sequential_download_from_piece_ = piece;
             sequential_download_from_piece_changed_.emit(this, piece);
+            return true;
         }
+        return false;
     }
 
     [[nodiscard]] constexpr auto sequential_download_from_piece() const noexcept
