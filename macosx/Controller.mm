@@ -19,6 +19,8 @@
 #include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
+#import <IOKit/pwr_mgt/IOPMLib.h>
+
 #import "VDKQueue.h"
 
 #import "CocoaCompatibility.h"
@@ -5013,25 +5015,35 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
     case kIOMessageSystemWillSleep:
         {
-            //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
-            BOOL anyActive = NO;
-            for (Torrent* torrent in self.fTorrents)
-            {
-                if (torrent.active)
-                {
-                    anyActive = YES;
-                }
-                [torrent sleep]; //have to call on all, regardless if they are active
-            }
+            IOPMAssertionID assertionID;
+            IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
 
-            //if there are any running transfers, wait 15 seconds for them to stop
-            if (anyActive)
+            if (success == kIOReturnSuccess)
             {
-                sleep(15);
+                //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
+                BOOL anyActive = NO;
+                for (Torrent* torrent in self.fTorrents)
+                {
+                    if (torrent.active)
+                    {
+                        anyActive = YES;
+                    }
+                    [torrent sleep]; //have to call on all, regardless if they are active
+                }
+
+                //if there are any running transfers, wait 15 seconds for them to stop
+                if (anyActive)
+                {
+                    sleep(15);
+                }
+
+                success = IOPMAssertionRelease(assertionID);
             }
 
             IOAllowPowerChange(self.fRootPort, (long)messageArgument);
             break;
+
+            //The system will be able to sleep again or forcefully sleep after 30 seconds
         }
 
     case kIOMessageCanSystemSleep:
@@ -5042,7 +5054,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 if (torrent.active && !torrent.stalled && !torrent.error)
                 {
-                    IOCancelPowerChange(self.fRootPort, (long)messageArgument);
+                    IOPMAssertionID assertionID;
+                    IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
+
                     return;
                 }
             }
