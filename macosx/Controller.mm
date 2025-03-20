@@ -5050,19 +5050,21 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         if ([self.fDefaults boolForKey:@"SleepPrevent"])
         {
             //prevent idle sleep unless no torrents are active
+            IOPMAssertionID assertionID;
+            IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
+
             for (Torrent* torrent in self.fTorrents)
             {
                 if (torrent.active && !torrent.stalled && !torrent.error)
                 {
-                    IOPMAssertionID assertionID;
-                    IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
-
+                    //there is a maximum of 30 seconds to do work before system sleeps
+                    // it is no longer possible to prevent idle sleep
                     return;
                 }
             }
-        }
 
-        IOAllowPowerChange(self.fRootPort, (long)messageArgument);
+            IOAllowPowerChange(self.fRootPort, (long)messageArgument);
+        }
         break;
 
     case kIOMessageSystemHasPoweredOn:
