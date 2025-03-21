@@ -12,16 +12,21 @@
 namespace
 {
 
-auto const Options = std::array<tr_option, 8>{
-    tr_option{ 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
-    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", true, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-    { 'q', "pooka", "Pooka", "pk", false, nullptr },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
-};
+auto constexpr Options = std::array<tr_option, 8>{ {
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", tr_option::Arg::None, nullptr },
+    { 'o', "outfile", "Save the generated .torrent to this filename", "o", tr_option::Arg::Required, "<file>" },
+    { 's',
+      "piecesize",
+      "Set how many KiB each piece should be, overriding the preferred default",
+      "s",
+      tr_option::Arg::Required,
+      "<size in KiB>" },
+    { 'c', "comment", "Add a comment", "c", tr_option::Arg::Required, "<comment>" },
+    { 't', "tracker", "Add a tracker's announce URL", "t", tr_option::Arg::Required, "<url>" },
+    { 'q', "pooka", "Pooka", "pk", tr_option::Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+} };
 
 } // namespace
 

@@ -47,22 +47,27 @@ auto constexpr TimeoutSecs = std::chrono::seconds{ 30 };
 char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 
-auto options = std::array<tr_option, 14>{
-    { { 'd', "header", "Show only header section", "d", false, nullptr },
-      { 'i', "info", "Show only info section", "i", false, nullptr },
-      { 't', "trackers", "Show only trackers section", "t", false, nullptr },
-      { 'f', "files", "Show only file list", "f", false, nullptr },
-      { 'D', "no-header", "Do not show header section", "D", false, nullptr },
-      { 'I', "no-info", "Do not show info section", "I", false, nullptr },
-      { 'T', "no-trackers", "Do not show trackers section", "T", false, nullptr },
-      { 'F', "no-files", "Do not show files section", "F", false, nullptr },
-      { 'b', "bytes", "Show file sizes in bytes", "b", false, nullptr },
-      { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
-      { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
-      { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+auto constexpr options = std::array<tr_option, 14>{ {
+    { 'd', "header", "Show only header section", "d", tr_option::Arg::None, nullptr },
+    { 'i', "info", "Show only info section", "i", tr_option::Arg::None, nullptr },
+    { 't', "trackers", "Show only trackers section", "t", tr_option::Arg::None, nullptr },
+    { 'f', "files", "Show only file list", "f", tr_option::Arg::None, nullptr },
+    { 'D', "no-header", "Do not show header section", "D", tr_option::Arg::None, nullptr },
+    { 'I', "no-info", "Do not show info section", "I", tr_option::Arg::None, nullptr },
+    { 'T', "no-trackers", "Do not show trackers section", "T", tr_option::Arg::None, nullptr },
+    { 'F', "no-files", "Do not show files section", "F", tr_option::Arg::None, nullptr },
+    { 'b', "bytes", "Show file sizes in bytes", "b", tr_option::Arg::None, nullptr },
+    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", tr_option::Arg::None, nullptr },
+    { 's',
+      "scrape",
+      "Ask the torrent's trackers how many peers are in the torrent's swarm",
+      "s",
+      tr_option::Arg::None,
+      nullptr },
+    { 'u', "unsorted", "Do not sort files by name", "u", tr_option::Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+} };
 
 struct app_opts
 {

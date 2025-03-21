@@ -35,14 +35,14 @@ struct app_options
     bool show_version = false;
 };
 
-auto constexpr Options = std::array<tr_option, 6>{
-    { { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
-      { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
-      { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
-      { 's', "source", "Set the source", "s", true, "<source>" },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+auto constexpr Options = std::array<tr_option, 6>{ {
+    { 'a', "add", "Add a tracker's announce URL", "a", tr_option::Arg::Required, "<url>" },
+    { 'd', "delete", "Delete a tracker's announce URL", "d", tr_option::Arg::Required, "<url>" },
+    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", tr_option::Arg::Required, "<old> <new>" },
+    { 's', "source", "Set the source", "s", tr_option::Arg::Required, "<source>" },
+    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+} };
 
 int parseCommandLine(app_options& opts, int argc, char const* const* argv)
 {
