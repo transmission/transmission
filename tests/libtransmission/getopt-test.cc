@@ -12,7 +12,7 @@
 namespace
 {
 
-auto constexpr Options = std::array<tr_option, 8>{ {
+auto constexpr Options = std::array<tr_option, 10>{ {
     { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", tr_option::Arg::None, nullptr },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", tr_option::Arg::Required, "<file>" },
     { 's',
@@ -25,6 +25,7 @@ auto constexpr Options = std::array<tr_option, 8>{ {
     { 't', "tracker", "Add a tracker's announce URL", "t", tr_option::Arg::Required, "<url>" },
     { 'q', "pooka", "Pooka", "pk", tr_option::Arg::None, nullptr },
     { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
+    { 994, "sequential-download", "Download the torrent sequentially", "seq", tr_option::Arg::Optional, "<piece>" },
     { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
 } };
 
@@ -84,7 +85,7 @@ TEST_F(GetoptTest, longNoarg)
     runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
-TEST_F(GetoptTest, shortWithArg)
+TEST_F(GetoptTest, shortWithRequiredArg)
 {
     auto const args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "-o", "/tmp/outfile" };
     auto constexpr ExpectedN = 1;
@@ -93,7 +94,7 @@ TEST_F(GetoptTest, shortWithArg)
     runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
-TEST_F(GetoptTest, longWithArg)
+TEST_F(GetoptTest, longWithRequiredArg)
 {
     auto const args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "--outfile", "/tmp/outfile" };
     auto constexpr ExpectedN = 1;
@@ -102,7 +103,7 @@ TEST_F(GetoptTest, longWithArg)
     runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
-TEST_F(GetoptTest, shortWithArgAfterEq)
+TEST_F(GetoptTest, shortWithRequiredArgAfterEq)
 {
     auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-o=/tmp/outfile" };
     auto constexpr ExpectedN = 1;
@@ -111,7 +112,7 @@ TEST_F(GetoptTest, shortWithArgAfterEq)
     runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
-TEST_F(GetoptTest, longWithArgAfterEq)
+TEST_F(GetoptTest, longWithRequiredArgAfterEq)
 {
     auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--outfile=/tmp/outfile" };
     auto constexpr ExpectedN = 1;
@@ -155,6 +156,60 @@ TEST_F(GetoptTest, matchLongerKey)
     auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-pk" };
     auto constexpr ExpectedN = 1;
     auto const expected_c = std::array<int, ExpectedN>{ 'q' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
+}
+
+TEST_F(GetoptTest, shortWithOptionalArg)
+{
+    auto const args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "-seq", "12" };
+    auto constexpr ExpectedN = 1;
+    auto const expected_c = std::array<int, ExpectedN>{ 994 };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "12" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
+}
+
+TEST_F(GetoptTest, longWithOptionalArg)
+{
+    auto const args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "--sequential-download", "12" };
+    auto constexpr ExpectedN = 1;
+    auto const expected_c = std::array<int, ExpectedN>{ 994 };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "12" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
+}
+
+TEST_F(GetoptTest, shortWithOptionalArgAfterEq)
+{
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-seq=12" };
+    auto constexpr ExpectedN = 1;
+    auto const expected_c = std::array<int, ExpectedN>{ 994 };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "12" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
+}
+
+TEST_F(GetoptTest, longWithOptionalArgAfterEq)
+{
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--sequential-download=12" };
+    auto constexpr ExpectedN = 1;
+    auto const expected_c = std::array<int, ExpectedN>{ 994 };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "12" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
+}
+
+TEST_F(GetoptTest, shortWithoutOptionalArg)
+{
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-seq" };
+    auto constexpr ExpectedN = 1;
+    auto const expected_c = std::array<int, ExpectedN>{ 994 };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
+}
+
+TEST_F(GetoptTest, longWithoutOptionalArg)
+{
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--sequential-download" };
+    auto constexpr ExpectedN = 1;
+    auto const expected_c = std::array<int, ExpectedN>{ 994 };
     auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
     runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
