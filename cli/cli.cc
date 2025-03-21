@@ -48,35 +48,35 @@ sig_atomic_t manualUpdate = false;
 
 char const* torrentPath = nullptr;
 
-auto constexpr Options = std::array<tr_option, 20>{
-    { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
-      { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-      { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
-      { 'D', "no-downlimit", "Don't limit the download speed", "D", false, nullptr },
-      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-      { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
-      { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
-      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-      { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-      { 't',
-        "tos",
-        "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
-        ")",
-        "t",
-        true,
-        "<dscp-or-tos>" },
-      { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
-      { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
-      { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
-      { 500, "sequential-download", "Download pieces sequentially", "seq", false, nullptr },
+auto constexpr Options = std::array<tr_option, 20>{ {
+    { 'b', "blocklist", "Enable peer blocklists", "b", tr_option::Arg::None, nullptr },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", tr_option::Arg::None, nullptr },
+    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", tr_option::Arg::Required, "<speed>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", tr_option::Arg::None, nullptr },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", tr_option::Arg::None, nullptr },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", tr_option::Arg::None, nullptr },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", tr_option::Arg::None, nullptr },
+    { 'f', "finish", "Run a script when the torrent finishes", "f", tr_option::Arg::Required, "<script>" },
+    { 'g', "config-dir", "Where to find configuration files", "g", tr_option::Arg::Required, "<path>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", tr_option::Arg::None, nullptr },
+    { 'M', "no-portmap", "Disable portmapping", "M", tr_option::Arg::None, nullptr },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", tr_option::Arg::Required, "<port>" },
+    { 't',
+      "tos",
+      "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
+      ")",
+      "t",
+      tr_option::Arg::Required,
+      "<dscp-or-tos>" },
+    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", tr_option::Arg::Required, "<speed>" },
+    { 'U', "no-uplimit", "Don't limit the upload speed", "U", tr_option::Arg::None, nullptr },
+    { 'v', "verify", "Verify the specified torrent", "v", tr_option::Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
+    { 'w', "download-dir", "Where to save downloaded data", "w", tr_option::Arg::Required, "<path>" },
+    { 500, "sequential-download", "Download pieces sequentially", "seq", tr_option::Arg::None, nullptr },
 
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+} };
 
 int parseCommandLine(tr_variant*, int argc, char const** argv);
 
