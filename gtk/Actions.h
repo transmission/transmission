@@ -22,9 +22,11 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
 void gtr_actions_set_core(Glib::RefPtr<Session> const& core);
 void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data);
 
+Glib::RefPtr<Gio::Action const> gtr_action_find(Glib::ustring const& action_name);
 void gtr_action_activate(Glib::ustring const& action_name);
 void gtr_action_set_sensitive(Glib::ustring const& action_name, bool is_sensitive);
 void gtr_action_set_toggled(Glib::ustring const& action_name, bool is_toggled);
+
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name);
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)

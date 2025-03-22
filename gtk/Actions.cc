@@ -180,24 +180,43 @@ namespace
 
 Glib::RefPtr<Gio::SimpleAction> get_action(Glib::ustring const& name)
 {
-    return key_to_action.at(name);
+    if (auto const action_it = key_to_action.find(name); action_it != key_to_action.end())
+    {
+        return action_it->second;
+    }
+
+    return {};
 }
 
 } // namespace
 
-void gtr_action_activate(Glib::ustring const& name)
+Glib::RefPtr<Gio::Action const> gtr_action_find(Glib::ustring const& action_name)
 {
-    get_action(name)->activate();
+    return get_action(action_name);
 }
 
-void gtr_action_set_sensitive(Glib::ustring const& name, bool is_sensitive)
+void gtr_action_activate(Glib::ustring const& action_name)
 {
-    get_action(name)->set_enabled(is_sensitive);
+    if (auto const action = get_action(action_name); action != nullptr)
+    {
+        action->activate();
+    }
 }
 
-void gtr_action_set_toggled(Glib::ustring const& name, bool is_toggled)
+void gtr_action_set_sensitive(Glib::ustring const& action_name, bool is_sensitive)
 {
-    get_action(name)->change_state(is_toggled);
+    if (auto const action = get_action(action_name); action != nullptr)
+    {
+        action->set_enabled(is_sensitive);
+    }
+}
+
+void gtr_action_set_toggled(Glib::ustring const& action_name, bool is_toggled)
+{
+    if (auto const action = get_action(action_name); action != nullptr)
+    {
+        action->change_state(is_toggled);
+    }
 }
 
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name)
