@@ -1253,15 +1253,22 @@ void create_bit_torrent_peer(
     tr_torrent& tor,
     std::shared_ptr<tr_peerIo> io,
     std::shared_ptr<tr_peer_info> peer_info,
-    tr_interned_string client)
+    tr_interned_string client,
+    tr_interned_string peer_id)
 {
     TR_ASSERT(peer_info);
     TR_ASSERT(tor.swarm != nullptr);
 
     tr_swarm* swarm = tor.swarm;
 
-    auto* const
-        msgs = tr_peerMsgs::create(tor, std::move(peer_info), std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
+    auto* const msgs = tr_peerMsgs::create(
+        tor,
+        std::move(peer_info),
+        std::move(io),
+        client,
+        peer_id,
+        &tr_swarm::peer_callback_bt,
+        swarm);
     swarm->peers.push_back(msgs);
 
     ++swarm->stats.peer_count;
@@ -1354,15 +1361,17 @@ void create_bit_torrent_peer(
     }
 
     auto client = tr_interned_string{};
+    auto peer_id = tr_interned_string{};
     if (result.peer_id)
     {
         auto buf = std::array<char, 128>{};
         tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
         client = tr_interned_string{ tr_quark_new(std::data(buf)) };
+        peer_id = tr_interned_string{ result.peer_id->data() };
     }
 
     result.io->set_bandwidth(&swarm->tor->bandwidth());
-    create_bit_torrent_peer(*swarm->tor, result.io, std::move(info), client);
+    create_bit_torrent_peer(*swarm->tor, result.io, std::move(info), client, peer_id);
 
     return true;
 }
@@ -1759,6 +1768,7 @@ namespace peer_stat_helpers
 
     addr.display_name(stats.addr, sizeof(stats.addr));
     stats.client = peer->user_agent().c_str();
+    stats.peer_id = peer->peer_id().c_str();
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();

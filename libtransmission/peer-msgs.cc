@@ -299,9 +299,11 @@ public:
         std::shared_ptr<tr_peer_info> peer_info_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_interned_string client,
+        tr_interned_string peer_id,
         tr_peer_callback_bt callback,
         void* callback_data)
-        : tr_peerMsgs{ torrent_in, std::move(peer_info_in), client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
+        : tr_peerMsgs{ torrent_in,           std::move(peer_info_in), client, peer_id, io_in->is_encrypted(),
+                       io_in->is_incoming(), io_in->is_utp() }
         , tor_{ torrent_in }
         , io_{ std::move(io_in) }
         , have_{ torrent_in.piece_count() }
@@ -2114,12 +2116,14 @@ tr_peerMsgs::tr_peerMsgs(
     tr_torrent const& tor,
     std::shared_ptr<tr_peer_info> peer_info_in,
     tr_interned_string user_agent,
+    tr_interned_string peer_id,
     bool connection_is_encrypted,
     bool connection_is_incoming,
     bool connection_is_utp)
     : tr_peer{ tor }
     , peer_info{ std::move(peer_info_in) }
     , user_agent_{ user_agent }
+    , peer_id_{ peer_id }
     , connection_is_encrypted_{ connection_is_encrypted }
     , connection_is_incoming_{ connection_is_incoming }
     , connection_is_utp_{ connection_is_utp }
@@ -2140,8 +2144,9 @@ tr_peerMsgs* tr_peerMsgs::create(
     std::shared_ptr<tr_peer_info> peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
+    tr_interned_string peer_id,
     tr_peer_callback_bt callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl{ torrent, std::move(peer_info), std::move(io), user_agent, callback, callback_data };
+    return new tr_peerMsgsImpl{ torrent, std::move(peer_info), std::move(io), user_agent, peer_id, callback, callback_data };
 }

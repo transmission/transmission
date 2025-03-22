@@ -1190,6 +1190,7 @@ struct tr_peer_stat
     char addr[TR_INET6_ADDRSTRLEN];
     char flagStr[32];
     char const* client;
+    char const* peer_id;
 
     float progress;
     double rateToPeer_KBps;

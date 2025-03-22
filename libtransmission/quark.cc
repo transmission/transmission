@@ -230,6 +230,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "peer-port-random-low"sv,
     "peer-port-random-on-start"sv,
     "peer-socket-tos"sv,
+    "peerID"sv,
     "peerIsChoked"sv,
     "peerIsInterested"sv,
     "peers"sv,
