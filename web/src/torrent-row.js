@@ -217,14 +217,7 @@ export class TorrentRendererFull {
   render(controller, torrent, root) {
     const is_stopped = torrent.isStopped();
     root.classList.toggle('paused', is_stopped);
-    const {
-      button,
-      labels,
-      name,
-      peer_details,
-      progressbar,
-      progress_details,
-    } = root;
+    const { labels, name, peer_details, progressbar, progress_details } = root;
 
     // name
     setTextContent(name, torrent.getName());
@@ -241,11 +234,6 @@ export class TorrentRendererFull {
 
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, torrent, progressbar);
-    progressbar.classList.add('full');
-
-    // pause/resume button
-    button.alt = is_stopped ? 'Resume' : 'Pause';
-    button.dataset.action = is_stopped ? 'resume' : 'pause';
 
     // peer details
     TorrentRendererFull.renderPeerDetails(torrent, peer_details);
@@ -261,7 +249,7 @@ export class TorrentRendererFull {
       ['name', 'torrent-name'],
       ['labels', 'torrent-labels'],
       ['progress_details', 'torrent-progress-details'],
-      ['progress', 'torrent-progress'],
+      ['progressbar', 'torrent-progress-bar'],
       ['peer_details', 'torrent-peer-details'],
     ];
 
@@ -273,16 +261,6 @@ export class TorrentRendererFull {
     }
 
     TorrentRendererHelper.updateIcon(root.icon, torrent);
-
-    const progressbar = document.createElement('div');
-    progressbar.className = 'torrent-progress-bar full';
-
-    const button = document.createElement('a');
-    button.className = 'torrent-pauseresume-button';
-
-    root.progress.append(progressbar, button);
-    root.progressbar = progressbar;
-    root.button = button;
 
     return root;
   }

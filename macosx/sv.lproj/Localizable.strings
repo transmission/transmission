@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ verifierat";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "%lu IP-adressregler i listan";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu Känt:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu lokalt upptäckt";
@@ -218,7 +217,7 @@
 "Available" = "Tillgänglig";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bandbredd";
@@ -487,7 +486,7 @@
 "KB/s" = "KB/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Känt:";
 
 /* Tracker last announce */
 "Last Announce" = "Senaste annonsering";
@@ -503,9 +502,6 @@
 
 /* About window -> license button */
 "License" = "Licens";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Gräns (%ld KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Det gick inte att spara loggen";
@@ -685,7 +681,7 @@
 "Peers" = "Jämlikar";
 
 /* Preferences -> Network -> port status */
-"Port check site is down" = "Webbplats för kontroll av port är nere";
+"Port check site is down" = "Webbplats för portkontroll är nere";
 
 /* Preferences -> Network -> port status */
 "Port is closed" = "Porten är stängd";
@@ -694,7 +690,7 @@
 "Port is open" = "Porten är öppen";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "Port: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "PrefWindowSize";
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "Visa datafilen i Finder";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Visa verktygsfält";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statistik";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Stoppa vid kvot (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Sluta vänta på att starta";
@@ -1001,7 +994,7 @@
 "This folder contains no files." = "Denna mapp innehåller inga filer.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Det här alternativet är inte tillgängligt om Standardplats är inställd på Samma som torrentfil.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Denna överföring är aktiv. När den har tagits bort kommer torrentfilen eller magnetlänken att krävas för att fortsätta överföringen.";

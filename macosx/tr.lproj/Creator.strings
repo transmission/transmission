@@ -1,6 +1,6 @@
 
 /* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
-"5.title" = "Torrent Oluşturucu";
+"5.title" = "Torrent Oluşturucusu";
 
 /* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
 "70.title" = "Açıklama:";
@@ -9,7 +9,7 @@
 "71.title" = "İzleyiciler:";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
-"73.title" = "Değiştir...";
+"73.title" = "Değiştir…";
 
 /* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
 "74.title" = "Torrent dosyası:";
@@ -30,7 +30,7 @@
 "82.title" = "Vazgeç";
 
 /* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
-"83.title" = "Torrent dosyası oluşturuluyor...";
+"83.title" = "Torrent dosyası oluşturuluyor…";
 
 /* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
 "108.title" = "Her izleyici kendi sırasına göre konumlandırılacaktır";

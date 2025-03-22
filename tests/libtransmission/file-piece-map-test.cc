@@ -38,7 +38,7 @@ protected:
         8U,
         7U,
         6U,
-        (3U * PieceSize + PieceSize / 2U - 10U - 9U - 8U - 7U - 6U), // [offset 5.75P +10+9+8+7+6] ends end-of-torrent
+        ((3U * PieceSize) + (PieceSize / 2U) - 10U - 9U - 8U - 7U - 6U), // [offset 5.75P +10+9+8+7+6] ends end-of-torrent
         0U, // [offset 10P+1] zero-sized files at the end-of-torrent
         0U,
         0U,

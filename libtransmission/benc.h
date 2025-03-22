@@ -119,20 +119,22 @@ struct BasicHandler : public Handler
         return true;
     }
 
-    constexpr auto key(size_t i) const
+    [[nodiscard]] constexpr auto key(size_t i) const
     {
         return keys_[i];
     }
 
-    constexpr auto depth() const
+    [[nodiscard]] constexpr auto depth() const
     {
         return depth_;
     }
 
-    constexpr auto currentKey() const
+    [[nodiscard]] constexpr auto currentKey() const
     {
         return key(depth());
     }
+
+    static auto constexpr ArrayKey = std::nullopt;
 
 protected:
     [[nodiscard]] std::string path() const
@@ -141,10 +143,24 @@ protected:
         for (size_t i = 0; i <= depth(); ++i)
         {
             ret += '[';
-            ret += key(i);
+            ret += key(i).value_or(std::string_view{});
             ret += ']';
         }
         return ret;
+    }
+
+    template<typename... Args>
+    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
+    }
+
+    template<typename... Args>
+    [[nodiscard]] bool pathIs(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() == sizeof...(args)) && ((key(i++) == args) && ...);
     }
 
 private:
@@ -160,7 +176,7 @@ private:
     }
 
     size_t depth_ = 0;
-    std::array<std::string_view, MaxDepth> keys_;
+    std::array<std::optional<std::string_view>, MaxDepth> keys_;
 };
 
 template<std::size_t MaxDepth>
@@ -209,7 +225,7 @@ struct ParserStack
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
 
-    constexpr std::optional<ParentType> parentType() const
+    [[nodiscard]] constexpr std::optional<ParentType> parentType() const
     {
         if (depth == 0)
         {

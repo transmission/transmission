@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include "BaseDialog.h"
 #include "Typedefs.h"
 #include "ui_RelocateDialog.h"
@@ -17,10 +15,13 @@ class TorrentModel;
 class RelocateDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(RelocateDialog)
 
 public:
     RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
+    RelocateDialog(RelocateDialog&&) = delete;
+    RelocateDialog(RelocateDialog const&) = delete;
+    RelocateDialog& operator=(RelocateDialog&&) = delete;
+    RelocateDialog& operator=(RelocateDialog const&) = delete;
 
 private slots:
     void onSetLocation();

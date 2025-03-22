@@ -298,16 +298,18 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 
     auto& band = band_[dir];
 
-    if (band.is_limited_ && is_piece_data)
-    {
-        band.bytes_left_ -= std::min(band.bytes_left_, byte_count);
-    }
-
-    notify_bandwidth_consumed_bytes(now, band.raw_, byte_count);
-
     if (is_piece_data)
     {
         notify_bandwidth_consumed_bytes(now, band.piece_, byte_count);
+    }
+    else
+    {
+        notify_bandwidth_consumed_bytes(now, band.raw_, byte_count);
+
+        if (band.is_limited_)
+        {
+            band.bytes_left_ -= std::min(band.bytes_left_, byte_count);
+        }
     }
 
     if (parent_ != nullptr)

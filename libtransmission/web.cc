@@ -49,10 +49,6 @@
 
 using namespace std::literals;
 
-#if LIBCURL_VERSION_NUM >= 0x070F06 // CURLOPT_SOCKOPT* was added in 7.15.6
-#define USE_LIBCURL_SOCKOPT
-#endif
-
 // ---
 
 namespace
@@ -171,6 +167,22 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
+        auto const curl_version_num = get_curl_version();
+        if (curl_version_num == 0x080901)
+        {
+            tr_logAddWarn(_("Consider upgrading your curl installation."));
+            tr_logAddWarn(
+                _("curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"));
+        }
+
+        if (curl_version_num == 0x080B01)
+        {
+            tr_logAddWarn(_("Consider upgrading your curl installation."));
+            tr_logAddWarn(
+                _("curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT "
+                  "crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"));
+        }
+
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
             curl_ca_bundle = std::move(bundle);
@@ -181,8 +193,9 @@ public:
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            tr_logAddInfo(
-                fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"), fmt::arg("bundle", bundle)));
+            tr_logAddInfo(fmt::format(
+                fmt::runtime(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}")),
+                fmt::arg("bundle", bundle)));
             tr_logAddInfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
             tr_logAddInfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
@@ -386,6 +399,26 @@ public:
         CURL* easy_;
     };
 
+    [[nodiscard]] static unsigned int get_curl_version() noexcept
+    {
+        static auto const ver = curl_version_info(CURLVERSION_NOW)->version_num;
+        return ver;
+    }
+
+    // https://github.com/curl/curl/issues/10936
+    [[nodiscard]] static bool check_curl_gh10936() noexcept
+    {
+        static bool const in_range = 0x075700 /* 7.87.0 */ <= get_curl_version() && get_curl_version() <= 0x080500 /* 8.5.0 */;
+        return in_range;
+    }
+
+    // https://github.com/curl/curl/issues/6312
+    [[nodiscard]] static bool check_curl_gh6312() noexcept
+    {
+        static bool const in_range = 0x074700 /* 7.71.0 */ <= get_curl_version() && get_curl_version() <= 0x074a00 /* 7.74.0 */;
+        return in_range;
+    }
+
     static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
     static auto constexpr MaxRedirects = long{ 10 };
@@ -393,6 +426,7 @@ public:
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
+    bool const curl_avoid_http2 = check_curl_gh10936() || check_curl_gh6312(); // both related to curl http2 bugs
 
     Mediator& mediator;
 
@@ -460,7 +494,7 @@ public:
             if (code != NoResponseCode && code != PartialContentResponseCode)
             {
                 tr_logAddWarn(fmt::format(
-                    _("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"),
+                    fmt::runtime(_("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}")),
                     fmt::arg("url", task->url()),
                     fmt::arg("expected_code", PartialContentResponseCode),
                     fmt::arg("actual_code", code)));
@@ -489,7 +523,6 @@ public:
         return bytes_used;
     }
 
-#ifdef USE_LIBCURL_SOCKOPT
     static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
     {
         auto const* const task = static_cast<Task const*>(vtask);
@@ -510,7 +543,6 @@ public:
         // return nonzero if this function encountered an error
         return 0;
     }
-#endif
 
     void initEasy(Task& task)
     {
@@ -526,11 +558,8 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
-
-#ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);
-#endif
 
         if (!curl_ssl_verify)
         {
@@ -592,12 +621,22 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
         }
 
+        if (auto const& proxyUrl = mediator.proxyUrl().value_or(""); !std::empty(proxyUrl))
+        {
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxyUrl.data());
+        }
+
         if (auto const& range = task.range(); range)
         {
             /* don't bother asking the server to compress webseed fragments */
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
             (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+        }
+
+        if (curl_avoid_http2)
+        {
+            (void)curl_easy_setopt(e, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
         }
     }
 

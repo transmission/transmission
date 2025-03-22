@@ -266,48 +266,6 @@
 /* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
 "1933.title" = "Трекеру";
 
-/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
-"1936.title" = "Меню";
-
-/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "Скорость скачивания";
-
-/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "Скорость скачивания";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
-"1946.title" = "Без ограничений";
-
-/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Скорость раздачи";
-
-/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Скорость раздачи";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
-"1960.title" = "С ограничением (?)";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
-"1963.title" = "Без ограничений";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
-"1964.title" = "С ограничением (?)";
-
-/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
-"2017.title" = "Остановить при рейтинге";
-
-/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
-"2018.title" = "Остановить при рейтинге";
-
-/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
-"2024.title" = "Не останавливать";
-
-/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
-"2025.title" = "остановить при рейтинге";
-
-/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
-"2031.title" = "Общие настройки";
-
 /* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
 "2122.title" = "Обновить трекер";
 
@@ -339,31 +297,13 @@
 "3078.title" = "Использовать группы";
 
 /* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
-/* "3093.headerCell.title" = ""; */
+"3093.headerCell.title" = "Торрент";
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
 "3166.title" = "Быстрый ";
 
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
 "3170.title" = "Transmission wiki и разработка";
-
-/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
-"3190.title" = "Не превышать общее ограничение скорости";
-
-/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
-"3196.title" = "Приоритет";
-
-/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
-"3197.title" = "Приоритет";
-
-/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
-"3198.title" = "Высокий";
-
-/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
-"3199.title" = "Нормальный";
-
-/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
-"3200.title" = "Низкий";
 
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
 "3207.title" = "Сохранить торрент-файл как…";
@@ -375,10 +315,10 @@
 "3212.title" = "Сделать пожертвование…";
 
 /* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3216"; */
-"3216.title" = "Копировать магнет-ссылку в буфер";
+"3216.title" = "Копировать магнит-ссылку в буфер";
 
 /* Class = "NSMenuItem"; title = "Copy Magnet Link to Clipboard"; ObjectID = "3218"; */
-"3218.title" = "Копировать магнет-ссылку в буфер";
+"3218.title" = "Копировать магнит-ссылку в буфер";
 
 /* Class = "NSMenuItem"; title = "Verify Local Data"; ObjectID = "3221"; */
 "3221.title" = "Перепроверить существующие данные";
@@ -411,16 +351,16 @@
 "Cay-iU-bH4.title" = "Отправить торрент-файл";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
-/* "HmT-FI-amY.title" = ""; */
+"HmT-FI-amY.title" = "0,0 КБ/с";
 
 /* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
-/* "Zmj-A9-NPf.title" = ""; */
+"Zmj-A9-NPf.title" = "Строка состояния";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
-/* "kbX-Av-eP4.title" = ""; */
+"kbX-Av-eP4.title" = "Заголовок";
 
 /* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
-/* "lmp-Y3-ZQO.title" = ""; */
+"lmp-Y3-ZQO.title" = "Состояние";
 
 /* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
 "lvU-Va-GzM.title" = "Отправить торрент-файл";
@@ -432,13 +372,13 @@
 "s5v-VO-G2y.title" = "Отправить торрент-файл";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
-/* "x8g-Nv-jcD.title" = ""; */
+"x8g-Nv-jcD.title" = "0,0 КБ/с";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
-/* "y9O-gd-sXA.title" = ""; */
+"y9O-gd-sXA.title" = "Заголовок";
 
 /* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
-/* "zIM-6D-jsa.title" = ""; */
+"zIM-6D-jsa.title" = "Заголовок группы";
 
 /* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
-/* "zLF-YR-Oq6.title" = ""; */
+"zLF-YR-Oq6.title" = "Расчётное время";

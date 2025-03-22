@@ -7,12 +7,9 @@
 
 #include <QObject>
 
-#include <libtransmission/tr-macros.h>
-
 class InteropObject : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(InteropObject)
 
 #ifdef ENABLE_DBUS_INTEROP
     Q_CLASSINFO("D-Bus Interface", "com.transmissionbt.Transmission")
@@ -28,8 +25,12 @@ class InteropObject : public QObject
 
 public:
     explicit InteropObject(QObject* parent = nullptr);
+    InteropObject& operator=(InteropObject&&) = delete;
+    InteropObject& operator=(InteropObject const&) = delete;
+    InteropObject(InteropObject&&) = delete;
+    InteropObject(InteropObject const&) = delete;
 
 public slots:
-    bool PresentWindow() const;
-    bool AddMetainfo(QString const& metainfo) const;
+    [[nodiscard]] bool PresentWindow() const;
+    [[nodiscard]] bool AddMetainfo(QString const& metainfo) const;
 };

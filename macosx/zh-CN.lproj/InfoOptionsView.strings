@@ -6,10 +6,10 @@
 "23.title" = "传输带宽";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
-"26.title" = "KB/s";
+"26.title" = "KB/秒";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
-"29.title" = "KB/s";
+"29.title" = "KB/秒";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
 "30.title" = "分享率：";

@@ -9,7 +9,6 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/favicon-cache.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 
 #include <gdkmm/pixbuf.h>
@@ -31,6 +30,11 @@
 class Session : public Glib::Object
 {
 public:
+    Session(Session&&) = delete;
+    Session(Session const&) = delete;
+    Session& operator=(Session&&) = delete;
+    Session& operator=(Session const&) = delete;
+
     enum ErrorCode : uint16_t
     {
         ERR_ADD_TORRENT_ERR = 1,
@@ -49,8 +53,6 @@ public:
 
 public:
     ~Session() override;
-
-    TR_DISABLE_COPY_MOVE(Session)
 
     static Glib::RefPtr<Session> create(tr_session* session);
 

@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/refptr.h>
 #include <gtkmm/window.h>
 
@@ -18,9 +16,11 @@ class SystemTrayIcon
 {
 public:
     SystemTrayIcon(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
+    SystemTrayIcon(SystemTrayIcon&&) = delete;
+    SystemTrayIcon(SystemTrayIcon const&) = delete;
+    SystemTrayIcon& operator=(SystemTrayIcon&&) = delete;
+    SystemTrayIcon& operator=(SystemTrayIcon const&) = delete;
     ~SystemTrayIcon();
-
-    TR_DISABLE_COPY_MOVE(SystemTrayIcon)
 
     void refresh();
 

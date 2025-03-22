@@ -12,7 +12,6 @@
 #include <QVariant>
 
 #include <libtransmission/quark.h>
-#include <libtransmission/tr-macros.h>
 
 class QDateTime;
 
@@ -24,7 +23,6 @@ extern "C"
 class Prefs : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum
@@ -132,6 +130,10 @@ public:
     };
 
     explicit Prefs(QString config_dir);
+    Prefs(Prefs&&) = delete;
+    Prefs(Prefs const&) = delete;
+    Prefs& operator=(Prefs&&) = delete;
+    Prefs& operator=(Prefs const&) = delete;
     ~Prefs() override;
 
     [[nodiscard]] constexpr auto isCore(int key) const noexcept

@@ -6,7 +6,6 @@
 #pragma once
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>
@@ -27,9 +26,11 @@ public:
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
         std::vector<tr_torrent_id_t> const& torrent_ids);
+    RelocateDialog(RelocateDialog&&) = delete;
+    RelocateDialog(RelocateDialog const&) = delete;
+    RelocateDialog& operator=(RelocateDialog&&) = delete;
+    RelocateDialog& operator=(RelocateDialog const&) = delete;
     ~RelocateDialog() override;
-
-    TR_DISABLE_COPY_MOVE(RelocateDialog)
 
     static std::unique_ptr<RelocateDialog> create(
         Gtk::Window& parent,

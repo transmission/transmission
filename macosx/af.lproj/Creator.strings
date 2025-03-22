@@ -1,0 +1,39 @@
+
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
+"5.title" = "Torrentskepper";
+
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
+"70.title" = "Kommentaar:";
+
+/* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
+"71.title" = "Spoorders:";
+
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
+"73.title" = "Verander…";
+
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
+"74.title" = "Torrentlêer:";
+
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
+"77.title" = "Privaat";
+
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
+"78.title" = "Skep";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
+"79.title" = "Kanselleer";
+
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
+"81.title" = "Open wanneer geskep";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
+"82.title" = "Kanselleer";
+
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
+"83.title" = "Skep tans torrentlêer…";
+
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
+"108.title" = "Elke spoorder sal in sy eie vlak geplaas word";
+
+/* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */
+"f1g-Kk-weU.title" = "Bron:";

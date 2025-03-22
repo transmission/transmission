@@ -7,8 +7,6 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/tr-macros.h>
-
 #include <giomm/listmodel.h>
 #include <glibmm/extraclassinit.h>
 #include <glibmm/refptr.h>
@@ -40,9 +38,11 @@ public:
 public:
     FilterBar();
     FilterBar(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    FilterBar(FilterBar&&) = delete;
+    FilterBar(FilterBar const&) = delete;
+    FilterBar& operator=(FilterBar&&) = delete;
+    FilterBar& operator=(FilterBar const&) = delete;
     ~FilterBar() override;
-
-    TR_DISABLE_COPY_MOVE(FilterBar)
 
     Glib::RefPtr<Model> get_filter_model() const;
 

@@ -32,6 +32,7 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #else
 #include <arpa/inet.h>
+#include <sys/stat.h> /* umask() */
 #endif
 
 #define UTF_CPP_CPLUSPLUS 201703L
@@ -134,7 +135,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (*error)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -143,7 +144,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
 
     if (!info || !info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
+        tr_logAddError(fmt::format(fmt::runtime(_("Couldn't read '{path}': Not a regular file")), fmt::arg("path", filename)));
         error->set(TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -153,7 +154,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -164,7 +165,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -193,6 +194,14 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
     {
         return false;
     }
+#ifndef _WIN32
+    // set file mode per settings umask()
+    {
+        auto const val = ::umask(0);
+        ::umask(val);
+        fchmod(fd, 0666 & ~val);
+    }
+#endif
 
     // Save the contents. This might take >1 pass.
     auto ok = true;
@@ -624,7 +633,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
     if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't remove '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
             fmt::arg("path", oldpath),
             fmt::arg("error", log_error.message()),
             fmt::arg("error_code", log_error.code())));
@@ -724,36 +733,53 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 // ---
 
-tr_net_init_mgr::tr_net_init_mgr()
+namespace
 {
-    // try to init curl with default settings (currently ssl support + win32 sockets)
-    // but if that fails, we need to init win32 sockets as a bare minimum
-    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+namespace tr_net_init_impl
+{
+class tr_net_init_mgr
+{
+private:
+    tr_net_init_mgr()
     {
-        curl_global_init(CURL_GLOBAL_WIN32);
+        // try to init curl with default settings (currently ssl support + win32 sockets)
+        // but if that fails, we need to init win32 sockets as a bare minimum
+        if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+        {
+            curl_global_init(CURL_GLOBAL_WIN32);
+        }
     }
-}
 
-tr_net_init_mgr::~tr_net_init_mgr()
-{
-    curl_global_cleanup();
-}
-
-std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::create()
-{
-    if (!initialised)
+public:
+    tr_net_init_mgr(tr_net_init_mgr const&) = delete;
+    tr_net_init_mgr(tr_net_init_mgr&&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr const&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr&&) = delete;
+    ~tr_net_init_mgr()
     {
-        initialised = true;
-        return std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+        curl_global_cleanup();
     }
-    return {};
-}
 
-bool tr_net_init_mgr::initialised = false;
+    static void create()
+    {
+        if (!instance)
+        {
+            instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+        }
+    }
 
-std::unique_ptr<tr_net_init_mgr> tr_lib_init()
+private:
+    static std::unique_ptr<tr_net_init_mgr> instance;
+};
+
+std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
+
+} // namespace tr_net_init_impl
+} // namespace
+
+void tr_lib_init()
 {
-    return tr_net_init_mgr::create();
+    tr_net_init_impl::tr_net_init_mgr::create();
 }
 
 // --- mime-type

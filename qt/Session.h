@@ -20,7 +20,6 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
-#include <libtransmission/tr-macros.h>
 
 #include "RpcClient.h"
 #include "RpcQueue.h"
@@ -38,10 +37,13 @@ extern "C"
 class Session : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(Session)
 
 public:
     Session(QString config_dir, Prefs& prefs);
+    Session(Session&&) = delete;
+    Session(Session const&) = delete;
+    Session& operator=(Session&&) = delete;
+    Session& operator=(Session const&) = delete;
     ~Session() override;
 
     void stop();

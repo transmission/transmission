@@ -12,8 +12,6 @@
 #include <QString>
 #include <QTimer>
 
-#include <libtransmission/tr-macros.h>
-
 #include "BaseDialog.h"
 #include "Session.h"
 #include "Typedefs.h"
@@ -34,10 +32,13 @@ class TrackerModelFilter;
 class DetailsDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(DetailsDialog)
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
+    DetailsDialog(DetailsDialog&&) = delete;
+    DetailsDialog(DetailsDialog const&) = delete;
+    DetailsDialog& operator=(DetailsDialog&&) = delete;
+    DetailsDialog& operator=(DetailsDialog const&) = delete;
     ~DetailsDialog() override;
 
     void setIds(torrent_ids_t const& ids);

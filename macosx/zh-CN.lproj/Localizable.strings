@@ -18,9 +18,8 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ 已验证";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld KB/s";
+/* Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/秒";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld 分钟";
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "列表中有 %lu 条 IP 地址规则";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu 已知：";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu 本地发现";
@@ -166,19 +165,19 @@
 "All Groups" = "全部群组";
 
 /* Tracker last announce */
-"Announce error" = "公告错误";
+"Announce error" = "宣告错误";
 
 /* Tracker next announce */
-"Announce in progress" = "正在公告";
+"Announce in progress" = "正在宣告";
 
 /* Tracker next announce */
-"Announce is queued" = "公告已排队";
+"Announce is queued" = "等待宣告";
 
 /* Tracker next announce */
-"Announce not scheduled" = "公告未计划";
+"Announce not scheduled" = "未计划宣告";
 
 /* Tracker last announce */
-"Announce timed out" = "公告超时";
+"Announce timed out" = "宣告超时";
 
 /* All toolbar item -> label */
 "Apply All" = "全部应用";
@@ -218,7 +217,7 @@
 "Available" = "可用";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "字节/秒";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "带宽";
@@ -248,7 +247,7 @@
 "Check Selected" = "勾选";
 
 /* Torrent -> status string */
-"Checking existing data" = "检查已有数据";
+"Checking existing data" = "正在检查已有数据";
 
 /* Message window -> save button */
 "Clear" = "清除";
@@ -407,7 +406,7 @@
 "From: tracker" = "来自tracker";
 
 /* Transfer speed (gigabytes per second) */
-"GB/s" = "GB/s";
+"GB/s" = "GB/秒";
 
 /* Preferences -> toolbar item title */
 "General" = "一般";
@@ -484,13 +483,13 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "%2$@处的文件%1$@不是种子文件。";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "KB/s";
+"KB/s" = "KB/秒";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "已知:";
 
 /* Tracker last announce */
-"Last Announce" = "上一公告";
+"Last Announce" = "上次宣告";
 
 /* Tracker last scrape */
 "Last Scrape" = "上一抓取";
@@ -503,9 +502,6 @@
 
 /* About window -> license button */
 "License" = "认证";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "限制（%ld KB/s）";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "无法保存记录";
@@ -524,7 +520,7 @@
 "Magnetized transfer" = "磁力传输";
 
 /* Transfer speed (megabytes per second) */
-"MB/s" = "MB/s";
+"MB/s" = "MB/秒";
 
 /* Message window -> table column */
 "Message" = "消息";
@@ -556,7 +552,7 @@
 "New Tier" = "新等级";
 
 /* Tracker next announce */
-"Next announce in %@" = "下一个公告在%@后";
+"Next announce in %@" = "下次宣告在 %@ 后";
 
 /* Group table row */
 "No Group" = "没有群组";
@@ -694,7 +690,7 @@
 "Port is open" = "端口是打开的";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "端口: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "偏好设置窗口大小";
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "在 Finder 中显示数据文件";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "显示工具栏";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -915,9 +911,6 @@
 /* Stats window -> title */
 "Statistics" = "统计信息";
 
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "达到分享率（%.2f）后停止";
-
 /* Torrent cell -> button info */
 "Stop waiting to start" = "停止等待开始";
 
@@ -925,7 +918,7 @@
 "Support open-source indie software" = "支持开源的独立软件";
 
 /* Transfer speed (terabytes per second) */
-"TB/s" = "TB/s";
+"TB/s" = "TB/秒";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "所选的 Torrent 文件位置不存在。";
@@ -1001,7 +994,7 @@
 "This folder contains no files." = "此文件夹中没有文件。";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "如果默认位置已设为与种子文件使用相同目录，此选项不可用。";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "该传输正在进行中。一旦移除，继续传输需要 Torrent 文件或磁力链接。";

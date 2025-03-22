@@ -35,12 +35,19 @@ public:
 
     tr_strbuf(tr_strbuf const& other)
     {
-        assign(other.sv());
+        if (this != &other)
+        {
+            assign(other.sv());
+        }
     }
 
     tr_strbuf& operator=(tr_strbuf const& other)
     {
-        assign(other.sv());
+        if (this != &other)
+        {
+            assign(other.sv());
+        }
+
         return *this;
     }
 
@@ -124,7 +131,7 @@ public:
     }
 
     template<typename ContiguousRange>
-    [[nodiscard]] constexpr auto operator==(ContiguousRange const& x) const noexcept
+    [[nodiscard]] constexpr bool operator==(ContiguousRange const& x) const noexcept
     {
         return sv() == x;
     }

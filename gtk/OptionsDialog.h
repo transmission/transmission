@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
@@ -28,9 +26,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core);
+    TorrentUrlChooserDialog(TorrentUrlChooserDialog&&) = delete;
+    TorrentUrlChooserDialog(TorrentUrlChooserDialog const&) = delete;
+    TorrentUrlChooserDialog& operator=(TorrentUrlChooserDialog&&) = delete;
+    TorrentUrlChooserDialog& operator=(TorrentUrlChooserDialog const&) = delete;
     ~TorrentUrlChooserDialog() override = default;
-
-    TR_DISABLE_COPY_MOVE(TorrentUrlChooserDialog)
 
     static std::unique_ptr<TorrentUrlChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
@@ -41,9 +41,11 @@ private:
 class TorrentFileChooserDialog : public Gtk::FileChooserNative
 {
 public:
+    TorrentFileChooserDialog(TorrentFileChooserDialog&&) = delete;
+    TorrentFileChooserDialog(TorrentFileChooserDialog const&) = delete;
+    TorrentFileChooserDialog& operator=(TorrentFileChooserDialog&&) = delete;
+    TorrentFileChooserDialog& operator=(TorrentFileChooserDialog const&) = delete;
     ~TorrentFileChooserDialog() override = default;
-
-    TR_DISABLE_COPY_MOVE(TorrentFileChooserDialog)
 
     static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
@@ -63,9 +65,11 @@ public:
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
+    OptionsDialog(OptionsDialog&&) = delete;
+    OptionsDialog(OptionsDialog const&) = delete;
+    OptionsDialog& operator=(OptionsDialog&&) = delete;
+    OptionsDialog& operator=(OptionsDialog const&) = delete;
     ~OptionsDialog() override;
-
-    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
     static std::unique_ptr<OptionsDialog> create(
         Gtk::Window& parent,

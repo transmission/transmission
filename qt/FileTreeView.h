@@ -7,8 +7,6 @@
 
 #include <QTreeView>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Torrent.h" // FileList
 #include "Typedefs.h" // file_indices_t
 
@@ -22,10 +20,13 @@ class FileTreeModel;
 class FileTreeView : public QTreeView
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FileTreeView)
 
 public:
     FileTreeView(QWidget* parent = nullptr, bool editable = true);
+    FileTreeView(FileTreeView&&) = delete;
+    FileTreeView(FileTreeView const&) = delete;
+    FileTreeView& operator=(FileTreeView&&) = delete;
+    FileTreeView& operator=(FileTreeView const&) = delete;
 
     void clear();
     void update(FileList const& files, bool update_fields = true);
@@ -62,7 +63,7 @@ private slots:
 
 private:
     void initContextMenu();
-    QModelIndexList selectedSourceRows(int column = 0) const;
+    [[nodiscard]] QModelIndexList selectedSourceRows(int column = 0) const;
 
     static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 

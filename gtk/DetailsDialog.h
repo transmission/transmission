@@ -6,7 +6,6 @@
 #pragma once
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>
@@ -26,9 +25,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core);
+    DetailsDialog(DetailsDialog&&) = delete;
+    DetailsDialog(DetailsDialog const&) = delete;
+    DetailsDialog& operator=(DetailsDialog&&) = delete;
+    DetailsDialog& operator=(DetailsDialog const&) = delete;
     ~DetailsDialog() override;
-
-    TR_DISABLE_COPY_MOVE(DetailsDialog)
 
     static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

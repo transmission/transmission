@@ -23,9 +23,11 @@ class FreeSpaceLabel::Impl
 {
 public:
     Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_dir(std::string_view dir);
 
@@ -51,8 +53,9 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     }
 
     auto const capacity = tr_sys_path_get_capacity(dir_);
-    auto const text = capacity ? fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
-                                 _("Error");
+    auto const text = capacity ?
+        fmt::format(fmt::runtime(_("{disk_space} free")), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
+        _("Error");
     label_.set_markup(fmt::format("<i>{:s}</i>", text));
 
     return true;

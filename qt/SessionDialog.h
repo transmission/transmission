@@ -7,8 +7,6 @@
 
 #include <QWidgetList>
 
-#include <libtransmission/tr-macros.h>
-
 #include "BaseDialog.h"
 #include "ui_SessionDialog.h"
 
@@ -18,10 +16,13 @@ class Session;
 class SessionDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(SessionDialog)
 
 public:
     SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
+    SessionDialog(SessionDialog&&) = delete;
+    SessionDialog(SessionDialog const&) = delete;
+    SessionDialog& operator=(SessionDialog&&) = delete;
+    SessionDialog& operator=(SessionDialog const&) = delete;
 
 public slots:
     // QDialog

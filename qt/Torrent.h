@@ -21,8 +21,8 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
+#include "libtransmission/tr-macros.h"
 #include <libtransmission/quark.h>
-#include <libtransmission/tr-macros.h>
 
 #include "IconCache.h"
 #include "Speed.h"
@@ -59,7 +59,7 @@ using PeerList = std::vector<Peer>;
 
 struct TrackerStat
 {
-    QPixmap getFavicon() const;
+    [[nodiscard]] QPixmap getFavicon() const;
 
     bool has_announced;
     bool has_scraped;
@@ -147,10 +147,13 @@ public:
 class Torrent : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(Torrent)
 
 public:
     Torrent(Prefs const&, int id);
+    Torrent(Torrent&&) = delete;
+    Torrent(Torrent const&) = delete;
+    Torrent& operator=(Torrent&&) = delete;
+    Torrent& operator=(Torrent const&) = delete;
 
     [[nodiscard]] constexpr auto getBandwidthPriority() const noexcept
     {

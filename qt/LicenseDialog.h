@@ -5,18 +5,19 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include "BaseDialog.h"
 #include "ui_LicenseDialog.h"
 
 class LicenseDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(LicenseDialog)
 
 public:
     explicit LicenseDialog(QWidget* parent = nullptr);
+    LicenseDialog(LicenseDialog&&) = delete;
+    LicenseDialog(LicenseDialog const&) = delete;
+    LicenseDialog& operator=(LicenseDialog&&) = delete;
+    LicenseDialog& operator=(LicenseDialog const&) = delete;
 
 private:
     Ui::LicenseDialog ui_ = {};

@@ -259,7 +259,9 @@ public:
 
     void got_piece_data(uint32_t n_bytes)
     {
-        bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, true, tr_time_msec());
+        auto const now = tr_time_msec();
+        bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, false, now);
+        bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, true, now);
         publish(tr_peer_event::GotPieceData(n_bytes));
         connection_limiter.got_data();
     }

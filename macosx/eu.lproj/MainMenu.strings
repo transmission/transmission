@@ -266,48 +266,6 @@
 /* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
 "1933.title" = "Aztarnaria";
 
-/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
-"1936.title" = "Menua";
-
-/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "Deskarga-transferentzien Muga";
-
-/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "Deskarga-transferentzien Muga";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
-"1946.title" = "Mugagabea";
-
-/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Igoera-transferentzien Muga";
-
-/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Igoera-transferentzien Muga";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
-"1960.title" = "muga";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
-"1963.title" = "Mugagabea";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
-"1964.title" = "muga";
-
-/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
-"2017.title" = "Gelditu aletzea tasa honetan";
-
-/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
-"2018.title" = "Gelditu aletzea tasa honetan";
-
-/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
-"2024.title" = "Aletu betiko";
-
-/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
-"2025.title" = "geratze-ratioa";
-
-/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
-"2031.title" = "Orokorra";
-
 /* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
 "2122.title" = "Eguneratu Aztarnaria";
 
@@ -346,24 +304,6 @@
 
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
 "3170.title" = "Laguntza eta Garapena";
-
-/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
-"3190.title" = "Jarraitu transferentzia-muga orokorrekin";
-
-/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
-"3196.title" = "Lehentasuna";
-
-/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
-"3197.title" = "Lehentasuna";
-
-/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
-"3198.title" = "Altua";
-
-/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
-"3199.title" = "Arrunta";
-
-/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
-"3200.title" = "Baxua";
 
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
 "3207.title" = "Gorde Torrent-fitxategia Honela...";

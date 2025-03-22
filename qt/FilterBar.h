@@ -14,8 +14,6 @@
 #include <QTimer>
 #include <QWidget>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -30,10 +28,13 @@ class TorrentModel;
 class FilterBar : public QWidget
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FilterBar)
 
 public:
     FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
+    FilterBar(FilterBar&&) = delete;
+    FilterBar(FilterBar const&) = delete;
+    FilterBar& operator=(FilterBar&&) = delete;
+    FilterBar& operator=(FilterBar const&) = delete;
 
 public slots:
     void clear();

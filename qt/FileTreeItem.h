@@ -14,15 +14,14 @@
 #include <QString>
 #include <QVariant>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Utils.h" // for std::hash<QString>
 #include "Typedefs.h"
+
+#include "libtransmission/tr-macros.h"
 
 class FileTreeItem
 {
     Q_DECLARE_TR_FUNCTIONS(FileTreeItem)
-    TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
     static auto constexpr Low = int{ 1 << 0 };
@@ -36,6 +35,10 @@ public:
     {
     }
 
+    FileTreeItem& operator=(FileTreeItem&&) = delete;
+    FileTreeItem& operator=(FileTreeItem const&) = delete;
+    FileTreeItem(FileTreeItem&&) = delete;
+    FileTreeItem(FileTreeItem const&) = delete;
     ~FileTreeItem();
 
     void appendChild(FileTreeItem* child);

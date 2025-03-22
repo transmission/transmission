@@ -15,17 +15,18 @@
 #include <QFutureWatcher>
 #include <QObject>
 
-#include <libtransmission/tr-macros.h>
-
 #include "RpcClient.h"
 
 class RpcQueue : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(RpcQueue)
 
 public:
     explicit RpcQueue(QObject* parent = nullptr);
+    RpcQueue(RpcQueue&&) = delete;
+    RpcQueue(RpcQueue const&) = delete;
+    RpcQueue& operator=(RpcQueue&&) = delete;
+    RpcQueue& operator=(RpcQueue const&) = delete;
 
     constexpr void setTolerateErrors(bool tolerate_errors = true)
     {

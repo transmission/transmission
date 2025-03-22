@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ zweryfikowano";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "%lu reguł(y) adresów IP na liście";
 
 /* Inspector -> Peers tab -> peers */
-"%lu Known:" = "Znanych %lu:";
+"%lu Known:" = "%lu znanych:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu wykrywanie lokalnych";
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "Licencja";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Ograniczenie (%ld KB/s)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Nie można zapisać dziennika";
 
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "Wyświetl plik danych w programie Finder";
 
 /* View menu -> Toolbar */
-"Show Toolbar" = "Pokaż pasek narzędzi";
+"Show Toolbar" = "Wyświetl pasek narzędzi";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statystyki";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Zatrzymanie przy udziale (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Zatrzymaj oczekiwanie na rozpoczęcie";

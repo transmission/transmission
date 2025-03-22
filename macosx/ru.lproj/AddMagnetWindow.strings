@@ -6,7 +6,7 @@
 "16.title" = "Изменить…";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
-"18.title" = "Начать скачивание";
+"18.title" = "Запустить после добавления";
 
 /* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Добавить";
@@ -30,7 +30,7 @@
 "91.title" = "Приоритет:";
 
 /* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
-"101.title" = "Магнет-ссылка";
+"101.title" = "Магнит-ссылка";
 
 /* Class = "NSMenuItem"; title = "None"; ObjectID = "2zq-5y-smI"; */
 "2zq-5y-smI.title" = "Нет";

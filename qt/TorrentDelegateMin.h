@@ -5,20 +5,21 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include "TorrentDelegate.h"
 
 class TorrentDelegateMin : public TorrentDelegate
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TorrentDelegateMin)
 
 public:
     explicit TorrentDelegateMin(QObject* parent = nullptr)
         : TorrentDelegate{ parent }
     {
     }
+    TorrentDelegateMin(TorrentDelegateMin&&) = delete;
+    TorrentDelegateMin(TorrentDelegateMin const&) = delete;
+    TorrentDelegateMin& operator=(TorrentDelegateMin&&) = delete;
+    TorrentDelegateMin& operator=(TorrentDelegateMin const&) = delete;
 
 protected:
     // TorrentDelegate

@@ -12,7 +12,7 @@
 "33.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
-"34.title" = "Deling:";
+"34.title" = "Forhold:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
 "35.placeholderString" = "N/A";
@@ -51,25 +51,25 @@
 "50.title" = "Overførsel";
 
 /* Class = "NSTextFieldCell"; title = "Last Activity:"; ObjectID = "51"; */
-"51.title" = "Sidst aktiv:";
+"51.title" = "Seneste aktivitet:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
 "52.placeholderString" = "N/A";
 
 /* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
-"54.ibShadowedLabels[0]" = "Progress";
+"54.ibShadowedLabels[0]" = "Fremgang";
 
 /* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Available"; ObjectID = "54"; */
-"54.ibShadowedLabels[1]" = "Available";
+"54.ibShadowedLabels[1]" = "Tilgængelig";
 
 /* Class = "NSTextFieldCell"; title = "Progress:"; ObjectID = "55"; */
-"55.title" = "Fremskridt:";
+"55.title" = "Fremgang:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
 "56.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
-"57.title" = "Er fejlet:";
+"57.title" = "Mislykkede DL:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
 "58.placeholderString" = "N/A";

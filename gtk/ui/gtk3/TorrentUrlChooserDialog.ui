@@ -34,6 +34,7 @@
                 <property name="label" translatable="yes">_Open</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
+                <property name="can-default">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-underline">True</property>
               </object>
@@ -94,6 +95,7 @@
                         <property name="width-request">400</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="activates-default">True</property>
                         <property name="hexpand">True</property>
                       </object>
                       <packing>

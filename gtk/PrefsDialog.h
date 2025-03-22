@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/dialog.h>
@@ -24,9 +22,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core);
+    PrefsDialog(PrefsDialog&&) = delete;
+    PrefsDialog(PrefsDialog const&) = delete;
+    PrefsDialog& operator=(PrefsDialog&&) = delete;
+    PrefsDialog& operator=(PrefsDialog const&) = delete;
     ~PrefsDialog() override;
-
-    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
     static std::unique_ptr<PrefsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

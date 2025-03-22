@@ -30,7 +30,7 @@
 "1203.title" = "Предупреждать при:";
 
 /* Class = "NSTextFieldCell"; title = "Badge Dock icon with:"; ObjectID = "1204"; */
-"1204.title" = "Показывать в Dock:";
+"1204.title" = "Показывать значок на док-панели:";
 
 /* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
 "1205.title" = "Общую скорость скачивания";
@@ -342,7 +342,7 @@
 "1926.title" = "Использовать распределённую хеш-таблицу (DHT) для публичных торрентов";
 
 /* Class = "NSTextFieldCell"; title = "Accept magnet links:"; ObjectID = "1931"; */
-"1931.title" = "Принимать магнет-ссылки:";
+"1931.title" = "Принимать магнит-ссылки:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
 "1933.title" = "Сделать программой по умолчанию";
@@ -351,7 +351,7 @@
 "1940.title" = "Добавлять .part к незавершенный файлам";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a magnet link"; ObjectID = "1948"; */
-"1948.title" = "Показывать диалоговое окно при открытии магнет-ссылки";
+"1948.title" = "Показывать окно при открытии магнит-ссылки";
 
 /* Class = "NSButtonCell"; title = "Use local peer discovery for public torrents"; ObjectID = "1952"; */
 "1952.title" = "Использовать локальное обнаружение участников для публичных торрентов";
@@ -390,10 +390,10 @@
 "2119.title" = "Удалить из списка раздач по завершении раздачи";
 
 /* Class = "NSTextFieldCell"; title = "Applies to newly added transfers"; ObjectID = "2123"; */
-"2123.title" = "Применимо к новым раздачам";
+"2123.title" = "Применяется к новым добавленным передачам";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "Открыть торрент-файлы:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "Сделать программой по умолчанию";

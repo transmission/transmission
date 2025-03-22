@@ -9,6 +9,7 @@ Checks: >
   cert-*,
   clang-analyzer-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-narrowing-conversions,

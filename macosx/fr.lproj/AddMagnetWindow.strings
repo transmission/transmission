@@ -1,12 +1,12 @@
 
 /* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
-"15.title" = "Enregistrer dans :";
+"15.title" = "Télécharger dans :";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
-"16.title" = "Modifier…";
+"16.title" = "Changer…";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
-"18.title" = "Démarrer tout de suite";
+"18.title" = "Démarrer dès l’ajout";
 
 /* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Ajouter";
@@ -15,7 +15,7 @@
 "22.title" = "Annuler";
 
 /* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
-"41.title" = "Groupe :";
+"41.title" = "Groupe :";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
 "88.title" = "Basse";
@@ -27,10 +27,10 @@
 "90.title" = "Haute";
 
 /* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
-"91.title" = "Priorité :";
+"91.title" = "Priorité :";
 
 /* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
-"101.title" = "Lien aimanté";
+"101.title" = "Lien magnet";
 
 /* Class = "NSMenuItem"; title = "None"; ObjectID = "2zq-5y-smI"; */
 "2zq-5y-smI.title" = "Aucun";

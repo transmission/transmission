@@ -6,7 +6,6 @@
 #pragma once
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
@@ -26,9 +25,11 @@ public:
         Glib::ustring const& view_name,
         Glib::RefPtr<Session> const& core,
         tr_torrent_id_t torrent_id);
+    FileList(FileList&&) = delete;
+    FileList(FileList const&) = delete;
+    FileList& operator=(FileList&&) = delete;
+    FileList& operator=(FileList const&) = delete;
     ~FileList() override;
-
-    TR_DISABLE_COPY_MOVE(FileList)
 
     void clear();
     void set_torrent(tr_torrent_id_t torrent_id);

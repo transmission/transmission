@@ -393,7 +393,7 @@
 "2123.title" = "Újonnan hozzáadott átvitelekre vonatkozik";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "Torrent fájlok megnyitása:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "Alapértelmezett alkalmazás beállítása";

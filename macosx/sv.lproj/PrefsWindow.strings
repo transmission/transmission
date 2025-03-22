@@ -393,7 +393,7 @@
 "2123.title" = "Tillämpas på nyligen tillagda överföringar";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "Öppna torrentfiler:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "Ställ in standardapplikation";

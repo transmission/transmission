@@ -7,8 +7,6 @@
 
 #include <QPointer>
 
-#include <libtransmission/tr-macros.h>
-
 #include "BaseDialog.h"
 #include "ui_AboutDialog.h"
 
@@ -18,10 +16,13 @@ class Session;
 class AboutDialog : public BaseDialog
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(AboutDialog)
 
 public:
     explicit AboutDialog(Session& session, QWidget* parent = nullptr);
+    AboutDialog(AboutDialog&&) = delete;
+    AboutDialog(AboutDialog const&) = delete;
+    AboutDialog& operator=(AboutDialog&&) = delete;
+    AboutDialog& operator=(AboutDialog const&) = delete;
 
 private slots:
     void showCredits();

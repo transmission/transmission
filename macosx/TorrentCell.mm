@@ -8,8 +8,6 @@
 #import "Torrent.h"
 #import "NSImageAdditions.h"
 
-static CGFloat const kPriorityIconWidth = 12.0;
-
 @implementation TorrentCell
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -31,14 +29,12 @@ static CGFloat const kPriorityIconWidth = 12.0;
                 imageWithColor:priorityColor];
 
             self.fTorrentPriorityView.image = priorityImage;
-            self.fStackView.spacing = 4;
-            self.fTorrentPriorityViewWidthConstraint.constant = kPriorityIconWidth;
+
+            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityMustHold forView:self.fTorrentPriorityView];
         }
         else
         {
-            self.fTorrentPriorityView.image = nil;
-            self.fStackView.spacing = 0;
-            self.fTorrentPriorityViewWidthConstraint.constant = 0;
+            [self.fStackView setVisibilityPriority:NSStackViewVisibilityPriorityNotVisible forView:self.fTorrentPriorityView];
         }
     }
 

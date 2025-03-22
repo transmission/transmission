@@ -266,48 +266,6 @@
 /* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
 "1933.title" = "Serwer śledzący";
 
-/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
-"1936.title" = "Menu";
-
-/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "Ograniczenie prędkości pobierania";
-
-/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "Ograniczenie prędkości pobierania";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
-"1946.title" = "Bez ograniczenia";
-
-/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Ograniczenie prędkości wysyłania";
-
-/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Ograniczenie prędkości wysyłania";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
-"1960.title" = "ograniczenie";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
-"1963.title" = "Bez ograniczenia";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
-"1964.title" = "ograniczenie";
-
-/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
-"2017.title" = "Zatrzymanie wysyłania po osiągnięciu udziału";
-
-/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
-"2018.title" = "Zatrzymanie wysyłania po osiągnięciu udziału";
-
-/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
-"2024.title" = "Wysyłanie bez końca";
-
-/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
-"2025.title" = "udział, przy którym zatrzymać";
-
-/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
-"2031.title" = "Globalne";
-
 /* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
 "2122.title" = "Zaktualizuj serwer śledzący";
 
@@ -346,24 +304,6 @@
 
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
 "3170.title" = "Wsparcie i rozwój";
-
-/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
-"3190.title" = "Bez wychodzenia poza globalne ograniczenia przesyłania";
-
-/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
-"3196.title" = "Priorytet";
-
-/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
-"3197.title" = "Priorytet";
-
-/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
-"3198.title" = "Wysoki";
-
-/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
-"3199.title" = "Zwykły";
-
-/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
-"3200.title" = "Niski";
 
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
 "3207.title" = "Zapisz plik torrent jako…";
@@ -441,4 +381,4 @@
 "zIM-6D-jsa.title" = "Tytuł grupy";
 
 /* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
-"zLF-YR-Oq6.title" = "ETA";
+"zLF-YR-Oq6.title" = "Szacowany czas ukończenia";

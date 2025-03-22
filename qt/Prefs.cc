@@ -49,8 +49,10 @@ void ensureSoundCommandIsAList(tr_variant* dict)
         key,
         std::array<std::string_view, 5>{
             "canberra-gtk-play",
-            TR_ARG_TUPLE("-i", "complete-download"),
-            TR_ARG_TUPLE("-d", "transmission torrent downloaded"),
+            "-i",
+            "complete-download",
+            "-d",
+            "transmission torrent downloaded",
         });
 }
 

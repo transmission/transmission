@@ -183,7 +183,7 @@ public:
             return false;
         }
 
-        auto const got = get_piece_speed(now_msec, dir);
+        auto const got = get_raw_speed(now_msec, dir);
         auto const want = get_desired_speed(dir);
         return got >= want;
     }

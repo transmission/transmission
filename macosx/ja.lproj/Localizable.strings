@@ -18,9 +18,8 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ 検証済み";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld KB/s";
+/* Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/秒";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld 分";
@@ -82,7 +81,7 @@
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
-"%lu transfers" = "%lu 転送";
+"%lu transfers" = "%lu 項目を転送";
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu ウェブシード";
@@ -114,7 +113,7 @@
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
-"1 transfer" = "1 転送";
+"1 transfer" = "1 項目を転送";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "「%@」は正しいトレントファイルではありません。";
@@ -218,7 +217,7 @@
 "Available" = "入手可能";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "バイト/秒";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "帯域幅";
@@ -407,7 +406,7 @@
 "From: tracker" = "トラッカーより";
 
 /* Transfer speed (gigabytes per second) */
-"GB/s" = "GB/s";
+"GB/s" = "GB/秒";
 
 /* Preferences -> toolbar item title */
 "General" = "一般";
@@ -484,7 +483,7 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "ファイル「%1$@」(%2$@) はトレントファイルではないようです。";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "KB/s";
+"KB/s" = "KB/秒";
 
 /* Inspector -> Peers tab -> peers */
 /* "Known:" = ""; */
@@ -504,9 +503,6 @@
 /* About window -> license button */
 "License" = "ライセンス";
 
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "制限 (%ld KB/s)";
-
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "ログを保存できません";
 
@@ -524,7 +520,7 @@
 "Magnetized transfer" = "マグネット転送";
 
 /* Transfer speed (megabytes per second) */
-"MB/s" = "MB/s";
+"MB/s" = "MB/秒";
 
 /* Message window -> table column */
 "Message" = "メッセージ";
@@ -671,7 +667,7 @@
 
 /* Filter Bar -> filter button
    Torrent -> status string */
-"Paused" = "一時停止";
+"Paused" = "停止";
 
 /* Inspector -> peer -> status */
 "Peer is unchoking you, but you are not interested" = "ピアがあなたをアンチョークしているが影響なし";
@@ -694,7 +690,7 @@
 "Port is open" = "ポートは開いています";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "ポート: %@";
 
 /* No comment provided by engineer. */
 /* "PrefWindowSize" = ""; */
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "データファイルを Finder で表示";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "ツールバーを表示";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -915,9 +911,6 @@
 /* Stats window -> title */
 "Statistics" = "統計情報";
 
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "この共有比で停止 (%.2f)";
-
 /* Torrent cell -> button info */
 "Stop waiting to start" = "開始の待機を停止";
 
@@ -925,7 +918,7 @@
 "Support open-source indie software" = "オープンソースの自主製作ソフトを支援";
 
 /* Transfer speed (terabytes per second) */
-"TB/s" = "TB/s";
+"TB/s" = "TB/秒";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "選択されたファイルの場所が存在しません。";
@@ -1001,7 +994,7 @@
 "This folder contains no files." = "フォルダ内にファイルがありません。";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "設定できません。「標準の保存場所」が 「トレントファイルと同じ 」に設定されているためです。";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "転送中です。一度削除すると、その転送を続行するにはトレントファイルかマグネットリンクが必要になります。";

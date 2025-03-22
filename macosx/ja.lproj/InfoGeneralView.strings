@@ -20,9 +20,6 @@
 /* Class = "NSTextFieldCell"; title = "Where"; ObjectID = "28"; */
 "28.title" = "場所";
 
-/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
-/* "29.title" = ""; */
-
 /* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
 "30.title" = "作成:";
 
@@ -46,3 +43,9 @@
 
 /* Class = "NSTextFieldCell"; title = "Torrent Information"; ObjectID = "41"; */
 "41.title" = "トレントの情報";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "7YU-bS-UkI"; */
+"7YU-bS-UkI.placeholderString" = "なし";
+
+/* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
+/* "uaW-NM-PTU.title" = ""; */

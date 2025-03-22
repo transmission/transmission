@@ -7,8 +7,6 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/propertyproxy.h>
 #include <gtkmm/cellrenderer.h>
 
@@ -20,9 +18,11 @@ class TorrentCellRenderer : public Gtk::CellRenderer
 {
 public:
     TorrentCellRenderer();
+    TorrentCellRenderer(TorrentCellRenderer&&) = delete;
+    TorrentCellRenderer(TorrentCellRenderer const&) = delete;
+    TorrentCellRenderer& operator=(TorrentCellRenderer&&) = delete;
+    TorrentCellRenderer& operator=(TorrentCellRenderer const&) = delete;
     ~TorrentCellRenderer() override;
-
-    TR_DISABLE_COPY_MOVE(TorrentCellRenderer)
 
     Glib::PropertyProxy<Torrent*> property_torrent();
 

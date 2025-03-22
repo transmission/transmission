@@ -266,48 +266,6 @@
 /* Class = "NSMenuItem"; title = "Tracker"; ObjectID = "1933"; */
 "1933.title" = "Tracker";
 
-/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
-"1936.title" = "Menu";
-
-/* Class = "NSMenuItem"; title = "Download Bandwidth Limit"; ObjectID = "1944"; */
-"1944.title" = "Downloadsnelheid";
-
-/* Class = "NSMenu"; title = "Download Bandwidth Limit"; ObjectID = "1945"; */
-"1945.title" = "Downloadsnelheid";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1946"; */
-"1946.title" = "Onbeperkt";
-
-/* Class = "NSMenuItem"; title = "Upload Bandwidth Limit"; ObjectID = "1950"; */
-"1950.title" = "Uploadsnelheid";
-
-/* Class = "NSMenu"; title = "Upload Bandwidth Limit"; ObjectID = "1951"; */
-"1951.title" = "Uploadsnelheid";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1960"; */
-"1960.title" = "Beperk";
-
-/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "1963"; */
-"1963.title" = "Onbeperkt";
-
-/* Class = "NSMenuItem"; title = "limit"; ObjectID = "1964"; */
-"1964.title" = "Beperk";
-
-/* Class = "NSMenuItem"; title = "Stop Seeding at Ratio"; ObjectID = "2017"; */
-"2017.title" = "Stop seeden bij ratio";
-
-/* Class = "NSMenu"; title = "Stop Seeding at Ratio"; ObjectID = "2018"; */
-"2018.title" = "Stop seeden bij ratio";
-
-/* Class = "NSMenuItem"; title = "Seed Forever"; ObjectID = "2024"; */
-"2024.title" = "Seed onophoudelijk";
-
-/* Class = "NSMenuItem"; title = "stop ratio"; ObjectID = "2025"; */
-"2025.title" = "stop ratio";
-
-/* Class = "NSMenuItem"; title = "Global"; ObjectID = "2031"; */
-"2031.title" = "Algemeen";
-
 /* Class = "NSMenuItem"; title = "Update Tracker"; ObjectID = "2122"; */
 "2122.title" = "Werk tracker bij";
 
@@ -339,31 +297,13 @@
 "3078.title" = "Toon groepen";
 
 /* Class = "NSTableColumn"; headerCell.title = "Torrent"; ObjectID = "3093"; */
-/* "3093.headerCell.title" = ""; */
+"3093.headerCell.title" = "Torrent";
 
 /* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
 "3166.title" = "Geef snel weer";
 
 /* Class = "NSMenuItem"; title = "Support & Development"; ObjectID = "3170"; */
 "3170.title" = "Support & ontwikkeling ";
-
-/* Class = "NSMenuItem"; title = "Stay Within Global Bandwidth Limits"; ObjectID = "3190"; */
-"3190.title" = "Blijf binnen globale bandbreedte";
-
-/* Class = "NSMenuItem"; title = "Priority"; ObjectID = "3196"; */
-"3196.title" = "Prioriteit";
-
-/* Class = "NSMenu"; title = "Priority"; ObjectID = "3197"; */
-"3197.title" = "Prioriteit";
-
-/* Class = "NSMenuItem"; title = "High"; ObjectID = "3198"; */
-"3198.title" = "Hoog";
-
-/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "3199"; */
-"3199.title" = "Normaal";
-
-/* Class = "NSMenuItem"; title = "Low"; ObjectID = "3200"; */
-"3200.title" = "Laag";
 
 /* Class = "NSMenuItem"; title = "Save Torrent File As…"; ObjectID = "3207"; */
 "3207.title" = "Bewaar een torrent bestand als...";
@@ -411,16 +351,16 @@
 "Cay-iU-bH4.title" = "Deel torrent bestand";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
-/* "HmT-FI-amY.title" = ""; */
+"HmT-FI-amY.title" = "0,0KB/s";
 
 /* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
-/* "Zmj-A9-NPf.title" = ""; */
+"Zmj-A9-NPf.title" = "Status String";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "kbX-Av-eP4"; */
-/* "kbX-Av-eP4.title" = ""; */
+"kbX-Av-eP4.title" = "Titel";
 
 /* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "lmp-Y3-ZQO"; */
-/* "lmp-Y3-ZQO.title" = ""; */
+"lmp-Y3-ZQO.title" = "Status";
 
 /* Class = "NSMenu"; title = "Share Torrent File"; ObjectID = "lvU-Va-GzM"; */
 "lvU-Va-GzM.title" = "Deel torrent bestand";
@@ -432,13 +372,13 @@
 "s5v-VO-G2y.title" = "Deel torrent bestand";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
-/* "x8g-Nv-jcD.title" = ""; */
+"x8g-Nv-jcD.title" = "0,0KB/s";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
-/* "y9O-gd-sXA.title" = ""; */
+"y9O-gd-sXA.title" = "Titel";
 
 /* Class = "NSTextFieldCell"; title = "Group Title"; ObjectID = "zIM-6D-jsa"; */
-/* "zIM-6D-jsa.title" = ""; */
+"zIM-6D-jsa.title" = "Groepstitel";
 
 /* Class = "NSMenuItem"; title = "ETA"; ObjectID = "zLF-YR-Oq6"; */
-/* "zLF-YR-Oq6.title" = ""; */
+"zLF-YR-Oq6.title" = "ETA";

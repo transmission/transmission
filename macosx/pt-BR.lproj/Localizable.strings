@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ verificado";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "%lu regras de endereços IP na lista";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu Conhecidos:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu descoberta local";
@@ -218,7 +217,7 @@
 "Available" = "Disponível";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Largura de Banda";
@@ -487,7 +486,7 @@
 "KB/s" = "KB/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Conhecidos:";
 
 /* Tracker last announce */
 "Last Announce" = "Último Anúncio";
@@ -503,9 +502,6 @@
 
 /* About window -> license button */
 "License" = "Licença";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limite (%ld KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Não foi possível salvar o log";
@@ -694,7 +690,7 @@
 "Port is open" = "A porta está aberta";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "Porta: %@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "PrefWindowSize";
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "Exibir o arquivo no Finder";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Exibir Barra de Ferramentas";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Estatísticas";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Parar na Proporção (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Parar de aguardar para começar";
@@ -1001,7 +994,7 @@
 "This folder contains no files." = "Esta pasta não contém arquivos.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Esta opção não estará disponível se o local Padrão estiver definido como Igual ao arquivo torrent.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Esta transferência está ativa. Uma vez removida, a continuação da transferência exigirá o arquivo de torrent ou link magnético.";

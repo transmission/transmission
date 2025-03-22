@@ -15,6 +15,7 @@
 
 #include <libtransmission/file.h>
 #include <libtransmission/torrent-files.h>
+#include "libtransmission/tr-macros.h"
 #include <libtransmission/tr-strbuf.h>
 
 #include "gtest/gtest.h"

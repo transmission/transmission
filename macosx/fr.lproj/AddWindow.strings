@@ -1,12 +1,12 @@
 
 /* Class = "NSTextFieldCell"; title = "Download to:"; ObjectID = "15"; */
-"15.title" = "Enregistrer dans :";
+"15.title" = "Télécharger dans :";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
-"16.title" = "Modifier...";
+"16.title" = "Changer…";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
-"18.title" = "Démarrer tout de suite";
+"18.title" = "Démarrer dès l’ajout";
 
 /* Class = "NSButtonCell"; title = "Add"; ObjectID = "20"; */
 "20.title" = "Ajouter";
@@ -15,22 +15,22 @@
 "22.title" = "Annuler";
 
 /* Class = "NSTextFieldCell"; title = "Group:"; ObjectID = "41"; */
-"41.title" = "Groupe :";
+"41.title" = "Groupe :";
 
 /* Class = "NSTableColumn"; headerCell.title = "Rank"; ObjectID = "47"; */
-"47.headerCell.title" = "Priorité";
+"47.headerCell.title" = "Rang";
 
 /* Class = "NSTableColumn"; headerCell.title = "DL"; ObjectID = "48"; */
-"48.headerCell.title" = "Téléch.";
+"48.headerCell.title" = "Téléchargement";
 
 /* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "49"; */
 "49.headerCell.title" = "Nom";
 
 /* Class = "NSButtonCell"; title = "Trash torrent file"; ObjectID = "59"; */
-"59.title" = "Supprimer le fichier torrent";
+"59.title" = "Déplacer le fichier torrent vers la corbeille";
 
 /* Class = "NSButtonCell"; title = "Verify Local Data"; ObjectID = "66"; */
-"66.title" = "Vérifier les données";
+"66.title" = "Vérifier les données locales";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
 "88.title" = "Basse";
@@ -42,7 +42,7 @@
 "90.title" = "Haute";
 
 /* Class = "NSTextFieldCell"; title = "Priority:"; ObjectID = "91"; */
-"91.title" = "Priorité :";
+"91.title" = "Priorité :";
 
 /* Class = "NSButtonCell"; title = "All"; ObjectID = "104"; */
 "104.title" = "Tous";
@@ -51,4 +51,4 @@
 "105.title" = "Aucun";
 
 /* Class = "NSSearchFieldCell"; placeholderString = "Filter"; ObjectID = "113"; */
-"113.placeholderString" = "Filtre";
+"113.placeholderString" = "Filtrer";

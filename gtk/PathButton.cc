@@ -27,9 +27,11 @@ class PathButton::Impl
 {
 public:
     explicit Impl(PathButton& widget);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
     std::string const& get_filename() const;

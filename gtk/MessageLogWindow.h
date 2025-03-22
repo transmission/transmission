@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/window.h>
@@ -23,9 +21,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core);
+    MessageLogWindow(MessageLogWindow&&) = delete;
+    MessageLogWindow(MessageLogWindow const&) = delete;
+    MessageLogWindow& operator=(MessageLogWindow&&) = delete;
+    MessageLogWindow& operator=(MessageLogWindow const&) = delete;
     ~MessageLogWindow() override;
-
-    TR_DISABLE_COPY_MOVE(MessageLogWindow)
 
     static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

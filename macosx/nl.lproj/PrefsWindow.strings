@@ -393,7 +393,7 @@
 "2123.title" = "Van toepassing op nieuwe transfers";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "Open torrent bestanden";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
 "pgY-W3-HdI.title" = "Stel in als standaard";

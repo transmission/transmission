@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
 #include <giomm/actiongroup.h>
 #include <glibmm/refptr.h>
 #include <gtkmm/application.h>
@@ -26,9 +24,11 @@ public:
         Gtk::Application& app,
         Glib::RefPtr<Gio::ActionGroup> const& actions,
         Glib::RefPtr<Session> const& core);
+    MainWindow(MainWindow&&) = delete;
+    MainWindow(MainWindow const&) = delete;
+    MainWindow& operator=(MainWindow&&) = delete;
+    MainWindow& operator=(MainWindow const&) = delete;
     ~MainWindow() override;
-
-    TR_DISABLE_COPY_MOVE(MainWindow)
 
     static std::unique_ptr<MainWindow> create(
         Gtk::Application& app,

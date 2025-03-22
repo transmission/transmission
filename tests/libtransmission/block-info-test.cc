@@ -43,7 +43,7 @@ TEST_F(BlockInfoTest, handlesOddSize)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
 
     auto const info = tr_block_info{ TotalSize, PieceSize };
 
@@ -60,7 +60,7 @@ TEST_F(BlockInfoTest, pieceSize)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
 
     auto const info = tr_block_info{ TotalSize, PieceSize };
 
@@ -74,7 +74,7 @@ TEST_F(BlockInfoTest, blockSize)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1)) + 1;
 
     auto const info = tr_block_info{ TotalSize, PieceSize };
 
@@ -88,7 +88,7 @@ TEST_F(BlockInfoTest, blockSpanForPiece)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
 
     auto info = tr_block_info{ TotalSize, PieceSize };
 
@@ -111,7 +111,7 @@ TEST_F(BlockInfoTest, blockLoc)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
 
     auto const info = tr_block_info{ TotalSize, PieceSize };
 
@@ -142,7 +142,7 @@ TEST_F(BlockInfoTest, pieceLoc)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
 
     auto const info = tr_block_info{ TotalSize, PieceSize };
 
@@ -189,7 +189,7 @@ TEST_F(BlockInfoTest, byteLoc)
     static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
     static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
     static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
+    static auto constexpr TotalSize = (PieceSize * (PieceCount - 1U)) + 1U;
 
     auto const info = tr_block_info{ TotalSize, PieceSize };
 
