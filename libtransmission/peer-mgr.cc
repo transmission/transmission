@@ -212,6 +212,8 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
         {
             set_connectable(conn_this || conn_that);
         }
+        bytes_sent_to_client_ += that.bytes_sent_to_client_;
+        bytes_sent_to_peer_ += that.bytes_sent_to_peer_;
     }
 
     if (auto const& other = that.supports_utp(); !supports_utp().has_value() && other)
@@ -514,6 +516,7 @@ public:
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(tr_time());
                 tor->session->add_uploaded(event.length);
+                msgs->peer_info->add_bytes_sent_to_peer(event.length);
             }
 
             break;
@@ -1779,6 +1782,9 @@ namespace peer_stat_helpers
     stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
     stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
     stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
+
+    stats.bytesToPeer = peer->peer_info->bytes_sent_to_peer();
+    stats.bytesToClient = peer->peer_info->bytes_sent_to_client();
 
     stats.activeReqsToPeer = peer->active_req_count(TR_CLIENT_TO_PEER);
     stats.activeReqsToClient = peer->active_req_count(TR_PEER_TO_CLIENT);

@@ -335,6 +335,26 @@ public:
         piece_data_at_ = value;
     }
 
+    constexpr void add_bytes_sent_to_peer(size_t value) noexcept
+    {
+        bytes_sent_to_peer_ += value;
+    }
+
+    [[nodiscard]] constexpr auto bytes_sent_to_peer() const noexcept
+    {
+        return bytes_sent_to_peer_;
+    }
+
+    constexpr void add_bytes_sent_to_client(size_t value) noexcept
+    {
+        bytes_sent_to_client_ += value;
+    }
+
+    [[nodiscard]] constexpr auto bytes_sent_to_client() const noexcept
+    {
+        return bytes_sent_to_client_;
+    }
+
     [[nodiscard]] constexpr bool has_transferred_piece_data() const noexcept
     {
         return piece_data_at_ != time_t{};
@@ -529,6 +549,9 @@ private:
     time_t connection_attempted_at_ = {};
     time_t connection_changed_at_ = {};
     time_t piece_data_at_ = {};
+
+    size_t bytes_sent_to_client_ = 0;
+    size_t bytes_sent_to_peer_ = 0;
 
     mutable std::optional<bool> blocklisted_;
     std::optional<bool> is_connectable_;
