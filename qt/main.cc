@@ -29,17 +29,21 @@ char const* const DisplayName = "transmission-qt";
 auto constexpr FileArgsSeparator = "--"sv;
 auto constexpr QtArgsSeparator = "---"sv;
 
+using Arg = tr_option::Arg;
 auto constexpr Opts = std::array<tr_option, 8>{ {
-    { 'g', "config-dir", "Where to look for configuration files", "g", tr_option::Arg::Required, "<path>" },
-    { 'm', "minimized", "Start minimized in system tray", "m", tr_option::Arg::None, nullptr },
-    { 'p', "port", "Port to use when connecting to an existing session", "p", tr_option::Arg::Required, "<port>" },
-    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", tr_option::Arg::Required, "<host>" },
-    { 'u', "username", "Username to use when connecting to an existing session", "u", tr_option::Arg::Required, "<username>" },
-    { 'v', "version", "Show version number and exit", "v", tr_option::Arg::None, nullptr },
-    { 'w', "password", "Password to use when connecting to an existing session", "w", tr_option::Arg::Required, "<password>" },
-    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+    { 'g', "config-dir", "Where to look for configuration files", "g", Arg::Required, "<path>" },
+    { 'm', "minimized", "Start minimized in system tray", "m", Arg::None, nullptr },
+    { 'p', "port", "Port to use when connecting to an existing session", "p", Arg::Required, "<port>" },
+    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", Arg::Required, "<host>" },
+    { 'u', "username", "Username to use when connecting to an existing session", "u", Arg::Required, "<username>" },
+    { 'v', "version", "Show version number and exit", "v", Arg::None, nullptr },
+    { 'w', "password", "Password to use when connecting to an existing session", "w", Arg::Required, "<password>" },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+} // namespace
 
+namespace
+{
 char const* getUsage()
 {
     return "Usage:\n"

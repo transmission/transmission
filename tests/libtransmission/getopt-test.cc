@@ -11,22 +11,22 @@
 
 namespace
 {
-
+using Arg = tr_option::Arg;
 auto constexpr Options = std::array<tr_option, 10>{ {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", tr_option::Arg::None, nullptr },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", tr_option::Arg::Required, "<file>" },
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", Arg::None, nullptr },
+    { 'o', "outfile", "Save the generated .torrent to this filename", "o", Arg::Required, "<file>" },
     { 's',
       "piecesize",
       "Set how many KiB each piece should be, overriding the preferred default",
       "s",
-      tr_option::Arg::Required,
+      Arg::Required,
       "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", tr_option::Arg::Required, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", tr_option::Arg::Required, "<url>" },
-    { 'q', "pooka", "Pooka", "pk", tr_option::Arg::None, nullptr },
-    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
-    { 994, "sequential-download", "Download the torrent sequentially", "seq", tr_option::Arg::Optional, "<piece>" },
-    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+    { 'c', "comment", "Add a comment", "c", Arg::Required, "<comment>" },
+    { 't', "tracker", "Add a tracker's announce URL", "t", Arg::Required, "<url>" },
+    { 'q', "pooka", "Pooka", "pk", Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 994, "sequential-download", "Download the torrent sequentially", "seq", Arg::Optional, "<piece>" },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
 
 } // namespace
