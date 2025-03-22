@@ -42,19 +42,23 @@ char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>"
 
 uint32_t constexpr KiB = 1024;
 
+using Arg = tr_option::Arg;
 auto constexpr Options = std::array<tr_option, 10>{ {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", tr_option::Arg::None, nullptr },
-    { 'r', "source", "Set the source for private trackers", "r", tr_option::Arg::Required, "<source>" },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", tr_option::Arg::Required, "<file>" },
-    { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", tr_option::Arg::Required, "<KiB>" },
-    { 'c', "comment", "Add a comment", "c", tr_option::Arg::Required, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", tr_option::Arg::Required, "<url>" },
-    { 'w', "webseed", "Add a webseed URL", "w", tr_option::Arg::Required, "<url>" },
-    { 'x', "anonymize", R"(Omit "Creation date" and "Created by" info)", nullptr, tr_option::Arg::None, nullptr },
-    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
-    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", Arg::None, nullptr },
+    { 'r', "source", "Set the source for private trackers", "r", Arg::Required, "<source>" },
+    { 'o', "outfile", "Save the generated .torrent to this filename", "o", Arg::Required, "<file>" },
+    { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", Arg::Required, "<KiB>" },
+    { 'c', "comment", "Add a comment", "c", Arg::Required, "<comment>" },
+    { 't', "tracker", "Add a tracker's announce URL", "t", Arg::Required, "<url>" },
+    { 'w', "webseed", "Add a webseed URL", "w", Arg::Required, "<url>" },
+    { 'x', "anonymize", R"(Omit "Creation date" and "Created by" info)", nullptr, Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+} // namespace
 
+namespace
+{
 struct app_options
 {
     tr_announce_list trackers;

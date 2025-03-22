@@ -48,36 +48,40 @@ sig_atomic_t manualUpdate = false;
 
 char const* torrentPath = nullptr;
 
+using Arg = tr_option::Arg;
 auto constexpr Options = std::array<tr_option, 20>{ {
-    { 'b', "blocklist", "Enable peer blocklists", "b", tr_option::Arg::None, nullptr },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", tr_option::Arg::None, nullptr },
-    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", tr_option::Arg::Required, "<speed>" },
-    { 'D', "no-downlimit", "Don't limit the download speed", "D", tr_option::Arg::None, nullptr },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", tr_option::Arg::None, nullptr },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", tr_option::Arg::None, nullptr },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", tr_option::Arg::None, nullptr },
-    { 'f', "finish", "Run a script when the torrent finishes", "f", tr_option::Arg::Required, "<script>" },
-    { 'g', "config-dir", "Where to find configuration files", "g", tr_option::Arg::Required, "<path>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", tr_option::Arg::None, nullptr },
-    { 'M', "no-portmap", "Disable portmapping", "M", tr_option::Arg::None, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", tr_option::Arg::Required, "<port>" },
+    { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
+    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", Arg::Required, "<speed>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", Arg::None, nullptr },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
+    { 'f', "finish", "Run a script when the torrent finishes", "f", Arg::Required, "<script>" },
+    { 'g', "config-dir", "Where to find configuration files", "g", Arg::Required, "<path>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
+    { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
     { 't',
       "tos",
       "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
       ")",
       "t",
-      tr_option::Arg::Required,
+      Arg::Required,
       "<dscp-or-tos>" },
-    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", tr_option::Arg::Required, "<speed>" },
-    { 'U', "no-uplimit", "Don't limit the upload speed", "U", tr_option::Arg::None, nullptr },
-    { 'v', "verify", "Verify the specified torrent", "v", tr_option::Arg::None, nullptr },
-    { 'V', "version", "Show version number and exit", "V", tr_option::Arg::None, nullptr },
-    { 'w', "download-dir", "Where to save downloaded data", "w", tr_option::Arg::Required, "<path>" },
-    { 500, "sequential-download", "Download pieces sequentially", "seq", tr_option::Arg::None, nullptr },
+    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", Arg::Required, "<speed>" },
+    { 'U', "no-uplimit", "Don't limit the upload speed", "U", Arg::None, nullptr },
+    { 'v', "verify", "Verify the specified torrent", "v", Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 'w', "download-dir", "Where to save downloaded data", "w", Arg::Required, "<path>" },
+    { 500, "sequential-download", "Download pieces sequentially", "seq", Arg::None, nullptr },
 
-    { 0, nullptr, nullptr, nullptr, tr_option::Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+} // namespace
 
+namespace
+{
 int parseCommandLine(tr_variant*, int argc, char const** argv);
 
 void sigHandler(int signal);
