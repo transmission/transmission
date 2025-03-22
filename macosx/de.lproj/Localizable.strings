@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ überprüft";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "%lu IP-Adressen in der Blockliste";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu bekannt:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu lokal entdeckt";
@@ -218,7 +217,7 @@
 "Available" = "Verfügbar";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Durchsatz";
@@ -487,7 +486,7 @@
 "KB/s" = "KB/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Bekannt:";
 
 /* Tracker last announce */
 "Last Announce" = "Letzte Meldung";
@@ -503,9 +502,6 @@
 
 /* About window -> license button */
 "License" = "Lizenz";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "höchstens %ld KB/s";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Meldungen konnten nicht gesichert werden";
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "Empfangene Daten im Finder zeigen";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Symbolleiste einblenden";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -914,9 +910,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statistik";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "ab Verhältnis %.2f";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Warten auf den Beginn abbrechen";
@@ -1001,7 +994,7 @@
 "This folder contains no files." = "Der Ordner enthält keine Dateien.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Diese Option ist nicht verfügbar, wenn der Standardort gleich ist wie die Torrentdatei.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Diese Übertragung ist aktiv. Nach dem Entfernen wird erneut die Torrent-Datei oder der magnet-Link benötigt, um sie fortzusetzen.";

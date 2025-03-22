@@ -10,17 +10,18 @@
 #include <QObject>
 #include <QTimer>
 
-#include <libtransmission/tr-macros.h>
-
 class QGridLayout;
 
 class ColumnResizer : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(ColumnResizer)
 
 public:
     explicit ColumnResizer(QObject* parent = nullptr);
+    ColumnResizer(ColumnResizer&&) = delete;
+    ColumnResizer(ColumnResizer const&) = delete;
+    ColumnResizer& operator=(ColumnResizer&&) = delete;
+    ColumnResizer& operator=(ColumnResizer const&) = delete;
 
     void addLayout(QGridLayout* layout);
 

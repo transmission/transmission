@@ -18,9 +18,8 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ vérifié";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld ko/s";
+/* Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld kb/s";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld minutes";
@@ -53,7 +52,7 @@
 "%lu IP address rules in list" = "%lu règles d’adresses IP dans la liste";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu connus :";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu découverte locale";
@@ -218,7 +217,7 @@
 "Available" = "Disponible";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "b/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bande passante";
@@ -302,10 +301,10 @@
    inspector -> web seed table -> header
    status bar -> status label
    Torrent -> status string */
-"DL" = "Téléch.";
+"DL" = "Téléchargement";
 
 /* Inspector -> Peers tab -> peers */
-"DL from %lu" = "Téléch. de %lu";
+"DL from %lu" = "Téléchargement de %lu";
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Ne plus vérifier l’espace disque";
@@ -407,7 +406,7 @@
 "From: tracker" = "De : traceur";
 
 /* Transfer speed (gigabytes per second) */
-"GB/s" = "Go/s";
+"GB/s" = "Gb/s";
 
 /* Preferences -> toolbar item title */
 "General" = "Général";
@@ -444,13 +443,13 @@
 "Hide Filter Bar" = "Cacher la barre du filtre";
 
 /* View menu -> Inspector */
-"Hide Inspector" = "Masquer l’inspecteur";
+"Hide Inspector" = "Cacher l’inspecteur";
 
 /* View menu -> Status Bar */
 "Hide Status Bar" = "Cacher la barre d’état";
 
 /* View menu -> Toolbar */
-"Hide Toolbar" = "Masquer la barre d'outils";
+"Hide Toolbar" = "Cacher la barre d’outils";
 
 /* File Outline -> Priority Menu */
 "High" = "Haute";
@@ -484,10 +483,10 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Il semble que le ficher « %1$@ » de %2$@ n’est pas un fichier torrent.";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "ko/s";
+"KB/s" = "kb/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Connus :";
 
 /* Tracker last announce */
 "Last Announce" = "Dernière annonce";
@@ -503,9 +502,6 @@
 
 /* About window -> license button */
 "License" = "Licence";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limiter (%ld ko/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Les messages n’ont pu être enregistrés";
@@ -524,7 +520,7 @@
 "Magnetized transfer" = "Transfert magnétisé";
 
 /* Transfer speed (megabytes per second) */
-"MB/s" = "Mo/s";
+"MB/s" = "Mb/s";
 
 /* Message window -> table column */
 "Message" = "Message";
@@ -885,7 +881,7 @@
 "Show in Finder" = "Afficher dans Finder";
 
 /* View menu -> Inspector */
-"Show Inspector" = "Montrer l’inspecteur";
+"Show Inspector" = "Afficher l’inspecteur";
 
 /* View menu -> Status Bar */
 "Show Status Bar" = "Afficher la barre d’état";
@@ -894,7 +890,7 @@
 "Show the data file in Finder" = "Afficher le fichier de données dans Finder";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Afficher la barre d’outils";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -910,13 +906,10 @@
 "Speed Limit overrides the total bandwidth limits with its own limits." = "La limite de vitesse remplace les limites de bande passante globales par ses propres limites.";
 
 /* Torrent -> status string */
-"Stalled" = "Bloqué";
+"Stalled" = "Bloqué sans réponse";
 
 /* Stats window -> title */
 "Statistics" = "Statistiques";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Arrêter au ratio (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Arrêté, en attente de démarrage";
@@ -925,7 +918,7 @@
 "Support open-source indie software" = "Soutenez les logiciels indépendants à code source ouvert";
 
 /* Transfer speed (terabytes per second) */
-"TB/s" = "To/s";
+"TB/s" = "Tb/s";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "La destination du fichier n’existe pas.";
@@ -1001,7 +994,7 @@
 "This folder contains no files." = "Ce dossier ne comprend aucun fichier.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Cette option n’est pas proposée si Emplacement par défaut est défini sur Identique au fichier torrent.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Ce transfert est actif. Une fois supprimé, la reprise du transfert exigera le fichier torrent ou le lien aimant.";
@@ -1016,13 +1009,13 @@
 "Toggle Filter" = "Activer/désactiver le filtre";
 
 /* Inspector toolbar item -> palette label */
-"Toggle Inspector" = "Afficher/masquer l’inspecteur";
+"Toggle Inspector" = "Afficher ou cacher l’inspecteur";
 
 /* Filter toolbar item -> tooltip */
 "Toggle the filter bar" = "Activer/désactiver la barre du filtre";
 
 /* Inspector toolbar item -> tooltip */
-"Toggle the torrent inspector" = "Affiche/masque l’inspecteur";
+"Toggle the torrent inspector" = "Afficher ou cacher l’inspecteur de torrent";
 
 /* Download not a torrent -> title
    Torrent download error -> title */

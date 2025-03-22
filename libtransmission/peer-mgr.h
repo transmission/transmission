@@ -24,6 +24,7 @@
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
+#include "libtransmission/variant.h"
 
 /**
  * @addtogroup peers Peers
@@ -233,7 +234,7 @@ public:
 
     // ---
 
-    constexpr auto set_connected(time_t now, bool is_connected = true) noexcept
+    constexpr auto set_connected(time_t now, bool is_connected = true, bool is_disconnecting = false) noexcept
     {
         if (is_connected_ == is_connected)
         {
@@ -252,7 +253,7 @@ public:
         {
             num_consecutive_fruitless_ = {};
         }
-        else
+        else if (is_disconnecting)
         {
             on_fruitless_connection();
         }
@@ -587,6 +588,21 @@ struct tr_pex
         uint8_t const* added_f,
         size_t added_f_len);
 
+    [[nodiscard]] tr_variant::Map to_variant() const;
+
+    [[nodiscard]] static tr_variant::Vector to_variant(tr_pex const* pex, size_t n_pex)
+    {
+        auto ret = tr_variant::Vector{};
+        ret.reserve(n_pex);
+        for (size_t i = 0; i < n_pex; ++i)
+        {
+            ret.emplace_back(pex[i].to_variant());
+        }
+        return ret;
+    }
+
+    [[nodiscard]] static std::vector<tr_pex> from_variant(tr_variant const* var, size_t n_var);
+
     [[nodiscard]] std::string display_name() const
     {
         return socket_address.display_name();
@@ -632,12 +648,6 @@ constexpr bool tr_isPex(tr_pex const* pex)
 void tr_peerMgrFree(tr_peerMgr* manager);
 
 [[nodiscard]] std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
-
-[[nodiscard]] bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
-
-void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span);
-
-[[nodiscard]] size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
 

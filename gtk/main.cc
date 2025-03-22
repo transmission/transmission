@@ -49,7 +49,7 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 int main(int argc, char** argv)
 {
     /* init libtransmission */
-    auto const init_mgr = tr_lib_init();
+    tr_lib_init();
 
     /* init i18n */
     tr_locale_set_global("");
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
         fmt::print(stderr, "{}\n", TR_GLIB_EXCEPTION_WHAT(e));
         fmt::print(
             stderr,
-            _("Run '{program} --help' to see a full list of available command line options.\n"),
+            fmt::runtime(_("Run '{program} --help' to see a full list of available command line options.\n")),
             fmt::arg("program", *argv));
         return 1;
     }

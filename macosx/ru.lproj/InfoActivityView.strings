@@ -36,7 +36,7 @@
 "42.title" = "Даты";
 
 /* Class = "NSTextFieldCell"; title = "Added:"; ObjectID = "43"; */
-"43.title" = "Добавлено:";
+"43.title" = "Добавлен:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
 "44.placeholderString" = "Нет данных";

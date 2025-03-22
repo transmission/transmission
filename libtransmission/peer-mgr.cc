@@ -39,7 +39,6 @@
 #include "libtransmission/observable.h"
 #include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mgr-active-requests.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
@@ -76,12 +75,13 @@ private:
             return {};
         }
 
-        auto info = TorrentInfo{};
-        info.info_hash = tor->info_hash();
-        info.client_peer_id = tor->peer_id();
-        info.id = tor->id();
-        info.is_done = tor->is_done();
-        return info;
+        return TorrentInfo{
+            tor->info_hash(), // info_hash
+            tor->peer_id(), // client_peer_id
+            tor->id(), // id
+            tor->is_done(), // is_done
+            tor->is_running() // is_running
+        };
     }
 
 public:
@@ -312,31 +312,40 @@ public:
         }
 
         [[nodiscard]] bool client_has_block(tr_block_index_t block) const override;
+        [[nodiscard]] bool client_has_piece(tr_piece_index_t piece) const override;
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override;
-        [[nodiscard]] bool is_endgame() const override;
         [[nodiscard]] bool is_sequential_download() const override;
-        [[nodiscard]] size_t count_active_requests(tr_block_index_t block) const override;
-        [[nodiscard]] size_t count_missing_blocks(tr_piece_index_t piece) const override;
+        [[nodiscard]] uint8_t count_active_requests(tr_block_index_t block) const override;
         [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override;
         [[nodiscard]] tr_block_span_t block_span(tr_piece_index_t piece) const override;
         [[nodiscard]] tr_piece_index_t piece_count() const override;
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override;
 
         [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
-            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_bad_piece(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_block(
-            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer) override;
+            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_choke(
+            libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_have(
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_have_all(
             libtransmission::SimpleObservable<tr_torrent*>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_got_reject(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_piece_completed(
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_priority_changed(
             libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer
                 observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_sent_cancel(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_sent_request(
+            libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
             libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
 
@@ -379,18 +388,6 @@ public:
         TR_ASSERT(std::empty(peers));
     }
 
-    void cancel_old_requests()
-    {
-        auto const now = tr_time();
-        auto const oldest = now - RequestTtlSecs;
-
-        for (auto const& [block, peer] : active_requests.sentBefore(oldest))
-        {
-            maybe_send_cancel_request(peer, block, nullptr);
-            active_requests.remove(block, peer);
-        }
-    }
-
     [[nodiscard]] uint16_t count_active_webseeds(uint64_t now) const noexcept
     {
         if (!tor->is_running() || tor->is_done())
@@ -413,7 +410,7 @@ public:
     {
         auto const lock = unique_lock();
 
-        peer_disconnect.emit(tor, peer->has());
+        peer_disconnect.emit(tor, peer->has(), peer->active_requests);
 
         auto const& peer_info = peer->peer_info;
         TR_ASSERT(peer_info);
@@ -440,18 +437,6 @@ public:
         }
 
         TR_ASSERT(stats.peer_count == 0);
-    }
-
-    void update_endgame()
-    {
-        /* we consider ourselves to be in endgame if the number of bytes
-           we've got requested is >= the number of bytes left to download */
-        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->left_until_done();
-    }
-
-    [[nodiscard]] constexpr auto is_endgame() const noexcept
-    {
-        return is_endgame_;
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto is_all_upload_only() const noexcept
@@ -513,6 +498,14 @@ public:
 
         switch (event.type)
         {
+        case tr_peer_event::Type::ClientSentCancel:
+            {
+                auto* const tor = s->tor;
+                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
+                s->sent_cancel.emit(tor, msgs, loc.block);
+            }
+            break;
+
         case tr_peer_event::Type::ClientSentPieceData:
             {
                 auto* const tor = s->tor;
@@ -549,7 +542,7 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
-            s->active_requests.remove(msgs);
+            s->got_choke.emit(s->tor, msgs->active_requests);
             break;
 
         case tr_peer_event::Type::ClientGotPort:
@@ -595,11 +588,16 @@ public:
         }
     }
 
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> peer_disconnect;
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const& /*bitfield*/, tr_bitfield const& /*active requests*/>
+        peer_disconnect;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t> got_block;
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t> got_block;
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_choke;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_have;
     libtransmission::SimpleObservable<tr_torrent*> got_have_all;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> got_reject;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t> sent_cancel;
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t> sent_request;
 
     mutable tr_swarm_stats stats = {};
 
@@ -611,14 +609,12 @@ public:
 
     tr_torrent* const tor;
 
-    ActiveRequests active_requests;
-
-    // depends-on: active_requests
     std::vector<std::unique_ptr<tr_webseed>> webseeds;
 
-    // depends-on: active_requests
     Peers peers;
 
+    // depends-on: tor
+    WishlistMediator wishlist_mediator{ *this };
     std::unique_ptr<Wishlist> wishlist;
 
     Pool connectable_pool;
@@ -671,13 +667,13 @@ private:
     {
         if (peer != nullptr && peer != muted)
         {
-            peer->cancel_block_request(block);
+            peer->maybe_cancel_block_request(block);
         }
     }
 
     void cancel_all_requests_for_block(tr_block_index_t block, tr_peer const* no_notify)
     {
-        for (auto* peer : active_requests.remove(block))
+        for (auto* peer : peers)
         {
             maybe_send_cancel_request(peer, block, no_notify);
         }
@@ -805,8 +801,21 @@ private:
     {
         switch (event.type)
         {
+        case tr_peer_event::Type::ClientSentRequest:
+            {
+                auto* const tor = s->tor;
+                auto const loc_begin = tor->piece_loc(event.pieceIndex, event.offset);
+                auto const loc_end = tor->piece_loc(event.pieceIndex, event.offset, event.length);
+                s->sent_request.emit(tor, peer, { loc_begin.block, loc_end.block });
+            }
+            break;
+
         case tr_peer_event::Type::ClientGotRej:
-            s->active_requests.remove(s->tor->piece_loc(event.pieceIndex, event.offset).block, peer);
+            {
+                auto* const tor = s->tor;
+                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
+                s->got_reject.emit(tor, peer, loc.block);
+            }
             break;
 
         case tr_peer_event::Type::ClientGotBlock:
@@ -817,7 +826,7 @@ private:
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 peer->blame.set(loc.piece);
                 tor->on_block_received(loc.block);
-                s->got_block.emit(tor, event.pieceIndex, loc.block);
+                s->got_block.emit(tor, loc.block);
             }
 
             break;
@@ -907,14 +916,9 @@ EXIT:
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = 5U;
 
-    // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = 90;
-
     std::array<libtransmission::ObserverTag, 8> const tags_;
 
     mutable std::optional<bool> pool_is_all_upload_only_;
-
-    bool is_endgame_ = false;
 };
 
 bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
@@ -922,14 +926,14 @@ bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
     return tor_.has_block(block);
 }
 
+bool tr_swarm::WishlistMediator::client_has_piece(tr_piece_index_t piece) const
+{
+    return tor_.has_blocks(block_span(piece));
+}
+
 bool tr_swarm::WishlistMediator::client_wants_piece(tr_piece_index_t piece) const
 {
     return tor_.piece_is_wanted(piece);
-}
-
-bool tr_swarm::WishlistMediator::is_endgame() const
-{
-    return swarm_.is_endgame();
 }
 
 bool tr_swarm::WishlistMediator::is_sequential_download() const
@@ -937,14 +941,14 @@ bool tr_swarm::WishlistMediator::is_sequential_download() const
     return tor_.is_sequential_download();
 }
 
-size_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block) const
+uint8_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block) const
 {
-    return swarm_.active_requests.count(block);
-}
-
-size_t tr_swarm::WishlistMediator::count_missing_blocks(tr_piece_index_t piece) const
-{
-    return tor_.count_missing_blocks_in_piece(piece);
+    auto const op = [block](uint8_t acc, auto const& peer)
+    {
+        return acc + (peer->active_requests.test(block) ? 1U : 0U);
+    };
+    return std::accumulate(std::begin(swarm_.peers), std::end(swarm_.peers), uint8_t{}, op) +
+        std::accumulate(std::begin(swarm_.webseeds), std::end(swarm_.webseeds), uint8_t{}, op);
 }
 
 size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piece) const
@@ -959,7 +963,17 @@ size_t tr_swarm::WishlistMediator::count_piece_replication(tr_piece_index_t piec
 
 tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) const
 {
-    return tor_.block_span_for_piece(piece);
+    auto span = tor_.block_span_for_piece(piece);
+
+    // Overlapping block spans caused by blocks unaligned to piece boundaries
+    // might cause redundant block requests to be sent out, so detect it and
+    // ensure that block spans within the wishlist do not overlap.
+    if (auto const is_unaligned_piece = tor_.block_loc(span.begin).piece != piece; is_unaligned_piece)
+    {
+        ++span.begin;
+    }
+
+    return span;
 }
 
 tr_piece_index_t tr_swarm::WishlistMediator::piece_count() const
@@ -973,9 +987,15 @@ tr_priority_t tr_swarm::WishlistMediator::priority(tr_piece_index_t piece) const
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_peer_disconnect(
-    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer)
 {
     return swarm_.peer_disconnect.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bad_piece(
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+{
+    return tor_.got_bad_piece_.observe(std::move(observer));
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
@@ -985,9 +1005,15 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_bitfield(
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_block(
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t, tr_block_index_t>::Observer observer)
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer)
 {
     return swarm_.got_block.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_choke(
+    libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer)
+{
+    return swarm_.got_choke.observe(std::move(observer));
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have(
@@ -1002,6 +1028,12 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_have_all(
     return swarm_.got_have_all.observe(std::move(observer));
 }
 
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_got_reject(
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
+{
+    return swarm_.got_reject.observe(std::move(observer));
+}
+
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_piece_completed(
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
 {
@@ -1012,6 +1044,18 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_priority_change
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t>::Observer observer)
 {
     return tor_.priority_changed_.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sent_cancel(
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_index_t>::Observer observer)
+{
+    return swarm_.sent_cancel.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sent_request(
+    libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer)
+{
+    return swarm_.sent_request.observe(std::move(observer));
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_changed(
@@ -1028,7 +1072,6 @@ private:
     static auto constexpr BandwidthTimerPeriod = 500ms;
     static auto constexpr PeerInfoPeriod = 1min;
     static auto constexpr RechokePeriod = 10s;
-    static auto constexpr RefillUpkeepPeriod = 10s;
 
     // Max number of outbound peer connections to initiate.
     // This throttle is an arbitrary number to avoid overloading routers.
@@ -1063,13 +1106,11 @@ public:
         , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
         , peer_info_timer_{ timer_maker.create([this]() { peer_info_pulse(); }) }
         , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
-        , refill_upkeep_timer_{ timer_maker.create([this]() { refill_upkeep(); }) }
         , blocklists_tag_{ blocklist.observe_changes([this]() { on_blocklists_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
         peer_info_timer_->start_repeating(PeerInfoPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
-        refill_upkeep_timer_->start_repeating(RefillUpkeepPeriod);
     }
 
     tr_peerMgr(tr_peerMgr&&) = delete;
@@ -1112,7 +1153,6 @@ private:
     void peer_info_pulse();
     void rechoke_pulse() const;
     void reconnect_pulse();
-    void refill_upkeep() const;
 
     void rechoke_pulse_marshall()
     {
@@ -1134,6 +1174,11 @@ private:
             for (auto* const peer : tor->swarm->peers)
             {
                 peer->peer_info->set_blocklisted_dirty();
+                if (peer->peer_info->is_blocklisted(blocklists_))
+                {
+                    peer->disconnect_soon();
+                    tr_logAddDebugTor(tor, fmt::format("Peer {} blocked in blocklists update", peer->display_name()));
+                }
             }
         }
     }
@@ -1143,7 +1188,6 @@ private:
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
     std::unique_ptr<libtransmission::Timer> const peer_info_timer_;
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
-    std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
 
     libtransmission::ObserverTag const blocklists_tag_;
 };
@@ -1153,16 +1197,9 @@ private:
 tr_peer::tr_peer(tr_torrent const& tor)
     : session{ tor.session }
     , swarm{ tor.swarm }
+    , active_requests{ tor.block_count() }
     , blame{ tor.piece_count() }
 {
-}
-
-tr_peer::~tr_peer()
-{
-    if (swarm != nullptr)
-    {
-        swarm->active_requests.remove(this);
-    }
 }
 
 // ---
@@ -1194,54 +1231,18 @@ void tr_peerMgrFree(tr_peerMgr* manager)
  *    tr_peerMgrGetNextRequests() is called.
  */
 
-// --- struct block_request
-
-// TODO: if we keep this, add equivalent API to ActiveRequest
-void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
-{
-    auto const now = tr_time();
-
-    for (tr_block_index_t block = span.begin; block < span.end; ++block)
-    {
-        torrent->swarm->active_requests.add(block, peer, now);
-    }
-}
-
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
     TR_ASSERT(!torrent->is_done());
     tr_swarm& swarm = *torrent->swarm;
     if (!swarm.wishlist)
     {
-        swarm.wishlist = std::make_unique<Wishlist>(std::make_unique<tr_swarm::WishlistMediator>(swarm));
+        swarm.wishlist = std::make_unique<Wishlist>(swarm.wishlist_mediator);
     }
-    swarm.update_endgame();
     return swarm.wishlist->next(
         numwant,
         [peer](tr_piece_index_t p) { return peer->has_piece(p); },
-        [peer, &swarm](tr_block_index_t b) { return swarm.active_requests.has(b, peer); });
-}
-
-// --- Piece List Manipulation / Accessors
-
-bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_block_index_t block)
-{
-    return tor->swarm->active_requests.has(block, peer);
-}
-
-size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* tor, tr_peer const* peer)
-{
-    return tor->swarm->active_requests.count(peer);
-}
-
-void tr_peerMgr::refill_upkeep() const
-{
-    auto const lock = unique_lock();
-
-    for (auto* const tor : torrents_)
-    {
-        tor->swarm->cancel_old_requests();
-    }
+        [peer](tr_block_index_t b) { return peer->active_requests.test(b); });
 }
 
 namespace
@@ -1289,7 +1290,12 @@ void create_bit_torrent_peer(
         info->destroy_handshake();
     }
 
-    if (!result.is_connected || swarm == nullptr || !swarm->is_running)
+    if (swarm == nullptr || !swarm->is_running)
+    {
+        return false;
+    }
+
+    if (!result.is_connected)
     {
         if (info && !info->is_connected())
         {
@@ -1455,6 +1461,64 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
     }
 
     return pex;
+}
+
+tr_variant::Map tr_pex::to_variant() const
+{
+    auto pex = tr_variant::Map{ 2 };
+
+    auto buf = std::array<char, tr_socket_address::CompactSockAddrMaxBytes>{};
+    auto* const buf_data = std::data(buf);
+    auto* const begin = reinterpret_cast<std::byte*>(buf_data);
+    auto* const end = to_compact(begin);
+
+    pex.try_emplace(TR_KEY_socket_address, std::string_view{ buf_data, static_cast<size_t>(end - begin) });
+    pex.try_emplace(TR_KEY_flags, flags);
+
+    return pex;
+}
+
+std::vector<tr_pex> tr_pex::from_variant(tr_variant const* const var, size_t const n_var)
+{
+    auto pex_vec = std::vector<tr_pex>{};
+    pex_vec.reserve(n_var);
+    for (size_t i = 0; i < n_var; ++i)
+    {
+        auto* const map = var[i].get_if<tr_variant::Map>();
+        if (map == nullptr)
+        {
+            continue;
+        }
+
+        auto sockaddr = map->value_if<std::string_view>(TR_KEY_socket_address);
+        if (!sockaddr)
+        {
+            continue;
+        }
+
+        auto pex = tr_pex{};
+        auto* const compact = reinterpret_cast<std::byte const*>(std::data(*sockaddr));
+        switch (std::size(*sockaddr))
+        {
+        case tr_socket_address::CompactSockAddrBytes[TR_AF_INET]:
+            pex.socket_address = tr_socket_address::from_compact_ipv4(compact).first;
+            break;
+
+        case tr_socket_address::CompactSockAddrBytes[TR_AF_INET6]:
+            pex.socket_address = tr_socket_address::from_compact_ipv6(compact).first;
+            break;
+
+        default:
+            TR_ASSERT(false);
+            continue;
+        }
+
+        pex.flags = static_cast<uint8_t>(map->value_if<int64_t>(TR_KEY_flags).value_or(0));
+
+        pex_vec.emplace_back(std::move(pex));
+    }
+
+    return pex_vec;
 }
 
 // ---
@@ -2427,12 +2491,6 @@ namespace connect_helpers
 /* is this atom someone that we'd want to initiate a connection to? */
 [[nodiscard]] bool is_peer_candidate(tr_torrent const* tor, tr_peer_info const& peer_info, time_t const now)
 {
-    // have we already tried and failed to connect?
-    if (auto const conn = peer_info.is_connectable(); conn && !*conn)
-    {
-        return false;
-    }
-
     // not if we're both upload only and pex is disabled
     if (tor->is_done() && peer_info.is_upload_only() && !tor->allows_pex())
     {

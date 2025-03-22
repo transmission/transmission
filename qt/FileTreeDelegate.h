@@ -7,20 +7,21 @@
 
 #include <QItemDelegate>
 
-#include <libtransmission/tr-macros.h>
-
 class FileTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FileTreeDelegate)
 
 public:
     explicit FileTreeDelegate(QObject* parent = nullptr)
         : QItemDelegate{ parent }
     {
     }
+    FileTreeDelegate(FileTreeDelegate&&) = delete;
+    FileTreeDelegate(FileTreeDelegate const&) = delete;
+    FileTreeDelegate& operator=(FileTreeDelegate&&) = delete;
+    FileTreeDelegate& operator=(FileTreeDelegate const&) = delete;
 
     // QAbstractItemDelegate
-    QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
+    [[nodiscard]] QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
     void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;
 };

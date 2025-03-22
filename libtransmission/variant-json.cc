@@ -50,7 +50,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Null()
     {
-        *get_leaf() = tr_variant::unmanaged_string("");
+        *get_leaf() = nullptr;
         return true;
     }
 
@@ -203,11 +203,11 @@ private:
 
 std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
-    auto* const begin = std::data(input);
-    TR_ASSERT(begin != nullptr); // RapidJSON will dereference a nullptr if this is false
+    auto* begin = std::data(input);
     if (begin == nullptr)
     {
-        return {};
+        // RapidJSON will dereference a nullptr otherwise
+        begin = "";
     }
 
     auto const size = std::size(input);
@@ -238,7 +238,7 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
         error_.set(
             EILSEQ,
             fmt::format(
-                _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})")),
                 fmt::arg("position", pos),
                 fmt::arg("text", std::string_view{ begin + pos, std::min(size_t{ 16U }, size - pos) }),
                 fmt::arg("error", rapidjson::GetParseError_En(err_code)),
@@ -311,6 +311,11 @@ private:
 
 using writer_var_t = std::variant<rapidjson::Writer<string_output_stream>, rapidjson::PrettyWriter<string_output_stream>>;
 
+void jsonNullFunc(tr_variant const& /*var*/, std::nullptr_t /*val*/, void* vdata)
+{
+    std::visit([](auto&& writer) { writer.Null(); }, *static_cast<writer_var_t*>(vdata));
+}
+
 void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
 {
     std::visit([val](auto&& writer) { writer.Int64(val); }, *static_cast<writer_var_t*>(vdata));
@@ -363,6 +368,7 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     using namespace to_string_helpers;
 
     static auto constexpr Funcs = WalkFuncs{
+        jsonNullFunc, //
         jsonIntFunc, //
         jsonBoolFunc, //
         jsonRealFunc, //

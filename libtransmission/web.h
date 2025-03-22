@@ -91,7 +91,7 @@ public:
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;
 
-        static auto inline constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
+        static auto constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
     };
 
     void fetch(FetchOptions&& options);
@@ -143,15 +143,16 @@ public:
             return std::nullopt;
         }
 
-        // Notify the system that `byte_count` of download bandwidth was used
-        virtual void notifyBandwidthConsumed([[maybe_unused]] int bandwidth_tag, [[maybe_unused]] size_t byte_count)
-        {
-        }
-
         // Return the number of bytes that should be allowed. See tr_bandwidth::clamp()
         [[nodiscard]] virtual size_t clamp([[maybe_unused]] int bandwidth_tag, size_t byte_count) const
         {
             return byte_count;
+        }
+
+        // Return the preferred proxy url
+        [[nodiscard]] virtual std::optional<std::string_view> proxyUrl() const
+        {
+            return std::nullopt;
         }
 
         // Invoke the user-provided fetch callback

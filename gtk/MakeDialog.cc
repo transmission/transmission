@@ -71,9 +71,11 @@ public:
         std::future<tr_error> future,
         std::string_view target,
         Glib::RefPtr<Session> const& core);
+    MakeProgressDialog(MakeProgressDialog&&) = delete;
+    MakeProgressDialog(MakeProgressDialog const&) = delete;
+    MakeProgressDialog& operator=(MakeProgressDialog&&) = delete;
+    MakeProgressDialog& operator=(MakeProgressDialog const&) = delete;
     ~MakeProgressDialog() override;
-
-    TR_DISABLE_COPY_MOVE(MakeProgressDialog)
 
     static std::unique_ptr<MakeProgressDialog> create(
         std::string_view target,
@@ -110,9 +112,11 @@ class MakeDialog::Impl
 {
 public:
     Impl(MakeDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onSourceToggled(Gtk::CheckButton* tb, PathButton* chooser);
@@ -187,7 +191,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     auto const base = Glib::path_get_basename(builder_.top());
     if (!is_done)
     {
-        str = fmt::format(_("Creating '{path}'"), fmt::arg("path", base));
+        str = fmt::format(fmt::runtime(_("Creating '{path}'")), fmt::arg("path", base));
     }
     else
     {
@@ -200,13 +204,13 @@ bool MakeProgressDialog::onProgressDialogRefresh()
 
         if (!error)
         {
-            str = fmt::format(_("Created '{path}'"), fmt::arg("path", base));
+            str = fmt::format(fmt::runtime(_("Created '{path}'")), fmt::arg("path", base));
             success = true;
         }
         else
         {
             str = fmt::format(
-                _("Couldn't create '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't create '{path}': {error} ({error_code})")),
                 fmt::arg("path", base),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code()));
@@ -224,7 +228,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     {
         /* how much data we've scanned through to generate checksums */
         str = fmt::format(
-            _("Scanned {file_size}"),
+            fmt::runtime(_("Scanned {file_size}")),
             fmt::arg("file_size", tr_strlsize(static_cast<uint64_t>(piece_index) * builder_.piece_size())));
     }
 
@@ -385,15 +389,18 @@ void MakeDialog::Impl::updatePiecesLabel()
     else
     {
         gstr += fmt::format(
-            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->file_count()),
+            fmt::runtime(ngettext(
+                "{total_size} in {file_count:L} file",
+                "{total_size} in {file_count:L} files",
+                builder_->file_count())),
             fmt::arg("total_size", tr_strlsize(builder_->total_size())),
             fmt::arg("file_count", builder_->file_count()));
         gstr += ' ';
         gstr += fmt::format(
-            ngettext(
+            fmt::runtime(ngettext(
                 "({piece_count} BitTorrent piece @ {piece_size})",
                 "({piece_count} BitTorrent pieces @ {piece_size})",
-                builder_->piece_count()),
+                builder_->piece_count())),
             fmt::arg("piece_count", builder_->piece_count()),
             fmt::arg("piece_size", Memory{ builder_->piece_size(), Memory::Units::Bytes }.to_string()));
     }
@@ -403,8 +410,8 @@ void MakeDialog::Impl::updatePiecesLabel()
 
 void MakeDialog::Impl::configurePieceSizeScale(uint32_t piece_size)
 {
-    // the below lower & upper bounds would allow piece size selection between approx 1KiB - 64MiB
-    auto adjustment = Gtk::Adjustment::create(log2(piece_size), 10, 26, 1.0, 1.0);
+    // the below lower & upper bounds would allow piece size selection between approx 16KiB - 256MiB
+    auto adjustment = Gtk::Adjustment::create(log2(piece_size), 14, 28, 1.0, 1.0);
     piece_size_scale_->set_adjustment(adjustment);
     piece_size_scale_->set_visible(true);
 }

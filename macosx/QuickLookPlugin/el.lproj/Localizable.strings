@@ -1,0 +1,27 @@
+/* quicklook file header */
+"%lu Files" = "%lu Αρχεία";
+
+/* quicklook file count */
+"%lu files" = "%lu αρχεία";
+
+/* quicklook tracker header */
+"%lu Trackers" = "%lu Ιχνηλάτες";
+
+/* quicklook web seed header */
+"%lu Web Seeds" = "%lu Διαμοιραστές Δικτύου";
+
+/* quicklook tracker header */
+"1 Tracker" = "1 Ιχνηλάτης";
+
+/* quicklook web seed header */
+"1 Web Seed" = "1 Διαμοιραστής Δικτύου";
+
+/* quicklook creation info */
+"Created on %@" = "Δημιουργήθηκε την %@";
+
+/* quicklook creation info */
+"Created on %@ with %@" = "Δημιουργήθηκε την %1$@ με %2$@";
+
+/* quicklook creation info */
+"Created with %@" = "Δημιουργήθηκε με %@";
+

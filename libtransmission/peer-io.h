@@ -49,7 +49,6 @@ enum class ReadState : uint8_t
 
 enum tr_preferred_transport : uint8_t
 {
-    // More preferred transports goes on top
     TR_PREFER_UTP,
     TR_PREFER_TCP,
     TR_NUM_PREFERRED_TRANSPORT
@@ -65,11 +64,12 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 
 public:
     tr_peerIo(
-        tr_session* session_in,
+        tr_session* session,
+        tr_peer_socket&& socket,
+        tr_bandwidth* parent_bandwidth,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,
-        bool client_is_seed,
-        tr_bandwidth* parent_bandwidth);
+        bool client_is_seed);
 
     ~tr_peerIo();
 
@@ -142,14 +142,7 @@ public:
 
     [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
-    {
-        outbuf_info_.emplace_back(n_bytes, is_piece_data);
-
-        auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
-        filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
-        outbuf_.commit_space(n_bytes);
-    }
+    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
@@ -350,7 +343,7 @@ private:
     void event_enable(short event);
     void event_disable(short event);
 
-    void can_read_wrapper();
+    void can_read_wrapper(size_t bytes_transferred);
     void did_write_wrapper(size_t bytes_transferred);
 
     size_t try_read(size_t max);
@@ -360,6 +353,7 @@ private:
     // production code should use new_outgoing() or new_incoming()
     static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
+        tr_peer_socket&& socket,
         tr_bandwidth* parent,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,
@@ -370,7 +364,7 @@ private:
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 
-    tr_peer_socket socket_ = {};
+    tr_peer_socket socket_;
 
     tr_bandwidth bandwidth_;
 

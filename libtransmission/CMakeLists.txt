@@ -82,8 +82,6 @@ target_sources(${TR_NAME}
         peer-common.h
         peer-io.cc
         peer-io.h
-        peer-mgr-active-requests.cc
-        peer-mgr-active-requests.h
         peer-mgr-wishlist.cc
         peer-mgr-wishlist.h
         peer-mgr.cc
@@ -136,6 +134,8 @@ target_sources(${TR_NAME}
         torrent-magnet.h
         torrent-metainfo.cc
         torrent-metainfo.h
+        torrent-queue.cc
+        torrent-queue.h
         torrent.cc
         torrent.h
         torrents.cc

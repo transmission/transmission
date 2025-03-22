@@ -19,19 +19,6 @@
 #define TR_HAVE_STD_POPCOUNT
 #endif
 
-#if (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))) || \
-    (defined(__clang__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 0)))
-
-#ifdef __has_builtin
-#if __has_builtin(__builtin_popcount)
-#define TR_HAVE_BUILTIN_POPCOUNT
-#endif
-#endif
-#if (defined(__x86_64__) || defined(__i386__)) && defined(__POPCNT__)
-#define TR_HAVE_ASM_POPCNT
-#endif
-#endif
-
 #if defined(TR_HAVE_STD_POPCOUNT)
 #include <bit>
 #endif
@@ -57,62 +44,6 @@ struct tr_popcnt
     {
         unsigned_T unsigned_v = static_cast<unsigned_T>(v);
         return static_cast<unsigned>(std::popcount(unsigned_v));
-    }
-
-#elif defined(TR_HAVE_BUILTIN_POPCOUNT)
-    /* Use __builtin as opposed to straight assembly to avoid any
-       strain the latter puts on the optimized. */
-    static inline unsigned count(T v)
-    {
-        /* Make sure we know how to find that right __builtin_popcount. */
-        static_assert(
-            sizeof(T) == sizeof(long long) || sizeof(T) == sizeof(long) || sizeof(T) <= sizeof(int),
-            "Unknown type size!");
-
-        if constexpr (sizeof(T) == sizeof(long long))
-        {
-            return __builtin_popcountll(v);
-        }
-        else if constexpr (sizeof(T) == sizeof(long))
-        {
-            return __builtin_popcountl(v);
-        }
-        else if constexpr (sizeof(T) == sizeof(int))
-        {
-            return __builtin_popcount(v);
-        }
-        else
-        {
-            static_assert(sizeof(T) < sizeof(int));
-            /* Need to avoid sign extension. */
-            unsigned_T unsigned_v = static_cast<unsigned_T>(v);
-            return __builtin_popcount(unsigned_v);
-        }
-    }
-#elif defined(TR_HAVE_ASM_POPCNT)
-    /* raw assembly. This prohibits constexpr so may be worth dropping if there
-     * is need for count() to be constexpr. */
-    static inline unsigned count(T v)
-    {
-        unsigned_T unsigned_v = static_cast<unsigned_T>(v);
-        if constexpr (sizeof(T) >= sizeof(uint32_t))
-        {
-            /* Make sure dst == src to avoid false dependency on many x86
-             * implementations. */
-            __asm__ __volatile__("popcnt %1, %0" : "=r"(unsigned_v) : "0"(unsigned_v) : "cc");
-
-            return unsigned_v;
-        }
-        else
-        {
-            /* No popcnt instruct for register size < 32. */
-            uint32_t unsigned_v32 = static_cast<uint32_t>(unsigned_v);
-
-            /* Make sure dst == src to avoid false dependency on many x86
-             * implementations. */
-            __asm__ __volatile__("popcnt %1, %0" : "=r"(unsigned_v32) : "0"(unsigned_v32) : "cc");
-            return unsigned_v32;
-        }
     }
 #else
     /* Generic implementation. */

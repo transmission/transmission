@@ -167,17 +167,17 @@ public:
 
     // UTILS
 
-    [[nodiscard]] auto torrent_file(std::string_view torrent_dir) const
+    [[nodiscard]] auto torrent_file(std::string_view torrent_dir = {}) const
     {
         return make_filename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".torrent");
     }
 
-    [[nodiscard]] auto magnet_file(std::string_view torrent_dir) const
+    [[nodiscard]] auto magnet_file(std::string_view torrent_dir = {}) const
     {
         return make_filename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".magnet");
     }
 
-    [[nodiscard]] auto resume_file(std::string_view resume_dir) const
+    [[nodiscard]] auto resume_file(std::string_view resume_dir = {}) const
     {
         return make_filename(resume_dir, name(), info_hash_string(), BasenameFormat::Hash, ".resume");
     }
@@ -199,7 +199,7 @@ private:
     static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);
     static std::string fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url);
 
-    enum class BasenameFormat
+    enum class BasenameFormat : uint8_t
     {
         Hash,
         NameAndPartialHash
