@@ -44,6 +44,7 @@ auto constexpr Options = std::array<tr_option, 6>{ {
     { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace

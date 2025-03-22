@@ -47,7 +47,7 @@ char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 
 using Arg = tr_option::Arg;
-auto constexpr options = std::array<tr_option, 14>{ {
+auto constexpr Options = std::array<tr_option, 14>{ {
     { 'd', "header", "Show only header section", "d", Arg::None, nullptr },
     { 'i', "info", "Show only info section", "i", Arg::None, nullptr },
     { 't', "trackers", "Show only trackers section", "t", Arg::None, nullptr },
@@ -63,6 +63,7 @@ auto constexpr options = std::array<tr_option, 14>{ {
     { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 namespace
@@ -86,7 +87,7 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -429,7 +430,7 @@ int tr_main(int argc, char* argv[])
     if (std::empty(opts.filename))
     {
         fmt::print(stderr, "ERROR: No torrent file specified.\n");
-        tr_getopt_usage(MyName, Usage, std::data(options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fmt::print(stderr, "\n");
         return EXIT_FAILURE;
     }

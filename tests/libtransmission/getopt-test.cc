@@ -12,7 +12,7 @@
 namespace
 {
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 10>{ {
+auto constexpr Options = std::array<tr_option, 9>{ {
     { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", Arg::None, nullptr },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", Arg::Required, "<file>" },
     { 's',
@@ -28,7 +28,7 @@ auto constexpr Options = std::array<tr_option, 10>{ {
     { 994, "sequential-download", "Download the torrent sequentially", "seq", Arg::Optional, "<piece>" },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
-
+static_assert(Options[std::size(Options) - 2].val != 0);
 } // namespace
 
 class GetoptTest : public ::testing::Test
