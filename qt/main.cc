@@ -40,6 +40,7 @@ auto constexpr Opts = std::array<tr_option, 8>{ {
     { 'w', "password", "Password to use when connecting to an existing session", "w", Arg::Required, "<password>" },
     { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
 } };
+static_assert(Opts[std::size(Opts) - 2].val != 0);
 } // namespace
 
 namespace
