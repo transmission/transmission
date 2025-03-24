@@ -210,7 +210,7 @@ enum
 
 // --- Command-Line Arguments
 
-auto constexpr Options = std::array<tr_option, 105>{
+auto constexpr Options = std::array<tr_option, 106>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -331,6 +331,7 @@ auto constexpr Options = std::array<tr_option, 105>{
         false,
         nullptr },
       { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
+      { 711, "tracker-list", "Set a list of tracker to a torrent", "tl", true, "<tracker>" },
       { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
       { 's', "start", "Start the current torrent(s)", "s", false, nullptr },
       { 'S', "stop", "Stop the current torrent(s)", "S", false, nullptr },
@@ -461,6 +462,7 @@ enum
     case 993: /* no-trash-torrent */
         return MODE_SESSION_SET;
 
+    case 711: /* tracker-list*/
     case 712: /* tracker-remove */
     case 950: /* seedratio */
     case 951: /* seedratio-default */
@@ -3004,6 +3006,18 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             switch (c)
             {
+            case 711:
+                    {
+                    auto* list = args.find_if<tr_variant::Vector>(TR_KEY_trackerList);
+                    if (list == nullptr)
+                    {
+                        list = args.insert_or_assign(TR_KEY_trackerList, tr_variant::make_vector(1))
+                                   .first.get_if<tr_variant::Vector>();
+                    }
+                    list->emplace_back(optarg_sv);
+                    }
+                    break;
+
             case 712:
                 {
                     auto* list = args.find_if<tr_variant::Vector>(TR_KEY_trackerRemove);
