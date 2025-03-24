@@ -1491,6 +1491,11 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
         ctor.set_sequential_download(TR_FORCE, *val);
     }
 
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val)
+    {
+        ctor.set_sequential_download_from_piece(TR_FORCE, *val);
+    }
+
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
 
     if (isCurlURL(filename))

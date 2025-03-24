@@ -462,20 +462,21 @@ Request arguments:
 
 | Key | Value Type | Description
 |:--|:--|:--
-| `cookies`             | string    | pointer to a string of one or more cookies.
-| `download-dir`        | string    | path to download the torrent to
-| `filename`            | string    | filename or URL of the .torrent file
-| `labels`              | array     | array of string labels
-| `metainfo`            | string    | base64-encoded .torrent content
-| `paused`              | boolean   | if true, don't start the torrent
-| `peer-limit`          | number    | maximum number of peers
-| `bandwidthPriority`   | number    | torrent's bandwidth tr_priority_t
-| `files-wanted`        | array     | indices of file(s) to download
-| `files-unwanted`      | array     | indices of file(s) to not download
-| `priority-high`       | array     | indices of high-priority file(s)
-| `priority-low`        | array     | indices of low-priority file(s)
-| `priority-normal`     | array     | indices of normal-priority file(s)
-| `sequential_download` | boolean   | download torrent pieces sequentially
+| `cookies`                        | string    | pointer to a string of one or more cookies.
+| `download-dir`                   | string    | path to download the torrent to
+| `filename`                       | string    | filename or URL of the .torrent file
+| `labels`                         | array     | array of string labels
+| `metainfo`                       | string    | base64-encoded .torrent content
+| `paused`                         | boolean   | if true, don't start the torrent
+| `peer-limit`                     | number    | maximum number of peers
+| `bandwidthPriority`              | number    | torrent's bandwidth tr_priority_t
+| `files-wanted`                   | array     | indices of file(s) to download
+| `files-unwanted`                 | array     | indices of file(s) to not download
+| `priority-high`                  | array     | indices of high-priority file(s)
+| `priority-low`                   | array     | indices of low-priority file(s)
+| `priority-normal`                | array     | indices of normal-priority file(s)
+| `sequential_download`            | boolean   | download torrent pieces sequentially
+| `sequential_download_from_piece` | boolean   | download from a specific piece when sequential download is enabled
 
 Either `filename` **or** `metainfo` **must** be included. All other arguments are optional.
 
@@ -1040,6 +1041,7 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-add` | new arg `sequential_download`
 | `torrent-get` | new arg `sequential_download`
 | `torrent-set` | new arg `sequential_download`
+| `torrent-add` | new arg `sequential_download_from_piece`
 | `torrent-get` | new arg `sequential_download_from_piece`
 | `torrent-set` | new arg `sequential_download_from_piece`
 | `torrent-get` | new arg `files.begin_piece`
