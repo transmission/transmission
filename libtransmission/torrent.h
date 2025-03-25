@@ -1012,7 +1012,7 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
-    libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_from_piece_changed_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
