@@ -5015,8 +5015,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
     case kIOMessageSystemWillSleep:
         {
+            //the system will prefer to enter the Dark Wake state, or remain in Dark Wake if already there, rather than go to sleep
             IOPMAssertionID assertionID;
-            IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
+            IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypePreventSystemSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
 
             if (success == kIOReturnSuccess)
             {
@@ -5040,30 +5041,30 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 success = IOPMAssertionRelease(assertionID);
             }
 
-            IOAllowPowerChange(self.fRootPort, (long)messageArgument);
             break;
-
-            //The system will be able to sleep again or forcefully sleep after 30 seconds
         }
 
     case kIOMessageCanSystemSleep:
         if ([self.fDefaults boolForKey:@"SleepPrevent"])
         {
             //prevent idle sleep unless no torrents are active
+            //the system may still sleep for lid close, Apple menu, low battery, or other sleep reasons.
+            //this assertion does not put the system into Dark Wake.
             IOPMAssertionID assertionID;
             IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
 
-            for (Torrent* torrent in self.fTorrents)
+            if (success == kIOReturnSuccess)
             {
-                if (torrent.active && !torrent.stalled && !torrent.error)
+                for (Torrent* torrent in self.fTorrents)
                 {
-                    //there is a maximum of 30 seconds to do work before system sleeps
-                    // it is no longer possible to prevent idle sleep
-                    return;
+                    if (torrent.active && !torrent.stalled && !torrent.error)
+                    {
+                        return;
+                    }
                 }
-            }
 
-            IOAllowPowerChange(self.fRootPort, (long)messageArgument);
+                success = IOPMAssertionRelease(assertionID);
+            }
         }
         break;
 
