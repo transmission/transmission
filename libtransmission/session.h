@@ -158,6 +158,11 @@ private:
             return tr_address::from_string(session_.announceIP());
         }
 
+        [[nodiscard]] bool has_source_address(tr_address_type type) const override
+        {
+            return !!session_.global_source_address(type);
+        }
+
     private:
         tr_session& session_;
     };
