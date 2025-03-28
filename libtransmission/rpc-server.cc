@@ -389,8 +389,20 @@ bool is_address_allowed(tr_rpc_server const* server, char const* address)
         return true;
     }
 
+    // Convert IPv4-mapped address to IPv4 address
+    // so that it can match with IPv4 whitelist entries
+    auto native = std::string{};
+    if (auto ipv4_mapped = tr_address::from_string(address); ipv4_mapped)
+    {
+        if (auto addr = ipv4_mapped->from_ipv4_mapped(); addr)
+        {
+            native = addr->display_name();
+        }
+    }
+    auto const* const addr = std::empty(native) ? address : native.c_str();
+
     auto const& src = server->whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
+    return std::any_of(std::begin(src), std::end(src), [&addr](auto const& s) { return tr_wildmat(addr, s); });
 }
 
 bool isIPAddressWithOptionalPort(char const* host)
