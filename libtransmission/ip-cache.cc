@@ -280,7 +280,7 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
         // Stop the update process since we have no public internet connectivity
         unset_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
-        tr_logAddDebug(fmt::format("Couldn't obtain source {} address", protocol));
+        tr_logAddDebug(fmt::format("Couldn't obtain source {} address: {} ({})", protocol, tr_net_strerror(err), err));
         if (err == EAFNOSUPPORT)
         {
             stop_timer(type); // No point in retrying
@@ -327,7 +327,12 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
             return;
         }
 
-        tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
+        tr_logAddDebug(fmt::format(
+            "Couldn't obtain global {} address, HTTP status = {}, did_connect = {}, did_timeout = {}",
+            protocol,
+            response.status,
+            response.did_connect,
+            response.did_timeout));
         unset_global_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
     }
