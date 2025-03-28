@@ -94,10 +94,14 @@ namespace global_source_ip_helpers
             }
         }
 
+        err_out = sockerrno;
         tr_net_close_socket(sock);
     }
+    else
+    {
+        err_out = sockerrno;
+    }
 
-    err_out = sockerrno;
     set_sockerrno(save);
     return {};
 }
