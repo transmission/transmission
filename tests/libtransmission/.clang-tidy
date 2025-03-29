@@ -26,6 +26,7 @@ Checks: >
   -hicpp-signed-bitwise,
   misc-*,
   -misc-include-cleaner,
+  -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
   -modernize-use-trailing-return-type,
@@ -41,7 +42,6 @@ CheckOptions:
   - { key: readability-identifier-naming.ClassCase,                         value: CamelCase  }
   - { key: readability-identifier-naming.ClassMethodCase,                   value: camelBack  }
   - { key: readability-identifier-naming.ConstexprVariableCase,             value: CamelCase  }
-  - { key: readability-identifier-naming.EnumConstantCase,                  value: UPPER_CASE }
   - { key: readability-identifier-naming.FunctionCase,                      value: camelBack  }
   - { key: readability-identifier-naming.GlobalConstantCase,                value: CamelCase  }
   - { key: readability-identifier-naming.MemberConstantCase,                value: CamelCase  }
