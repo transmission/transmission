@@ -266,7 +266,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DRUN_CLANG_TIDY=ON
       - name: Make
-        run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
+        run: cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee makelog
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
@@ -303,7 +303,7 @@ jobs:
       - name: Make
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target transmission.lib 2>&1 | tee makelog
+          cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee makelog
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
