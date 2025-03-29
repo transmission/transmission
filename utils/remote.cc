@@ -48,7 +48,7 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TR_DEFAULT_RPC_PORT };
+auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
 char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 

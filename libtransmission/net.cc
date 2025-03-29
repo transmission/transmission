@@ -487,7 +487,7 @@ std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* comp
 
 std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
-    auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
+    auto const address_sz = tr_strbuf<char, TrAddrStrlen>{ address_sv };
 
     auto ss = sockaddr_storage{};
     auto sslen = int{ sizeof(ss) };
@@ -814,8 +814,7 @@ std::optional<tr_socket_address> tr_socket_address::from_string(std::string_view
 {
     auto ss = sockaddr_storage{};
     auto sslen = int{ sizeof(ss) };
-    if (evutil_parse_sockaddr_port(tr_strbuf<char, TR_ADDRSTRLEN>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) !=
-        0)
+    if (evutil_parse_sockaddr_port(tr_strbuf<char, TrAddrStrlen>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) != 0)
     {
         return {};
     }

@@ -26,7 +26,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-upnp.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h" // TR_ADDRSTRLEN
+#include "libtransmission/tr-macros.h" // TrAddrStrlen
 #include "libtransmission/utils.h" // for _(), tr_strerror()
 
 #ifndef MINIUPNPC_API_VERSION
@@ -260,7 +260,7 @@ tr_port_forwarding_state tr_upnpPulse(
         handle->discover_future.reset();
 
         FreeUPNPUrls(&handle->urls);
-        auto lanaddr = std::array<char, TR_ADDRSTRLEN>{};
+        auto lanaddr = std::array<char, TrAddrStrlen>{};
         if (
 #if (MINIUPNPC_API_VERSION >= 18)
             UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, std::data(lanaddr), std::size(lanaddr) - 1, nullptr, 0)

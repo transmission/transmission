@@ -17,7 +17,7 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1250>{
+inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1250>{
     { { "123", "application/vnd.lotus-1-2-3" },
       { "1km", "application/vnd.1000minds.decision-model+xml" },
       { "3dml", "text/vnd.in3d.3dml" },

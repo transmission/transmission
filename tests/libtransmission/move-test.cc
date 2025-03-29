@@ -69,9 +69,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
     EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
 
-    // auto constexpr completeness_unset = tr_completeness { -1 };
-    // auto completeness = completeness_unset;
-    int completeness = -1;
+    static auto constexpr CompletenessUnset = static_cast<tr_completeness>(-1);
+    auto completeness = CompletenessUnset;
     auto const zeroes_completeness_func =
         [](tr_torrent* /*torrent*/, tr_completeness c, bool /*was_running*/, void* vc) noexcept
     {
@@ -125,7 +124,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     auto test = [&completeness]()
     {
-        return completeness != -1;
+        return completeness != CompletenessUnset;
     };
     EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_SEED, completeness);

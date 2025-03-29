@@ -38,7 +38,7 @@ public:
     class FetchOptions
     {
     public:
-        enum class IPProtocol
+        enum class IPProtocol : uint8_t
         {
             ANY,
             V4,
@@ -107,6 +107,11 @@ public:
     // before destroying the tr_web object. Deleting the object will cancel
     // all of its tasks.
     ~tr_web();
+
+    tr_web(tr_web const&) = delete;
+    tr_web(tr_web&&) = delete;
+    tr_web& operator=(tr_web const&) = delete;
+    tr_web& operator=(tr_web&&) = delete;
 
     /**
      * Mediates between `tr_web` and its clients.
