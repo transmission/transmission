@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
-    bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
+    bool set_global_addr(tr_address_type type, tr_address const& addr_new) noexcept;
 
     void update_addr(tr_address_type type) noexcept;
     void update_global_addr(tr_address_type type) noexcept;
@@ -97,7 +97,7 @@ private:
     using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
 
     void unset_global_addr(tr_address_type type) noexcept;
-    void set_source_addr(tr_address const& addr) noexcept;
+    void set_source_addr(tr_address const& addr_new) noexcept;
     void unset_addr(tr_address_type type) noexcept;
 
     void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
