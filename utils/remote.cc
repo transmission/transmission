@@ -941,7 +941,7 @@ void print_details(tr_variant::Map const& map)
             {
                 if (auto sv = it->value_if<std::string_view>(); sv)
                 {
-                    fmt::print("{:s}{:s}", it == begin ? ", " : "", *sv);
+                    fmt::print("{:s}{:s}", it != begin ? ", " : "", *sv);
                 }
             }
 
