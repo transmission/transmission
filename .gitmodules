@@ -13,7 +13,6 @@
 [submodule "third-party/libnatpmp"]
 	path = third-party/libnatpmp
 	url = https://github.com/transmission/libnatpmp.git
-	branch = post-20151025-transmission
 [submodule "third-party/libutp"]
 	path = third-party/libutp
 	url = https://github.com/transmission/libutp.git
