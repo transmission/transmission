@@ -350,7 +350,7 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
     auto done = false;
     auto err = false;
 
-    if (bytes_transferred > 0U)
+    if (socket_.is_tcp() && bytes_transferred > 0U)
     {
         bandwidth().notify_bandwidth_consumed(TR_DOWN, bytes_transferred, false, now);
     }
@@ -365,11 +365,18 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
            (socket_.is_tcp() || read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
     {
         auto piece = size_t{};
+        auto const old_size = read_buffer_size();
         auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : ReadState::Err;
+        auto const used = old_size - read_buffer_size();
 
         if (piece > 0U)
         {
             bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
+        }
+
+        if (socket_.is_utp() && used > 0U)
+        {
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, used, false, now);
         }
 
         switch (read_state)
