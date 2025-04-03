@@ -358,10 +358,11 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
     // In normal conditions, only continue processing if we still have bandwidth
     // quota for it.
     //
-    // The read buffer will grow indefinitely if libutp or the TCP stack keeps buffering
-    // data faster than the bandwidth limit allows. To safeguard against that, we keep
+    // The read buffer will grow indefinitely if libutp keeps buffering data faster
+    // than the bandwidth limit allows. To safeguard against that, we keep
     // processing if the read buffer is more than twice as large as the target size.
-    while (!done && !err && (read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
+    while (!done && !err &&
+           (socket_.is_tcp() || read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
     {
         auto piece = size_t{};
         auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : ReadState::Err;
