@@ -347,9 +347,9 @@ namespace make_torrent_field_helpers
     {
         auto const file = tr_torrentFile(&tor, idx);
         auto file_map = tr_variant::Map{ 5U };
-        file_map.try_emplace(TR_KEY_beginPiece, file.beginPiece);
+        file_map.try_emplace(TR_KEY_begin_piece, file.beginPiece);
         file_map.try_emplace(TR_KEY_bytesCompleted, file.have);
-        file_map.try_emplace(TR_KEY_endPiece, file.endPiece);
+        file_map.try_emplace(TR_KEY_end_piece, file.endPiece);
         file_map.try_emplace(TR_KEY_length, file.length);
         file_map.try_emplace(TR_KEY_name, file.name);
         vec.emplace_back(std::move(file_map));
@@ -563,7 +563,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode:
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
-    case TR_KEY_sequentialDownload:
+    case TR_KEY_sequential_download:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
     case TR_KEY_startDate:
@@ -657,7 +657,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode: return tor.idle_limit_mode();
     case TR_KEY_seedRatioLimit: return tor.seed_ratio();
     case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
-    case TR_KEY_sequentialDownload: return tor.is_sequential_download();
+    case TR_KEY_sequential_download: return tor.is_sequential_download();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
@@ -1008,7 +1008,7 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>(TR_KEY_sequentialDownload))
+        if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download))
         {
             tor->set_sequential_download(*val);
         }
@@ -1145,9 +1145,9 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (auto const addr = tr_address::from_string(primary_ip);
-        data->args_out.find_if<std::string_view>(TR_KEY_ipProtocol) == nullptr && addr && addr->is_valid())
+        data->args_out.find_if<std::string_view>(TR_KEY_ip_protocol) == nullptr && addr && addr->is_valid())
     {
-        data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+        data->args_out.try_emplace(TR_KEY_ip_protocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     }
 
     if (status != 200)
@@ -1155,7 +1155,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data,
             fmt::format(
-                _("Couldn't test port: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't test port: {error} ({error_code})")),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
         return;
@@ -1174,17 +1174,17 @@ char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     options.timeout_secs = TimeoutSecs;
 
-    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ipProtocol))
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ip_protocol))
     {
         if (*val == "ipv4"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv4"sv);
+            idle_data->args_out.try_emplace(TR_KEY_ip_protocol, "ipv4"sv);
         }
         else if (*val == "ipv6"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv6"sv);
+            idle_data->args_out.try_emplace(TR_KEY_ip_protocol, "ipv6"sv);
         }
         else
         {
@@ -1210,7 +1210,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data,
             fmt::format(
-                _("Couldn't fetch blocklist: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't fetch blocklist: {error} ({error_code})")),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
         return;
@@ -1255,7 +1255,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data,
             fmt::format(
-                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
@@ -1337,7 +1337,7 @@ void onMetadataFetched(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data->data,
             fmt::format(
-                _("Couldn't fetch torrent: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't fetch torrent: {error} ({error_code})")),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
     }
@@ -1450,6 +1450,11 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
         }
 
         ctor.set_labels(std::move(labels));
+    }
+
+    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
+    {
+        ctor.set_sequential_download(TR_FORCE, *val);
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
@@ -1839,6 +1844,11 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         tr_sessionSetAntiBruteForceEnabled(session, *val);
     }
 
+    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
+    {
+        session->set_sequential_download(*val);
+    }
+
     session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
 
     return nullptr;
@@ -1974,6 +1984,7 @@ char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/
     case TR_KEY_seedRatioLimited: return session.isRatioLimited();
     case TR_KEY_seed_queue_enabled: return session.queueEnabled(TR_UP);
     case TR_KEY_seed_queue_size: return session.queueSize(TR_UP);
+    case TR_KEY_sequential_download: return session.sequential_download();
     case TR_KEY_session_id: return session.sessionId();
     case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_down_enabled: return session.is_speed_limited(TR_DOWN);

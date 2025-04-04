@@ -45,7 +45,7 @@
 "41.title" = "פרטי הטורנט";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "7YU-bS-UkI"; */
-/* "7YU-bS-UkI.placeholderString" = ""; */
+"7YU-bS-UkI.placeholderString" = "לא זמין";
 
 /* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
-/* "uaW-NM-PTU.title" = ""; */
+"uaW-NM-PTU.title" = "היה:";

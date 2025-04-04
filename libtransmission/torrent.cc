@@ -6,10 +6,8 @@
 #include <algorithm>
 #include <array>
 #include <cerrno> // EINVAL
-#include <climits> /* INT_MAX */
 #include <cstddef> // size_t
 #include <ctime>
-#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -136,7 +134,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     if (error)
     {
         tor->error().set_local_error(fmt::format(
-            _("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("magnet", tor->magnet()),
             fmt::arg("error", error.message()),
@@ -400,7 +398,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
-    tr_logAddInfoTor(tor, fmt::format(_("Calling script '{path}'"), fmt::arg("path", script)));
+    tr_logAddInfoTor(tor, fmt::format(fmt::runtime(_("Calling script '{path}'")), fmt::arg("path", script)));
 
     auto error = tr_error{};
     if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
@@ -408,7 +406,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         tr_logAddWarnTor(
             tor,
             fmt::format(
-                _("Couldn't call script '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't call script '{path}': {error} ({error_code})")),
                 fmt::arg("path", script),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
@@ -464,132 +462,59 @@ void tr_torrent::stop_if_seed_limit_reached()
 
 // --- Queue
 
-namespace
-{
-namespace queue_helpers
-{
-constexpr auto MinQueuePosition = std::numeric_limits<size_t>::min();
-constexpr auto MaxQueuePosition = std::numeric_limits<size_t>::max();
-
-#ifdef TR_ENABLE_ASSERTS
-[[nodiscard]] bool torrents_are_sorted_by_queue_position(std::vector<tr_torrent*> torrents)
-{
-    std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
-
-    for (size_t idx = 0, end_idx = std::size(torrents); idx < end_idx; ++idx)
-    {
-        if (torrents[idx]->queue_position() != idx)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-#endif
-} // namespace queue_helpers
-} // namespace
-
 size_t tr_torrentGetQueuePosition(tr_torrent const* tor)
 {
     return tor->queue_position();
 }
 
-void tr_torrent::set_unique_queue_position(size_t const new_pos)
-{
-    using namespace queue_helpers;
-
-    auto max_pos = size_t{};
-    auto const old_pos = queue_position_;
-
-    auto& torrents = session->torrents();
-    for (auto* const walk : torrents)
-    {
-        if (walk == this)
-        {
-            continue;
-        }
-
-        if ((old_pos < new_pos) && (old_pos < walk->queue_position_) && (walk->queue_position_ <= new_pos))
-        {
-            --walk->queue_position_;
-            walk->mark_changed();
-            walk->set_dirty();
-        }
-
-        if ((old_pos > new_pos) && (new_pos <= walk->queue_position_) && (walk->queue_position_ < old_pos))
-        {
-            ++walk->queue_position_;
-            walk->mark_changed();
-            walk->set_dirty();
-        }
-
-        max_pos = std::max(max_pos, walk->queue_position_);
-    }
-
-    queue_position_ = std::min(new_pos, max_pos + 1);
-    mark_changed();
-    set_dirty();
-
-    TR_ASSERT(torrents_are_sorted_by_queue_position(torrents.get_all()));
-}
-
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position)
 {
-    tor->set_unique_queue_position(queue_position);
+    tor->set_queue_position(queue_position);
 }
 
 void tr_torrentsQueueMoveTop(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    using namespace queue_helpers;
-
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
-        tor->set_unique_queue_position(MinQueuePosition);
+        tor->set_queue_position(tr_torrent_queue::MinQueuePosition);
     }
 }
 
 void tr_torrentsQueueMoveUp(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    using namespace queue_helpers;
-
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos > MinQueuePosition)
+        if (auto const pos = tor->queue_position(); pos > tr_torrent_queue::MinQueuePosition)
         {
-            tor->set_unique_queue_position(pos - 1U);
+            tor->set_queue_position(pos - 1U);
         }
     }
 }
 
 void tr_torrentsQueueMoveDown(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    using namespace queue_helpers;
-
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::rbegin(torrents), std::rend(torrents), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
-        if (auto const pos = tor->queue_position(); pos < MaxQueuePosition)
+        if (auto const pos = tor->queue_position(); pos < tr_torrent_queue::MaxQueuePosition)
         {
-            tor->set_unique_queue_position(pos + 1U);
+            tor->set_queue_position(pos + 1U);
         }
     }
 }
 
 void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents_in, size_t torrent_count)
 {
-    using namespace queue_helpers;
-
     auto torrents = std::vector<tr_torrent*>(torrents_in, torrents_in + torrent_count);
     std::sort(std::begin(torrents), std::end(torrents), tr_torrent::CompareQueuePosition);
     for (auto* const tor : torrents)
     {
-        tor->set_unique_queue_position(MaxQueuePosition);
+        tor->set_queue_position(tr_torrent_queue::MaxQueuePosition);
     }
 }
 
@@ -613,8 +538,6 @@ bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* erro
 
 void freeTorrent(tr_torrent* tor)
 {
-    using namespace queue_helpers;
-
     auto const lock = tor->unique_lock();
 
     TR_ASSERT(!tor->is_running());
@@ -629,9 +552,7 @@ void freeTorrent(tr_torrent* tor)
 
     if (!session->isClosing())
     {
-        // move the torrent being freed to the end of the queue so that
-        // all the torrents queued after it will move up one position
-        tor->set_unique_queue_position(queue_helpers::MaxQueuePosition);
+        session->torrent_queue().remove(tor->id());
     }
 
     delete tor;
@@ -796,7 +717,7 @@ void tr_torrentRemoveInSessionThread(
             tor->is_deleting_ = false;
 
             tor->error().set_local_error(fmt::format(
-                _("Couldn't remove all torrent files: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't remove all torrent files: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
             tr_torrentStop(tor);
@@ -970,8 +891,6 @@ void tr_torrent::init(tr_ctor const& ctor)
 
     auto const now_sec = tr_time();
 
-    queue_position_ = std::size(session->torrents());
-
     on_metainfo_updated();
 
     if (auto dir = ctor.download_dir(TR_FORCE); !std::empty(dir))
@@ -1003,7 +922,9 @@ void tr_torrent::init(tr_ctor const& ctor)
 
     mark_changed();
 
-    date_added_ = now_sec; // this is a default that will be overwritten by the resume file
+    // these are defaults that will be overwritten by the resume file
+    date_added_ = now_sec;
+    set_sequential_download(session->sequential_download());
 
     tr_resume::fields_t loaded = {};
 
@@ -1058,11 +979,11 @@ void tr_torrent::init(tr_ctor const& ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    auto const filename = has_metainfo() ? torrent_file() : magnet_file();
+    auto const file_path = store_file();
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
-    bool const is_new_torrent = !tr_sys_path_exists(filename);
+    bool const is_new_torrent = !tr_sys_path_exists(file_path);
 
     if (is_new_torrent)
     {
@@ -1070,19 +991,19 @@ void tr_torrent::init(tr_ctor const& ctor)
 
         if (has_metainfo()) // torrent file
         {
-            ctor.save(filename, &error);
+            ctor.save(file_path, &error);
         }
         else // magnet link
         {
             auto const magnet_link = magnet();
-            tr_file_save(filename, magnet_link, &error);
+            tr_file_save(file_path, magnet_link, &error);
         }
 
         if (error)
         {
             this->error().set_local_error(fmt::format(
-                _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                fmt::arg("path", file_path),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
         }
@@ -1179,7 +1100,7 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
         if (error)
         {
             this->error().set_local_error(fmt::format(
-                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
                 fmt::arg("old_path", current_dir()),
                 fmt::arg("path", path),
                 fmt::arg("error", error.message()),
@@ -1685,7 +1606,7 @@ void tr_torrent::update_file_path(tr_file_index_t file, std::optional<bool> has_
         tr_logAddErrorTor(
             this,
             fmt::format(
-                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
                 fmt::arg("old_path", oldpath),
                 fmt::arg("path", newpath),
                 fmt::arg("error", error.message()),
@@ -2070,7 +1991,7 @@ bool tr_torrent::set_announce_list(tr_announce_list announce_list)
     if (save_error.has_value())
     {
         error().set_local_error(fmt::format(
-            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", save_error.message()),
             fmt::arg("error_code", save_error.code())));
@@ -2123,7 +2044,7 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
         tr_logAddWarnTor(
             this,
             fmt::format(
-                _("Tracker warning: '{warning}' ({url})"),
+                fmt::runtime(_("Tracker warning: '{warning}' ({url})")),
                 fmt::arg("warning", event->text),
                 fmt::arg("url", tr_urlTrackerLogName(event->announce_url))));
         error_.set_tracker_warning(event->announce_url, event->text);
@@ -2733,13 +2654,6 @@ void tr_torrent::ResumeHelper::load_incomplete_dir(std::string_view const dir) n
     {
         tor_.current_dir_ = tor_.incomplete_dir_;
     }
-}
-
-// ---
-
-void tr_torrent::ResumeHelper::load_queue_position(size_t pos) noexcept
-{
-    tor_.queue_position_ = pos;
 }
 
 // ---

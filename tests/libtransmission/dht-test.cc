@@ -60,17 +60,17 @@ using namespace std::literals;
 
 namespace libtransmission::test
 {
+namespace
+{
 
 bool waitFor(struct event_base* event_base, std::chrono::milliseconds msec)
 {
-    return waitFor( //
+    return libtransmission::test::waitFor( //
         event_base,
         []() { return false; },
         msec);
 }
 
-namespace
-{
 auto constexpr IdLength = size_t{ 20U };
 auto constexpr MockTimerInterval = 40ms;
 
