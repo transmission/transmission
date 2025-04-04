@@ -71,7 +71,7 @@ jobs:
           cat "$GITHUB_OUTPUT"
 
   code-style:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     env:
@@ -89,9 +89,7 @@ jobs:
       - name: Get Dependencies
         run: |
           set -ex
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
-          sudo apt-get install -y clang-format-17 npm
+          sudo apt-get install -y clang-format-18 npm
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
