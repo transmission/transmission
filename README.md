@@ -36,10 +36,9 @@ $ tar xf transmission-4.0.6.tar.xz
 $ cd transmission-4.0.6
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
-$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-$ cd build
-$ cmake --build .
-$ sudo cmake --install .
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTS=OFF
+$ cmake --build build -j $(nproc)
+$ sudo cmake --install build
 ```
 
 ### Building Transmission from the nightly builds
@@ -55,10 +54,9 @@ $ git clone --recurse-submodules https://github.com/transmission/transmission Tr
 $ cd Transmission
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
-$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-$ cd build
-$ cmake --build .
-$ sudo cmake --install .
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTS=OFF
+$ cmake --build build -j $(nproc)
+$ sudo cmake --install build
 ```
 
 ### Building Transmission from Git (updating)
@@ -69,7 +67,8 @@ $ cmake --build . -t clean
 $ git submodule foreach --recursive git clean -xfd
 $ git pull --rebase --prune
 $ git submodule update --init --recursive
-$ cmake --build .
+$ cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTS=OFF
+$ cmake --build . -j $(nproc)
 $ sudo cmake --install .
 ```
 
