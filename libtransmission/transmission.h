@@ -1212,8 +1212,8 @@ struct tr_peer_stat
     /* how many requests we've made and are currently awaiting a response for */
     size_t activeReqsToPeer;
 
-    size_t bytesToPeer;
-    size_t bytesToClient;
+    size_t bytes_to_peer;
+    size_t bytes_to_client;
 };
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);

@@ -315,8 +315,8 @@ Files are returned in the order they are laid out in the torrent. References to 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `address`            | string     | tr_peer_stat
-| `bytesToClient`      | number     | tr_peer_stat
-| `bytesToPeer`        | number     | tr_peer_stat
+| `bytes-to-client`    | number     | tr_peer_stat
+| `bytes-to-peer`      | number     | tr_peer_stat
 | `clientName`         | string     | tr_peer_stat
 | `clientIsChoked`     | boolean    | tr_peer_stat
 | `clientIsInterested` | boolean    | tr_peer_stat
