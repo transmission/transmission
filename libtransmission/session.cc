@@ -343,6 +343,16 @@ std::optional<std::string> tr_session::WebMediator::bind_address_V6() const
     return std::nullopt;
 }
 
+bool tr_session::WebMediator::has_source_address_V4() const
+{
+    return !!session_->global_source_address(TR_AF_INET);
+}
+
+bool tr_session::WebMediator::has_source_address_V6() const
+{
+    return !!session_->global_source_address(TR_AF_INET6);
+}
+
 size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
 {
     auto const lock = session_->unique_lock();
