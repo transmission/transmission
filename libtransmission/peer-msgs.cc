@@ -1676,7 +1676,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
     }
 
     peer_info->set_latest_piece_data_time(tr_time());
-    peer_info->add_bytes_sent_to_client(len);
+    bytes_sent_to_client.add(tr_time(), len);
     publish(tr_peer_event::GotPieceData(len));
 
     if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block

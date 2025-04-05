@@ -264,6 +264,9 @@ struct tr_peer
 
     // how many requests we made to this peer and then canceled
     tr_recentHistory<uint16_t> cancels_sent_to_peer;
+
+    tr_recentHistory<uint16_t> bytes_sent_to_client;
+    tr_recentHistory<uint16_t> bytes_sent_to_peer;
 };
 
 // ---
