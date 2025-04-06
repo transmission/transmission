@@ -514,7 +514,6 @@ public:
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(tr_time());
                 tor->session->add_uploaded(event.length);
-                msgs->bytes_sent_to_peer.add(tr_time(), event.length);
             }
 
             break;

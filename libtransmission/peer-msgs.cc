@@ -1743,6 +1743,7 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
     {
         msgs->peer_info->set_latest_piece_data_time(tr_time());
         msgs->publish(tr_peer_event::SentPieceData(bytes_written));
+        msgs->bytes_sent_to_peer.add(tr_time(), bytes_written);
     }
 }
 
