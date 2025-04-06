@@ -160,7 +160,7 @@ private:
 
         [[nodiscard]] bool has_source_address(tr_address_type type) const override
         {
-            return !!session_.global_source_address(type);
+            return session_.global_source_address(type).has_value();
         }
 
     private:
