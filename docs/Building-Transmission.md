@@ -197,11 +197,14 @@ git submodule update --init --recursive
 ### Configure CMake and build the project
 
 To configure which components are built use the flags below.
-Each option can be set to `ON` or `OFF`, values shown below are the defaults.
+Each option can be set to `ON`/`OFF`/`AUTO`, values shown below are the defaults.
 * `-DENABLE_DAEMON=ON` - build transmission daemon
 * `-DENABLE_QT=AUTO` - build the Qt client
 * `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
 * `-DENABLE_CLI=OFF` - build the cli client
+
+Other options:
+* `-DUSE_QT_VERSION=6` - `5`/`6`/`AUTO` choose Qt version to build with
 
 ```bat
 cmake -B build -DCMAKE_TOOLCHAIN_FILE="<path-to-vcpkg>\scripts\buildsystems\vcpkg.cmake" <flags-from-above> <other-cmake-configurations>
