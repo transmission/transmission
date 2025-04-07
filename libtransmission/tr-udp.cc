@@ -166,7 +166,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         return;
     }
 
-    if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    if (!session.has_ip_protocol(TR_AF_INET))
+    {
+        // no IPv4; do nothing
+    }
+    else if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         (void)evutil_make_listen_socket_reuseable(sock);
 
@@ -249,6 +253,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp6_event_.get(), nullptr);
         }
+    }
+
+    if (udp4_socket_ == TR_BAD_SOCKET && udp6_socket_ == TR_BAD_SOCKET)
+    {
+        tr_logAddError(_("Couldn't create any UDP sockets."));
     }
 }
 
