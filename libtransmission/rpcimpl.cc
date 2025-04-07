@@ -442,7 +442,7 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_clientIsChoked, peer.clientIsChoked);
         peer_map.try_emplace(TR_KEY_clientIsInterested, peer.clientIsInterested);
         peer_map.try_emplace(TR_KEY_clientName, peer.client);
-        peer_map.try_emplace(TR_KEY_peer_id, peer.peer_id);
+        peer_map.try_emplace(TR_KEY_peer_id, peer.encoded_peer_id_.c_str());
         peer_map.try_emplace(TR_KEY_flagStr, peer.flagStr);
         peer_map.try_emplace(TR_KEY_isDownloadingFrom, peer.isDownloadingFrom);
         peer_map.try_emplace(TR_KEY_isEncrypted, peer.isEncrypted);

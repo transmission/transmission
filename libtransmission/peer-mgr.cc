@@ -1751,7 +1751,7 @@ namespace peer_stat_helpers
 
     addr.display_name(stats.addr, sizeof(stats.addr));
     stats.client = peer->user_agent().c_str();
-    stats.peer_id = tr_base64_encode(std::string_view{ peer->peer_id().data(), peer->peer_id().size() }).c_str();
+    stats.encoded_peer_id_ = tr_base64_encode(std::string_view{ peer->peer_id().data(), peer->peer_id().size() });
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();
