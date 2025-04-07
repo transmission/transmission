@@ -38,8 +38,7 @@ public:
     tr_peerMsgs(
         tr_torrent const& tor,
         std::shared_ptr<tr_peer_info> peer_info_in,
-        tr_interned_string user_agent,
-        tr_interned_string peer_id,
+        std::optional<tr_peer_id_t> peer_id,
         bool connection_is_encrypted,
         bool connection_is_incoming,
         bool connection_is_utp);
@@ -126,8 +125,7 @@ public:
         tr_torrent& torrent,
         std::shared_ptr<tr_peer_info> peer_info,
         std::shared_ptr<tr_peerIo> io,
-        tr_interned_string user_agent,
-        tr_interned_string peer_id,
+        std::optional<tr_peer_id_t> peer_id,
         tr_peer_callback_bt callback,
         void* callback_data);
 
@@ -162,7 +160,7 @@ protected:
         user_agent_ = val;
     }
 
-    constexpr void set_peer_id(tr_interned_string val) noexcept
+    constexpr void set_peer_id(tr_peer_id_t val) noexcept
     {
         peer_id_ = val;
     }
@@ -177,7 +175,7 @@ private:
     // Derived from the `v` string in LTEP's handshake dictionary, when available.
     tr_interned_string user_agent_;
 
-    tr_interned_string peer_id_;
+    tr_peer_id_t peer_id_;
 
     bool const connection_is_encrypted_;
     bool const connection_is_incoming_;
