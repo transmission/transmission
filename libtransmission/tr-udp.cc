@@ -166,7 +166,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         return;
     }
 
-    if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    if (!session.source_address(TR_AF_INET))
+    {
+        // no IPv4; do nothing
+    }
+    else if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         (void)evutil_make_listen_socket_reuseable(sock);
 
@@ -206,7 +210,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
     }
 
-    if (!session.has_ip_protocol(TR_AF_INET6))
+    if (!session.source_address(TR_AF_INET6))
     {
         // no IPv6; do nothing
     }
@@ -250,6 +254,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             event_add(udp6_event_.get(), nullptr);
         }
     }
+
+    if (udp4_socket_ == TR_BAD_SOCKET && udp6_socket_ == TR_BAD_SOCKET)
+    {
+        tr_logAddError(_("Couldn't create any UDP sockets."));
+    }
 }
 
 tr_session::tr_udp_core::~tr_udp_core()
@@ -280,11 +289,6 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
     {
         // don't warn on bad sockets; the system may not support IPv6
-        return;
-    }
-    else if (!session_.source_address(tr_af_to_ip_protocol(to->sa_family)))
-    {
-        // don't try to send if we don't have a route in this IP protocol
         return;
     }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
