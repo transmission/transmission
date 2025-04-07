@@ -2115,7 +2115,7 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
 tr_peerMsgs::tr_peerMsgs(
     tr_torrent const& tor,
     std::shared_ptr<tr_peer_info> peer_info_in,
-    std::optional<tr_peer_id_t>peer_id,
+    std::optional<tr_peer_id_t> peer_id,
     bool connection_is_encrypted,
     bool connection_is_incoming,
     bool connection_is_utp)

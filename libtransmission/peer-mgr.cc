@@ -1260,13 +1260,8 @@ void create_bit_torrent_peer(
 
     tr_swarm* swarm = tor.swarm;
 
-    auto* const msgs = tr_peerMsgs::create(
-        tor,
-        std::move(peer_info),
-        std::move(io),
-        peer_id,
-        &tr_swarm::peer_callback_bt,
-        swarm);
+    auto* const
+        msgs = tr_peerMsgs::create(tor, std::move(peer_info), std::move(io), peer_id, &tr_swarm::peer_callback_bt, swarm);
     swarm->peers.push_back(msgs);
 
     ++swarm->stats.peer_count;
@@ -1756,7 +1751,7 @@ namespace peer_stat_helpers
 
     addr.display_name(stats.addr, sizeof(stats.addr));
     stats.client = peer->user_agent().c_str();
-    stats.peer_id = tr_base64_encode(std::string_view{peer->peer_id().data(), peer->peer_id().size()}).c_str();
+    stats.peer_id = tr_base64_encode(std::string_view{ peer->peer_id().data(), peer->peer_id().size() }).c_str();
     stats.port = port.host();
     stats.from = peer->peer_info->from_first();
     stats.progress = peer->percent_done();
