@@ -129,6 +129,7 @@ private:
     array_ip_t<std::optional<tr_address>> global_addr_;
     mutable array_ip_t<std::shared_mutex> source_addr_mutex_;
     array_ip_t<std::optional<tr_address>> source_addr_;
+    array_ip_t<bool> source_addr_updated_ = {};
 
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
