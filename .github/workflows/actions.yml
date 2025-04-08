@@ -172,7 +172,8 @@ jobs:
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -213,7 +214,8 @@ jobs:
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -264,7 +266,8 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DRUN_CLANG_TIDY=ON
+            -DRUN_CLANG_TIDY=ON \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
       - name: Test for warnings
@@ -381,7 +384,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -433,7 +437,8 @@ jobs:
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
 
@@ -497,7 +502,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -816,7 +822,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -893,7 +900,8 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -965,7 +973,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -1090,6 +1099,7 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_EVENT2=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"

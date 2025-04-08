@@ -10,7 +10,7 @@ foreach(P create edit remote show)
             ${TR_NAME}
             CURL::libcurl
             fmt::fmt-header-only
-            libevent::event)
+            libevent::core)
 
     tr_win32_app_info(${TR_NAME}-${P}
         "Transmission Utility ('${P}')"

@@ -496,8 +496,10 @@ tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
-tr_add_external_auto_library(EVENT2 libevent event
-    TARGET libevent::event
+tr_add_external_auto_library(EVENT2 Libevent event
+    SUBPROJECT
+    SOURCE_DIR libevent
+    COMPONENTS core extra
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
         -DEVENT__DISABLE_BENCHMARK:BOOL=ON
@@ -505,6 +507,11 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_REGRESS:BOOL=ON
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
+# Workaround, perm fix: https://github.com/libevent/libevent/pull/1791
+if(NOT TARGET libevent::core)
+    add_library(libevent::core ALIAS event_core)
+    add_library(libevent::extra ALIAS event_extra)
+endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
     TARGET natpmp::natpmp
