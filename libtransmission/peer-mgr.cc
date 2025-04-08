@@ -1253,7 +1253,7 @@ void create_bit_torrent_peer(
     tr_torrent& tor,
     std::shared_ptr<tr_peerIo> io,
     std::shared_ptr<tr_peer_info> peer_info,
-    std::optional<tr_peer_id_t> peer_id)
+    tr_peer_id_t peer_id)
 {
     TR_ASSERT(peer_info);
     TR_ASSERT(tor.swarm != nullptr);
@@ -1354,7 +1354,7 @@ void create_bit_torrent_peer(
     }
 
     result.io->set_bandwidth(&swarm->tor->bandwidth());
-    create_bit_torrent_peer(*swarm->tor, result.io, std::move(info), result.peer_id);
+    create_bit_torrent_peer(*swarm->tor, result.io, std::move(info), result.peer_id.value_or(tr_peer_id_t{}));
 
     return true;
 }

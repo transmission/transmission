@@ -38,7 +38,7 @@ public:
     tr_peerMsgs(
         tr_torrent const& tor,
         std::shared_ptr<tr_peer_info> peer_info_in,
-        std::optional<tr_peer_id_t> peer_id,
+        tr_peer_id_t peer_id,
         bool connection_is_encrypted,
         bool connection_is_incoming,
         bool connection_is_utp);
@@ -125,7 +125,7 @@ public:
         tr_torrent& torrent,
         std::shared_ptr<tr_peer_info> peer_info,
         std::shared_ptr<tr_peerIo> io,
-        std::optional<tr_peer_id_t> peer_id,
+        tr_peer_id_t peer_id,
         tr_peer_callback_bt callback,
         void* callback_data);
 
