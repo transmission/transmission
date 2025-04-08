@@ -2125,17 +2125,16 @@ tr_peerMsgs::tr_peerMsgs(
     , connection_is_incoming_{ connection_is_incoming }
     , connection_is_utp_{ connection_is_utp }
 {
+    set_peer_id(peer_id);
     auto client = tr_interned_string{};
-    auto tmp_peer_id = tr_peer_id_t{};
-    if (peer_id)
+    bool peer_id_is_empty = std::all_of(peer_id.begin(), peer_id.end(), [](int i) { return i == 0; });
+    if (!peer_id_is_empty)
     {
         auto buf = std::array<char, 128>{};
-        tr_clientForId(std::data(buf), sizeof(buf), *peer_id);
+        tr_clientForId(std::data(buf), sizeof(buf), peer_id);
         client = tr_interned_string{ tr_quark_new(std::data(buf)) };
-        tmp_peer_id = *peer_id;
     }
     set_user_agent(client);
-    set_peer_id(*peer_id);
     peer_info->set_connected(tr_time());
     ++n_peers;
 }
