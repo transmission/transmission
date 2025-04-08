@@ -529,14 +529,15 @@ if(WIN32)
 else()
     set(TR_MINIUPNPC_LIBNAME miniupnpc)
 endif()
-tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc ${TR_MINIUPNPC_LIBNAME}
-    TARGET miniupnpc::libminiupnpc
+tr_add_external_auto_library(MINIUPNPC miniupnpc ${TR_MINIUPNPC_LIBNAME}
+    SOURCE_DIR miniupnp/miniupnpc
+    TARGET miniupnpc::miniupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    target_compile_definitions(miniupnpc::libminiupnpc
+    target_compile_definitions(miniupnpc::miniupnpc
         INTERFACE
             MINIUPNP_STATICLIB)
 endif()
