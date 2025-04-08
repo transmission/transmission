@@ -2121,11 +2121,11 @@ tr_peerMsgs::tr_peerMsgs(
     bool connection_is_utp)
     : tr_peer{ tor }
     , peer_info{ std::move(peer_info_in) }
+    , peer_id_{ peer_id }
     , connection_is_encrypted_{ connection_is_encrypted }
     , connection_is_incoming_{ connection_is_incoming }
     , connection_is_utp_{ connection_is_utp }
 {
-    set_peer_id(peer_id);
     auto client = tr_interned_string{};
     bool peer_id_is_empty = std::all_of(peer_id.begin(), peer_id.end(), [](int i) { return i == 0; });
     if (!peer_id_is_empty)
