@@ -173,6 +173,7 @@ jobs:
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -216,6 +217,7 @@ jobs:
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -269,6 +271,7 @@ jobs:
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DRUN_CLANG_TIDY=ON \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -388,6 +391,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -442,6 +446,7 @@ jobs:
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -471,6 +476,8 @@ jobs:
             g++ \
             gettext-dev \
             git \
+            libdeflate-dev \
+            libdeflate-static \
             libevent-dev \
             libpsl \
             linux-headers \
@@ -508,6 +515,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -829,6 +837,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Build
@@ -908,6 +917,7 @@ jobs:
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Build
@@ -982,6 +992,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make
@@ -1109,6 +1120,7 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
       - name: Make

@@ -265,7 +265,7 @@ endif()
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
-        deflate::deflate
+        libdeflate::libdeflate
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
