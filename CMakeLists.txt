@@ -485,6 +485,8 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
+# Don't build libdeflate as subdirectory as its CMakeLists.txt
+# messes with global CMAKE_* variables and global compiler options
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
@@ -492,7 +494,7 @@ else()
 endif()
 tr_add_external_auto_library(DEFLATE libdeflate
     LIBNAME ${DEFLATE_LIB_NAME}
-    TARGET deflate::deflate
+    TARGET libdeflate::libdeflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
