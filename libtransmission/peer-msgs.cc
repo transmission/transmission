@@ -2127,8 +2127,7 @@ tr_peerMsgs::tr_peerMsgs(
     , connection_is_utp_{ connection_is_utp }
 {
     auto client = tr_interned_string{};
-    bool peer_id_is_empty = std::all_of(peer_id.begin(), peer_id.end(), [](int i) { return i == 0; });
-    if (!peer_id_is_empty)
+    if (peer_id != tr_peer_id_t{})
     {
         auto buf = std::array<char, 128>{};
         tr_clientForId(std::data(buf), sizeof(buf), peer_id);
