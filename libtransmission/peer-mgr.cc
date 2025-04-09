@@ -1008,7 +1008,7 @@ bool tr_swarm::WishlistMediator::client_has_block(tr_block_index_t block) const
 
 bool tr_swarm::WishlistMediator::client_has_piece(tr_piece_index_t piece) const
 {
-    return tor_.has_blocks(block_span(piece));
+    return tor_.has_blocks(block_span(piece)) || tor_.piece_is_padded(piece);
 }
 
 bool tr_swarm::WishlistMediator::client_wants_piece(tr_piece_index_t piece) const
@@ -1801,7 +1801,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (tr_piece_index_t i = 0, n = tor->piece_count(); i < n; ++i)
     {
-        if (tor->piece_is_wanted(i) && available.test(i))
+        if (tor->piece_is_wanted(i) && available.test(i) && !tor->piece_is_padded(i))
         {
             desired_available += tor->count_missing_bytes_in_piece(i);
         }
@@ -1999,7 +1999,7 @@ void updateInterest(tr_swarm* swarm)
         auto piece_is_interesting = std::vector<bool>(n);
         for (tr_piece_index_t i = 0U; i < n; ++i)
         {
-            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
+            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i) && !tor->piece_is_padded(i);
         }
 
         for (auto const& peer : peers)

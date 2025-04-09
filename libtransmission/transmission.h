@@ -1283,6 +1283,7 @@ struct tr_file_view
     tr_piece_index_t endPiece; // piece index where this file ends (exclusive)
     tr_priority_t priority; // the file's priority
     bool wanted; // do we want to download this file?
+    bool padded;
 };
 tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t file);
 

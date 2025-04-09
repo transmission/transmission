@@ -854,6 +854,7 @@ void tr_torrent::on_metainfo_updated()
     file_mtimes_.resize(file_count());
     file_priorities_ = tr_file_priorities{ &fpm_ };
     files_wanted_ = tr_files_wanted{ &fpm_ };
+    files_padded_ = tr_files_padded{ &fpm_ };
     checked_pieces_ = tr_bitfield{ size_t(piece_count()) };
 }
 
@@ -1429,6 +1430,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
     auto const& subpath = tor->file_subpath(file);
     auto const priority = tor->file_priorities_.file_priority(file);
     auto const wanted = tor->files_wanted_.file_wanted(file);
+    auto const padded = tor->files_padded_.file_padded(file);
     auto const length = tor->file_size(file);
     auto const [begin, end] = tor->piece_span_for_file(file);
 
@@ -1443,6 +1445,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
             .endPiece = end,
             .priority = priority,
             .wanted = wanted,
+            .padded = padded,
         };
     }
 
@@ -1456,6 +1459,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
         .endPiece = end,
         .priority = priority,
         .wanted = wanted,
+        .padded = padded,
     };
 }
 
@@ -2132,7 +2136,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
     for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
-        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted)
+        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted || !tor->files_padded_.file_padded(i))
         {
             continue;
         }

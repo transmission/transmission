@@ -424,6 +424,28 @@ struct tr_torrent
         set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ false);
     }
 
+    /// PADDED
+
+    [[nodiscard]] bool piece_is_padded(tr_piece_index_t piece) const
+    {
+        return files_padded_.piece_padded(piece);
+    }
+
+    [[nodiscard]] TR_CONSTEXPR20 bool file_is_padded(tr_file_index_t file) const
+    {
+        return files_padded_.file_padded(file);
+    }
+
+    void init_files_padded(tr_file_index_t const* files, size_t n_files, bool padded)
+    {
+        set_files_padded(files, n_files, padded, /*is_bootstrapping*/ true);
+    }
+
+    void set_files_padded(tr_file_index_t const* files, size_t n_files, bool padded)
+    {
+        set_files_padded(files, n_files, padded, /*is_bootstrapping*/ false);
+    }
+
     /// PRIORITIES
 
     [[nodiscard]] tr_priority_t piece_priority(tr_piece_index_t piece) const
@@ -488,6 +510,11 @@ struct tr_torrent
     [[nodiscard]] TR_CONSTEXPR_VEC auto file_size(tr_file_index_t i) const
     {
         return metainfo_.file_size(i);
+    }
+
+    [[nodiscard]] TR_CONSTEXPR20 auto file_is_padding(tr_file_index_t i) const
+    {
+        return metainfo_.file_is_padding(i);
     }
 
     void set_file_subpath(tr_file_index_t i, std::string_view subpath)
@@ -1257,6 +1284,28 @@ private:
         }
     }
 
+    void set_files_padded(tr_file_index_t const* files, size_t n_files, bool padded, bool is_bootstrapping)
+    {
+        auto const lock = unique_lock();
+
+        files_padded_.set(files, n_files, padded);
+        completion_.invalidate_size_when_done();
+
+        if (!is_bootstrapping)
+        {
+            set_dirty();
+            recheck_completeness();
+        }
+    }
+
+    constexpr void bump_date_changed(time_t when)
+    {
+        if (date_changed_ < when)
+        {
+            date_changed_ = when;
+        }
+    }
+
     void set_verify_state(VerifyState state);
 
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
@@ -1388,6 +1437,7 @@ private:
     mutable SimpleSmoothedSpeed eta_speed_;
 
     tr_files_wanted files_wanted_{ &fpm_ };
+    tr_files_padded files_padded_{ &fpm_ };
     tr_file_priorities file_priorities_{ &fpm_ };
 
     /* If the initiator of the connection receives a handshake in which the
