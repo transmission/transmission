@@ -823,6 +823,12 @@ private:
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancel_all_requests_for_block(loc.block, peer);
+                auto is_padding_data = tor->piece_is_padded(loc.piece);
+                if (is_padding_data)
+                {
+                    tr_logAddDebugTor(tor, "got padding block");
+                    break;
+                }
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 peer->blame.set(loc.piece);
                 tor->on_block_received(loc.block);
