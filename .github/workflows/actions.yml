@@ -137,6 +137,7 @@ jobs:
             clang \
             cmake \
             gettext \
+            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
@@ -173,6 +174,7 @@ jobs:
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -192,7 +194,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libb64 libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -217,6 +219,7 @@ jobs:
             -DENABLE_UTILS=ON \
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -245,6 +248,7 @@ jobs:
             clang-tidy \
             cmake \
             gettext \
+            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
@@ -271,6 +275,7 @@ jobs:
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DRUN_CLANG_TIDY=ON \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -359,7 +364,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libb64 libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -391,6 +396,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -420,7 +426,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libb64 libdeflate libevent libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -446,6 +452,7 @@ jobs:
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -792,6 +799,7 @@ jobs:
             cmake \
             g++ \
             gettext \
+            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
@@ -837,6 +845,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -875,6 +884,7 @@ jobs:
             fmt-devel \
             gcc-c++ \
             gettext \
+            libb64-devel \
             libcurl-devel \
             libdeflate-devel \
             libevent-devel \
@@ -917,6 +927,7 @@ jobs:
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -952,6 +963,7 @@ jobs:
             clang \
             cmake \
             gettext \
+            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
@@ -992,6 +1004,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
@@ -1079,6 +1092,7 @@ jobs:
             clang \
             cmake \
             gettext \
+            libb64-dev \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
@@ -1120,6 +1134,7 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_MINIUPNPC=ON
