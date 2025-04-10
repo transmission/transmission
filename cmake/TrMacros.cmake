@@ -128,7 +128,7 @@ function(tr_process_list_conditions VAR_PREFIX)
     set(${VAR_PREFIX}_DISALLOWED "${DISALLOWED_ITEMS}" PARENT_SCOPE)
 endfunction()
 
-macro(tr_add_external_auto_library ID PACKAGENAME LIBNAME)
+macro(tr_add_external_auto_library ID PACKAGENAME)
     cmake_parse_arguments(_TAEAL_ARG
         "SUBPROJECT;HEADER_ONLY"
         "LIBNAME;NAMESPACE;SOURCE_DIR;TARGET"
