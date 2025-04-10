@@ -490,13 +490,14 @@ if(WIN32 AND NOT MINGW)
 else()
     set(DEFLATE_LIB_NAME deflate)
 endif()
-tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
+tr_add_external_auto_library(DEFLATE libdeflate
+    LIBNAME ${DEFLATE_LIB_NAME}
     TARGET deflate::deflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
 
-tr_add_external_auto_library(EVENT2 Libevent event
+tr_add_external_auto_library(EVENT2 Libevent
     SUBPROJECT
     SOURCE_DIR libevent
     COMPONENTS core extra
@@ -513,7 +514,8 @@ if(NOT TARGET libevent::core)
     add_library(libevent::extra ALIAS event_extra)
 endif()
 
-tr_add_external_auto_library(NATPMP libnatpmp natpmp
+tr_add_external_auto_library(NATPMP libnatpmp
+    LIBNAME natpmp
     TARGET natpmp::natpmp
     CMAKE_ARGS
         -DBUILD_SHARED_LIBS=OFF)
@@ -529,7 +531,8 @@ if(WIN32)
 else()
     set(TR_MINIUPNPC_LIBNAME miniupnpc)
 endif()
-tr_add_external_auto_library(MINIUPNPC miniupnpc ${TR_MINIUPNPC_LIBNAME}
+tr_add_external_auto_library(MINIUPNPC miniupnpc
+    LIBNAME ${TR_MINIUPNPC_LIBNAME}
     SOURCE_DIR miniupnp/miniupnpc
     TARGET miniupnpc::miniupnpc
     CMAKE_ARGS
@@ -545,20 +548,22 @@ unset(TR_MINIUPNPC_LIBNAME)
 
 add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
-tr_add_external_auto_library(DHT dht dht
+tr_add_external_auto_library(DHT dht
+    LIBNAME dht
     TARGET dht::dht)
 
-tr_add_external_auto_library(PSL libpsl psl
+tr_add_external_auto_library(PSL libpsl
+    LIBNAME psl
     TARGET psl::psl)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library(UTP libutp utp
+    tr_add_external_auto_library(UTP libutp
         SUBPROJECT
         CMAKE_ARGS
             -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
-tr_add_external_auto_library(B64 libb64 b64
+tr_add_external_auto_library(B64 libb64
     SUBPROJECT
     TARGET libb64::libb64
     CMAKE_ARGS
