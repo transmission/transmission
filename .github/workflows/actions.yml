@@ -198,7 +198,20 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake fast_float gettext libb64 libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkgconf
+        run: |
+          brew install --formulae \
+            cmake \
+            fast_float \
+            gettext \
+            libb64 \
+            libdeflate \
+            libevent \
+            libnatpmp \
+            libpsl \
+            miniupnpc \
+            ninja \
+            node \
+            pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -375,7 +388,20 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake fast_float gettext libb64 libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkgconf
+        run: |
+          brew install --formulae \
+            cmake \
+            fast_float \
+            gettext \
+            libb64 \
+            libdeflate \
+            libevent \
+            libnatpmp \
+            libpsl \
+            miniupnpc \
+            ninja \
+            node \
+            pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -440,7 +466,20 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake fast_float gettext libb64 libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkgconf
+        run: |
+          brew install --formulae \
+            cmake \
+            fast_float \
+            gettext \
+            libb64 \
+            libdeflate \
+            libevent \
+            libnatpmp \
+            libpsl \
+            miniupnpc \
+            ninja \
+            node \
+            pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
