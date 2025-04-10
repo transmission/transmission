@@ -177,7 +177,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -194,7 +195,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libb64 libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libb64 libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -222,7 +223,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
@@ -278,7 +280,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
       - name: Test for warnings
@@ -364,7 +367,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libb64 libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libb64 libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkgconf
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -399,7 +402,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -426,7 +430,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libb64 libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libb64 libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -455,7 +459,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
 
@@ -486,6 +491,7 @@ jobs:
             libdeflate-dev \
             libdeflate-static \
             libevent-dev \
+            libnatpmp-dev \
             libpsl \
             linux-headers \
             miniupnpc-dev \
@@ -524,7 +530,8 @@ jobs:
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -848,7 +855,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -930,7 +938,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -1007,7 +1016,8 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -1137,6 +1147,7 @@ jobs:
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
-            -DUSE_SYSTEM_MINIUPNPC=ON
+            -DUSE_SYSTEM_MINIUPNPC=ON \
+            -DUSE_SYSTEM_NATPMP=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
