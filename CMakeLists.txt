@@ -73,6 +73,7 @@ tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
+tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
@@ -238,7 +239,6 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
-find_package(FastFloat)
 find_package(Fmt)
 find_package(RapidJSON)
 find_package(Small)
@@ -569,6 +569,15 @@ tr_add_external_auto_library(B64 libb64
     SUBPROJECT
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
+
+tr_add_external_auto_library(FAST_FLOAT FastFloat
+    SUBPROJECT
+    SOURCE_DIR fast_float
+    CMAKE_ARGS
+        -DFASTFLOAT_INSTALL=OFF
+        -DFASTFLOAT_TEST=OFF
+        -DFASTFLOAT_SANITIZE=OFF
+        -DFASTFLOAT_CXX_STANDARD=${CMAKE_CXX_STANDARD})
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
