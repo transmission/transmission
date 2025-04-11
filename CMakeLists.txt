@@ -85,6 +85,7 @@ tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_RAPIDJSON "Use system RapidJSON library" AUTO)
 tr_auto_option(USE_SYSTEM_SMALL "Use system small library" AUTO)
 tr_auto_option(USE_SYSTEM_UTF8CPP "Use system uft8cpp library" AUTO)
+tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
@@ -247,8 +248,6 @@ endif()
 set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
-
-find_package(WideInteger)
 
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -619,6 +618,23 @@ tr_add_external_auto_library(UTF8CPP utf8cpp
 if (NOT TARGET utf8::cpp)
     add_library(utf8::cpp ALIAS utf8cpp)
 endif()
+
+tr_add_external_auto_library(WIDE_INTEGER WideInteger
+    SUBPROJECT
+    SOURCE_DIR wide-integer)
+if(NOT TARGET WideInteger::WideInteger)
+    add_library(WideInteger::WideInteger ALIAS WideInteger)
+endif()
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+"int main()
+{
+    unsigned __int128 u;
+    signed __int128 i;
+    return 0;
+}" TR_HAVE_INT128)
+add_compile_definitions(
+    $<$<BOOL:${TR_HAVE_INT128}>:WIDE_INTEGER_HAS_LIMB_TYPE_UINT64>)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
