@@ -771,7 +771,8 @@ jobs:
             -DUSE_SYSTEM_UTP=OFF \
             -DUSE_SYSTEM_B64=OFF \
             -DUSE_SYSTEM_PSL=OFF \
-            -DUSE_SYSTEM_RAPIDJSON=OFF
+            -DUSE_SYSTEM_RAPIDJSON=OFF \
+            -DUSE_SYSTEM_SMALL=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -847,7 +848,8 @@ jobs:
             -DUSE_SYSTEM_UTP=OFF \
             -DUSE_SYSTEM_B64=OFF \
             -DUSE_SYSTEM_PSL=OFF \
-            -DUSE_SYSTEM_RAPIDJSON=OFF
+            -DUSE_SYSTEM_RAPIDJSON=OFF \
+            -DUSE_SYSTEM_SMALL=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
