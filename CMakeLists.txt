@@ -78,6 +78,7 @@ tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" AUTO)
 tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
+tr_auto_option(USE_SYSTEM_RAPIDJSON "Use system RapidJSON library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
@@ -241,7 +242,6 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
-find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
@@ -588,6 +588,21 @@ tr_add_external_auto_library(FMT fmt
 if(NOT fmt_VERSION)
     tr_get_fmt_version(fmt_VERSION, "${TR_THIRD_PARTY_SOURCE_DIR}/fmt/include")
 endif()
+
+# RapidJSON's CMakeLists.txt messes with global
+# CMAKE_* variables, so don't build as subproject
+tr_add_external_auto_library(RAPIDJSON RapidJSON
+    LIBNAME RapidJSON
+    SOURCE_DIR rapidjson
+    TARGET RapidJSON
+    HEADER_ONLY
+    CMAKE_ARGS
+        -DRAPIDJSON_BUILD_DOC=OFF
+        -DRAPIDJSON_BUILD_EXAMPLES=OFF
+        -DRAPIDJSON_BUILD_TESTS=OFF
+        -DRAPIDJSON_BUILD_CXX11=OFF
+        -DRAPIDJSON_BUILD_CXX17=OFF
+        -DCMAKE_INSTALL_DIR=OFF)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
