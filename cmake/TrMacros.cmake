@@ -128,6 +128,18 @@ function(tr_process_list_conditions VAR_PREFIX)
     set(${VAR_PREFIX}_DISALLOWED "${DISALLOWED_ITEMS}" PARENT_SCOPE)
 endfunction()
 
+macro(tr_get_fmt_version OVAR INCLUDE_DIR)
+    unset(${OVAR})
+    file(READ "${INCLUDE_DIR}/fmt/base.h" _FMT_BASE_H)
+    if(_FMT_BASE_H MATCHES "FMT_VERSION ([0-9]+)([0-9][0-9])([0-9][0-9])")
+        # Use math to skip leading zeros if any.
+        math(EXPR _FMT_VERSION_MAJOR ${CMAKE_MATCH_1})
+        math(EXPR _FMT_VERSION_MINOR ${CMAKE_MATCH_2})
+        math(EXPR _FMT_VERSION_PATCH ${CMAKE_MATCH_3})
+        set(${OVAR} "${_FMT_VERSION_MAJOR}.${_FMT_VERSION_MINOR}.${_FMT_VERSION_PATCH}")
+    endif()
+endmacro()
+
 macro(tr_add_external_auto_library ID PACKAGENAME)
     cmake_parse_arguments(_TAEAL_ARG
         "SUBPROJECT;HEADER_ONLY"

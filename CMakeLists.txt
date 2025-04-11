@@ -44,6 +44,7 @@ set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
 set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
+set(FMT_MINIMUM 8.0.1)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
@@ -74,6 +75,7 @@ tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
 tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" AUTO)
+tr_auto_option(USE_SYSTEM_FMT "Use system fmt library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
@@ -239,7 +241,6 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
-find_package(Fmt)
 find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
@@ -578,6 +579,15 @@ tr_add_external_auto_library(FAST_FLOAT FastFloat
         -DFASTFLOAT_TEST=OFF
         -DFASTFLOAT_SANITIZE=OFF
         -DFASTFLOAT_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+
+tr_add_external_auto_library(FMT fmt
+    SUBPROJECT
+    CMAKE_ARGS
+        -DFMT_INSTALL=OFF
+        -DFMT_SYSTEM_HEADERS=ON)
+if(NOT fmt_VERSION)
+    tr_get_fmt_version(fmt_VERSION, "${TR_THIRD_PARTY_SOURCE_DIR}/fmt/include")
+endif()
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
