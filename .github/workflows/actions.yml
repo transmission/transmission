@@ -787,7 +787,8 @@ jobs:
             -DUSE_SYSTEM_PSL=OFF \
             -DUSE_SYSTEM_RAPIDJSON=OFF \
             -DUSE_SYSTEM_SMALL=OFF \
-            -DUSE_SYSTEM_UTF8CPP=OFF
+            -DUSE_SYSTEM_UTF8CPP=OFF \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -865,7 +866,8 @@ jobs:
             -DUSE_SYSTEM_PSL=OFF \
             -DUSE_SYSTEM_RAPIDJSON=OFF \
             -DUSE_SYSTEM_SMALL=OFF \
-            -DUSE_SYSTEM_UTF8CPP=OFF
+            -DUSE_SYSTEM_UTF8CPP=OFF \
+            -DUSE_SYSTEM_WIDE_INTEGER=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
