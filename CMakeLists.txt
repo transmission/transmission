@@ -55,6 +55,9 @@ set(NPM_MINIMUM 8.1.307) # Node.js 14
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
 set(SMALL_MINIMUM 0.2.2)
+# utf8cpp v4's version file is configured with `COMPATIBILITY SameMajorVersion`
+# and does not support version range.
+# set(UTF8CPP_MINIMUM 3.1...4)
 
 option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
@@ -81,6 +84,7 @@ tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_RAPIDJSON "Use system RapidJSON library" AUTO)
 tr_auto_option(USE_SYSTEM_SMALL "Use system small library" AUTO)
+tr_auto_option(USE_SYSTEM_UTF8CPP "Use system uft8cpp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
@@ -244,7 +248,6 @@ set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 set(SOURCE_ICONS_DIR "${PROJECT_SOURCE_DIR}/icons")
 
-find_package(UtfCpp)
 find_package(WideInteger)
 
 find_package(Threads)
@@ -609,6 +612,13 @@ tr_add_external_auto_library(SMALL small
     SUBPROJECT
     CMAKE_ARGS
         -DSMALL_BUILD_WITH_EXCEPTIONS=OFF)
+
+tr_add_external_auto_library(UTF8CPP utf8cpp
+    SUBPROJECT
+    SOURCE_DIR utfcpp)
+if (NOT TARGET utf8::cpp)
+    add_library(utf8::cpp ALIAS utf8cpp)
+endif()
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)
