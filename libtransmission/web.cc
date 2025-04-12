@@ -35,7 +35,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef _WIN32
 #include "libtransmission/crypto-utils.h"

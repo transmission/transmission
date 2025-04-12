@@ -27,7 +27,7 @@
 
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"

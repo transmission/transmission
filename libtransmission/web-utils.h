@@ -11,7 +11,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 

@@ -23,7 +23,7 @@
 #include <small/map.hpp>
 #include <small/vector.hpp>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_PEER_MODULE
 #include "libtransmission/transmission.h"

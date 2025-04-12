@@ -29,7 +29,7 @@
 #include <sys/socket.h> // sockaddr_storage, AF_INET
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 

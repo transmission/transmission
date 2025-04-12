@@ -8,7 +8,7 @@
 
 #include <algorithm> /* std::max() */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>

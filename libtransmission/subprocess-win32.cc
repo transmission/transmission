@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/xchar.h> // for wchar_t support
 
 #include <windows.h>
