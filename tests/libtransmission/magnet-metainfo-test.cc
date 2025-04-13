@@ -91,7 +91,7 @@ TEST(MagnetMetainfo, magnetParse)
     }
 }
 
-TEST(WebUtilsTest, parseMagnetFuzzRegressions)
+TEST(MagnetMetainfo, parseMagnetFuzzRegressions)
 {
     static auto constexpr Tests = std::array<std::string_view, 1>{
         "UICOl7RLjChs/QZZwNH4sSQwuH890UMHuoxoWBmMkr0=",
@@ -104,7 +104,7 @@ TEST(WebUtilsTest, parseMagnetFuzzRegressions)
     }
 }
 
-TEST(WebUtilsTest, parseMagnetFuzz)
+TEST(MagnetMetainfo, parseMagnetFuzz)
 {
     auto buf = std::array<char, 1024>{};
 
