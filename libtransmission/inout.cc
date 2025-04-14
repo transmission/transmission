@@ -192,7 +192,18 @@ void read_or_write_piece(
     while (buflen != 0U && !error)
     {
         auto const bytes_this_pass = std::min(buflen, tor.file_size(file_index) - file_offset);
-        read_or_write_bytes(session, open_files, tor, writable, file_index, file_offset, buf, bytes_this_pass, error);
+        auto const is_padded_file = tor.file_is_padded(file_index);
+        if (is_padded_file)
+        {
+            if (!writable)
+            {
+                memset_s(buf, bytes_this_pass, 0, buflen);
+            }
+        }
+        else
+        {
+            read_or_write_bytes(session, open_files, tor, writable, file_index, file_offset, buf, bytes_this_pass, error);
+        }
         if (buf != nullptr)
         {
             buf += bytes_this_pass;
@@ -218,9 +229,12 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
     {
         auto const block_loc = tor.block_loc(block);
         auto const block_len = tor.block_size(block);
-        if (auto const success = cache->read_block(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
+        if (!tor.piece_is_padded(block_loc.piece))
         {
-            return {};
+            if (auto const success = cache->read_block(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
+            {
+                return {};
+            }
         }
 
         auto begin = std::data(buffer);
