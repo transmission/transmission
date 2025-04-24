@@ -178,6 +178,7 @@ export class OverflowMenu extends EventTarget {
       [Prefs.SortByRatio, 'Ratio'],
       [Prefs.SortBySize, 'Size'],
       [Prefs.SortByState, 'State'],
+      [Prefs.SortByUploaded, 'Uploaded'],
     ];
     for (const [value, text] of sort_modes) {
       const option = document.createElement('option');
