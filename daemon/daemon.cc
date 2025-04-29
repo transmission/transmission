@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
+#include <cstdint>
 #include <cstdio> /* printf */
 #include <iostream>
 #include <iterator> /* std::back_inserter */
@@ -49,6 +50,9 @@ struct tr_session;
 struct tr_torrent;
 
 #ifdef USE_SYSTEMD
+
+#include <cinttypes>
+#include <ctime>
 
 #include <systemd/sd-daemon.h>
 
@@ -705,6 +709,25 @@ void tr_daemon::reconfigure()
     }
     else
     {
+#ifdef USE_SYSTEMD
+        auto ts = timespec{};
+        if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0)
+        {
+            auto error = tr_error{};
+            error.set_from_errno(errno);
+            tr_logAddError(fmt::format(
+                fmt::runtime(_("Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})")),
+                fmt::arg("errmsg", error.message()),
+                fmt::arg("errno", error.code())));
+            return;
+        }
+
+        sd_notifyf(
+            0,
+            "STATUS=Reloading...\nRELOADING=1\nMONOTONIC_USEC=%" PRIu64 "\n",
+            static_cast<uint64_t>(ts.tv_sec) * 1000000U + static_cast<uint64_t>(ts.tv_nsec) / 1000U);
+#endif
+
         char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
@@ -718,6 +741,8 @@ void tr_daemon::reconfigure()
 
         tr_sessionSet(my_session_, load_settings(configDir));
         tr_sessionReloadBlocklists(my_session_);
+
+        sd_notify(0, "STATUS=Reload complete.\nREADY=1\n");
     }
 }
 
