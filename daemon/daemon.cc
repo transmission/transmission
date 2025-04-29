@@ -49,7 +49,7 @@ struct tr_ctor;
 struct tr_session;
 struct tr_torrent;
 
-#ifdef USE_SYSTEMD
+#ifdef WITH_SYSTEMD
 
 #include <cinttypes>
 #include <ctime>
@@ -709,7 +709,7 @@ void tr_daemon::reconfigure()
     }
     else
     {
-#ifdef USE_SYSTEMD
+#ifdef WITH_SYSTEMD
         auto ts = timespec{};
         if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0)
         {
