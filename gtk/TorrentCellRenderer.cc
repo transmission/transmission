@@ -32,7 +32,7 @@
 
 #include <fmt/core.h>
 
-#include <algorithm> // std::max()
+#include <algorithm> // std::max(), std::min()
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
@@ -250,6 +250,26 @@ void set_error_color(
     }
 }
 
+// A modified version of "Torrent.get_percent_done" where the returned
+// percentage is never rounded to 100 before the torrent is completely
+// downloaded.
+int get_percent_done(Torrent const& torrent)
+{
+    auto percent_done = torrent.get_percent_done().to_int();
+    switch (torrent.get_activity())
+    {
+    case TR_STATUS_DOWNLOAD:
+        // The "Percents" class can round "percent_done" to 100 before the
+        // torrent is completely downloaded.
+        percent_done = std::min(99, percent_done);
+        break;
+
+    default:
+        break;
+    }
+    return percent_done;
+}
+
 std::optional<Gdk::RGBA> get_progress_bar_color(Torrent const& torrent, Gtk::Widget const& widget)
 {
     static auto const down_color_name = Glib::ustring{ "tr_transfer_down_color" };
@@ -354,7 +374,7 @@ void TorrentCellRenderer::Impl::render_compact(
     int width = 0;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = torrent.get_percent_done().to_int();
+    auto const percent_done = get_percent_done(torrent);
     bool const sensitive = torrent.get_sensitive();
 
     set_error_color(*text_renderer_, torrent, widget, flags);
@@ -443,7 +463,7 @@ void TorrentCellRenderer::Impl::render_full(
     Gtk::Requisition size;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = torrent.get_percent_done().to_int();
+    auto const percent_done = get_percent_done(torrent);
     bool const sensitive = torrent.get_sensitive();
 
     set_error_color(*text_renderer_, torrent, widget, flags);
