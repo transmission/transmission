@@ -318,12 +318,13 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     }
     catch (Glib::Error const& e)
     {
-        gtr_message(fmt::format(
-            fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
-            fmt::arg("old_path", old_name),
-            fmt::arg("path", new_name),
-            fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code())));
+        gtr_message(
+            fmt::format(
+                fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code())));
     }
 }
 
@@ -807,11 +808,12 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        gtr_message(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", file->get_parse_name()),
-            fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code())));
+        gtr_message(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", file->get_parse_name()),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code())));
     }
 
     dec_busy();
@@ -1070,12 +1072,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
             std::string(SessionManagerObjectPath),
             std::string(SessionManagerInterface),
             "Inhibit",
-            Glib::VariantContainerBase::create_tuple({
-                Glib::Variant<Glib::ustring>::create(application),
-                Glib::Variant<guint32>::create(toplevel_xid),
-                Glib::Variant<Glib::ustring>::create(reason),
-                Glib::Variant<guint32>::create(flags),
-            }),
+            Glib::VariantContainerBase::create_tuple(
+                {
+                    Glib::Variant<Glib::ustring>::create(application),
+                    Glib::Variant<guint32>::create(toplevel_xid),
+                    Glib::Variant<Glib::ustring>::create(reason),
+                    Glib::Variant<guint32>::create(flags),
+                }),
             std::string(SessionManagerServiceName),
             1000);
 

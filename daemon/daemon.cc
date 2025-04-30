@@ -207,11 +207,12 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
         auto error = tr_error{};
         if (!tr_file_read(filename, content, &error))
         {
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-                fmt::arg("path", basename),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                    fmt::arg("path", basename),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
             retry = true;
         }
         else
@@ -246,11 +247,12 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
             if (auto error = tr_error{}; !tr_sys_path_remove(filename, &error))
             {
-                tr_logAddError(fmt::format(
-                    fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-                    fmt::arg("path", basename),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
+                tr_logAddError(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                        fmt::arg("path", basename),
+                        fmt::arg("error", error.message()),
+                        fmt::arg("error_code", error.code())));
             }
         }
         else
@@ -722,10 +724,11 @@ void tr_daemon::reconfigure()
         {
             auto error = tr_error{};
             error.set_from_errno(errno);
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})")),
-                fmt::arg("errmsg", error.message()),
-                fmt::arg("errno", error.code())));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})")),
+                    fmt::arg("errmsg", error.message()),
+                    fmt::arg("errno", error.code())));
             return;
         }
 
@@ -814,11 +817,12 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         }
         else
         {
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-                fmt::arg("path", sz_pid_filename),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                    fmt::arg("path", sz_pid_filename),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
         }
     }
 
@@ -887,20 +891,22 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         if (status_ev == nullptr)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
     }
@@ -911,10 +917,11 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     if (event_base_dispatch(ev_base_) == -1)
     {
         auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't launch daemon event loop: {error} ({error_code})")),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't launch daemon event loop: {error} ({error_code})")),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
         goto CLEANUP;
     }
 
