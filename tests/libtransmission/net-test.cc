@@ -82,10 +82,11 @@ TEST_F(NetTest, compact4)
     EXPECT_EQ(std::size(Compact4) - tr_port::CompactPortBytes, static_cast<size_t>(out - std::data(buf)));
     EXPECT_TRUE(
         std::equal(std::data(Compact4), std::data(Compact4) + std::size(Compact4) - tr_port::CompactPortBytes, std::data(buf)));
-    EXPECT_TRUE(std::all_of(
-        std::begin(buf) + std::size(Compact4) - tr_port::CompactPortBytes,
-        std::end(buf),
-        [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
+    EXPECT_TRUE(
+        std::all_of(
+            std::begin(buf) + std::size(Compact4) - tr_port::CompactPortBytes,
+            std::end(buf),
+            [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
 
     /// sockaddr --> compact
 
@@ -144,14 +145,16 @@ TEST_F(NetTest, compact6)
     out = std::data(compact6);
     out = addr.to_compact(out);
     EXPECT_EQ(std::size(Compact6) - tr_port::CompactPortBytes, static_cast<size_t>(out - std::data(compact6)));
-    EXPECT_TRUE(std::equal(
-        std::data(Compact6),
-        std::data(Compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
-        std::data(compact6)));
-    EXPECT_TRUE(std::all_of(
-        std::begin(compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
-        std::end(compact6),
-        [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
+    EXPECT_TRUE(
+        std::equal(
+            std::data(Compact6),
+            std::data(Compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
+            std::data(compact6)));
+    EXPECT_TRUE(
+        std::all_of(
+            std::begin(compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
+            std::end(compact6),
+            [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
 
     /// sockaddr --> compact
 
