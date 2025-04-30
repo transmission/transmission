@@ -100,7 +100,7 @@ public:
     // Location of the first byte (+ optional offset and length) in `piece`
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = {}, uint32_t length = {}) const noexcept
     {
-        return byte_loc(uint64_t{ piece } * piece_size() + offset + length);
+        return byte_loc((uint64_t{ piece } * piece_size()) + offset + length);
     }
 
     [[nodiscard]] constexpr tr_block_span_t block_span_for_piece(tr_piece_index_t const piece) const noexcept
@@ -130,7 +130,7 @@ private:
     // Location of the last byte in `piece`.
     [[nodiscard]] constexpr Location piece_last_loc(tr_piece_index_t const piece) const noexcept
     {
-        return byte_loc(static_cast<uint64_t>(piece) * piece_size() + piece_size(piece) - 1);
+        return byte_loc((static_cast<uint64_t>(piece) * piece_size()) + piece_size(piece) - 1);
     }
 
     [[nodiscard]] constexpr bool is_initialized() const noexcept

@@ -1253,10 +1253,7 @@ private:
 
     constexpr void bump_date_changed(time_t when)
     {
-        if (date_changed_ < when)
-        {
-            date_changed_ = when;
-        }
+        date_changed_ = std::max(date_changed_, when);
     }
 
     void set_verify_state(VerifyState state);
