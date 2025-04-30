@@ -42,20 +42,20 @@ tr_win32_app_info(${TR_NAME}-daemon
     "${TR_NAME}-daemon"
     "${TR_NAME}-daemon.exe")
 
-foreach(P daemon)
+install(
+    TARGETS ${TR_NAME}-daemon
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if(INSTALL_DOC)
     install(
-        TARGETS ${TR_NAME}-${P}
-        DESTINATION ${CMAKE_INSTALL_BINDIR})
+        FILES ${TR_NAME}-daemon.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+endif()
 
-    if(INSTALL_DOC)
-        install(
-            FILES ${TR_NAME}-${P}.1
-            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-    endif()
+if (WITH_SYSTEMD)
+    configure_file("${TR_NAME}-daemon.service.in" "${TR_NAME}-daemon.service")
 
-    if (WITH_SYSTEMD)
-        install(
-            FILES ${TR_NAME}-${P}.service
-            DESTINATION lib/systemd/system)
-    endif()
-endforeach()
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-daemon.service"
+        DESTINATION lib/systemd/system)
+endif()
