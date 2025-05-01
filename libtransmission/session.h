@@ -263,7 +263,7 @@ private:
         [[nodiscard]] std::optional<std::string> bind_address_V6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
-        [[nodiscard]] std::optional<std::string_view> proxyUrl() const override;
+        [[nodiscard]] std::optional<std::string> proxyUrl() const override;
         [[nodiscard]] time_t now() const override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -426,6 +426,7 @@ public:
         size_t upload_slots_per_torrent = 8U;
         std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
+        std::optional<std::string> proxy_url;
         std::string announce_ip;
         std::string bind_address_ipv4;
         std::string bind_address_ipv6;
@@ -437,7 +438,6 @@ public:
         std::string script_torrent_added_filename;
         std::string script_torrent_done_filename;
         std::string script_torrent_done_seeding_filename;
-        std::string proxy_url;
         tr_encryption_mode encryption_mode = TR_ENCRYPTION_PREFERRED;
         tr_log_level log_level = TR_LOG_INFO;
         tr_mode_t umask = 022;
