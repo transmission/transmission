@@ -53,7 +53,7 @@ if(INSTALL_DOC)
 endif()
 
 if (WITH_SYSTEMD)
-    configure_file("${TR_NAME}-daemon.service.in" "${TR_NAME}-daemon.service")
+    configure_file("${TR_NAME}-daemon.service.in" "${TR_NAME}-daemon.service" @ONLY)
 
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-daemon.service"
