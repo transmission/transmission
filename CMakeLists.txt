@@ -507,7 +507,9 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
-    TARGET natpmp::natpmp)
+    TARGET natpmp::natpmp
+    CMAKE_ARGS
+        -DBUILD_SHARED_LIBS=OFF)
 if(NOT USE_SYSTEM_NATPMP)
     target_compile_definitions(natpmp::natpmp
         INTERFACE
