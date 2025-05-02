@@ -42,7 +42,7 @@ struct tr_error;
 
 /* #define DISABLE_GETTEXT */
 #ifndef DISABLE_GETTEXT
-#if defined(_WIN32)
+#if defined(__APPLE__) || defined(_WIN32)
 #define DISABLE_GETTEXT
 #endif
 #endif
