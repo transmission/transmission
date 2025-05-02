@@ -244,7 +244,7 @@ The 'source' column here corresponds to the data structure there.
 | `labels` | array of strings | tr_torrent
 | `leftUntilDone` | number| tr_stat
 | `magnetLink` | string| n/a
-| `manualAnnounceTime` | number| tr_stat
+| `manualAnnounceTime` | number| **DEPRECATED** don't use it, it never worked
 | `maxConnectedPeers` | number| tr_torrent
 | `metadataPercentComplete` | double| tr_stat
 | `name` | string| tr_torrent_view
@@ -1037,3 +1037,4 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-get` | new arg `files.begin_piece`
 | `torrent-get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`
+| `torrent-get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked
