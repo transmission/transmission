@@ -166,6 +166,10 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
             {
                 data->on_response(response.did_connect || response.did_timeout ? response : *data->previous_response);
             }
+            else if (data->requests_sent_count == 1U)
+            {
+                data->on_response(response);
+            }
         }
         else
         {
