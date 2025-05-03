@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="./login.css" rel="stylesheet" />
+    <link href="../images/favicon.ico" rel="icon" />
+    <link href="../images/favicon.png" rel="shortcut icon" />
+    <link rel="apple-touch-icon" href="../images/webclip-icon.png" />
+    <script type="text/javascript" src="./login.js"></script>
+    <title>Log in: Transmission Web Interface</title>
+  </head>
+  <body>
+    <form class="login-form" id="login-form" aria-describedby="login-error">
+      <div class="login-heading">
+        <img class="login-heading__icon" src="./icon-large.png" />
+        <h1 class="login-heading__title">Transmission</h1>
+      </div>
+
+      <div class="login-field">
+        <label>
+          <div class="login-field__label">Username</div>
+          <input
+            class="login-field__input"
+            id="username"
+            type="username"
+            placeholder="bramcohen"
+            autocomplete="username"
+            required
+          />
+        </label>
+      </div>
+
+      <div class="login-field">
+        <label>
+          <div class="login-field__label">Password</div>
+          <input
+            class="login-field__input"
+            id="password"
+            type="password"
+            placeholder="********"
+            autocomplete="current-password"
+            required
+          />
+        </label>
+      </div>
+
+      <button type="submit" class="login-button">
+        Log in
+      </button>
+    </form>
+
+    <div id="login-error" class="hidden">
+      The username or password you entered is incorrect.
+    </div>
+  </body>
+</html>
