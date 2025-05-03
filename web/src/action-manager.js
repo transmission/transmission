@@ -12,6 +12,10 @@ export class ActionManager extends EventTarget {
         shortcut: 'D',
         text: 'Deselect all',
       },
+      logout: {
+        enabled: true,
+        text: 'Log out',
+      },
       'move-bottom': { enabled: false, text: 'Move to the back of the queue' },
       'move-down': { enabled: false, text: 'Move down in the queue' },
       'move-top': { enabled: false, text: 'Move to the front of the queue' },

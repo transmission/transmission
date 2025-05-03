@@ -3,6 +3,7 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
+import { AuthManager } from './auth-manager.js';
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
 import { RPC } from './remote.js';
@@ -465,6 +466,13 @@ export class OverflowMenu extends EventTarget {
     ]) {
       const text = this.action_manager.text(action_name);
       actions[action_name] = make_button(section, text, action_name, on_click);
+    }
+
+    if (AuthManager.loadCredentials() !== null) {
+      const divider = document.createElement('hr');
+      section.append(divider);
+      const logoutText = this.action_manager.text('logout');
+      actions.logout = make_button(section, logoutText, 'logout', on_click);
     }
 
     section = make_section('help', 'Help');

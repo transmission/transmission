@@ -250,3 +250,21 @@ export function setTextContent(e, text) {
     e.textContent = text;
   }
 }
+
+/**
+ * Requests might be issued from the web app root, or from subdirectories. This
+ * makes it challenging to use relative paths, and the frontend isn't told the
+ * full absolute path it's hosted under. The next best thing is to walk up the
+ * path until we discover the web root at runtime.
+ * @return {string} Absolute path of the web root
+ */
+export const getAppRoot = () => {
+  const path = window.location.pathname;
+  const pathSegments = path
+    .split('/')
+    .filter((pathOrFile) => pathOrFile !== '' && !pathOrFile.endsWith('.html'))
+    .reverse();
+  const webIndex = pathSegments.indexOf('web');
+  const traversal = '../'.repeat(webIndex);
+  return new URL(traversal, window.location.href).pathname.replace(/\/$/, '');
+};

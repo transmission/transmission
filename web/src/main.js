@@ -3,6 +3,7 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
+import { AuthManager } from './auth-manager.js';
 import { ActionManager } from './action-manager.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
@@ -11,7 +12,20 @@ import { debounce } from './utils.js';
 
 import '../assets/css/transmission-app.scss';
 
-function main() {
+async function main() {
+  // The user might load up the web app without being logged in. All RPC calls
+  // will fail.
+  const credentials = AuthManager.loadCredentials();
+  if (!(await AuthManager.testCredentials(credentials))) {
+    AuthManager.redirectToLogin();
+    // Even though we've just initiated a page navigation, JS on this page will
+    // continue executing until until the end of the current synchronous code
+    // block. As a result, we'll get a wave of unauthenticated RPC calls, which
+    // can artificially inflate the brute force detector's measurements. So we
+    // explicitly early return to prevent that from happening.
+    return;
+  }
+
   const action_manager = new ActionManager();
   const prefs = new Prefs();
   const notifications = new Notifications(prefs);
