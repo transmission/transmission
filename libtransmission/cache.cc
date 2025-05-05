@@ -29,7 +29,7 @@ Cache::Key Cache::make_key(tr_torrent const& tor, tr_block_info::Location const 
     return std::make_pair(tor.id(), loc.block);
 }
 
-Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
+Cache::CIter Cache::find_span_end(CIter const& span_begin, CIter const& end) noexcept
 {
     static constexpr auto NotAdjacent = [](CacheBlock const& block1, CacheBlock const& block2)
     {
@@ -39,7 +39,7 @@ Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
     return span_end == end ? end : std::next(span_end);
 }
 
-std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const begin, CIter const end) noexcept
+std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const& begin, CIter const& end) noexcept
 {
     auto biggest_begin = begin;
     auto biggest_end = begin;
@@ -62,7 +62,7 @@ std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const begin
     return { biggest_begin, biggest_end };
 }
 
-int Cache::write_contiguous(CIter const begin, CIter const end) const
+int Cache::write_contiguous(CIter const& begin, CIter const& end) const
 {
     // The most common case without an extra data copy.
     auto const* out = std::data(*begin->buf);
@@ -185,7 +185,7 @@ int Cache::read_block(tr_torrent const& tor, tr_block_info::Location const& loc,
 
 // ---
 
-int Cache::flush_span(CIter const begin, CIter const end)
+int Cache::flush_span(CIter const& begin, CIter const& end)
 {
     for (auto span_begin = begin; span_begin < end;)
     {

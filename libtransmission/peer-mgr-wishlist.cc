@@ -390,7 +390,7 @@ private:
         }
     }
 
-    TR_CONSTEXPR20 void resort_piece(CandidateVec::iterator const pos_old)
+    TR_CONSTEXPR20 void resort_piece(CandidateVec::iterator const& pos_old)
     {
         if (candidates_dirty_)
         {
