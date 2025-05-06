@@ -20,7 +20,7 @@
 
 #include <event2/http.h> /* for HTTP_OK */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 

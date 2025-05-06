@@ -40,7 +40,7 @@
 
 #include <curl/curl.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
 #include <wildmat.h>

@@ -25,7 +25,7 @@
 #include <glibmm/wrap.h>
 #include <gtkmm.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <cstdio>
 #include <string>

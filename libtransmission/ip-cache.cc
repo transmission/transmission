@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/log.h"

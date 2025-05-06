@@ -28,8 +28,8 @@
 #include <event2/http.h>
 #include <event2/listener.h>
 
-#include <fmt/core.h>
 #include <fmt/chrono.h>
+#include <fmt/format.h>
 
 #include <libdeflate.h>
 

@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/clients.h"
 #include "libtransmission/tr-macros.h" // tr_peer_id_t

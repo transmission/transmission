@@ -13,7 +13,7 @@
 #include <utility> // std::make_pair()
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
