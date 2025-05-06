@@ -205,12 +205,13 @@ enum
     TAG_PIECES,
     TAG_PORTTEST,
     TAG_TORRENT_ADD,
-    TAG_TRACKERS
+    TAG_TRACKERS,
+    TAG_ANNOUNCES
 };
 
 // --- Command-Line Arguments
 
-auto constexpr Options = std::array<tr_option, 105>{
+auto constexpr Options = std::array<tr_option, 107>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -331,7 +332,9 @@ auto constexpr Options = std::array<tr_option, 105>{
         false,
         nullptr },
       { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
-      { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
+      { 711, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
+      { 712, "trackerlist-get", "get the list of announce URL of a torrent", "tg", false, nullptr },
+      { 713, "trackerlist-set", "set a list of announce URL to torrent", "ts", true, "<trackers>" },
       { 's', "start", "Start the current torrent(s)", "s", false, nullptr },
       { 'S', "stop", "Stop the current torrent(s)", "S", false, nullptr },
       { 't', "torrent", "Set the current torrent(s)", "t", true, "<torrent>" },
@@ -461,7 +464,8 @@ enum
     case 993: /* no-trash-torrent */
         return MODE_SESSION_SET;
 
-    case 712: /* tracker-remove */
+    case 711: /* tracker-remove */
+    case 713: /* trackerlist-set*/
     case 950: /* seedratio */
     case 951: /* seedratio-default */
     case 952: /* no-seedratio */
@@ -488,6 +492,7 @@ enum
 
     case 'i': /* info */
     case 'l': /* list all torrents */
+    case 712: /* trackerlist-get*/
     case 940: /* info-files */
     case 941: /* info-peer */
     case 942: /* info-pieces */
@@ -1758,6 +1763,43 @@ void print_trackers(tr_variant::Map const& map)
     }
 }
 
+void print_announces(tr_variant::Map const& map)
+{
+    auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
+    if (args == nullptr)
+    {
+        return;
+    }
+
+    auto* const torrents = args->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    if (torrents == nullptr)
+    {
+        return;
+    }
+
+    for (auto it = std::begin(*torrents), end = std::end(*torrents); it != end; ++it)
+    {
+        auto* const t = it->get_if<tr_variant::Map>();
+        if (t == nullptr)
+        {
+            continue;
+        }
+        
+        auto* const tracker_list = t->find_if<std::string_view>(TR_KEY_trackerList);
+        if (tracker_list == nullptr)
+        {
+            fmt::print("\n");
+            fmt::print("No tracker list for the specified torrent\n");
+        }
+
+        else
+        {
+            fmt::print("\n");
+            fmt::print("Tracker list :\n{:s}\n", *tracker_list);
+        }   
+    }
+}
+
 void print_session(tr_variant::Map const& map)
 {
     auto* const args = map.find_if<tr_variant::Map>(TR_KEY_arguments);
@@ -2274,6 +2316,10 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
             case TAG_TRACKERS:
                 print_trackers(map);
                 break;
+            
+            case TAG_ANNOUNCES:
+                print_announces(map);
+                break;
 
             case TAG_GROUPS:
                 print_groups(map);
@@ -2699,6 +2745,12 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
                 add_id_arg(args, config, "all");
                 break;
+            
+            case 712:
+                map.insert_or_assign(TR_KEY_tag, TAG_ANNOUNCES);
+                fields.emplace_back(tr_variant::unmanaged_string("trackerList"sv));
+                add_id_arg(args, config);
+                break;
 
             case 940:
                 map.insert_or_assign(TR_KEY_tag, TAG_FILES);
@@ -3004,7 +3056,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
 
             switch (c)
             {
-            case 712:
+            case 711:
                 {
                     auto* list = args.find_if<tr_variant::Vector>(TR_KEY_trackerRemove);
                     if (list == nullptr)
@@ -3014,6 +3066,10 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     }
                     list->emplace_back(tr_num_parse<int64_t>(optarg_sv).value());
                 }
+                break;
+
+            case 713:
+                args.insert_or_assign(TR_KEY_trackerList, optarg_sv);
                 break;
 
             case 950:
