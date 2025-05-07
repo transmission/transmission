@@ -114,5 +114,7 @@ private:
 
     enum Type type_ = Type::None;
 
-    static inline std::atomic<size_t> n_open_sockets = {};
+    // TODO: Re-enable after setting readability-identifier-naming.PrivateMemberSuffix to _
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    static inline std::atomic<size_t> n_open_sockets_ = {};
 };
