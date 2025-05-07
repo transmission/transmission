@@ -51,13 +51,15 @@ public:
         return *this;
     }
 
-    tr_strbuf(tr_strbuf&& other)
+    tr_strbuf(tr_strbuf&& other) noexcept
         : buffer_{ std::move(other.buffer_) }
     {
         ensure_sz();
     }
 
-    tr_strbuf& operator=(tr_strbuf&& other)
+    ~tr_strbuf() = default;
+
+    tr_strbuf& operator=(tr_strbuf&& other) noexcept
     {
         buffer_ = std::move(other.buffer_);
         ensure_sz();
@@ -269,11 +271,13 @@ public:
         join(std::basic_string_view<Char>{ sz_delim }, args...);
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator std::basic_string_view<Char>() const noexcept
     {
         return sv();
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator auto() const noexcept
     {
         return c_str();
@@ -281,6 +285,7 @@ public:
 
     bool popdir() noexcept
     {
+        // NOLINTNEXTLINE(readability-redundant-declaration): P.S. This looks like some dark magic
         std::string_view tr_sys_path_dirname(std::string_view path);
         auto const parent = tr_sys_path_dirname(sv());
         auto const changed = parent != sv();

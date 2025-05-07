@@ -115,7 +115,7 @@ public:
 
     TR_CONSTEXPR20 void clear()
     {
-        return trackers_.clear();
+        trackers_.clear();
     }
 
     /**

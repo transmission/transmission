@@ -1,4 +1,6 @@
 ---
+HeaderFilterRegex: .*/qt/.*
+
 # Many of these checks are disabled only because the code hasn't been
 # cleaned up yet. Pull requests welcomed.
 Checks: >
