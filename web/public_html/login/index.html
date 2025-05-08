@@ -32,6 +32,7 @@
             placeholder="bramcohen"
             autocomplete="username"
             required
+            data-testid="username"
           />
         </label>
       </div>
@@ -46,16 +47,17 @@
             placeholder="********"
             autocomplete="current-password"
             required
+            data-testid="password"
           />
         </label>
       </div>
 
-      <button type="submit" class="login-button">
+      <button type="submit" class="login-button" data-testid="log in">
         Log in
       </button>
     </form>
 
-    <div id="login-error" class="hidden">
+    <div id="login-error" class="hidden" data-testid="login-error">
       The username or password you entered is incorrect.
     </div>
   </body>
