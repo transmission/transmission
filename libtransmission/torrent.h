@@ -95,7 +95,7 @@ struct tr_torrent
         friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
         friend struct tr_torrent;
 
-        ResumeHelper(tr_torrent& tor)
+        explicit ResumeHelper(tr_torrent& tor)
             : tor_{ tor }
         {
         }
@@ -969,7 +969,7 @@ struct tr_torrent
         return session->torrent_queue().get_pos(id());
     }
 
-    void set_queue_position(size_t new_pos)
+    void set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
     {
         session->torrent_queue().set_pos(id(), new_pos);
     }
@@ -1397,7 +1397,7 @@ private:
 
     uint16_t idle_limit_minutes_ = 0;
 
-    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
+    uint16_t max_connected_peers_ = TrDefaultPeerLimitTorrent;
 
     bool is_deleting_ = false;
     bool is_dirty_ = false;

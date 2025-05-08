@@ -17,7 +17,7 @@
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/messagedialog.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 #include <string>

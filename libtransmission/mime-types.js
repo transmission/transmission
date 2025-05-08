@@ -52,7 +52,7 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>{
+inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, ${suffixes.length}>{
     { ${mime_type_lines.trim()} }
 };
 `);

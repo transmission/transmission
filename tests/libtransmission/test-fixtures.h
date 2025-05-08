@@ -37,15 +37,12 @@ inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
     return os;
 }
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 using file_func_t = std::function<void(char const* filename)>;
 
-static void depthFirstWalk(char const* path, file_func_t func)
+static void depthFirstWalk(char const* path, file_func_t const& func)
 {
     if (auto const info = tr_sys_path_get_info(path); info && info->isFolder())
     {
@@ -125,8 +122,8 @@ class Sandbox
 {
 public:
     Sandbox()
-        : parent_dir_{ get_default_parent_dir() }
-        , sandbox_dir_{ create_sandbox(parent_dir_, "transmission-test-XXXXXX") }
+        : parent_dir_{ getDefaultParentDir() }
+        , sandbox_dir_{ createSandbox(parent_dir_, "transmission-test-XXXXXX") }
     {
     }
 
@@ -135,12 +132,17 @@ public:
         rimraf(sandbox_dir_);
     }
 
+    Sandbox(Sandbox const&) = delete;
+    Sandbox(Sandbox&&) = delete;
+    Sandbox& operator=(Sandbox const&) = delete;
+    Sandbox& operator=(Sandbox&&) = delete;
+
     [[nodiscard]] constexpr std::string const& path() const
     {
         return sandbox_dir_;
     }
 
-    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
+    static std::string createSandbox(std::string const& parent_dir, std::string const& tmpl)
     {
         auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
         tr_sys_dir_create_temp(std::data(path));
@@ -149,7 +151,7 @@ public:
     }
 
 protected:
-    static std::string get_default_parent_dir()
+    static std::string getDefaultParentDir()
     {
         if (auto* const path = getenv("TMPDIR"); path != nullptr)
         {
@@ -166,7 +168,7 @@ protected:
         {
             if (verbose)
             {
-                std::cerr << "cleanup: removing '" << filename << "'" << std::endl;
+                std::cerr << "cleanup: removing '" << filename << "'\n";
             }
 
             tr_sys_path_remove(filename);
@@ -188,7 +190,7 @@ protected:
         return sandbox_.path();
     }
 
-    [[nodiscard]] auto currentTestName() const
+    [[nodiscard]] static auto currentTestName()
     {
         auto const* i = ::testing::UnitTest::GetInstance()->current_test_info();
         auto child = std::string(i->test_suite_name());
@@ -197,7 +199,7 @@ protected:
         return child;
     }
 
-    void buildParentDir(std::string_view path) const
+    static void buildParentDir(std::string_view path)
     {
         auto const tmperr = errno;
 
@@ -237,7 +239,7 @@ protected:
         }
     }
 
-    void createTmpfileWithContents(char* tmpl, void const* payload, size_t n) const
+    static void createTmpfileWithContents(char* tmpl, void const* payload, size_t n)
     {
         auto const tmperr = errno;
 
@@ -260,7 +262,7 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string_view path, void const* payload, size_t n) const
+    static void createFileWithContents(std::string_view path, void const* payload, size_t n)
     {
         auto const tmperr = errno;
 
@@ -278,19 +280,19 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string_view path, std::string_view payload) const
+    static void createFileWithContents(std::string_view path, std::string_view payload)
     {
         createFileWithContents(path, std::data(payload), std::size(payload));
     }
 
-    void createFileWithContents(std::string_view path, void const* payload) const
+    static void createFileWithContents(std::string_view path, void const* payload)
     {
         createFileWithContents(path, payload, strlen(static_cast<char const*>(payload)));
     }
 
-    bool verbose = false;
+    bool verbose_ = false;
 
-    void sync() const
+    static void sync()
     {
 #ifndef _WIN32
         ::sync();
@@ -330,19 +332,19 @@ private:
         // fill in any missing settings
         settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
         settings_map->try_emplace(TR_KEY_dht_enabled, false);
-        settings_map->try_emplace(TR_KEY_message_level, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
+        settings_map->try_emplace(TR_KEY_message_level, verbose_ ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
-        return tr_sessionInit(sandboxDir().data(), !verbose, settings);
+        return tr_sessionInit(sandboxDir().data(), !verbose_, settings);
     }
 
-    void sessionClose(tr_session* session)
+    static void sessionClose(tr_session* session)
     {
         tr_sessionClose(session);
         tr_logFreeQueue(tr_logGetQueue());
     }
 
 protected:
-    enum class ZeroTorrentState
+    enum class ZeroTorrentState : uint8_t
     {
         NoFiles,
         Partial,
@@ -485,7 +487,7 @@ protected:
         return settings_.get();
     }
 
-    virtual void SetUp() override
+    void SetUp() override
     {
         SandboxedTest::SetUp();
 
@@ -494,7 +496,7 @@ protected:
         session_ = sessionInit(*settings());
     }
 
-    virtual void TearDown() override
+    void TearDown() override
     {
         sessionClose(session_);
         session_ = nullptr;
@@ -509,6 +511,4 @@ private:
     std::vector<tr_torrent*> verified_;
 };
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

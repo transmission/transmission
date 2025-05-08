@@ -20,7 +20,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
