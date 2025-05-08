@@ -218,11 +218,22 @@ public:
         optional_args_[mode].sequential_download_ = seq;
     }
 
+    [[nodiscard]] constexpr auto const& sequential_download_from_piece(tr_ctorMode const mode) const noexcept
+    {
+        return optional_args_[mode].sequential_download_from_piece_;
+    }
+
+    constexpr void set_sequential_download_from_piece(tr_ctorMode const mode, tr_piece_index_t const piece) noexcept
+    {
+        optional_args_[mode].sequential_download_from_piece_ = piece;
+    }
+
 private:
     struct OptionalArgs
     {
         std::optional<bool> paused_;
         std::optional<bool> sequential_download_;
+        std::optional<tr_piece_index_t> sequential_download_from_piece_;
         std::optional<uint16_t> peer_limit_;
         std::string download_dir_;
     };
