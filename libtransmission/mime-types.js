@@ -44,7 +44,7 @@ async function main() {
     .filter(({ extension }, pos, arr) => pos === 0 || extension !== arr[pos - 1].extension);
 
   const mime_type_lines = extensions
-    .map(({ extension, mime_type }) => `      { "${extension}", "${mime_type}" }`)
+    .map(({ extension, mime_type }) => `      { R"(${extension})", R"(${mime_type})" }`)
     .join(',\n')
     .trim();
 
