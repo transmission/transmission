@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 
 const copyright =
-`// This file was generated with libtransmission/mime-types.js
+  `// This file was generated with libtransmission/mime-types.js
 // DO NOT EDIT MANUALLY
 
 // This file Copyright © Mnemosyne LLC.
@@ -35,6 +35,20 @@ async function main() {
       const extension_order = lhs.extension.localeCompare(rhs.extension);
       if (extension_order !== 0)
         return extension_order;
+
+      // Prefer entries that has a trusted source
+      const lhs_has_source = lhs.info?.source ? 0 : 1;
+      const rhs_has_source = rhs.info?.source ? 0 : 1;
+      const has_source = lhs_has_source - rhs_has_source;
+      if (has_source !== 0)
+        return has_source;
+
+      // Prefer a specific type over the generic octet stream
+      const lhs_is_octet = lhs.mime_type === 'application/octet-stream' ? 1 : 0;
+      const rhs_is_octet = rhs.mime_type === 'application/octet-stream' ? 1 : 0;
+      const is_octet = lhs_is_octet - rhs_is_octet;
+      if (is_octet !== 0)
+        return is_octet;
 
       // Prefer iana source
       const lhs_is_iana = lhs.info?.source === 'iana' ? 0 : 1;
