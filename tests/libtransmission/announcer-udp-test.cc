@@ -193,8 +193,8 @@ protected:
     {
         EXPECT_TRUE(
             libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); }));
-        auto buf = std::move(mediator.sent_.back().buf_);
-        mediator.sent_.pop_back();
+        auto buf = std::move(mediator.sent_.front().buf_);
+        mediator.sent_.pop_front();
         return buf;
     }
 
