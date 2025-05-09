@@ -791,3 +791,415 @@ TEST_F(AnnouncerUdpTest, canAnnounceIPv6)
     ASSERT_TRUE(response.has_value());
     expectEqual(expected_response, *response);
 }
+
+TEST_F(AnnouncerUdpTest, canAnnounceDualStack)
+{
+    static auto constexpr Interval = time_t{ 3600 };
+    static auto constexpr Leechers = uint32_t{ 10 };
+    static auto constexpr Seeders = uint32_t{ 20 };
+    auto const addresses = std::array{
+        std::array<tr_socket_address, 3>{ {
+            { tr_address::from_string("10.10.10.5"sv).value_or(tr_address{}), tr_port::from_host(128) },
+            { tr_address::from_string("192.168.1.2"sv).value_or(tr_address{}), tr_port::from_host(2021) },
+            { tr_address::from_string("192.168.1.3"sv).value_or(tr_address{}), tr_port::from_host(2022) },
+        } },
+        std::array<tr_socket_address, 3>{ {
+            { tr_address::from_string("fd12:3456:789a:1::1"sv).value_or(tr_address{}), tr_port::from_host(128) },
+            { tr_address::from_string("fd12:3456:789a:1::2"sv).value_or(tr_address{}), tr_port::from_host(2021) },
+            { tr_address::from_string("fd12:3456:789a:1::3"sv).value_or(tr_address{}), tr_port::from_host(2022) },
+        } },
+    };
+
+    auto request = tr_announce_request{};
+    request.event = TR_ANNOUNCE_EVENT_STARTED;
+    request.port = tr_port::from_host(80);
+    request.key = 0xCAFE;
+    request.numwant = 20;
+    request.up = 1;
+    request.down = 2;
+    request.corrupt = 3;
+    request.leftUntilComplete = 100;
+    request.announce_url = "https://localhost/announce"sv;
+    request.tracker_id = "fnord"s;
+    request.peer_id = tr_peerIdInit();
+    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
+
+    auto expected_responses = std::array<tr_announce_response, NUM_TR_AF_INET_TYPES>{};
+    for (auto& expected_response : expected_responses)
+    {
+        expected_response.info_hash = request.info_hash;
+        expected_response.did_connect = true;
+        expected_response.did_timeout = false;
+        expected_response.interval = Interval;
+        expected_response.min_interval = 0; // not specified in UDP announce
+        expected_response.seeders = Seeders;
+        expected_response.leechers = Leechers;
+        expected_response.downloads = std::nullopt; // not specified in UDP announce
+        expected_response.errmsg = {};
+        expected_response.warning = {};
+        expected_response.tracker_id = {}; // not specified in UDP announce
+        expected_response.external_ip = {};
+    }
+    expected_responses[TR_AF_INET].pex = std::vector<tr_pex>{
+        tr_pex{ addresses[TR_AF_INET][0] },
+        tr_pex{ addresses[TR_AF_INET][1] },
+        tr_pex{ addresses[TR_AF_INET][2] },
+    };
+    expected_responses[TR_AF_INET6].pex6 = std::vector<tr_pex>{
+        tr_pex{ addresses[TR_AF_INET6][0] },
+        tr_pex{ addresses[TR_AF_INET6][1] },
+        tr_pex{ addresses[TR_AF_INET6][2] },
+    };
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto const upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    auto response = std::optional<tr_announce_response>{};
+    announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
+
+    auto from = sockaddr_storage{};
+    auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+    auto fromlen = socklen_t{};
+
+    auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        // Announcer will request a connection. Verify and grant the request
+        auto const connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen));
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        connection_ids[ipp] = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
+    }
+
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        response.reset();
+
+        // The announcer should have sent a UDP announce request.
+        // Inspect that request for validity.
+        auto const data = waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen);
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        auto const udp_ann_req = parseAnnounceRequest(data, connection_ids[ipp]);
+        expectEqual(request, udp_ann_req);
+
+        // Have the tracker respond to the request
+        auto const& expected_response = expected_responses[ipp];
+        auto buf = MessageBuffer{};
+        buf.add_uint32(AnnounceAction);
+        buf.add_uint32(udp_ann_req.transaction_id);
+        buf.add_uint32(expected_response.interval);
+        buf.add_uint32(expected_response.leechers.value_or(-1));
+        buf.add_uint32(expected_response.seeders.value_or(-1));
+        for (auto const& [addr, port] : addresses[ipp])
+        {
+            if (ipp == TR_AF_INET)
+            {
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+                buf.add(&addr.addr.addr4.s_addr, sizeof(addr.addr.addr4.s_addr));
+            }
+            else
+            {
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+                buf.add(&addr.addr.addr6.s6_addr, sizeof(addr.addr.addr6.s6_addr));
+            }
+            buf.add_uint16(port.host());
+        }
+
+        EXPECT_TRUE(
+            announcer->handle_message(reinterpret_cast<uint8_t const*>(std::data(buf)), std::size(buf), from_ptr, fromlen));
+
+        // Confirm that announcer processed the response
+        ASSERT_TRUE(response.has_value());
+        expectEqual(expected_response, *response);
+    }
+}
+
+TEST_F(AnnouncerUdpTest, announceDualStackOnlyIPv4Successful)
+{
+    static auto constexpr Interval = time_t{ 3600 };
+    static auto constexpr Leechers = uint32_t{ 10 };
+    static auto constexpr Seeders = uint32_t{ 20 };
+    auto const addresses = std::array<tr_socket_address, 3>{ {
+        { tr_address::from_string("10.10.10.5"sv).value_or(tr_address{}), tr_port::from_host(128) },
+        { tr_address::from_string("192.168.1.2"sv).value_or(tr_address{}), tr_port::from_host(2021) },
+        { tr_address::from_string("192.168.1.3"sv).value_or(tr_address{}), tr_port::from_host(2022) },
+    } };
+
+    auto request = tr_announce_request{};
+    request.event = TR_ANNOUNCE_EVENT_STARTED;
+    request.port = tr_port::from_host(80);
+    request.key = 0xCAFE;
+    request.numwant = 20;
+    request.up = 1;
+    request.down = 2;
+    request.corrupt = 3;
+    request.leftUntilComplete = 100;
+    request.announce_url = "https://localhost/announce"sv;
+    request.tracker_id = "fnord"s;
+    request.peer_id = tr_peerIdInit();
+    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
+
+    auto expected_response = tr_announce_response{};
+    expected_response.info_hash = request.info_hash;
+    expected_response.did_connect = true;
+    expected_response.did_timeout = false;
+    expected_response.interval = Interval;
+    expected_response.min_interval = 0; // not specified in UDP announce
+    expected_response.seeders = Seeders;
+    expected_response.leechers = Leechers;
+    expected_response.downloads = std::nullopt; // not specified in UDP announce
+    expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
+    expected_response.pex6 = {};
+    expected_response.errmsg = {};
+    expected_response.warning = {};
+    expected_response.tracker_id = {}; // not specified in UDP announce
+    expected_response.external_ip = {};
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto const upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    auto response = std::optional<tr_announce_response>{};
+    announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
+
+    auto from = sockaddr_storage{};
+    auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+    auto fromlen = socklen_t{};
+
+    auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        // Announcer will request a connection. Verify and grant the request
+        auto const connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen));
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        connection_ids[ipp] = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
+    }
+
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        response.reset();
+
+        // The announcer should have sent a UDP announce request.
+        // Inspect that request for validity.
+        auto const data = waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen);
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        auto const udp_ann_req = parseAnnounceRequest(data, connection_ids[ipp]);
+        expectEqual(request, udp_ann_req);
+
+        // Have the tracker respond to the request
+        if (ipp == TR_AF_INET)
+        {
+            auto buf = MessageBuffer{};
+            buf.add_uint32(AnnounceAction);
+            buf.add_uint32(udp_ann_req.transaction_id);
+            buf.add_uint32(expected_response.interval);
+            buf.add_uint32(expected_response.leechers.value_or(-1));
+            buf.add_uint32(expected_response.seeders.value_or(-1));
+            for (auto const& [addr, port] : addresses)
+            {
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+                buf.add(&addr.addr.addr4.s_addr, sizeof(addr.addr.addr4.s_addr));
+                buf.add_uint16(port.host());
+            }
+
+            EXPECT_TRUE(
+                announcer->handle_message(reinterpret_cast<uint8_t const*>(std::data(buf)), std::size(buf), from_ptr, fromlen));
+        }
+        else
+        {
+            EXPECT_TRUE(sendError(*announcer, udp_ann_req.transaction_id, "Failed"sv, from_ptr, fromlen));
+        }
+
+        // Failed responses won't be processed if one of the other announce requests succeeded
+        EXPECT_TRUE(ipp == TR_AF_INET6 ? !response.has_value() : response.has_value());
+        if (response)
+        {
+            expectEqual(expected_response, *response);
+        }
+    }
+}
+
+TEST_F(AnnouncerUdpTest, announceDualStackOnlyIPv6Successful)
+{
+    static auto constexpr Interval = time_t{ 3600 };
+    static auto constexpr Leechers = uint32_t{ 10 };
+    static auto constexpr Seeders = uint32_t{ 20 };
+    auto const addresses = std::array<tr_socket_address, 3>{ {
+        { tr_address::from_string("fd12:3456:789a:1::1"sv).value_or(tr_address{}), tr_port::from_host(128) },
+        { tr_address::from_string("fd12:3456:789a:1::2"sv).value_or(tr_address{}), tr_port::from_host(2021) },
+        { tr_address::from_string("fd12:3456:789a:1::3"sv).value_or(tr_address{}), tr_port::from_host(2022) },
+    } };
+
+    auto request = tr_announce_request{};
+    request.event = TR_ANNOUNCE_EVENT_STARTED;
+    request.port = tr_port::from_host(80);
+    request.key = 0xCAFE;
+    request.numwant = 20;
+    request.up = 1;
+    request.down = 2;
+    request.corrupt = 3;
+    request.leftUntilComplete = 100;
+    request.announce_url = "https://localhost/announce"sv;
+    request.tracker_id = "fnord"s;
+    request.peer_id = tr_peerIdInit();
+    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
+
+    auto expected_response = tr_announce_response{};
+    expected_response.info_hash = request.info_hash;
+    expected_response.did_connect = true;
+    expected_response.did_timeout = false;
+    expected_response.interval = Interval;
+    expected_response.min_interval = 0; // not specified in UDP announce
+    expected_response.seeders = Seeders;
+    expected_response.leechers = Leechers;
+    expected_response.downloads = std::nullopt; // not specified in UDP announce
+    expected_response.pex = {};
+    expected_response.pex6 = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
+    expected_response.errmsg = {};
+    expected_response.warning = {};
+    expected_response.tracker_id = {}; // not specified in UDP announce
+    expected_response.external_ip = {};
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto const upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    auto response = std::optional<tr_announce_response>{};
+    announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
+
+    auto from = sockaddr_storage{};
+    auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+    auto fromlen = socklen_t{};
+
+    auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        // Announcer will request a connection. Verify and grant the request
+        auto const connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen));
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        connection_ids[ipp] = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
+    }
+
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        response.reset();
+
+        // The announcer should have sent a UDP announce request.
+        // Inspect that request for validity.
+        auto const data = waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen);
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        auto const udp_ann_req = parseAnnounceRequest(data, connection_ids[ipp]);
+        expectEqual(request, udp_ann_req);
+
+        // Have the tracker respond to the request
+        if (ipp == TR_AF_INET6)
+        {
+            auto buf = MessageBuffer{};
+            buf.add_uint32(AnnounceAction);
+            buf.add_uint32(udp_ann_req.transaction_id);
+            buf.add_uint32(expected_response.interval);
+            buf.add_uint32(expected_response.leechers.value_or(-1));
+            buf.add_uint32(expected_response.seeders.value_or(-1));
+            for (auto const& [addr, port] : addresses)
+            {
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+                buf.add(&addr.addr.addr6.s6_addr, sizeof(addr.addr.addr6.s6_addr));
+                buf.add_uint16(port.host());
+            }
+
+            EXPECT_TRUE(
+                announcer->handle_message(reinterpret_cast<uint8_t const*>(std::data(buf)), std::size(buf), from_ptr, fromlen));
+        }
+        else
+        {
+            EXPECT_TRUE(sendError(*announcer, udp_ann_req.transaction_id, "Failed"sv, from_ptr, fromlen));
+        }
+
+        // Failed responses won't be processed if one of the other announce requests succeeded
+        EXPECT_TRUE(ipp == TR_AF_INET ? !response.has_value() : response.has_value());
+        if (response)
+        {
+            expectEqual(expected_response, *response);
+        }
+    }
+}
+
+TEST_F(AnnouncerUdpTest, announceDualStackNoneSuccessful)
+{
+    auto request = tr_announce_request{};
+    request.event = TR_ANNOUNCE_EVENT_STARTED;
+    request.port = tr_port::from_host(80);
+    request.key = 0xCAFE;
+    request.numwant = 20;
+    request.up = 1;
+    request.down = 2;
+    request.corrupt = 3;
+    request.leftUntilComplete = 100;
+    request.announce_url = "https://localhost/announce"sv;
+    request.tracker_id = "fnord"s;
+    request.peer_id = tr_peerIdInit();
+    request.info_hash = tr_rand_obj<tr_sha1_digest_t>();
+
+    auto expected_response = tr_announce_response{};
+    expected_response.info_hash = request.info_hash;
+    expected_response.did_connect = true;
+    expected_response.did_timeout = false;
+    expected_response.interval = {};
+    expected_response.min_interval = 0; // not specified in UDP announce
+    expected_response.seeders = {};
+    expected_response.leechers = {};
+    expected_response.downloads = std::nullopt; // not specified in UDP announce
+    expected_response.pex = {};
+    expected_response.pex6 = {};
+    expected_response.errmsg = "Failed"s;
+    expected_response.warning = {};
+    expected_response.tracker_id = {}; // not specified in UDP announce
+    expected_response.external_ip = {};
+
+    // build the announcer
+    auto mediator = MockMediator{};
+    auto announcer = tr_announcer_udp::create(mediator);
+    auto const upkeep_timer = createUpkeepTimer(mediator, announcer);
+
+    auto response = std::optional<tr_announce_response>{};
+    announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
+
+    auto from = sockaddr_storage{};
+    auto* const from_ptr = reinterpret_cast<struct sockaddr*>(&from);
+    auto fromlen = socklen_t{};
+
+    auto connection_ids = std::array<tau_connection_t, NUM_TR_AF_INET_TYPES>{};
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        // Announcer will request a connection. Verify and grant the request
+        auto const connect_transaction_id = parseConnectionRequest(waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen));
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        connection_ids[ipp] = sendConnectionResponse(*announcer, connect_transaction_id, from_ptr, fromlen);
+    }
+
+    for (uint8_t i = 0U; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        auto const received_response = response.has_value();
+
+        // The announcer should have sent a UDP announce request.
+        // Inspect that request for validity.
+        auto const data = waitForAnnouncerToSendMessage(mediator, from_ptr, &fromlen);
+        auto const ipp = tr_af_to_ip_protocol(from_ptr->sa_family);
+        auto const udp_ann_req = parseAnnounceRequest(data, connection_ids[ipp]);
+        expectEqual(request, udp_ann_req);
+
+        // Have the tracker respond to the request
+        EXPECT_TRUE(sendError(*announcer, udp_ann_req.transaction_id, expected_response.errmsg, from_ptr, fromlen));
+
+        // Failed responses will only be processed if none of the announce requests are successful
+        // Or in other words, at most one failed response will be processed for each announce event
+        EXPECT_FALSE(received_response && response.has_value());
+        if (response)
+        {
+            expectEqual(expected_response, *response);
+        }
+    }
+}
