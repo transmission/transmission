@@ -95,14 +95,18 @@ protected:
 TEST_F(IPCacheTest, bindAddr)
 {
     static constexpr auto AddrTests = std::array{
-        std::array<std::pair<std::string_view, std::string_view>, 4>{ { { "8.8.8.8"sv, "8.8.8.8"sv },
-                                                                        { "192.168.133.133"sv, "192.168.133.133"sv },
-                                                                        { "2001:1890:1112:1::20"sv, "0.0.0.0"sv },
-                                                                        { "asdasd"sv, "0.0.0.0"sv } } } /* IPv4 */,
-        std::array<std::pair<std::string_view, std::string_view>, 4>{ { { "fd12:3456:789a:1::1"sv, "fd12:3456:789a:1::1"sv },
-                                                                        { "192.168.133.133"sv, "::"sv },
-                                                                        { "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv },
-                                                                        { "asdasd"sv, "::"sv } } } /* IPv6 */
+        std::array<std::pair<std::string_view, std::string_view>, 4>{ {
+            { "8.8.8.8"sv, "8.8.8.8"sv },
+            { "192.168.133.133"sv, "192.168.133.133"sv },
+            { "2001:1890:1112:1::20"sv, "0.0.0.0"sv },
+            { "asdasd"sv, "0.0.0.0"sv },
+        } } /* IPv4 */,
+        std::array<std::pair<std::string_view, std::string_view>, 4>{ {
+            { "fd12:3456:789a:1::1"sv, "fd12:3456:789a:1::1"sv },
+            { "192.168.133.133"sv, "::"sv },
+            { "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv },
+            { "asdasd"sv, "::"sv },
+        } } /* IPv6 */
     };
     static_assert(TR_AF_INET == 0);
     static_assert(TR_AF_INET6 == 1);
@@ -134,34 +138,26 @@ TEST_F(IPCacheTest, bindAddr)
 
 TEST_F(IPCacheTest, setGlobalAddr)
 {
-    static auto constexpr AddrStr = std::array{ "8.8.8.8"sv,
-                                                "192.168.133.133"sv,
-                                                "172.16.241.133"sv,
-                                                "2001:1890:1112:1::20"sv,
-                                                "fd12:3456:789a:1::1"sv };
-    static auto constexpr AddrTests = std::array{ std::array{ true, false, false, false, false /* IPv4 */ },
-                                                  std::array{ false, false, false, true, false /* IPv6 */ } };
+    static auto constexpr AddrStr = std::array{
+        "8.8.8.8"sv, "192.168.133.133"sv, "172.16.241.133"sv, "2001:1890:1112:1::20"sv, "fd12:3456:789a:1::1"sv,
+    };
+    static auto constexpr AddrTests = std::array{ true, false, false, true, false };
     static_assert(TR_AF_INET == 0);
     static_assert(TR_AF_INET6 == 1);
     static_assert(NUM_TR_AF_INET_TYPES == 2);
-    static_assert(std::size(AddrStr) == std::size(AddrTests[TR_AF_INET]));
-    static_assert(std::size(AddrStr) == std::size(AddrTests[TR_AF_INET6]));
+    static_assert(std::size(AddrStr) == std::size(AddrTests));
 
     auto mediator = MockMediator{};
     ip_cache_ = std::make_unique<tr_ip_cache>(mediator);
 
-    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    for (std::size_t i = 0; i < std::size(AddrStr); ++i)
     {
-        for (std::size_t j = 0; j < std::size(AddrStr); ++j)
+        auto const addr = tr_address::from_string(AddrStr[i]);
+        ASSERT_TRUE(addr.has_value());
+        EXPECT_EQ(ip_cache_->set_global_addr(*addr), AddrTests[i]);
+        if (auto const val = ip_cache_->global_addr(addr->type); val && AddrTests[i])
         {
-            auto const type = static_cast<tr_address_type>(i);
-            auto const addr = tr_address::from_string(AddrStr[j]);
-            ASSERT_TRUE(addr.has_value());
-            EXPECT_EQ(ip_cache_->set_global_addr(type, *addr), AddrTests[i][j]);
-            if (auto const val = ip_cache_->global_addr(type); val && AddrTests[i][j])
-            {
-                EXPECT_EQ(val->display_name(), AddrStr[j]);
-            }
+            EXPECT_EQ(val->display_name(), AddrStr[i]);
         }
     }
 }
