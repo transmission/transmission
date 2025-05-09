@@ -360,7 +360,7 @@ void Session::start()
         }
         url.setHost(prefs_.get<QString>(Prefs::SESSION_REMOTE_HOST));
         url.setPort(prefs_.get<int>(Prefs::SESSION_REMOTE_PORT));
-        url.setPath(QStringLiteral("/transmission/rpc"));
+        url.setPath(prefs_.get<QString>(Prefs::SESSION_REMOTE_RPC_URL));
 
         if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
         {
