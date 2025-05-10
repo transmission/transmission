@@ -50,6 +50,7 @@ using tr_socket_t = SOCKET;
 #define ENETUNREACH WSAENETUNREACH
 
 #define sockerrno WSAGetLastError()
+#define set_sockerrno(save)
 #else
 /** @brief Platform-specific socket descriptor type. */
 using tr_socket_t = int;
@@ -57,6 +58,7 @@ using tr_socket_t = int;
 #define TR_BAD_SOCKET (-1)
 
 #define sockerrno errno
+#define set_sockerrno(save) (sockerrno) = (save)
 #endif
 
 #include "libtransmission/transmission.h" // tr_peer_from

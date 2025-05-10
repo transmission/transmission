@@ -70,7 +70,7 @@ namespace global_source_ip_helpers
 {
     TR_ASSERT(dst_addr.type == bind_addr.type);
 
-    auto const save = errno;
+    [[maybe_unused]] auto const save = sockerrno;
 
     auto const [dst_ss, dst_sslen] = tr_socket_address::to_sockaddr(dst_addr, dst_port);
     auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(bind_addr, {});
@@ -87,18 +87,22 @@ namespace global_source_ip_helpers
                     if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                     {
                         tr_net_close_socket(sock);
-                        errno = save;
+                        set_sockerrno(save);
                         return addrport->address();
                     }
                 }
             }
         }
 
+        err_out = sockerrno;
         tr_net_close_socket(sock);
     }
+    else
+    {
+        err_out = sockerrno;
+    }
 
-    err_out = errno;
-    errno = save;
+    set_sockerrno(save);
     return {};
 }
 
