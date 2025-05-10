@@ -42,19 +42,24 @@ char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>"
 
 uint32_t constexpr KiB = 1024;
 
-auto constexpr Options = std::array<tr_option, 10>{
-    { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
-      { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
-      { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
-      { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", true, "<KiB>" },
-      { 'c', "comment", "Add a comment", "c", true, "<comment>" },
-      { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-      { 'w', "webseed", "Add a webseed URL", "w", true, "<url>" },
-      { 'x', "anonymize", R"(Omit "Creation date" and "Created by" info)", nullptr, false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+using Arg = tr_option::Arg;
+auto constexpr Options = std::array<tr_option, 10>{ {
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", Arg::None, nullptr },
+    { 'r', "source", "Set the source for private trackers", "r", Arg::Required, "<source>" },
+    { 'o', "outfile", "Save the generated .torrent to this filename", "o", Arg::Required, "<file>" },
+    { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", Arg::Required, "<KiB>" },
+    { 'c', "comment", "Add a comment", "c", Arg::Required, "<comment>" },
+    { 't', "tracker", "Add a tracker's announce URL", "t", Arg::Required, "<url>" },
+    { 'w', "webseed", "Add a webseed URL", "w", Arg::Required, "<url>" },
+    { 'x', "anonymize", R"(Omit "Creation date" and "Created by" info)", nullptr, Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
+static_assert(Options[std::size(Options) - 2].val != 0);
+} // namespace
 
+namespace
+{
 struct app_options
 {
     tr_announce_list trackers;
