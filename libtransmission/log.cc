@@ -196,13 +196,14 @@ void tr_logFreeQueue(tr_log_message* freeme)
 
 std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point now, char* buf, size_t buflen)
 {
-    auto const now_tm = fmt::localtime(std::chrono::system_clock::to_time_t(now));
+    auto const now_time_t = std::chrono::system_clock::to_time_t(now);
+    auto const* const now_tm = std::localtime(&now_time_t);
     auto const subseconds = now - std::chrono::time_point_cast<std::chrono::seconds>(now);
     auto const [out, len] = fmt::format_to_n(
         buf,
         buflen,
         "{0:%FT%T.}{1:0>3%Q}{0:%z}",
-        now_tm,
+        *now_tm,
         std::chrono::duration_cast<std::chrono::milliseconds>(subseconds));
     return { buf, len };
 }
