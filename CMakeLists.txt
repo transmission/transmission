@@ -764,6 +764,11 @@ add_compile_options(
     $<$<COMPILE_LANGUAGE:C>:${C_WARNING_FLAGS_GENEX}>
     $<$<COMPILE_LANGUAGE:CXX>:${CXX_WARNING_FLAGS_GENEX}>)
 
+### Enable ISO 19217 Concepts (i.e. C++20 Concepts) for GCC < 10.1
+
+add_compile_options(
+    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,10.1>>:-fconcepts>)
+
 ###
 
 include(LargeFileSupport)
