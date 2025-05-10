@@ -3,6 +3,7 @@
    License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
+import { AuthManager } from './auth-manager.js';
 import { ContextMenu } from './context-menu.js';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
@@ -87,6 +88,9 @@ export class Transmission extends EventTarget {
       switch (event_.action) {
         case 'deselect-all':
           this._deselectAll();
+          break;
+        case 'logout':
+          this._logout();
           break;
         case 'move-bottom':
           this._moveBottom();
@@ -906,6 +910,12 @@ TODO: fix this when notifications get fixed
   }
   changeFileCommand(torrentId, rowIndices, command) {
     this.remote.changeFileCommand(torrentId, rowIndices, command);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  _logout() {
+    AuthManager.clearCredentials();
+    AuthManager.redirectToLogin();
   }
 
   // Queue
