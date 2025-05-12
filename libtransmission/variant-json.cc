@@ -16,7 +16,7 @@
 #include <utility>
 #include <variant>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <rapidjson/encodedstream.h>
 #include <rapidjson/encodings.h>
