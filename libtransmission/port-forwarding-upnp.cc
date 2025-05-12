@@ -13,7 +13,7 @@
 #include <thread>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
