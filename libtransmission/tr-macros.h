@@ -39,9 +39,9 @@
 
 // ---
 
-#define TR_INET6_ADDRSTRLEN 46
+inline auto constexpr TrInet6AddrStrlen = 46U;
 
-#define TR_ADDRSTRLEN 64
+inline auto constexpr TrAddrStrlen = 64U;
 
 // https://www.bittorrent.org/beps/bep_0007.html
 // "The client SHOULD include a key parameter in its announces. The key

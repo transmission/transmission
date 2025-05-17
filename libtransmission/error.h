@@ -37,7 +37,7 @@ public:
         return code_ != 0;
     }
 
-    [[nodiscard]] constexpr operator bool() const noexcept
+    [[nodiscard]] explicit constexpr operator bool() const noexcept
     {
         return has_value();
     }
