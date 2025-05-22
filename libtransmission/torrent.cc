@@ -1791,7 +1791,7 @@ void tr_torrent::create_empty_files() const
     auto const file_count = this->file_count();
     for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
     {
-        if (file_size(file_index) != 0U || !file_is_wanted(file_index) || find_file(file_index))
+        if (file_is_padding(file_index) || file_size(file_index) != 0U || !file_is_wanted(file_index) || find_file(file_index))
         {
             continue;
         }
@@ -2136,7 +2136,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
     for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
-        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted || !tor->files_padded_.file_padded(i))
+        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted || !tor->file_is_padding(i))
         {
             continue;
         }
