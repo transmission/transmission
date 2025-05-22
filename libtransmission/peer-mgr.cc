@@ -420,6 +420,10 @@ public:
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
 
+        [[nodiscard]] tr_torrent& torrent() const override {
+            return tor_;
+        }
+
     private:
         tr_torrent& tor_;
         tr_swarm& swarm_;

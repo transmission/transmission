@@ -517,6 +517,8 @@ struct tr_torrent
         return metainfo_.file_is_padding(i);
     }
 
+    [[nodiscard]] bool block_is_padding(tr_block_index_t block_index) const;
+
     void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
         metainfo_.set_file_subpath(i, subpath);

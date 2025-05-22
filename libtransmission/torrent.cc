@@ -2331,6 +2331,43 @@ void tr_torrent::refresh_current_dir()
     current_dir_ = dir;
 }
 
+bool tr_torrent::block_is_padding(tr_block_index_t const block_index) const
+{
+    if (!has_metainfo() || block_index >= block_count())
+    {
+        tr_logAddInfoTor(this, "block not found");
+        return false; // Or handle error appropriately
+    }
+
+    auto const loc = this->block_loc(block_index);
+    uint64_t const block_len = this->block_size(block_index);
+    uint64_t bytes_checked_in_block = 0;
+
+    // Iterate through the file segments that this block covers
+    auto [file_idx, file_offset_in_current_file] = this->file_offset(loc);
+
+    while (bytes_checked_in_block < block_len && file_idx < file_count())
+    {
+        uint64_t const current_file_total_size = this->file_size(file_idx);
+        uint64_t const bytes_remaining_in_current_file = current_file_total_size - file_offset_in_current_file;
+        uint64_t const bytes_from_this_file_for_this_block = std::min(
+            block_len - bytes_checked_in_block,
+            bytes_remaining_in_current_file);
+
+        if (!this->file_is_padding(file_idx)) // Using metainfo_.file_is_padding()
+        {
+            return false; // Found a non-padding part in this block
+        }
+
+        bytes_checked_in_block += bytes_from_this_file_for_this_block;
+        file_idx++;
+        file_offset_in_current_file = 0; // Subsequent files start at offset 0
+    }
+
+    // If all segments of the block belong to padding files
+    return bytes_checked_in_block == block_len;
+}
+
 // --- RENAME
 
 namespace
