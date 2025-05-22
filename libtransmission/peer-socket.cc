@@ -7,7 +7,7 @@
 #include <cerrno>
 #include <cstddef> // std::byte
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libutp/utp.h>
 

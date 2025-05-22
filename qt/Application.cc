@@ -71,21 +71,21 @@ void initUnits()
 {
     using Config = libtransmission::Values::Config;
 
-    Config::Speed = { Config::Base::Kilo,
+    Config::speed = { Config::Base::Kilo,
                       QObject::tr("B/s").toStdString(),
                       QObject::tr("kB/s").toStdString(),
                       QObject::tr("MB/s").toStdString(),
                       QObject::tr("GB/s").toStdString(),
                       QObject::tr("TB/s").toStdString() };
 
-    Config::Memory = { Config::Base::Kibi,
+    Config::memory = { Config::Base::Kibi,
                        QObject::tr("B").toStdString(),
                        QObject::tr("KiB").toStdString(),
                        QObject::tr("MiB").toStdString(),
                        QObject::tr("GiB").toStdString(),
                        QObject::tr("TiB").toStdString() };
 
-    Config::Storage = { Config::Base::Kilo,
+    Config::storage = { Config::Base::Kilo,
                         QObject::tr("B").toStdString(),
                         QObject::tr("kB").toStdString(),
                         QObject::tr("MB").toStdString(),

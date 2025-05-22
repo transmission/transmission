@@ -11,7 +11,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
@@ -62,8 +62,8 @@ struct tr_url_query_view
 
     struct iterator
     {
-        std::pair<std::string_view, std::string_view> keyval = std::make_pair(std::string_view{ "" }, std::string_view{ "" });
-        std::string_view remain = "";
+        std::pair<std::string_view, std::string_view> keyval;
+        std::string_view remain;
 
         iterator& operator++();
 
@@ -90,7 +90,7 @@ struct tr_url_query_view
 
     [[nodiscard]] iterator begin() const;
 
-    [[nodiscard]] constexpr iterator end() const
+    [[nodiscard]] static constexpr iterator end()
     {
         return iterator{};
     }

@@ -33,6 +33,11 @@ public:
         save();
     }
 
+    tr_stats(tr_stats const&) = delete;
+    tr_stats(tr_stats&&) = delete;
+    tr_stats& operator=(tr_stats const&) = delete;
+    tr_stats& operator=(tr_stats&&) = delete;
+
     void clear();
 
     [[nodiscard]] tr_session_stats current() const;

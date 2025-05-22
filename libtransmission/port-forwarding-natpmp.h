@@ -31,6 +31,11 @@ public:
         closenatpmp(&natpmp_);
     }
 
+    tr_natpmp(tr_natpmp const&) = delete;
+    tr_natpmp(tr_natpmp&&) = delete;
+    tr_natpmp& operator=(tr_natpmp const&) = delete;
+    tr_natpmp& operator=(tr_natpmp&&) = delete;
+
     [[nodiscard]] constexpr auto renewTime() const noexcept
     {
         return renew_time_;
@@ -47,7 +52,7 @@ public:
     PulseResult pulse(tr_port local_port, bool is_enabled);
 
 private:
-    enum class State
+    enum class State : uint8_t
     {
         Idle,
         Err,

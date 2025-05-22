@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>

@@ -23,7 +23,7 @@
 #include <windows.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>

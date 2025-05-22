@@ -42,7 +42,7 @@ public:
 
         for (size_t i = 0, j = 0; i < 256; ++i)
         {
-            j = static_cast<uint8_t>(j + s_[i] + ((uint8_t const*)key)[i % key_length]);
+            j = static_cast<uint8_t>(j + s_[i] + reinterpret_cast<uint8_t const*>(key)[i % key_length]);
             arc4_swap(i, j);
         }
     }

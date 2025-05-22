@@ -38,7 +38,7 @@ public:
     class FetchOptions
     {
     public:
-        enum class IPProtocol
+        enum class IPProtocol : uint8_t
         {
             ANY,
             V4,
@@ -108,6 +108,11 @@ public:
     // all of its tasks.
     ~tr_web();
 
+    tr_web(tr_web const&) = delete;
+    tr_web(tr_web&&) = delete;
+    tr_web& operator=(tr_web const&) = delete;
+    tr_web& operator=(tr_web&&) = delete;
+
     /**
      * Mediates between `tr_web` and its clients.
      *
@@ -150,7 +155,7 @@ public:
         }
 
         // Return the preferred proxy url
-        [[nodiscard]] virtual std::optional<std::string_view> proxyUrl() const
+        [[nodiscard]] virtual std::optional<std::string> proxyUrl() const
         {
             return std::nullopt;
         }

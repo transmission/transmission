@@ -194,7 +194,7 @@ struct tr_address
     }
 
     template<typename OutputIt>
-    OutputIt to_compact(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const // NOLINT(modernize-use-nodiscard)
     {
         switch (type)
         {
@@ -255,7 +255,7 @@ struct tr_address
     {
         struct in6_addr addr6;
         struct in_addr addr4;
-    } addr;
+    } addr = {};
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
     static auto constexpr CompactAddrMaxBytes = *std::max_element(std::begin(CompactAddrBytes), std::end(CompactAddrBytes));
@@ -362,7 +362,7 @@ struct tr_socket_address
     }
 
     template<typename OutputIt>
-    OutputIt to_compact(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const // NOLINT(modernize-use-nodiscard)
     {
         return to_compact(out, address_, port_);
     }
@@ -389,7 +389,7 @@ struct tr_socket_address
     // --- sockaddr helpers
 
     [[nodiscard]] static std::optional<tr_socket_address> from_string(std::string_view sockaddr_sv);
-    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
+    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const* from);
     [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 
     [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr() const noexcept
@@ -488,12 +488,13 @@ public:
     {
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator int() const noexcept
     {
         return value_;
     }
 
-    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view);
+    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view name);
 
     [[nodiscard]] std::string toString() const;
 

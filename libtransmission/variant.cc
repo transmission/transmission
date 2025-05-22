@@ -18,7 +18,7 @@
 #include <share.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/vector.hpp>
 

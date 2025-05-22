@@ -47,7 +47,7 @@
 #include <gtkmm/treeview.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include <algorithm>

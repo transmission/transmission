@@ -41,7 +41,7 @@
 #include <gtkmm/clipboard.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <functional>
 #include <memory>

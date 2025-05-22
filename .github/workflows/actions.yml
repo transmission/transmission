@@ -627,7 +627,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext ninja node pkgconf
+        run: brew install --formulae cmake ninja node pkgconf
       - name: Get Source
         uses: actions/download-artifact@v4
         with:
@@ -643,6 +643,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64' \
+            -DCMAKE_DISABLE_FIND_PACKAGE_Intl=ON \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=OFF \

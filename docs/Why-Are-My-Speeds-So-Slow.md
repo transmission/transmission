@@ -31,8 +31,6 @@ If you try to upload to the limit of your connection bandwidth you may block you
 ## 7. Is it your ISP?
 If your ISP is one of those that manipulates BitTorrent packets &mdash; and even if it is not &mdash; it is often a good idea to enable the [Blocklist](./Blocklist.md) and also to tell Transmission to "Ignore Unencrypted Peers" to give your sessions slightly better privacy.
 
-Update: Google now has [a free online tool](https://broadband.mpi-sws.org/transparency/bttest.php) to test what your ISP is doing. Follow that link and go down to the "Start testing" button.
-
 ## 8. Is it an old version of Transmission?
 Work is constantly being done to improve performance and behavior. If you are using an old version, consider upgrading.
 

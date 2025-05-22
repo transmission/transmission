@@ -163,7 +163,7 @@ private:
     class DhtMediator : public tr_dht::Mediator
     {
     public:
-        DhtMediator(tr_session& session) noexcept
+        explicit DhtMediator(tr_session& session) noexcept
             : session_{ session }
         {
         }
@@ -184,7 +184,7 @@ private:
             return session_.timerMaker();
         }
 
-        void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
+        void add_pex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex) override;
 
     private:
         tr_session& session_;
@@ -263,7 +263,7 @@ private:
         [[nodiscard]] std::optional<std::string> bind_address_V6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
-        [[nodiscard]] std::optional<std::string_view> proxyUrl() const override;
+        [[nodiscard]] std::optional<std::string> proxyUrl() const override;
         [[nodiscard]] time_t now() const override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -353,6 +353,11 @@ private:
         tr_udp_core(tr_session& session, tr_port udp_port);
         ~tr_udp_core();
 
+        tr_udp_core(tr_udp_core const&) = delete;
+        tr_udp_core(tr_udp_core&&) = delete;
+        tr_udp_core& operator=(tr_udp_core const&) = delete;
+        tr_udp_core& operator=(tr_udp_core&&) = delete;
+
         void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen) const;
 
         [[nodiscard]] constexpr auto socket4() const noexcept
@@ -416,8 +421,8 @@ public:
         size_t cache_size_mbytes = 4U;
         size_t download_queue_size = 5U;
         size_t idle_seeding_limit_minutes = 30U;
-        size_t peer_limit_global = TR_DEFAULT_PEER_LIMIT_GLOBAL;
-        size_t peer_limit_per_torrent = TR_DEFAULT_PEER_LIMIT_TORRENT;
+        size_t peer_limit_global = TrDefaultPeerLimitGlobal;
+        size_t peer_limit_per_torrent = TrDefaultPeerLimitTorrent;
         size_t queue_stalled_minutes = 30U;
         size_t reqq = 2000U;
         size_t seed_queue_size = 10U;
@@ -426,6 +431,7 @@ public:
         size_t upload_slots_per_torrent = 8U;
         std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
+        std::optional<std::string> proxy_url;
         std::string announce_ip;
         std::string bind_address_ipv4;
         std::string bind_address_ipv6;
@@ -437,14 +443,13 @@ public:
         std::string script_torrent_added_filename;
         std::string script_torrent_done_filename;
         std::string script_torrent_done_seeding_filename;
-        std::string proxy_url;
         tr_encryption_mode encryption_mode = TR_ENCRYPTION_PREFERRED;
         tr_log_level log_level = TR_LOG_INFO;
         tr_mode_t umask = 022;
         tr_open_files::Preallocation preallocation_mode = tr_open_files::Preallocation::Sparse;
         tr_port peer_port_random_high = tr_port::from_host(65535);
         tr_port peer_port_random_low = tr_port::from_host(49152);
-        tr_port peer_port = tr_port::from_host(TR_DEFAULT_PEER_PORT);
+        tr_port peer_port = tr_port::from_host(TrDefaultPeerPort);
         tr_tos_t peer_socket_tos{ 0x04 };
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
 
@@ -1103,6 +1108,7 @@ public:
 
     void addTorrent(tr_torrent* tor);
 
+    // NOLINTNEXTLINE(readability-make-member-function-const)
     void maybe_add_dht_node(tr_address const& addr, tr_port port)
     {
         if (dht_)
@@ -1149,7 +1155,7 @@ private:
     void onAdvertisedPeerPortChanged();
 
     struct init_data;
-    void initImpl(init_data&);
+    void initImpl(init_data& data);
     void setSettings(tr_variant const& settings_map, bool force);
     void setSettings(Settings&& settings, bool force);
 
@@ -1311,7 +1317,6 @@ private:
     QueueMediator torrent_queue_mediator_{ *this };
     tr_torrent_queue torrent_queue_{ torrent_queue_mediator_ };
 
-private:
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())

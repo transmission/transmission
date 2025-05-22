@@ -39,7 +39,7 @@ struct tr_session;
 struct tr_torrent;
 
 /* added_f's bitwise-or'ed flags */
-enum
+enum : uint8_t
 {
     /* true if the peer supports encryption */
     ADDED_F_ENCRYPTION_FLAG = 1,
@@ -561,7 +561,7 @@ struct tr_pex
     }
 
     template<typename OutputIt>
-    OutputIt to_compact(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const // NOLINT(modernize-use-nodiscard)
     {
         return socket_address.to_compact(out);
     }
@@ -653,7 +653,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex);
 
-enum
+enum : uint8_t
 {
     TR_PEERS_CONNECTED,
     TR_PEERS_INTERESTING

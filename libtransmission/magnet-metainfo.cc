@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error-types.h"

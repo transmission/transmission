@@ -19,7 +19,7 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -262,7 +262,7 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
     auto error = tr_error{};

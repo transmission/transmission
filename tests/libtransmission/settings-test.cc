@@ -339,6 +339,48 @@ TEST_F(SettingsTest, canSaveString)
     EXPECT_EQ(ChangedValue, *val);
 }
 
+TEST_F(SettingsTest, canLoadNullableString)
+{
+    static auto constexpr Key = TR_KEY_proxy_url;
+    static auto constexpr ChangedValue = std::string_view{ "http://127.0.0.1" };
+
+    auto settings = tr_session::Settings{};
+    EXPECT_EQ(std::nullopt, settings.proxy_url);
+
+    auto map = tr_variant::Map{ 1U };
+    map.try_emplace(Key, ChangedValue);
+    settings.load(std::move(map));
+    EXPECT_EQ(ChangedValue, settings.proxy_url);
+
+    map = tr_variant::Map{ 1U };
+    map.try_emplace(Key, nullptr);
+    settings.load(std::move(map));
+    EXPECT_EQ(std::nullopt, settings.proxy_url);
+}
+
+TEST_F(SettingsTest, canSaveNullableString)
+{
+    static auto constexpr Key = TR_KEY_proxy_url;
+    static auto constexpr ChangedValue = std::string_view{ "http://127.0.0.1" };
+
+    auto settings = tr_session::Settings{};
+    EXPECT_EQ(std::nullopt, settings.proxy_url);
+
+    settings.proxy_url = ChangedValue;
+    auto var = settings.save();
+    auto* map = var.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+    auto const sv = map->value_if<std::string_view>(Key);
+    EXPECT_EQ(ChangedValue, sv);
+
+    settings.proxy_url = std::nullopt;
+    var = settings.save();
+    map = var.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+    auto const null_p = map->value_if<std::nullptr_t>(Key);
+    EXPECT_TRUE(null_p);
+}
+
 TEST_F(SettingsTest, canLoadTos)
 {
     static auto constexpr Key = TR_KEY_peer_socket_tos;

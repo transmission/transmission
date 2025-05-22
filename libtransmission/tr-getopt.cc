@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"

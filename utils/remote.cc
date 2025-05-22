@@ -24,7 +24,7 @@
 #include <event2/buffer.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -48,7 +48,7 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TR_DEFAULT_RPC_PORT };
+auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
 char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
@@ -941,7 +941,7 @@ void print_details(tr_variant::Map const& map)
             {
                 if (auto sv = it->value_if<std::string_view>(); sv)
                 {
-                    fmt::print("{:s}{:s}", it == begin ? ", " : "", *sv);
+                    fmt::print("{:s}{:s}", it != begin ? ", " : "", *sv);
                 }
             }
 

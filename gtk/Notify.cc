@@ -20,7 +20,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/variant.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <map>
 #include <utility>

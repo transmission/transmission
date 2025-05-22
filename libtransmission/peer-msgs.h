@@ -45,6 +45,11 @@ public:
 
     ~tr_peerMsgs() override;
 
+    tr_peerMsgs(tr_peerMsgs const&) = delete;
+    tr_peerMsgs(tr_peerMsgs&&) = delete;
+    tr_peerMsgs& operator=(tr_peerMsgs const&) = delete;
+    tr_peerMsgs& operator=(tr_peerMsgs&&) = delete;
+
     [[nodiscard]] static auto size() noexcept
     {
         return n_peers.load();

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 /**
  * @addtogroup utils Utilities
  * @{
@@ -23,7 +25,7 @@ struct tr_option
     char const* argName; /* argument's description for tr_getopt_usage() */
 };
 
-enum
+enum : int8_t
 {
     /* all options have been processed */
     TR_OPT_DONE = 0,

@@ -29,7 +29,7 @@
 #include <sys/socket.h> // sockaddr_storage, AF_INET
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
@@ -90,7 +90,7 @@ struct tau_scrape_request
     {
         response.scrape_url = in.scrape_url;
         response.row_count = in.info_hash_count;
-        for (int i = 0; i < response.row_count; ++i)
+        for (size_t i = 0; i < response.row_count; ++i)
         {
             response.rows[i].info_hash = in.info_hash[i];
         }
@@ -98,7 +98,7 @@ struct tau_scrape_request
         // build the payload
         payload.add_uint32(TAU_ACTION_SCRAPE);
         payload.add_uint32(transaction_id);
-        for (int i = 0; i < in.info_hash_count; ++i)
+        for (size_t i = 0; i < in.info_hash_count; ++i)
         {
             payload.add(in.info_hash[i]);
         }
@@ -132,7 +132,7 @@ struct tau_scrape_request
 
         if (action == TAU_ACTION_SCRAPE)
         {
-            for (int i = 0; i < response.row_count && std::size(buf) >= sizeof(uint32_t) * 3U; ++i)
+            for (size_t i = 0; i < response.row_count && std::size(buf) >= sizeof(uint32_t) * 3U; ++i)
             {
                 auto& row = response.rows[i];
                 row.seeders = buf.to_uint32();

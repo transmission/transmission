@@ -20,7 +20,7 @@ class TimerMaker;
 class Watchdir
 {
 public:
-    enum class Action
+    enum class Action : uint8_t
     {
         Done,
         Retry
@@ -60,6 +60,8 @@ public:
         std::chrono::milliseconds rescan_interval = generic_rescan_interval_);
 
 private:
+    // TODO: Re-enable after setting readability-identifier-naming.PrivateMemberSuffix to _
+    // NOLINTNEXTLINE(readability-identifier-naming)
     static inline auto generic_rescan_interval_ = std::chrono::milliseconds{ 1000 };
 };
 

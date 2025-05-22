@@ -34,7 +34,7 @@
 #include <gtkmm/filterlistmodel.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm> // std::transform()
 #include <array>

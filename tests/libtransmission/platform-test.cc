@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 

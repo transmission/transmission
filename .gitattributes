@@ -1,0 +1,7 @@
+# libtransmission
+libtransmission/mime-types.h linguist-generated=true
+
+# web
+web/package.json.buildonly linguist-generated=true
+web/public_html/transmission-app.* linguist-generated=true
+web/public_html/transmission-app.js -diff -merge

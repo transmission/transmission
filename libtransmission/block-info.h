@@ -14,9 +14,7 @@ struct tr_block_info
 public:
     static auto constexpr BlockSize = uint32_t{ 1024U * 16U };
 
-    tr_block_info() noexcept
-    {
-    }
+    tr_block_info() noexcept = default;
 
     tr_block_info(uint64_t const total_size_in, uint32_t const piece_size_in) noexcept
     {

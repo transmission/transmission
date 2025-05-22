@@ -35,7 +35,7 @@ public:
         virtual void on_port_forwarded(tr_port advertised_port) = 0;
     };
 
-    [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(Mediator&);
+    [[nodiscard]] static std::unique_ptr<tr_port_forwarding> create(Mediator& mediator);
     virtual ~tr_port_forwarding() = default;
 
     [[nodiscard]] virtual bool is_enabled() const = 0;

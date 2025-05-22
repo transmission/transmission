@@ -25,30 +25,11 @@ struct tr_error;
  * @{
  */
 
-#if !defined(_)
-#if defined(HAVE_GETTEXT) && !defined(__APPLE__)
+#ifdef ENABLE_GETTEXT
 #include <libintl.h>
-#define _(a) gettext(a)
-#else
-#define _(a) (a)
-#endif
-#endif
-
-#if defined(HAVE_NGETTEXT)
+#define _ gettext
 #define tr_ngettext ngettext
 #else
-#define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
-#endif
-
-/* #define DISABLE_GETTEXT */
-#ifndef DISABLE_GETTEXT
-#if defined(_WIN32)
-#define DISABLE_GETTEXT
-#endif
-#endif
-#ifdef DISABLE_GETTEXT
-#undef _
-#undef tr_ngettext
 #define _(a) (a)
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif

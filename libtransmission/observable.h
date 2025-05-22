@@ -67,7 +67,7 @@ private:
 // remove-during-emit; this is meant to be as lightweight
 // as possible for very basic use cases.
 template<typename... Args>
-class SimpleObservable
+class SimpleObservable // NOLINT(cppcoreguidelines-special-member-functions)
 {
     using Key = size_t;
 
@@ -104,6 +104,8 @@ private:
         TR_ASSERT(n_removed == 1U);
     }
 
+    // TODO: Re-enable after setting readability-identifier-naming.PrivateMemberSuffix to _
+    // NOLINTNEXTLINE(readability-identifier-naming)
     static auto inline next_key_ = Key{ 1U };
     small::map<Key, Observer, 4U> observers_;
 };

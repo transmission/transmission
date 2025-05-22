@@ -190,7 +190,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMulti)
     std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
-    response.row_count = 3;
+    response.row_count = 3U;
     tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
@@ -248,7 +248,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithUnexpected)
     std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
-    response.row_count = 3;
+    response.row_count = 3U;
     tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
@@ -292,7 +292,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithMissing)
     std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
-    response.row_count = 3;
+    response.row_count = 3U;
     tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);

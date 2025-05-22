@@ -26,7 +26,7 @@
 #include <gtkmm/listview.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <cstddef>
 #include <cstdint>
