@@ -229,12 +229,9 @@ std::optional<tr_sha1_digest_t> recalculate_hash(tr_torrent const& tor, tr_piece
     {
         auto const block_loc = tor.block_loc(block);
         auto const block_len = tor.block_size(block);
-        if (!tor.piece_is_padded(block_loc.piece))
+        if (auto const success = cache->read_block(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
         {
-            if (auto const success = cache->read_block(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
-            {
-                return {};
-            }
+            return {};
         }
 
         auto begin = std::data(buffer);
