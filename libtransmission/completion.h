@@ -28,9 +28,11 @@
 struct tr_completion
 {
     using PieceIsWantedFunc = std::function<bool(tr_piece_index_t piece)>;
+    using PieceIsPaddedFunc = std::function<bool(tr_piece_index_t piece)>;
 
-    tr_completion(PieceIsWantedFunc&& piece_is_wanted, tr_block_info const* block_info)
+    tr_completion(PieceIsWantedFunc&& piece_is_wanted, PieceIsPaddedFunc&& piece_is_padded, tr_block_info const* block_info)
         : piece_is_wanted_{ std::move(piece_is_wanted) }
+        , piece_is_padded_{ std::move(piece_is_padded) }
         , block_info_{ block_info }
         , blocks_{ block_info_->block_count() }
     {
@@ -174,6 +176,7 @@ private:
     void remove_block(tr_block_index_t block);
 
     PieceIsWantedFunc piece_is_wanted_;
+    PieceIsPaddedFunc piece_is_padded_;
     tr_block_info const* block_info_;
 
     tr_bitfield blocks_{ 0 };
