@@ -19,6 +19,8 @@
 #include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
+#import <IOKit/pwr_mgt/IOPMLib.h>
+
 #import "VDKQueue.h"
 
 #import "CocoaCompatibility.h"
@@ -5013,24 +5015,32 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
     case kIOMessageSystemWillSleep:
         {
-            //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
-            BOOL anyActive = NO;
-            for (Torrent* torrent in self.fTorrents)
+            //the system will prefer to enter the Dark Wake state, or remain in Dark Wake if already there, rather than go to sleep
+            IOPMAssertionID assertionID;
+            IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypePreventSystemSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
+
+            if (success == kIOReturnSuccess)
             {
-                if (torrent.active)
+                //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
+                BOOL anyActive = NO;
+                for (Torrent* torrent in self.fTorrents)
                 {
-                    anyActive = YES;
+                    if (torrent.active)
+                    {
+                        anyActive = YES;
+                    }
+                    [torrent sleep]; //have to call on all, regardless if they are active
                 }
-                [torrent sleep]; //have to call on all, regardless if they are active
+
+                //if there are any running transfers, wait 15 seconds for them to stop
+                if (anyActive)
+                {
+                    sleep(15);
+                }
+
+                success = IOPMAssertionRelease(assertionID);
             }
 
-            //if there are any running transfers, wait 15 seconds for them to stop
-            if (anyActive)
-            {
-                sleep(15);
-            }
-
-            IOAllowPowerChange(self.fRootPort, (long)messageArgument);
             break;
         }
 
@@ -5038,17 +5048,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         if ([self.fDefaults boolForKey:@"SleepPrevent"])
         {
             //prevent idle sleep unless no torrents are active
-            for (Torrent* torrent in self.fTorrents)
+            //the system may still sleep for lid close, Apple menu, low battery, or other sleep reasons.
+            //this assertion does not put the system into Dark Wake.
+            IOPMAssertionID assertionID;
+            IOReturn success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep, kIOPMAssertionLevelOn, CFSTR("Active Torrent"), &assertionID);
+
+            if (success == kIOReturnSuccess)
             {
-                if (torrent.active && !torrent.stalled && !torrent.error)
+                for (Torrent* torrent in self.fTorrents)
                 {
-                    IOCancelPowerChange(self.fRootPort, (long)messageArgument);
-                    return;
+                    if (torrent.active && !torrent.stalled && !torrent.error)
+                    {
+                        return;
+                    }
                 }
+
+                success = IOPMAssertionRelease(assertionID);
             }
         }
-
-        IOAllowPowerChange(self.fRootPort, (long)messageArgument);
         break;
 
     case kIOMessageSystemHasPoweredOn:
