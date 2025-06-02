@@ -52,7 +52,7 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"

@@ -14,7 +14,7 @@
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define ENABLE_STRNATPMPERR
 #include "natpmp.h"
