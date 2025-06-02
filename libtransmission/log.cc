@@ -142,7 +142,7 @@ void logAddImpl(
         }
         else
         {
-            fmt::print("[{:s}] {:s}: {:s}\n", timestr, name, msg);
+            fmt::print(stderr, "[{:s}] {:s}: {:s}\n", timestr, name, msg);
         }
     }
 #endif
