@@ -39,3 +39,8 @@ E.g. universities, Wi-Fi hotspots, RV parks and some "true" ISPs (common in Rome
 Although these ISPs are often very interesting, offering high speeds, unlimited bandwidth (sometimes) and low prizes, this is because they do not buy IP addresses for their clients and provide the (local) network themselves.
 
 Basically the only thing you can do, is to ''politely'' ask for them to forward a port for you.
+
+### IPv6
+If port forwarding has been configured correctly and has been checked by external services, check that IPv6 is enabled on the machine running Transmission. If it is, the port check will prefer it, even if IPv4 connectivity is set up correctly.
+
+Ensure the proper firewall rules have been set up to allow traffic to the same port at the machine's IPv6 address.
