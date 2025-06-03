@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>248</width>
-    <height>297</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,6 +106,19 @@
          <enum>QLineEdit::Password</enum>
         </property>
        </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="rpcLabel">
+        <property name="text">
+         <string>RPC URL pa&amp;th:</string>
+        </property>
+        <property name="buddy">
+         <cstring>rpcEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="rpcEdit"/>
       </item>
      </layout>
     </widget>
