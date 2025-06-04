@@ -2,7 +2,9 @@
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
+import { AuthManager } from './auth-manager.js';
 import { AlertDialog } from './alert-dialog.js';
+import { getAppRoot } from './utils.js';
 
 export const RPC = {
   _DaemonVersion: 'version',
@@ -12,7 +14,7 @@ export const RPC = {
   _QueueMoveDown: 'queue-move-down',
   _QueueMoveTop: 'queue-move-top',
   _QueueMoveUp: 'queue-move-up',
-  _Root: '../rpc',
+  _Root: new URL(`${getAppRoot()}/../rpc`, window.location.href).pathname,
   _TurtleDownSpeedLimit: 'alt-speed-down',
   _TurtleState: 'alt-speed-enabled',
   _TurtleUpSpeedLimit: 'alt-speed-up',
@@ -33,6 +35,9 @@ export class Remote {
     headers.append('cache-control', 'no-cache');
     headers.append('content-type', 'application/json');
     headers.append('pragma', 'no-cache');
+
+    AuthManager.addAuthHeaders(headers);
+
     if (this._session_id) {
       headers.append(Remote._SessionHeader, this._session_id);
     }
@@ -45,6 +50,13 @@ export class Remote {
     })
       .then((response) => {
         response_argument = response;
+
+        // Even though we checked credentials on boot, the user may have
+        // reconfigured transmission with different credentials.
+        if (response.status === 401) {
+          AuthManager.redirectToLogin();
+        }
+
         if (response.status === 409) {
           const error = new Error(Remote._SessionHeader);
           error.header = response.headers.get(Remote._SessionHeader);
