@@ -133,12 +133,13 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
     tor->use_metainfo_from_file(metainfo, filename, &error);
     if (error)
     {
-        tor->error().set_local_error(fmt::format(
-            fmt::runtime(_("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("magnet", tor->magnet()),
-            fmt::arg("error", error.message()),
-            fmt::arg("error_code", error.code())));
+        tor->error().set_local_error(
+            fmt::format(
+                fmt::runtime(_("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("magnet", tor->magnet()),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
         return false;
     }
 
@@ -716,10 +717,11 @@ void tr_torrentRemoveInSessionThread(
             ok = false;
             tor->is_deleting_ = false;
 
-            tor->error().set_local_error(fmt::format(
-                fmt::runtime(_("Couldn't remove all torrent files: {error} ({error_code})")),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            tor->error().set_local_error(
+                fmt::format(
+                    fmt::runtime(_("Couldn't remove all torrent files: {error} ({error_code})")),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
             tr_torrentStop(tor);
         }
     }
@@ -849,6 +851,7 @@ void tr_torrent::on_metainfo_updated()
     file_mtimes_.resize(file_count());
     file_priorities_ = tr_file_priorities{ &fpm_ };
     files_wanted_ = tr_files_wanted{ &fpm_ };
+    files_padded_ = tr_files_padded{ &fpm_ };
     checked_pieces_ = tr_bitfield{ size_t(piece_count()) };
 }
 
@@ -1001,11 +1004,12 @@ void tr_torrent::init(tr_ctor const& ctor)
 
         if (error)
         {
-            this->error().set_local_error(fmt::format(
-                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-                fmt::arg("path", file_path),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            this->error().set_local_error(
+                fmt::format(
+                    fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                    fmt::arg("path", file_path),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
         }
     }
 
@@ -1099,12 +1103,13 @@ void tr_torrent::set_location_in_session_thread(std::string_view const path, boo
         ok = files().move(current_dir(), path, name(), &error);
         if (error)
         {
-            this->error().set_local_error(fmt::format(
-                fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
-                fmt::arg("old_path", current_dir()),
-                fmt::arg("path", path),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            this->error().set_local_error(
+                fmt::format(
+                    fmt::runtime(_("Couldn't move '{old_path}' to '{path}': {error} ({error_code})")),
+                    fmt::arg("old_path", current_dir()),
+                    fmt::arg("path", path),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
             tr_torrentStop(this);
         }
     }
@@ -1398,16 +1403,19 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
     auto const& subpath = tor->file_subpath(file);
     auto const priority = tor->file_priorities_.file_priority(file);
     auto const wanted = tor->files_wanted_.file_wanted(file);
+    auto const padded = tor->files_padded_.file_padded(file);
     auto const length = tor->file_size(file);
     auto const [begin, end] = tor->piece_span_for_file(file);
 
     if (tor->is_seed() || length == 0)
     {
-        return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted };
+        return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted, padded };
     }
 
     auto const have = tor->completion_.count_has_bytes_in_span(tor->byte_span_for_file(file));
-    return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), begin, end, priority, wanted };
+    return {
+        subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), begin, end, priority, wanted, padded
+    };
 }
 
 size_t tr_torrentFileCount(tr_torrent const* torrent)
@@ -1745,7 +1753,7 @@ void tr_torrent::create_empty_files() const
     auto const file_count = this->file_count();
     for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
     {
-        if (file_size(file_index) != 0U || !file_is_wanted(file_index) || find_file(file_index))
+        if (file_is_padding(file_index) || file_size(file_index) != 0U || !file_is_wanted(file_index) || find_file(file_index))
         {
             continue;
         }
@@ -1990,11 +1998,12 @@ bool tr_torrent::set_announce_list(tr_announce_list announce_list)
 
     if (save_error.has_value())
     {
-        error().set_local_error(fmt::format(
-            fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", save_error.message()),
-            fmt::arg("error_code", save_error.code())));
+        error().set_local_error(
+            fmt::format(
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", save_error.message()),
+                fmt::arg("error_code", save_error.code())));
         return false;
     }
 
@@ -2085,7 +2094,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
     for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
-        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted)
+        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted || !tor->file_is_padding(i))
         {
             continue;
         }
@@ -2277,6 +2286,43 @@ void tr_torrent::refresh_current_dir()
     TR_ASSERT(dir == download_dir() || dir == incomplete_dir());
 
     current_dir_ = dir;
+}
+
+bool tr_torrent::block_is_padding(tr_block_index_t const block_index) const
+{
+    if (!has_metainfo() || block_index >= block_count())
+    {
+        tr_logAddInfoTor(this, "block not found");
+        return false; // Or handle error appropriately
+    }
+
+    auto const loc = this->block_loc(block_index);
+    uint64_t const block_len = this->block_size(block_index);
+    uint64_t bytes_checked_in_block = 0;
+
+    // Iterate through the file segments that this block covers
+    auto [file_idx, file_offset_in_current_file] = this->file_offset(loc);
+
+    while (bytes_checked_in_block < block_len && file_idx < file_count())
+    {
+        uint64_t const current_file_total_size = this->file_size(file_idx);
+        uint64_t const bytes_remaining_in_current_file = current_file_total_size - file_offset_in_current_file;
+        uint64_t const bytes_from_this_file_for_this_block = std::min(
+            block_len - bytes_checked_in_block,
+            bytes_remaining_in_current_file);
+
+        if (!this->file_is_padding(file_idx)) // Using metainfo_.file_is_padding()
+        {
+            return false; // Found a non-padding part in this block
+        }
+
+        bytes_checked_in_block += bytes_from_this_file_for_this_block;
+        file_idx++;
+        file_offset_in_current_file = 0; // Subsequent files start at offset 0
+    }
+
+    // If all segments of the block belong to padding files
+    return bytes_checked_in_block == block_len;
 }
 
 // --- RENAME
