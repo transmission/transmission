@@ -5,13 +5,14 @@
 
 #pragma once
 
+#include <bitset>
 #include <initializer_list>
 #include <type_traits>
 
 // NOLINTBEGIN(bugprone-macro-parentheses, cppcoreguidelines-macro-usage)
 
 #define DEFINE_FLAGS_OPERATORS(FlagType) \
-    constexpr inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
+    inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
     { \
         return { lhs, rhs }; \
     }
@@ -23,9 +24,10 @@ class Flags
 {
 public:
     using FlagType = T;
-    using ValueType = std::make_unsigned_t<std::underlying_type_t<FlagType>>;
+    using EnumValueType = std::make_unsigned_t<std::underlying_type_t<FlagType>>;
+    using BitsetType = std::bitset<static_cast<EnumValueType>(FlagType::N_FLAGS)>;
 
-    static_assert(std::is_enum_v<FlagType> && !std::is_convertible_v<FlagType, ValueType>);
+    static_assert(std::is_enum_v<FlagType> && !std::is_convertible_v<FlagType, BitsetType>);
 
 public:
     constexpr Flags() noexcept = default;
@@ -64,7 +66,7 @@ public:
         return (value_ & rhs.value_) != 0;
     }
 
-    constexpr void set(FlagType flag) noexcept
+    void set(FlagType flag) noexcept
     {
         value_ |= get_mask(flag);
     }
@@ -74,7 +76,7 @@ public:
         return Flags(value_ | rhs.value_);
     }
 
-    constexpr Flags& operator|=(Flags rhs) noexcept
+    Flags& operator|=(Flags rhs) noexcept
     {
         value_ |= rhs.value_;
         return *this;
@@ -86,16 +88,16 @@ public:
     }
 
 private:
-    constexpr explicit Flags(ValueType value) noexcept
+    constexpr explicit Flags(BitsetType value) noexcept
         : value_(value)
     {
     }
 
-    [[nodiscard]] static constexpr ValueType get_mask(FlagType flag) noexcept
+    [[nodiscard]] static constexpr BitsetType get_mask(FlagType flag) noexcept
     {
-        return ValueType{ 1 } << static_cast<ValueType>(flag);
+        return BitsetType{ 1 } << static_cast<EnumValueType>(flag);
     }
 
 private:
-    ValueType value_ = {};
+    BitsetType value_ = {};
 };
