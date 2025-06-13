@@ -214,6 +214,7 @@ tr_allow_compile_if(
 target_compile_definitions(${TR_NAME}
     PRIVATE
         __TRANSMISSION__
+        RAPIDJSON_HAS_STDSTRING=1
         WIDE_INTEGER_DISABLE_FLOAT_INTEROP
         WIDE_INTEGER_DISABLE_IOSTREAM
         PACKAGE_DATA_DIR="${CMAKE_INSTALL_FULL_DATAROOTDIR}"
@@ -223,6 +224,8 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
+        $<IF:$<VERSION_GREATER_EQUAL:${fmt_VERSION},11.2.0>,FMT_USE_EXCEPTIONS,FMT_EXCEPTIONS>=0
+        SMALL_DISABLE_EXCEPTIONS=1 # Workaround, perm fix at https://github.com/alandefreitas/small/pull/52
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
@@ -265,12 +268,12 @@ endif()
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
-        deflate::deflate
+        libdeflate::libdeflate
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
         natpmp::natpmp
-        miniupnpc::libminiupnpc
+        miniupnpc::miniupnpc
         dht::dht
         libutp::libutp
         libb64::libb64
@@ -291,7 +294,8 @@ target_link_libraries(${TR_NAME}
         transmission::crypto_impl
         fmt::fmt-header-only
         small::small
-        libevent::event)
+        libevent::core
+        libevent::extra)
 
 if(INSTALL_LIB)
     install(
