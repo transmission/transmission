@@ -28,7 +28,7 @@
 
 namespace
 {
-[[nodiscard]] std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
+[[nodiscard]] TR_CONSTEXPR_VEC std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
 {
     if (std::empty(blocks))
     {
@@ -39,7 +39,7 @@ namespace
     spans.reserve(std::size(blocks));
     for (auto span_begin = std::begin(blocks), end = std::end(blocks); span_begin != end;)
     {
-        static auto constexpr NotAdjacent = [](tr_block_index_t const lhs, tr_block_index_t const rhs)
+        auto constexpr NotAdjacent = [](tr_block_index_t const lhs, tr_block_index_t const rhs)
         {
             return lhs + 1U != rhs;
         };

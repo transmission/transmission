@@ -17,6 +17,18 @@
 #define TR_CONSTEXPR20
 #endif
 
+#if __cpp_lib_constexpr_vector >= 201907L
+#define TR_CONSTEXPR_VEC constexpr
+#else
+#define TR_CONSTEXPR_VEC
+#endif
+
+#if __cpp_lib_constexpr_string >= 201907L
+#define TR_CONSTEXPR_STR constexpr
+#else
+#define TR_CONSTEXPR_STR
+#endif
+
 // Placeholder for future use.
 // Can't implement right now because __cplusplus version for C++23 is currently TBD
 #define TR_CONSTEXPR23
