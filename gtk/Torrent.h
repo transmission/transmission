@@ -39,7 +39,8 @@ public:
         Gtk::TreeModelColumn<Glib::ustring> name_collated;
     };
 
-    enum class ChangeFlag : uint8_t
+    // wider type required because of bitwise operations on underlying type
+    enum class ChangeFlag : uint32_t
     {
         ACTIVE_PEER_COUNT,
         ACTIVE_PEERS_DOWN,
