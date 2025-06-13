@@ -36,10 +36,9 @@ $ tar xf transmission-4.0.6.tar.xz
 $ cd transmission-4.0.6
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
-$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-$ cd build
-$ cmake --build .
-$ sudo cmake --install .
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTS=OFF
+$ cmake --build build -j $(nproc)
+$ sudo cmake --install build
 ```
 
 ### Building Transmission from the nightly builds
@@ -48,29 +47,16 @@ Download a tarball from https://build.transmissionbt.com/job/trunk-linux/ and fo
 
 If you're new to building programs from source code, this is typically easier than building from Git.
 
-### Building Transmission from Git (first time)
+### Building Transmission from Git
 
 ```bash
 $ git clone --recurse-submodules https://github.com/transmission/transmission Transmission
 $ cd Transmission
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
-$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-$ cd build
-$ cmake --build .
-$ sudo cmake --install .
-```
-
-### Building Transmission from Git (updating)
-
-```bash
-$ cd Transmission/build
-$ cmake --build . -t clean
-$ git submodule foreach --recursive git clean -xfd
-$ git pull --rebase --prune
-$ git submodule update --init --recursive
-$ cmake --build .
-$ sudo cmake --install .
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTS=OFF
+$ cmake --build build -j $(nproc)
+$ sudo cmake --install build
 ```
 
 ## Contributing
