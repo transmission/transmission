@@ -41,29 +41,33 @@ using namespace libtransmission::Values;
 
 namespace
 {
-
 auto constexpr TimeoutSecs = std::chrono::seconds{ 30 };
 
 char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 
-auto options = std::array<tr_option, 14>{
-    { { 'd', "header", "Show only header section", "d", false, nullptr },
-      { 'i', "info", "Show only info section", "i", false, nullptr },
-      { 't', "trackers", "Show only trackers section", "t", false, nullptr },
-      { 'f', "files", "Show only file list", "f", false, nullptr },
-      { 'D', "no-header", "Do not show header section", "D", false, nullptr },
-      { 'I', "no-info", "Do not show info section", "I", false, nullptr },
-      { 'T', "no-trackers", "Do not show trackers section", "T", false, nullptr },
-      { 'F', "no-files", "Do not show files section", "F", false, nullptr },
-      { 'b', "bytes", "Show file sizes in bytes", "b", false, nullptr },
-      { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
-      { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
-      { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+using Arg = tr_option::Arg;
+auto constexpr Options = std::array<tr_option, 14>{ {
+    { 'd', "header", "Show only header section", "d", Arg::None, nullptr },
+    { 'i', "info", "Show only info section", "i", Arg::None, nullptr },
+    { 't', "trackers", "Show only trackers section", "t", Arg::None, nullptr },
+    { 'f', "files", "Show only file list", "f", Arg::None, nullptr },
+    { 'D', "no-header", "Do not show header section", "D", Arg::None, nullptr },
+    { 'I', "no-info", "Do not show info section", "I", Arg::None, nullptr },
+    { 'T', "no-trackers", "Do not show trackers section", "T", Arg::None, nullptr },
+    { 'F', "no-files", "Do not show files section", "F", Arg::None, nullptr },
+    { 'b', "bytes", "Show file sizes in bytes", "b", Arg::None, nullptr },
+    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", Arg::None, nullptr },
+    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", Arg::None, nullptr },
+    { 'u', "unsorted", "Do not sort files by name", "u", Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
+static_assert(Options[std::size(Options) - 2].val != 0);
+} // namespace
 
+namespace
+{
 struct app_opts
 {
     std::string_view filename;
@@ -83,7 +87,7 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(Usage, argc, argv, std::data(options), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -426,7 +430,7 @@ int tr_main(int argc, char* argv[])
     if (std::empty(opts.filename))
     {
         fmt::print(stderr, "ERROR: No torrent file specified.\n");
-        tr_getopt_usage(MyName, Usage, std::data(options));
+        tr_getopt_usage(MyName, Usage, std::data(Options));
         fmt::print(stderr, "\n");
         return EXIT_FAILURE;
     }
