@@ -156,6 +156,11 @@ private:
             return tr_address::from_string(session_.announceIP());
         }
 
+        [[nodiscard]] bool has_source_address(tr_address_type type) const override
+        {
+            return session_.global_source_address(type).has_value();
+        }
+
     private:
         tr_session& session_;
     };
@@ -261,6 +266,8 @@ private:
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> bind_address_V4() const override;
         [[nodiscard]] std::optional<std::string> bind_address_V6() const override;
+        [[nodiscard]] bool has_source_address_V4() const override;
+        [[nodiscard]] bool has_source_address_V6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
         [[nodiscard]] std::optional<std::string> proxyUrl() const override;
