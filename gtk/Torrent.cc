@@ -362,7 +362,7 @@ void Torrent::Impl::notify_property_changes(ChangeFlags changes) const
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 
-    static auto constexpr properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
+    static auto properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
         { Property::ICON, ChangeFlag::MIME_TYPE },
         { Property::NAME, ChangeFlag::NAME },
         { Property::PERCENT_DONE, ChangeFlag::PERCENT_DONE },
