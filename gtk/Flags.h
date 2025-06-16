@@ -5,13 +5,16 @@
 
 #pragma once
 
+#include <libtransmission/tr-macros.h>
+
+#include <bitset>
 #include <initializer_list>
 #include <type_traits>
 
 // NOLINTBEGIN(bugprone-macro-parentheses, cppcoreguidelines-macro-usage)
 
 #define DEFINE_FLAGS_OPERATORS(FlagType) \
-    constexpr inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
+    TR_CONSTEXPR23 inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
     { \
         return { lhs, rhs }; \
     }
@@ -23,20 +26,21 @@ class Flags
 {
 public:
     using FlagType = T;
-    using ValueType = std::make_unsigned_t<std::underlying_type_t<FlagType>>;
+    using EnumValueType = std::make_unsigned_t<std::underlying_type_t<FlagType>>;
+    using BitsetType = std::bitset<static_cast<EnumValueType>(FlagType::N_FLAGS)>;
 
-    static_assert(std::is_enum_v<FlagType> && !std::is_convertible_v<FlagType, ValueType>);
+    static_assert(std::is_enum_v<FlagType> && !std::is_convertible_v<FlagType, BitsetType>);
 
 public:
     constexpr Flags() noexcept = default;
 
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
-    constexpr Flags(FlagType flag) noexcept
+    TR_CONSTEXPR23 Flags(FlagType flag) noexcept
     {
         set(flag);
     }
 
-    constexpr Flags(std::initializer_list<FlagType> flags) noexcept
+    TR_CONSTEXPR23 Flags(std::initializer_list<FlagType> flags) noexcept
     {
         for (auto const flag : flags)
         {
@@ -44,58 +48,53 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr bool none() const noexcept
+    [[nodiscard]] TR_CONSTEXPR23 bool none() const noexcept
     {
-        return value_ == 0;
+        return value_.none();
     }
 
-    [[nodiscard]] constexpr bool any() const noexcept
+    [[nodiscard]] TR_CONSTEXPR23 bool any() const noexcept
     {
-        return !none();
+        return value_.any();
     }
 
-    [[nodiscard]] constexpr bool test(FlagType flag) const noexcept
+    [[nodiscard]] TR_CONSTEXPR23 bool test(FlagType flag) const noexcept
     {
-        return (value_ & get_mask(flag)) != 0;
+        return value_.test(static_cast<EnumValueType>(flag));
     }
 
-    [[nodiscard]] constexpr bool test(Flags rhs) const noexcept
+    [[nodiscard]] TR_CONSTEXPR23 bool test(Flags rhs) const noexcept
     {
-        return (value_ & rhs.value_) != 0;
+        return (value_ & rhs.value_).any();
     }
 
-    constexpr void set(FlagType flag) noexcept
+    TR_CONSTEXPR23 void set(FlagType flag) noexcept
     {
-        value_ |= get_mask(flag);
+        value_.set(static_cast<EnumValueType>(flag));
     }
 
-    [[nodiscard]] constexpr Flags operator|(Flags rhs) const noexcept
+    [[nodiscard]] TR_CONSTEXPR23 Flags operator|(Flags rhs) const noexcept
     {
         return Flags(value_ | rhs.value_);
     }
 
-    constexpr Flags& operator|=(Flags rhs) noexcept
+    TR_CONSTEXPR23 Flags& operator|=(Flags rhs) noexcept
     {
         value_ |= rhs.value_;
         return *this;
     }
 
-    [[nodiscard]] constexpr Flags operator~() const noexcept
+    [[nodiscard]] TR_CONSTEXPR23 Flags operator~() const noexcept
     {
         return Flags(~value_);
     }
 
 private:
-    constexpr explicit Flags(ValueType value) noexcept
-        : value_(value)
+    constexpr explicit Flags(BitsetType value) noexcept
+        : value_(std::move(value))
     {
-    }
-
-    [[nodiscard]] static constexpr ValueType get_mask(FlagType flag) noexcept
-    {
-        return ValueType{ 1 } << static_cast<ValueType>(flag);
     }
 
 private:
-    ValueType value_ = {};
+    BitsetType value_ = {};
 };
