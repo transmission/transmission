@@ -11,6 +11,7 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 
@@ -362,23 +363,24 @@ void Torrent::Impl::notify_property_changes(ChangeFlags changes) const
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 
-    static auto properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
-        { Property::ICON, ChangeFlag::MIME_TYPE },
-        { Property::NAME, ChangeFlag::NAME },
-        { Property::PERCENT_DONE, ChangeFlag::PERCENT_DONE },
-        { Property::SHORT_STATUS,
-          ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::FINISHED |
-              ChangeFlag::RATIO | ChangeFlag::RECHECK_PROGRESS | ChangeFlag::SPEED_DOWN | ChangeFlag::SPEED_UP },
-        { Property::LONG_PROGRESS,
-          ChangeFlag::ACTIVITY | ChangeFlag::ETA | ChangeFlag::LONG_PROGRESS | ChangeFlag::PERCENT_COMPLETE |
-              ChangeFlag::PERCENT_DONE | ChangeFlag::RATIO | ChangeFlag::TOTAL_SIZE },
-        { Property::LONG_STATUS,
-          ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE |
-              ChangeFlag::ERROR_MESSAGE | ChangeFlag::HAS_METADATA | ChangeFlag::LONG_STATUS | ChangeFlag::SPEED_DOWN |
-              ChangeFlag::SPEED_UP | ChangeFlag::STALLED },
-        { Property::SENSITIVE, ChangeFlag::ACTIVITY },
-        { Property::CSS_CLASSES, ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE },
-    } });
+    static auto TR_CONSTEXPR23
+        properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
+            { Property::ICON, ChangeFlag::MIME_TYPE },
+            { Property::NAME, ChangeFlag::NAME },
+            { Property::PERCENT_DONE, ChangeFlag::PERCENT_DONE },
+            { Property::SHORT_STATUS,
+              ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::FINISHED |
+                  ChangeFlag::RATIO | ChangeFlag::RECHECK_PROGRESS | ChangeFlag::SPEED_DOWN | ChangeFlag::SPEED_UP },
+            { Property::LONG_PROGRESS,
+              ChangeFlag::ACTIVITY | ChangeFlag::ETA | ChangeFlag::LONG_PROGRESS | ChangeFlag::PERCENT_COMPLETE |
+                  ChangeFlag::PERCENT_DONE | ChangeFlag::RATIO | ChangeFlag::TOTAL_SIZE },
+            { Property::LONG_STATUS,
+              ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE |
+                  ChangeFlag::ERROR_MESSAGE | ChangeFlag::HAS_METADATA | ChangeFlag::LONG_STATUS | ChangeFlag::SPEED_DOWN |
+                  ChangeFlag::SPEED_UP | ChangeFlag::STALLED },
+            { Property::SENSITIVE, ChangeFlag::ACTIVITY },
+            { Property::CSS_CLASSES, ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE },
+        } });
 
     auto& properties = PropertyStore::get();
 

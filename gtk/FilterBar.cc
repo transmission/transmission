@@ -13,6 +13,8 @@
 #include "TorrentFilter.h"
 #include "Utils.h"
 
+#include <libtransmission/tr-macros.h>
+
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
@@ -604,7 +606,7 @@ void FilterBar::Impl::update_count_label_idle()
 
 void FilterBar::Impl::update_filter_models(Torrent::ChangeFlags changes)
 {
-    static auto activity_flags = Torrent::ChangeFlag::ACTIVE_PEERS_DOWN | Torrent::ChangeFlag::ACTIVE_PEERS_UP |
+    static auto TR_CONSTEXPR23 activity_flags = Torrent::ChangeFlag::ACTIVE_PEERS_DOWN | Torrent::ChangeFlag::ACTIVE_PEERS_UP |
         Torrent::ChangeFlag::ACTIVE | Torrent::ChangeFlag::ACTIVITY | Torrent::ChangeFlag::ERROR_CODE |
         Torrent::ChangeFlag::FINISHED;
     static auto constexpr tracker_flags = Torrent::ChangeFlag::TRACKERS;
