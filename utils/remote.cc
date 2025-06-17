@@ -693,7 +693,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
 };
 static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
-auto constexpr DetailsKeys = std::array<tr_quark, 55>{
+auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -726,6 +726,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_peersGettingFromUs,
     TR_KEY_peersSendingToUs,
     TR_KEY_peer_limit,
+    TR_KEY_percentDone,
     TR_KEY_pieceCount,
     TR_KEY_pieceSize,
     TR_KEY_rateDownload,
@@ -968,9 +969,9 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_sizeWhenDone), j = t->value_if<int64_t>(TR_KEY_leftUntilDone); i && j)
+        if (auto d = t->value_if<double>(TR_KEY_percentDone); d)
         {
-            fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * (*i - *j) / *i));
+            fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * *d));
         }
 
         if (auto i = t->value_if<int64_t>(TR_KEY_eta); i)
