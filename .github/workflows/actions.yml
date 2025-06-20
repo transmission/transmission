@@ -71,7 +71,7 @@ jobs:
           cat "$GITHUB_OUTPUT"
 
   code-style:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     env:
@@ -90,8 +90,9 @@ jobs:
         run: |
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
-          sudo apt-get install -y clang-format-17 npm
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
+          sudo apt update
+          sudo apt install -y clang-format-20 npm
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -232,11 +233,13 @@ jobs:
       - name: Get Dependencies
         run: |
           set -ex
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
+          sudo apt update
+          sudo apt install -y --no-install-recommends \
             ca-certificates \
             clang \
-            clang-tidy \
+            clang-tidy-20 \
             cmake \
             gettext \
             libcurl4-openssl-dev \
@@ -247,8 +250,7 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            ninja-build \
-            npm
+            ninja-build
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -272,7 +274,7 @@ jobs:
           if grep 'warning:' makelog; then exit 1; fi
 
   clang-tidy-libtransmission-win32:
-    runs-on: windows-2022
+    runs-on: windows-2025
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     steps:

@@ -50,7 +50,7 @@ public:
         }
     }
 
-    void erase_if(std::function<bool(Key const&, Val const&)> test)
+    void erase_if(std::function<bool(Key const&, Val const&)> const& test)
     {
         for (auto& entry : entries_)
         {
