@@ -245,12 +245,12 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
     return len;
 }
 
-/* User-level routine. returns whether or not 'text' and 'p' matched */
-bool tr_wildmat(std::string_view text, std::string_view pattern)
+/* User-level routine. returns whether or not 'text' and 'pattern' matched */
+bool tr_wildmat(char const* text, char const* pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
+    return (pattern[0] == '*' && pattern[1] == '\0') || DoMatch(text, pattern) > 0;
 }
 
 char const* tr_strerror(int errnum)
