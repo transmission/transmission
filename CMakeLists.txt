@@ -332,6 +332,7 @@ if(ENABLE_GTK)
             giomm-2.68>=${GIOMM_MINIMUM})
         set(GTK_VERSION 4)
         set(GTK_FOUND ${GTK4_FOUND})
+        set(GTKMM_MINIMUM ${GTKMM4_MINIMUM})
     endif()
 
     if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
@@ -341,6 +342,7 @@ if(ENABLE_GTK)
             giomm-2.4>=${GIOMM_MINIMUM})
         set(GTK_VERSION 3)
         set(GTK_FOUND ${GTK3_FOUND})
+        set(GTKMM_MINIMUM ${GTKMM3_MINIMUM})
     endif()
 
     if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
@@ -378,6 +380,14 @@ if(GTK_FOUND)
     target_link_libraries(transmission::gtk_impl
         INTERFACE
             ${GTK${GTK_VERSION}_LIBRARIES})
+
+    if(GTKMM_MINIMUM MATCHES "^([0-9]+)\.([0-9]+)\.")
+        # GDK_VERSION_x_y is only defined for stable versions, i.e. even minor version numbers
+        math(EXPR GTKMM_MINIMUM_MINOR_STABLE "(${CMAKE_MATCH_2} + 1) / 2 * 2")
+        target_compile_definitions(transmission::gtk_impl
+            INTERFACE
+                GDK_VERSION_MIN_REQUIRED=GDK_VERSION_${CMAKE_MATCH_1}_${GTKMM_MINIMUM_MINOR_STABLE})
+    endif()
 endif()
 
 if(ENABLE_QT)
