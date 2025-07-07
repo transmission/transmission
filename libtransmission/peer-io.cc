@@ -18,7 +18,7 @@
 
 #include <libutp/utp.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -663,7 +663,7 @@ void tr_peerIo::on_utp_state_change(int state)
     }
     else
     {
-        tr_logAddErrorIo(this, fmt::format(_("Unknown state: {state}"), fmt::arg("state", state)));
+        tr_logAddErrorIo(this, fmt::format(fmt::runtime(_("Unknown state: {state}")), fmt::arg("state", state)));
     }
 }
 

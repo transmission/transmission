@@ -6,16 +6,16 @@
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# maboroshin, 2024
+# maboroshin, 2025
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 14:06+0000\n"
+"POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: maboroshin, 2024\n"
+"Last-Translator: maboroshin, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -827,35 +827,35 @@ msgstr "新しいブロックリストを取得中…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "不明"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "確認中…"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "開く"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "閉鎖"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "エラー"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "状態: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "状態: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2086,11 +2086,11 @@ msgstr "不明のエラー"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} 接続失敗"
 
 #: ../libtransmission/announcer-udp.cc:508
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "参照できません '{address}:{port}'  /{ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:893
 msgid "Announce error: {error} ({url})"
@@ -2137,7 +2137,7 @@ msgstr "取得できません「{path}」: {error} ({error_code})"
 
 #: ../libtransmission/ip-cache.cc:274
 msgid "Successfully updated source {protocol} address to {ip}"
-msgstr ""
+msgstr "更新成功: 元の {protocol} アドレスを {ip} へ"
 
 #: ../libtransmission/ip-cache.cc:288
 msgid "Your machine does not support {protocol}"
@@ -2145,7 +2145,7 @@ msgstr " この端末は{protocol}に未対応"
 
 #: ../libtransmission/ip-cache.cc:313
 msgid "Successfully updated global {type} address to {ip} using {url}"
-msgstr ""
+msgstr "更新成功: グローバル {type} アドレスを {ip} の {url}を利用したものへ"
 
 #: ../libtransmission/log.cc:268
 msgid "Too many messages like this! I won't log this message anymore this session."
@@ -2187,7 +2187,7 @@ msgstr "事前割り当てできません「{path}」: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "切り詰めできません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:692
+#: ../libtransmission/peer-io.cc:666
 msgid "Unknown state: {state}"
 msgstr "不明の状態: {state}"
 
@@ -2213,7 +2213,7 @@ msgstr "内部アドレスは「{address}」"
 
 #: ../libtransmission/port-forwarding-upnp.cc:298
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "ローカルのポート{local_port} は {advertised_port}に転送されません"
 
 #: ../libtransmission/port-forwarding-upnp.cc:310
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2225,7 +2225,7 @@ msgstr "以下によるポート転送中「{url}」「サービス {type}」。
 
 #: ../libtransmission/port-forwarding-upnp.cc:352
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "ローカルのポート {local_port} を {advertised_port}に転送しました"
 
 #: ../libtransmission/port-forwarding-upnp.cc:360
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2261,27 +2261,27 @@ msgstr "Unix のソケットのパスは {count} 文字以下の必要があり�
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "{host}からの要求が拒否されました (ディレクトリトラバーサル攻撃の可能性)"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "{host} からの要求が拒否されました (ブルートフォース保護が有効)"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "{host} からの要求が拒否されました (ホワイトリスト未登録のIP)"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr " {host} からの要求が拒否されました (認証失敗)"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "{host} からの要求が拒否されました (ホワイトリスト未登録のホスト)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "以下からの不明なURI {host}: '{uri}'"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2407,7 +2407,7 @@ msgstr "トレントの停止"
 
 #: ../libtransmission/torrent.cc:799
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "すべてのトレントファイルを除去できませんでした: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:865
 msgid "Removing torrent"
@@ -2435,11 +2435,11 @@ msgstr "以下を検索できませんでした「{address}:{port}」: {error} (
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "{ip_protocol} LPD を初期化できませんでした: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "IPv4ソケットを非ブロック化できませんでした {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2447,7 +2447,7 @@ msgstr "IPv4 ソケットをバインドできません {address}: {error} ({err
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "IPv6ソケットを非ブロック化できませんでした {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
@@ -2505,19 +2505,31 @@ msgstr "ディレクトリの変更を読み取りできません"
 msgid "Couldn't wait for directory changes"
 msgstr "ディレクトリの変更を待機できません"
 
-#: ../libtransmission/web.cc:185
+#: ../libtransmission/web.cc:173 ../libtransmission/web.cc:180
+msgid "Consider upgrading your curl installation."
+msgstr ""
+
+#: ../libtransmission/web.cc:175
+msgid "curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"
+msgstr ""
+
+#: ../libtransmission/web.cc:182
+msgid "curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"
+msgstr ""
+
+#: ../libtransmission/web.cc:197
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "envvar CURL_CA_BUNDLE を使いトラッカーを検証: {bundle}"
 
-#: ../libtransmission/web.cc:186
+#: ../libtransmission/web.cc:198
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "注: nssではなく、openssl か gnutls のある libcurl に対してビルドした場合のみ動作します"
 
-#: ../libtransmission/web.cc:187
+#: ../libtransmission/web.cc:199
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "注: 無効な証明書では、多くのほかのエラーのように「トラッカーに接続できません」となります"
 
-#: ../libtransmission/web.cc:463
+#: ../libtransmission/web.cc:496
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr "以下から取得できません {url} : 期待する応答コード {expected_code}、実際は {actual_code}"
 

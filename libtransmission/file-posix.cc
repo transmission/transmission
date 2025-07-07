@@ -52,7 +52,7 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -569,7 +569,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
           { TR_SYS_FILE_SEQUENTIAL, TR_SYS_FILE_SEQUENTIAL, O_SEQUENTIAL } }
     };
 
-    int native_flags = O_BINARY | O_LARGEFILE | O_CLOEXEC;
+    int native_flags = O_BINARY | O_LARGEFILE | O_CLOEXEC; // NOLINT(misc-redundant-expression)
 
     for (auto const& item : NativeMap)
     {

@@ -11,7 +11,7 @@
 
 #include <signal.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -263,7 +263,7 @@ int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 500:
-            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
+            tr_variantDictAddBool(d, TR_KEY_sequential_download, true);
             break;
 
         case TR_OPT_UNK:
@@ -450,7 +450,7 @@ int tr_main(int argc, char* argv[])
         }
 
         auto const status_str = getStatusStr(st);
-        printf("\r%-*s", TR_ARG_TUPLE(LineWidth, status_str.c_str()));
+        printf("\r%-*s", LineWidth, status_str.c_str());
 
         if (messageName[st->error])
         {

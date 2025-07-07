@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 14:06+0000\n"
+"POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2024\n"
 "Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
@@ -2351,7 +2351,7 @@ msgstr "No se pudo prereservar «{path}»: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "No se pudo truncar «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:692
+#: ../libtransmission/peer-io.cc:666
 msgid "Unknown state: {state}"
 msgstr "Estado desconocido: {state}"
 
@@ -2673,19 +2673,31 @@ msgstr "No se pudo leer cambios en el directorio"
 msgid "Couldn't wait for directory changes"
 msgstr "No se pudo esparar a cambios en el directorio"
 
-#: ../libtransmission/web.cc:185
+#: ../libtransmission/web.cc:173 ../libtransmission/web.cc:180
+msgid "Consider upgrading your curl installation."
+msgstr ""
+
+#: ../libtransmission/web.cc:175
+msgid "curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"
+msgstr ""
+
+#: ../libtransmission/web.cc:182
+msgid "curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"
+msgstr ""
+
+#: ../libtransmission/web.cc:197
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "Se verificar certificados del rastreador usando envvar CURL_CA_BUNDLE: {bundle}"
 
-#: ../libtransmission/web.cc:186
+#: ../libtransmission/web.cc:198
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: esto solo funciona si construye contra libcurl con openssl o gnutls, no nss"
 
-#: ../libtransmission/web.cc:187
+#: ../libtransmission/web.cc:199
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: certificados inválidos aparecerán como «No se pudo conectar al rastreador» como otros varios errores"
 
-#: ../libtransmission/web.cc:463
+#: ../libtransmission/web.cc:496
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr "No se pudo obtener «{url}»: código de respuesta esperado {expected_code}, obtenido {actual_code}"
 

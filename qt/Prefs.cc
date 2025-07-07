@@ -49,8 +49,10 @@ void ensureSoundCommandIsAList(tr_variant* dict)
         key,
         std::array<std::string_view, 5>{
             "canberra-gtk-play",
-            TR_ARG_TUPLE("-i", "complete-download"),
-            TR_ARG_TUPLE("-d", "transmission torrent downloaded"),
+            "-i",
+            "complete-download",
+            "-d",
+            "transmission torrent downloaded",
         });
 }
 
@@ -462,7 +464,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_main_window_width, 300);
     settings.try_emplace(TR_KEY_main_window_x, 50);
     settings.try_emplace(TR_KEY_main_window_y, 50);
-    settings.try_emplace(TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
+    settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     settings.try_emplace(TR_KEY_download_dir, download_dir);
     settings.try_emplace(TR_KEY_filter_mode, FilterMode);
     settings.try_emplace(TR_KEY_main_window_layout_order, WindowLayout);

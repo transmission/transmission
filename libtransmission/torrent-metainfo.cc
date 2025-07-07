@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -663,9 +663,9 @@ std::string tr_torrent_metainfo::make_filename(
     BasenameFormat format,
     std::string_view suffix)
 {
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    auto filename = tr_pathbuf{ dirname, '/' };
+    // `[${dirname}/]${name}.${info_hash}${suffix}`
+    // `[${dirname}/]${info_hash}${suffix}`
+    auto filename = std::empty(dirname) ? tr_pathbuf{} : tr_pathbuf{ dirname, '/' };
     if (format == BasenameFormat::Hash)
     {
         filename.append(info_hash_string);
@@ -702,7 +702,7 @@ bool tr_torrent_metainfo::migrate_file(
     {
         tr_logAddError(
             fmt::format(
-                _("Migrated torrent file from '{old_path}' to '{path}'"),
+                fmt::runtime(_("Migrated torrent file from '{old_path}' to '{path}'")),
                 fmt::arg("old_path", old_filename),
                 fmt::arg("path", new_filename)),
             name);

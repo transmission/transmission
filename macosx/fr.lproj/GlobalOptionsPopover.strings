@@ -6,7 +6,7 @@
 "23.title" = "Bande passante en transfert";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
-"26.title" = "Ko/s";
+"26.title" = "kb/s";
 
 /* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
 "43.title" = "Limiter le téléversement :";
@@ -30,4 +30,4 @@
 "130.title" = "Temps restant";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "180"; */
-"180.title" = "Ko/s";
+"180.title" = "kb/s";

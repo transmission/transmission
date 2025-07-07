@@ -19,7 +19,7 @@ using tr_quark = size_t;
  * between RPC and settings. This will be a mess and we shouldn't be
  * in a hurry to do it.
  */
-enum
+enum // NOLINT(performance-enum-size)
 {
     TR_KEY_NONE, /* represented as an empty string */
     TR_KEY_activeTorrentCount, /* rpc */
@@ -50,7 +50,7 @@ enum
     TR_KEY_availability, // rpc
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
-    TR_KEY_beginPiece,
+    TR_KEY_begin_piece,
     TR_KEY_bind_address_ipv4,
     TR_KEY_bind_address_ipv6,
     TR_KEY_bitfield,
@@ -112,7 +112,7 @@ enum
     TR_KEY_editDate,
     TR_KEY_encoding,
     TR_KEY_encryption,
-    TR_KEY_endPiece,
+    TR_KEY_end_piece,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -160,7 +160,7 @@ enum
     TR_KEY_incomplete_dir_enabled,
     TR_KEY_info,
     TR_KEY_inhibit_desktop_hibernation,
-    TR_KEY_ipProtocol,
+    TR_KEY_ip_protocol,
     TR_KEY_ipv4,
     TR_KEY_ipv6,
     TR_KEY_isBackup,
@@ -172,7 +172,6 @@ enum
     TR_KEY_isStalled,
     TR_KEY_isUTP,
     TR_KEY_isUploadingTo,
-    TR_KEY_is_queued,
     TR_KEY_labels,
     TR_KEY_lastAnnouncePeerCount,
     TR_KEY_lastAnnounceResult,
@@ -266,6 +265,7 @@ enum
     TR_KEY_private,
     TR_KEY_progress,
     TR_KEY_prompt_before_exit,
+    TR_KEY_proxy_url,
     TR_KEY_queue_move_bottom,
     TR_KEY_queue_move_down,
     TR_KEY_queue_move_top,
@@ -338,7 +338,7 @@ enum
     TR_KEY_seedRatioMode,
     TR_KEY_seederCount,
     TR_KEY_seeding_time_seconds,
-    TR_KEY_sequentialDownload,
+    TR_KEY_sequential_download,
     TR_KEY_session_count,
     TR_KEY_session_id,
     TR_KEY_sessionCount,
@@ -355,6 +355,7 @@ enum
     TR_KEY_size_units,
     TR_KEY_sizeWhenDone,
     TR_KEY_sleep_per_seconds_during_verify,
+    TR_KEY_socket_address,
     TR_KEY_sort_mode,
     TR_KEY_sort_reversed,
     TR_KEY_source,

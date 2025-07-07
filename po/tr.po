@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 14:06+0000\n"
+"POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: b83946de5835331df42b9ffcc43e6a33_05e65cd <73a30e0a984b2291d4915f37112ad292_814039>, 2023\n"
 "Language-Team: Turkish (https://app.transifex.com/transmissionbt/teams/33778/tr/)\n"
@@ -2231,7 +2231,7 @@ msgstr "'{path}' önden pay edilemedi: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "'{path}' kesilemedi: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:692
+#: ../libtransmission/peer-io.cc:666
 msgid "Unknown state: {state}"
 msgstr "Bilinmeyen durum: {state}"
 
@@ -2551,19 +2551,31 @@ msgstr "Dizin değişiklikeri okunamadı"
 msgid "Couldn't wait for directory changes"
 msgstr "Dizin değişiklikleri için beklenemedi"
 
-#: ../libtransmission/web.cc:185
+#: ../libtransmission/web.cc:173 ../libtransmission/web.cc:180
+msgid "Consider upgrading your curl installation."
+msgstr ""
+
+#: ../libtransmission/web.cc:175
+msgid "curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"
+msgstr ""
+
+#: ../libtransmission/web.cc:182
+msgid "curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"
+msgstr ""
+
+#: ../libtransmission/web.cc:197
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "envvar CURL_CA_BUNDLE kullanılarak izleyici sertifikaları doğrulanacak: {bundle}"
 
-#: ../libtransmission/web.cc:186
+#: ../libtransmission/web.cc:198
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: bu yalnızca openssl veya gnutls ile libcurl'e karşı inşa ederseniz çalışır, nss ile DEĞİL"
 
-#: ../libtransmission/web.cc:187
+#: ../libtransmission/web.cc:199
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: Geçersiz sertifikalar diğer birçok hata gibi 'İzleyiciye bağlanılamadı' olarak görülecektir"
 
-#: ../libtransmission/web.cc:463
+#: ../libtransmission/web.cc:496
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 

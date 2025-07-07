@@ -1,4 +1,6 @@
 ---
+HeaderFilterRegex: .*/qt/.*
+
 # Many of these checks are disabled only because the code hasn't been
 # cleaned up yet. Pull requests welcomed.
 Checks: >
@@ -9,6 +11,7 @@ Checks: >
   cert-*,
   clang-analyzer-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-narrowing-conversions,
@@ -38,18 +41,19 @@ Checks: >
   -readability-redundant-access-specifiers, # keep: 'private' vs 'private slots'
 
 CheckOptions:
-  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,          value: true       }
-  - { key: readability-identifier-naming.ClassCase,                value: CamelCase  }
-  - { key: readability-identifier-naming.ClassMethodCase,          value: camelBack  }
-  - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }
-  - { key: readability-identifier-naming.EnumConstantCase,         value: UPPER_CASE }
-  - { key: readability-identifier-naming.FunctionCase,             value: camelBack  }
-  - { key: readability-identifier-naming.GlobalConstantCase,       value: CamelCase  }
-  - { key: readability-identifier-naming.MemberConstantCase,       value: CamelCase  }
-  - { key: readability-identifier-naming.NamespaceCase,            value: lower_case }
-  - { key: readability-identifier-naming.PrivateMemberSuffix,      value: _          }
-  - { key: readability-identifier-naming.ProtectedMemberSuffix,    value: _          }
-  - { key: readability-identifier-naming.StaticConstantCase,       value: CamelCase  }
-  - { key: readability-identifier-naming.StructCase,               value: CamelCase  }
-  - { key: readability-identifier-naming.TemplateParameterCase,    value: CamelCase  }
-  - { key: readability-identifier-naming.VariableCase,             value: lower_case }
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,                   value: true       }
+  - { key: readability-identifier-naming.ClassCase,                         value: CamelCase  }
+  - { key: readability-identifier-naming.ClassMethodCase,                   value: camelBack  }
+  - { key: readability-identifier-naming.ConstexprVariableCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.EnumConstantCase,                  value: UPPER_CASE }
+  - { key: readability-identifier-naming.FunctionCase,                      value: camelBack  }
+  - { key: readability-identifier-naming.GlobalConstantCase,                value: CamelCase  }
+  - { key: readability-identifier-naming.MemberConstantCase,                value: CamelCase  }
+  - { key: readability-identifier-naming.NamespaceCase,                     value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,               value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,             value: _          }
+  - { key: readability-identifier-naming.StaticConstantCase,                value: CamelCase  }
+  - { key: readability-identifier-naming.StructCase,                        value: CamelCase  }
+  - { key: readability-identifier-naming.TemplateParameterCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.VariableCase,                      value: lower_case }
+  - { key: readability-implicit-bool-conversion.UseUpperCaseLiteralSuffix,  value: true       }

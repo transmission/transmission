@@ -35,7 +35,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef _WIN32
 #include "libtransmission/crypto-utils.h"
@@ -48,10 +48,6 @@
 #include "libtransmission/web-utils.h"
 
 using namespace std::literals;
-
-#if LIBCURL_VERSION_NUM >= 0x070F06 // CURLOPT_SOCKOPT* was added in 7.15.6
-#define USE_LIBCURL_SOCKOPT
-#endif
 
 // ---
 
@@ -197,8 +193,9 @@ public:
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            tr_logAddInfo(
-                fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"), fmt::arg("bundle", bundle)));
+            tr_logAddInfo(fmt::format(
+                fmt::runtime(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}")),
+                fmt::arg("bundle", bundle)));
             tr_logAddInfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
             tr_logAddInfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
@@ -497,7 +494,7 @@ public:
             if (code != NoResponseCode && code != PartialContentResponseCode)
             {
                 tr_logAddWarn(fmt::format(
-                    _("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"),
+                    fmt::runtime(_("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}")),
                     fmt::arg("url", task->url()),
                     fmt::arg("expected_code", PartialContentResponseCode),
                     fmt::arg("actual_code", code)));
@@ -526,7 +523,6 @@ public:
         return bytes_used;
     }
 
-#ifdef USE_LIBCURL_SOCKOPT
     static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
     {
         auto const* const task = static_cast<Task const*>(vtask);
@@ -547,7 +543,6 @@ public:
         // return nonzero if this function encountered an error
         return 0;
     }
-#endif
 
     void initEasy(Task& task)
     {
@@ -563,11 +558,8 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
-
-#ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);
-#endif
 
         if (!curl_ssl_verify)
         {
@@ -627,6 +619,15 @@ public:
         if (auto const& file = cookie_file; !std::empty(file))
         {
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
+        }
+
+        if (auto const& proxy_url = mediator.proxyUrl(); proxy_url)
+        {
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url->c_str());
+        }
+        else
+        {
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, nullptr);
         }
 
         if (auto const& range = task.range(); range)

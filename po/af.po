@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 14:06+0000\n"
+"POT-Creation-Date: 2025-03-09 12:32+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Gideon Wentink <gjwentink@gmail.com>, 2024\n"
 "Language-Team: Afrikaans (https://app.transifex.com/transmissionbt/teams/33778/af/)\n"
@@ -2224,7 +2224,7 @@ msgstr "Kon nie ‘{path}’‘ vooraf toewys nie: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Kon nie ‘{path}’ afknot nie: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:692
+#: ../libtransmission/peer-io.cc:666
 msgid "Unknown state: {state}"
 msgstr "Onbekende staat: {state}"
 
@@ -2544,19 +2544,31 @@ msgstr "Kon nie gidswysigings lees nie"
 msgid "Couldn't wait for directory changes"
 msgstr "Kon nie wag vir gidswysigings nie"
 
-#: ../libtransmission/web.cc:185
+#: ../libtransmission/web.cc:173 ../libtransmission/web.cc:180
+msgid "Consider upgrading your curl installation."
+msgstr ""
+
+#: ../libtransmission/web.cc:175
+msgid "curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"
+msgstr ""
+
+#: ../libtransmission/web.cc:182
+msgid "curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"
+msgstr ""
+
+#: ../libtransmission/web.cc:197
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "Sal spoordersertifikate verifieer m.b.v. envvar CURL_CA_BUNDLE: {bundle}"
 
-#: ../libtransmission/web.cc:186
+#: ../libtransmission/web.cc:198
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: dit werk slegs indien u teen libcurl bou met openssl of gnutls, NIE nss"
 
-#: ../libtransmission/web.cc:187
+#: ../libtransmission/web.cc:199
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: Ongeldige sertifikate word weergegee as ‘Kan geen verbinding maak met spoorder’ soos by talle ander foute"
 
-#: ../libtransmission/web.cc:463
+#: ../libtransmission/web.cc:496
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr "Kon nie ‘{url}’ ophaal nie: het HTTP-responskode {expected_code} verwag, het {actual_code} gekry"
 

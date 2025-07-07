@@ -24,13 +24,12 @@
 #include <event2/buffer.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
-#include <libtransmission/log.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-assert.h>
@@ -49,7 +48,7 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TR_DEFAULT_RPC_PORT };
+auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
 char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
@@ -211,7 +210,7 @@ enum
 
 // --- Command-Line Arguments
 
-auto constexpr Options = std::array<tr_option, 103>{
+auto constexpr Options = std::array<tr_option, 105>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -340,6 +339,8 @@ auto constexpr Options = std::array<tr_option, 103>{
       { 991, "no-start-paused", "Start added torrents unpaused", nullptr, false, nullptr },
       { 992, "trash-torrent", "Delete torrents after adding", nullptr, false, nullptr },
       { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, false, nullptr },
+      { 994, "sequential-download", "Download the torrent sequentially", "seq", false, nullptr },
+      { 995, "no-sequential-download", "Download the torrent sequentially", "SEQ", false, nullptr },
       { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, nullptr },
       { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, nullptr },
       { 'u',
@@ -500,6 +501,10 @@ enum
     case 'U': /* no upload speed limit */
     case 930: /* peers */
         return MODE_SESSION_SET | MODE_TORRENT_SET;
+
+    case 994: /* sequential-download */
+    case 995: /* no-sequential-download */
+        return MODE_SESSION_SET | MODE_TORRENT_SET | MODE_TORRENT_ADD;
 
     case 'r': /* remove */
     case 840: /* remove and delete */
@@ -732,7 +737,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_seedIdleLimit,
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
-    TR_KEY_sequentialDownload,
+    TR_KEY_sequential_download,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -936,7 +941,7 @@ void print_details(tr_variant::Map const& map)
             {
                 if (auto sv = it->value_if<std::string_view>(); sv)
                 {
-                    fmt::print(it == begin ? "{:s}" : ", {:s}", *sv);
+                    fmt::print("{:s}{:s}", it != begin ? ", " : "", *sv);
                 }
             }
 
@@ -958,7 +963,7 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Location: {:s}\n", *sv);
         }
 
-        if (auto b = t->value_if<bool>(TR_KEY_sequentialDownload); b)
+        if (auto b = t->value_if<bool>(TR_KEY_sequential_download); b)
         {
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
         }
@@ -1832,6 +1837,11 @@ void print_session(tr_variant::Map const& map)
         fmt::print("  Maximum memory cache size: {:s}\n", Memory{ *i, Memory::Units::MBytes }.to_string());
     }
 
+    if (auto b = args->value_if<bool>(TR_KEY_sequential_download); b)
+    {
+        fmt::print("  Sequential download: {:s}\n", *b ? "Yes" : "No");
+    }
+
     auto const alt_enabled = args->value_if<bool>(TR_KEY_alt_speed_enabled);
     auto const alt_time_enabled = args->value_if<bool>(TR_KEY_alt_speed_time_enabled);
     auto const up_enabled = args->value_if<bool>(TR_KEY_speed_limit_up_enabled);
@@ -2207,12 +2217,12 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
 
     if (auto top = tr_variant_serde::json().inplace().parse(response); !top)
     {
-        tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
+        fmt::print(stderr, "Unable to parse response '{}'\n", response);
         status |= EXIT_FAILURE;
     }
     else if (auto* map_ptr = top->get_if<tr_variant::Map>(); map_ptr == nullptr)
     {
-        tr_logAddWarn("Response was not a JSON object");
+        fmt::print(stderr, "Response was not a JSON object\n");
         status |= EXIT_FAILURE;
     }
     else if (auto osv = map_ptr->value_if<std::string_view>(TR_KEY_result); osv)
@@ -2387,7 +2397,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
     auto status = EXIT_SUCCESS;
     if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
-        tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
+        fmt::print(stderr, "Unable to send request to '{}': {}\n", rpcurl_http, curl_easy_strerror(res));
         status |= EXIT_FAILURE;
     }
     else
@@ -3105,6 +3115,36 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     }
                     list->emplace_back(optarg_sv);
                 }
+                break;
+
+            default:
+                TR_ASSERT_MSG(false, "unhandled value");
+                break;
+            }
+        }
+        else if (step_mode == (MODE_SESSION_SET | MODE_TORRENT_SET | MODE_TORRENT_ADD))
+        {
+            tr_variant::Map& args = [&]() -> tr_variant::Map&
+            {
+                if (tadd.has_value())
+                {
+                    return ensure_tadd(tadd);
+                }
+                if (!std::empty(config.torrent_ids))
+                {
+                    return ensure_tset(tset);
+                }
+                return ensure_sset(sset);
+            }();
+
+            switch (c)
+            {
+            case 994:
+                args.insert_or_assign(TR_KEY_sequential_download, true);
+                break;
+
+            case 995:
+                args.insert_or_assign(TR_KEY_sequential_download, false);
                 break;
 
             default:
