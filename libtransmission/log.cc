@@ -19,7 +19,7 @@
 #endif
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/map.hpp>
 
@@ -50,7 +50,7 @@ public:
 
     tr_log_message** queue_tail_ = &queue_;
 
-    int queue_length_ = 0;
+    size_t queue_length_ = 0;
 
     std::recursive_mutex message_mutex_;
 };
@@ -121,14 +121,14 @@ void logAddImpl(
         log_state.queue_tail_ = &newmsg->next;
         ++log_state.queue_length_;
 
-        if (log_state.queue_length_ > TR_LOG_MAX_QUEUE_LENGTH)
+        if (log_state.queue_length_ > TrLogMaxQueueLength)
         {
             tr_log_message* old = log_state.queue_;
             log_state.queue_ = old->next;
             old->next = nullptr;
             tr_logFreeQueue(old);
             --log_state.queue_length_;
-            TR_ASSERT(log_state.queue_length_ == TR_LOG_MAX_QUEUE_LENGTH);
+            TR_ASSERT(log_state.queue_length_ == TrLogMaxQueueLength);
         }
     }
     else

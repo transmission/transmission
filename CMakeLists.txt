@@ -1,8 +1,6 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
-if(POLICY CMP0092)
-    cmake_policy(SET CMP0092 NEW)
-endif()
+cmake_policy(SET CMP0092 NEW)
 if(POLICY CMP0114)
     cmake_policy(SET CMP0114 NEW)
 endif()
@@ -515,7 +513,9 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
-    TARGET natpmp::natpmp)
+    TARGET natpmp::natpmp
+    CMAKE_ARGS
+        -DBUILD_SHARED_LIBS=OFF)
 if(NOT USE_SYSTEM_NATPMP)
     target_compile_definitions(natpmp::natpmp
         INTERFACE

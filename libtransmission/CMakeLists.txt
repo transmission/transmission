@@ -3,10 +3,7 @@ include(CheckLibraryExists)
 include(CheckSymbolExists)
 
 if(ENABLE_NLS)
-    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
-    if(HAVE_LIBINTL)
-        set(LIBINTL_LIBRARY intl)
-    endif()
+    find_package(Intl)
 endif()
 
 check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
@@ -230,19 +227,13 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
-        $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
+        $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_headers(${TR_NAME}
     PRIVATE
         sys/statvfs.h
         xfs/xfs.h
         xlocale.h)
-
-if(ENABLE_NLS)
-    tr_target_compile_definitions_for_headers(${TR_NAME}
-        PRIVATE
-            libintl.h)
-endif()
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
@@ -259,17 +250,13 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         pread
         pwrite
         sendfile64
-        statvfs
-    PUBLIC
-        gettext
-        ngettext
-    REQUIRED_LIBS
-        $<$<BOOL:${HAVE_LIBINTL}>:${LIBINTL_LIBRARY}>) # gettext, ngettext
+        statvfs)
 
 target_include_directories(${TR_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..
-        ${CMAKE_CURRENT_BINARY_DIR}/..)
+        ${CMAKE_CURRENT_BINARY_DIR}/..
+        ${Intl_INCLUDE_DIRS})
 
 if(ANDROID)
     find_library(log-lib log)
@@ -287,7 +274,7 @@ target_link_libraries(${TR_NAME}
         dht::dht
         libutp::libutp
         libb64::libb64
-        ${LIBINTL_LIBRARY}
+        ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}

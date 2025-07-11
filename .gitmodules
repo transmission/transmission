@@ -9,11 +9,10 @@
 [submodule "third-party/libevent"]
 	path = third-party/libevent
 	url = https://github.com/transmission/libevent.git
-	branch = post-2.0.22-transmission
+	branch = post-2.1.12-transmission
 [submodule "third-party/libnatpmp"]
 	path = third-party/libnatpmp
 	url = https://github.com/transmission/libnatpmp.git
-	branch = post-20151025-transmission
 [submodule "third-party/libutp"]
 	path = third-party/libutp
 	url = https://github.com/transmission/libutp.git

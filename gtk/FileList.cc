@@ -32,7 +32,7 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <memory>

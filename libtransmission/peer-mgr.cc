@@ -23,7 +23,7 @@
 #include <small/map.hpp>
 #include <small/vector.hpp>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_PEER_MODULE
 #include "libtransmission/transmission.h"
@@ -468,7 +468,7 @@ public:
         tr_peer_from const from)
     {
         TR_ASSERT(socket_address.is_valid());
-        TR_ASSERT(from < TR_PEER_FROM__MAX);
+        TR_ASSERT(from < TR_PEER_FROM_N_TYPES);
 
         auto peer_info = get_existing_peer_info(socket_address);
         if (peer_info)
@@ -2585,7 +2585,7 @@ namespace connect_helpers
 
     /* Prefer peers that we got from more trusted sources.
      * lower `fromBest` values indicate more trusted sources */
-    score = addValToKey(score, 4U, peer_info.from_best()); // TODO(tearfur): use std::bit_width(TR_PEER_FROM__MAX - 1)
+    score = addValToKey(score, 4U, peer_info.from_best()); // TODO(tearfur): use std::bit_width(TR_PEER_FROM_N_TYPES - 1)
 
     /* salt */
     score = addValToKey(score, 8U, salt);

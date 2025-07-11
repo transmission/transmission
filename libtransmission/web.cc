@@ -35,7 +35,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef _WIN32
 #include "libtransmission/crypto-utils.h"
@@ -621,9 +621,13 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
         }
 
-        if (auto const& proxyUrl = mediator.proxyUrl().value_or(""); !std::empty(proxyUrl))
+        if (auto const& proxy_url = mediator.proxyUrl(); proxy_url)
         {
-            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxyUrl.data());
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url->c_str());
+        }
+        else
+        {
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, nullptr);
         }
 
         if (auto const& range = task.range(); range)
