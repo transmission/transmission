@@ -340,7 +340,7 @@ auto constexpr Options = std::array<tr_option, 105>{
       { 992, "trash-torrent", "Delete torrents after adding", nullptr, false, nullptr },
       { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, false, nullptr },
       { 994, "sequential-download", "Download the torrent sequentially", "seq", false, nullptr },
-      { 995, "no-sequential-download", "Download the torrent sequentially", "SEQ", false, nullptr },
+      { 995, "no-sequential-download", "Download the torrent normally", "SEQ", false, nullptr },
       { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, nullptr },
       { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, nullptr },
       { 'u',
