@@ -1714,10 +1714,11 @@ void torrentAdd(tr_session* session, tr_variant::Map const& args_in, DoneCb&& do
     if (isCurlURL(filename))
     {
         auto* const d = new add_torrent_idle_data{ idle_data, std::move(ctor) };
-        auto options = tr_web::FetchOptions{ filename,
-                                             [cb = std::move(done_cb)](tr_web::FetchResponse const& r)
-                                             { onMetadataFetched(r, cb); },
-                                             d };
+        auto options = tr_web::FetchOptions{
+            filename,
+            [cb = std::move(done_cb)](tr_web::FetchResponse const& r) { onMetadataFetched(r, cb); },
+            d,
+        };
         options.cookies = cookies;
         session->fetch(std::move(options));
         return;
@@ -2536,13 +2537,14 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& re
     auto const n_requests = std::size(requests);
     auto responses = std::make_shared<tr_variant::Vector>(n_requests);
     auto n_responses = std::make_shared<size_t>();
+    auto cb = std::make_shared<tr_rpc_response_func>(std::move(callback));
 
     for (size_t i = 0U; i < n_requests; ++i)
     {
         tr_rpc_request_exec_impl(
             session,
             requests[i],
-            [responses, n_requests, n_responses, i, callback](tr_session* session, tr_variant&& response)
+            [responses, n_requests, n_responses, i, cb](tr_session* session, tr_variant&& response)
             {
                 (*responses)[i] = std::move(response);
 
@@ -2555,7 +2557,7 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& re
                         [](auto const& r) { return !r.has_value(); });
                     responses->erase(it_end, std::end(*responses));
 
-                    callback(session, !std::empty(*responses) ? std::move(*responses) : tr_variant{});
+                    (*cb)(session, !std::empty(*responses) ? std::move(*responses) : tr_variant{});
                 }
             },
             true);
