@@ -49,6 +49,40 @@ cmake --build build -t transmission-qt
 ## On Unix ##
 ### Prerequisites ###
 
+#### Debian 13 / Trixie ####
+On Debian, you can build transmission with a few dependencies on top of a base installation.
+
+For building transmission-daemon you will need basic dependencies:
+```bash
+$ sudo apt install build-essential cmake git libcurl4-openssl-dev
+```
+These packages are not mandatory for a working binary. Transmission brings its own libraries if they aren't installed, except for `libsystemd-dev`.
+```bash
+$ sudo apt install libb64-dev libdeflate-dev libevent-dev libminiupnpc-dev libnatpmp-dev libsystemd-dev
+```
+
+You likely want to install transmission as a native GUI application.
+There are two options, GTK and Qt.
+
+GTK 3 client:
+```bash
+$ sudo apt install gettext libgtkmm-3.0-dev
+```
+GTK 4 client:
+```bash
+$ sudo apt install gettext libgtkmm-4.0-dev
+```
+Qt5 client:
+```bash
+$ sudo apt install libqt5svg5-dev qttools5-dev
+```
+Qt6 client:
+```bash
+$ sudo apt install qt6-svg-dev qt6-tools-dev
+```
+
+Then you can begin [building.](#building-transmission-from-git-first-time)
+
 #### Debian 12 / Bookworm ####
 On Debian, you can build transmission with a few dependencies on top of a base installation.
 
