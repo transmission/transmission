@@ -114,27 +114,6 @@ $ sudo apt install qt6-svg-dev qt6-tools-dev
 
 Then you can begin [building.](#building-transmission-from-git-first-time)
 
-#### Debian 11 / Bullseye ####
-On Debian, you can build transmission with a few dependencies on top of a base installation.
-
-For building transmission-daemon you will need basic dependencies
-```bash
-$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev python3
-```
-You likely want to install transmission as a native GUI application. There are two options, GTK and Qt.
-
-For GTK 3 client, two additional packages are required
-```bash
-$ sudo apt install libgtkmm-3.0-dev gettext
-```
-
-For Qt client, one additional package is needed on top of basic dependencies
-```bash
-$ sudo apt install qttools5-dev
-```
-
-Then you can begin [building.](#building-transmission-from-git-first-time)
-
 #### Ubuntu ####
 On Ubuntu, you can install the required development tools for GTK with this command:
 
