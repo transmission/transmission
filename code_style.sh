@@ -40,8 +40,8 @@ find_cfiles() {
        ! \( $(get_find_path_args $(trim_comments .clang-format-ignore)) \) "$@"
 }
 
-# We're targeting clang-format version 17 and other versions give slightly
-# different results, so prefer `clang-format-17` if it's installed.
+# We're targeting clang-format version 17 and other versions give
+# different results, so only accept `clang-format-17` if it's installed.
 clang_format_exe_names=(
   'clang-format-17'
   'clang-format'
@@ -53,16 +53,33 @@ for name in ${clang_format_exe_names[@]}; do
     break
   fi
 done
-if [ -z "${clang_format_exe}" ]; then
-  echo "error: clang-format not found";
-  exit 1;
-fi
 
 # format C/C++
-clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
-if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
-  [ -n "$fix" ] || echo 'C/C++ code needs formatting'
+if [ -z "${clang_format_exe}" ]; then
+  echo "error: clang-format not found"
   exitcode=1
+else
+  case `${clang_format_exe} --version` in
+    *" 17."*)
+      # That's the version that we want.
+      clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
+      if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
+        [ -n "$fix" ] || echo 'C/C++ code needs formatting'
+        exitcode=1
+      fi
+      ;;
+    *" 1."*|*" 2."*|*" 3."*|*" 4."*|*" 5."*|*" 6."*|*" 7."*|*" 8."*|*" 9."*|*" 10."*|*" 11."*|*" 12."*|*" 13."*|*" 14."*|*" 15."*|*" 16."*)
+      echo "error: clang-format version outdated"
+      exitcode=1
+      ;;
+    *)
+      # We ignore newer versions except for CI for which it's an error.
+      echo "error: clang-format version unsupported"
+      if [ -n "${CI}" ]; then
+        exitcode=1
+      fi
+      ;;
+  esac
 fi
 
 # format Xcodeproj
