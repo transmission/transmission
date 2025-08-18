@@ -1,3 +1,6 @@
+/// IMPORTS
+@import '../../node_modules/clusterize.js/clusterize.css';
+
 /// MIXINS
 
 @mixin viewport-small {
@@ -490,6 +493,12 @@ a {
   overflow: auto;
   padding: 0;
   right: 0;
+  
+  // Override clusterize default max-height
+  &.clusterize-scroll {
+    max-height: none;
+    height: 100%;
+  }
 }
 
 #torrent-list {
