@@ -367,6 +367,7 @@ export class Transmission extends EventTarget {
   _initializeClusterize() {
     // Initialize clusterize.js for virtual scrolling
     this.clusterize = new Clusterize({
+      blocks_in_cluster: 6, // Increase from default 4 for better scrolling
       callbacks: {
         clusterChanged: () => {
           // Update selections on newly rendered rows
@@ -377,6 +378,7 @@ export class Transmission extends EventTarget {
       no_data_class: 'clusterize-no-data',
       no_data_text: 'No torrents',
       rows: ['<li class="clusterize-no-data">Loading torrents...</li>'],
+      rows_in_block: 50, // Keep default but make explicit
       scrollId: 'torrent-container',
       show_no_data_row: true,
       tag: 'li',
@@ -1322,6 +1324,13 @@ TODO: fix this when notifications get fixed
       this.clusterize.update(['<li class="clusterize-no-data">No torrents</li>']);
     } else {
       this.clusterize.update(rowsHTML);
+    }
+
+    // Force refresh to recalculate row heights for large lists
+    if (rowsHTML.length > 1000) {
+      setTimeout(() => {
+        this.clusterize.refresh(true);
+      }, 50);
     }
 
     // Clear dirty torrents set
