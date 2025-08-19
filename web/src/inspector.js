@@ -28,7 +28,7 @@ export class Inspector extends EventTarget {
     this.current_page = this.elements.info.root;
     this.interval = setInterval(this._refreshTorrents.bind(this), 3000);
     this.name = 'inspector';
-    this.selection_listener = (event_) => this._setTorrents(event_.selected);
+    this.selection_listener = (event_) => this._setTorrents(event_.selected, true);
     this.torrent_listener = () => this._updateCurrentPage();
     this.torrents = [];
     this.file_torrent = null;
@@ -202,8 +202,8 @@ export class Inspector extends EventTarget {
       t.addEventListener(key, callback);
     }
 
-    // On initial load, fetch detailed torrent data immediately
-    // Otherwise, only update the display (interval handles data refresh)
+    // Fetch detailed data immediately when requested
+    // (initial load or selection changes)
     if (isInitialLoad) {
       this._refreshTorrents();
     }
