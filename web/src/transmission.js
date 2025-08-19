@@ -81,8 +81,8 @@ export class Transmission extends EventTarget {
     this.clusterize = null; // Will be initialized later
 
     this.changeStatus = false;
-    this.refilterSoon = debounce(() => this._refilter(false));
-    this.refilterAllSoon = debounce(() => this._refilter(true));
+    this.refilterSoon = debounce(() => this._refilter());
+    this.refilterAllSoon = debounce(() => this._refilter());
 
     this.pointer_device = Object.seal({
       is_touch_device: 'ontouchstart' in globalThis,
@@ -1343,9 +1343,6 @@ TODO: fix this when notifications get fixed
     setTimeout(() => {
       this._updateVisibleSelections();
     }, 0);
-
-    // Dispatch selection changed event
-    this._dispatchSelectionChanged();
   }
 
   setFilterTracker(sitename) {
