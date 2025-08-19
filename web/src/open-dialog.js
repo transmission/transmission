@@ -187,9 +187,43 @@ export class OpenDialog extends EventTarget {
     input = document.createElement('input');
     input.type = 'text';
     input.id = 'add-dialog-folder-input';
+    input.setAttribute('list', 'add-dialog-folder-datalist');
     input.addEventListener('change', () => this._updateFreeSpaceInAddDialog());
     input.value = this.controller.session_properties.download_dir;
     workarea.append(input);
+
+    const datalist = document.createElement('datalist');
+    datalist.id = 'add-dialog-folder-datalist';
+    const rebuildDatalist = () => {
+      while (datalist.firstChild) {
+        datalist.removeChild(datalist.firstChild);
+      }
+      const dirs = new Set();
+      let torrents = this.controller._getAllTorrents();
+      torrents = torrents.slice().sort((a, b) => b.getDateAdded() - a.getDateAdded());
+      for (const torrent of torrents) {
+        const dir = torrent.getDownloadDir();
+        if (dir && dir.trim().length > 0) {
+          dirs.add(dir);
+        }
+        if (dirs.size >= 250) { // do not explode the ui
+          break;
+        }
+      }
+      for (const dir of dirs) {
+        const option = document.createElement('option');
+        option.value = dir;
+        datalist.append(option);
+      }
+    };
+    const clearDatalist = () => {
+      while (datalist.firstChild) {
+        datalist.removeChild(datalist.firstChild);
+      }
+    };
+    input.addEventListener('focus', rebuildDatalist);
+    input.addEventListener('blur', clearDatalist)
+    workarea.append(datalist);
     elements.folder_input = input;
 
     const checkarea = document.createElement('div');
