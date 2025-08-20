@@ -1304,7 +1304,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // peer id encoding.
     if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
     {
-        set_user_agent(tr_interned_string{ tr_strv_replace_invalid(sv) });
+        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(sv) });
     }
 
     /* get peer's listening port */
