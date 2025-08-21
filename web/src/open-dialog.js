@@ -206,7 +206,7 @@ export class OpenDialog extends EventTarget {
         if (dir && dir.trim().length > 0) {
           dirs.add(dir);
         }
-        if (dirs.size >= 250) { // do not explode the ui
+        if (dirs.size >= 100) { // do not explode the ui
           break;
         }
       }
