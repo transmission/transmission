@@ -4935,7 +4935,7 @@
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DFORCE_BUILTIN_LIST=1",
+					"-DENABLE_BUILTIN=1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4950,7 +4950,7 @@
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DFORCE_BUILTIN_LIST=1",
+					"-DENABLE_BUILTIN=1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4965,7 +4965,7 @@
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DFORCE_BUILTIN_LIST=1",
+					"-DENABLE_BUILTIN=1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
