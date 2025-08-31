@@ -11,12 +11,19 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include <iostream>
 #include <iterator> // std::back_inserter
 #include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -45,7 +52,9 @@ namespace
 auto constexpr TimeoutSecs = std::chrono::seconds{ 30 };
 
 char constexpr MyName[] = "transmission-show";
-char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
+char constexpr Usage
+    [] = "Usage: transmission-show [options] [torrent-file]\n"
+         "If torrent-file is not specified or is \"-\", piped standard input is read.";
 
 auto options = std::array<tr_option, 14>{
     { { 'd', "header", "Show only header section", "d", false, nullptr },
@@ -422,22 +431,53 @@ int tr_main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    /* make sure the user specified a filename */
-    if (std::empty(opts.filename))
-    {
-        fmt::print(stderr, "ERROR: No torrent file specified.\n");
-        tr_getopt_usage(MyName, Usage, std::data(options));
-        fmt::print(stderr, "\n");
-        return EXIT_FAILURE;
-    }
-
-    /* try to parse the torrent file */
     auto metainfo = tr_torrent_metainfo{};
     auto error = tr_error{};
-    auto const parsed = metainfo.parse_torrent_file(opts.filename, nullptr, &error);
+    bool parsed = false;
+    auto const is_stdin = std::empty(opts.filename) || opts.filename == "-";
+
+    if (is_stdin)
+    {
+#ifdef _WIN32
+        if (_isatty(_fileno(stdin)))
+#else
+        if (isatty(fileno(stdin)))
+#endif
+        {
+            fmt::print("ERROR: input file must be piped if reading from standard input.\n");
+            tr_getopt_usage(MyName, Usage, std::data(options));
+            fmt::print(stderr, "\n");
+            return EXIT_FAILURE;
+        }
+        std::vector<char> buffer;
+        char byte;
+        while (std::cin.get(byte))
+        {
+            buffer.push_back(byte);
+        }
+        parsed = metainfo.parse_benc({ std::data(buffer), std::size(buffer) }, &error);
+    }
+
+    else
+    {
+        parsed = metainfo.parse_torrent_file(opts.filename, nullptr, &error);
+    }
+
     if (error)
     {
-        fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error.message(), error.code());
+        if (is_stdin)
+        {
+            fmt::print(stderr, "Error parsing torrent file : {:s} ({:d})\n", error.message(), error.code());
+        }
+        else
+        {
+            fmt::print(
+                stderr,
+                "Error parsing torrent file '{:s}': {:s} ({:d})\n",
+                opts.filename,
+                error.message(),
+                error.code());
+        }
     }
     if (!parsed)
     {
@@ -453,7 +493,10 @@ int tr_main(int argc, char* argv[])
         if (opts.print_header)
         {
             fmt::print("Name: {:s}\n", metainfo.name());
-            fmt::print("File: {:s}\n", opts.filename);
+            if (!is_stdin)
+            {
+                fmt::print("File: {:s}\n", opts.filename);
+            }
             fmt::print("\n");
             fflush(stdout);
         }
