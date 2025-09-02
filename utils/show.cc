@@ -444,13 +444,20 @@ int tr_main(int argc, char* argv[])
         if (isatty(fileno(stdin)))
 #endif
         {
-            fmt::print("ERROR: input file must be piped if reading from standard input.\n");
+            fmt::print(stderr, "ERROR: input file must be piped if reading from standard input.\n");
             tr_getopt_usage(MyName, Usage, std::data(options));
             fmt::print(stderr, "\n");
             return EXIT_FAILURE;
         }
         std::vector<char> buffer;
         char byte;
+#ifdef _WIN32
+        if (_setmode(_fileno(stdin), _O_BINARY) == -1)
+        {
+            fmt::print(stderr, "ERROR: cannot set standard input to binary mode.\n");
+            return EXIT_FAILURE;
+        }
+#endif
         while (std::cin.get(byte))
         {
             buffer.push_back(byte);
@@ -467,7 +474,7 @@ int tr_main(int argc, char* argv[])
     {
         if (is_stdin)
         {
-            fmt::print(stderr, "Error parsing torrent file : {:s} ({:d})\n", error.message(), error.code());
+            fmt::print(stderr, "Error parsing torrent file: {:s} ({:d})\n", error.message(), error.code());
         }
         else
         {
