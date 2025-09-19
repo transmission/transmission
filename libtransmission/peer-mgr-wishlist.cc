@@ -39,12 +39,8 @@ namespace
             return lhs + 1U != rhs;
         };
 
-        auto span_end = std::adjacent_find(span_begin, end, NotAdjacent);
-        if (span_end == end)
-        {
-            --span_end;
-        }
-        spans.push_back({ *span_begin, *span_end + 1 });
+        auto const span_end = std::min(std::adjacent_find(span_begin, end, NotAdjacent), std::prev(end));
+        spans.push_back({ *span_begin, *span_end + 1U });
 
         span_begin = std::next(span_end);
     }
@@ -63,12 +59,11 @@ class Wishlist::Impl
             , replication{ mediator->count_piece_replication(piece_in) }
             , priority{ mediator->priority(piece_in) }
             , salt{ salt_in }
-            , mediator_{ mediator }
         {
             unrequested.reserve(block_span.end - block_span.begin);
             for (auto [block, end] = block_span; block < end; ++block)
             {
-                if (!mediator_->client_has_block(block))
+                if (!mediator->client_has_block(block))
                 {
                     unrequested.insert(block);
                 }
@@ -102,9 +97,6 @@ class Wishlist::Impl
         tr_priority_t priority;
 
         tr_piece_index_t salt;
-
-    private:
-        Mediator const* mediator_;
     };
 
     using CandidateVec = std::vector<Candidate>;
