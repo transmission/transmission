@@ -28,16 +28,12 @@ struct tr_peer;
 class Wishlist
 {
 public:
-    static auto constexpr EndgameMaxPeers = size_t{ 2U };
-    static auto constexpr NormalMaxPeers = size_t{ 1U };
-
     struct Mediator
     {
         [[nodiscard]] virtual bool client_has_block(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool client_has_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool client_wants_piece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool is_sequential_download() const = 0;
-        [[nodiscard]] virtual uint8_t count_active_requests(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual size_t count_piece_replication(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_block_span_t block_span(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_piece_index_t piece_count() const = 0;
@@ -51,8 +47,6 @@ public:
             libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_bitfield(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
-        [[nodiscard]] virtual libtransmission::ObserverTag observe_got_block(
-            libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_choke(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&>::Observer observer) = 0;
         [[nodiscard]] virtual libtransmission::ObserverTag observe_got_have(
@@ -82,8 +76,7 @@ public:
     // the next blocks that we should request from a peer
     [[nodiscard]] std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
-        std::function<bool(tr_piece_index_t)> const& peer_has_piece,
-        std::function<bool(tr_block_index_t)> const& has_active_pending_to_peer);
+        std::function<bool(tr_piece_index_t)> const& peer_has_piece);
 
 private:
     class Impl;
