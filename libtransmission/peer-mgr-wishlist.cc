@@ -383,6 +383,52 @@ private:
         std::sort(std::begin(candidates_), std::end(candidates_));
     }
 
+    // ---
+
+    void recalculate_wanted_pieces()
+    {
+        if (candidates_dirty_)
+        {
+            return;
+        }
+
+        auto n_old_c = std::size(candidates_);
+        auto salter = tr_salt_shaker<tr_piece_index_t>{};
+        auto const is_sequential = mediator_.is_sequential_download();
+        auto const n_pieces = mediator_.piece_count();
+
+        std::sort(
+            std::begin(candidates_),
+            std::end(candidates_),
+            [](auto const& lhs, auto const& rhs) { return lhs.piece < rhs.piece; });
+
+        for (tr_piece_index_t piece = 0U, idx_c = 0U; piece < n_pieces; ++piece)
+        {
+            auto const existing_candidate = idx_c < n_old_c && piece == candidates_[idx_c].piece;
+            if (mediator_.client_wants_piece(piece))
+            {
+                if (existing_candidate)
+                {
+                    ++idx_c;
+                }
+                else
+                {
+                    auto const salt = get_salt(piece, n_pieces, salter(), is_sequential);
+                    candidates_.emplace_back(piece, salt, &mediator_);
+                }
+            }
+            else if (existing_candidate)
+            {
+                candidates_.erase(std::next(std::begin(candidates_), idx_c));
+                --n_old_c;
+            }
+        }
+
+        std::sort(std::begin(candidates_), std::end(candidates_));
+    }
+
+    // ---
+
     TR_CONSTEXPR20 void remove_piece(tr_piece_index_t const piece)
     {
         if (candidates_dirty_)
@@ -423,13 +469,15 @@ private:
     bool candidates_dirty_ = true;
     bool is_endgame_ = false;
 
-    std::array<libtransmission::ObserverTag, 13U> const tags_;
+    std::array<libtransmission::ObserverTag, 14U> const tags_;
 
     Mediator& mediator_;
 };
 
 Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
+          mediator_in.observe_files_wanted_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool)
+                                                   { recalculate_wanted_pieces(); }),
           mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b, tr_bitfield const& ar)
                                               { peer_disconnect(b, ar); }),
           mediator_in.observe_got_bad_piece([this](tr_torrent*, tr_piece_index_t) { set_candidates_dirty(); }),

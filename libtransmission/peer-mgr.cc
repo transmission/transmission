@@ -321,6 +321,9 @@ public:
         [[nodiscard]] tr_piece_index_t piece_count() const override;
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override;
 
+        [[nodiscard]] libtransmission::ObserverTag observe_files_wanted_changed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
+            override;
         [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_got_bad_piece(
@@ -984,6 +987,12 @@ tr_piece_index_t tr_swarm::WishlistMediator::piece_count() const
 tr_priority_t tr_swarm::WishlistMediator::priority(tr_piece_index_t piece) const
 {
     return tor_.piece_priority(piece);
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_files_wanted_changed(
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
+{
+    return tor_.files_wanted_changed_.observe(std::move(observer));
 }
 
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_peer_disconnect(
