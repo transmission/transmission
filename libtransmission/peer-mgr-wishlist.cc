@@ -61,9 +61,9 @@ class Wishlist::Impl
             , salt{ salt_in }
         {
             unrequested.reserve(block_span.end - block_span.begin);
-            for (auto [block, end] = block_span; block < end; ++block)
+            for (auto [begin, i] = block_span; i > begin; --i)
             {
-                if (!mediator->client_has_block(block))
+                if (auto const block = i - 1U; !mediator->client_has_block(block))
                 {
                     unrequested.insert(block);
                 }
@@ -85,7 +85,9 @@ class Wishlist::Impl
         tr_piece_index_t piece;
         tr_block_span_t block_span;
 
-        small::set<tr_block_index_t> unrequested;
+        // This is sorted in reverse order so that smaller blocks indices
+        // can be taken from the end of the list, avoiding a move operation.
+        small::set<tr_block_index_t, small::default_inline_storage_v<tr_block_index_t>, std::greater<>> unrequested;
 
         // Caching the following 2 values are highly beneficial, because:
         // - they are often used (mainly because resort_piece() is called
@@ -191,11 +193,11 @@ private:
 
             auto& unreq = it_p->unrequested;
 
-            auto it_b_begin = std::begin(unreq);
-            it_b_begin = *it_b_begin >= block_span.begin ? it_b_begin : unreq.lower_bound(block_span.begin);
-
             auto it_b_end = std::end(unreq);
-            it_b_end = *std::prev(it_b_end) < block_span.end ? it_b_end : unreq.lower_bound(block_span.end);
+            it_b_end = *std::prev(it_b_end) >= block_span.begin ? it_b_end : unreq.upper_bound(block_span.begin);
+
+            auto it_b_begin = std::begin(unreq);
+            it_b_begin = *it_b_begin < block_span.end ? it_b_begin : unreq.upper_bound(block_span.end);
 
             unreq.erase(it_b_begin, it_b_end);
 
@@ -218,9 +220,9 @@ private:
     {
         for (auto& candidate : candidates_)
         {
-            for (auto [block, end] = candidate.block_span; block < end; ++block)
+            for (auto [begin, i] = candidate.block_span; i > begin; --i)
             {
-                if (requests.test(block))
+                if (auto const block = i - 1U; requests.test(block))
                 {
                     candidate.unrequested.insert(block);
                 }
@@ -244,9 +246,9 @@ private:
     {
         if (auto iter = find_by_piece(piece); iter != std::end(candidates_))
         {
-            for (auto [block, end] = iter->block_span; block < end; ++block)
+            for (auto [begin, i] = iter->block_span; i > begin; --i)
             {
-                iter->unrequested.insert(block);
+                iter->unrequested.insert(i - 1U);
             }
             resort_piece(iter);
         }
@@ -475,14 +477,14 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // walk the blocks in this piece that we don't have or not requested
-        for (auto const& block : candidate.unrequested)
+        for (auto it = std::rbegin(candidate.unrequested), end = std::rend(candidate.unrequested); it != end; ++it)
         {
             if (std::size(blocks) >= n_wanted_blocks)
             {
                 break;
             }
 
-            blocks.emplace_back(block);
+            blocks.emplace_back(*it);
         }
     }
 
