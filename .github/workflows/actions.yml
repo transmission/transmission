@@ -532,12 +532,18 @@ jobs:
 
   windows:
     needs: [ what-to-make ]
-    runs-on: windows-2022
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        arch: [x64, x86]
+      matrix:        
+        include:
+          - arch: x64
+            runner: windows-2022
+          - arch: arm64
+            runner: windows-11-arm
+    runs-on: ${{ matrix.runner }}
+    env:
+      qt_version: "6.8.2"
     steps:
       - name: Show Configuration
         run: |
@@ -548,6 +554,30 @@ jobs:
         with:
           path: src
           submodules: recursive
+      - name: Setup MSVC devcmd
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch == 'arm64' && 'arm64' || 'amd64' }}
+      - name: Install Qt (Windows x64 version)
+        if: matrix.arch == 'x64'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "${{ env.qt_version }}"
+          host: 'windows'
+          arch: 'win64_msvc2022_64'
+          archives: 'qtbase qttools qttranslations qtsvg'
+          set-env: true
+          add-tools-to-path: true
+      - name: Install Qt (Windows arm64 version)
+        if: matrix.arch == 'arm64'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "${{ env.qt_version }}"
+          host: 'windows_arm64'
+          arch: 'win64_msvc2022_arm64'
+          archives: 'qtbase qttools qttranslations qtsvg'
+          set-env: true
+          add-tools-to-path: true
       - name: Prepare Build Deps
         uses: ./src/.github/actions/prepare-deps-win32
         with:
@@ -555,14 +585,13 @@ jobs:
           type: Deps
       - name: Configure
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake `
             -S src `
             -B obj `
             -G Ninja `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DCMAKE_INSTALL_PREFIX=pfx `
-            -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
+            -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX};${env:QT_ROOT_DIR}" `
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_GTK=OFF `
@@ -572,13 +601,12 @@ jobs:
             -DENABLE_UTILS=ON `
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF `
       - name: Make
         run: |
-          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true'}}
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install

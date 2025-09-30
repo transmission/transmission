@@ -15,14 +15,20 @@ runs:
         $DepsPrefix = (Join-Path (Get-Item .).Root.Name "${{ inputs.arch }}-prefix")
         "DEPS_PREFIX=${DepsPrefix}" | Out-File $Env:GITHUB_ENV -Append
         (Join-Path $DepsPrefix bin) | Out-File $Env:GITHUB_PATH -Append
-
         choco install `
           jom `
-          nasm `
-          nodejs
+          nasm 
         & "C:\Program Files\OpenSSL\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- | Out-Host
         (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
-        (Join-Path (Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*")[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
+        $WixPath = Get-Item -Path "${Env:ProgramFiles(x86)}\WiX Toolset v3.*" -ErrorAction SilentlyContinue
+        if ($WixPath) {
+          (Join-Path $WixPath[0].FullName bin) | Out-File $Env:GITHUB_PATH -Append
+        } else {
+          Write-Host "WiX Toolset not found, downloading and installing manually..."
+          Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
+          Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:/wix"
+          "C:\wix" | Out-File $Env:GITHUB_PATH -Append
+        }
 
         Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
     - name: Get Cache Key

@@ -6,7 +6,7 @@ Param(
     [string] $Mode,
 
     [Parameter(Mandatory=$true)]
-    [ValidateSet('x86', 'x64')]
+    [ValidateSet('x86', 'x64', 'arm64')]
     [string] $BuildArch,
 
     [Parameter()]
@@ -272,7 +272,6 @@ if ($Mode -eq 'DepsHash') {
         $Names = $Names + @(
             Invoke-Build Expat -CacheArchiveNameOnly
             Invoke-Build DBus -CacheArchiveNameOnly
-            Invoke-Build Qt$UseQtVersion -CacheArchiveNameOnly
         )
     }
 
@@ -303,7 +302,6 @@ if ($Mode -eq 'Build') {
     if (@('All', 'Deps') -contains $BuildPart) {
         Invoke-Build Expat
         Invoke-Build DBus
-        Invoke-Build Qt$UseQtVersion
     }
 
     if (@('All', 'App') -contains $CCachePart) {
