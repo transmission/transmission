@@ -134,9 +134,8 @@
       </Directory>
 
       <Directory Id="QTSTYLESDIR" Name="styles">
-        <?if $(var.QtMajorVer) = 5 or ($(var.QtMajorVer) = 6 and $(var.QtMinorVer) < 7) ?>
-        <Component Id="dll.qt.plugins.styles.windowsvista">
-          <File DiskId="1" KeyPath="yes" Name="qwindowsvistastyle.dll" />
+        <Component Id="dll.qt.plugins.styles.modernwindows">
+          <File DiskId="1" KeyPath="yes" Name="qmodernwindowsstyle.dll" />
         </Component>
         <?else ?>
         <Component Id="dll.qt.plugins.styles.modernwindows">
