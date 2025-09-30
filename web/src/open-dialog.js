@@ -199,7 +199,7 @@ export class OpenDialog extends EventTarget {
         datalist.removeChild(datalist.firstChild);
       }
       const dirs = new Set();
-      let torrents = this.controller._getAllTorrents();
+      let torrents = this.controller._getFilteredTorrents();
       torrents = torrents.slice().sort((a, b) => b.getDateAdded() - a.getDateAdded());
       for (const torrent of torrents) {
         const dir = torrent.getDownloadDir();
