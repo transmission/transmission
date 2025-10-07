@@ -31,11 +31,38 @@ export class OpenDialog extends EventTarget {
     }
     this._updateFreeSpaceInAddDialog();
     this.elements.url_input.focus();
+
+    // Bind paste event listener
+    this._boundPasteHandler = (e) => this._onPaste(e);
+    document.addEventListener('paste', this._boundPasteHandler);
+
+    // Bind drag-and-drop listeners
+    this._boundDragOverHandler = (e) => this._onDragOver(e);
+    this._boundDragLeaveHandler = (e) => this._onDragLeave(e);
+    this._boundDropHandler = (e) => this._onDrop(e);
+
+    const { root } = this.elements;
+    root.addEventListener('dragover', this._boundDragOverHandler);
+    root.addEventListener('dragleave', this._boundDragLeaveHandler);
+    root.addEventListener('drop', this._boundDropHandler);
   }
 
   close() {
     if (!this.closed) {
       clearInterval(this.interval);
+
+      // Clean up paste event listener
+      if (this._boundPasteHandler) {
+        document.removeEventListener('paste', this._boundPasteHandler);
+      }
+
+      // Clean up drag-and-drop listeners
+      if (this._boundDragOverHandler) {
+        const { root } = this.elements;
+        root.removeEventListener('dragover', this._boundDragOverHandler);
+        root.removeEventListener('dragleave', this._boundDragLeaveHandler);
+        root.removeEventListener('drop', this._boundDropHandler);
+      }
 
       this.elements.root.remove();
       this.dispatchEvent(new Event('close'));
@@ -131,6 +158,73 @@ export class OpenDialog extends EventTarget {
     }
 
     this._onDismiss();
+  }
+
+  _onPaste(event) {
+    const files = [...event.clipboardData.files];
+
+    // Allow text paste in url_input
+    if (event.target === this.elements.url_input && files.length === 0) {
+      return; // Allow default text paste behavior
+    }
+
+    // Check for .torrent files
+    const torrentFiles = files.filter(
+      (f) =>
+        f.name.endsWith('.torrent') || f.type === 'application/x-bittorrent',
+    );
+
+    if (torrentFiles.length > 0) {
+      event.preventDefault();
+      this._addFilesToInput(torrentFiles);
+    }
+  }
+
+  _addFilesToInput(filesArray) {
+    const dt = new DataTransfer();
+
+    // Add existing files first (preserve them)
+    for (const file of this.elements.file_input.files) {
+      dt.items.add(file);
+    }
+
+    // Add new files
+    for (const file of filesArray) {
+      dt.items.add(file);
+    }
+
+    this.elements.file_input.files = dt.files;
+  }
+
+  _onDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.elements.root.classList.add('drag-over');
+  }
+
+  _onDragLeave(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    // Only remove if leaving the root element entirely
+    if (event.target === this.elements.root) {
+      this.elements.root.classList.remove('drag-over');
+    }
+  }
+
+  _onDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.elements.root.classList.remove('drag-over');
+
+    const files = [...event.dataTransfer.files];
+    const torrentFiles = files.filter(
+      (f) =>
+        f.name.endsWith('.torrent') || f.type === 'application/x-bittorrent',
+    );
+
+    if (torrentFiles.length > 0) {
+      this._addFilesToInput(torrentFiles);
+    }
   }
 
   _create(url) {
