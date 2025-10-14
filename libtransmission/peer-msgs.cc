@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/vector.hpp>
 
@@ -1179,7 +1179,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // you as. i.e. this is the receiver's external ip address (no port is included).
     // This may be either an IPv4 (4 bytes) or an IPv6 (16 bytes) address.
     {
-        auto buf = std::array<std::byte, TR_ADDRSTRLEN>{};
+        auto buf = std::array<std::byte, TrAddrStrlen>{};
         auto const begin = std::data(buf);
         auto const end = io_->address().to_compact(begin);
         auto const len = end - begin;
@@ -1304,7 +1304,7 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // peer id encoding.
     if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
     {
-        set_user_agent(tr_interned_string{ sv });
+        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(sv) });
     }
 
     /* get peer's listening port */

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -165,7 +165,7 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 
 [[nodiscard]] auto toString(time_t now)
 {
-    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
+    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", *std::localtime(&now));
 }
 
 bool compareSecondField(std::string_view l, std::string_view r)

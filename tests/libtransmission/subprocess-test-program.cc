@@ -6,7 +6,7 @@
 #include <libtransmission/file.h> // tr_sys_dir_get_current()
 #include <libtransmission/utils.h> // tr_env_get_string()
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ostream.h>
 
 #include <fstream>

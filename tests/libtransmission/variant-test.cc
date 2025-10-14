@@ -4,9 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cassert>
 #include <cerrno>
-#include <cmath> // lrint()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <string>
@@ -22,6 +20,7 @@
 #include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 

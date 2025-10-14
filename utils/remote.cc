@@ -7,6 +7,7 @@
 #include <array>
 #include <cctype> /* isspace */
 #include <cmath> // floor
+#include <chrono>
 #include <cstdint> // int64_t
 #include <cstdio>
 #include <cstdlib>
@@ -24,7 +25,7 @@
 #include <event2/buffer.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -48,7 +49,7 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TR_DEFAULT_RPC_PORT };
+auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
 char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
@@ -340,7 +341,7 @@ auto constexpr Options = std::array<tr_option, 105>{
       { 992, "trash-torrent", "Delete torrents after adding", nullptr, false, nullptr },
       { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, false, nullptr },
       { 994, "sequential-download", "Download the torrent sequentially", "seq", false, nullptr },
-      { 995, "no-sequential-download", "Download the torrent sequentially", "SEQ", false, nullptr },
+      { 995, "no-sequential-download", "Download the torrent normally", "SEQ", false, nullptr },
       { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, nullptr },
       { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, nullptr },
       { 'u',
@@ -883,7 +884,7 @@ template<size_t N>
 std::string_view format_date(std::array<char, N>& buf, time_t now)
 {
     auto begin = std::data(buf);
-    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", fmt::localtime(now)).out;
+    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", *std::localtime(&now)).out;
     return { begin, static_cast<size_t>(end - begin) };
 }
 
@@ -941,7 +942,7 @@ void print_details(tr_variant::Map const& map)
             {
                 if (auto sv = it->value_if<std::string_view>(); sv)
                 {
-                    fmt::print("{:s}{:s}", it == begin ? ", " : "", *sv);
+                    fmt::print("{:s}{:s}", it != begin ? ", " : "", *sv);
                 }
             }
 

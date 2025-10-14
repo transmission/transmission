@@ -182,7 +182,7 @@ private:
 template<std::size_t MaxDepth>
 struct ParserStack
 {
-    enum class ParentType
+    enum class ParentType : uint8_t
     {
         Array,
         Dict

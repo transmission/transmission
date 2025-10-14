@@ -30,7 +30,7 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 

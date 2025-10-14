@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/log.h"
@@ -198,9 +198,9 @@ tr_address tr_ip_cache::bind_addr(tr_address_type type) const noexcept
     return {};
 }
 
-bool tr_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
+bool tr_ip_cache::set_global_addr(tr_address const& addr) noexcept
 {
-    if (type == addr.type && addr.is_global_unicast_address())
+    if (addr.is_global_unicast_address())
     {
         auto const lock = std::scoped_lock{ global_addr_mutex_[addr.type] };
         global_addr_[addr.type] = addr;
@@ -305,7 +305,8 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
     if (response.status == 200 /* HTTP_OK */)
     {
         // Update member
-        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body)); addr && set_global_addr(type, *addr))
+        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body));
+            addr && type == addr->type && set_global_addr(*addr))
         {
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cerrno> // EINVAL
+#include <chrono>
 #include <cstddef> // size_t
 #include <ctime>
 #include <map>
@@ -16,7 +17,7 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/map.hpp>
 
@@ -373,6 +374,8 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         return;
     }
 
+    auto const now = tr_time();
+
     auto torrent_dir = tr_pathbuf{ tor->current_dir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
@@ -382,7 +385,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const labels_str = build_labels_string(tor->labels());
     auto const trackers_str = buildTrackersString(tor);
     auto const bytes_downloaded_str = std::to_string(tor->bytes_downloaded_.ever());
-    auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time()));
+    auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", *std::localtime(&now));
     auto const priority_str = std::to_string(tor->get_priority());
 
     auto const env = std::map<std::string_view, std::string_view>{
@@ -1285,7 +1288,7 @@ tr_stat tr_torrent::stats() const
     stats.peersGettingFromUs = swarm_stats.active_peer_count[TR_UP];
     stats.webseedsSendingToUs = swarm_stats.active_webseed_count;
 
-    for (int i = 0; i < TR_PEER_FROM__MAX; i++)
+    for (int i = 0; i < TR_PEER_FROM_N_TYPES; i++)
     {
         stats.peersFrom[i] = swarm_stats.peer_from_count[i];
         stats.knownPeersFrom[i] = swarm_stats.known_peer_from_count[i];

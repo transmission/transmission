@@ -30,7 +30,7 @@
 #include <gtkmm/snapshot.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm> // std::max(), std::min()
 #include <cstring> // strchr()

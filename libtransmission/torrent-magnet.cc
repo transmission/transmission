@@ -15,7 +15,7 @@
 #include <string_view>
 #include <utility> // std::move
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 

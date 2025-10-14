@@ -3,10 +3,7 @@ include(CheckLibraryExists)
 include(CheckSymbolExists)
 
 if(ENABLE_NLS)
-    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
-    if(HAVE_LIBINTL)
-        set(LIBINTL_LIBRARY intl)
-    endif()
+    find_package(Intl)
 endif()
 
 check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
@@ -16,6 +13,11 @@ add_compile_options(
     $<$<AND:$<BOOL:${APPLE}>,$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>,$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>>:-fobjc-arc>)
 
 add_library(${TR_NAME} STATIC)
+
+set(IS_APPLE_CLANG FALSE)
+if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(IS_APPLE_CLANG TRUE)
+endif()
 
 target_sources(${TR_NAME}
     PRIVATE
@@ -159,7 +161,7 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
-        utils.mm
+        $<$<BOOL:${IS_APPLE_CLANG}>:utils.mm>
         variant-benc.cc
         variant-json.cc
         variant.cc
@@ -204,8 +206,6 @@ tr_allow_compile_if(
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
-    [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
-        utils.mm
     [=[[WIN32]]=]
         file-win32.cc
         subprocess-win32.cc
@@ -230,19 +230,13 @@ target_compile_definitions(${TR_NAME}
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>
         $<$<STREQUAL:${CRYPTO_PKG},openssl>:WITH_OPENSSL>
         $<$<STREQUAL:${CRYPTO_PKG},wolfssl>:WITH_WOLFSSL>
-        $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
+        $<$<BOOL:${Intl_FOUND}>:ENABLE_GETTEXT>)
 
 tr_target_compile_definitions_for_headers(${TR_NAME}
     PRIVATE
         sys/statvfs.h
         xfs/xfs.h
         xlocale.h)
-
-if(ENABLE_NLS)
-    tr_target_compile_definitions_for_headers(${TR_NAME}
-        PRIVATE
-            libintl.h)
-endif()
 
 tr_target_compile_definitions_for_functions(${TR_NAME}
     PRIVATE
@@ -259,17 +253,13 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         pread
         pwrite
         sendfile64
-        statvfs
-    PUBLIC
-        gettext
-        ngettext
-    REQUIRED_LIBS
-        $<$<BOOL:${HAVE_LIBINTL}>:${LIBINTL_LIBRARY}>) # gettext, ngettext
+        statvfs)
 
 target_include_directories(${TR_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..
-        ${CMAKE_CURRENT_BINARY_DIR}/..)
+        ${CMAKE_CURRENT_BINARY_DIR}/..
+        ${Intl_INCLUDE_DIRS})
 
 if(ANDROID)
     find_library(log-lib log)
@@ -287,7 +277,7 @@ target_link_libraries(${TR_NAME}
         dht::dht
         libutp::libutp
         libb64::libb64
-        ${LIBINTL_LIBRARY}
+        ${Intl_LIBRARIES}
         ${LIBM_LIBRARY}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
