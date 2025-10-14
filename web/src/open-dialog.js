@@ -7,7 +7,7 @@ import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
-let isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream
+const isIOS = (/iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
