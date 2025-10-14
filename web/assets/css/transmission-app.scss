@@ -1243,35 +1243,53 @@ a {
 
   > * {
     appearance: none;
-    background-color: var(--color-border-starkest);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 10px, 20px;
-    border: 1px solid var(--color-border-stark);
+    background-color: var(--color-bg-tabs);
+    border: 1px solid var(--color-border-default);
     border-radius: 0;
     height: 20px;
     margin: 0;
     padding: 0;
     width: 20px;
-  }
 
-  > .low {
-    background-image: var(--image-chevron-dn);
-    border-right-width: 0;
-  }
+    &.low {
+      &::after {
+        mask-image: var(--image-chevron-dn);
+      }
+    }
 
-  > .normal {
-    background-image: var(--image-baseline);
-  }
+    &.normal {
+      border-width: 1px 0;
+      width: 19px;
 
-  > .high {
-    background-image: var(--image-chevron-up);
-    border-left-width: 0;
-  }
+      &::after {
+        mask-image: var(--image-baseline);
+      }
+    }
 
-  //if input is checked then change the background color
-  > .checked {
-    background-color: var(--color-bg-hover);
+    &.high {
+      &::after {
+        mask-image: var(--image-chevron-up);
+      }
+    }
+
+    &.checked {
+      background-color: var(--color-bg-selected);
+
+      &::after {
+        background-color: var(--color-fg-selected);
+      }
+    }
+
+    &::after {
+      content: '';
+      background-color: var(--color-fg-primary);
+      display: inline-block;
+      height: 20px;
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: 14px;
+      width: 18px;
+    }
   }
 }
 
