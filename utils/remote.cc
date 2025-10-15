@@ -7,6 +7,7 @@
 #include <array>
 #include <cctype> /* isspace */
 #include <cmath> // floor
+#include <chrono>
 #include <cstdint> // int64_t
 #include <cstdio>
 #include <cstdlib>
@@ -341,7 +342,7 @@ auto constexpr Options = std::array<tr_option, 105>{ {
     { 992, "trash-torrent", "Delete torrents after adding", nullptr, Arg::None, nullptr },
     { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, Arg::None, nullptr },
     { 994, "sequential-download", "Download the torrent sequentially", "seq", Arg::None, nullptr },
-    { 995, "no-sequential-download", "Download the torrent sequentially", "SEQ", Arg::None, nullptr },
+    { 995, "no-sequential-download", "Download the torrent normally", "SEQ", Arg::None, nullptr },
     { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", Arg::None, nullptr },
     { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", Arg::None, nullptr },
     { 'u',
@@ -887,7 +888,7 @@ template<size_t N>
 std::string_view format_date(std::array<char, N>& buf, time_t now)
 {
     auto begin = std::data(buf);
-    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", fmt::localtime(now)).out;
+    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", *std::localtime(&now)).out;
     return { begin, static_cast<size_t>(end - begin) };
 }
 

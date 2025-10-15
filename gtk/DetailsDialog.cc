@@ -52,6 +52,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstddef>
 #include <cstdlib> // abort()
 #include <iterator>
@@ -611,12 +612,12 @@ void gtr_text_buffer_set_text(Glib::RefPtr<Gtk::TextBuffer> const& b, Glib::ustr
 
 [[nodiscard]] std::string get_date_string(time_t t)
 {
-    return t == 0 ? _("N/A") : fmt::format("{:%x}", fmt::localtime(t));
+    return t == 0 ? _("N/A") : fmt::format("{:%x}", *std::localtime(&t));
 }
 
 [[nodiscard]] std::string get_date_time_string(time_t t)
 {
-    return t == 0 ? _("N/A") : fmt::format("{:%c}", fmt::localtime(t));
+    return t == 0 ? _("N/A") : fmt::format("{:%c}", *std::localtime(&t));
 }
 
 } // namespace
