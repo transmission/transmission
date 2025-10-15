@@ -414,16 +414,7 @@ struct tau_tracker
                     [this](tr_address_type ip_protocol) { return lookup(ip_protocol); },
                     static_cast<tr_address_type>(ipp));
             }
-        }
 
-        // are there any dns requests pending?
-        if (is_dns_pending())
-        {
-            return;
-        }
-
-        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
-        {
             auto const ipp_enum = static_cast<tr_address_type>(ipp);
             auto& conn_at = connecting_at[ipp];
             logtrace(
@@ -477,11 +468,6 @@ private:
     [[nodiscard]] constexpr bool is_connected(tr_address_type ip_protocol, time_t now) const noexcept
     {
         return connection_id[ip_protocol] != tau_connection_t{} && now < connection_expiration_time[ip_protocol];
-    }
-
-    [[nodiscard]] TR_CONSTEXPR20 bool is_dns_pending() const noexcept
-    {
-        return std::any_of(std::begin(addr_pending_dns_), std::end(addr_pending_dns_), [](auto const& o) { return !!o; });
     }
 
     [[nodiscard]] TR_CONSTEXPR20 bool has_addr() const noexcept
@@ -589,8 +575,7 @@ private:
 
     void maybe_send_requests(time_t now)
     {
-        TR_ASSERT(!is_dns_pending());
-        if (is_dns_pending() || !has_addr())
+        if (!has_addr())
         {
             return;
         }
