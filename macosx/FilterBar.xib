@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -28,9 +28,6 @@
             <subviews>
                 <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="4">
                     <rect key="frame" x="5" y="4" width="26" height="15"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="26" id="SSy-Cy-W3L"/>
-                    </constraints>
                     <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="left" alignment="left" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="-999" imageScaling="proportionallyDown" inset="2" pullsDown="YES" arrowPosition="noArrow" selectedItem="57" id="16">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="miniSystem"/>
@@ -51,6 +48,9 @@
                             </connections>
                         </menu>
                     </popUpButtonCell>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="26" id="SSy-Cy-W3L"/>
+                    </constraints>
                 </popUpButton>
                 <box horizontalHuggingPriority="750" horizontalCompressionResistancePriority="1000" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5">
                     <rect key="frame" x="34" y="5" width="5" height="13"/>
@@ -139,10 +139,9 @@
                         <real value="3.4028234663852886e+38"/>
                     </customSpacing>
                 </stackView>
-                <searchField wantsLayer="YES" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="10">
+                <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="10">
                     <rect key="frame" x="401" y="2" width="95" height="19"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="95" placeholder="YES" id="RUH-hb-Ldl"/>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="Ven-bt-DjP"/>
                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="95" id="b6y-sO-sUo"/>
                     </constraints>
@@ -188,6 +187,7 @@
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="76" y="-39"/>
         </menu>
     </objects>
 </document>
