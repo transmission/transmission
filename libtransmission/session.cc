@@ -1455,6 +1455,14 @@ auto get_remaining_files(std::string_view folder, std::vector<std::string>& queu
         std::begin(queue_order),
         std::end(queue_order),
         std::back_inserter(ret));
+
+    // Read .torrent first if somehow a .magnet of the same hash exists
+    // Example of possible cause: https://github.com/transmission/transmission/issues/5007
+    std::stable_partition(
+        std::begin(ret),
+        std::end(ret),
+        [](std::string_view name) { return tr_strv_ends_with(name, ".torrent"sv); });
+
     return ret;
 }
 
