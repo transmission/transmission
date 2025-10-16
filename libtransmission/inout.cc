@@ -192,7 +192,18 @@ void read_or_write_piece(
     while (buflen != 0U && !error)
     {
         auto const bytes_this_pass = std::min(buflen, tor.file_size(file_index) - file_offset);
-        read_or_write_bytes(session, open_files, tor, writable, file_index, file_offset, buf, bytes_this_pass, error);
+        auto const is_padded_file = tor.file_is_padding(file_index);
+        if (is_padded_file)
+        {
+            if (!writable)
+            {
+                memset(buf, bytes_this_pass, 0);
+            }
+        }
+        else
+        {
+            read_or_write_bytes(session, open_files, tor, writable, file_index, file_offset, buf, bytes_this_pass, error);
+        }
         if (buf != nullptr)
         {
             buf += bytes_this_pass;
