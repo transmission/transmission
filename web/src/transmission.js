@@ -342,7 +342,7 @@ export class Transmission extends EventTarget {
 
   loadDaemonPrefs() {
     this.remote.loadDaemonPrefs((data) => {
-      this.session_properties = data.arguments;
+      this.session_properties = data.result;
       this._openTorrentFromUrl();
     });
   }
@@ -433,8 +433,8 @@ export class Transmission extends EventTarget {
 
   seedRatioLimit() {
     const p = this.session_properties;
-    if (p && p.seedRatioLimited) {
-      return p.seedRatioLimit;
+    if (p && p.seed_ratio_limited) {
+      return p.seed_ratio_limit;
     }
     return -1;
   }
@@ -664,7 +664,7 @@ export class Transmission extends EventTarget {
   }
 
   shouldAddedTorrentsStart() {
-    return this.session_properties['start-added-torrents'];
+    return this.session_properties.start_added_torrents;
   }
 
   _drop(event_) {
@@ -799,7 +799,7 @@ TODO: fix this when notifications get fixed
 
   refreshTorrents() {
     const fields = ['id', ...Torrent.Fields.Stats];
-    this.updateTorrents('recently-active', fields);
+    this.updateTorrents('recently_active', fields);
   }
 
   _initializeTorrents() {
