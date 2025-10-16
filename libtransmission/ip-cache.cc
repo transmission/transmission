@@ -71,7 +71,7 @@ namespace global_source_ip_helpers
 {
     TR_ASSERT(dst_addr.type == bind_addr.type);
 
-    auto const save = errno;
+    [[maybe_unused]] auto const save = sockerrno;
 
     auto const [dst_ss, dst_sslen] = tr_socket_address::to_sockaddr(dst_addr, dst_port);
     auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(bind_addr, {});
@@ -88,18 +88,22 @@ namespace global_source_ip_helpers
                     if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                     {
                         tr_net_close_socket(sock);
-                        errno = save;
+                        set_sockerrno(save);
                         return addrport->address();
                     }
                 }
             }
         }
 
+        err_out = sockerrno;
         tr_net_close_socket(sock);
     }
+    else
+    {
+        err_out = sockerrno;
+    }
 
-    err_out = errno;
-    errno = save;
+    set_sockerrno(save);
     return {};
 }
 
@@ -199,9 +203,9 @@ tr_address tr_ip_cache::bind_addr(tr_address_type type) const noexcept
     return {};
 }
 
-bool tr_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr_new) noexcept
+bool tr_ip_cache::set_global_addr(tr_address const& addr_new) noexcept
 {
-    if (type == addr_new.type && addr_new.is_global_unicast_address())
+    if (addr_new.is_global_unicast_address())
     {
         auto const lock = std::scoped_lock{ global_addr_mutex_[addr_new.type] };
         if (auto& addr = global_addr_[addr_new.type]; addr != addr_new)
@@ -317,7 +321,8 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
     if (response.status == 200 /* HTTP_OK */)
     {
         // Update member
-        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body)); addr && set_global_addr(type, *addr))
+        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body));
+            addr && type == addr->type && set_global_addr(*addr))
         {
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);

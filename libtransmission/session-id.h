@@ -36,7 +36,7 @@ public:
      * relative paths to absolute before passing through RPC, or presenting
      * different UI for local and remote sessions.
      */
-    [[nodiscard]] static bool is_local(std::string_view) noexcept;
+    [[nodiscard]] static bool is_local(std::string_view session_id) noexcept;
 
     // current session identifier
     [[nodiscard]] std::string_view sv() const noexcept;

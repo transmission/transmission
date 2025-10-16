@@ -49,7 +49,7 @@ public:
     public:
         Map() = default;
 
-        Map(size_t const n_reserve)
+        explicit Map(size_t const n_reserve)
         {
             vec_.reserve(n_reserve);
         }
@@ -193,13 +193,14 @@ public:
     };
 
     constexpr tr_variant() noexcept = default;
+    ~tr_variant() = default;
     tr_variant(tr_variant const&) = delete;
     tr_variant(tr_variant&& that) noexcept = default;
     tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
-    tr_variant(Val&& value)
+    tr_variant(Val&& value) // NOLINT(bugprone-forwarding-reference-overload, google-explicit-constructor)
     {
         *this = std::forward<Val>(value);
     }
@@ -382,10 +383,14 @@ private:
     {
     public:
         StringHolder() = default;
+        ~StringHolder() = default;
         explicit StringHolder(std::string&& str) noexcept;
-        explicit StringHolder(StringHolder&& that) noexcept;
+        StringHolder(StringHolder&& that) noexcept;
+        StringHolder(StringHolder const&) = delete;
         void set_unmanaged(std::string_view sv);
         StringHolder& operator=(StringHolder&& that) noexcept;
+        StringHolder& operator=(StringHolder const&) = delete;
+
         std::string_view sv_;
 
     private:
@@ -565,7 +570,7 @@ public:
 private:
     friend tr_variant;
 
-    enum class Type
+    enum class Type : uint8_t
     {
         Benc,
         Json
@@ -583,7 +588,7 @@ private:
         void (*container_end_func)(tr_variant const& var, void* user_data);
     };
 
-    tr_variant_serde(Type type)
+    explicit tr_variant_serde(Type type)
         : type_{ type }
     {
     }

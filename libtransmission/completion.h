@@ -84,13 +84,13 @@ struct tr_completion
     [[nodiscard]] constexpr double percent_complete() const
     {
         auto const denom = block_info_->total_size();
-        return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+        return denom != 0U ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
     }
 
     [[nodiscard]] double percent_done() const
     {
         auto const denom = size_when_done();
-        return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+        return denom != 0U ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
     }
 
     [[nodiscard]] uint64_t size_when_done() const;
@@ -155,7 +155,7 @@ struct tr_completion
         size_when_done_.reset();
     }
 
-    [[nodiscard]] uint64_t count_has_bytes_in_span(tr_byte_span_t) const;
+    [[nodiscard]] uint64_t count_has_bytes_in_span(tr_byte_span_t span) const;
 
     [[nodiscard]] constexpr bool has_metainfo() const noexcept
     {
