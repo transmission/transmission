@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
-    bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
+    bool set_global_addr(tr_address const& addr) noexcept;
 
     void update_addr(tr_address_type type) noexcept;
     void update_global_addr(tr_address_type type) noexcept;

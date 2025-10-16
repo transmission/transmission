@@ -1035,7 +1035,7 @@ public:
 
     bool set_global_address(tr_address const& addr) noexcept
     {
-        return ip_cache_.set_global_addr(addr.type, addr);
+        return ip_cache_.set_global_addr(addr);
     }
 
     [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
