@@ -491,9 +491,10 @@ MessageLogWindow::Impl::Impl(
     , filter_(Gtk::TreeModelFilter::create(store_))
     , sort_(Gtk::TreeModelSort::create(filter_))
     , maxLevel_(static_cast<tr_log_level>(gtr_pref_int_get(TR_KEY_message_level)))
-    , refresh_tag_(Glib::signal_timeout().connect_seconds(
-          sigc::mem_fun(*this, &Impl::onRefresh),
-          SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
+    , refresh_tag_(
+          Glib::signal_timeout().connect_seconds(
+              sigc::mem_fun(*this, &Impl::onRefresh),
+              SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS))
 {
     /**
     ***  toolbar
