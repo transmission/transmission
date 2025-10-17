@@ -244,7 +244,7 @@ The 'source' column here corresponds to the data structure there.
 | `labels` | array of strings | tr_torrent
 | `leftUntilDone` | number| tr_stat
 | `magnetLink` | string| n/a
-| `manualAnnounceTime` | number| tr_stat
+| `manualAnnounceTime` | number| **DEPRECATED** don't use it, it never worked
 | `maxConnectedPeers` | number| tr_torrent
 | `metadataPercentComplete` | double| tr_stat
 | `name` | string| tr_torrent_view
@@ -536,7 +536,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-enabled` | boolean | true means enabled
 | `blocklist-size` | number | number of rules in the blocklist
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
-| `cache-size-mb` | number | maximum size of the disk cache (MiB)
+| `cache-size-mb` | number | maximum size of the disk cache (MiB). Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
 | `config-dir` | string | location of transmission's configuration directory
 | `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `dht-enabled` | boolean | true means allow DHT in public torrents
@@ -1037,3 +1037,4 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-get` | new arg `files.begin_piece`
 | `torrent-get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`
+| `torrent-get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked
