@@ -12,6 +12,7 @@ jobs:
   what-to-make:
     runs-on: ubuntu-22.04
     outputs:
+      make-core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.core-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
       make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
@@ -54,6 +55,7 @@ jobs:
             git diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
+          get_changes core       CMakeLists.txt cmake third-party libtransmission
           get_changes android    CMakeLists.txt cmake third-party libtransmission android
           get_changes cli        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
           get_changes any-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
@@ -262,7 +264,7 @@ jobs:
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -308,6 +310,7 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON \
             -DUSE_SYSTEM_B64=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
@@ -319,8 +322,11 @@ jobs:
             -DUSE_SYSTEM_PSL=ON \
             -DUSE_SYSTEM_RAPIDJSON=ON \
             -DUSE_SYSTEM_UTF8CPP=ON
-      - name: Make
-        run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
+      - name: Make (Core)
+        run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
+      - name: Make (Tests)
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        run: cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if grep 'warning:' makelog; then exit 1; fi
@@ -328,7 +334,7 @@ jobs:
   clang-tidy-libtransmission-win32:
     runs-on: windows-2022
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -353,11 +359,17 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
             -DRUN_CLANG_TIDY=ON
-      - name: Make
+      - name: Make (Core)
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
-          cmake --build obj --config Debug --target transmission.lib 2>&1 | tee makelog
+          cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
+      - name: Make (Tests)
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
+          cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }

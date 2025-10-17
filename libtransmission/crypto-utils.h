@@ -32,6 +32,7 @@ using tr_sha256_context_t = mbedtls_sha256_context;
 using tr_sha1_context_t = EVP_MD_CTX*;
 using tr_sha256_context_t = EVP_MD_CTX*;
 #elif defined(WITH_WOLFSSL)
+#include <wolfssl/options.h>
 #include <wolfssl/wolfcrypt/sha.h>
 #include <wolfssl/wolfcrypt/sha256.h>
 using tr_sha1_context_t = wc_Sha;
