@@ -315,6 +315,7 @@ public:
         [[nodiscard]] bool client_has_piece(tr_piece_index_t piece) const override;
         [[nodiscard]] bool client_wants_piece(tr_piece_index_t piece) const override;
         [[nodiscard]] bool is_sequential_download() const override;
+        [[nodiscard]] tr_piece_index_t sequential_download_from_piece() const override;
         [[nodiscard]] uint8_t count_active_requests(tr_block_index_t block) const override;
         [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override;
         [[nodiscard]] tr_block_span_t block_span(tr_piece_index_t piece) const override;
@@ -348,6 +349,8 @@ public:
             libtransmission::SimpleObservable<tr_torrent*, tr_peer*, tr_block_span_t>::Observer observer) override;
         [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_changed(
             libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) override;
+        [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override;
 
     private:
         tr_torrent& tor_;
@@ -941,6 +944,11 @@ bool tr_swarm::WishlistMediator::is_sequential_download() const
     return tor_.is_sequential_download();
 }
 
+tr_piece_index_t tr_swarm::WishlistMediator::sequential_download_from_piece() const
+{
+    return tor_.sequential_download_from_piece();
+}
+
 uint8_t tr_swarm::WishlistMediator::count_active_requests(tr_block_index_t block) const
 {
     auto const op = [block](uint8_t acc, auto const& peer)
@@ -1062,6 +1070,12 @@ libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_down
     libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer)
 {
     return tor_.sequential_download_changed_.observe(std::move(observer));
+}
+
+libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_sequential_download_from_piece_changed(
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer)
+{
+    return tor_.sequential_download_from_piece_changed_.observe(std::move(observer));
 }
 
 // ---

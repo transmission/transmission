@@ -343,6 +343,7 @@ private:
 
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
+        auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
         candidates_.reserve(n_pieces);
         for (tr_piece_index_t piece = 0U; piece < n_pieces; ++piece)
@@ -370,7 +371,19 @@ private:
                     return 1U;
                 }
 
-                return piece + 1U;
+                if (sequential_download_from_piece <= 1)
+                {
+                    return piece + 1U;
+                }
+
+                // Rotate remaining pieces
+                // 1 2 3 4 5 -> 3 4 5 1 2 if sequential_download_from_piece is 3
+                if (piece < sequential_download_from_piece)
+                {
+                    return n_pieces - (sequential_download_from_piece - piece);
+                }
+
+                return piece - sequential_download_from_piece + 2U;
             }();
             candidates_.emplace_back(piece, salt, &mediator_);
         }
@@ -417,7 +430,7 @@ private:
     bool candidates_dirty_ = true;
     bool is_endgame_ = false;
 
-    std::array<libtransmission::ObserverTag, 13U> const tags_;
+    std::array<libtransmission::ObserverTag, 14U> const tags_;
 
     Mediator& mediator_;
 };
@@ -439,6 +452,8 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
           mediator_in.observe_sent_cancel([this](tr_torrent*, tr_peer*, tr_block_index_t b) { dec_active_request_block(b); }),
           mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { inc_active_request_span(bs); }),
           mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { set_candidates_dirty(); }),
+          mediator_in.observe_sequential_download_from_piece_changed([this](tr_torrent*, tr_piece_index_t)
+                                                                     { set_candidates_dirty(); }),
       } }
     , mediator_{ mediator_in }
 {
