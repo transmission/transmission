@@ -7,6 +7,12 @@ import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
+const is_ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+// https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
+// https://caniuse.com/input-file-accept
+const can_use_input_accept = !(is_ios && is_safari);
+
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
     super();
@@ -138,6 +144,9 @@ export class OpenDialog extends EventTarget {
     input.name = 'torrent-files[]';
     input.id = input_id;
     input.multiple = true;
+    if (can_use_input_accept) {
+        input.accept = ".torrent,application/x-bittorrent";
+    }
     workarea.append(input);
     elements.file_input = input;
 
