@@ -1150,7 +1150,7 @@ msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
 msgstr[0] "{seconds_left:L} seconde restante"
 msgstr[1] "{seconds_left:L} secondes restantes"
-msgstr[2] "Encore {minutes_left:L} minute"
+msgstr[2] "Encore {seconds_left:L} secondes"
 
 #: ../gtk/Utils.cc:266
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
