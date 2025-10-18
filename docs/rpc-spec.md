@@ -326,6 +326,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `isUTP`              | boolean    | tr_peer_stat
 | `peerIsChoked`       | boolean    | tr_peer_stat
 | `peerIsInterested`   | boolean    | tr_peer_stat
+| `peer_id`            | string     | tr_peer_stat
 | `port`               | number     | tr_peer_stat
 | `progress`           | double     | tr_peer_stat
 | `rateToClient` (B/s) | number     | tr_peer_stat
