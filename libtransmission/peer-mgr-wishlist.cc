@@ -332,6 +332,31 @@ private:
             [block](auto const& c) { return c.block_span.begin <= block && block < c.block_span.end; });
     }
 
+    static constexpr tr_piece_index_t get_salt(
+        tr_piece_index_t const piece,
+        tr_piece_index_t const n_pieces,
+        tr_piece_index_t const random_salt,
+        bool const is_sequential)
+    {
+        if (!is_sequential)
+        {
+            return random_salt;
+        }
+
+        // Download first and last piece first
+        if (piece == 0U)
+        {
+            return 0U;
+        }
+
+        if (piece == n_pieces - 1U)
+        {
+            return 1U;
+        }
+
+        return piece + 1U;
+    }
+
     void maybe_rebuild_candidate_list()
     {
         if (!candidates_dirty_)
@@ -352,26 +377,7 @@ private:
                 continue;
             }
 
-            auto const salt = [&]()
-            {
-                if (!is_sequential)
-                {
-                    return salter();
-                }
-
-                // Download first and last piece first
-                if (piece == 0U)
-                {
-                    return 0U;
-                }
-
-                if (piece == n_pieces - 1U)
-                {
-                    return 1U;
-                }
-
-                return piece + 1U;
-            }();
+            auto const salt = get_salt(piece, n_pieces, salter(), is_sequential);
             candidates_.emplace_back(piece, salt, &mediator_);
         }
         std::sort(std::begin(candidates_), std::end(candidates_));
