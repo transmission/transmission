@@ -326,7 +326,7 @@ export class OverflowMenu extends EventTarget {
       ...new Set(speeds)
         .add(`${session_properties[RPC._UpSpeedLimit]}`)
         .values(),
-    ].sort((a, b) => a - b)) {
+    ].toSorted((a, b) => a - b)) {
       const option = document.createElement('option');
       option.value = speed;
       option.textContent =
@@ -370,7 +370,7 @@ export class OverflowMenu extends EventTarget {
       ...new Set(speeds)
         .add(`${session_properties[RPC._DownSpeedLimit]}`)
         .values(),
-    ].sort((a, b) => a - b)) {
+    ].toSorted((a, b) => a - b)) {
       const option = document.createElement('option');
       option.value = speed;
       option.textContent =

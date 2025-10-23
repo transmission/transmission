@@ -979,7 +979,7 @@ TODO: fix this when notifications get fixed
 
   _updateFilterSelect() {
     const trackers = this._getTrackerCounts();
-    const sitenames = Object.keys(trackers).sort();
+    const sitenames = Object.keys(trackers).toSorted();
 
     // build the new html
     let string = '';
