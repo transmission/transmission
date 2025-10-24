@@ -136,6 +136,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "fromLtep"sv,
     "fromPex"sv,
     "fromTracker"sv,
+    "gateway_address"sv,
     "group"sv,
     "hasAnnounced"sv,
     "hasScraped"sv,

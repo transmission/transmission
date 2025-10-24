@@ -64,11 +64,19 @@ void tr_natpmp::setCommandTime()
     command_time_ = tr_time() + CommandWaitSecs;
 }
 
-tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
+tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled, std::optional<tr_address> gateway)
 {
     if (is_enabled && state_ == State::Discover)
     {
-        int val = initnatpmp(&natpmp_, 0, 0);
+        int forcegw = 0;
+        in_addr_t forcedgw = 0;
+        if (gateway && gateway->is_ipv4())
+        {
+            forcegw = 1;
+            forcedgw = gateway->addr.addr4.s_addr;
+        }
+
+        int val = initnatpmp(&natpmp_, forcegw, forcedgw);
         log_val("initnatpmp", val);
         val = sendpublicaddressrequest(&natpmp_);
         log_val("sendpublicaddressrequest", val);

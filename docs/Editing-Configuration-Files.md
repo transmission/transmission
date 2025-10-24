@@ -113,6 +113,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer-port-random-low:** Number (default = 1024)
  * **peer-port-random-on-start:** Boolean (default = false)
  * **port-forwarding-enabled:** Boolean (default = true) Enable [UPnP](https://en.wikipedia.org/wiki/Universal_Plug_and_Play) or [NAT-PMP](https://en.wikipedia.org/wiki/NAT_Port_Mapping_Protocol).
+ * **gateway_address**: String? (default = null) Gateway to use for NAT-PMP.
 
 #### Queuing
  * **download-queue-enabled:** Boolean (default = true) When true, Transmission will only download `download-queue-size` non-stalled torrents at once.

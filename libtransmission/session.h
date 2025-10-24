@@ -213,6 +213,11 @@ private:
             return session_.localPeerPort();
         }
 
+        [[nodiscard]] std::optional<tr_address> gateway_address() const override
+        {
+            return session_.gateway_address();
+        }
+
         [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
@@ -433,6 +438,7 @@ public:
         std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::optional<std::string> proxy_url;
+        std::optional<std::string> gateway_address;
         std::string announce_ip;
         std::string bind_address_ipv4;
         std::string bind_address_ipv6;
@@ -471,6 +477,7 @@ public:
                 { TR_KEY_download_queue_enabled, &download_queue_enabled },
                 { TR_KEY_download_queue_size, &download_queue_size },
                 { TR_KEY_encryption, &encryption_mode },
+                { TR_KEY_gateway_address, &gateway_address },
                 { TR_KEY_idle_seeding_limit, &idle_seeding_limit_minutes },
                 { TR_KEY_idle_seeding_limit_enabled, &idle_seeding_limit_enabled },
                 { TR_KEY_incomplete_dir, &incomplete_dir },
@@ -908,6 +915,16 @@ public:
     [[nodiscard]] constexpr tr_port advertisedPeerPort() const noexcept
     {
         return advertised_peer_port_;
+    }
+
+    [[nodiscard]] std::optional<tr_address> gateway_address() const noexcept
+    {
+        if (auto const addr = settings().gateway_address)
+        {
+            return tr_address::from_string(*addr);
+        }
+
+        return {};
     }
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept

@@ -138,6 +138,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_fromLtep,
     TR_KEY_fromPex,
     TR_KEY_fromTracker,
+    TR_KEY_gateway_address,
     TR_KEY_group,
     TR_KEY_hasAnnounced,
     TR_KEY_hasScraped,
