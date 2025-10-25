@@ -145,7 +145,7 @@ export class OpenDialog extends EventTarget {
     input.id = input_id;
     input.multiple = true;
     if (can_use_input_accept) {
-        input.accept = ".torrent,application/x-bittorrent";
+      input.accept = ".torrent,application/x-bittorrent";
     }
     workarea.append(input);
     elements.file_input = input;
