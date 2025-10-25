@@ -362,7 +362,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -393,7 +393,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_Crc32c=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -420,7 +421,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -445,7 +446,8 @@ jobs:
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
 
@@ -468,6 +470,7 @@ jobs:
           apk add \
             ca-certificates \
             cmake \
+            crc32c-dev \
             curl-dev \
             fmt-dev \
             g++ \
@@ -509,7 +512,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -864,6 +868,7 @@ jobs:
             fmt-devel \
             gcc-c++ \
             gettext \
+            google-crc32c-devel \
             libcurl-devel \
             libdeflate-devel \
             libevent-devel \
@@ -905,7 +910,8 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_Crc32c=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
