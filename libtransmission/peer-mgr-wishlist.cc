@@ -20,6 +20,7 @@
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/peer-mgr-wishlist.h"
+#include "torrent.h"
 
 // Asserts in this file are expensive, so hide them in #ifdef
 #ifdef TR_WISHLIST_ASSERT
@@ -512,6 +513,7 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     auto const max_peers = is_endgame_ ? EndgameMaxPeers : NormalMaxPeers;
     auto blocks = small::vector<tr_block_index_t>{};
+    tr_torrent& tor = mediator_.torrent(); 
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
     {
@@ -554,7 +556,19 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
                 continue;
             }
 
-            blocks.emplace_back(block);
+            if (tor.block_is_padding(block))
+            {
+                tor.session->run_in_session_thread(
+                    [tor_id = tor.id(), block_idx_to_complete = block, session_ptr = tor.session]() {
+                        if (auto* current_tor = session_ptr->torrents().get(tor_id)) {
+                            current_tor->on_block_received(block_idx_to_complete);
+                        }
+                    });
+            }
+            else
+            {
+                blocks.emplace_back(block);
+            }
         }
     }
 
