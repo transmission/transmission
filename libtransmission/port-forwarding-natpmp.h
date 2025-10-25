@@ -49,7 +49,7 @@ public:
         tr_port advertised_port;
     };
 
-    PulseResult pulse(tr_port local_port, bool is_enabled);
+    PulseResult pulse(tr_port local_port, std::optional<tr_address> gateway, bool is_enabled);
 
 private:
     enum class State : uint8_t

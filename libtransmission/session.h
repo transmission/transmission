@@ -213,6 +213,11 @@ private:
             return session_.localPeerPort();
         }
 
+        [[nodiscard]] std::optional<tr_address> gateway_address() const override
+        {
+            return session_.gateway_address();
+        }
+
         [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
@@ -450,6 +455,7 @@ public:
         tr_port peer_port_random_high = tr_port::from_host(65535);
         tr_port peer_port_random_low = tr_port::from_host(49152);
         tr_port peer_port = tr_port::from_host(TrDefaultPeerPort);
+        std::optional<std::string> gateway_address;
         tr_tos_t peer_socket_tos{ 0x04 };
         tr_verify_added_mode torrent_added_verify_mode = TR_VERIFY_ADDED_FAST;
 
@@ -470,6 +476,7 @@ public:
                 { TR_KEY_download_queue_enabled, &download_queue_enabled },
                 { TR_KEY_download_queue_size, &download_queue_size },
                 { TR_KEY_encryption, &encryption_mode },
+                { TR_KEY_gateway_address, &gateway_address },
                 { TR_KEY_idle_seeding_limit, &idle_seeding_limit_minutes },
                 { TR_KEY_idle_seeding_limit_enabled, &idle_seeding_limit_enabled },
                 { TR_KEY_incomplete_dir, &incomplete_dir },
@@ -906,6 +913,16 @@ public:
     [[nodiscard]] constexpr tr_port advertisedPeerPort() const noexcept
     {
         return advertised_peer_port_;
+    }
+
+    [[nodiscard]] std::optional<tr_address> gateway_address() const noexcept
+    {
+        auto addr = settings().gateway_address;
+        if (addr) {
+            return tr_address::from_string(*addr);
+        }
+
+        return {};
     }
 
     [[nodiscard]] constexpr auto queueEnabled(tr_direction dir) const noexcept
