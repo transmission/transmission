@@ -992,6 +992,7 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*> started_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
 
@@ -1223,6 +1224,7 @@ private:
 
         files_wanted_.set(files, n_files, wanted);
         completion_.invalidate_size_when_done();
+        files_wanted_changed_.emit(this, files, n_files, wanted);
 
         if (!is_bootstrapping)
         {

@@ -76,8 +76,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -94,7 +92,11 @@ jobs:
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
           sudo apt update
-          sudo apt install -y clang-format-20 npm
+          sudo apt install -y clang-format-20
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -123,8 +125,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -148,8 +148,7 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            ninja-build \
-            npm
+            ninja-build
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -364,7 +363,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -395,7 +394,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_Crc32c=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -422,7 +422,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -447,7 +447,8 @@ jobs:
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
 
@@ -470,6 +471,7 @@ jobs:
           apk add \
             ca-certificates \
             cmake \
+            crc32c-dev \
             curl-dev \
             fmt-dev \
             g++ \
@@ -511,7 +513,8 @@ jobs:
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -767,8 +770,6 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: debian:11-slim
     steps:
@@ -847,8 +848,6 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: fedora:39
     steps:
@@ -866,6 +865,7 @@ jobs:
             fmt-devel \
             gcc-c++ \
             gettext \
+            google-crc32c-devel \
             libcurl-devel \
             libdeflate-devel \
             libevent-devel \
@@ -873,10 +873,13 @@ jobs:
             libpsl-devel \
             miniupnpc-devel \
             ninja-build \
-            npm \
             openssl-devel \
             pkgconf-pkg-config \
             xz
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
@@ -907,7 +910,8 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
-            -DRUN_CLANG_TIDY=OFF
+            -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_Crc32c=ON
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
@@ -948,8 +952,11 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            ninja-build \
-            npm
+            ninja-build
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev

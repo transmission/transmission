@@ -50,7 +50,7 @@ export class Transmission extends EventTarget {
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
     this.pointer_device = Object.seal({
-      is_touch_device: 'ontouchstart' in window,
+      is_touch_device: 'ontouchstart' in globalThis,
       long_press_callback: null,
       x: 0,
       y: 0,
@@ -328,14 +328,14 @@ export class Transmission extends EventTarget {
 
   _openTorrentFromUrl() {
     setTimeout(() => {
-      const addTorrent = new URLSearchParams(window.location.search).get(
+      const addTorrent = new URLSearchParams(globalThis.location.search).get(
         'addtorrent',
       );
       if (addTorrent) {
         this.setCurrentPopup(new OpenDialog(this, this.remote, addTorrent));
-        const newUrl = new URL(window.location);
+        const newUrl = new URL(globalThis.location);
         newUrl.search = '';
-        window.history.pushState('', '', newUrl.toString());
+        globalThis.history.pushState('', '', newUrl.toString());
       }
     }, 0);
   }
@@ -385,8 +385,7 @@ export class Transmission extends EventTarget {
       }
       case Prefs.ContrastMode: {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
-        document.body.classList.remove('contrast-more');
-        document.body.classList.remove('contrast-less');
+        document.body.classList.remove('contrast-more', 'contrast-less');
         document.body.classList.add(`contrast-${value}`);
         // this.refilterAllSoon();
         break;
@@ -822,7 +821,7 @@ TODO: fix this when notifications get fixed
     if (event_.shiftKey) {
       this._selectRange(row);
       // Need to deselect any selected text
-      window.focus();
+      globalThis.focus();
 
       // Apple-Click, not selected
     } else if (!row.isSelected() && meta_key) {
@@ -941,7 +940,7 @@ TODO: fix this when notifications get fixed
   ///
 
   _updateGuiFromSession(o) {
-    const [, version, checksum] = o.version.match(/(.*)\s\(([\da-f]+)\)/);
+    const [, version, checksum] = o.version.match(/^(.*)\s\(([\da-f]+)\)/);
     this.version_info = {
       checksum,
       version,
@@ -980,7 +979,7 @@ TODO: fix this when notifications get fixed
 
   _updateFilterSelect() {
     const trackers = this._getTrackerCounts();
-    const sitenames = Object.keys(trackers).sort();
+    const sitenames = Object.keys(trackers).toSorted();
 
     // build the new html
     let string = '';
@@ -1027,6 +1026,9 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
+    // TODO: This regex is wrong and is about to be removed in https://github.com/transmission/transmission/pull/7008,
+    // so it is left alone for now.
+    // eslint-disable-next-line sonarjs/slow-regex
     const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
