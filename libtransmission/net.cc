@@ -233,9 +233,8 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     auto const& [addr, port] = socket_address;
 
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
+    if (!session->allowsTCP() || !socket_address.is_valid())
     {
         return TR_BAD_SOCKET;
     }
