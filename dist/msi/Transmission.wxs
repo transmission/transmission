@@ -3,8 +3,8 @@
 
   <?include TransmissionConfig.wxi ?>
 
-  <?if $(sys.BUILDARCH) = x64 ?>
-    <?define ProductName = "Transmission $(var.TrVersionFull) (x64)" ?>
+  <?if $(sys.BUILDARCH) = x64 or $(sys.BUILDARCH) = arm64 ?>
+    <?define ProductName = "Transmission $(var.TrVersionFull) ($(sys.BUILDARCH))" ?>
     <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
     <?define PlatformSystemFolder = "System64Folder" ?>
   <?else ?>

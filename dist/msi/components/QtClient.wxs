@@ -134,8 +134,8 @@
       </Directory>
 
       <Directory Id="QTSTYLESDIR" Name="styles">
-        <Component Id="dll.qt.plugins.styles.windowsvista">
-          <File DiskId="1" KeyPath="yes" Name="qwindowsvistastyle.dll" />
+        <Component Id="dll.qt.plugins.styles.modernwindows">
+          <File DiskId="1" KeyPath="yes" Name="qmodernwindowsstyle.dll" />
         </Component>
       </Directory>
 
@@ -175,7 +175,7 @@
       <ComponentRef Id="dll.qt.plugins.imageformats.jpeg" />
       <ComponentRef Id="dll.qt.plugins.imageformats.svg" />
       <ComponentRef Id="dll.qt.plugins.platforms.windows" />
-      <ComponentRef Id="dll.qt.plugins.styles.windowsvista" />
+      <ComponentRef Id="dll.qt.plugins.styles.modernwindows" />
       <?if $(var.QtMajorVer) = 6 ?>
       <ComponentRef Id="dll.qt.plugins.tls.openssl" />
       <?endif ?>

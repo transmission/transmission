@@ -37,7 +37,14 @@ function global:Build-Transmission(
             ForEach-Object { Copy-Item -Path $_.FullName -Destination $DebugSymbolsDir }
     }
 
-    $OpenSslLibSuffix = if ($Arch -eq 'x86') { '' } else { '-x64' }
+    $OpenSslLibSuffix = if ($Arch -eq 'x86') { 
+        '' 
+    } elseif ($Arch -eq 'arm64' -or $env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 
+        '-arm64' 
+    } else { 
+        '-x64' 
+    }
+    
     foreach ($x in @('libcurl', "libcrypto-3${OpenSslLibSuffix}", "libssl-3${OpenSslLibSuffix}", 'zlib', 'dbus-1')) {
         if ($DepsPrefixDir -ne $PrefixDir) {
             Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.dll") -Destination (Join-Path $PrefixDir bin)
