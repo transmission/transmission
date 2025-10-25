@@ -85,6 +85,13 @@ protected:
             return piece_priority_[piece];
         }
 
+        [[nodiscard]] libtransmission::ObserverTag observe_files_wanted_changed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
+            override
+        {
+            return parent_.files_wanted_changed_.observe(std::move(observer));
+        }
+
         [[nodiscard]] libtransmission::ObserverTag observe_peer_disconnect(
             libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&>::Observer observer) override
         {
@@ -165,6 +172,7 @@ protected:
         }
     };
 
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&, tr_bitfield const&> peer_disconnect_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*, tr_bitfield const&> got_bitfield_;
@@ -1544,5 +1552,122 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadRebuildsWishlist)
         EXPECT_EQ(100U, requested.count(0, 100));
         EXPECT_EQ(50U, requested.count(100, 200));
         EXPECT_EQ(100U, requested.count(200, 300));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAdd)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: four pieces, all missing
+        mediator.piece_count_ = 4;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+        mediator.block_span_[3] = { 300, 400 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially only want the first 2 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+        (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
+
+        // now we want the file that consists of piece 2 and piece 3 also
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+        files_wanted_changed_.emit(nullptr, nullptr, 0, true);
+
+        // a candidate should be inserted into the wishlist for
+        // piece 2 and piece 3
+        return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    };
+
+    // We should request all 4 pieces here.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 400 };
+        auto const spans = get_spans(350);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(350U, requested.count());
+        EXPECT_NE(0U, requested.count(0, 100));
+        EXPECT_NE(0U, requested.count(100, 200));
+        EXPECT_NE(0U, requested.count(200, 300));
+        EXPECT_NE(0U, requested.count(300, 400));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: four pieces, all missing
+        mediator.piece_count_ = 4;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+        mediator.block_span_[3] = { 300, 400 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially only want the all 4 pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+        (void)wishlist.next(1, PeerHasAllPieces, ClientHasNoActiveRequests);
+
+        // we no longer want the file that consists of piece 2 and piece 3
+        mediator.client_wants_piece_.erase(2);
+        mediator.client_wants_piece_.erase(3);
+        files_wanted_changed_.emit(nullptr, nullptr, 0, true);
+
+        // the candidate objects for piece 2 and piece 3 should be removed
+        return wishlist.next(n_wanted, PeerHasAllPieces, ClientHasNoActiveRequests);
+    };
+
+    // We should request only the first 2 pieces here.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 400 };
+        auto const spans = get_spans(350);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(200U, requested.count());
+        EXPECT_NE(0U, requested.count(0, 100));
+        EXPECT_NE(0U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(200, 300));
+        EXPECT_EQ(0U, requested.count(300, 400));
     }
 }
