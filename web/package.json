@@ -18,9 +18,9 @@
     "lint:stylelint:fix": "stylelint --fix assets/css/*scss"
   },
   "devDependencies": {
+    "@primer/stylelint-config": "^12.8.0",
     "esbuild": "^0.19.7",
     "esbuild-sass-plugin": "^2.16.0",
-    "@primer/stylelint-config": "^12.8.0",
     "eslint": "^8.45.0",
     "eslint-plugin-sonarjs": "^0.19.0",
     "eslint-plugin-unicorn": "^47.0.0",
@@ -33,6 +33,7 @@
     "stylelint-config-standard": "^34.0.0"
   },
   "dependencies": {
+    "clusterize.js": "^1.0.0",
     "lodash.isequal": "^4.5.0"
   }
 }
