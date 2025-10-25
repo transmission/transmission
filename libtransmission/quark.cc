@@ -59,6 +59,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "blocklist-url"sv,
     "blocks"sv,
     "bytesCompleted"sv,
+    "bytes_to_client"sv,
+    "bytes_to_peer"sv,
     "cache-size-mb"sv,
     "clientIsChoked"sv,
     "clientIsInterested"sv,
