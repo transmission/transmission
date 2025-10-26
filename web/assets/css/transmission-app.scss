@@ -244,8 +244,9 @@ html,
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-fg-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   height: 100%;
   margin: 0;
 }
@@ -346,11 +347,11 @@ a {
     border-left: 1px solid var(--color-border-default);
     height: 25px;
     margin: 0 6px 0 0;
-  }
 
-  :nth-last-child(2) {
-    border: 0;
-    flex-grow: 1;
+    &:last-of-type {
+      border: 0;
+      flex-grow: 1;
+    }
   }
 }
 
@@ -1056,6 +1057,16 @@ a {
 
     &.skip {
       opacity: 0.5;
+
+      > .inspector-torrent-file-list-entry-name {
+        color: var(--color-fg-disabled);
+      }
+    }
+
+    &.complete {
+      > .file-wanted-control {
+        cursor: default;
+      }
     }
   }
 
@@ -1071,22 +1082,10 @@ a {
     overflow-wrap: anywhere;
   }
 
-  .inspector-torrent-file-list-entry.skip
-    > .inspector-torrent-file-list-entry-name {
-    color: var(--color-fg-disabled);
-  }
-
   .inspector-torrent-file-list-entry-progress {
     color: var(--color-fg-secondary);
     font-size: 12px;
     grid-area: info;
-  }
-
-  .single-file .inspector-torrent-file-list-entry,
-  .inspector-torrent-file-list-entry.complete {
-    > .file-wanted-control {
-      cursor: default;
-    }
   }
 }
 

@@ -76,8 +76,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -93,7 +91,11 @@ jobs:
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
-          sudo apt-get install -y clang-format-17 npm
+          sudo apt-get install -y clang-format-17
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -122,8 +124,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -151,7 +151,6 @@ jobs:
             libssl-dev \
             libutfcpp-dev \
             ninja-build \
-            npm \
             rapidjson-dev
       - name: Get Source
         uses: actions/checkout@v4
@@ -293,7 +292,6 @@ jobs:
             libssl-dev \
             libutfcpp-dev \
             ninja-build \
-            npm \
             rapidjson-dev
       - name: Get Source
         uses: actions/checkout@v4
@@ -419,6 +417,7 @@ jobs:
         run: |
           brew install --formulae \
             cmake \
+            crc32c \
             fast_float \
             fmt \
             gettext \
@@ -464,7 +463,8 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_B64=ON \
+            -DUSE_SYSTEM_B64=ON \ \
+            -DUSE_SYSTEM_Crc32c=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -503,6 +503,7 @@ jobs:
         run: |
           brew install --formulae \
             cmake \
+            crc32c \
             fast_float \
             fmt \
             gettext \
@@ -543,6 +544,7 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_B64=ON \
+            -DUSE_SYSTEM_CRC32C=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -574,6 +576,7 @@ jobs:
           apk add \
             ca-certificates \
             cmake \
+            crc32c-dev \
             curl-dev \
             fast_float \
             fmt-dev \
@@ -622,6 +625,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -1108,6 +1112,7 @@ jobs:
             fmt-devel \
             gcc-c++ \
             gettext \
+            google-crc32c-devel \
             libb64-devel \
             libcurl-devel \
             libdeflate-devel \
@@ -1116,12 +1121,15 @@ jobs:
             libpsl-devel \
             miniupnpc-devel \
             ninja-build \
-            npm \
             openssl-devel \
             pkgconf-pkg-config \
             rapidjson-devel \
             utf8cpp-devel \
             xz
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK4)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
@@ -1154,6 +1162,7 @@ jobs:
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_B64=ON \
+            -DUSE_SYSTEM_Crc32c=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -1207,8 +1216,11 @@ jobs:
             libssl-dev \
             libutfcpp-dev \
             ninja-build \
-            npm \
             rapidjson-dev
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev

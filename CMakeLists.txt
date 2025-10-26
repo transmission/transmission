@@ -52,7 +52,7 @@ set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 1.3)
-set(NPM_MINIMUM 8.1.307) # Node.js 14
+set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
 set(SMALL_MINIMUM 0.2.2)
@@ -90,6 +90,7 @@ tr_auto_option(USE_SYSTEM_WIDE_INTEGER "Use system WideInteger library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
+tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" AUTO)
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -574,6 +575,14 @@ tr_add_external_auto_library(B64 libb64
     SUBPROJECT
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
+
+tr_add_external_auto_library(CRC32C crc32c crc32c
+    TARGET Crc32c::crc32c
+    CMAKE_ARGS
+        -DCRC32C_BUILD_TESTS=OFF
+        -DCRC32C_BUILD_BENCHMARKS=OFF
+        -DCRC32C_USE_GLOG=OFF
+        -DCRC32C_INSTALL=ON)
 
 tr_add_external_auto_library(FAST_FLOAT FastFloat
     SUBPROJECT
