@@ -258,9 +258,10 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
 
 void tr_peer_info::update_canonical_priority()
 {
-    auto const type = client_external_address_.type;
-    if (type == NUM_TR_AF_INET_TYPES)
+    if (!client_external_address_.is_valid())
+    {
         return;
+    }
 
     // https://www.bittorrent.org/beps/bep_0040.html
     // If the IP addresses are the same, the port numbers (16-bit integers) should be used instead:
@@ -276,6 +277,8 @@ void tr_peer_info::update_canonical_priority()
         canonical_priority_ = tr_crc32c(reinterpret_cast<uint8_t*>(std::data(buf)), std::size(buf) * sizeof(uint16_t));
         return;
     }
+
+    auto const type = client_external_address_.type;
 
     // https://www.bittorrent.org/beps/bep_0040.html
     // The formula to be used in prioritizing peers is this:
