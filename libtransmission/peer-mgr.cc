@@ -259,6 +259,8 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
 void tr_peer_info::update_canonical_priority()
 {
     auto const type = client_external_address_.type;
+    if (type == NUM_TR_AF_INET_TYPES)
+        return;
 
     // https://www.bittorrent.org/beps/bep_0040.html
     // If the IP addresses are the same, the port numbers (16-bit integers) should be used instead:
