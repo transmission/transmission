@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype> /* isspace */
+#include <cctype> // isspace
 #include <cmath> // floor
 #include <chrono>
 #include <cstdint> // int64_t
@@ -21,8 +21,6 @@
 #include <vector>
 
 #include <curl/curl.h>
-
-#include <event2/buffer.h>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -779,30 +777,26 @@ static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
 
 [[nodiscard]] size_t write_func(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
-    auto* const buf = static_cast<evbuffer*>(vbuf);
-    size_t const byteCount = size * nmemb;
-    evbuffer_add(buf, ptr, byteCount);
-    return byteCount;
+    auto const n_bytes = size * nmemb;
+    static_cast<std::string*>(vbuf)->append(static_cast<char const*>(ptr), n_bytes);
+    return n_bytes;
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
-    auto& config = *static_cast<RemoteConfig*>(vconfig);
-    auto const* const line = static_cast<char const*>(ptr);
-    size_t const line_len = size * nmemb;
-    char const* key = TR_RPC_SESSION_ID_HEADER ": ";
-    size_t const key_len = strlen(key);
+    auto const line = std::string_view{ static_cast<char const*>(ptr), size * nmemb };
+    auto const key = tr_strlower(TR_RPC_SESSION_ID_HEADER ": ");
 
-    if (line_len >= key_len && evutil_ascii_strncasecmp(line, key, key_len) == 0)
+    if (tr_strv_starts_with(tr_strlower(line), key))
     {
-        char const* begin = line + key_len;
-        char const* end = std::find_if(begin, line + line_len, [](char c) { return isspace(c); });
-
-        config.session_id.assign(begin, end - begin);
+        auto const val = line.substr(key.size());
+        auto const begin = std::begin(val);
+        auto const end = std::find_if(begin, std::end(val), [](auto c) { return isspace(c); });
+        static_cast<RemoteConfig*>(vconfig)->session_id.assign(begin, end);
     }
 
-    return line_len;
+    return line.size();
 }
 
 [[nodiscard]] long get_timeout_secs(std::string_view req)
@@ -2317,7 +2311,7 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
     return status;
 }
 
-CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
+CURL* tr_curl_easy_init(std::string* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, LONG_VERSION_STRING).c_str());
@@ -2389,8 +2383,8 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
     auto const rpcurl_http = fmt::format("{:s}://{:s}", scheme, rpcurl);
 
-    auto* const buf = evbuffer_new();
-    auto* curl = tr_curl_easy_init(buf, config);
+    auto buf = std::string{};
+    auto* curl = tr_curl_easy_init(&buf, config);
     (void)curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, get_timeout_secs(json));
@@ -2414,10 +2408,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
         switch (response)
         {
         case 200:
-            status |= process_response(
-                rpcurl,
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) },
-                config);
+            status |= process_response(rpcurl, buf, config);
             break;
 
         case 409:
@@ -2430,18 +2421,13 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
             break;
 
         default:
-            fmt::print(
-                stderr,
-                "Unexpected response: {:s}\n",
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) });
+            fmt::print(stderr, "Unexpected response: {:s}\n", buf);
             status |= EXIT_FAILURE;
             break;
         }
     }
 
     /* cleanup */
-    evbuffer_free(buf);
-
     if (curl != nullptr)
     {
         tr_curl_easy_cleanup(curl);
