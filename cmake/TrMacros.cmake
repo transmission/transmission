@@ -143,8 +143,8 @@ endmacro()
 macro(tr_add_external_auto_library ID PACKAGENAME)
     cmake_parse_arguments(_TAEAL_ARG
         "SUBPROJECT;HEADER_ONLY"
-        "LIBNAME;NAMESPACE;SOURCE_DIR;TARGET"
-        "CMAKE_ARGS;COMPONENTS;TARGET_TRANSFORM"
+        "LIBNAME;SOURCE_DIR;TARGET"
+        "CMAKE_ARGS;COMPONENTS"
         ${ARGN})
 
     set(_TAEAL_SOURCE_DIR "${TR_THIRD_PARTY_SOURCE_DIR}")
