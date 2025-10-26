@@ -207,6 +207,7 @@ jobs:
         run: |
           brew install --formulae \
             cmake \
+            crc32c \
             fast_float \
             fmt \
             gettext \
@@ -246,6 +247,7 @@ jobs:
             -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_B64=ON \
+            -DUSE_SYSTEM_CRC32C=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -463,8 +465,8 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_B64=ON \ \
-            -DUSE_SYSTEM_Crc32c=ON \
+            -DUSE_SYSTEM_B64=ON \
+            -DUSE_SYSTEM_CRC32C=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -791,6 +793,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
             -DUSE_SYSTEM_DEFLATE=OFF \
             -DUSE_SYSTEM_DHT=OFF \
@@ -871,6 +874,7 @@ jobs:
             -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
+            -DUSE_SYSTEM_CRC32C=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
             -DUSE_SYSTEM_DEFLATE=OFF \
             -DUSE_SYSTEM_DHT=OFF \
@@ -1162,7 +1166,7 @@ jobs:
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_B64=ON \
-            -DUSE_SYSTEM_Crc32c=ON \
+            -DUSE_SYSTEM_CRC32C=ON \
             -DUSE_SYSTEM_DEFLATE=ON \
             -DUSE_SYSTEM_EVENT2=ON \
             -DUSE_SYSTEM_FAST_FLOAT=ON \
@@ -1299,7 +1303,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    
+
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v3
       with:
