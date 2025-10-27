@@ -25,6 +25,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // tr_pex
 #include "libtransmission/tr-macros.h" // tr_peer_id_t
+#include "libtransmission/utils.h"
 
 struct tr_url_parsed_t;
 
@@ -145,6 +146,30 @@ struct tr_announce_response
     /* tracker extension that returns the client's public IP address.
      * https://www.bittorrent.org/beps/bep_0024.html */
     std::optional<tr_address> external_ip;
+
+    static constexpr struct
+    {
+        static constexpr int compare(tr_announce_response const& lhs, tr_announce_response const& rhs)
+        {
+            if (auto val = tr_compare_3way(lhs.did_connect, rhs.did_connect); val != 0)
+            {
+                return val;
+            }
+
+            if (auto val = tr_compare_3way(lhs.did_timeout, rhs.did_timeout); val != 0)
+            {
+                return -val;
+            }
+
+            // Non-empty error message most likely means we reached the tracker
+            return -tr_compare_3way(std::empty(lhs.errmsg), std::empty(rhs.errmsg));
+        }
+
+        constexpr bool operator()(tr_announce_response const& lhs, tr_announce_response const& rhs) const noexcept
+        {
+            return compare(lhs, rhs) > 0;
+        }
+    } CompareFailed{};
 };
 
 // --- SCRAPE
