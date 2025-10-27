@@ -139,7 +139,7 @@ TEST_F(PeerInfoTest, updateCanonicalPriority)
                     uint32_t{ 0x67F8FE57 } },
     };
 
-    for (auto [client_sockaddr_str, peer_sockaddr_str, expected] : Tests)
+    for (auto const& [client_sockaddr_str, peer_sockaddr_str, expected] : Tests)
     {
         auto client_sockaddr = tr_socket_address::from_string(client_sockaddr_str);
         auto peer_sockaddr = tr_socket_address::from_string(peer_sockaddr_str);
