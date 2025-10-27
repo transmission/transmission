@@ -2580,18 +2580,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "დღე"
 msgstr[1] "დღე"
-
-#~ msgid "_File"
-#~ msgstr "_ფაილი"
-
-#~ msgid "_Queue"
-#~ msgstr "_რიგი"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "ტორენტების _დალაგება"
-
-#~ msgid "_Torrent"
-#~ msgstr "_ტორენტი"
-
-#~ msgid "_View"
-#~ msgstr "_ხედი"

@@ -2623,18 +2623,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "_File"
-#~ msgstr "_Fájl"
-
-#~ msgid "_Queue"
-#~ msgstr "_Sorrend"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "T_orrentek rendezése:"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Nézet"

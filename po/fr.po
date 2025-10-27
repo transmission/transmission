@@ -7,10 +7,10 @@
 # Philippe Janocha, 2017
 # Alexandre <a.github@jouand.in>, 2017
 # Thomas, 2022
-# Jean de la Mouche, 2022
 # Charles Monzat <c.monzat@laposte.net>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
+# Jean de la Mouche, 2022
 # AO <ao@localizationlab.org>, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: AO <ao@localizationlab.org>, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: French (https://app.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -215,7 +215,7 @@ msgstr "Terminé"
 
 #: ../gtk/DetailsDialog.cc:594 ../gtk/FilterBar.cc:478 ../gtk/Torrent.cc:427
 msgid "Paused"
-msgstr "En pause"
+msgstr "Suspendu"
 
 #: ../gtk/DetailsDialog.cc:615 ../gtk/DetailsDialog.cc:620 ../gtk/DetailsDialog.cc:737
 msgid "N/A"
@@ -958,7 +958,7 @@ msgstr "{current_size} sur {complete_size} ({percent_done} %)"
 
 #: ../gtk/Torrent.cc:479
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
-msgstr "{current_size} sur {complete_size} ({percent_complete} %), téléversé {uploaded_size} (ratio : {ratio}, objectif : {seed_ratio})"
+msgstr "{current_size} sur {complete_size} ({percent_complete} %), téléversés {uploaded_size} (ratio : {ratio}, objectif : {seed_ratio})"
 
 #: ../gtk/Torrent.cc:492
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
@@ -1000,9 +1000,9 @@ msgstr "Erreur locale : « {error} »"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] "Téléchargement des métadonnées de {active_count} pair connecté ({percent_done} % terminé)"
-msgstr[1] "Téléchargement des métadonnées de {active_count} de pairs connectés ({percent_done} % terminé)"
-msgstr[2] "Téléchargement des métadonnées de {active_count} pairs connectés ({percent_done} % terminé)"
+msgstr[0] "Téléchargement des métadonnées en provenance de {active_count} pair connecté ({percent_done} % terminés)"
+msgstr[1] "Téléchargement des métadonnées en provenance de {active_count} pairs connectés ({percent_done} % terminés)"
+msgstr[2] "Téléchargement des métadonnées en provenance de {active_count} pairs connectés ({percent_done} % terminés)"
 
 #: ../gtk/Torrent.cc:685
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -1014,16 +1014,16 @@ msgstr[2] "Téléchargement de {active_count} sur {connected_count} semences Web
 #: ../gtk/Torrent.cc:696
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] "Téléchargement de {active_count} semence Web"
-msgstr[1] "Téléchargement de {active_count} de semences Web"
-msgstr[2] "Téléchargement de {active_count} semences Web"
+msgstr[0] "Téléchargement en provenance de {active_count} semence Web"
+msgstr[1] "Téléchargement en provenance de {active_count} semences Web"
+msgstr[2] "Téléchargement en provenance de {active_count} semences Web"
 
 #: ../gtk/Torrent.cc:704
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] "Téléchargement de {active_count} sur {connected_count} pair connecté"
-msgstr[1] "Téléchargement de {active_count} sur {connected_count}de pairs connectés"
-msgstr[2] "Téléchargement de {active_count} sur {connected_count} pairs connectés"
+msgstr[0] "Téléchargement en provenance de {active_count} de {connected_count} pair connecté"
+msgstr[1] "Téléchargement en provenance de {active_count} de {connected_count} pairs connectés"
+msgstr[2] "Téléchargement en provenance de {active_count} de {connected_count} pairs connectés"
 
 #: ../gtk/Torrent.cc:713
 msgid "Seeding to {active_count} of {connected_count} connected peer"
@@ -1124,29 +1124,29 @@ msgstr[2] "{seconds:L} secondes"
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
 msgstr[0] "Encore {days_left:L} jour"
-msgstr[1] "Encore {days_left:L} de jours"
+msgstr[1] "Encore {days_left:L} jours"
 msgstr[2] "Encore {days_left:L} jours"
 
 #: ../gtk/Utils.cc:241
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
 msgstr[0] "Encore {hours_left:L} heure"
-msgstr[1] "Encore {hours_left:L} d’heures"
+msgstr[1] "Encore {hours_left:L} heures"
 msgstr[2] "Encore {hours_left:L} heures"
 
 #: ../gtk/Utils.cc:248
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] "{minutes_left:L} minute restante"
-msgstr[1] "Encore {minutes_left:L} de minutes"
+msgstr[0] "Encore {minutes_left:L} minute"
+msgstr[1] "Encore {minutes_left:L} minutes"
 msgstr[2] "Encore {minutes_left:L} minutes"
 
 #: ../gtk/Utils.cc:255
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] "{seconds_left:L} seconde restante"
-msgstr[1] "{seconds_left:L} secondes restantes"
-msgstr[2] "Encore {minutes_left:L} minute"
+msgstr[0] "Encore {seconds_left:L} seconde"
+msgstr[1] "Encore {seconds_left:L} secondes"
+msgstr[2] "Encore {seconds_left:L} secondes"
 
 #: ../gtk/Utils.cc:274
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -1188,7 +1188,7 @@ msgstr "Emplacement où chercher les fichiers de configuration"
 
 #: ../gtk/main.cc:80
 msgid "Start with all torrents paused"
-msgstr "Démarrer avec tous les torrents en pause"
+msgstr "Démarrer avec tous les torrents suspendus"
 
 #: ../gtk/main.cc:81
 msgid "Start minimized in notification area"
@@ -1277,7 +1277,7 @@ msgstr "torrents;téléchargement;téléversement;partager;partage;"
 
 #: ../gtk/transmission-gtk.desktop.in:20
 msgid "Start Transmission with All Torrents Paused"
-msgstr "Démarrer Transmission avec tous les torrents en pause"
+msgstr "Démarrer Transmission avec tous les torrents suspendus"
 
 #: ../gtk/transmission-gtk.desktop.in:24
 msgid "Start Transmission Minimized"
@@ -1309,11 +1309,11 @@ msgstr "Démarrer tous les torrents"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr "Tout mettre en _pause"
+msgstr "Tout sus_pendre"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr "Mettre tous les torrents en pause"
+msgstr "Suspendre tous les torrents"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
@@ -1381,11 +1381,11 @@ msgstr "Déplacer en _dernier"
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:54 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
-msgstr "Mettre en _pause"
+msgstr "Sus_pendre"
 
 #: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:52 ../gtk/ui/gtk4/MainWindow.ui:52
 msgid "Pause torrent"
-msgstr "Mettre le torrent en pause"
+msgstr "Suspendre le torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
@@ -2486,7 +2486,7 @@ msgstr "Impossible de déplacer « {old_path} »  vers « {path} » : {error
 
 #: ../libtransmission/torrent.cc:1554
 msgid "Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\", then use \"Verify Local Data\" again. To re-download, start the torrent."
-msgstr "Le torrent a été mis en pause, car aucune donnée n’a été trouvée. Assurez-vous que vos disques sont connectés ou utilisez « Définir l’emplacement ». Pour retélécharger, utilisez « Vérifier les données locales », puis lancez le torrent."
+msgstr "Le torrent a été suspendu, car aucune donnée n’a été trouvée. Assurez-vous que vos disques sont connectés ou utilisez « Définir l’emplacement ». Pour retélécharger, utilisez « Vérifier les données locales », puis lancez le torrent."
 
 #: ../libtransmission/torrent.cc:2050
 msgid "Tracker warning: '{warning}' ({url})"
@@ -2574,15 +2574,15 @@ msgstr "Impossible d’attendre les changements du dossier"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Envisagez de mettre à niveau votre installation de curl."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} est sujet à des plantages SIGPIPE. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} est sujet à une vulnérabilité eventfd double ferneture qui pourrait provoquer des plantages SIGABRT pour le service systemd transmission-daemon. {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2641,18 +2641,3 @@ msgid_plural "days"
 msgstr[0] "jour"
 msgstr[1] "de jours"
 msgstr[2] "jours"
-
-#~ msgid "_File"
-#~ msgstr "_Fichier"
-
-#~ msgid "_Queue"
-#~ msgstr "_File d’attente"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Trier les torrent_s par"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Affichage"

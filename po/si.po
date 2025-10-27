@@ -2578,12 +2578,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_Queue"
-#~ msgstr "පෝලිම (_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "අනුව ටොරන්ට් පෙලගස්වන්න (_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "ටොරන්ට් (_T)"

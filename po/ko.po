@@ -2553,18 +2553,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "_File"
-#~ msgstr "파일(_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "대기열(_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "다음 기준으로 토렌트 정렬(_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "토렌트(_T)"
-
-#~ msgid "_View"
-#~ msgstr "보기(_V)"

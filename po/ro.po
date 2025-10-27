@@ -2653,18 +2653,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "_File"
-#~ msgstr "_Fişier"
-
-#~ msgid "_Queue"
-#~ msgstr "_Coadă"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Sortează torentele după"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torent"
-
-#~ msgid "_View"
-#~ msgstr "_Vizualizare"

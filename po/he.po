@@ -5,9 +5,9 @@
 #
 # Translators:
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # Avi Markovitz <avi.markovitz@gmail.com>, 2023
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -2631,15 +2631,15 @@ msgstr "לא ניתן להמתין לשינויים בתיקייה"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "כדאי לעדכן את ה־curl שלך."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} חשוף לקריסות SIGPIPE.‏ {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} חשוף לחולשת סגירת eventfd כפולה שעלולה לגרום לקריסותSIGABRT לשירות ה־systemd בשם transmission-daemon.‏ {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2704,18 +2704,3 @@ msgstr[0] "יום"
 msgstr[1] "יומיים"
 msgstr[2] "ימים"
 msgstr[3] "ימים"
-
-#~ msgid "_File"
-#~ msgstr "_קובץ"
-
-#~ msgid "_Queue"
-#~ msgstr "ה_עברה לתור"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_סידור טורנטים לפי"
-
-#~ msgid "_Torrent"
-#~ msgstr "_טורנט"
-
-#~ msgid "_View"
-#~ msgstr "_תצוגה"

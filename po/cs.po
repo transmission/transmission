@@ -2691,18 +2691,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "_File"
-#~ msgstr "_Soubor"
-
-#~ msgid "_Queue"
-#~ msgstr "_Fronta"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Řadit torrenty _dle"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Zobrazit"

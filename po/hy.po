@@ -2580,12 +2580,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "_Նշոց"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Հոսընթաց"
-
-#~ msgid "_View"
-#~ msgstr "_Տեսք"

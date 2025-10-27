@@ -5,10 +5,10 @@
 #
 # Translators:
 # Gonçalo Matos, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
-# Rui <xymarior@yandex.com>, 2022
-# Hugo Carvalho <hugokarvalho@hotmail.com>, 2022
 # 7c6417e89b22a8ff879ae1c785868b50_dffeeef <c09a75da091a7c844bae1ff96a7d87ea_606937>, 2022
+# Rui <xymarior@yandex.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Hugo Carvalho <hugokarvalho@hotmail.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: 7c6417e89b22a8ff879ae1c785868b50_dffeeef <c09a75da091a7c844bae1ff96a7d87ea_606937>, 2022\n"
+"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>, 2025\n"
 "Language-Team: Portuguese (Portugal) (https://app.transifex.com/transmissionbt/teams/33778/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -115,7 +115,7 @@ msgstr "_Cancelar"
 
 #: ../gtk/Application.cc:791
 msgid "I _Agree"
-msgstr "Eu _Concordo"
+msgstr "_Concordo"
 
 #: ../gtk/Application.cc:1020
 msgid "Closing Connections…"
@@ -226,7 +226,7 @@ msgstr "Misturado"
 
 #: ../gtk/DetailsDialog.cc:630
 msgid "No Torrents Selected"
-msgstr "Sem Torrents Selecionados"
+msgstr "Nenhum torrent selecionado"
 
 #: ../gtk/DetailsDialog.cc:659
 msgid "Private to this tracker -- DHT and PEX disabled"
@@ -285,7 +285,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1025
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (Rácio: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1066
 msgid "No errors"
@@ -908,7 +908,7 @@ msgstr "Impedir a hibernação"
 
 #: ../gtk/Session.cc:1092 ../gtk/Session.cc:1118
 msgid "Couldn't inhibit desktop hibernation: {error}"
-msgstr ""
+msgstr "Não foi possível inibir a hibernação: {error}"
 
 #. logging
 #: ../gtk/Session.cc:1113
@@ -1316,11 +1316,11 @@ msgstr "_Sair"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr "Selecion_ar Tudo"
+msgstr "Selecion_ar tudo"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr "Desce_lecionar Tudo"
+msgstr "Desselecionar tudo"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
@@ -1758,7 +1758,7 @@ msgstr "_Começar logo ao adicionar"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:182 ../gtk/ui/gtk3/PrefsDialog.ui:458 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr ""
+msgstr "Mo_ver o ficheiro torrent para o lixo"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:7 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -1775,12 +1775,12 @@ msgstr "Limites de Velocidade"
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:90 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
-msgstr ""
+msgstr "_Enviar ({speed_units}):"
 
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr ""
+msgstr "_Receber ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"
@@ -1820,7 +1820,7 @@ msgstr "A adicionar"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
-msgstr ""
+msgstr "Adicionar automaticamente ficheiros torrent a partir de:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
@@ -1836,7 +1836,7 @@ msgstr "Gravar na _localização:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:557 ../gtk/ui/gtk4/PrefsDialog.ui:389
 msgid "Download Queue"
-msgstr "Fila de descarregamento"
+msgstr "Fila de descargas"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:573 ../gtk/ui/gtk4/PrefsDialog.ui:401
 msgid "Ma_ximum active downloads:"
@@ -1860,12 +1860,12 @@ msgstr "Manter os torrents incompletos em:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Invocar o scrip_t quando terminar a descarga:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:740 ../gtk/ui/gtk4/PrefsDialog.ui:528
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr "Descarregar"
+msgstr "A descarregar"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:762 ../gtk/ui/gtk4/PrefsDialog.ui:545
 msgid "Limits"
@@ -1881,7 +1881,7 @@ msgstr "Parar de semear se estiver inativo por _X minutos:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:806 ../gtk/ui/gtk4/PrefsDialog.ui:581
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Invocar o scrip_t quando terminar de semear:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:874 ../gtk/ui/gtk4/PrefsDialog.ui:631
 msgctxt "Gerund"
@@ -1994,7 +1994,7 @@ msgstr "Rede"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1509 ../gtk/ui/gtk3/PrefsDialog.ui:1653 ../gtk/ui/gtk4/PrefsDialog.ui:1112 ../gtk/ui/gtk4/PrefsDialog.ui:1218
 msgid "Desktop"
-msgstr "Secretária"
+msgstr "Ambiente gráfico"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1523 ../gtk/ui/gtk4/PrefsDialog.ui:1124
 msgid "_Inhibit hibernation when torrents are active"
@@ -2439,11 +2439,11 @@ msgstr ""
 
 #: ../libtransmission/torrent.cc:404
 msgid "Calling script '{path}'"
-msgstr ""
+msgstr "A invocar o script '{path}'"
 
 #: ../libtransmission/torrent.cc:412
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Não foi possível invocar o script '{path}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:446
 msgid "Seed ratio reached; pausing torrent"
@@ -2630,18 +2630,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "_File"
-#~ msgstr "_Ficheiro"
-
-#~ msgid "_Queue"
-#~ msgstr "F_ila"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Ordenar Torrents por"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Vista"

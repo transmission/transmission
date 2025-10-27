@@ -7,12 +7,13 @@
 # Clay Cheng <569735195@qq.com>, 2020
 # Lin Xue <iconteral@yahoo.com>, 2022
 # 玉堂白鹤 <yjwork@qq.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # Dingzhong Chen <wsxy162@gmail.com>, 2023
 # LIN, 2023
 # Wenbin Lv <wenbin816@gmail.com>, 2023
 # 普鲁文 <pluwen@gmail.com>, 2024
 # YFdyh000 <yfdyh000@gmail.com>, 2024
+# watchout, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -21,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: YFdyh000 <yfdyh000@gmail.com>, 2024\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -872,35 +873,35 @@ msgstr "正在获取新的屏蔽列表…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "未知"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "检查中"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "打开"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "关闭"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "错误"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "状态: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "状态: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2109,11 +2110,11 @@ msgstr "未知错误"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} 连接失败"
 
 #: ../libtransmission/announcer-udp.cc:495
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "无法使用{ip_protocol}找到 '{address}:{port}' : {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2240,7 +2241,7 @@ msgstr "本地地址为“{address}”"
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "本地端口 {local_port} 未转发至 {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2252,7 +2253,7 @@ msgstr "通过“{url}”，服务“{type}”进行端口转发。（本地地�
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "本地端口 {local_port} 已转发至 {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2288,27 +2289,27 @@ msgstr "Unix socket 路径必须少于 {count} 个字符（包括“{prefix}”�
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "已拒绝来自 {host} 的请求（可能引起目录遍历攻击）"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "已拒绝来自 {host} 的请求（暴力破解保护已激活）"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "已拒绝来自 {host} 的请求（IP 未在白名单）"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "已拒绝来自 {host} 的请求（认证失败）"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "已拒绝来自 {host} 的请求（主机未在白名单）"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "来自 {host} 的未知 URI: '{uri}'"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2434,7 +2435,7 @@ msgstr "正在暂停种子任务"
 
 #: ../libtransmission/torrent.cc:723
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "无法移除全部种子文件: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:789
 msgid "Removing torrent"
@@ -2462,11 +2463,11 @@ msgstr "无法查询“{address}:{port}”：{error}（{error_code}）"
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "无法初始化 {ip_protocol} LPD: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "无法设置 IPv4 套接字为非阻塞模式 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2474,7 +2475,7 @@ msgstr "无法绑定 IPv4 socket {address}：{error}（{error_code}）"
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "无法设置 IPv6 套接字为非阻塞模式 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
@@ -2534,15 +2535,15 @@ msgstr "无法等待目录更改"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "请考虑升级您的 curl 工具"
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} 易受 SIGPIPE 崩溃影响。 {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} 存在 eventfd 双重关闭漏洞，这可能导致 transmission-daemon systemd 服务发生 SIGABRT 崩溃。 {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2589,18 +2590,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "_File"
-#~ msgstr "文件(_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "队列(_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "排列种子(_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "种子(_T)"
-
-#~ msgid "_View"
-#~ msgstr "查看(_V)"

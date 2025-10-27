@@ -5,8 +5,8 @@
 #
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # maboroshin, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: maboroshin, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -2487,15 +2487,15 @@ msgstr "ディレクトリの変更を待機できません"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "curl のアップグレードを考慮してください。"
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} は SIGPIPE クラッシュを起こしやすいです。{details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} には、eventfd にて二重にクローズする脆弱性があり、 transmission-daemon systemd サービスに SIGABRT クラッシュを引き起こすことがあります。{details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2542,18 +2542,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid "_File"
-#~ msgstr "ファイル(_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "待ち行列(_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "トレントの並べ替え(_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "トレント(_T)"
-
-#~ msgid "_View"
-#~ msgstr "表示(_V)"

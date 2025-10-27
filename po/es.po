@@ -5,7 +5,7 @@
 #
 # Translators:
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
-# Adolfo Jayme-Barrientos, 2021
+# Adolfo Jayme Barrientos, 2021
 # Julvenzor <adrlopgal@disroot.org>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
@@ -2722,18 +2722,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgid "_File"
-#~ msgstr "_Archivo"
-
-#~ msgid "_Queue"
-#~ msgstr "_Cola"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Ordenar torrents por"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Ver"

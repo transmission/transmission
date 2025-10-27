@@ -7,8 +7,8 @@
 # Rodrigo Piñero <rodrigo.pinero@yahoo.com.br>, 2017
 # Gustavo Costa <xfgusta@gmail.com>, 2022
 # Gabriel P Machado <machado.gp@gmail.com>, 2022
-# 380125ae2590f93d3e1eff2258abdf75_6979c31, 2022
 # Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2022
+# 380125ae2590f93d3e1eff2258abdf75_6979c31, 2022
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
@@ -2703,18 +2703,3 @@ msgid_plural "days"
 msgstr[0] "dia"
 msgstr[1] "dias"
 msgstr[2] "dias"
-
-#~ msgid "_File"
-#~ msgstr "_Arquivo"
-
-#~ msgid "_Queue"
-#~ msgstr "_Fila"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Ordenar Torrent_s Por"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Visualizar"

@@ -2722,15 +2722,3 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
-
-#~ msgid "_File"
-#~ msgstr "_Restr"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Rummañ an torrentoù dre"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "G_welout"

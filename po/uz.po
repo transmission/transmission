@@ -2536,18 +2536,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "_File"
-#~ msgstr "_Fayl"
-
-#~ msgid "_Queue"
-#~ msgstr "_So‘rov"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Torrentlarni _taxlash"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Ko‘rinishi"

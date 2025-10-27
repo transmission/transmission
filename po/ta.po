@@ -2577,15 +2577,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "கோப்பு (_F)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "டொராண்ட் படி ஒழுங்குசெய் (_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "டொராண்ட் (_T)"
-
-#~ msgid "_View"
-#~ msgstr "காட்சி (_V)"

@@ -2625,18 +2625,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "_File"
-#~ msgstr "_Fichier"
-
-#~ msgid "_Queue"
-#~ msgstr "_File d'attente"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Trier les torrent_s par"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Affichage"

@@ -2535,18 +2535,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "_File"
-#~ msgstr "檔案(_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "佇列(_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "排序 torrent(_S) 按"
-
-#~ msgid "_Torrent"
-#~ msgstr "Torrent(_T)"
-
-#~ msgid "_View"
-#~ msgstr "檢視(_V)"

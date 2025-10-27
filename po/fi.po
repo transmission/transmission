@@ -6,8 +6,8 @@
 # Translators:
 # Otto Koskelah <otto@nise.fi>, 2017
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2023
-# Mike Gelfand <mikedld@mikedld.com>, 2023
 # Kimmo Kujansuu <mrkujansuu@gmail.com>, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Finnish (https://app.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -2550,15 +2550,15 @@ msgstr "Ei voitu odottaa hakemiston muutoksia"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Harkitse curl-asennuksen päivittämistä."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} on altis SIGPIPE kaatumisille. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} on altis eventfd double close haavoittuvuudelle, joka saattaa aiheuttaa SIGABRT-kaatumiset transmission-daemon systemd palvelulle. {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2611,18 +2611,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
-
-#~ msgid "_File"
-#~ msgstr "_Tiedosto"
-
-#~ msgid "_Queue"
-#~ msgstr "_Jono"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Järje_stä torrentit"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Näytä"

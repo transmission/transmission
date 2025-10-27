@@ -2578,18 +2578,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "jorn"
 msgstr[1] "jorns"
-
-#~ msgid "_File"
-#~ msgstr "_Fichièr"
-
-#~ msgid "_Queue"
-#~ msgstr "_Metre en espèra"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Triar los torrent_s per"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Afichatge"

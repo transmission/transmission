@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Lim Karsen, 2023
 # scootergrisen, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: scootergrisen, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Danish (https://app.transifex.com/transmissionbt/teams/33778/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -528,8 +528,8 @@ msgstr[1] "Slet de downloadede filer fra disse {count:L} torrents?"
 #: ../gtk/Dialogs.cc:68
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen."
-msgstr[1] "Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne."
+msgstr[0] "Når den er blevet fjernet kræver det torrent-filen eller magnetlinket for at fortsætte overførslen."
+msgstr[1] "Når de er blevet fjernet kræver det torrent-filerne eller magnetlinkene for at fortsætte overførslerne."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent has not finished downloading."
@@ -650,7 +650,7 @@ msgstr "Ubegrænset"
 
 #: ../gtk/MainWindow.cc:500
 msgid "Seed Forever"
-msgstr "Seed for altid"
+msgstr "Seed uendeligt"
 
 #: ../gtk/MainWindow.cc:539
 msgid "Limit Download Speed"
@@ -691,12 +691,12 @@ msgstr "Forhold: {ratio}"
 #: ../gtk/MainWindow.cc:772
 msgctxt "current session totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr "Ned: {downloaded_size}, op: {uploaded_size}"
+msgstr "Ned: {downloaded_size}, Op: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:780
 msgctxt "all-time totals"
 msgid "Down: {downloaded_size}, Up: {uploaded_size}"
-msgstr "Ned: {downloaded_size}, op: {uploaded_size}"
+msgstr "Ned: {downloaded_size}, Op: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:814
 msgid "{download_speed} ▼"
@@ -1157,7 +1157,7 @@ msgstr "Transmission ved ikke hvordan den skal bruge '{url}'"
 
 #: ../gtk/Utils.cc:874
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr "Magnet-linket ser ud til at være beregnet til noget andet end BitTorrent."
+msgstr "Magnetlinket ser ud til at være beregnet til noget andet end BitTorrent."
 
 #: ../gtk/main.cc:63 ../gtk/transmission-gtk.desktop.in:2
 msgid "Transmission"
@@ -1379,7 +1379,7 @@ msgstr "_Bekræft lokale data"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "_Kopiér magnet-link til udklipsholder"
+msgstr "_Kopiér magnetlink til udklipsholder"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:67 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:62 ../gtk/ui/gtk4/MainWindow.ui:64
 msgid "Remove torrent"
@@ -1623,7 +1623,7 @@ msgstr "Modpartsforbindelser"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1141 ../gtk/ui/gtk4/DetailsDialog.ui:843
 msgid "_Maximum peers:"
-msgstr "_Maksimum modparter:"
+msgstr "_Højeste antal modparter:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1180 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1328 ../gtk/ui/gtk4/DetailsDialog.ui:871 ../gtk/ui/gtk4/MainWindow.ui:136 ../gtk/ui/gtk4/PrefsDialog.ui:973
 msgid "Options"
@@ -1795,7 +1795,7 @@ msgstr "_Planlagte tidspunkter:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:260 ../gtk/ui/gtk4/PrefsDialog.ui:167
 msgid "_On days:"
-msgstr "_På dagene:"
+msgstr "_På følgende dage:"
 
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:317 ../gtk/ui/gtk4/PrefsDialog.ui:210
@@ -1805,7 +1805,7 @@ msgstr "_til"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:395 ../gtk/ui/gtk4/PrefsDialog.ui:262
 msgctxt "Gerund"
 msgid "Adding"
-msgstr "Tilføjer"
+msgstr "Tilføjelse"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
@@ -1813,7 +1813,7 @@ msgstr "Tilføj automatisk torrent-filer _fra:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:424 ../gtk/ui/gtk4/PrefsDialog.ui:286
 msgid "Show the Torrent Options _dialog"
-msgstr "Vis torrent-indstillinger-_dialogen"
+msgstr "Vis torrent-indstillings_dialogen"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:441 ../gtk/ui/gtk4/PrefsDialog.ui:300
 msgid "_Start added torrents"
@@ -1829,7 +1829,7 @@ msgstr "Downloadkø"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:573 ../gtk/ui/gtk4/PrefsDialog.ui:401
 msgid "Ma_ximum active downloads:"
-msgstr "Mak_simale aktive downloads:"
+msgstr "_Højeste antal aktive downloads:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:587 ../gtk/ui/gtk4/PrefsDialog.ui:413
 msgid "Downloads sharing data in the last _N minutes are active:"
@@ -1845,7 +1845,7 @@ msgstr "Tilføj \"._part\" til ufuldstændige filers navne"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:667 ../gtk/ui/gtk4/PrefsDialog.ui:477
 msgid "Keep _incomplete torrents in:"
-msgstr "Behold ufuldstændige torrents _i:"
+msgstr "Opbevar ufuldstændige torrents _i:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:682 ../gtk/ui/gtk4/PrefsDialog.ui:489
 msgid "Call scrip_t when done downloading:"
@@ -1915,7 +1915,7 @@ msgstr "Vælg en _tilfældig port hver gang Transmission startes"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1151 ../gtk/ui/gtk4/PrefsDialog.ui:839
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Brug port-_viderestilling med UPnP eller NAT-PMP fra min router"
+msgstr "Brug port_viderestilling med UPnP eller NAT-PMP fra min router"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1213 ../gtk/ui/gtk4/PrefsDialog.ui:891
 msgid "Te_st Port"
@@ -1923,7 +1923,7 @@ msgstr "Te_st port"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1249 ../gtk/ui/gtk4/PrefsDialog.ui:911
 msgid "Peer Limits"
-msgstr "Modpartsbegrænsning"
+msgstr "Modpartsbegrænsninger"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1265 ../gtk/ui/gtk4/PrefsDialog.ui:923
 msgid "Maximum peers per _torrent:"
@@ -2260,11 +2260,11 @@ msgstr "Lokal port {local_port} er ikke viderestillet til {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr "Stopper port-viderestilling gennem '{url}', tjeneste '{type}'"
+msgstr "Stopper portviderestilling gennem '{url}', tjeneste '{type}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:345
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr "Port-viderestilling gennem '{url}', tjeneste '{type}'. (lokal adresse: {address}:{port})"
+msgstr "Portviderestilling gennem '{url}', tjeneste '{type}'. (lokal adresse: {address}:{port})"
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
@@ -2552,15 +2552,15 @@ msgstr "Kunne ikke vente på ændringer af mappe"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Overvej at opgradere din curl-installation."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} er tilbøjelig til at SIGPIPE-crashe. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} er tilbøjelig til en sårbarhed med dobbeltlukning af eventfd, der kan fører til SIGABRT-crash af systemd-tjenesten transmission-daemon. {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2613,18 +2613,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dage"
-
-#~ msgid "_File"
-#~ msgstr "_Fil"
-
-#~ msgid "_Queue"
-#~ msgstr "_Kø"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Sortér torrents efter"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Vis"

@@ -5,6 +5,7 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# kelvin nam, 2025
 #
 #, fuzzy
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: kelvin nam, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/transmissionbt/teams/33778/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -31,63 +32,63 @@ msgstr ""
 
 #: ../daemon/daemon.cc:207 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Không thể đọc '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:232 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Không thể thêm file torrent '{path}'"
 
 #: ../daemon/daemon.cc:241
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Đang xóa file torrent '{path}'"
 
 #: ../daemon/daemon.cc:246 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Không thể xóa '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:655
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "Không thể phân tích log cấp '{level}'"
 
 #: ../daemon/daemon.cc:703
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "Đang hoãn việc tải lại cho đến khi phiên được khởi động hoàn tất."
 
 #: ../daemon/daemon.cc:717
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "Đang tải lại cài đặt từ '{path}'"
 
 #: ../daemon/daemon.cc:741
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "Không thể khởi tạo trình nền: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:753
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "Đang tải cài đặt từ '{path}'"
 
 #: ../daemon/daemon.cc:774
 msgid "Saved pidfile '{path}'"
-msgstr ""
+msgstr "Đã lưu pidfile '{path}'"
 
 #: ../daemon/daemon.cc:780 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1008 ../libtransmission/torrent.cc:1997 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Không thể lưu '{path}': {error} ({error_code})"
 
 #: ../daemon/daemon.cc:789
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Yêu cầu xác thực"
 
 #: ../daemon/daemon.cc:811
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "Theo dõi '{path}' để tìm file torrent mới"
 
 #: ../daemon/daemon.cc:856 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "Không thể tạo event: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:866 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "Không thể thêm event: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:880
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
@@ -198,7 +199,7 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:585 ../gtk/FilterBar.cc:476
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "Đang tải"
 
 #: ../gtk/DetailsDialog.cc:588 ../gtk/Torrent.cc:436
 msgid "Queued for seeding"
@@ -207,7 +208,7 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:591 ../gtk/FilterBar.cc:477
 msgctxt "Verb"
 msgid "Seeding"
-msgstr ""
+msgstr "Đang seed"
 
 #: ../gtk/DetailsDialog.cc:594 ../gtk/FilterBar.cc:479 ../gtk/Torrent.cc:427
 msgid "Finished"
@@ -239,15 +240,15 @@ msgstr "Torrent công khai"
 
 #: ../gtk/DetailsDialog.cc:723
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "Tạo bởi {creator} vào {date}"
 
 #: ../gtk/DetailsDialog.cc:729
 msgid "Created by {creator}"
-msgstr ""
+msgstr "Tạo bởi {creator}"
 
 #: ../gtk/DetailsDialog.cc:733
 msgid "Created on {date}"
-msgstr ""
+msgstr "Tạo vào {date}"
 
 #: ../gtk/DetailsDialog.cc:847
 msgid "Unknown"
@@ -256,7 +257,7 @@ msgstr "Không biết"
 #: ../gtk/DetailsDialog.cc:885 ../gtk/MakeDialog.cc:393
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
+msgstr[0] "{total_size} trong {file_count:L} tập tin"
 
 #: ../gtk/DetailsDialog.cc:900 ../gtk/MakeDialog.cc:401
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
@@ -699,22 +700,22 @@ msgstr ""
 #: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Lỗi"
 
 #: ../gtk/MessageLogWindow.cc:106
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Cảnh báo"
 
 #: ../gtk/MessageLogWindow.cc:107
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Thông tin"
 
 #: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Debug"
 
 #: ../gtk/MessageLogWindow.cc:271
 msgid "Save Log"
@@ -722,7 +723,7 @@ msgstr "Lưu Nhật ký"
 
 #: ../gtk/MessageLogWindow.cc:271 ../gtk/ui/gtk3/EditTrackersDialog.ui:34 ../gtk/ui/gtk4/EditTrackersDialog.ui:94
 msgid "_Save"
-msgstr ""
+msgstr "_Lưu"
 
 #: ../gtk/MessageLogWindow.cc:351
 msgid "Message"
@@ -750,7 +751,7 @@ msgstr "Hoàn thành Torrent"
 
 #: ../gtk/Notify.cc:274
 msgid "Start Now"
-msgstr ""
+msgstr "Bắt đầu ngay"
 
 #: ../gtk/Notify.cc:286
 msgid "Torrent Added"
@@ -770,7 +771,7 @@ msgstr "Mở một torrent"
 
 #: ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:154 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:24 ../gtk/ui/gtk3/OptionsDialog.ui:35 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:34 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:75
 msgid "_Open"
-msgstr ""
+msgstr "_Mở"
 
 #: ../gtk/OptionsDialog.cc:383
 msgid "Show options dialog"
@@ -778,11 +779,11 @@ msgstr ""
 
 #: ../gtk/PathButton.cc:152
 msgid "Select a File"
-msgstr ""
+msgstr "Chọn một tập tin"
 
 #: ../gtk/PathButton.cc:210
 msgid "(None)"
-msgstr ""
+msgstr "(Trống)"
 
 #: ../gtk/PrefsDialog.cc:314
 msgid "Allow encryption"
@@ -811,56 +812,56 @@ msgstr "Cuối tuần"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] ""
+msgstr[0] "Danh sách chặn có {count:L} mục"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr ""
+msgstr "Đã cập nhật danh sách chặn!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr ""
+msgstr "Không thể cập nhật danh sách chặn"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
-msgstr ""
+msgstr "Đang tải danh sách chặn mới..."
 
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "không rõ"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "đang kiểm tra..."
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "mở"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "đã đóng"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "lỗi"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Trạng thái: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Trạng thái: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
-msgstr ""
+msgstr "Đang di chuyển '{torrent_name}'"
 
 #: ../gtk/RelocateDialog.cc:98
 msgid "Couldn't move torrent"
@@ -868,11 +869,11 @@ msgstr "Không di chuyển được torrent"
 
 #: ../gtk/RelocateDialog.cc:149
 msgid "This may take a moment…"
-msgstr ""
+msgstr "Vui lòng chờ trong giây lát..."
 
 #: ../gtk/Session.cc:797 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
-msgstr ""
+msgstr "Không thể đọc '{path}"
 
 #. logging
 #: ../gtk/Session.cc:1085
@@ -991,86 +992,86 @@ msgstr[0] ""
 #: ../gtk/Utils.cc:135
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
+msgstr[0] "{days_from_now:L} ngày kể từ bây giờ"
 
 #: ../gtk/Utils.cc:142
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
+msgstr[0] "{hours_from_now:L} tiếng kể từ bây giờ"
 
 #: ../gtk/Utils.cc:150
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
+msgstr[0] "{minutes_from_now:L} phút kể từ bây giờ"
 
 #: ../gtk/Utils.cc:158
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
+msgstr[0] "{seconds_from_now:L} giây kể từ bây giờ"
 
 #: ../gtk/Utils.cc:162 ../gtk/Utils.cc:195 ../gtk/Utils.cc:226 ../gtk/Utils.cc:259
 msgid "now"
-msgstr ""
+msgstr "bây giờ"
 
 #: ../gtk/Utils.cc:170
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
+msgstr[0] "cách đây {days_ago:L} ngày"
 
 #: ../gtk/Utils.cc:177
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
+msgstr[0] "cách đây {hours_ago:L} tiếng"
 
 #: ../gtk/Utils.cc:184
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
+msgstr[0] "cách đây {minutes_ago:L} phút"
 
 #: ../gtk/Utils.cc:191
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
+msgstr[0] "cách đây {seconds_ago:L} giây"
 
 #: ../gtk/Utils.cc:204
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
-msgstr[0] ""
+msgstr[0] "{days:L} ngày"
 
 #: ../gtk/Utils.cc:209
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
+msgstr[0] "{hours:L} tiếng"
 
 #: ../gtk/Utils.cc:215
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
+msgstr[0] "{minutes:L} phút"
 
 #: ../gtk/Utils.cc:222
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
+msgstr[0] "{seconds:L} giây"
 
 #: ../gtk/Utils.cc:234
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
+msgstr[0] "còn {days_left:L} ngày"
 
 #: ../gtk/Utils.cc:241
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
+msgstr[0] "còn {hours_left:L} tiếng"
 
 #: ../gtk/Utils.cc:248
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
+msgstr[0] "còn {minutes_left:L} phút"
 
 #: ../gtk/Utils.cc:255
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
+msgstr[0] "còn {seconds_left:L} giây"
 
 #: ../gtk/Utils.cc:274
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -1132,27 +1133,27 @@ msgstr ""
 
 #: ../gtk/main.cc:120
 msgid "B/s"
-msgstr ""
+msgstr "B/giây"
 
 #: ../gtk/main.cc:120
 msgid "GB/s"
-msgstr ""
+msgstr "GB/giây"
 
 #: ../gtk/main.cc:120
 msgid "MB/s"
-msgstr ""
+msgstr "MB/giây"
 
 #: ../gtk/main.cc:120
 msgid "TB/s"
-msgstr ""
+msgstr "TB/giây"
 
 #: ../gtk/main.cc:120
 msgid "kB/s"
-msgstr ""
+msgstr "kB/giây"
 
 #: ../gtk/main.cc:121 ../gtk/main.cc:122
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: ../gtk/main.cc:121
 msgid "GiB"
@@ -1172,19 +1173,19 @@ msgstr "TiB"
 
 #: ../gtk/main.cc:122
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: ../gtk/main.cc:122
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: ../gtk/main.cc:122
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/main.cc:122
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: ../gtk/transmission-gtk.desktop.in:3
 msgid "BitTorrent Client"
@@ -1221,7 +1222,7 @@ msgstr ""
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "_Mới..."
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -2084,7 +2085,7 @@ msgstr ""
 
 #: ../libtransmission/announcer.cc:1095
 msgid "Success"
-msgstr ""
+msgstr "Thành công"
 
 #: ../libtransmission/blocklist.cc:82 ../libtransmission/blocklist.cc:405
 msgid "Blocklist '{path}' has {count} entry"
@@ -2523,31 +2524,19 @@ msgstr[0] ""
 #: ../utils/remote.cc:140
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
+msgstr[0] "giờ"
 
 #: ../utils/remote.cc:141
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
+msgstr[0] "phút"
 
 #: ../utils/remote.cc:142 ../utils/remote.cc:162
 msgid "seconds"
 msgid_plural "seconds"
-msgstr[0] ""
+msgstr[0] "giây"
 
 #: ../utils/remote.cc:146
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-
-#~ msgid "_File"
-#~ msgstr "_Tập tin"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Xếp Torrent theo"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Hiển thị"
+msgstr[0] "ngày"

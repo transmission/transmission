@@ -2715,18 +2715,3 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "_Queue"
-#~ msgstr "Додати до _черги"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Впорядкувати торенти за"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торент"
-
-#~ msgid "_View"
-#~ msgstr "_Перегляд"

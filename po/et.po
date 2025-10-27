@@ -2592,18 +2592,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "_Fail"
-
-#~ msgid "_Queue"
-#~ msgstr "_Järjekord"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Järjesta torrentid"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Vaade"

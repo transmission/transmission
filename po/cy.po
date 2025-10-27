@@ -2672,18 +2672,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "_File"
-#~ msgstr "_Ffeil"
-
-#~ msgid "_Queue"
-#~ msgstr "_Ciw"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Trefnu Torren"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "Go_lwg"

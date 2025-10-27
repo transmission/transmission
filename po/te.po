@@ -2581,18 +2581,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "దస్త్రం (_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "వరుస (_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "టోరెంట్లను ఇలా క్రమబద్దీకరించు(_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "టోరెంట్ (_T)"
-
-#~ msgid "_View"
-#~ msgstr "వీక్షణం (_V)"

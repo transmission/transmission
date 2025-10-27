@@ -2580,18 +2580,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "फाईल"
-
-#~ msgid "_Queue"
-#~ msgstr "रांग"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "टोरंट क्रमवारीनुसार लावा"
-
-#~ msgid "_Torrent"
-#~ msgstr "टोरंट"
-
-#~ msgid "_View"
-#~ msgstr "दृश्य"

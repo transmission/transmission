@@ -2579,15 +2579,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "_Besjtandj"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_sorteer stortvlooden bie"
-
-#~ msgid "_Torrent"
-#~ msgstr "stortvlood"
-
-#~ msgid "_View"
-#~ msgstr "_kiekhook"

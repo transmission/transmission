@@ -2624,9 +2624,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "_File"
-#~ msgstr "_Fiila"
-
-#~ msgid "_View"
-#~ msgstr "_Čájet"

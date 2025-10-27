@@ -2688,18 +2688,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "_Queue"
-#~ msgstr "_Чарга"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Парадкаваць торэнты паводле"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торэнт"
-
-#~ msgid "_View"
-#~ msgstr "_Выгляд"

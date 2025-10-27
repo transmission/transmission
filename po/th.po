@@ -2539,15 +2539,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#~ msgid "_File"
-#~ msgstr "แฟ้ม"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "เรียงทอร์เรนท์ตาม"
-
-#~ msgid "_Torrent"
-#~ msgstr "ทอร์เรนท์"
-
-#~ msgid "_View"
-#~ msgstr "มุมมอง"

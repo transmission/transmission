@@ -2623,18 +2623,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "μέρα"
 msgstr[1] "μέρες"
-
-#~ msgid "_File"
-#~ msgstr "_Αρχείο"
-
-#~ msgid "_Queue"
-#~ msgstr "_Σειρά"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Ταξινόμηση torrents κατά"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Προβολή"

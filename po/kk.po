@@ -2582,18 +2582,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "_Queue"
-#~ msgstr "_Кезек"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Торрентерді _сұрыптау"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торрент"
-
-#~ msgid "_View"
-#~ msgstr "Тү_рі"

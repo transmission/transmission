@@ -7,10 +7,10 @@
 # Moritz Bruder <muesli4@gmail.com>, 2017
 # sfan5 <sfan5@ymail.com>, 2017
 # Sami Bosch <sami.bosch@student.uclouvain.be>, 2019
-# Ben Wiederhake <BenWiederhake.GitHub@gmx.de>, 2020
+# DELETE THIS ACCOUNT <BenWiederhake.GitHub@gmx.de>, 2020
 # Christian <Christian.Kirbach@googlemail.com>, 2022
-# luca pöllmann, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# luca pöllmann, 2022
 # Thomas Lange, 2024
 #
 #, fuzzy
@@ -2654,18 +2654,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "Tag"
 msgstr[1] "Tage"
-
-#~ msgid "_File"
-#~ msgstr "_Datei"
-
-#~ msgid "_Queue"
-#~ msgstr "In _Warteschlange einreihen"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Torrents so_rtieren nach"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Ansicht"

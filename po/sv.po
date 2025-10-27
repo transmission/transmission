@@ -5,10 +5,10 @@
 #
 # Translators:
 # 553bfca145c93e26efcabc21d311cd2f, 2020
-# efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
 # Josef Andersson <janderssonse@proton.me>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
-# Jonatan Nyberg, 2025
+# efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
+# Daniel, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jonatan Nyberg, 2025\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -107,7 +107,7 @@ msgstr "Fick stängningssignal, försöker stänga av rent. Gör det igen om det
 
 #: ../gtk/Application.cc:784
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Transmission är ett fildelningsprogram. När du kör en torrent kommer dess data att göras tillgängliga för andra genom att den skickas. Allt innehåll du delar är ditt eget ansvar."
+msgstr "Transmission är ett fildelningsprogram. När du kör en torrent kommer dess data att göras tillgänglig för andra genom sändning. Allt innehåll du delar är ditt eget ansvar."
 
 #: ../gtk/Application.cc:790 ../gtk/Dialogs.cc:120 ../gtk/MessageLogWindow.cc:271 ../gtk/OptionsDialog.cc:370 ../gtk/PathButton.cc:155 ../gtk/StatsDialog.cc:112 ../gtk/ui/gtk3/AddTrackerDialog.ui:20 ../gtk/ui/gtk3/EditTrackersDialog.ui:20 ../gtk/ui/gtk3/MakeProgressDialog.ui:21 ../gtk/ui/gtk3/OptionsDialog.ui:20 ../gtk/ui/gtk3/RelocateDialog.ui:20 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:20 ../gtk/ui/gtk4/AddTrackerDialog.ui:67 ../gtk/ui/gtk4/EditTrackersDialog.ui:86 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:67
 msgid "_Cancel"
@@ -406,7 +406,7 @@ msgstr "Förfrågan efter lista över jämlikar {markup_begin}tog för lång tid
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1843
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "Fick ett fel '{markup_begin}{error}{markup_end}' för {time_span_ago}"
+msgstr "Fick felet '{markup_begin}{error}{markup_end}' för {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1856
 msgid "No updates scheduled"
@@ -498,7 +498,7 @@ msgstr[1] "Ta bort {count:L} torrenter?"
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
 msgstr[0] "Ta bort den här torrentens hämtade filer?"
-msgstr[1] "Ta bort dessa {count:L} torrenters hämtade filer?"
+msgstr[1] "Ta bort dessa {count:L} torrenternas hämtade filer?"
 
 #: ../gtk/Dialogs.cc:68
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -522,13 +522,13 @@ msgstr[1] "Dessa torrenter är anslutna till jämlikar."
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "En av de här torrenterna är ansluten till jämlikar."
-msgstr[1] "Några av de här torrenterna är anslutna till jämlikar."
+msgstr[1] "Några av dessa torrenter är anslutna till jämlikar."
 
 #: ../gtk/Dialogs.cc:101
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "En av de här torrenterna har inte hämtats klart."
-msgstr[1] "Några av de här torrenterna har inte hämtats klart."
+msgstr[1] "Några av dessa torrenter har inte hämtats klart."
 
 #: ../gtk/Dialogs.cc:121
 msgid "_Delete"
@@ -821,20 +821,20 @@ msgstr "Helger"
 #: ../gtk/PrefsDialog.cc:567
 msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
-msgstr[0] "Blocklistan har 1 post"
-msgstr[1] "Blocklistan har {count:L} poster"
+msgstr[0] "Blockeringslistan har 1 post"
+msgstr[1] "Blockeringslistan har {count:L} poster"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Blocklist updated!"
-msgstr "Blocklistan uppdaterad!"
+msgstr "Blockeringslistan uppdaterad!"
 
 #: ../gtk/PrefsDialog.cc:583
 msgid "Couldn't update blocklist"
-msgstr "Det gick inte att uppdatera blocklistan"
+msgstr "Det gick inte att uppdatera blockeringslista"
 
 #: ../gtk/PrefsDialog.cc:595
 msgid "Getting new blocklist…"
-msgstr "Hämtar ny blocklista…"
+msgstr "Hämtar ny blockeringslista…"
 
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
@@ -879,7 +879,7 @@ msgstr "Det gick inte att flytta torrent"
 
 #: ../gtk/RelocateDialog.cc:149
 msgid "This may take a moment…"
-msgstr "Det här kan ta en stund…"
+msgstr "Detta kan ta en stund…"
 
 #: ../gtk/Session.cc:797 ../libtransmission/watchdir-win32.cc:160 ../libtransmission/watchdir-win32.cc:176
 msgid "Couldn't read '{path}'"
@@ -928,7 +928,7 @@ msgstr "{upload_speed} ▲ {download_speed} ▼"
 #: ../gtk/Torrent.cc:441
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr "Verifierar lokala data ({percent_done}% testade)"
+msgstr "Verifierar lokala data ({percent_done}% kontrollerat)"
 
 #: ../gtk/Torrent.cc:468
 msgid "{current_size} of {complete_size} ({percent_done}%)"
@@ -1346,7 +1346,7 @@ msgstr "Pausa torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Ställ in p_lats…"
+msgstr "Ange p_lats…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1362,7 +1362,7 @@ msgstr "Ta bort torrent"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr "_Ta bort filer och ta bort"
+msgstr "_Ta bort torrent och dess filer"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1518,7 +1518,7 @@ msgstr "Hash:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:392 ../gtk/ui/gtk4/DetailsDialog.ui:306
 msgid "Privacy:"
-msgstr "Sekretess:"
+msgstr "Integritet:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:404 ../gtk/ui/gtk4/DetailsDialog.ui:316
 msgid "Origin:"
@@ -1739,12 +1739,12 @@ msgstr "Hastighetsgränser"
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:90 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
-msgstr "_Skickar ({speed_units}):"
+msgstr "_Skicka ({speed_units}):"
 
 #. Checkbox to limit download speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:105 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
-msgstr "_Hämtar ({speed_units}):"
+msgstr "_Hämta ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:159 ../gtk/ui/gtk4/PrefsDialog.ui:93
 msgid "Alternative Speed Limits"
@@ -1757,12 +1757,12 @@ msgstr "Åsidosätt normala hastighetsgränser manuellt eller vid schemalagda ti
 #. Labels a spinbutton for alternate upload speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:216 ../gtk/ui/gtk4/PrefsDialog.ui:130
 msgid "U_pload ({speed_units}):"
-msgstr "S_kickar ({speed_units}):"
+msgstr "S_kicka ({speed_units}):"
 
 #. Labels a spinbutton for alternate download speed limits
 #: ../gtk/ui/gtk3/PrefsDialog.ui:230 ../gtk/ui/gtk4/PrefsDialog.ui:142
 msgid "Do_wnload ({speed_units}):"
-msgstr "H_ämtar ({speed_units}):"
+msgstr "H_ämta ({speed_units}):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:242 ../gtk/ui/gtk4/PrefsDialog.ui:154
 msgid "_Scheduled times:"
@@ -1780,7 +1780,7 @@ msgstr "_till"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:395 ../gtk/ui/gtk4/PrefsDialog.ui:262
 msgctxt "Gerund"
 msgid "Adding"
-msgstr "Lägga till"
+msgstr "Tilläggning"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:409 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
@@ -1804,7 +1804,7 @@ msgstr "Hämtningskö"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:573 ../gtk/ui/gtk4/PrefsDialog.ui:401
 msgid "Ma_ximum active downloads:"
-msgstr "Ma&ximalt antal aktiva hämtningar:"
+msgstr "Ma_ximalt antal aktiva hämtningar:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:587 ../gtk/ui/gtk4/PrefsDialog.ui:413
 msgid "Downloads sharing data in the last _N minutes are active:"
@@ -1854,7 +1854,7 @@ msgstr "Distribuering"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:896 ../gtk/ui/gtk3/PrefsDialog.ui:1083 ../gtk/ui/gtk4/PrefsDialog.ui:648 ../gtk/ui/gtk4/PrefsDialog.ui:783
 msgid "Privacy"
-msgstr "Sekretess"
+msgstr "Integritet"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:912 ../gtk/ui/gtk4/PrefsDialog.ui:660
 msgid "_Encryption mode:"
@@ -1862,11 +1862,11 @@ msgstr "Kr_ypteringsläge:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:950 ../gtk/ui/gtk4/PrefsDialog.ui:687
 msgid "Blocklist"
-msgstr "Blocklista"
+msgstr "Blockeringslista"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:699
 msgid "Enable _blocklist:"
-msgstr "Aktivera _blocklista:"
+msgstr "Aktivera _blockeringslista:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:979 ../gtk/ui/gtk4/PrefsDialog.ui:712
 msgid "Enable _automatic updates"
@@ -1978,11 +1978,11 @@ msgstr "Avisering"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1586 ../gtk/ui/gtk4/PrefsDialog.ui:1170
 msgid "Show a notification when torrents are a_dded"
-msgstr "Visa en avisering när torrenter läggs _till"
+msgstr "Visa avisering när torrenter läggs _till"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1603 ../gtk/ui/gtk4/PrefsDialog.ui:1184
 msgid "Show a notification when torrents _finish"
-msgstr "Visa en avisering när torrenter _slutförs"
+msgstr "Visa avisering när torrenter _slutförs"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1620 ../gtk/ui/gtk4/PrefsDialog.ui:1198
 msgid "Play a _sound when torrents finish"
@@ -2018,7 +2018,7 @@ msgstr "Lösen_ord:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1329
 msgid "Only allow these IP a_ddresses:"
-msgstr "Tillåt endast de här IP-a_dresserna:"
+msgstr "Tillåt endast dessa IP-a_dresser:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1817 ../gtk/ui/gtk4/PrefsDialog.ui:1345
 msgid "Addresses:"
@@ -2034,7 +2034,7 @@ msgstr "Fjärråtkomst"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:7 ../gtk/ui/gtk4/RelocateDialog.ui:5
 msgid "Set Torrent Location"
-msgstr "Ställ in torrentplats"
+msgstr "Ange torrentplats"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:35 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
@@ -2130,7 +2130,7 @@ msgstr "Lyckades"
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] "Blocklistan '{path}' har {count} post"
-msgstr[1] "Blocklistan '{path}' har {count} poster"
+msgstr[1] "Blockeringslistan '{path}' har {count} poster"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:260
@@ -2353,7 +2353,7 @@ msgstr "Det gick inte att testa port: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1213
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr "Det gick inte att hämta blocklistan: {error} ({error_code})"
+msgstr "Det gick inte att hämta blockeringslistan: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1340
 msgid "Couldn't fetch torrent: {error} ({error_code})"
@@ -2527,15 +2527,15 @@ msgstr "Det gick inte att vänta på mappändringar"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Överväg att uppgradera din curl-installation."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} är benägen att drabbas av SIGPIPE-krascher. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} är benägen att drabbas av en sårbarhet med dubbel stängning av händelser (eventfd) som kan orsaka SIGABRT-krascher för transmission-daemon systemd-tjänsten. {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2588,18 +2588,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#~ msgid "_File"
-#~ msgstr "_Arkiv"
-
-#~ msgid "_Queue"
-#~ msgstr "_Kö"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Sortera torrenter efter"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Visa"

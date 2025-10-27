@@ -2596,18 +2596,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dagur"
 msgstr[1] "dagar"
-
-#~ msgid "_File"
-#~ msgstr "_Skrá"
-
-#~ msgid "_Queue"
-#~ msgstr "_Biðröð"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Raða torrent-streymum eftir"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent-streymi"
-
-#~ msgid "_View"
-#~ msgstr "_Skoða"

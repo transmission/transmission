@@ -2583,12 +2583,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Подреди торенти по"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торент"
-
-#~ msgid "_View"
-#~ msgstr "_Поглед"

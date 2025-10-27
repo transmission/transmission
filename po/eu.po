@@ -7,8 +7,8 @@
 # Xabier Martin <Iparra@iparra.eus>, 2020
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2022
 # Sendoa Sojo <sendoasojo@gmail.com>, 2022
-# Alexander Gabilondo <alexgabi@disroot.org>, 2022
 # Xabier Aramendi <azpidatziak@gmail.com>, 2022
+# Alexander Gabilondo <alexgabi@disroot.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Iñigo Zendegi Urzelai, 2023
 #
@@ -2600,18 +2600,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#~ msgid "_File"
-#~ msgstr "_Agiria"
-
-#~ msgid "_Queue"
-#~ msgstr "_Lerroa"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Antolatu torrentak honela:"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrenta"
-
-#~ msgid "_View"
-#~ msgstr "_Ikusi"

@@ -5,9 +5,10 @@
 #
 # Translators:
 # jrthsr700tmax <jrthsr700tmax@gmail.com>, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2023
-# Meng Pang Wang, 2023
+# MP Wang, 2023
 # abc0922001 <abc0922001@hotmail.com>, 2024
+# taijuin lee, 2025
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: abc0922001 <abc0922001@hotmail.com>, 2024\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -847,35 +848,35 @@ msgstr "正在取得新的黑名單…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "未知"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "正在檢查…"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "開啟"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "關閉"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "錯誤"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "狀態：<b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "狀態：<b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2084,11 +2085,11 @@ msgstr "未知的錯誤"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} 連線失敗"
 
 #: ../libtransmission/announcer-udp.cc:495
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "無法找到 '{address}:{port}' 在 {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2215,7 +2216,7 @@ msgstr "本機位址為 '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "本地埠 {local_port} 未轉傳至 {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2227,7 +2228,7 @@ msgstr "正在從 '{url}'，服務 '{type}' 通訊埠轉送。(本機位址：{a
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "轉傳的本地埠 {local_port} 至 {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2263,27 +2264,27 @@ msgstr "Unix socket 路徑必須少於 {count} 個字元 (包含 '{prefix}' 前�
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "拒絕來自 {host}（可能的目錄遍歷攻擊）"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "拒絕來自 {host}（已啟動強力防護）"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "拒絕來自 {host}（IP未列入白名單）"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "拒絕來自 {host}（驗證失敗）"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "拒絕來自 {host}（主機未列入白名單）"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "未知 URI 來自 {host}: '{uri}'"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2409,7 +2410,7 @@ msgstr "正在暫停 torrent"
 
 #: ../libtransmission/torrent.cc:723
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "無法移除所有 torrent 檔案：{error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:789
 msgid "Removing torrent"
@@ -2437,11 +2438,11 @@ msgstr "無法查詢 '{address}:{port}'：{error} ({error_code})"
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "無法初始化 {ip_protocol} LPD: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "無法使 IPv4 socket 不阻塞 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2449,7 +2450,7 @@ msgstr "無法繫結 IPv4 socket {address}：{error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "無法使 IPv6 socket 不阻塞 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
@@ -2509,15 +2510,15 @@ msgstr "無法等候資料夾變更"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "請考慮升級您的 curl 安裝。"
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} 容易發生 SIGPIPE 崩潰。 {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} 容易產生 eventfd 雙重關閉漏洞，可能導致 transmission-daemon systemd 服務 SIGABRT 當機。 {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
@@ -2564,18 +2565,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "_File"
-#~ msgstr "檔案 (_F)"
-
-#~ msgid "_Queue"
-#~ msgstr "排程 (_Q)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "依以下方式排序 Torrents (_S)"
-
-#~ msgid "_Torrent"
-#~ msgstr "Torrent (_T)"
-
-#~ msgid "_View"
-#~ msgstr "檢視 (_V)"

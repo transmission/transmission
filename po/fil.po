@@ -2580,9 +2580,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Pag_sunud-sunurin ang mga Torrent Ayon sa"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"

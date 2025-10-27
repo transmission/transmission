@@ -5,7 +5,7 @@
 #
 # Translators:
 # Nejc Bertoncelj, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
 "Language-Team: Slovenian (https://app.transifex.com/transmissionbt/teams/33778/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -2689,18 +2689,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "_File"
-#~ msgstr "_Datoteka"
-
-#~ msgid "_Queue"
-#~ msgstr "Postavi v čakalno _vrsto"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Razvrsti torrente po"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Pogled"

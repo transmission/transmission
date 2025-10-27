@@ -10,7 +10,8 @@
 # Темак, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Victor, 2024
-# Andrei Stepanov, 2024
+# Andrei Stepanov, 2025
+# Алексей Ладыгин, 2025
 #
 #, fuzzy
 msgid ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 09:20+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andrei Stepanov, 2024\n"
+"Last-Translator: Алексей Ладыгин, 2025\n"
 "Language-Team: Russian (https://app.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -876,35 +877,35 @@ msgstr "Получение нового чёрного списка…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "неизвестно"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "проверяется…"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "открыт"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "закрыт"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "ошибка"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Состояние: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Состояние: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2179,11 +2180,11 @@ msgstr "Неизвестная ошибка"
 
 #: ../libtransmission/announcer-udp.cc:376
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "Сбой подключения по {ip_protocol}"
 
 #: ../libtransmission/announcer-udp.cc:495
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось найти '{address}:{port}' в {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2316,7 +2317,7 @@ msgstr "Локальный адрес: \"{address}\""
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "Локальный порт {local_port} не перенаправлен на {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2328,7 +2329,7 @@ msgstr "Проброс порта через «{url}», служба «{type}».
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "Локальный порт {local_port} перенаправлен на {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2364,27 +2365,27 @@ msgstr "Путь к сокету Unix должен быть меньше {count}
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "Отклоненный запрос от {host} (вероятна атака обхода каталога)"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "Отклоненный запрос от {host} (активна защита от брутфорса)"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "Отклоненный запрос от {host} (IP не входит в белый список)"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "Отклоненный запрос от {host} (ошибка аутентификации)"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "Отклоненный запрос от {host} (хост не входит в белый список)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "Неизвестный URI от {host}: «{uri}»"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2516,7 +2517,7 @@ msgstr "Приостановка торрента"
 
 #: ../libtransmission/torrent.cc:723
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось удалить все торрент-файлы: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:789
 msgid "Removing torrent"
@@ -2544,11 +2545,11 @@ msgstr "Не удалось найти \"{address}:{port}\": {error} ({error_cod
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось инициализировать локальное обнаружение участников для{ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось установить неблокирующий режим сокета IPv4 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2556,7 +2557,7 @@ msgstr "Не удалось привязать сокет IPv4 {address}: {error
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось установить неблокирующий режим сокета IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
@@ -2616,7 +2617,7 @@ msgstr "Не удалось дождаться изменений каталог
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Рассмотрите обновление вашей установки curl."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
@@ -2689,18 +2690,3 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "_Queue"
-#~ msgstr "По_ложение в очереди"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Упо_рядочивать торренты по"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торрент"
-
-#~ msgid "_View"
-#~ msgstr "_Вид"

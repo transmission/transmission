@@ -33,7 +33,7 @@ msgstr ""
 
 #: ../daemon/daemon.cc:207 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Nepavyko perskaityti „{path}“: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:232 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
@@ -149,7 +149,7 @@ msgstr "Sparti ir paprasta „BitTorrent“ klientinė programa"
 
 #: ../gtk/Application.cc:1421
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Autorių teisės © Transmission projektas"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -510,7 +510,7 @@ msgstr "Sekikliai"
 
 #: ../gtk/DetailsDialog.cc:2650
 msgid "{torrent_name} Properties"
-msgstr ""
+msgstr "{torrent_name} savybės"
 
 #: ../gtk/DetailsDialog.cc:2655
 msgid "Properties - {torrent_count:L} Torrent"
@@ -721,11 +721,11 @@ msgstr "Ats.: {downloaded_size}, Išs.: {uploaded_size}"
 
 #: ../gtk/MainWindow.cc:814
 msgid "{download_speed} ▼"
-msgstr ""
+msgstr "{download_speed} ▼"
 
 #: ../gtk/MainWindow.cc:817 ../gtk/Torrent.cc:628
 msgid "{upload_speed} ▲"
-msgstr ""
+msgstr "{upload_speed} ▲"
 
 #: ../gtk/MakeDialog.cc:194
 msgid "Creating '{path}'"
@@ -755,17 +755,17 @@ msgstr ""
 #: ../gtk/MessageLogWindow.cc:105
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Klaida"
 
 #: ../gtk/MessageLogWindow.cc:106
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Įspėjimas"
 
 #: ../gtk/MessageLogWindow.cc:107
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Informacija"
 
 #: ../gtk/MessageLogWindow.cc:108
 msgctxt "Logging level"
@@ -907,15 +907,15 @@ msgstr ""
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "klaida"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Būsena: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Būsena: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2285,7 +2285,7 @@ msgstr ""
 
 #: ../libtransmission/open-files.cc:192
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Nepavyko atverti „{path}“: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:220
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
@@ -2297,7 +2297,7 @@ msgstr ""
 
 #: ../libtransmission/peer-io.cc:674
 msgid "Unknown state: {state}"
-msgstr ""
+msgstr "Nežinoma būsena: {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:91
 msgid "Found public address '{address}'"
@@ -2317,7 +2317,7 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding-upnp.cc:275
 msgid "Local Address is '{address}'"
-msgstr ""
+msgstr "Vietinis adresas yra „{address}“"
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
@@ -2694,18 +2694,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid "_File"
-#~ msgstr "_Failas"
-
-#~ msgid "_Queue"
-#~ msgstr "_Eilė"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Rikiuoti torentus pagal"
-
-#~ msgid "_Torrent"
-#~ msgstr "T_orentas"
-
-#~ msgid "_View"
-#~ msgstr "_Rodymas"

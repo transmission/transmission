@@ -2791,18 +2791,3 @@ msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
-
-#~ msgid "_File"
-#~ msgstr "_ملف"
-
-#~ msgid "_Queue"
-#~ msgstr "ال_طابور"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "رتب التورنتات _حسب"
-
-#~ msgid "_Torrent"
-#~ msgstr "_تورنت"
-
-#~ msgid "_View"
-#~ msgstr "_عرض"

@@ -2664,18 +2664,3 @@ msgid_plural "days"
 msgstr[0] "giorno"
 msgstr[1] "giorni"
 msgstr[2] "giorni"
-
-#~ msgid "_File"
-#~ msgstr "_File"
-
-#~ msgid "_Queue"
-#~ msgstr "C_oda"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Ordina _torrent per"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
-#~ msgid "_View"
-#~ msgstr "_Visualizza"
