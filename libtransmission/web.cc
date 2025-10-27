@@ -171,16 +171,20 @@ public:
         if (curl_version_num == 0x080901)
         {
             tr_logAddWarn(_("Consider upgrading your curl installation."));
-            tr_logAddWarn(
-                _("curl 8.9.1 is prone to SIGPIPE crashes. https://github.com/transmission/transmission/issues/7035"));
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("curl {curl_version} is prone to SIGPIPE crashes. {details_url}")),
+                fmt::arg("curl_version", "8.9.1"),
+                fmt::arg("details_url", "https://github.com/transmission/transmission/issues/7035")));
         }
 
         if (curl_version_num == 0x080B01)
         {
             tr_logAddWarn(_("Consider upgrading your curl installation."));
-            tr_logAddWarn(
-                _("curl 8.11.1 is prone to an eventfd double close vulnerability that might cause SIGABRT "
-                  "crashes for the transmission-daemon systemd service. https://curl.se/docs/CVE-2025-0665.html"));
+            tr_logAddWarn(fmt::format(
+                fmt::runtime(_("curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT "
+                               "crashes for the transmission-daemon systemd service. {details_url}")),
+                fmt::arg("curl_version", "8.11.1"),
+                fmt::arg("details_url", "https://curl.se/docs/CVE-2025-0665.html")));
         }
 
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
