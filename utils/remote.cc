@@ -785,18 +785,19 @@ static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
 /* look for a session id in the header in case the server gives back a 409 */
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
+    auto& config = *static_cast<RemoteConfig*>(vconfig);
     auto const line = std::string_view{ static_cast<char const*>(ptr), size * nmemb };
     auto const key = tr_strlower(TR_RPC_SESSION_ID_HEADER ": ");
 
     if (tr_strv_starts_with(tr_strlower(line), key))
     {
-        auto const val = line.substr(key.size());
+        std::string_view const val = line.substr(std::size(key));
         auto const begin = std::begin(val);
-        auto const end = std::find_if(begin, std::end(val), [](auto c) { return isspace(c); });
-        static_cast<RemoteConfig*>(vconfig)->session_id.assign(begin, end);
+        auto const end = std::find_if(begin, std::end(val), [](char c) { return isspace(c); });
+        config.session_id.assign(begin, end);
     }
 
-    return line.size();
+    return std::size(line);
 }
 
 [[nodiscard]] long get_timeout_secs(std::string_view req)
