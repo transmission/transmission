@@ -32,6 +32,7 @@ using tr_sha256_context_t = mbedtls_sha256_context;
 using tr_sha1_context_t = EVP_MD_CTX*;
 using tr_sha256_context_t = EVP_MD_CTX*;
 #elif defined(WITH_WOLFSSL)
+#include <wolfssl/options.h>
 #include <wolfssl/wolfcrypt/sha.h>
 #include <wolfssl/wolfcrypt/sha256.h>
 using tr_sha1_context_t = wc_Sha;
@@ -192,6 +193,11 @@ using tr_sha256_string = tr_strbuf<char, sizeof(tr_sha256_digest_t) * 2U + 1U>;
  * @brief Generate a sha256 digest from a hex string.
  */
 [[nodiscard]] std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
+
+/**
+ * @brief Calculate CRC32-C checksum for a buffer.
+ */
+[[nodiscard]] uint32_t tr_crc32c(uint8_t const* data, size_t count);
 
 // Convenience utility to efficiently get many random small values.
 // Use this instead of making a lot of calls to tr_rand_int().

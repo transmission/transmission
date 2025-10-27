@@ -142,7 +142,7 @@ Request arguments:
 | Key | Value Type | Value Description
 |:--|:--|:--
 | `bandwidthPriority`   | number   | this torrent's bandwidth tr_priority_t
-| `downloadLimit`       | number   | maximum download speed (KBps)
+| `downloadLimit`       | number   | maximum download speed (kB/s)
 | `downloadLimited`     | boolean  | true if `downloadLimit` is honored
 | `files-unwanted`      | array    | indices of file(s) to not download
 | `files-wanted`        | array    | indices of file(s) to download
@@ -165,7 +165,7 @@ Request arguments:
 | `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
 | `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
-| `uploadLimit`         | number   | maximum upload speed (KBps)
+| `uploadLimit`         | number   | maximum upload speed (kB/s)
 | `uploadLimited`       | boolean  | true if `uploadLimit` is honored
 
 Just as an empty `ids` value is shorthand for "all ids", using an empty array
@@ -244,7 +244,7 @@ The 'source' column here corresponds to the data structure there.
 | `labels` | array of strings | tr_torrent
 | `leftUntilDone` | number| tr_stat
 | `magnetLink` | string| n/a
-| `manualAnnounceTime` | number| tr_stat
+| `manualAnnounceTime` | number| **DEPRECATED** don't use it, it never worked
 | `maxConnectedPeers` | number| tr_torrent
 | `metadataPercentComplete` | double| tr_stat
 | `name` | string| tr_torrent_view
@@ -527,17 +527,17 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 ### 4.1 Session arguments
 | Key | Value Type | Description
 |:--|:--|:--
-| `alt-speed-down` | number | max global download speed (KBps)
+| `alt-speed-down` | number | max global download speed (kB/s)
 | `alt-speed-enabled` | boolean | true means use the alt speeds
 | `alt-speed-time-begin` | number | when to turn on alt speeds (units: minutes after midnight)
 | `alt-speed-time-day` | number | what day(s) to turn on alt speeds (look at tr_sched_day)
 | `alt-speed-time-enabled` | boolean | true means the scheduled on/off times are used
 | `alt-speed-time-end` | number | when to turn off alt speeds (units: same)
-| `alt-speed-up` | number | max global upload speed (KBps)
+| `alt-speed-up` | number | max global upload speed (kB/s)
 | `blocklist-enabled` | boolean | true means enabled
 | `blocklist-size` | number | number of rules in the blocklist
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
-| `cache-size-mb` | number | maximum size of the disk cache (MB)
+| `cache-size-mb` | number | maximum size of the disk cache (MiB). Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
 | `config-dir` | string | location of transmission's configuration directory
 | `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `dht-enabled` | boolean | true means allow DHT in public torrents
@@ -577,9 +577,9 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `sequential_download` | boolean | true means sequential download is enabled by default for added torrents
 | `session-id` | string | the current `X-Transmission-Session-Id` value
 | `speed-limit-down-enabled` | boolean | true means enabled
-| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-down` | number | max global download speed (kB/s)
 | `speed-limit-up-enabled` | boolean | true means enabled
-| `speed-limit-up` | number | max global upload speed (KBps)
+| `speed-limit-up` | number | max global upload speed (kB/s)
 | `start-added-torrents` | boolean | true means added torrents will be started right away
 | `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
@@ -741,9 +741,9 @@ Request parameters:
 | `honorsSessionLimits` | boolean  | true if session upload limits are honored
 | `name` | string | Bandwidth group name
 | `speed-limit-down-enabled` | boolean | true means enabled
-| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-down` | number | max global download speed (kB/s)
 | `speed-limit-up-enabled` | boolean | true means enabled
-| `speed-limit-up` | number | max global upload speed (KBps)
+| `speed-limit-up` | number | max global upload speed (kB/s)
 
 Response arguments: none
 
@@ -768,9 +768,9 @@ A bandwidth group description object has:
 | `honorsSessionLimits` | boolean  | true if session upload limits are honored
 | `name` | string | Bandwidth group name
 | `speed-limit-down-enabled` | boolean | true means enabled
-| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-down` | number | max global download speed (kB/s)
 | `speed-limit-up-enabled` | boolean | true means enabled
-| `speed-limit-up` | number | max global upload speed (KBps)
+| `speed-limit-up` | number | max global upload speed (kB/s)
 
 ## 5 Protocol versions
 This section lists the changes that have been made to the RPC protocol.
@@ -1039,3 +1039,4 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`
 | `torrent-get` | new arg `trackerStats.downloader_count`
+| `torrent-get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked

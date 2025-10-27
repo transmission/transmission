@@ -244,8 +244,9 @@ html,
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-fg-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   height: 100%;
   margin: 0;
 }
@@ -346,11 +347,11 @@ a {
     border-left: 1px solid var(--color-border-default);
     height: 25px;
     margin: 0 6px 0 0;
-  }
 
-  :nth-last-child(2) {
-    border: 0;
-    flex-grow: 1;
+    &:last-of-type {
+      border: 0;
+      flex-grow: 1;
+    }
   }
 }
 
@@ -470,6 +471,7 @@ a {
       background-position:
         center,
         top left;
+      grid-area: icon;
       -webkit-mask-image: var(--mime-icon-url);
       -webkit-mask-repeat: no-repeat;
       mask-image: var(--mime-icon-url);
@@ -586,13 +588,14 @@ a {
       grid-template-columns: calc(var(--icon-size) + 10px) auto 1fr auto auto;
 
       .icon {
-        -webkit-mask-size: var(--icon-size), calc(var(--icon-size) / 2);
+        -webkit-mask-size: var(--icon-size);
         height: var(--icon-size);
-        mask-size: var(--icon-size), calc(var(--icon-size) / 2);
+        mask-size: var(--icon-size);
         width: var(--icon-size);
 
         &[data-icon-multifile='true'] {
-          --mime-icon-url: var(--folder-image-url);
+          -webkit-mask-image: var(--folder-image-url);
+          mask-image: var(--folder-image-url);
         }
       }
 
@@ -619,7 +622,6 @@ a {
 
       .icon {
         background-size: var(--icon-size), calc(var(--icon-size) / 2);
-        grid-area: icon;
         height: var(--icon-size);
         width: var(--icon-size);
       }
@@ -1055,6 +1057,16 @@ a {
 
     &.skip {
       opacity: 0.5;
+
+      > .inspector-torrent-file-list-entry-name {
+        color: var(--color-fg-disabled);
+      }
+    }
+
+    &.complete {
+      > .file-wanted-control {
+        cursor: default;
+      }
     }
   }
 
@@ -1070,22 +1082,10 @@ a {
     overflow-wrap: anywhere;
   }
 
-  .inspector-torrent-file-list-entry.skip
-    > .inspector-torrent-file-list-entry-name {
-    color: var(--color-fg-disabled);
-  }
-
   .inspector-torrent-file-list-entry-progress {
     color: var(--color-fg-secondary);
     font-size: 12px;
     grid-area: info;
-  }
-
-  .single-file .inspector-torrent-file-list-entry,
-  .inspector-torrent-file-list-entry.complete {
-    > .file-wanted-control {
-      cursor: default;
-    }
   }
 }
 
@@ -1243,35 +1243,53 @@ a {
 
   > * {
     appearance: none;
-    background-color: var(--color-border-starkest);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 10px, 20px;
-    border: 1px solid var(--color-border-stark);
+    background-color: var(--color-bg-tabs);
+    border: 1px solid var(--color-border-default);
     border-radius: 0;
     height: 20px;
     margin: 0;
     padding: 0;
     width: 20px;
-  }
 
-  > .low {
-    background-image: var(--image-chevron-dn);
-    border-right-width: 0;
-  }
+    &.low {
+      &::after {
+        mask-image: var(--image-chevron-dn);
+      }
+    }
 
-  > .normal {
-    background-image: var(--image-baseline);
-  }
+    &.normal {
+      border-width: 1px 0;
+      width: 19px;
 
-  > .high {
-    background-image: var(--image-chevron-up);
-    border-left-width: 0;
-  }
+      &::after {
+        mask-image: var(--image-baseline);
+      }
+    }
 
-  //if input is checked then change the background color
-  > .checked {
-    background-color: var(--color-bg-hover);
+    &.high {
+      &::after {
+        mask-image: var(--image-chevron-up);
+      }
+    }
+
+    &.checked {
+      background-color: var(--color-bg-selected);
+
+      &::after {
+        background-color: var(--color-fg-selected);
+      }
+    }
+
+    &::after {
+      content: '';
+      background-color: var(--color-fg-primary);
+      display: inline-block;
+      height: 20px;
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: 14px;
+      width: 18px;
+    }
   }
 }
 
@@ -1421,13 +1439,13 @@ a {
       grid-column-gap: 5px;
       grid-row-gap: 5px;
       grid-template-areas:
-        'check   lb'
-        'turtle  values';
+        'check  text'
+        'turtle parentheses';
       grid-template-columns: 22px 1fr;
       margin-bottom: 4px;
     }
 
-    #alt-speed-check {
+    :nth-child(1) {
       grid-area: check;
 
       &:checked ~ #alt-speed-image {
@@ -1442,19 +1460,19 @@ a {
       }
     }
 
+    :nth-child(2) {
+      grid-area: text;
+    }
+
     #alt-speed-image {
       background-position: center;
       background-repeat: no-repeat;
       grid-area: turtle;
     }
 
-    #alt-speed-label {
-      grid-area: lb;
-    }
-
-    #alt-speed-values-label {
+    :nth-child(4) {
       font-size: small;
-      grid-area: values;
+      grid-area: parentheses;
     }
   }
 }
