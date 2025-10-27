@@ -777,13 +777,15 @@ auto parse_whitelist(std::string_view whitelist)
 {
     auto list = std::vector<std::string>{};
 
-    while (!std::empty(whitelist))
+    auto item = std::string_view{};
+    while (tr_strv_sep(&whitelist, &item, ",;"sv))
     {
-        auto const pos = whitelist.find_first_of(" ,;"sv);
-        auto const token = tr_strv_strip(whitelist.substr(0, pos));
-        list.emplace_back(token);
-        tr_logAddInfo(fmt::format(fmt::runtime(_("Added '{entry}' to host whitelist")), fmt::arg("entry", token)));
-        whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
+        item = tr_strv_strip(item);
+        if (!std::empty(item))
+        {
+            list.emplace_back(item);
+            tr_logAddInfo(fmt::format(fmt::runtime(_("Added '{entry}' to host whitelist")), fmt::arg("entry", item)));
+        }
     }
 
     return list;

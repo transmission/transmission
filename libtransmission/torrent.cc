@@ -2160,6 +2160,13 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
     // bookkeeping
     set_needs_completeness_check();
 
+    // in sequential mode, flush files as soon a piece
+    // is completed to let other programs read the written data
+    if (is_sequential_download())
+    {
+        session->flush_torrent_files(id());
+    }
+
     // if this piece completes any file, invoke the fileCompleted func for it
     for (auto [file, file_end] = fpm_.file_span_for_piece(piece); file < file_end; ++file)
     {
