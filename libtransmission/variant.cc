@@ -618,7 +618,7 @@ protected:
         var_ = v_in;
         is_visited_ = false;
         child_index_ = 0;
-        sorted.clear();
+        sorted_.clear();
     }
 
     struct ByKey
@@ -649,10 +649,10 @@ protected:
 
         //  keep the sorted indices
 
-        sorted.resize(n);
+        sorted_.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
-            sorted[i] = sortbuf[i].idx;
+            sorted_[i] = sortbuf[i].idx;
         }
     }
 
@@ -662,15 +662,15 @@ private:
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    small::vector<size_t, 128U> sorted;
+    small::vector<size_t, 128U> sorted_;
 
     [[nodiscard]] size_t next_index()
     {
         auto idx = child_index_++;
 
-        if (idx < std::size(sorted))
+        if (idx < std::size(sorted_))
         {
-            idx = sorted[idx];
+            idx = sorted_[idx];
         }
 
         return idx;
