@@ -19,6 +19,7 @@ function global:Build-Expat([string] $PrefixDir, [string] $Arch, [string] $DepsP
         '-DEXPAT_BUILD_TESTS=OFF'
         '-DEXPAT_BUILD_TOOLS=OFF'
         '-DEXPAT_SHARED_LIBS=ON'
+        '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
     )
 
     Invoke-CMakeBuildAndInstall $SourceDir $BuildDir $ConfigOptions
