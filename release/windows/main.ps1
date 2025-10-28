@@ -6,7 +6,7 @@ Param(
     [string] $Mode,
 
     [Parameter(Mandatory=$true)]
-    [ValidateSet('x86', 'x64', 'arm64')]
+    [ValidateSet('x86', 'x64', 'arm64', 'x64_arm64')]
     [string] $BuildArch,
 
     [Parameter()]
