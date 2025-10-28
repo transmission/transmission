@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <curl/curl.h>
 
@@ -91,10 +92,11 @@ struct http_announce_data
         , on_response{ std::move(on_response_in) }
         , log_name{ log_name_in }
     {
+        failed_responses.reserve(NUM_TR_AF_INET_TYPES);
     }
 
     tr_sha1_digest_t info_hash = {};
-    std::optional<tr_announce_response> previous_response;
+    std::vector<tr_announce_response> failed_responses;
 
     tr_announce_response_func on_response;
 
@@ -158,26 +160,19 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
         {
             data->on_response(response);
         }
-        else if (got_all_responses)
-        {
-            // All requests have been answered, but none were successful.
-            // Choose the one that went further to report.
-            if (data->previous_response)
-            {
-                data->on_response(response.did_connect || response.did_timeout ? response : *data->previous_response);
-            }
-            else if (data->requests_sent_count == 1U)
-            {
-                data->on_response(response);
-            }
-        }
         else
         {
-            // There is still one request pending that might succeed, so store
-            // the response for later. There is only room for 1 previous response,
-            // because there can be at most 2 requests.
-            TR_ASSERT(!data->previous_response);
-            data->previous_response = std::move(response);
+            data->failed_responses.emplace_back(std::move(response));
+            if (got_all_responses)
+            {
+                auto const begin = std::begin(data->failed_responses);
+                std::partial_sort(
+                    begin,
+                    std::next(begin),
+                    std::end(data->failed_responses),
+                    tr_announce_response::CompareFailed);
+                data->on_response(data->failed_responses.front());
+            }
         }
     }
 
