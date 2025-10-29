@@ -15,7 +15,6 @@
 #include <string>
 #include <string_view>
 #include <utility>
-#include <vector>
 
 #include <curl/curl.h>
 
@@ -92,11 +91,10 @@ struct http_announce_data
         , on_response{ std::move(on_response_in) }
         , log_name{ log_name_in }
     {
-        failed_responses.reserve(NUM_TR_AF_INET_TYPES);
     }
 
     tr_sha1_digest_t info_hash = {};
-    std::vector<tr_announce_response> failed_responses;
+    std::optional<tr_announce_response> failed_response;
 
     tr_announce_response_func on_response;
 
@@ -162,16 +160,14 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
         }
         else
         {
-            data->failed_responses.emplace_back(std::move(response));
+            if (!data->failed_response || tr_announce_response::compare_failed(*data->failed_response, response) < 0)
+            {
+                data->failed_response = std::move(response);
+            }
+
             if (got_all_responses)
             {
-                auto const begin = std::begin(data->failed_responses);
-                std::partial_sort(
-                    begin,
-                    std::next(begin),
-                    std::end(data->failed_responses),
-                    tr_announce_response::CompareFailed);
-                data->on_response(data->failed_responses.front());
+                data->on_response(*data->failed_response);
             }
         }
     }

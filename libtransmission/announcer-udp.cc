@@ -201,13 +201,14 @@ public:
         }
         else if (!succeeded_)
         {
-            failed_responses_.emplace_back(std::move(response));
+            if (!failed_responses_ || tr_announce_response::compare_failed(*failed_responses_, response) < 0)
+            {
+                failed_responses_ = std::move(response);
+            }
 
             if (got_all_responses)
             {
-                auto const begin = std::begin(failed_responses_);
-                std::partial_sort(begin, std::next(begin), std::end(failed_responses_), tr_announce_response::CompareFailed);
-                on_response_(failed_responses_.front());
+                on_response_(*failed_responses_);
             }
         }
     }
@@ -215,7 +216,7 @@ public:
 private:
     bool succeeded_ = false;
 
-    std::vector<tr_announce_response> failed_responses_;
+    std::optional<tr_announce_response> failed_responses_;
 
     tr_announce_response_func on_response_;
 
