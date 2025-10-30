@@ -147,29 +147,21 @@ struct tr_announce_response
      * https://www.bittorrent.org/beps/bep_0024.html */
     std::optional<tr_address> external_ip;
 
-    static constexpr struct
+    static constexpr int compare_failed(tr_announce_response const& lhs, tr_announce_response const& rhs) noexcept
     {
-        static constexpr int compare(tr_announce_response const& lhs, tr_announce_response const& rhs)
+        if (auto val = tr_compare_3way(lhs.did_connect, rhs.did_connect); val != 0)
         {
-            if (auto val = tr_compare_3way(lhs.did_connect, rhs.did_connect); val != 0)
-            {
-                return val;
-            }
-
-            if (auto val = tr_compare_3way(lhs.did_timeout, rhs.did_timeout); val != 0)
-            {
-                return -val;
-            }
-
-            // Non-empty error message most likely means we reached the tracker
-            return -tr_compare_3way(std::empty(lhs.errmsg), std::empty(rhs.errmsg));
+            return val;
         }
 
-        constexpr bool operator()(tr_announce_response const& lhs, tr_announce_response const& rhs) const noexcept
+        if (auto val = tr_compare_3way(lhs.did_timeout, rhs.did_timeout); val != 0)
         {
-            return compare(lhs, rhs) > 0;
+            return -val;
         }
-    } CompareFailed{};
+
+        // Non-empty error message most likely means we reached the tracker
+        return -tr_compare_3way(std::empty(lhs.errmsg), std::empty(rhs.errmsg));
+    }
 };
 
 // --- SCRAPE
