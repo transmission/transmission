@@ -207,22 +207,22 @@ class tr_salt_shaker // NOLINT(cppcoreguidelines-pro-type-member-init): buf does
 public:
     [[nodiscard]] auto operator()() noexcept
     {
-        if (pos == std::size(buf))
+        if (pos_ == std::size(buf_))
         {
-            pos = 0U;
+            pos_ = 0U;
         }
 
-        if (pos == 0U)
+        if (pos_ == 0U)
         {
-            tr_rand_buffer(std::data(buf), std::size(buf) * sizeof(T));
+            tr_rand_buffer(std::data(buf_), std::size(buf_) * sizeof(T));
         }
 
-        return buf[pos++];
+        return buf_[pos_++];
     }
 
 private:
-    size_t pos = 0;
-    std::array<T, N> buf;
+    size_t pos_ = 0;
+    std::array<T, N> buf_;
 };
 
 // UniformRandomBitGenerator impl that uses `tr_rand_buffer()`.
