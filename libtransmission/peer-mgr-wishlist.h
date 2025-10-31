@@ -73,6 +73,8 @@ public:
         [[nodiscard]] virtual libtransmission::ObserverTag observe_sequential_download_changed(
             libtransmission::SimpleObservable<tr_torrent*, bool>::Observer observer) = 0;
 
+        [[nodiscard]] virtual tr_torrent& torrent() const = 0;
+
         virtual ~Mediator() = default;
     };
 
