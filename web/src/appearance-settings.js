@@ -44,6 +44,9 @@ export class Appearance extends EventTarget {
     const elements = createDialogContainer('dis-appearance');
     const { dismiss, heading, message } = elements;
 
+    heading.textContent = 'Appearance';
+    dismiss.textContent = 'Close';
+
     // contrast
 
     let legend = document.createElement('h4');
@@ -82,9 +85,6 @@ export class Appearance extends EventTarget {
 
       listener(input, className);
     };
-
-    heading.textContent = 'Appearance';
-    dismiss.textContent = 'Close';
 
     let listener = (e) => {
       e.checked = this.prefs.contrast_mode === Prefs.ContrastMore;
