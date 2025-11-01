@@ -110,6 +110,7 @@ Prefs.FilterFinished = 'finished';
 Prefs.FilterMode = 'filter-mode';
 Prefs.FilterPaused = 'paused';
 Prefs.FilterSeeding = 'seeding';
+Prefs.HighlightColor = 'highlight-color';
 Prefs.NotificationsEnabled = 'notifications-enabled';
 Prefs.RefreshRate = 'refresh-rate-sec';
 Prefs.SortAscending = 'ascending';
@@ -133,6 +134,7 @@ Prefs._Defaults = {
     ? Prefs.ContrastMore
     : Prefs.ContrastLess,
   [Prefs.FilterMode]: Prefs.FilterAll,
+  [Prefs.HighlightColor]: 'AccentColor',
   [Prefs.NotificationsEnabled]: false,
   [Prefs.RefreshRate]: 5,
   [Prefs.SortDirection]: Prefs.SortAscending,
