@@ -3401,12 +3401,13 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/third_party/macosx-crc32c-config.h",
+				"$(SRCROOT)/third-party/macosx-crc32c-config.h",
 			);
 			name = "Copy libcrc32c headers";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/third-party/crc32c/include/crc32c/crc32c_config.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
