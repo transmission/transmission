@@ -5471,7 +5471,6 @@
 		ED91F0142CBDA5D3008388AA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5481,7 +5480,6 @@
 		ED91F0152CBDA5D3008388AA /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5491,7 +5489,6 @@
 		ED91F0162CBDA5D3008388AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
