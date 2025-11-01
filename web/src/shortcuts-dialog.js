@@ -54,7 +54,7 @@ export class ShortcutsDialog extends EventTarget {
       o[sortKey] = { name, shortcut };
     }
 
-    for (const [, values] of Object.entries(o).sort()) {
+    for (const [, values] of Object.entries(o).toSorted()) {
       const { name, shortcut } = values;
       tr = document.createElement('tr');
       tbody.append(tr);

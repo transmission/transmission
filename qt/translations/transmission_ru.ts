@@ -1764,7 +1764,10 @@ To add another primary URL, add it after a blank line.</source>
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Трекеры для использования на всех общедоступных торрентах.
+
+Чтобы добавить резервный адрес, укажите его в следующей строке после основного адреса.
+Чтобы добавить новый основной адрес, укажите его после пустой строки.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -2024,37 +2027,37 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>неизвестно</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>проверяется…</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>открыт</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>closed</source>
-        <translation type="unfinished"></translation>
+        <translation>закрыт</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Состояние: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Состояние: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
     </message>
     <message numerus="yes">
         <location line="+96"/>
@@ -2142,73 +2145,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Б/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>КБ/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>МБ/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>ГБ/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>ТБ/с</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>Б</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>КиБ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>МиБ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>ГиБ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>ТиБ</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>ГБ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>ТБ</translation>
     </message>
     <message>
         <location line="+276"/>
@@ -2702,7 +2705,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтобы добавить резервный адрес, добавьте его в следующей строке после основного адреса.</translation>
     </message>
     <message>
         <location line="+7"/>

@@ -513,7 +513,7 @@
 "Low Priority" = "Lav prioritet";
 
 /* Open duplicate magnet alert -> title */
-"Magnet link is a duplicate of an existing transfer." = "Magnet-linket er en dublet af en eksisterende overførsel.";
+"Magnet link is a duplicate of an existing transfer." = "Magnetlinket er en dublet af en eksisterende overførsel.";
 
 /* Inspector -> selected torrents
    Torrent -> progress string */
@@ -599,11 +599,11 @@
 "OK" = "OK";
 
 /* Remove completed confirm panel -> message */
-"Once removed, continuing the transfer will require the torrent file or magnet link." = "Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen.";
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "Når den er blevet fjernet kræver det torrent-filen eller magnetlinket for at fortsætte overførslen.";
 
 /* Removal confirm panel -> message part 2
    Remove completed confirm panel -> message */
-"Once removed, continuing the transfers will require the torrent files or magnet links." = "Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne.";
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "Når de er blevet fjernet kræver det torrent-filerne eller magnetlinkene for at fortsætte overførslerne.";
 
 /* Remove trackers alert -> message */
 "Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Fjernes denne, vil programmet ikke længere forsøge at kontakte den. Denne handling kan ikke fortrydes.";
@@ -930,7 +930,7 @@
 "The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "Mappen \"%@\" eksisterer ikke. Opret mappen eller vælg en anden for at oprette torrent-filen.";
 
 /* Open duplicate magnet alert -> message */
-"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Magnet-linket \"%@\" kan ikke tilføjes fordi det er en dublet af en eksisterende overførsel.";
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Magnetlinket \"%@\" kan ikke tilføjes fordi det er en dublet af en eksisterende overførsel.";
 
 /* Move error alert -> message
    Move inside itself alert -> message */
@@ -988,7 +988,7 @@
 "There was an error moving the data file." = "Der opstod en fejl ved flytning af datafilen.";
 
 /* Magnet link failed -> message */
-"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Magnet-linket \"%@\" kunne ikke tilføjes. Overførslen startes ikke.";
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Magnetlinket \"%@\" kunne ikke tilføjes. Overførslen startes ikke.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Ingen filer i mappe.";
@@ -997,7 +997,7 @@
 "This option is not available if Default location is set to Same as torrent file." = "Valgmuligheden er ikke tilgængelig hvis Standardplacering er indstillet til Samme som torrent-fil.";
 
 /* Removal confirm panel -> message */
-"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Denne overførsel er aktiv. Hvis den fjernes, kræves torrent-filen eller magnet-linket for at fortsætte.";
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Denne overførsel er aktiv. Hvis den fjernes, kræves torrent-filen eller magnetlinket for at fortsætte.";
 
 /* Stats reset -> message */
 "This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Dette vil rydde statistikker vist af Transmission. Individuelle overførselsstatistikker påvirkes ikke.";

@@ -171,15 +171,68 @@ private:
 
 // --- ANNOUNCE
 
+class tau_announce_data
+{
+public:
+    explicit tau_announce_data(tr_announce_response_func&& on_response)
+        : on_response_{ std::move(on_response) }
+    {
+    }
+
+    constexpr void inc_request_sent_count() noexcept
+    {
+        ++requests_sent_count_;
+    }
+
+    void on_response(tr_announce_response&& response, bool is_success)
+    {
+        TR_ASSERT(on_response_);
+        if (!on_response_)
+        {
+            return;
+        }
+
+        auto const got_all_responses = ++requests_answered_count_ == requests_sent_count_;
+
+        if (is_success)
+        {
+            on_response_(response);
+            succeeded_ = true;
+        }
+        else if (!succeeded_)
+        {
+            if (!failed_responses_ || tr_announce_response::compare_failed(*failed_responses_, response) < 0)
+            {
+                failed_responses_ = std::move(response);
+            }
+
+            if (got_all_responses)
+            {
+                on_response_(*failed_responses_);
+            }
+        }
+    }
+
+private:
+    bool succeeded_ = false;
+
+    std::optional<tr_announce_response> failed_responses_;
+
+    tr_announce_response_func on_response_;
+
+    uint8_t requests_sent_count_ = {};
+    uint8_t requests_answered_count_ = {};
+};
+
 struct tau_announce_request
 {
     tau_announce_request(
         tr_address_type ip_protocol_in,
         std::optional<tr_address> announce_ip,
         tr_announce_request const& in,
-        tr_announce_response_func on_response)
+        std::shared_ptr<tau_announce_data> data)
         : ip_protocol{ ip_protocol_in }
-        , on_response_{ std::move(on_response) }
+        , data_{ std::move(data) }
     {
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
         static_assert(sizeof(tr_announce_request::key) == sizeof(uint32_t));
@@ -207,19 +260,13 @@ struct tau_announce_request
         payload.add_uint32(in.key);
         payload.add_uint32(in.numwant);
         payload.add_port(in.port);
+
+        data_->inc_request_sent_count();
     }
 
     [[nodiscard]] auto has_callback() const noexcept
     {
-        return !!on_response_;
-    }
-
-    void request_finished() const
-    {
-        if (on_response_)
-        {
-            on_response_(response);
-        }
+        return !!data_;
     }
 
     void fail(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -227,7 +274,7 @@ struct tau_announce_request
         response.did_connect = did_connect;
         response.did_timeout = did_timeout;
         response.errmsg = errmsg;
-        request_finished();
+        data_->on_response(std::move(response), false);
     }
 
     void on_response(tr_address_type ip_protocol_resp, tau_action_t action, InBuf& buf)
@@ -254,7 +301,7 @@ struct tau_announce_request
             default:
                 break;
             }
-            request_finished();
+            data_->on_response(std::move(response), true);
         }
         else
         {
@@ -307,7 +354,7 @@ private:
 
     time_t const created_at_ = tr_time();
 
-    tr_announce_response_func on_response_;
+    std::shared_ptr<tau_announce_data> data_;
 };
 
 // --- TRACKER
@@ -414,16 +461,7 @@ struct tau_tracker
                     [this](tr_address_type ip_protocol) { return lookup(ip_protocol); },
                     static_cast<tr_address_type>(ipp));
             }
-        }
 
-        // are there any dns requests pending?
-        if (is_dns_pending())
-        {
-            return;
-        }
-
-        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
-        {
             auto const ipp_enum = static_cast<tr_address_type>(ipp);
             auto& conn_at = connecting_at[ipp];
             logtrace(
@@ -477,11 +515,6 @@ private:
     [[nodiscard]] constexpr bool is_connected(tr_address_type ip_protocol, time_t now) const noexcept
     {
         return connection_id[ip_protocol] != tau_connection_t{} && now < connection_expiration_time[ip_protocol];
-    }
-
-    [[nodiscard]] TR_CONSTEXPR20 bool is_dns_pending() const noexcept
-    {
-        return std::any_of(std::begin(addr_pending_dns_), std::end(addr_pending_dns_), [](auto const& o) { return !!o; });
     }
 
     [[nodiscard]] TR_CONSTEXPR20 bool has_addr() const noexcept
@@ -589,8 +622,7 @@ private:
 
     void maybe_send_requests(time_t now)
     {
-        TR_ASSERT(!is_dns_pending());
-        if (is_dns_pending() || !has_addr())
+        if (!has_addr())
         {
             return;
         }
@@ -696,9 +728,10 @@ public:
             return;
         }
 
+        auto const data = std::make_shared<tau_announce_data>(std::move(on_response));
         for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            tracker->announces.emplace_back(static_cast<tr_address_type>(ipp), mediator_.announce_ip(), request, on_response);
+            tracker->announces.emplace_back(static_cast<tr_address_type>(ipp), mediator_.announce_ip(), request, data);
         }
         tracker->upkeep(false);
     }
