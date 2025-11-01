@@ -258,7 +258,10 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
 
 void tr_peer_info::update_canonical_priority()
 {
-    auto const type = client_external_address_.type;
+    if (!client_external_address_.is_valid())
+    {
+        return;
+    }
 
     // https://www.bittorrent.org/beps/bep_0040.html
     // If the IP addresses are the same, the port numbers (16-bit integers) should be used instead:
@@ -274,6 +277,8 @@ void tr_peer_info::update_canonical_priority()
         canonical_priority_ = tr_crc32c(reinterpret_cast<uint8_t*>(std::data(buf)), std::size(buf) * sizeof(uint16_t));
         return;
     }
+
+    auto const type = client_external_address_.type;
 
     // https://www.bittorrent.org/beps/bep_0040.html
     // The formula to be used in prioritizing peers is this:
@@ -2315,7 +2320,12 @@ constexpr struct
             return a->is_disconnecting() ? 1 : -1;
         }
 
-        return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
+        if (auto val = a->peer_info->compare_by_piece_data_time(*b->peer_info); val != 0)
+        {
+            return -val;
+        }
+
+        return tr_compare_3way(a->swarm->tor->is_done(), b->swarm->tor->is_done());
     }
 
     [[nodiscard]] bool operator()(tr_peerMsgs const* a, tr_peerMsgs const* b) const // less than
@@ -2775,10 +2785,16 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     using namespace handshake_helpers;
 
     auto const now = tr_time();
-    auto const utp = mgr->session->allowsUTP() && peer_info.supports_utp().value_or(true);
     auto* const session = mgr->session;
+    auto const utp = session->allowsUTP() && peer_info.supports_utp().value_or(true);
 
-    if (tr_peer_socket::limit_reached(session) || (!utp && !session->allowsTCP()))
+    // Allow downloading torrents to "steal" connection slots
+    if (tr_peer_socket::limit_reached(session) && s->tor->is_done())
+    {
+        return;
+    }
+
+    if (!utp && !session->allowsTCP())
     {
         return;
     }
