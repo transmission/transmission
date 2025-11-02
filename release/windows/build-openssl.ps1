@@ -11,7 +11,16 @@ function global:Build-OpenSsl([string] $PrefixDir, [string] $Arch, [string] $Dep
     $SourceDir = Invoke-DownloadAndUnpack $Url $Filename
     $BuildDir = $SourceDir
 
-    $ConfigName = if ($Arch -eq 'x86') { 'VC-WIN32' } else { 'VC-WIN64A' }
+    $ConfigName = if ($Arch -eq 'x86') { 
+        'VC-WIN32' 
+    } elseif ($Arch -eq 'arm64' -or $Arch -eq 'x64_arm64') { 
+        'VC-WIN64-ARM' 
+    } elseif ($Arch -eq 'x64') { 
+        'VC-WIN64A' 
+    } else { 
+        'VC-WIN64A' 
+    }
+    
     $ConfigOptions = @(
         "--prefix=${PrefixDir}"
         '--api=1.1.0'
