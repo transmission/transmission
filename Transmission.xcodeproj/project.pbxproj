@@ -612,13 +612,6 @@
 			remoteGlobalIDString = 4D18389609DEC0030047D688;
 			remoteInfo = libtransmission;
 		};
-		ED91F3942CBDA9BD008388AA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = ED91F00B2CBDA5D3008388AA;
-			remoteInfo = crc32c;
-		};
 		ED5E0E8B2CD30B180071433B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -632,6 +625,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4D18389609DEC0030047D688;
 			remoteInfo = libtransmission;
+		};
+		ED91F3942CBDA9BD008388AA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ED91F00B2CBDA5D3008388AA;
+			remoteInfo = crc32c;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1662,13 +1662,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		ED91F00A2CBDA5D3008388AA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		ED5E0E792CD30B180071433B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1676,6 +1669,13 @@
 				ED5E0E7E2CD30B180071433B /* Quartz.framework in Frameworks */,
 				ED5E0E9D2CD3134B0071433B /* libtransmission.a in Frameworks */,
 				ED5E0EA02CD3147B0071433B /* libcurl.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED91F00A2CBDA5D3008388AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2486,6 +2486,20 @@
 			name = "Overlay Window";
 			sourceTree = "<group>";
 		};
+		ED5E0E992CD30E8F0071433B /* QuickLookExtension */ = {
+			isa = PBXGroup;
+			children = (
+				ED5E0EF72CD315720071433B /* Localizable.strings */,
+				ED5E0EA12CD314FE0071433B /* style.css */,
+				ED5E0E942CD30E8F0071433B /* Info.plist */,
+				ED5E0E952CD30E8F0071433B /* PreviewProvider.h */,
+				ED5E0E962CD30E8F0071433B /* PreviewProvider.mm */,
+				ED5E0E972CD30E8F0071433B /* QuickLookExtension.entitlements */,
+			);
+			name = QuickLookExtension;
+			path = macosx/QuickLookExtension;
+			sourceTree = "<group>";
+		};
 		ED91F01C2CBDA72C008388AA /* crc32c */ = {
 			isa = PBXGroup;
 			children = (
@@ -2529,20 +2543,6 @@
 			);
 			name = crc32c;
 			path = "third-party/crc32c";
-			sourceTree = "<group>";
-		};
-		ED5E0E992CD30E8F0071433B /* QuickLookExtension */ = {
-			isa = PBXGroup;
-			children = (
-				ED5E0EF72CD315720071433B /* Localizable.strings */,
-				ED5E0EA12CD314FE0071433B /* style.css */,
-				ED5E0E942CD30E8F0071433B /* Info.plist */,
-				ED5E0E952CD30E8F0071433B /* PreviewProvider.h */,
-				ED5E0E962CD30E8F0071433B /* PreviewProvider.mm */,
-				ED5E0E972CD30E8F0071433B /* QuickLookExtension.entitlements */,
-			);
-			name = QuickLookExtension;
-			path = macosx/QuickLookExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3099,26 +3099,6 @@
 			productReference = C8B27BA128153F3400A22B5D /* transmission-show */;
 			productType = "com.apple.product-type.tool";
 		};
-		ED91F00B2CBDA5D3008388AA /* crc32c */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = ED91F0172CBDA5D3008388AA /* Build configuration list for PBXNativeTarget "crc32c" */;
-			buildPhases = (
-				ED91F3982CBDAB95008388AA /* Copy libcrc32c headers */,
-				ED91F0082CBDA5D3008388AA /* Headers */,
-				ED91F0092CBDA5D3008388AA /* Sources */,
-				ED91F00A2CBDA5D3008388AA /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = crc32c;
-			packageProductDependencies = (
-			);
-			productName = crc32c;
-			productReference = ED91F00C2CBDA5D3008388AA /* libcrc32c.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 		ED5E0E7B2CD30B180071433B /* QuickLookExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ED5E0E932CD30B180071433B /* Build configuration list for PBXNativeTarget "QuickLookExtension" */;
@@ -3138,6 +3118,26 @@
 			productName = QuickLookExtension;
 			productReference = ED5E0E7C2CD30B180071433B /* QuickLookExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		ED91F00B2CBDA5D3008388AA /* crc32c */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ED91F0172CBDA5D3008388AA /* Build configuration list for PBXNativeTarget "crc32c" */;
+			buildPhases = (
+				ED91F3982CBDAB95008388AA /* Copy libcrc32c headers */,
+				ED91F0082CBDA5D3008388AA /* Headers */,
+				ED91F0092CBDA5D3008388AA /* Sources */,
+				ED91F00A2CBDA5D3008388AA /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = crc32c;
+			packageProductDependencies = (
+			);
+			productName = crc32c;
+			productReference = ED91F00C2CBDA5D3008388AA /* libcrc32c.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
@@ -3162,11 +3162,11 @@
 					C3D9062027B7E3C900EF2386 = {
 						CreatedOnToolsVersion = 13.0;
 					};
-					ED91F00B2CBDA5D3008388AA = {
-						CreatedOnToolsVersion = 16.0;
-					};
 					ED5E0E7B2CD30B180071433B = {
 						CreatedOnToolsVersion = 16.1;
+					};
+					ED91F00B2CBDA5D3008388AA = {
+						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
@@ -3401,12 +3401,13 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/third_party/macosx-crc32c-config.h",
+				"$(SRCROOT)/third-party/macosx-crc32c-config.h",
 			);
 			name = "Copy libcrc32c headers";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/third-party/crc32c/include/crc32c/crc32c_config.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
@@ -3769,6 +3770,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ED5E0E782CD30B180071433B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED5E0F0F2CD31BC20071433B /* NSStringAdditions.mm in Sources */,
+				ED5E0E9C2CD30E8F0071433B /* PreviewProvider.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ED91F0092CBDA5D3008388AA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3777,15 +3787,6 @@
 				ED91F2B52CBDA72C008388AA /* crc32c_sse42.cc in Sources */,
 				ED91F2F52CBDA72C008388AA /* crc32c_arm64.cc in Sources */,
 				ED91F3152CBDA72C008388AA /* crc32c_portable.cc in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		ED5E0E782CD30B180071433B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				ED5E0F0F2CD31BC20071433B /* NSStringAdditions.mm in Sources */,
-				ED5E0E9C2CD30E8F0071433B /* PreviewProvider.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3882,11 +3883,6 @@
 			target = 4D18389609DEC0030047D688 /* libtransmission */;
 			targetProxy = C8B27B9428153F3400A22B5D /* PBXContainerItemProxy */;
 		};
-		ED91F3952CBDA9BD008388AA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = ED91F00B2CBDA5D3008388AA /* crc32c */;
-			targetProxy = ED91F3942CBDA9BD008388AA /* PBXContainerItemProxy */;
-		};
 		ED5E0E8C2CD30B180071433B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = ED5E0E7B2CD30B180071433B /* QuickLookExtension */;
@@ -3896,6 +3892,11 @@
 			isa = PBXTargetDependency;
 			target = 4D18389609DEC0030047D688 /* libtransmission */;
 			targetProxy = ED5E0E9E2CD3134B0071433B /* PBXContainerItemProxy */;
+		};
+		ED91F3952CBDA9BD008388AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ED91F00B2CBDA5D3008388AA /* crc32c */;
+			targetProxy = ED91F3942CBDA9BD008388AA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -5467,36 +5468,6 @@
 			};
 			name = Release;
 		};
-		ED91F0142CBDA5D3008388AA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		ED91F0152CBDA5D3008388AA /* Release - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Release - Debug";
-		};
-		ED91F0162CBDA5D3008388AA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		ED5E0E8F2CD30B180071433B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -5605,6 +5576,33 @@
 					"third-party/fmt/include",
 					"third-party/small/include",
 				);
+			};
+			name = Release;
+		};
+		ED91F0142CBDA5D3008388AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ED91F0152CBDA5D3008388AA /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Release - Debug";
+		};
+		ED91F0162CBDA5D3008388AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				HEADER_SEARCH_PATHS = "third-party/crc32c/include";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -5801,22 +5799,22 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		ED91F0172CBDA5D3008388AA /* Build configuration list for PBXNativeTarget "crc32c" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				ED91F0142CBDA5D3008388AA /* Debug */,
-				ED91F0152CBDA5D3008388AA /* Release - Debug */,
-				ED91F0162CBDA5D3008388AA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		ED5E0E932CD30B180071433B /* Build configuration list for PBXNativeTarget "QuickLookExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED5E0E8F2CD30B180071433B /* Debug */,
 				ED5E0E902CD30B180071433B /* Release - Debug */,
 				ED5E0E912CD30B180071433B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		ED91F0172CBDA5D3008388AA /* Build configuration list for PBXNativeTarget "crc32c" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ED91F0142CBDA5D3008388AA /* Debug */,
+				ED91F0152CBDA5D3008388AA /* Release - Debug */,
+				ED91F0162CBDA5D3008388AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
