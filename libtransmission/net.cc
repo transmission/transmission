@@ -27,7 +27,7 @@
 
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -189,7 +189,7 @@ tr_socket_t createSocket(int domain, int type)
         if (sockerrno != EAFNOSUPPORT)
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't create socket: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't create socket: {error} ({error_code})")),
                 fmt::arg("error", tr_net_strerror(sockerrno)),
                 fmt::arg("error_code", sockerrno)));
         }
@@ -228,22 +228,21 @@ tr_socket_t createSocket(int domain, int type)
 }
 } // namespace
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
+tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
 {
     auto const& [addr, port] = socket_address;
 
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
+    if (!session->allowsTCP() || !socket_address.is_valid())
     {
-        return {};
+        return TR_BAD_SOCKET;
     }
 
     auto const s = createSocket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
-        return {};
+        return TR_BAD_SOCKET;
     }
 
     // seeds don't need a big read buffer, so make it smaller
@@ -266,13 +265,13 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
+            fmt::runtime(_("Couldn't set source address {address} on {socket}: {error} ({error_code})")),
             fmt::arg("address", source_addr.display_name()),
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
         tr_net_close_socket(s);
-        return {};
+        return TR_BAD_SOCKET;
     }
 
     if (connect(s, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1 &&
@@ -285,7 +284,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
             (tmperrno != ECONNREFUSED && tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})")),
                 fmt::arg("socket", s),
                 fmt::arg("address", addr.display_name()),
                 fmt::arg("port", port.host()),
@@ -294,12 +293,12 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         }
 
         tr_net_close_socket(s);
-        return {};
+        return TR_BAD_SOCKET;
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
-    return { session, socket_address, s };
+    return s;
 }
 
 namespace
@@ -326,13 +325,17 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)evutil_make_listen_socket_reuseable(fd);
 
-    if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
+#ifdef IPV6_V6ONLY
+    // TODO(tearfur): Consider using `evutil_make_listen_socket_ipv6only` once minimum libevent version is bumped to 2.1.9 or above
+    if (addr.is_ipv6() &&
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
+#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
@@ -343,9 +346,10 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
         if (!suppress_msgs)
         {
             tr_logAddError(fmt::format(
-                err == EADDRINUSE ?
-                    _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
-                    _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
+                fmt::runtime(
+                    err == EADDRINUSE ?
+                        _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
+                        _("Couldn't bind port {port} on {address}: {error} ({error_code})")),
                 fmt::arg("address", addr.display_name()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(err)),
@@ -486,7 +490,7 @@ std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* comp
 
 std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
-    auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
+    auto const address_sz = tr_strbuf<char, TrAddrStrlen>{ address_sv };
 
     auto ss = sockaddr_storage{};
     auto sslen = int{ sizeof(ss) };
@@ -798,7 +802,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
 std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
 {
-    return fmt::format(address.is_ipv6() ? "[{:s}]:{:d}" : "{:s}:{:d}", address.display_name(), port.host());
+    return fmt::format(fmt::runtime(address.is_ipv6() ? "[{:s}]:{:d}" : "{:s}:{:d}"), address.display_name(), port.host());
 }
 
 bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
@@ -813,8 +817,7 @@ std::optional<tr_socket_address> tr_socket_address::from_string(std::string_view
 {
     auto ss = sockaddr_storage{};
     auto sslen = int{ sizeof(ss) };
-    if (evutil_parse_sockaddr_port(tr_strbuf<char, TR_ADDRSTRLEN>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) !=
-        0)
+    if (evutil_parse_sockaddr_port(tr_strbuf<char, TrAddrStrlen>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) != 0)
     {
         return {};
     }

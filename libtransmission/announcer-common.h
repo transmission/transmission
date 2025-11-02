@@ -12,6 +12,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint> // uint64_t
+#include <ctime>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -24,6 +25,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // tr_pex
 #include "libtransmission/tr-macros.h" // tr_peer_id_t
+#include "libtransmission/utils.h"
 
 struct tr_url_parsed_t;
 
@@ -65,7 +67,7 @@ struct tr_announce_request
     tr_announce_key_t key;
 
     /* the number of peers we'd like to get back in the response */
-    int numwant = 0;
+    int64_t numwant = 0;
 
     /* the number of bytes we uploaded since the last 'started' event */
     uint64_t up = 0;
@@ -110,11 +112,11 @@ struct tr_announce_response
 
     /* preferred interval between announces.
      * transmission treats this as the interval for periodic announces */
-    int interval = 0;
+    time_t interval = 0;
 
     /* minimum interval between announces. (optional)
      * transmission treats this as the min interval for manual announces */
-    int min_interval = 0;
+    time_t min_interval = 0;
 
     /* how many peers are seeding this torrent */
     std::optional<int64_t> seeders;
@@ -144,6 +146,22 @@ struct tr_announce_response
     /* tracker extension that returns the client's public IP address.
      * https://www.bittorrent.org/beps/bep_0024.html */
     std::optional<tr_address> external_ip;
+
+    static constexpr int compare_failed(tr_announce_response const& lhs, tr_announce_response const& rhs) noexcept
+    {
+        if (auto val = tr_compare_3way(lhs.did_connect, rhs.did_connect); val != 0)
+        {
+            return val;
+        }
+
+        if (auto val = tr_compare_3way(lhs.did_timeout, rhs.did_timeout); val != 0)
+        {
+            return -val;
+        }
+
+        // Non-empty error message most likely means we reached the tracker
+        return -tr_compare_3way(std::empty(lhs.errmsg), std::empty(rhs.errmsg));
+    }
 };
 
 // --- SCRAPE
@@ -157,7 +175,7 @@ struct tr_announce_response
  * This is only an upper bound: if the tracker complains about
  * length, announcer will incrementally lower the batch size.
  */
-auto inline constexpr TrMultiscrapeMax = 60;
+auto inline constexpr TrMultiscrapeMax = 60U;
 
 auto inline constexpr TrAnnounceTimeoutSec = std::chrono::seconds{ 45 };
 auto inline constexpr TrScrapeTimeoutSec = std::chrono::seconds{ 30 };
@@ -174,7 +192,7 @@ struct tr_scrape_request
     std::array<tr_sha1_digest_t, TrMultiscrapeMax> info_hash;
 
     /* how many hashes to use in the info_hash field */
-    int info_hash_count = 0;
+    size_t info_hash_count = 0U;
 };
 
 struct tr_scrape_response_row
@@ -206,7 +224,7 @@ struct tr_scrape_response
     bool did_timeout = false;
 
     /* how many info hashes are in the 'rows' field */
-    int row_count;
+    size_t row_count;
 
     /* the individual torrents' scrape results */
     std::array<tr_scrape_response_row, TrMultiscrapeMax> rows;
@@ -219,5 +237,5 @@ struct tr_scrape_response
 
     /* minimum interval (in seconds) allowed between scrapes.
      * this is an unofficial extension that some trackers won't support. */
-    int min_request_interval;
+    time_t min_request_interval;
 };

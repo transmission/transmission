@@ -13,7 +13,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 #include <string>
@@ -53,8 +53,9 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     }
 
     auto const capacity = tr_sys_path_get_capacity(dir_);
-    auto const text = capacity ? fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
-                                 _("Error");
+    auto const text = capacity ?
+        fmt::format(fmt::runtime(_("{disk_space} free")), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
+        _("Error");
     label_.set_markup(fmt::format("<i>{:s}</i>", text));
 
     return true;

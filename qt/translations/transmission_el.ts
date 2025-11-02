@@ -218,12 +218,12 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>O διαμοιραστής είναι συνδεδεμένος μέσω µTP</translation>
     </message>
     <message>
         <location line="+161"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Προσθήκη συνδέσμων για ανακοινώσεις ιχνηλατών, ένας ανά γραμμή:</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -233,7 +233,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν βρέθηκαν νέοι σύνδεσμοι.</translation>
     </message>
     <message>
         <location line="-872"/>
@@ -268,15 +268,15 @@
         <location line="+358"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 λεπτό</numerusform>
+            <numerusform>%1 λεπτά</numerusform>
         </translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Προσθήκη συνδέσμων</translation>
     </message>
     <message>
         <location line="+116"/>
@@ -427,12 +427,12 @@
     <message>
         <location line="+154"/>
         <source>Labels:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ετικέτες:</translation>
     </message>
     <message>
         <location line="+108"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Επεξεργασία Ιχνηλατών</translation>
     </message>
     <message>
         <location line="-230"/>
@@ -452,7 +452,7 @@
     <message>
         <location line="+32"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Προστέθηκε:</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -638,7 +638,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Μετονομασία…</translation>
     </message>
 </context>
 <context>
@@ -692,7 +692,7 @@
     <message>
         <location line="+13"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Αναζήτηση…</translation>
     </message>
 </context>
 <context>
@@ -747,7 +747,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Υπολογισμός Ελεύθερου Χώρου…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -823,17 +823,17 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Επιλογές</translation>
+        <translation>Επιλογές</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Στατιστικά</translation>
+        <translation>Στατιστικά</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Άνοιγμα…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -848,7 +848,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Νέο…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1089,17 +1089,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Αλλαγή Συνεδρίας…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Καθορισμός &amp;Τοποθεσίας…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Άνοιγμα &amp;Συνδέσμου…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1413,7 +1413,7 @@
     <message>
         <location line="+20"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Μ&amp;έγεθος κομματιού:</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1440,7 +1440,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Πηγή:</translation>
+        <translation>&amp;Πηγή:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1468,7 +1468,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Αδυναμία δημιουργίας &quot;%1&quot;: %2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1659,24 +1659,24 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+464"/>
         <source>%1 minute(s)</source>
         <extracomment>Spin box format, &quot;Stop seeding if idle for: [ 5 minutes ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 λεπτό</numerusform>
+            <numerusform>%1 λεπτά</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+26"/>
         <source>%1 minute(s) ago</source>
         <extracomment>Spin box format, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>πριν %1 λεπτό</numerusform>
+            <numerusform>πριν %1 λεπτά</numerusform>
         </translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιλογή Script «Το Torrent Κατέβηκε»</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+447"/>
@@ -1701,7 +1701,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="-35"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιλογή Script «Το Torrent Διαμοιράστηκε»</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-520"/>
@@ -1749,7 +1749,10 @@ To add another primary URL, add it after a blank line.</source>
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ιχνηλάτες για χρήση σε όλα τα δημόσια torrents.
+
+Για την χρήση εφεδρικού συνδέσμου, προσθέστε τον στην επόμενη γραμμή έπειτα από τον κύριο σύνδεσμο.
+Για την προσθήκη νέου κύριου συνδέσμου, προσθέστε τον έπειτα από μία κενή γραμμή.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -1898,37 +1901,37 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+142"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Διαβάζει το περιεχόμενο του προχείρου του χρήστη για torrents</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Εντοπίζει νέα torrents από το πρόχειρο</translation>
     </message>
     <message>
         <location line="+136"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Κλήση scrip&amp;t όταν το κατέβασμα ολοκληρωθεί:</translation>
     </message>
     <message>
         <location line="+97"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Κλήση scrip&amp;t όταν ο διαμοιρασμός ολοκληρωθεί:</translation>
     </message>
     <message>
         <location line="+254"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Το µTP είναι ένα μέσο μείωσης της δικτυακής συμφόρησης.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Ενεργοποίηση µ&amp;TP για συνδέσεις διαμοιραστών</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Προκαθορισμένοι Δημόσιοι Ιχνηλάτες</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2008,50 +2011,50 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>άγνωστο</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>έλεγχος…</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>ανοιχτή</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>closed</source>
-        <translation type="unfinished"></translation>
+        <translation>κλειστή</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>σφάλμα</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Κατάσταση: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Κατάσταση: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
     </message>
     <message numerus="yes">
         <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Η ενημέρωση πέτυχε!&lt;/b&gt;&lt;p&gt;Η λίστα φραγής τώρα έχει %Ln κανόνα.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Η ενημέρωση πέτυχε!&lt;/b&gt;&lt;p&gt;Η λίστα φραγής τώρα έχει %Ln κανόνες.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Ενημέρωση λίστα φραγής&lt;/b&gt;&lt;p&gt;Απόκτηση νέας λίστας φραγής…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2125,78 +2128,78 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>KiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>MiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>GiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>TiB</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>kB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message>
         <location line="+276"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Εκκίνηση Τώρα</translation>
     </message>
 </context>
 <context>
@@ -2257,17 +2260,17 @@ To add a new primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Διπλότυπο Torrent</numerusform>
+            <numerusform>Διπλότυπα Torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Αδυναμία προσθήκης %n διπλότυπου torrent</numerusform>
+            <numerusform>Αδυναμία προσθήκης %n διπλότυπων torrents</numerusform>
         </translation>
     </message>
 </context>
@@ -2325,7 +2328,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location filename="../Speed.h" line="+40"/>
         <location line="+6"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
 </context>
 <context>
@@ -2495,13 +2498,13 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+18"/>
         <source>%1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 απομένουν</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Άγνωστος υπολειπόμενος χρόνος</translation>
     </message>
     <message numerus="yes">
         <location line="+40"/>
@@ -2608,7 +2611,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Αποστολή αιτήματος για αριθμούς διαμοιραστών… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-37"/>
@@ -2644,7 +2647,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="-20"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Αποστολή αιτήματος για περισσότερους διαμοιραστές… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -2663,27 +2666,27 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Επεξεργασία Ιχνηλατών</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Σύνδεσμοι Ανακοινώσεων Ιχνηλατών</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Για την χρήση εφεδρικού συνδέσμου, προσθέστε τον στην επόμενη γραμμή έπειτα ενός κύριου συνδέσμου.</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Για την προσθήκη ενός νέου κύριου συνδέσμου, προσθέστε τον έπειτα από μία κενή γραμμή.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Δείτε επίσης τους Προκαθορισμένους Δημόσιους Ιχνηλάτες υπό την Επεξεργασία &gt; Προτιμήσεις &gt; Δίκτυο</translation>
     </message>
 </context>
 </TS>

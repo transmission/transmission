@@ -13,6 +13,8 @@
 #include "TorrentFilter.h"
 #include "Utils.h"
 
+#include <libtransmission/tr-macros.h>
+
 #include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
@@ -34,7 +36,7 @@
 #include <gtkmm/filterlistmodel.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm> // std::transform()
 #include <array>
@@ -585,7 +587,7 @@ bool FilterBar::Impl::update_count_label()
     /* set the text */
     if (auto const new_markup = visibleCount == std::min(activityCount, trackerCount) ?
             _("_Show:") :
-            fmt::format(_("_Show {count:L} of:"), fmt::arg("count", visibleCount));
+            fmt::format(fmt::runtime(_("_Show {count:L} of:")), fmt::arg("count", visibleCount));
         new_markup != show_lb_->get_label().raw())
     {
         show_lb_->set_markup_with_mnemonic(new_markup);
@@ -604,7 +606,7 @@ void FilterBar::Impl::update_count_label_idle()
 
 void FilterBar::Impl::update_filter_models(Torrent::ChangeFlags changes)
 {
-    static auto constexpr activity_flags = Torrent::ChangeFlag::ACTIVE_PEERS_DOWN | Torrent::ChangeFlag::ACTIVE_PEERS_UP |
+    static auto TR_CONSTEXPR23 activity_flags = Torrent::ChangeFlag::ACTIVE_PEERS_DOWN | Torrent::ChangeFlag::ACTIVE_PEERS_UP |
         Torrent::ChangeFlag::ACTIVE | Torrent::ChangeFlag::ACTIVITY | Torrent::ChangeFlag::ERROR_CODE |
         Torrent::ChangeFlag::FINISHED;
     static auto constexpr tracker_flags = Torrent::ChangeFlag::TRACKERS;

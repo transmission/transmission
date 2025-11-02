@@ -11,13 +11,14 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/values.h>
 
 #include <glibmm/i18n.h>
 #include <glibmm/value.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <array>
 #include <cmath>
@@ -362,23 +363,24 @@ void Torrent::Impl::notify_property_changes(ChangeFlags changes) const
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 
-    static auto constexpr properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
-        { Property::ICON, ChangeFlag::MIME_TYPE },
-        { Property::NAME, ChangeFlag::NAME },
-        { Property::PERCENT_DONE, ChangeFlag::PERCENT_DONE },
-        { Property::SHORT_STATUS,
-          ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::FINISHED |
-              ChangeFlag::RATIO | ChangeFlag::RECHECK_PROGRESS | ChangeFlag::SPEED_DOWN | ChangeFlag::SPEED_UP },
-        { Property::LONG_PROGRESS,
-          ChangeFlag::ACTIVITY | ChangeFlag::ETA | ChangeFlag::LONG_PROGRESS | ChangeFlag::PERCENT_COMPLETE |
-              ChangeFlag::PERCENT_DONE | ChangeFlag::RATIO | ChangeFlag::TOTAL_SIZE },
-        { Property::LONG_STATUS,
-          ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE |
-              ChangeFlag::ERROR_MESSAGE | ChangeFlag::HAS_METADATA | ChangeFlag::LONG_STATUS | ChangeFlag::SPEED_DOWN |
-              ChangeFlag::SPEED_UP | ChangeFlag::STALLED },
-        { Property::SENSITIVE, ChangeFlag::ACTIVITY },
-        { Property::CSS_CLASSES, ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE },
-    } });
+    static auto TR_CONSTEXPR23
+        properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
+            { Property::ICON, ChangeFlag::MIME_TYPE },
+            { Property::NAME, ChangeFlag::NAME },
+            { Property::PERCENT_DONE, ChangeFlag::PERCENT_DONE },
+            { Property::SHORT_STATUS,
+              ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::FINISHED |
+                  ChangeFlag::RATIO | ChangeFlag::RECHECK_PROGRESS | ChangeFlag::SPEED_DOWN | ChangeFlag::SPEED_UP },
+            { Property::LONG_PROGRESS,
+              ChangeFlag::ACTIVITY | ChangeFlag::ETA | ChangeFlag::LONG_PROGRESS | ChangeFlag::PERCENT_COMPLETE |
+                  ChangeFlag::PERCENT_DONE | ChangeFlag::RATIO | ChangeFlag::TOTAL_SIZE },
+            { Property::LONG_STATUS,
+              ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE |
+                  ChangeFlag::ERROR_MESSAGE | ChangeFlag::HAS_METADATA | ChangeFlag::LONG_STATUS | ChangeFlag::SPEED_DOWN |
+                  ChangeFlag::SPEED_UP | ChangeFlag::STALLED },
+            { Property::SENSITIVE, ChangeFlag::ACTIVITY },
+            { Property::CSS_CLASSES, ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE },
+        } });
 
     auto& properties = PropertyStore::get();
 
@@ -436,7 +438,7 @@ Glib::ustring Torrent::Impl::get_short_status_text() const
     case TR_STATUS_CHECK:
         return fmt::format(
             // xgettext:no-c-format
-            _("Verifying local data ({percent_done}% tested)"),
+            fmt::runtime(_("Verifying local data ({percent_done}% tested)")),
             fmt::arg("percent_done", cache_.recheck_progress.to_string()));
 
     case TR_STATUS_DOWNLOAD:
@@ -444,7 +446,7 @@ Glib::ustring Torrent::Impl::get_short_status_text() const
         return fmt::format(
             "{:s} {:s}",
             get_short_transfer_text(),
-            fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(cache_.ratio))));
+            fmt::format(fmt::runtime(_("Ratio: {ratio}")), fmt::arg("ratio", tr_strlratio(cache_.ratio))));
 
     default:
         return {};
@@ -463,7 +465,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
     {
         // 50 MB of 200 MB (25%)
         gstr += fmt::format(
-            _("{current_size} of {complete_size} ({percent_done}%)"),
+            fmt::runtime(_("{current_size} of {complete_size} ({percent_done}%)")),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.size_when_done)),
             fmt::arg("percent_done", cache_.percent_done.to_string()));
@@ -473,7 +475,8 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
         // 50 MB of 200 MB (25%), uploaded 30 MB (Ratio: X%, Goal: Y%)
         gstr += fmt::format(
             // xgettext:no-c-format
-            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
+            fmt::runtime(_(
+                "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})")),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("percent_complete", cache_.percent_complete.to_string()),
@@ -485,7 +488,8 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
     {
         gstr += fmt::format(
             // xgettext:no-c-format
-            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
+            fmt::runtime(
+                _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})")),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("percent_complete", cache_.percent_complete.to_string()),
@@ -495,7 +499,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
     else if (cache_.has_seed_ratio) // seed, seed ratio
     {
         gstr += fmt::format(
-            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
+            fmt::runtime(_("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})")),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)),
@@ -504,7 +508,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
     else // seed, no seed ratio
     {
         gstr += fmt::format(
-            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"),
+            fmt::runtime(_("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})")),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)));
@@ -637,13 +641,13 @@ Glib::ustring Torrent::Impl::get_error_text() const
     switch (cache_.error_code)
     {
     case TR_STAT_TRACKER_WARNING:
-        return fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", cache_.error_message));
+        return fmt::format(fmt::runtime(_("Tracker warning: '{warning}'")), fmt::arg("warning", cache_.error_message));
 
     case TR_STAT_TRACKER_ERROR:
-        return fmt::format(_("Tracker Error: '{error}'"), fmt::arg("error", cache_.error_message));
+        return fmt::format(fmt::runtime(_("Tracker Error: '{error}'")), fmt::arg("error", cache_.error_message));
 
     case TR_STAT_LOCAL_ERROR:
-        return fmt::format(_("Local error: '{error}'"), fmt::arg("error", cache_.error_message));
+        return fmt::format(fmt::runtime(_("Local error: '{error}'")), fmt::arg("error", cache_.error_message));
 
     default:
         return {};
@@ -665,11 +669,11 @@ Glib::ustring Torrent::Impl::get_activity_text() const
         if (!cache_.has_metadata)
         {
             return fmt::format(
-                ngettext(
+                fmt::runtime(ngettext(
                     // xgettext:no-c-format
                     "Downloading metadata from {active_count} connected peer ({percent_done}% done)",
                     "Downloading metadata from {active_count} connected peers ({percent_done}% done)",
-                    cache_.peers_connected),
+                    cache_.peers_connected)),
                 fmt::arg("active_count", cache_.peers_connected),
                 fmt::arg("percent_done", cache_.metadata_percent_complete.to_string()));
         }
@@ -677,10 +681,10 @@ Glib::ustring Torrent::Impl::get_activity_text() const
         if (cache_.peers_sending_to_us != 0 && cache_.webseeds_sending_to_us != 0)
         {
             return fmt::format(
-                ngettext(
+                fmt::runtime(ngettext(
                     "Downloading from {active_count} of {connected_count} connected peer and webseed",
                     "Downloading from {active_count} of {connected_count} connected peers and webseeds",
-                    cache_.peers_connected + cache_.webseeds_sending_to_us),
+                    cache_.peers_connected + cache_.webseeds_sending_to_us)),
                 fmt::arg("active_count", cache_.peers_sending_to_us + cache_.webseeds_sending_to_us),
                 fmt::arg("connected_count", cache_.peers_connected + cache_.webseeds_sending_to_us));
         }
@@ -688,27 +692,27 @@ Glib::ustring Torrent::Impl::get_activity_text() const
         if (cache_.webseeds_sending_to_us != 0)
         {
             return fmt::format(
-                ngettext(
+                fmt::runtime(ngettext(
                     "Downloading from {active_count} webseed",
                     "Downloading from {active_count} webseeds",
-                    cache_.webseeds_sending_to_us),
+                    cache_.webseeds_sending_to_us)),
                 fmt::arg("active_count", cache_.webseeds_sending_to_us));
         }
 
         return fmt::format(
-            ngettext(
+            fmt::runtime(ngettext(
                 "Downloading from {active_count} of {connected_count} connected peer",
                 "Downloading from {active_count} of {connected_count} connected peers",
-                cache_.peers_connected),
+                cache_.peers_connected)),
             fmt::arg("active_count", cache_.peers_sending_to_us),
             fmt::arg("connected_count", cache_.peers_connected));
 
     case TR_STATUS_SEED:
         return fmt::format(
-            ngettext(
+            fmt::runtime(ngettext(
                 "Seeding to {active_count} of {connected_count} connected peer",
                 "Seeding to {active_count} of {connected_count} connected peers",
-                cache_.peers_connected),
+                cache_.peers_connected)),
             fmt::arg("active_count", cache_.peers_getting_from_us),
             fmt::arg("connected_count", cache_.peers_connected));
 

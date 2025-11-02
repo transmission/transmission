@@ -49,7 +49,6 @@ enum class ReadState : uint8_t
 
 enum tr_preferred_transport : uint8_t
 {
-    // More preferred transports goes on top
     TR_PREFER_UTP,
     TR_PREFER_TCP,
     TR_NUM_PREFERRED_TRANSPORT
@@ -60,18 +59,24 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
     using DH = tr_message_stream_encryption::DH;
     using Filter = tr_message_stream_encryption::Filter;
     using CanRead = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
-    using DidWrite = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-    using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* userData);
+    using DidWrite = void (*)(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* user_data);
+    using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* user_data);
 
 public:
     tr_peerIo(
-        tr_session* session_in,
+        tr_session* session,
+        tr_peer_socket&& socket,
+        tr_bandwidth* parent_bandwidth,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,
-        bool client_is_seed,
-        tr_bandwidth* parent_bandwidth);
+        bool client_is_seed);
 
     ~tr_peerIo();
+
+    tr_peerIo(tr_peerIo const&) = delete;
+    tr_peerIo(tr_peerIo&&) = delete;
+    tr_peerIo& operator=(tr_peerIo const&) = delete;
+    tr_peerIo& operator=(tr_peerIo&&) = delete;
 
     static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
@@ -96,7 +101,7 @@ public:
         set_callbacks(nullptr, nullptr, nullptr, nullptr);
     }
 
-    void set_socket(tr_peer_socket);
+    void set_socket(tr_peer_socket socket_in);
 
     [[nodiscard]] constexpr auto is_utp() const noexcept
     {
@@ -353,6 +358,7 @@ private:
     // production code should use new_outgoing() or new_incoming()
     static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
+        tr_peer_socket&& socket,
         tr_bandwidth* parent,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,

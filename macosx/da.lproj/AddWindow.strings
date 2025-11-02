@@ -3,7 +3,7 @@
 "15.title" = "Download til:";
 
 /* Class = "NSButtonCell"; title = "Change…"; ObjectID = "16"; */
-"16.title" = "Andet...";
+"16.title" = "Skift …";
 
 /* Class = "NSButtonCell"; title = "Start when added"; ObjectID = "18"; */
 "18.title" = "Start overførslen nu";
@@ -30,7 +30,7 @@
 "59.title" = "Flyt torrent fil til papirkurven";
 
 /* Class = "NSButtonCell"; title = "Verify Local Data"; ObjectID = "66"; */
-"66.title" = "Kontroller data";
+"66.title" = "Bekræft lokale data";
 
 /* Class = "NSMenuItem"; title = "Low"; ObjectID = "88"; */
 "88.title" = "Lav";

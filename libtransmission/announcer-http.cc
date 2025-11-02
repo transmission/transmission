@@ -7,6 +7,7 @@
 #include <cctype>
 #include <cstddef> // std::byte, size_t
 #include <cstdint> // int64_t, uint8_t, uint...
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -19,7 +20,7 @@
 
 #include <event2/http.h> /* for HTTP_OK */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
@@ -93,7 +94,7 @@ struct http_announce_data
     }
 
     tr_sha1_digest_t info_hash = {};
-    std::optional<tr_announce_response> previous_response;
+    std::optional<tr_announce_response> failed_response;
 
     tr_announce_response_func on_response;
 
@@ -121,6 +122,11 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
     }
 
     tr_announcerParseHttpAnnounceResponse(response, body, log_name);
+
+    if (!std::empty(response.errmsg))
+    {
+        return false;
+    }
 
     if (!std::empty(response.pex6))
     {
@@ -152,22 +158,17 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
         {
             data->on_response(response);
         }
-        else if (got_all_responses)
-        {
-            // All requests have been answered, but none were successful.
-            // Choose the one that went further to report.
-            if (data->previous_response)
-            {
-                data->on_response(response.did_connect || response.did_timeout ? response : *data->previous_response);
-            }
-        }
         else
         {
-            // There is still one request pending that might succeed, so store
-            // the response for later. There is only room for 1 previous response,
-            // because there can be at most 2 requests.
-            TR_ASSERT(!data->previous_response);
-            data->previous_response = std::move(response);
+            if (!data->failed_response || tr_announce_response::compare_failed(*data->failed_response, response) < 0)
+            {
+                data->failed_response = std::move(response);
+            }
+
+            if (got_all_responses)
+            {
+                data->on_response(*data->failed_response);
+            }
         }
     }
 
@@ -229,6 +230,22 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     {
         fmt::format_to(out, "&trackerid={}", req.tracker_id);
     }
+
+    if (auto ipv4_addr = session->global_address(TR_AF_INET); ipv4_addr)
+    {
+        auto buf = std::array<char, INET_ADDRSTRLEN>{};
+        auto const display_name = ipv4_addr->display_name(std::data(buf), std::size(buf));
+        fmt::format_to(out, "&ipv4=");
+        tr_urlPercentEncode(out, display_name);
+    }
+
+    if (auto ipv6_addr = session->global_address(TR_AF_INET6); ipv6_addr)
+    {
+        auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+        auto const display_name = ipv6_addr->display_name(std::data(buf), std::size(buf));
+        fmt::format_to(out, "&ipv6=");
+        tr_urlPercentEncode(out, display_name);
+    }
 }
 
 [[nodiscard]] std::string format_ip_arg(std::string_view ip)
@@ -255,8 +272,8 @@ void tr_tracker_http_announce(
        public address they want to use.
 
        We should ensure that we send the announce both via IPv6 and IPv4,
-       but no longer use the "ipv4=" and "ipv6=" parameters. So, we no
-       longer need to compute the global IPv4 and IPv6 addresses.
+       and to be safe we also add the "ipv4=" and "ipv6=" parameters, if
+       we already have them.
      */
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
@@ -348,11 +365,11 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             if (pathIs("interval"sv))
             {
-                response_.interval = static_cast<int>(value);
+                response_.interval = static_cast<time_t>(value);
             }
             else if (pathIs("min interval"sv))
             {
-                response_.min_interval = static_cast<int>(value);
+                response_.min_interval = static_cast<time_t>(value);
             }
             else if (pathIs("complete"sv))
             {
@@ -433,7 +450,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     {
         tr_logAddWarn(
             fmt::format(
-                _("Couldn't parse announce response: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse announce response: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())),
             log_name);
@@ -510,7 +527,7 @@ void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const& req)
     scrape_url = req.scrape_url.sv();
     char delimiter = tr_strv_contains(scrape_url, '?') ? '&' : '?';
 
-    for (int i = 0; i < req.info_hash_count; ++i)
+    for (size_t i = 0; i < req.info_hash_count; ++i)
     {
         scrape_url.append(delimiter, "info_hash=");
         tr_urlPercentEncode(std::back_inserter(scrape_url), req.info_hash[i]);
@@ -529,7 +546,7 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     auto& response = d->response();
     response.scrape_url = request.scrape_url;
     response.row_count = request.info_hash_count;
-    for (int i = 0; i < response.row_count; ++i)
+    for (size_t i = 0; i < response.row_count; ++i)
     {
         response.rows[i].info_hash = request.info_hash[i];
     }
@@ -620,7 +637,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             }
             else if (pathIs("flags"sv, "min_request_interval"sv))
             {
-                response_.min_request_interval = static_cast<int>(value);
+                response_.min_request_interval = static_cast<time_t>(value);
             }
             else
             {
@@ -653,7 +670,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     {
         tr_logAddWarn(
             fmt::format(
-                _("Couldn't parse scrape response: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't parse scrape response: {error} ({error_code})")),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())),
             log_name);

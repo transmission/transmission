@@ -155,11 +155,13 @@ public:
     tr_handshake::Mediator::TorrentInfo const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
                                                                    tr_peerIdInit(),
                                                                    tr_torrent_id_t{ 100 },
-                                                                   true /*is_done*/ };
+                                                                   true /*is_done*/,
+                                                                   true /*is_running*/ };
     tr_handshake::Mediator::TorrentInfo const UbuntuTorrent{ *tr_sha1_from_string("2c6b6858d61da9543d4231a71db4b1c9264b0685"sv),
                                                              tr_peerIdInit(),
                                                              tr_torrent_id_t{ 101 },
-                                                             false /*is_done*/ };
+                                                             false /*is_done*/,
+                                                             true /*is_running*/ };
 
     auto createIncomingIo(tr_session* session)
     {
@@ -180,8 +182,13 @@ public:
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
         EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[0]));
         EXPECT_EQ(0, evutil_make_socket_nonblocking(sockpair[1]));
-        auto peer_io = tr_peerIo::create(session, &session->top_bandwidth_, &info_hash, false /*incoming*/, false /*seed*/);
-        peer_io->set_socket(tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0]));
+        auto peer_io = tr_peerIo::create(
+            session,
+            { session, DefaultPeerSockAddr, static_cast<tr_socket_t>(sockpair[0]) },
+            &session->top_bandwidth_,
+            &info_hash,
+            false /*incoming*/,
+            false /*seed*/);
         return std::pair{ std::move(peer_io), sockpair[1] };
     }
 

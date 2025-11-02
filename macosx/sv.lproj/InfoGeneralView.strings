@@ -1,6 +1,6 @@
 
 /* Class = "NSTextFieldCell"; title = "Pieces:"; ObjectID = "21"; */
-"21.title" = "Delar";
+"21.title" = "Delar:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "22"; */
 "22.placeholderString" = "N/A";
@@ -48,4 +48,4 @@
 "7YU-bS-UkI.placeholderString" = "N/A";
 
 /* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
-/* "uaW-NM-PTU.title" = ""; */
+"uaW-NM-PTU.title" = "Var:";

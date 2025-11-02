@@ -442,7 +442,7 @@
     <message>
         <location line="+32"/>
         <source>Privacy:</source>
-        <translation>Sekretess:</translation>
+        <translation>Integritet:</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -908,7 +908,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
-        <translation>&amp;Ta bort filer och ta bort</translation>
+        <translation>&amp;Ta bort torrent och dess filer</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1094,7 +1094,7 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Ställ in &amp;plats…</translation>
+        <translation>Ange &amp;plats…</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1304,7 +1304,7 @@
     <message>
         <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
-        <translation>De här torrenterna är inte klara med hämtningarna.</translation>
+        <translation>Dessa torrenter är inte klara med hämtningarna.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1314,27 +1314,27 @@
     <message>
         <location line="+0"/>
         <source>These torrents are connected to peers.</source>
-        <translation>De här torrenterna är anslutna till jämlikar.</translation>
+        <translation>Dessa torrenter är anslutna till jämlikar.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>En av de här torrenterna är ansluten till jämlikar.</translation>
+        <translation>En av dessa torrenter är ansluten till jämlikar.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>Några av de här torrenterna är anslutna till jämlikar.</translation>
+        <translation>Några av dessa torrenter är anslutna till jämlikar.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>One of these torrents has not finished downloading.</source>
-        <translation>En av de här torrenterna har inte hämtats klart.</translation>
+        <translation>En av dessa torrenter har inte hämtats klart.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
-        <translation>Några av de här torrenterna har inte hämtats klart.</translation>
+        <translation>Några av dessa torrenter har inte hämtats klart.</translation>
     </message>
     <message>
         <location line="+69"/>
@@ -1423,7 +1423,7 @@
     <message>
         <location line="+6"/>
         <source>&amp;Trackers:</source>
-        <translation>&amp;Spårare</translation>
+        <translation>&amp;Spårare:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1749,7 +1749,10 @@ För att lägga till ytterligare en primär URL, lägg till den efter en tom rad
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Spårare att använda på alla publika torrenter.
+
+För att lägga till en reserv-URL, lägg till den på nästa rad efter en primär URL.
+Lägg till en ny primär URL genom att lägga till den efter en tom rad.</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -1761,7 +1764,7 @@ To add a new primary URL, add it after a blank line.</source>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;Blocklistan innehåller %Ln regel&lt;/i&gt;</numerusform>
-            <numerusform>&lt;i&gt;Blocklistan innehåller %Ln regler&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Blockeringslistan innehåller %Ln regler&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1787,7 +1790,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-155"/>
         <source>Blocklist</source>
-        <translation>Blocklista</translation>
+        <translation>Blockeringslista</translation>
     </message>
     <message>
         <location line="+36"/>
@@ -1812,7 +1815,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-64"/>
         <source>Privacy</source>
-        <translation>Sekretess</translation>
+        <translation>Integritet</translation>
     </message>
     <message>
         <location line="-372"/>
@@ -1838,7 +1841,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-86"/>
         <source>Enable &amp;blocklist:</source>
-        <translation>Aktivera &amp;blocklista:</translation>
+        <translation>Aktivera &amp;blockeringslista:</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -1943,12 +1946,12 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Visa en avisering när torrenter lä&amp;ggs till</translation>
+        <translation>Visa avisering när torrenter lä&amp;ggs till</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Visa en avisering när torrenter &amp;slutförs</translation>
+        <translation>Visa avisering när torrenter &amp;slutförs</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2008,50 +2011,50 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="-210"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>okänd</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>checking…</source>
-        <translation type="unfinished"></translation>
+        <translation>kontrollerar…</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>open</source>
-        <translation type="unfinished"></translation>
+        <translation>öppen</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>closed</source>
-        <translation type="unfinished"></translation>
+        <translation>stängd</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>fel</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Status: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Status: &lt;b&gt;%1&lt;/b&gt; (IPv4), &lt;b&gt;%2&lt;/b&gt; (IPv6)</translation>
     </message>
     <message numerus="yes">
         <location line="+96"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
         <translation>
             <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blocklistan har nu %Ln regel.&lt;/p&gt;</numerusform>
-            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blocklistan har nu %Ln regler.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Uppdatering lyckades!&lt;/b&gt;&lt;p&gt;Blockeringslistan har nu %Ln regler.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;Uppdatera blocklista&lt;/b&gt;&lt;p&gt;Hämtar ny blocklista…&lt;/p&gt;</translation>
+        <translation>&lt;b&gt;Uppdatera blockeringslista&lt;/b&gt;&lt;p&gt;Hämtar ny blockeringslista…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2061,7 +2064,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-323"/>
         <source>Adding</source>
-        <translation>Lägga till</translation>
+        <translation>Tilläggning</translation>
     </message>
     <message>
         <location line="+117"/>
@@ -2125,73 +2128,73 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../Application.cc" line="-295"/>
         <source>B/s</source>
-        <translation type="unfinished"></translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+7"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>KiB</source>
-        <translation type="unfinished"></translation>
+        <translation>KiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation type="unfinished"></translation>
+        <translation>MiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation type="unfinished"></translation>
+        <translation>GiB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation type="unfinished"></translation>
+        <translation>TiB</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>kB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message>
         <location line="+276"/>
@@ -2209,12 +2212,12 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location filename="../RelocateDialog.ui" line="+14"/>
         <source>Set Torrent Location</source>
-        <translation>Ställ in torrentplats</translation>
+        <translation>Ange torrentplats</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Set Location</source>
-        <translation>Ställ in plats</translation>
+        <translation>Ange plats</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2586,7 +2589,7 @@ To add a new primary URL, add it after a blank line.</source>
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Fick ett fel %1&quot;%2&quot;%3 för %4 sedan</translation>
+        <translation>Fick felet %1&quot;%2&quot;%3 för %4 sedan</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2673,7 +2676,7 @@ To add a new primary URL, add it after a blank line.</source>
     <message>
         <location line="+6"/>
         <source>To add a backup URL, add it on the next line after a primary URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>För att lägga till en reserv-URL, lägg till den på nästa rad efter en primär URL.</translation>
     </message>
     <message>
         <location line="+7"/>

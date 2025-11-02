@@ -3,13 +3,13 @@
 "23.title" = "Preferences";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "53"; */
-"53.title" = "Andet...";
+"53.title" = "Andet …";
 
 /* Class = "NSMenuItem"; title = "Same as torrent file"; ObjectID = "55"; */
-"55.title" = "Samme som torrent";
+"55.title" = "Samme som torrent-fil";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "219"; */
-"219.title" = "Andet...";
+"219.title" = "Andet …";
 
 /* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
 "253.label" = "Tilføjelse";
@@ -18,7 +18,7 @@
 "254.label" = "Håndtering";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "542"; */
-"542.title" = "Andet...";
+"542.title" = "Andet …";
 
 /* Class = "NSButtonCell"; title = "Quit with active transfers"; ObjectID = "1201"; */
 "1201.title" = "Når der afsluttes med aktive overførsler";
@@ -33,10 +33,10 @@
 "1204.title" = "Dock ikon:";
 
 /* Class = "NSButtonCell"; title = "Total download rate"; ObjectID = "1205"; */
-"1205.title" = "Samlet downloadratio";
+"1205.title" = "Samlet downloadrate";
 
 /* Class = "NSButtonCell"; title = "Total upload rate"; ObjectID = "1206"; */
-"1206.title" = "Samlet uploadratio";
+"1206.title" = "Samlet uploadrate";
 
 /* Class = "NSButtonCell"; title = "Only when transfers are downloading"; ObjectID = "1207"; */
 "1207.title" = "Kun hvis der hentes";
@@ -72,13 +72,13 @@
 "1218.title" = "Flyt torrent filen til papirkurven";
 
 /* Class = "NSButtonCell"; title = "Watch for torrent files in:"; ObjectID = "1219"; */
-"1219.title" = "Se efter torrent filer i:";
+"1219.title" = "Hold øje med torrent-filer i:";
 
 /* Class = "NSTextFieldCell"; title = "Auto add:"; ObjectID = "1226"; */
 "1226.title" = "Auto tilføj:";
 
 /* Class = "NSButtonCell"; title = "Keep incomplete files in:"; ObjectID = "1227"; */
-"1227.title" = "Behold ufulstændige filer i:";
+"1227.title" = "Opbevar ufulstændige filer i:";
 
 /* Class = "NSTextFieldCell"; title = "Queues:"; ObjectID = "1230"; */
 "1230.title" = "Sæt i kø:";
@@ -87,13 +87,13 @@
 "1231.title" = "aktive overførsler";
 
 /* Class = "NSButtonCell"; title = "Stop seeding at ratio:"; ObjectID = "1232"; */
-"1232.title" = "Stop deling ved delingsforhold:";
+"1232.title" = "Stop med at seede ved forhold:";
 
 /* Class = "NSTextFieldCell"; title = "Limits:"; ObjectID = "1234"; */
-"1234.title" = "Begræns:";
+"1234.title" = "Begrænsninger:";
 
 /* Class = "NSTextFieldCell"; title = "Ratio is amount uploaded to amount downloaded"; ObjectID = "1235"; */
-"1235.title" = "Delingsforhold er mængde uploadet til mængde downloadet";
+"1235.title" = "Forhold er mængde uploadet mod mængde downloadet";
 
 /* Class = "NSButtonCell"; title = "Download with maximum of:"; ObjectID = "1236"; */
 "1236.title" = "Når der hentes mere end:";
@@ -129,10 +129,10 @@
 "1255.title" = "Vågeblus:";
 
 /* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
-"1265.title" = "Uploadratio:";
+"1265.title" = "Uploadrate:";
 
 /* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
-"1267.title" = "Downloadratio:";
+"1267.title" = "Downloadrate:";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "1268"; */
 "1268.title" = "KB/s";
@@ -150,16 +150,16 @@
 "1274.title" = "KB/s";
 
 /* Class = "NSTextFieldCell"; title = "Speed Limit mode:"; ObjectID = "1275"; */
-"1275.title" = "Hastighedsbegrænsning:";
+"1275.title" = "Hastighedsbegrænsningstilstand:";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Uploadratio:";
+"1276.title" = "Uploadrate:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
-"1277.title" = "Downloadratio:";
+"1277.title" = "Downloadrate:";
 
 /* Class = "NSTextFieldCell"; title = "When enabled Speed Limit overrides the global bandwidth limits"; ObjectID = "1278"; */
-"1278.title" = "Når hastighedsbegrænsningstilstanden overskrider de globale begrænsninger";
+"1278.title" = "Når den er aktiveret, tilsidesætter Hastighedsbegrænsning de globale begrænsninger";
 
 /* Class = "NSButtonCell"; title = "Schedule Speed Limit:"; ObjectID = "1280"; */
 "1280.title" = "Planlæg begrænsning:";
@@ -168,7 +168,7 @@
 "1281.title" = "til";
 
 /* Class = "NSButtonCell"; title = "Display a window when opening a torrent file"; ObjectID = "1294"; */
-"1294.title" = "Når der åbnes en torrent";
+"1294.title" = "Vis et vindue når en torrent-fil åbnes";
 
 /* Class = "NSButtonCell"; title = "When download completes:"; ObjectID = "1302"; */
 "1302.title" = "Når en overførsel er hentet:";
@@ -279,7 +279,7 @@
 "1796.title" = "Gruppe navn:";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "1813"; */
-"1813.title" = "Andet...";
+"1813.title" = "Andet …";
 
 /* Class = "NSButtonCell"; title = "Custom location:"; ObjectID = "1815"; */
 "1815.title" = "Tilpas placering:";
@@ -294,7 +294,7 @@
 "1831.title" = "Tildel gruppe til nye overførsler baseret på kriterier";
 
 /* Class = "NSButtonCell"; title = "Edit…"; ObjectID = "1833"; */
-"1833.title" = "Rediger...";
+"1833.title" = "Rediger …";
 
 /* Class = "NSTextFieldCell"; title = "Transfers will be assigned to the first group where all criteria are met"; ObjectID = "1835"; */
 "1835.title" = "Overførsler tildeles til den første gruppe hvor alle kriterier er opfyldt";
@@ -345,7 +345,7 @@
 "1931.title" = "Magnetlinks:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "1933"; */
-"1933.title" = "Sæt som standardprogram";
+"1933.title" = "Indstil som standardprogram";
 
 /* Class = "NSButtonCell"; title = "Append .part to incomplete files"; ObjectID = "1940"; */
 "1940.title" = "Føj .part endelse til ufuldstændige filer";
@@ -372,7 +372,7 @@
 "2047.title" = "Kør script:";
 
 /* Class = "NSMenuItem"; title = "Other…"; ObjectID = "2053"; */
-"2053.title" = "Andet...";
+"2053.title" = "Andet …";
 
 /* Class = "NSButtonCell"; title = "Enable Micro Transport Protocol (µTP)"; ObjectID = "2078"; */
 "2078.title" = "Aktiver Micro Transport Protocol (µTP)";
@@ -393,7 +393,7 @@
 "2123.title" = "Gælder nylige tilføjede overførsler";
 
 /* Class = "NSTextFieldCell"; title = "Open torrent files:"; ObjectID = "A9E-F4-a3c"; */
-/* "A9E-F4-a3c.title" = ""; */
+"A9E-F4-a3c.title" = "Åbn torrent-filer:";
 
 /* Class = "NSButtonCell"; title = "Set Default Application"; ObjectID = "pgY-W3-HdI"; */
-"pgY-W3-HdI.title" = "Sæt som standardprogram";
+"pgY-W3-HdI.title" = "Indstil som standardprogram";

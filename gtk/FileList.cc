@@ -32,7 +32,7 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <memory>
@@ -854,7 +854,7 @@ void FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         auto w = std::make_shared<Gtk::MessageDialog>(
             gtr_widget_get_window(widget_),
             fmt::format(
-                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
                 fmt::arg("old_path", path_string),
                 fmt::arg("path", newname),
                 fmt::arg("error", tr_strerror(error)),

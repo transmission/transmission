@@ -40,7 +40,7 @@
 
 #include <curl/curl.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
@@ -68,9 +68,9 @@ namespace libtransmission::Values
 {
 
 // default values; can be overridden by client apps
-Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
-Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
-Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+Config::Units<MemoryUnits> Config::memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
 } // namespace libtransmission::Values
 
@@ -135,7 +135,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (*error)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -144,7 +144,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
 
     if (!info || !info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
+        tr_logAddError(fmt::format(fmt::runtime(_("Couldn't read '{path}': Not a regular file")), fmt::arg("path", filename)));
         error->set(TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -154,7 +154,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -165,7 +165,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -633,7 +633,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
     if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't remove '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
             fmt::arg("path", oldpath),
             fmt::arg("error", log_error.message()),
             fmt::arg("error_code", log_error.code())));
@@ -769,8 +769,11 @@ public:
     }
 
 private:
-    static inline std::unique_ptr<tr_net_init_mgr> instance;
+    static std::unique_ptr<tr_net_init_mgr> instance;
 };
+
+std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
+
 } // namespace tr_net_init_impl
 } // namespace
 
@@ -791,8 +794,8 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, Compare);
-        if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
+        auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
+        if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
             return it->mime_type;
         }

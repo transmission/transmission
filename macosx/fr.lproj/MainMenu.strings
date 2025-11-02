@@ -81,7 +81,7 @@
 "456.title" = "Menu";
 
 /* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "457"; */
-"457.title" = "Mettre en pause la sélection";
+"457.title" = "Suspendre la sélection";
 
 /* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "459"; */
 "459.title" = "Afficher l’inspecteur";
@@ -120,13 +120,13 @@
 "1400.title" = "Transferts";
 
 /* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "1403"; */
-"1403.title" = "Mettre en pause la sélection";
+"1403.title" = "Suspendre la sélection";
 
 /* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1404"; */
 "1404.title" = "Reprendre la sélection";
 
 /* Class = "NSMenuItem"; title = "Pause All"; ObjectID = "1413"; */
-"1413.title" = "Tout mettre en pause";
+"1413.title" = "Tout suspendre";
 
 /* Class = "NSMenuItem"; title = "Resume All"; ObjectID = "1414"; */
 "1414.title" = "Tout reprendre";
@@ -351,7 +351,7 @@
 "Cay-iU-bH4.title" = "Partagez le fichier torrent";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "HmT-FI-amY"; */
-"HmT-FI-amY.title" = "0,0 ko/s";
+"HmT-FI-amY.title" = "0,0 kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Status String"; ObjectID = "Zmj-A9-NPf"; */
 "Zmj-A9-NPf.title" = "Chaîne d’état";
@@ -372,7 +372,7 @@
 "s5v-VO-G2y.title" = "Partagez le fichier torrent";
 
 /* Class = "NSTextFieldCell"; title = "0.0KB/s"; ObjectID = "x8g-Nv-jcD"; */
-"x8g-Nv-jcD.title" = "0,0 ko/s";
+"x8g-Nv-jcD.title" = "0,0 kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Title"; ObjectID = "y9O-gd-sXA"; */
 "y9O-gd-sXA.title" = "Titre";

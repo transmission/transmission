@@ -76,7 +76,6 @@ struct tr_torrent
         void load_date_done(time_t when) noexcept;
         void load_download_dir(std::string_view dir) noexcept;
         void load_incomplete_dir(std::string_view dir) noexcept;
-        void load_queue_position(size_t pos) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
         void load_start_when_stable(bool val) noexcept;
@@ -96,7 +95,7 @@ struct tr_torrent
         friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
         friend struct tr_torrent;
 
-        ResumeHelper(tr_torrent& tor)
+        explicit ResumeHelper(tr_torrent& tor)
             : tor_{ tor }
         {
         }
@@ -560,6 +559,21 @@ struct tr_torrent
         return metainfo_.date_created();
     }
 
+    [[nodiscard]] auto torrent_filename() const
+    {
+        return metainfo_.torrent_file();
+    }
+
+    [[nodiscard]] auto magnet_filename() const
+    {
+        return metainfo_.magnet_file();
+    }
+
+    [[nodiscard]] auto store_filename() const
+    {
+        return has_metainfo() ? torrent_filename() : magnet_filename();
+    }
+
     [[nodiscard]] auto torrent_file() const
     {
         return metainfo_.torrent_file(session->torrentDir());
@@ -568,6 +582,11 @@ struct tr_torrent
     [[nodiscard]] auto magnet_file() const
     {
         return metainfo_.magnet_file(session->torrentDir());
+    }
+
+    [[nodiscard]] auto store_file() const
+    {
+        return has_metainfo() ? torrent_file() : magnet_file();
     }
 
     [[nodiscard]] auto resume_file() const
@@ -739,6 +758,10 @@ struct tr_torrent
     {
         if (is_sequential != sequential_download_)
         {
+            if (is_sequential)
+            {
+                session->flush_torrent_files(id());
+            }
             sequential_download_ = is_sequential;
             sequential_download_changed_.emit(this, is_sequential);
             set_dirty();
@@ -941,18 +964,21 @@ struct tr_torrent
 
     // --- queue position
 
-    [[nodiscard]] constexpr auto queue_position() const noexcept
+    [[nodiscard]] auto queue_position() const noexcept
     {
-        return queue_position_;
+        return session->torrent_queue().get_pos(id());
     }
 
-    void set_unique_queue_position(size_t new_pos);
+    void set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
+    {
+        session->torrent_queue().set_pos(id(), new_pos);
+    }
 
     static constexpr struct
     {
-        constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
+        bool operator()(tr_torrent const* a, tr_torrent const* b) const noexcept
         {
-            return a->queue_position_ < b->queue_position_;
+            return a->queue_position() < b->queue_position();
         }
     } CompareQueuePosition{};
 
@@ -966,6 +992,7 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*> started_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
 
@@ -1197,6 +1224,7 @@ private:
 
         files_wanted_.set(files, n_files, wanted);
         completion_.invalidate_size_when_done();
+        files_wanted_changed_.emit(this, files, n_files, wanted);
 
         if (!is_bootstrapping)
         {
@@ -1344,8 +1372,6 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
-    size_t queue_position_ = 0;
-
     time_t date_active_ = 0;
     time_t date_added_ = 0;
     time_t date_changed_ = 0;
@@ -1373,7 +1399,7 @@ private:
 
     uint16_t idle_limit_minutes_ = 0;
 
-    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
+    uint16_t max_connected_peers_ = TrDefaultPeerLimitTorrent;
 
     bool is_deleting_ = false;
     bool is_dirty_ = false;

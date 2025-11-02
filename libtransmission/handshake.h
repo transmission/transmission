@@ -64,6 +64,7 @@ public:
             tr_peer_id_t client_peer_id;
             tr_torrent_id_t id;
             bool is_done;
+            bool is_running;
         };
 
         virtual ~Mediator() = default;
@@ -88,6 +89,11 @@ public:
     {
         maybe_recycle_dh();
     }
+
+    tr_handshake(tr_handshake const&) = delete;
+    tr_handshake(tr_handshake&&) = delete;
+    tr_handshake& operator=(tr_handshake const&) = delete;
+    tr_handshake& operator=(tr_handshake&&) = delete;
 
     // bittorrent handshake constants
     // https://www.bittorrent.org/beps/bep_0003.html#peer-protocol
@@ -172,19 +178,19 @@ private:
 
     // ---
 
-    ReadState read_crypto_provide(tr_peerIo*);
-    ReadState read_crypto_select(tr_peerIo*);
-    ReadState read_handshake(tr_peerIo*);
-    ReadState read_ia(tr_peerIo*);
-    ReadState read_pad_a(tr_peerIo*);
-    ReadState read_pad_c(tr_peerIo*);
-    ReadState read_pad_d(tr_peerIo*);
-    ReadState read_peer_id(tr_peerIo*);
-    ReadState read_vc(tr_peerIo*);
-    ReadState read_ya(tr_peerIo*);
-    ReadState read_yb(tr_peerIo*);
+    ReadState read_crypto_provide(tr_peerIo* peer_io);
+    ReadState read_crypto_select(tr_peerIo* peer_io);
+    ReadState read_handshake(tr_peerIo* peer_io);
+    ReadState read_ia(tr_peerIo* peer_io);
+    ReadState read_pad_a(tr_peerIo* peer_io);
+    ReadState read_pad_c(tr_peerIo* peer_io);
+    ReadState read_pad_d(tr_peerIo* peer_io);
+    ReadState read_peer_id(tr_peerIo* peer_io);
+    ReadState read_vc(tr_peerIo* peer_io);
+    ReadState read_ya(tr_peerIo* peer_io);
+    ReadState read_yb(tr_peerIo* peer_io);
 
-    void send_ya(tr_peerIo*);
+    void send_ya(tr_peerIo* io);
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
@@ -227,22 +233,24 @@ private:
 
     static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
 
-    static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
+    static void on_error(tr_peerIo* io, tr_error const& error, void* vhandshake);
 
     bool build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const;
 
     bool send_handshake(tr_peerIo* io);
 
     template<size_t PadMax>
-    void send_public_key_and_pad(tr_peerIo* io)
+    auto send_public_key_and_pad(tr_peerIo* io)
     {
         auto const public_key = get_dh().publicKey();
         auto outbuf = std::array<std::byte, std::size(public_key) + PadMax>{};
         auto const data = std::data(outbuf);
         auto walk = data;
         walk = std::copy(std::begin(public_key), std::end(public_key), walk);
-        walk += mediator_->pad(walk, PadMax);
+        auto const pad_len = mediator_->pad(walk, PadMax);
+        walk += pad_len;
         io->write_bytes(data, walk - data, false);
+        return pad_len;
     }
 
     [[nodiscard]] uint32_t crypto_provide() const noexcept;
@@ -333,12 +341,11 @@ private:
 
     uint32_t crypto_select_ = {};
     uint32_t crypto_provide_ = {};
+    uint16_t pad_a_len_ = {};
+    uint16_t pad_b_len_ = {};
     uint16_t pad_c_len_ = {};
     uint16_t pad_d_len_ = {};
     uint16_t ia_len_ = {};
-
-    uint16_t pad_a_recv_len_ = {};
-    uint16_t pad_b_recv_len_ = {};
 
     bool have_read_anything_from_peer_ = false;
 

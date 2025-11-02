@@ -1,0 +1,1145 @@
+/* file size string
+   Inspector -> Files tab -> file status string
+   Status bar transfer count */
+"%@ of %@" = "%1$@ από %2$@";
+
+/* Torrent -> progress string */
+"%@ of torrent metadata retrieved" = "ανακτήθηκαν %@ από μεταδεδομένα torrent";
+
+/* Add torrent -> info
+   Inspector -> Activity tab -> progress
+   Torrent -> progress string */
+"%@ selected" = "%@ επιλεγμένα";
+
+/* Inspector -> selected torrents
+   stats total */
+"%@ total" = "%@ συνολικά";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ επαληθεύτηκε";
+
+/* Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/s";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld λεπτά";
+
+/* stats window -> times opened */
+"%llu times" = "%llu φορές";
+
+/* Inspector -> Peers tab -> peers */
+"%lu cache" = "%lu cache";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Connected" = "%lu Συνδεδεμένοι";
+
+/* Inspector -> Peers tab -> peers */
+"%lu DHT" = "%lu DHT";
+
+/* Dock item - Downloading */
+"%lu Downloading" = "%lu Κατεβαίνουν";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu αρχεία";
+
+/* Inspector -> Peers tab -> peers */
+"%lu incoming" = "%lu εισερχόμενοι";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu κανόνες διευθύνσεων IP στη λίστα";
+
+/* Inspector -> Peers tab -> peers */
+"%lu Known:" = "%lu Γνωστοί:";
+
+/* Inspector -> Peers tab -> peers */
+"%lu local discovery" = "%lu τοπική ανακάλυψη";
+
+/* Inspector -> Peers tab -> peers */
+"%lu LTEP" = "%lu LTEP";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu μαγνητισμένες μεταφορές";
+
+/* Inspector -> Peers tab -> peers */
+"%lu PEX" = "%lu PEX";
+
+/* Dock item - Seeding */
+"%lu Seeding" = "%lu Ανεβαίνουν";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu Αρχεία Torrent";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu Επιλεγμένα Torrents";
+
+/* Inspector -> Peers tab -> peers */
+"%lu tracker" = "%lu ιχνηλάτης";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu μεταφορές";
+
+/* Torrent -> status string */
+"%lu web seeds" = "%lu διαμοιραστές δικτύου";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u κομμάτια, %2$@ έκαστο";
+
+/* Inspector -> Peers tab -> peers */
+"1 Connected" = "1 Συνδεδεμένος";
+
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"1 file" = "1 αρχείο";
+
+/* Inspector -> selected torrents */
+"1 magnetized transfer" = "1 μεταφορά μαγνήτη";
+
+/* Info options -> global setting */
+"1 minute" = "1 λεπτό";
+
+/* Create torrent -> info */
+"1 piece, %@" = "1 κομμάτι, %@";
+
+/* stats window -> times opened */
+"1 time" = "1 φορά";
+
+/* Filter Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"1 transfer" = "1 μεταφορά";
+
+/* Open invalid alert -> title */
+"\"%@\" is not a valid torrent file." = "\"%@\" δεν είναι ένα έγκυρο αρχείο torrent.";
+
+/* Prefs -> blocklist -> message */
+"A blocklist must first be downloaded" = "Πρέπει πρώτα να γίνει λήψη μίας λίστας αποκλεισμού";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Ένα αρχείο με το όνομα \"%1$@\" υπάρχει ήδη στον κατάλογο \"%2$@\". Επιλέξτε ένα νέο όνομα ή κατάλογο για την δημιουργία του αρχείου torrent.";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "Ένας φάκελος δεν μπορεί να μεταφερθεί στο εσωτερικό του.";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "Ένα αρχείο torrent δεν μπορεί να δημιουργηθεί για αρχεία χωρίς μέγεθος.";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "Ένα αρχείο torrent με αυτό το όνομα και κατάλογο δεν μπορεί να δημιουργηθεί.";
+
+/* Create torrent -> blank address -> message */
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Μια μεταφορά που σημειώνεται ως ιδιωτική, χωρίς διευθύνσεις ιχνηλάτη, δεν θα μπορεί να συνδεθεί σε ομότιμους χρήστες. Το αρχείο torrent θα είναι χρήσιμο μόνο εάν σχεδιάζετε να το αποστείλετε σε μία ιστοσελίδα ιχνηλάτη, η οποία θα προσθέσει τις διευθύνσεις για εσάς.";
+
+/* Open duplicate alert -> title
+   Open duplicate magnet alert -> title */
+"A transfer of \"%@\" already exists." = "Μια μεταφορά για \"%@\" υπάρχει ήδη.";
+
+/* Filter Bar -> filter button */
+"Active" = "Ενεργά";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Activity" = "Δραστηριότητα";
+
+/* Add torrent -> same name -> button */
+"Add" = "Προσθήκη";
+
+/* Inspector view -> tracker buttons */
+"Add a tracker" = "Προσθήκη ενός ιχνηλάτη";
+
+/* Magnet link failed -> title */
+"Adding magnetized transfer failed." = "Η προσθήκη μεταφοράς μαγνήτη απέτυχε.";
+
+/* Filter Bar -> filter button
+   inspector -> check all */
+"All" = "Όλα";
+
+/* Filter Bar -> group filter menu
+   Groups -> Button */
+"All Groups" = "Όλες οι ομάδες";
+
+/* Tracker last announce */
+"Announce error" = "Σφάλμα Ανακοίνωσης";
+
+/* Tracker next announce */
+"Announce in progress" = "Ανακοίνωση σε εξέλιξη";
+
+/* Tracker next announce */
+"Announce is queued" = "Ανακοίνωση σε ουρά";
+
+/* Tracker next announce */
+"Announce not scheduled" = "Δεν έχει προγραμματιστεί Ανακοίνωση";
+
+/* Tracker last announce */
+"Announce timed out" = "Λήξη χρονικού ορίου Ανακοίνωσης";
+
+/* All toolbar item -> label */
+"Apply All" = "Εφαρμογή όλων";
+
+/* Selected toolbar item -> label */
+"Apply Selected" = "Εφαρμογή Επιλεγμένων";
+
+/* Confirm Quit panel -> title */
+"Are you sure you want to quit?" = "Είστε σίγουροι ότι θέλετε να βγείτε;";
+
+/* Remove completed confirm panel -> title */
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε %lu ολοκληρωμένες μεταφορές από τη λίστα μεταφορών;";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε %lu ιχνηλάτες;";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε %lu μεταφορές από τη λίστα μεταφορών και να διαγράψετε τα αρχεία δεδομένων;";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove %lu transfers from the transfer list?" = "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε %lu μεταφορές από τη λίστα μεταφορών;";
+
+/* Removal confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Είστε σίγουροι ότι θέλετε να αφαιρέσετε το \"%@\" από την λίστα μεταφορών και να απορρίψετε τα δεδομένα των αρχείων;";
+
+/* Removal confirm panel -> title
+   Remove completed confirm panel -> title */
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Είστε σίγουροι ότι θέλετε να αφαιρέσετε τα \"%@\" από την λίστα μεταφορών;";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove this tracker?" = "Είστε σίγουροι ότι θέλετε να αφαιρέσετε αυτόν τον ιχνηλάτη;";
+
+/* Stats reset -> title */
+"Are you sure you want to reset usage statistics?" = "Είστε σίγουροι ότι θέλετε να επαναφέρετε τα στατιστικά χρήσης;";
+
+/* inspector -> peer table -> header tool tip */
+"Available" = "Διαθέσιμο";
+
+/* Transfer speed (bytes per second) */
+"B/s" = "B/s";
+
+/* Preferences -> toolbar item title */
+"Bandwidth" = "Εύρος ζώνης";
+
+/* notification description */
+"Bandwidth settings changed" = "Οι ρυθμίσεις του εύρους ζώνης έχουν αλλάξει";
+
+/* Groups -> Name */
+"Blue" = "Μπλε";
+
+/* Add torrent -> same name -> button
+   Blocklist -> cancel button
+   Confirm Quit panel -> button
+   Create torrent -> blank address -> button
+   Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove trackers alert -> button
+   rename sheet button
+   Stats reset -> button
+   URL sheet button */
+"Cancel" = "Ακύρωση";
+
+/* Torrent Table -> tooltip */
+"Change transfer settings" = "Αλλαγή ρυθμίσεων μεταφορών";
+
+/* File Outline -> Menu */
+"Check Selected" = "Έλεγχος Επιλεγμένων";
+
+/* Torrent -> status string */
+"Checking existing data" = "Γίνετε έλεγχος των υπαρχόντων δεδομένων";
+
+/* Message window -> save button */
+"Clear" = "Καθαρισμός";
+
+/* inspector -> peer table -> header */
+"Client" = "Πελάτης";
+
+/* View menu -> Quick Look */
+"Close Quick Look" = "Κλείσιμο Quick Look";
+
+/* Blocklist -> message */
+"Connecting to site" = "Γίνεται σύνδεση στη σελίδα";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "Δεν μπορεί να δημιουργηθεί αντίγραφο του \"%@\" ";
+
+/* Create toolbar item -> label
+   Create torrent -> blank address -> button */
+"Create" = "Δημιουργήστε";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "Δημιουργία ενός Αρχείου Torrent";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Δημιουργία αρχείου torrent";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+"Create Torrent File" = "Δημιουργία Αρχείου Torrent";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "Η δημιουργία του \"%@\" απέτυχε.";
+
+/* Inspector -> peer -> status */
+"Currently downloading (interested and not choked)" = "Αυτή την στιγμή γίνεται λήψη (ενδιαφέρεται και επιτρέπει την ανταλλαγή δεδομένων)";
+
+/* Inspector -> peer -> status */
+"Currently uploading (interested and not choked)" = "Αυτή την στιγμή γίνεται αποστολή (ενδιαφέρεται και επιτρέπει την ανταλλαγή δεδομένων)";
+
+/* Message window -> table column */
+"Date" = "Ημερομηνία";
+
+/* Message window -> level
+   Message window -> level string */
+"Debug" = "Αποσφαλμάτωση";
+
+/* Info options -> global setting */
+"disabled" = "απενεργοποιημένο";
+
+/* inspector -> peer table -> header
+   inspector -> web seed table -> header
+   status bar -> status label
+   Torrent -> status string */
+"DL" = "DL";
+
+/* Inspector -> Peers tab -> peers */
+"DL from %lu" = "DL από %lu";
+
+/* Torrent disk space alert -> button */
+"Do not check disk space again" = "Να μην γίνει ξανά έλεγχος του χώρου στο δίσκο";
+
+/* Donation beg -> button */
+"Don't bug me about this ever again." = "Να μην ενοχληθώ για αυτό ξανά.";
+
+/* files tab -> tooltip */
+"Don't Download" = "Να μην γίνει λήψη";
+
+/* Donation beg -> button */
+"Donate" = "Δωρίστε";
+
+/* Donation beg -> message */
+"Donate or not, there will be no difference to your torrenting experience." = "Η πραγματοποίηση δωρεάς ή όχι, δεν θα έχει καμία διαφορά στην εμπειρία κατεβάσματος torrent.";
+
+/* file table -> header tool tip
+   files tab -> tooltip */
+"Download" = "Λήψη";
+
+/* Torrent disk space alert -> button */
+"Download Anyway" = "Λήψη ούτως ή άλλως ";
+
+/* notification title */
+"Download Complete" = "Η Λήψη Ολοκληρώθηκε";
+
+/* Blocklist -> message */
+"Download of the blocklist failed." = "Η λήψη της λίστας αποκλεισμού απέτυχε.";
+
+/* files tab -> tooltip */
+"Download Some" = "Μερική Λήψη";
+
+/* Torrent table -> group row -> tooltip */
+"Download speed" = "Ταχύτητα Λήψης";
+
+/* Stats window -> label
+   tracker peer stat */
+"Downloaded" = "Ληφθέντα";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Downloading" = "Γίνεται λήψη";
+
+/* Blocklist -> message */
+"Downloading blocklist" = "Γίνεται λήψη της λίστας αποκλεισμού";
+
+/* Torrent -> status string */
+"Downloading from %lu of %lu peers" = "Λήψη από %1$lu από %2$lu διαμοιραστές";
+
+/* Torrent -> status string */
+"Downloading from %lu of 1 peer" = "Λήψη από %lu από 1 διαμοιραστή";
+
+/* inspector -> peer table -> header tool tip */
+"Downloading From Peer" = "Γίνεται λήψη από ομότιμο χρήστη";
+
+/* inspector -> web seed table -> header tool tip */
+"Downloading From Web Seed" = "Γίνεται λήψη από διαμοιραστή δικτύου";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"encrypted" = "κρυπτογραφημένο";
+
+/* inspector -> peer table -> header tool tip */
+"Encrypted Connection" = "Κρυπτογραφημένη Σύνδεση";
+
+/* Filter Bar -> filter button
+   Message window -> level
+   Message window -> level string
+   Torrent -> status string */
+"Error" = "Σφάλμα";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Files" = "Αρχεία";
+
+/* Filter toolbar item -> label
+   inspector -> file filter
+   Message window -> filter field */
+"Filter" = "Φίλτρο";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "Από: λανθάνουσα μνήμη";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: distributed hash table" = "Από: κατανεμημένο πίνακα κατακερματισμού";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "Από: εισερχόμενη σύνδεση";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: libtorrent extension protocol handshake" = "Από: χειραψία πρωτοκόλλου επέκτασης libtorrent";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: local peer discovery" = "Από: ανακάλυψη τοπικών ομότιμων χρηστών";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "Από: ανταλλαγή ομότιμων χρηστών";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "Από: ιχνηλάτη";
+
+/* Transfer speed (gigabytes per second) */
+"GB/s" = "GB/s";
+
+/* Preferences -> toolbar item title */
+"General" = "Γενικά";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"General Info" = "Γενικές Πληροφορίες";
+
+/* Status Bar -> speed tooltip */
+"Global download limit" = "Καθολικό όριο λήψης";
+
+/* Status Bar -> speed tooltip */
+"Global upload limit" = "Καθολικό όριο αποστολής";
+
+/* Tracker last announce */
+"got %lu peers" = "λήφθηκαν %lu διαμοιραστές";
+
+/* Tracker last announce */
+"got 1 peer" = "υπάρχει 1 ομότιμος χρήστης";
+
+/* Groups -> Name */
+"Gray" = "Γκρι";
+
+/* Groups -> Name */
+"Green" = "Πράσινο";
+
+/* Groups -> Button */
+"Group" = "Ομάδα";
+
+/* Preferences -> toolbar item title */
+"Groups" = "Ομάδες";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "Απόκρυψη Γραμμής Φίλτρου";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "Απόκρυψη Επιθεωρητή";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "Απόκρυψη Γραμμής Κατάστασης";
+
+/* View menu -> Toolbar */
+"Hide Toolbar" = "Απόκρυψη Μπάρας εργαλείων";
+
+/* File Outline -> Priority Menu */
+"High" = "Υψηλή";
+
+/* files tab -> tooltip */
+"High Priority" = "Υψηλή προτεραιότητα ";
+
+/* Legal alert -> button */
+"I Accept" = "Δέχομαι";
+
+/* Add torrent -> same name -> message */
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Αν προσπαθείτε να χρησιμοποιήσετε ήδη υπάρχοντα δεδομένα, ο ριζικός κατάλογος δεδομένων θα πρέπει να βρίσκεται μέσα στον κατάλογο προορισμού.";
+
+/* Torrent -> eta string */
+"inactive" = "αδρανές";
+
+/* Message window -> level
+   Message window -> level string */
+"Info" = "Πληροφορίες";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "Επιθεωρητής";
+
+/* URL sheet label */
+"Internet address of torrent file:" = "Διαδικτυακή διεύθυνση του αρχείου torrent:";
+
+/* inspector -> peer table -> header */
+"IP Address" = "Διεύθυνση IP";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Φαίνεται ότι το αρχείο \"%1$@\" από %2$@ δεν είναι ένα αρχείο torrent.";
+
+/* Transfer speed (kilobytes per second) */
+"KB/s" = "KB/s";
+
+/* Inspector -> Peers tab -> peers */
+"Known:" = "Γνωστοί:";
+
+/* Tracker last announce */
+"Last Announce" = "Τελευταία Ανακοίνωση";
+
+/* Tracker last scrape */
+"Last Scrape" = "Τελευταίο Πέρασμα";
+
+/* Prefs -> blocklist -> message */
+"Last updated" = "Τελευταία ενημέρωση ";
+
+/* tracker peer stat */
+"Leechers" = "Αποδέκτες";
+
+/* About window -> license button */
+"License" = "Άδεια";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "Δεν ήταν δυνατή η αποθήκευση του αρχείου καταγραφής";
+
+/* File Outline -> Priority Menu */
+"Low" = "Χαμηλή";
+
+/* files tab -> tooltip */
+"Low Priority" = "Χαμηλή προτεραιότητα ";
+
+/* Open duplicate magnet alert -> title */
+"Magnet link is a duplicate of an existing transfer." = "Ο σύνδεσμος μαγνήτη είναι διπλότυπος μίας υπάρχουσας μεταφοράς.";
+
+/* Inspector -> selected torrents
+   Torrent -> progress string */
+"Magnetized transfer" = "Μεταφορά μαγνήτη";
+
+/* Transfer speed (megabytes per second) */
+"MB/s" = "MB/s";
+
+/* Message window -> table column */
+"Message" = "Μήνυμα";
+
+/* Message window -> title */
+"Message Log" = "Καταγραφή μηνυμάτων";
+
+/* files tab -> tooltip */
+"Multiple Priorities" = "Πολλαπλές προτεραιότητες ";
+
+/* Inspector -> Peers tab -> table row tooltip
+   No Ratio
+   Prefs -> blocklist -> message
+   Tracker last announce
+   Tracker last scrape
+   tracker peer stat */
+"N/A" = "N/A";
+
+/* Filter Bar -> filter menu */
+"Name" = "Όνομα";
+
+/* Preferences -> toolbar item title */
+"Network" = "Δίκτυο";
+
+/* Prefs -> blocklist -> message */
+"Never" = "Ποτέ";
+
+/* Inspector -> tracker table */
+"New Tier" = "Νέα βαθμίδα ";
+
+/* Tracker next announce */
+"Next announce in %@" = "Επόμενη ανακοίνωσης σε %@";
+
+/* Group table row */
+"No Group" = "Χωρίς Ομάδα";
+
+/* Inspector -> selected torrents */
+"No Torrents Selected" = "Δεν έχουν επιλεχθεί torrents";
+
+/* Groups -> Button
+   Groups -> Menu
+   inspector -> check all */
+"None" = "Κανένα";
+
+/* Donation beg -> button */
+"Nope" = "Όχι";
+
+/* File Outline -> Priority Menu */
+"Normal" = "Κανονική";
+
+/* files tab -> tooltip */
+"Normal Priority" = "Κανονική Προτεραιότητα ";
+
+/* Torrent disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "Δεν υπάρχει αρκετός υπολειπόμενος χώρος στο δίσκο για την πλήρη λήψη του \"%@\".";
+
+/* About window -> license close button
+   Blocklist -> button
+   Create torrent -> directory doesn't exist warning -> button
+   Create torrent -> failed -> button
+   Create torrent -> file already exists warning -> button
+   Create torrent -> no files -> button
+   Create torrent -> zero size -> button
+   Download not a torrent -> button
+   Magnet link failed -> button
+   Move error alert -> button
+   Move inside itself alert -> button
+   Open duplicate alert -> button
+   Open duplicate magnet alert -> button
+   Open invalid alert -> button
+   Save log alert panel -> button
+   Torrent disk space alert -> button
+   Torrent download failed -> button
+   Torrent file copy alert -> button
+   Transmission already running alert -> button */
+"OK" = "ΟΚ";
+
+/* Remove completed confirm panel -> message */
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "Μετά την αφαίρεση, η συνέχιση της μεταφοράς θα απαιτεί το αρχείο torrent ή το σύνδεσμο μαγνήτη.";
+
+/* Removal confirm panel -> message part 2
+   Remove completed confirm panel -> message */
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "Μετά την αφαίρεση των torrent, για να είναι δυνατή η επανεκκίνησή τους, θα απαιτηθούν τα αρχεία torrent ή οι σύνδεσμοι μαγνήτη.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Μετά την αφαίρεση, το Transmission δεν θα προσπαθήσει πλέον να επικοινωνήσει μαζί του. Αυτό δεν μπορεί να αναιρεθεί.";
+
+/* Remove trackers alert -> message */
+"Once removed, Transmission will no longer attempt to contact them. This cannot be undone." = "Μετά την αφαίρεση, το Transmission δεν θα προσπαθήσει πλέον να επικοινωνήσει μαζί τους. Αυτό δεν μπορεί να αναιρεθεί.";
+
+/* File Outline -> Menu */
+"Only Check Selected" = "Μόνο έλεγχος Επιλεγμένων";
+
+/* Open toolbar item -> label
+   URL sheet button */
+"Open" = "Άνοιγμα";
+
+/* Open address toolbar item -> label */
+"Open Address" = "Άνοιγμα Διεύθυνσης";
+
+/* Open address toolbar item -> palette label */
+"Open Torrent Address" = "Άνοιγμα Διεύθυνσης Torrent";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Άνοιγμα αρχείων torrent";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Άνοιγμα Αρχείων Torrent";
+
+/* Open address toolbar item -> tooltip */
+"Open torrent web address" = "Άνοιγμα διεύθυνσης ιστού torrent";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Options" = "Επιλογές";
+
+/* Groups -> Name */
+"Orange" = "Πορτοκαλί";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Partial Seed" = "Μερικός Διαμοιρασμός";
+
+/* All toolbar item -> palette label */
+"Pause / Resume All" = "Παύση / Συνέχιση Όλων ";
+
+/* Selected toolbar item -> palette label */
+"Pause / Resume Selected" = "Παύση / Συνέχιση Επιλεγμένων";
+
+/* All toolbar item -> label
+   Dock item */
+"Pause All" = "Παύση Όλων";
+
+/* All toolbar item -> tooltip */
+"Pause all transfers" = "Παύση όλων των μεταφορών";
+
+/* Selected toolbar item -> label */
+"Pause Selected" = "Παύση Επιλεγμένων ";
+
+/* Selected toolbar item -> tooltip */
+"Pause selected transfers" = "Παύση επιλεγμένων μεταφορών ";
+
+/* Torrent Table -> tooltip */
+"Pause the transfer" = "Παύση της μεταφοράς";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Paused" = "Σε παύση";
+
+/* Inspector -> peer -> status */
+"Peer is unchoking you, but you are not interested" = "Ο ομότιμος χρήστης προσπαθεί να σας αποσυμφορήσει, αλλά εσείς δεν ενδιαφέρεστε";
+
+/* Inspector -> peer -> status */
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Ο ομότιμος χρήστης επιθυμεί να αποστείλετε, αλλά δεν θέλετε (ενδιαφέρεστε αλλά δεν επιτρέπετε την ανταλλαγή δεδομένων)";
+
+/* Inspector -> tab
+   Inspector view -> title
+   Preferences -> toolbar item title */
+"Peers" = "Ομότιμοι χρήστες";
+
+/* Preferences -> Network -> port status */
+"Port check site is down" = "Η ιστοσελίδα ελέγχου θυρών είναι εκτός λειτουργίας";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "Η θύρα είναι κλειστή";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "Η θύρα είναι ανοιχτή";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %@" = "Θύρα: %@";
+
+/* No comment provided by engineer. */
+"PrefWindowSize" = "PrefWindowSize";
+
+/* File Outline -> Menu
+   file table -> header tool tip */
+"Priority" = "Προτεραιότητα";
+
+/* files tab -> tooltip */
+"Priority Not Available" = "Η προτεραιότητα δεν είναι διαθέσιμη";
+
+/* Inspector -> private torrent */
+"Private Torrent, non-tracker peer discovery disabled" = "Ιδιωτικό Torrent, απενεργοποίηση ανακάλυψης ομότιμων χρηστών χωρίς-ιχνηλάτη";
+
+/* Message window -> table column */
+"Process" = "Διεργασία";
+
+/* Blocklist -> message */
+"Processing blocklist" = "Γίνεται επεξεργασία της λίστας αποκλεισμού";
+
+/* Stats window -> label */
+"Program Started" = "Εκκίνηση προγράμματος";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %@" = "Πρόοδος: %@";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Protocol: %@" = "Πρωτόκολλο: %@";
+
+/* Inspector -> private torrent */
+"Public Torrent" = "Δημόσιο Torrent";
+
+/* Groups -> Name */
+"Purple" = "Μοβ ";
+
+/* QuickLook toolbar item -> label
+   QuickLook toolbar item -> palette label
+   QuickLook toolbar item -> tooltip
+   View menu -> Quick Look */
+"Quick Look" = "Quick Look";
+
+/* Confirm Quit panel -> button
+   Legal alert -> button */
+"Quit" = "Έξοδος";
+
+/* Stats window -> label
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string
+   Torrent table -> group row -> tooltip */
+"Ratio" = "Αναλογία";
+
+/* Groups -> Name */
+"Red" = "Κόκκινο";
+
+/* Torrent -> eta string */
+"remaining time unknown" = "άγνωστος υπολειπόμενος χρόνος";
+
+/* Preferences -> toolbar item title */
+"Remote" = "Απομακρυσμένα";
+
+/* Removal confirm panel -> button
+   Remove completed confirm panel -> button
+   Remove toolbar item -> label
+   Remove trackers alert -> button */
+"Remove" = "Αφαίρεση";
+
+/* Main window -> 3rd bottom left button (remove all) tooltip */
+"Remove all transfers that have completed seeding." = "Αφαίρεση όλων των μεταφορών που έχει ολοκληρωθεί ο διαμοιρασμός τους.";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "Αφαίρεση Επιλεγμένων";
+
+/* Inspector view -> tracker buttons */
+"Remove selected trackers" = "Αφαίρεση επιλεγμένων ιχνηλατών";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "Αφαίρεση επιλεγμένων μεταφορών";
+
+/* rename sheet button */
+"Rename" = "Μετονομασία";
+
+/* File Outline -> Menu */
+"Rename File" = "Μετονομασία Αρχείου";
+
+/* rename sheet label */
+"Rename the file \"%@\":" = "Μετονομασία του αρχείου \"%@\":";
+
+/* Stats reset -> button
+   Stats window -> reset button */
+"Reset" = "Επαναφορά";
+
+/* All toolbar item -> label
+   Dock item */
+"Resume All" = "Συνέχιση Όλων";
+
+/* All toolbar item -> tooltip */
+"Resume all transfers" = "Συνέχιση όλων των μεταφορών";
+
+/* Selected toolbar item -> label */
+"Resume Selected" = "Συνέχιση Επιλεγμένων";
+
+/* Selected toolbar item -> tooltip */
+"Resume selected transfers" = "Συνέχιση επιλεγμένων μεταφορών";
+
+/* Torrent cell -> button info */
+"Resume the transfer" = "Συνέχιση της μεταφοράς";
+
+/* Torrent cell -> button info */
+"Resume the transfer right away" = "Άμεση συνέχιση της μεταφοράς";
+
+/* Stats window -> label */
+"Running Time" = "Χρόνος λειτουργίας";
+
+/* Message window -> save button */
+"Save" = "Αποθήκευση";
+
+/* Tracker last scrape */
+"Scrape error" = "Σφάλμα Περάσματος";
+
+/* Tracker last scrape */
+"Scrape timed out" = "Λήξη χρονικού ορίου Περάσματος";
+
+/* tracker peer stat */
+"Seeders" = "Διαμοιραστές";
+
+/* Filter Bar -> filter button
+   Torrent -> status string */
+"Seeding" = "Διαμοιρασμός";
+
+/* Torrent -> status string */
+"Seeding complete" = "Ολοκλήρωση διαμοιρασμού";
+
+/* notification title */
+"Seeding Complete" = "Ολοκλήρωση Διαμοιρασμού";
+
+/* Torrent -> status string */
+"Seeding to %1$lu of %2$lu peers" = "Διαμοιρασμός σε %1$lu από %2$lu διαμοιραστές";
+
+/* Torrent -> status string */
+"Seeding to %u of 1 peer" = "Διαμοιρασμός σε %u από 1 διαμοιραστή";
+
+/* Create torrent -> location sheet -> button
+   Create torrent -> select file
+   Move torrent -> prompt
+   Open torrent -> prompt
+   Preferences -> Open panel prompt */
+"Select" = "Επιλογή";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "Επιλογή ενός αρχείου ή φακέλου για το αρχείο torrent.";
+
+/* Add -> select destination folder */
+"Select the download folder for \"%@\"" = "Επιλογή του καταλόγου λήψης για το \"%@\"";
+
+/* Create torrent -> location sheet -> message */
+"Select the name and location for the torrent file." = "Επιλογή του ονόματος και της τοποθεσίας για το αρχείο torrent.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %lu data files." = "Επίλεξε τον νέο φάκελο για %lu αρχεία δεδομένων.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "Επιλογή του νέου καταλόγου για το \"%@\".";
+
+/* Status Bar -> status menu */
+"Session Ratio" = "Αναλογία συνεδρίας";
+
+/* Status Bar -> status menu */
+"Session Transfer" = "Μεταφερθέντα συνεδρίας";
+
+/* Share toolbar item -> label
+   Share toolbar item -> palette label */
+"Share" = "Μοιραστείτε";
+
+/* Share toolbar item -> tooltip */
+"Share torrent file" = "Κοινή χρήση αρχείου torrent";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "Συντομεύσεις για την αλλαγή καθολικών ρυθμίσεων.";
+
+/* notification button */
+"Show" = "Εμφάνιση";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "Εμφάνιση Γραμμής Φίλτρου";
+
+/* File Outline -> Menu */
+"Show in Finder" = "Εμφάνιση στο Finder";
+
+/* View menu -> Inspector */
+"Show Inspector" = "Εμφάνιση Επιθεωρητή";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "Εμφάνιση Γραμμής Κατάστασης";
+
+/* Torrent cell -> button info */
+"Show the data file in Finder" = "Εμφάνιση των αρχείων δεδομένων στον Finder";
+
+/* View menu -> Toolbar */
+"Show Toolbar" = "Προβολή Μπάρας εργαλείων";
+
+/* Dock item
+   Status Bar -> speed tooltip */
+"Speed Limit" = "Όριο ταχύτητας";
+
+/* notification title */
+"Speed Limit Auto Disabled" = "Απενεργοποιήθηκε το αυτόματο όριο ταχύτητας ";
+
+/* notification title */
+"Speed Limit Auto Enabled" = "Ενεργοποιήθηκε το αυτόματο όριο ταχύτητας ";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Το όριο ταχύτητας παρακάμπτει τα συνολικά όρια εύρους ζώνης με τα δικά του όρια.";
+
+/* Torrent -> status string */
+"Stalled" = "Στάσιμο";
+
+/* Stats window -> title */
+"Statistics" = "Στατιστικά";
+
+/* Torrent cell -> button info */
+"Stop waiting to start" = "Διακοπή αναμονής εκκίνησης";
+
+/* Donation beg -> title */
+"Support open-source indie software" = "Υποστήριξη ανοιχτού κώδικα indie λογισμικού ";
+
+/* Transfer speed (terabytes per second) */
+"TB/s" = "TB/s";
+
+/* Create torrent -> directory doesn't exist warning -> title */
+"The chosen torrent file location does not exist." = "Η επιλεγμένη τοποθεσία αρχείου torrent δεν υπάρχει.";
+
+/* Add torrent -> same name -> title */
+"The destination directory and root data directory have the same name." = "Ο κατάλογος προορισμού και ο κατάλογος δεδομένων ρίζας έχουν το ίδιο όνομα.";
+
+/* Create torrent -> directory doesn't exist warning -> warning */
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "Ο κατάλογος \"%@\" δεν υπάρχει την τρέχουσα στιγμή. Δημιουργήστε τον κατάλογο ή επιλέξτε έναν διαφορετικό για να δημιουργήσετε το αρχείο torrent.";
+
+/* Open duplicate magnet alert -> message */
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "Ο σύνδεσμος μαγνήτη  \"%@\" δεν μπορεί να προστεθεί επειδή είναι διπλότυπος μιας ήδη υπάρχουσας μεταφοράς.";
+
+/* Move error alert -> message
+   Move inside itself alert -> message */
+"The move operation of \"%@\" cannot be done." = "Η λειτουργία μετακίνησης του \"%@\" δεν μπορεί να γίνει.";
+
+/* blocklist fail message */
+"The specified blocklist file did not contain any valid rules." = "Η καθορισμένη λίστα αποκλεισμού δεν περιείχε έγκυρους κανόνες.";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@: %@." = "Αδυναμία λήψης torrent από %1$@: %2$@.";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "Δεν βρέθηκε το αρχείο torrent (%@) ";
+
+/* Open invalid alert -> message */
+"The torrent file cannot be opened because it contains invalid data." = "Δεν μπορεί να ανοιχτεί το αρχείο επειδή περιέχει μη έγκυρα δεδομένα.";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "Το συνολικό μέγεθος αρχείου είναι μηδέν bytes.";
+
+/* Open duplicate alert -> message */
+"The transfer cannot be added because it is a duplicate of an already existing transfer." = "Η μεταφορά δεν μπορεί να προστεθεί γιατί είναι διπλότυπο μιας ήδη υπάρχουσας μεταφοράς.";
+
+/* Torrent disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Η μεταφορά θα τεθεί σε παύση. Εκκαθαρίστε χώρο στο %@ ή αποεπιλέξτε αρχεία στον επιθεωρητή torrent για να συνεχίσετε.";
+
+/* Create torrent -> blank address -> message */
+"The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Η μεταφορά δεν θα επικοινωνήσει με ιχνηλάτες για ομότιμους χρήστες και θα πρέπει να βασιστεί, για την λήψη και αποστολή, αποκλειστικά σε μεθόδους ανακάλυψης ομότιμων χωρίς-ιχνηλάτες, όπως το PEX και το DHT.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %1$lu transfers (%2$lu active)." = "Υπάρχουν %1$lu μεταφορές (%2$lu ενεργές).";
+
+/* Confirm Quit panel -> message */
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Υπάρχουν %lu ενεργές μεταφορές που θα σταματήσουν κατά την έξοδο. Οι μεταφορές θα συνεχίσουν αυτόματα στην επόμενη εκκίνηση.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "Υπάρχουν %lu ενεργές μεταφορές.";
+
+/* Create torrent -> blank address -> title */
+"There are no tracker addresses." = "Δεν υπάρχουν διευθύνσεις ιχνηλατών.";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Εκτελείται ήδη ένα αντίγραφο του Transmission. Αυτό το αντίγραφο δεν μπορεί να ανοίξει μέχρις ότου τερματιστεί η άλλη διεργασία.";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Υπάρχει μια ενεργή μεταφορά που θα τεθεί σε παύση κατά την έξοδο. Η μεταφορά θα συνεχιστεί αυτόματα στην επόμενη έναρξη.";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "Θα πρέπει να υπάρχει τουλάχιστον ένα αρχείο σε έναν φάκελο για να δημιουργηθεί ένα αρχείο torrent.";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "Υπήρξε ένα πρόβλημα κατά τη δημιουργία του αρχείου \"%@\".";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "Υπήρξε σφάλμα κατά την μεταφορά των δεδομένων των αρχείων.";
+
+/* Magnet link failed -> message */
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Παρουσιάστηκε σφάλμα κατά την προσθήκη του συνδέσμου μαγνήτη \"%@\". Η μεταφορά δεν θα πραγματοποιηθεί.";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "Αυτός ο φάκελος δεν περιέχει αρχεία.";
+
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+"This option is not available if Default location is set to Same as torrent file." = "Η επιλογή δεν είναι διαθέσιμη αν η Προκαθορισμένη τοποθεσία είναι Ίδια με του αρχείου torrent.";
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Αυτή η μεταφορά είναι ενεργή. Μετά την αφαίρεση, για τη συνέχισή της θα απαιτηθεί το αρχείο torrent ή ο σύνδεσμος μαγνήτη.";
+
+/* Stats reset -> message */
+"This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Αυτό θα διαγράψει τα καθολικά στατιστικά που εμφανίζονται από το Transmission. Τα μεμονωμένα στατιστικά μεταφοράς δεν θα επηρεαστούν.";
+
+/* Inspector -> tracker table */
+"Tier %ld" = "Κατηγορία %ld";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "Εναλλαγή Φίλτρου";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "Εναλλαγή Επιθεωρητή";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "Εναλλαγή γραμμής φίλτρου";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "Εναλλαγή του επιθεωρητή torrent";
+
+/* Download not a torrent -> title
+   Torrent download error -> title */
+"Torrent download failed" = "Αποτυχία λήψης torrent";
+
+/* notification title */
+"Torrent File Auto Added" = "Το αρχείο torrent προστέθηκε αυτόματα";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Επιθεωρητής Torrent";
+
+/* Torrent -> progress string */
+"torrent metadata needed" = "απαιτούνται μεταδεδομένα torrent ";
+
+/* stats total */
+"Total N/A" = "Σύνολο N/A";
+
+/* Status Bar -> status menu */
+"Total Ratio" = "Συνολική αναλογία";
+
+/* Status Bar -> status menu */
+"Total Transfer" = "Συνολικώς μεταφερθέντα";
+
+/* Message window -> level */
+"Trace" = "Ίχνος";
+
+/* Filter Bar -> filter menu */
+"Tracker" = "Ιχνηλάτης";
+
+/* Torrent -> status string */
+"Tracker returned error" = "Ο Ιχνηλάτης επέστρεψε σφάλμα";
+
+/* Torrent -> status string */
+"Tracker returned warning" = "Ο Ιχνηλάτης επέστρεψε προειδοποίηση";
+
+/* Tracker next announce */
+"Tracker will be used as a backup" = "Ο Ιχνηλάτης θα χρησιμοποιηθεί ως εφεδρικός";
+
+/* Inspector -> tab
+   Inspector view -> title */
+"Trackers" = "Ιχνηλάτες";
+
+/* Inspector -> Peers tab -> peers */
+"Transfer Not Active" = "Μεταφορά μη ενεργή";
+
+/* Preferences -> toolbar item title */
+"Transfers" = "Μεταφορές";
+
+/* Inspector -> Peers tab -> peers */
+"Transfers Not Active" = "Μεταφορές μη ενεργές";
+
+/* Legal alert -> message */
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Το Transmission είναι ένα πρόγραμμα κοινής χρήσης αρχείων. Όταν εκτελείτε ένα torrent, τα δεδομένα του θα διατίθενται σε άλλους μέσω μεταφόρτωσης. Εσείς και μόνο εσείς είστε πλήρως υπεύθυνοι για την άσκηση ορθής κρίσης και την τήρηση των τοπικών σας νόμων.";
+
+/* Donation beg -> message */
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Το Transmission είναι μια πλήρης εφαρμογή torrent. Έχει δαπανηθεί πολύς χρόνος και προσπάθεια για την ανάπτυξη, την κωδικοποίηση και τη βελτίωση. Εάν απολαμβάνετε την χρήση του, σκεφτείτε να δείξετε την αγάπη σας με μια δωρεά.";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Το Transmission είναι ήδη ανοιχτό. ";
+
+/* inspector -> peer table -> header
+   status bar -> status label
+   Torrent -> status image
+   Torrent -> status string */
+"UL" = "UL";
+
+/* Inspector -> Peers tab -> peers */
+"UL to %lu" = "UL σε %lu";
+
+/* File Outline -> Menu */
+"Uncheck Selected" = "Αποεπιλογή Επιλεγμένων";
+
+/* Status Bar -> speed tooltip */
+"unlimited" = "απεριόριστα";
+
+/* Torrent -> error string unreadable */
+"unreadable error" = "Μη αναγνώσιμο σφάλμα";
+
+/* Save log panel -> default file name */
+"untitled" = "άτιτλο";
+
+/* Torrent table -> group row -> tooltip */
+"Upload speed" = "Ταχύτητα αποστολής";
+
+/* Stats window -> label */
+"Uploaded" = "Μεταφορτώθηκε ";
+
+/* Torrent -> progress string */
+"uploaded %@ (Ratio: %@)" = "μεταφορτώθηκε  %1$@ (Αναλογία: %2$@)";
+
+/* inspector -> peer table -> header tool tip */
+"Uploading To Peer" = "Αποστολή σε ομότιμο χρήστη";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "Αναμονή για έλεγχο υπαρχόντων δεδομένων";
+
+/* Torrent -> status string */
+"Waiting to download" = "Αναμονή για λήψη";
+
+/* Torrent -> status string */
+"Waiting to seed" = "Αναμονή για διαμοιρασμό";
+
+/* Message window -> level
+   Message window -> level string */
+"Warning" = "Προειδοποίηση";
+
+/* Drag overlay -> url */
+"Web Address" = "Διαδικτυακή Διεύθυνση";
+
+/* Torrent -> status string */
+"web seed" = "διαμοιραστής δικτύου";
+
+/* inspector -> web seed table -> header */
+"Web Seeds" = "Διαμοιραστές δικτύου";
+
+/* Legal alert -> title */
+"Welcome to Transmission" = "Καλώς ήρθατε στο Transmission";
+
+/* Groups -> Name */
+"Yellow" = "Κίτρινο";
+
+/* Inspector -> peer -> status */
+"You unchoked the peer, but the peer is not interested" = "Επιτρέψατε την ανταλλαγή δεδομένων στον ομότιμο χρήστη, αλλά δεν ενδιαφέρεται";
+
+/* Inspector -> peer -> status */
+"You want to download, but peer does not want to send (interested and choked)" = "Θέλετε να κάνετε λήψη, αλλά ο ομότιμος χρήστης δεν θέλει να αποστείλει (ενδιαφέρεται αλλά δεν επιτρέπει την ανταλλαγή δεδομένων)";
+

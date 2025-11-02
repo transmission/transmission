@@ -50,6 +50,7 @@ using tr_socket_t = SOCKET;
 #define ENETUNREACH WSAENETUNREACH
 
 #define sockerrno WSAGetLastError()
+#define set_sockerrno(save)
 #else
 /** @brief Platform-specific socket descriptor type. */
 using tr_socket_t = int;
@@ -57,6 +58,7 @@ using tr_socket_t = int;
 #define TR_BAD_SOCKET (-1)
 
 #define sockerrno errno
+#define set_sockerrno(save) (sockerrno) = (save)
 #endif
 
 #include "libtransmission/transmission.h" // tr_peer_from
@@ -194,7 +196,7 @@ struct tr_address
     }
 
     template<typename OutputIt>
-    OutputIt to_compact(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const // NOLINT(modernize-use-nodiscard)
     {
         switch (type)
         {
@@ -219,6 +221,11 @@ struct tr_address
     [[nodiscard]] bool operator==(tr_address const& that) const noexcept
     {
         return this->compare(that) == 0;
+    }
+
+    [[nodiscard]] bool operator!=(tr_address const& that) const noexcept
+    {
+        return !(*this == that);
     }
 
     [[nodiscard]] bool operator<(tr_address const& that) const noexcept
@@ -255,7 +262,7 @@ struct tr_address
     {
         struct in6_addr addr6;
         struct in_addr addr4;
-    } addr;
+    } addr = {};
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
     static auto constexpr CompactAddrMaxBytes = *std::max_element(std::begin(CompactAddrBytes), std::end(CompactAddrBytes));
@@ -362,7 +369,7 @@ struct tr_socket_address
     }
 
     template<typename OutputIt>
-    OutputIt to_compact(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const // NOLINT(modernize-use-nodiscard)
     {
         return to_compact(out, address_, port_);
     }
@@ -389,7 +396,7 @@ struct tr_socket_address
     // --- sockaddr helpers
 
     [[nodiscard]] static std::optional<tr_socket_address> from_string(std::string_view sockaddr_sv);
-    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
+    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const* from);
     [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 
     [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr() const noexcept
@@ -466,6 +473,11 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
+[[nodiscard]] tr_socket_t tr_net_open_peer_socket(
+    tr_session* session,
+    tr_socket_address const& socket_address,
+    bool client_is_seed);
+
 void tr_net_close_socket(tr_socket_t fd);
 
 // --- TOS / DSCP
@@ -483,12 +495,13 @@ public:
     {
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator int() const noexcept
     {
         return value_;
     }
 
-    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view);
+    [[nodiscard]] static std::optional<tr_tos_t> from_string(std::string_view name);
 
     [[nodiscard]] std::string toString() const;
 

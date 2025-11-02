@@ -6,10 +6,10 @@
 "23.title" = "Bande passante en transfert";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
-"26.title" = "Ko/s";
+"26.title" = "kb/s";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
-"29.title" = "Ko/s";
+"29.title" = "kb/s";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
 "30.title" = "Ratio :";

@@ -16,7 +16,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -100,7 +100,7 @@ class ConnectionLimiter
 public:
     constexpr void task_started() noexcept
     {
-        ++n_tasks;
+        ++n_tasks_;
     }
 
     void task_finished(bool success)
@@ -110,15 +110,15 @@ public:
             task_failed();
         }
 
-        TR_ASSERT(n_tasks > 0);
-        --n_tasks;
+        TR_ASSERT(n_tasks_ > 0);
+        --n_tasks_;
     }
 
     constexpr void got_data() noexcept
     {
-        TR_ASSERT(n_tasks > 0);
-        n_consecutive_failures = 0;
-        paused_until = 0;
+        TR_ASSERT(n_tasks_ > 0);
+        n_consecutive_failures_ = 0;
+        paused_until_ = 0;
     }
 
     [[nodiscard]] size_t slots_available() const noexcept
@@ -129,32 +129,32 @@ public:
         }
 
         auto const max = max_connections();
-        if (n_tasks >= max)
+        if (n_tasks_ >= max)
         {
             return 0;
         }
 
-        return max - n_tasks;
+        return max - n_tasks_;
     }
 
 private:
     [[nodiscard]] bool is_paused() const noexcept
     {
-        return paused_until > tr_time();
+        return paused_until_ > tr_time();
     }
 
     [[nodiscard]] constexpr size_t max_connections() const noexcept
     {
-        return n_consecutive_failures > 0 ? 1 : MaxConnections;
+        return n_consecutive_failures_ > 0 ? 1 : MaxConnections;
     }
 
     void task_failed()
     {
-        TR_ASSERT(n_tasks > 0);
+        TR_ASSERT(n_tasks_ > 0);
 
-        if (++n_consecutive_failures >= MaxConsecutiveFailures)
+        if (++n_consecutive_failures_ >= MaxConsecutiveFailures)
         {
-            paused_until = tr_time() + TimeoutIntervalSecs;
+            paused_until_ = tr_time() + TimeoutIntervalSecs;
         }
     }
 
@@ -162,9 +162,9 @@ private:
     static auto constexpr MaxConnections = size_t{ 4 };
     static auto constexpr MaxConsecutiveFailures = MaxConnections;
 
-    size_t n_tasks = 0;
-    size_t n_consecutive_failures = 0;
-    time_t paused_until = 0;
+    size_t n_tasks_ = 0;
+    size_t n_consecutive_failures_ = 0;
+    time_t paused_until_ = 0;
 };
 
 class tr_webseed_impl final : public tr_webseed

@@ -11,39 +11,24 @@
 
 // ---
 
-#ifdef _MSVC_LANG
-#define TR_CPLUSPLUS _MSVC_LANG
-#else
-#define TR_CPLUSPLUS __cplusplus
-#endif
-
-#if ((TR_CPLUSPLUS >= 202002L) && (!defined(_GLIBCXX_RELEASE) || _GLIBCXX_RELEASE > 9)) || \
-    (TR_CPLUSPLUS >= 201709L && TR_GCC_VERSION >= 1002)
+#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
 #define TR_CONSTEXPR20 constexpr
 #else
 #define TR_CONSTEXPR20
 #endif
 
-// Placeholder for future use.
-// Can't implement right now because __cplusplus version for C++23 is currently TBD
+#if __cplusplus >= 202302L // _MSVC_LANG value for C++23 not available yet
+#define TR_CONSTEXPR23 constexpr
+#else
 #define TR_CONSTEXPR23
+#endif
 
 // ---
-
-#ifndef __has_builtin
-#define __has_builtin(x) 0
-#endif
 
 #ifdef _WIN32
 #define TR_IF_WIN32(ThenValue, ElseValue) ThenValue
 #else
 #define TR_IF_WIN32(ThenValue, ElseValue) ElseValue
-#endif
-
-#ifdef __GNUC__
-#define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#define TR_GNUC_CHECK_VERSION(major, minor) 0
 #endif
 
 #ifdef __UCLIBC__
@@ -56,22 +41,9 @@
 
 // ---
 
-#if __has_builtin(__builtin_expect) || TR_GNUC_CHECK_VERSION(3, 0)
-#define TR_LIKELY(x) __builtin_expect((x) ? 1L : 0L, 1L)
-#define TR_UNLIKELY(x) __builtin_expect((x) ? 1L : 0L, 0L)
-#else
-#define TR_LIKELY(x) (x)
-#define TR_UNLIKELY(x) (x)
-#endif
+inline auto constexpr TrInet6AddrStrlen = 46U;
 
-// ---
-
-#define TR_INET6_ADDRSTRLEN 46
-
-#define TR_ADDRSTRLEN 64
-
-// Mostly to enforce better formatting
-#define TR_ARG_TUPLE(...) __VA_ARGS__
+inline auto constexpr TrAddrStrlen = 64U;
 
 // https://www.bittorrent.org/beps/bep_0007.html
 // "The client SHOULD include a key parameter in its announces. The key

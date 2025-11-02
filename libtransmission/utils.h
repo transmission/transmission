@@ -25,30 +25,11 @@ struct tr_error;
  * @{
  */
 
-#if !defined(_)
-#if defined(HAVE_GETTEXT) && !defined(__APPLE__)
+#ifdef ENABLE_GETTEXT
 #include <libintl.h>
-#define _(a) gettext(a)
-#else
-#define _(a) (a)
-#endif
-#endif
-
-#if defined(HAVE_NGETTEXT)
+#define _ gettext
 #define tr_ngettext ngettext
 #else
-#define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
-#endif
-
-/* #define DISABLE_GETTEXT */
-#ifndef DISABLE_GETTEXT
-#if defined(_WIN32)
-#define DISABLE_GETTEXT
-#endif
-#endif
-#ifdef DISABLE_GETTEXT
-#undef _
-#undef tr_ngettext
 #define _(a) (a)
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
@@ -180,15 +161,15 @@ template<typename T>
     return 0;
 }
 
-constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
+constexpr std::string_view tr_strv_sep(std::string_view* sv, std::string_view delim)
 {
-    auto pos = sv->find(delim);
+    auto pos = sv->find_first_of(delim);
     auto const ret = sv->substr(0, pos);
     sv->remove_prefix(pos != std::string_view::npos ? pos + 1 : std::size(*sv));
     return ret;
 }
 
-constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, std::string_view delim)
 {
     if (std::empty(*sv))
     {
@@ -197,6 +178,16 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char d
 
     *token = tr_strv_sep(sv, delim);
     return true;
+}
+
+constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
+{
+    return tr_strv_sep(sv, { &delim, 1U });
+}
+
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
+{
+    return tr_strv_sep(sv, token, { &delim, 1U });
 }
 
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);

@@ -38,7 +38,7 @@ public:
     class FetchOptions
     {
     public:
-        enum class IPProtocol
+        enum class IPProtocol : uint8_t
         {
             ANY,
             V4,
@@ -108,6 +108,11 @@ public:
     // all of its tasks.
     ~tr_web();
 
+    tr_web(tr_web const&) = delete;
+    tr_web(tr_web&&) = delete;
+    tr_web& operator=(tr_web const&) = delete;
+    tr_web& operator=(tr_web&&) = delete;
+
     /**
      * Mediates between `tr_web` and its clients.
      *
@@ -147,6 +152,12 @@ public:
         [[nodiscard]] virtual size_t clamp([[maybe_unused]] int bandwidth_tag, size_t byte_count) const
         {
             return byte_count;
+        }
+
+        // Return the preferred proxy url
+        [[nodiscard]] virtual std::optional<std::string> proxyUrl() const
+        {
+            return std::nullopt;
         }
 
         // Invoke the user-provided fetch callback
