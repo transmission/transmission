@@ -143,6 +143,8 @@ target_sources(${TR_NAME}-mac
         PiecesView.mm
         PortChecker.h
         PortChecker.mm
+        PowerManager.h
+        PowerManager.mm
         PredicateEditorRowTemplateAny.h
         PredicateEditorRowTemplateAny.mm
         PrefsController.h
@@ -412,7 +414,6 @@ target_link_libraries(${TR_NAME}-mac
         "-framework AppKit"
         "-framework Carbon"
         "-framework Foundation"
-        "-framework IOKit"
         "-framework Quartz"
         "-framework Security"
         "-weak_framework UserNotifications")
