@@ -745,7 +745,7 @@ private:
     static auto constexpr SendPexInterval = 90s;
 
     // how many seconds we expect the next piece block to arrive
-    static auto constexpr RequestTimeoutSecs = time_t{ 90 };
+    static auto constexpr RequestTimeoutSecs = time_t{ 15 };
 };
 
 // ---
