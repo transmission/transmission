@@ -7,7 +7,7 @@
 #include <chrono>
 #include <memory>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 

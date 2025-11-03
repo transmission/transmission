@@ -164,7 +164,7 @@ export class Torrent extends EventTarget {
     return this.fields.id;
   }
   getLabels() {
-    return this.fields.labels.sort();
+    return this.fields.labels.toSorted();
   }
   getLastActivity() {
     return this.fields.activityDate;
@@ -353,6 +353,12 @@ export class Torrent extends EventTarget {
     const s = this.getStatus();
 
     switch (state) {
+      case Prefs.FilterError:
+        return this.getError();
+      case Prefs.FilterPrivate:
+        return this.getPrivateFlag();
+      case Prefs.FilterPublic:
+        return !this.getPrivateFlag();
       case Prefs.FilterActive:
         return (
           this.getPeersGettingFromUs() > 0 ||

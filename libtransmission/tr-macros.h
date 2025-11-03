@@ -17,9 +17,11 @@
 #define TR_CONSTEXPR20
 #endif
 
-// Placeholder for future use.
-// Can't implement right now because __cplusplus version for C++23 is currently TBD
+#if __cplusplus >= 202302L // _MSVC_LANG value for C++23 not available yet
+#define TR_CONSTEXPR23 constexpr
+#else
 #define TR_CONSTEXPR23
+#endif
 
 // ---
 
@@ -39,9 +41,9 @@
 
 // ---
 
-#define TR_INET6_ADDRSTRLEN 46
+inline auto constexpr TrInet6AddrStrlen = 46U;
 
-#define TR_ADDRSTRLEN 64
+inline auto constexpr TrAddrStrlen = 64U;
 
 // https://www.bittorrent.org/beps/bep_0007.html
 // "The client SHOULD include a key parameter in its announces. The key

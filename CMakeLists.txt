@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
-if(POLICY CMP0092)
-    cmake_policy(SET CMP0092 NEW)
-endif()
+cmake_policy(SET CMP0090 NEW)
+cmake_policy(SET CMP0092 NEW)
 if(POLICY CMP0114)
     cmake_policy(SET CMP0114 NEW)
 endif()
@@ -52,7 +51,7 @@ set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 1.3)
-set(NPM_MINIMUM 8.1.307) # Node.js 14
+set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
 
@@ -80,6 +79,7 @@ tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
+tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" AUTO)
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -334,6 +334,7 @@ if(ENABLE_GTK)
             giomm-2.68>=${GIOMM_MINIMUM})
         set(GTK_VERSION 4)
         set(GTK_FOUND ${GTK4_FOUND})
+        set(GTKMM_MINIMUM ${GTKMM4_MINIMUM})
     endif()
 
     if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
@@ -343,6 +344,7 @@ if(ENABLE_GTK)
             giomm-2.4>=${GIOMM_MINIMUM})
         set(GTK_VERSION 3)
         set(GTK_FOUND ${GTK3_FOUND})
+        set(GTKMM_MINIMUM ${GTKMM3_MINIMUM})
     endif()
 
     if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
@@ -380,6 +382,14 @@ if(GTK_FOUND)
     target_link_libraries(transmission::gtk_impl
         INTERFACE
             ${GTK${GTK_VERSION}_LIBRARIES})
+
+    if(GTKMM_MINIMUM MATCHES "^([0-9]+)\.([0-9]+)\.")
+        # GDK_VERSION_x_y is only defined for stable versions, i.e. even minor version numbers
+        math(EXPR GTKMM_MINIMUM_MINOR_STABLE "(${CMAKE_MATCH_2} + 1) / 2 * 2")
+        target_compile_definitions(transmission::gtk_impl
+            INTERFACE
+                GDK_VERSION_MIN_REQUIRED=GDK_VERSION_${CMAKE_MATCH_1}_${GTKMM_MINIMUM_MINOR_STABLE})
+    endif()
 endif()
 
 if(ENABLE_QT)
@@ -509,7 +519,9 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
-    TARGET natpmp::natpmp)
+    TARGET natpmp::natpmp
+    CMAKE_ARGS
+        -DBUILD_SHARED_LIBS=OFF)
 if(NOT USE_SYSTEM_NATPMP)
     target_compile_definitions(natpmp::natpmp
         INTERFACE
@@ -556,6 +568,14 @@ tr_add_external_auto_library(B64 libb64 b64
     TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
+
+tr_add_external_auto_library(CRC32C crc32c crc32c
+    TARGET Crc32c::crc32c
+    CMAKE_ARGS
+        -DCRC32C_BUILD_TESTS=OFF
+        -DCRC32C_BUILD_BENCHMARKS=OFF
+        -DCRC32C_USE_GLOG=OFF
+        -DCRC32C_INSTALL=ON)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)

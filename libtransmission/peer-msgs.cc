@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/vector.hpp>
 
@@ -747,7 +747,7 @@ private:
     static auto constexpr SendPexInterval = 90s;
 
     // how many seconds we expect the next piece block to arrive
-    static auto constexpr RequestTimeoutSecs = time_t{ 90 };
+    static auto constexpr RequestTimeoutSecs = time_t{ 15 };
 };
 
 // ---
@@ -1181,7 +1181,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // you as. i.e. this is the receiver's external ip address (no port is included).
     // This may be either an IPv4 (4 bytes) or an IPv6 (16 bytes) address.
     {
-        auto buf = std::array<std::byte, TR_ADDRSTRLEN>{};
+        auto buf = std::array<std::byte, TrAddrStrlen>{};
         auto const begin = std::data(buf);
         auto const end = io_->address().to_compact(begin);
         auto const len = end - begin;
@@ -1306,7 +1306,28 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // peer id encoding.
     if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
     {
-        set_user_agent(tr_interned_string{ sv });
+        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(sv) });
+    }
+
+    // https://www.bittorrent.org/beps/bep_0010.html
+    // A string containing the compact representation of the ip address
+    // this peer sees you as. i.e. this is the receiver's external ip
+    // address (no port is included). This may be either an IPv4 (4 bytes)
+    // or an IPv6 (16 bytes) address.
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_yourip, &sv))
+    {
+        auto const* const bytes = reinterpret_cast<std::byte const*>(std::data(sv));
+        switch (std::size(sv))
+        {
+        case tr_address::CompactAddrBytes[TR_AF_INET]:
+            peer_info->maybe_update_canonical_priority(tr_address::from_compact_ipv4(bytes).first);
+            break;
+        case tr_address::CompactAddrBytes[TR_AF_INET6]:
+            peer_info->maybe_update_canonical_priority(tr_address::from_compact_ipv6(bytes).first);
+            break;
+        default:
+            break;
+        }
     }
 
     /* get peer's listening port */

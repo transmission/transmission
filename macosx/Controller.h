@@ -143,8 +143,6 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 
 - (void)beginCreateFile:(NSNotification*)notification;
 
-- (void)sleepCallback:(natural_t)messageType argument:(void*)messageArgument;
-
 @property(nonatomic, readonly) VDKQueue* fileWatcherQueue;
 
 - (void)torrentTableViewSelectionDidChange:(NSNotification*)notification;

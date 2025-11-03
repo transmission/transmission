@@ -14,7 +14,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define PSL_STATIC
 #include <libpsl.h>
@@ -446,8 +446,7 @@ tr_url_query_view::iterator tr_url_query_view::begin() const
 {
     auto it = iterator{};
     it.remain = query;
-    ++it;
-    return it;
+    return ++it;
 }
 
 std::string tr_urlPercentDecode(std::string_view in)

@@ -5,8 +5,9 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype> /* isspace */
+#include <cctype> // isspace
 #include <cmath> // floor
+#include <chrono>
 #include <cstdint> // int64_t
 #include <cstdio>
 #include <cstdlib>
@@ -21,10 +22,8 @@
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
-
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -48,7 +47,7 @@ using namespace libtransmission::Values;
 
 namespace
 {
-auto constexpr DefaultPort = uint16_t{ TR_DEFAULT_RPC_PORT };
+auto constexpr DefaultPort = uint16_t{ TrDefaultRpcPort };
 char constexpr DefaultHost[] = "localhost";
 char constexpr DefaultUrl[] = TR_DEFAULT_RPC_URL_STR "rpc/";
 
@@ -210,166 +209,170 @@ enum
 
 // --- Command-Line Arguments
 
-auto constexpr Options = std::array<tr_option, 105>{
-    { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
-      { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
-      { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
-      { 972, "alt-speed-downlimit", "max alternate download speed (in " SPEED_K_STR ")", "asd", true, "<speed>" },
-      { 973, "alt-speed-uplimit", "max alternate upload speed (in " SPEED_K_STR ")", "asu", true, "<speed>" },
-      { 974, "alt-speed-scheduler", "Use the scheduled on/off times", "asc", false, nullptr },
-      { 975, "no-alt-speed-scheduler", "Don't use the scheduled on/off times", "ASC", false, nullptr },
-      { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", nullptr, true, "<time>" },
-      { 977, "alt-speed-time-end", "Time to stop using the alt speed limits (in hhmm)", nullptr, true, "<time>" },
-      { 978, "alt-speed-days", "Numbers for any/all days of the week - eg. \"1-7\"", nullptr, true, "<days>" },
-      { 963, "blocklist-update", "Blocklist update", nullptr, false, nullptr },
-      { 'c', "incomplete-dir", "Where to store new torrents until they're complete", "c", true, "<dir>" },
-      { 'C', "no-incomplete-dir", "Don't store incomplete torrents in a different location", "C", false, nullptr },
-      { 'b', "debug", "Print debugging information", "b", false, nullptr },
-      { 730, "bandwidth-group", "Set the current torrents' bandwidth group", "bwg", true, "<group>" },
-      { 731, "no-bandwidth-group", "Reset the current torrents' bandwidth group", "nwg", false, nullptr },
-      { 732, "list-groups", "Show bandwidth groups with their parameters", "lg", false, nullptr },
-      { 'd',
-        "downlimit",
-        "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
-        "d",
-        true,
-        "<speed>" },
-      { 'D', "no-downlimit", "Disable max download speed for the current torrent(s) or globally", "D", false, nullptr },
-      { 'e', "cache", "Set the maximum size of the session's memory cache (in " MEM_M_STR ")", "e", true, "<size>" },
-      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-      { 850, "exit", "Tell the transmission session to shut down", nullptr, false, nullptr },
-      { 940, "files", "List the current torrent(s)' files", "f", false, nullptr },
-      { 'F', "filter", "Filter the current torrent(s)", "F", true, "criterion" },
-      { 'g', "get", "Mark files for download", "g", true, "<files>" },
-      { 'G', "no-get", "Mark files for not downloading", "G", true, "<files>" },
-      { 'i', "info", "Show the current torrent(s)' details", "i", false, nullptr },
-      { 944, "print-ids", "Print the current torrent(s)' ids", "ids", false, nullptr },
-      { 940, "info-files", "List the current torrent(s)' files", "if", false, nullptr },
-      { 941, "info-peers", "List the current torrent(s)' peers", "ip", false, nullptr },
-      { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", false, nullptr },
-      { 943, "info-trackers", "List the current torrent(s)' trackers", "it", false, nullptr },
-      { 'j', "json", "Return RPC response as a JSON string", "j", false, nullptr },
-      { 920, "session-info", "Show the session's details", "si", false, nullptr },
-      { 921, "session-stats", "Show the session's statistics", "st", false, nullptr },
-      { 'l', "list", "List all torrents", "l", false, nullptr },
-      { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
-      { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
-      { 968, "unix-socket", "Use a Unix domain socket", nullptr, true, "<path>" },
-      { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
-      { 964, "rename", "Rename torrents root folder or a file", nullptr, true, "<name>" },
-      { 965, "path", "Provide path for rename functions", nullptr, true, "<path>" },
-      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-      { 'n', "auth", "Set username and password", "n", true, "<user:pw>" },
-      { 810, "authenv", "Set authentication info from the TR_AUTH environment variable (user:pw)", "ne", false, nullptr },
-      { 'N', "netrc", "Set authentication info from a .netrc file", "N", true, "<file>" },
-      { 820, "ssl", "Use SSL when talking to daemon", nullptr, false, nullptr },
-      { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
-      { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, nullptr },
-      { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-      { 962, "port-test", "Port testing", "pt", false, nullptr },
-      { 'P', "random-port", "Random port for incoming peers", "P", false, nullptr },
-      { 900, "priority-high", "Try to download these file(s) first", "ph", true, "<files>" },
-      { 901, "priority-normal", "Try to download these file(s) normally", "pn", true, "<files>" },
-      { 902, "priority-low", "Try to download these file(s) last", "pl", true, "<files>" },
-      { 700, "bandwidth-high", "Give this torrent first chance at available bandwidth", "Bh", false, nullptr },
-      { 701, "bandwidth-normal", "Give this torrent bandwidth left over by high priority torrents", "Bn", false, nullptr },
-      { 702,
-        "bandwidth-low",
-        "Give this torrent bandwidth left over by high and normal priority torrents",
-        "Bl",
-        false,
-        nullptr },
-      { 600, "reannounce", "Reannounce the current torrent(s)", nullptr, false, nullptr },
-      { 'r', "remove", "Remove the current torrent(s)", "r", false, nullptr },
-      { 930, "peers", "Set the maximum number of peers for the current torrent(s) or globally", "pr", true, "<max>" },
-      { 840, "remove-and-delete", "Remove the current torrent(s) and delete local data", "rad", false, nullptr },
-      { 800, "torrent-done-script", "A script to run when a torrent finishes downloading", nullptr, true, "<file>" },
-      { 801, "no-torrent-done-script", "Don't run the done-downloading script", nullptr, false, nullptr },
-      { 802, "torrent-done-seeding-script", "A script to run when a torrent finishes seeding", nullptr, true, "<file>" },
-      { 803, "no-torrent-done-seeding-script", "Don't run the done-seeding script", nullptr, false, nullptr },
-      { 950, "seedratio", "Let the current torrent(s) seed until a specific ratio", "sr", true, "ratio" },
-      { 951, "seedratio-default", "Let the current torrent(s) use the global seedratio settings", "srd", false, nullptr },
-      { 952, "no-seedratio", "Let the current torrent(s) seed regardless of ratio", "SR", false, nullptr },
-      { 953,
-        "global-seedratio",
-        "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
-        "gsr",
-        true,
-        "ratio" },
-      { 954,
-        "no-global-seedratio",
-        "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
-        "GSR",
-        false,
-        nullptr },
-      { 955,
-        "idle-seeding-limit",
-        "Let the current torrent(s) seed until a specific amount idle time",
-        "isl",
-        true,
-        "<minutes>" },
-      { 956,
-        "default-idle-seeding-limit",
-        "Let the current torrent(s) use the default idle seeding settings",
-        "isld",
-        false,
-        nullptr },
-      { 957, "no-idle-seeding-limit", "Let the current torrent(s) seed regardless of idle time", "ISL", false, nullptr },
-      { 958,
-        "global-idle-seeding-limit",
-        "All torrents, unless overridden by a per-torrent setting, should seed until a specific amount of idle time",
-        "gisl",
-        true,
-        "<minutes>" },
-      { 959,
-        "no-global-idle-seeding-limit",
-        "All torrents, unless overridden by a per-torrent setting, should seed regardless of idle time",
-        "GISL",
-        false,
-        nullptr },
-      { 710, "tracker-add", "Add a tracker to a torrent", "td", true, "<tracker>" },
-      { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", true, "<trackerId>" },
-      { 's', "start", "Start the current torrent(s)", "s", false, nullptr },
-      { 'S', "stop", "Stop the current torrent(s)", "S", false, nullptr },
-      { 't', "torrent", "Set the current torrent(s)", "t", true, "<torrent>" },
-      { 990, "start-paused", "Start added torrents paused", nullptr, false, nullptr },
-      { 991, "no-start-paused", "Start added torrents unpaused", nullptr, false, nullptr },
-      { 992, "trash-torrent", "Delete torrents after adding", nullptr, false, nullptr },
-      { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, false, nullptr },
-      { 994, "sequential-download", "Download the torrent sequentially", "seq", false, nullptr },
-      { 995, "no-sequential-download", "Download the torrent sequentially", "SEQ", false, nullptr },
-      { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", false, nullptr },
-      { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", false, nullptr },
-      { 'u',
-        "uplimit",
-        "Set the max upload speed in " SPEED_K_STR " for the current torrent(s) or globally",
-        "u",
-        true,
-        "<speed>" },
-      { 'U', "no-uplimit", "Disable max upload speed for the current torrent(s) or globally", "U", false, nullptr },
-      { 830, "utp", "Enable µTP for peer connections", nullptr, false, nullptr },
-      { 831, "no-utp", "Disable µTP for peer connections", nullptr, false, nullptr },
-      { 'v', "verify", "Verify the current torrent(s)", "v", false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 'w',
-        "download-dir",
-        "When used in conjunction with --add, set the new torrent's download folder. "
-        "Otherwise, set the default download folder",
-        "w",
-        true,
-        "<path>" },
-      { 'x', "pex", "Enable peer exchange (PEX)", "x", false, nullptr },
-      { 'X', "no-pex", "Disable peer exchange (PEX)", "X", false, nullptr },
-      { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, nullptr },
-      { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, nullptr },
-      { 941, "peer-info", "List the current torrent(s)' peers", "pi", false, nullptr },
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+using Arg = tr_option::Arg;
+auto constexpr Options = std::array<tr_option, 105>{ {
+    { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
+    { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
+    { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", Arg::None, nullptr },
+    { 972, "alt-speed-downlimit", "max alternate download speed (in " SPEED_K_STR ")", "asd", Arg::Required, "<speed>" },
+    { 973, "alt-speed-uplimit", "max alternate upload speed (in " SPEED_K_STR ")", "asu", Arg::Required, "<speed>" },
+    { 974, "alt-speed-scheduler", "Use the scheduled on/off times", "asc", Arg::None, nullptr },
+    { 975, "no-alt-speed-scheduler", "Don't use the scheduled on/off times", "ASC", Arg::None, nullptr },
+    { 976, "alt-speed-time-begin", "Time to start using the alt speed limits (in hhmm)", nullptr, Arg::Required, "<time>" },
+    { 977, "alt-speed-time-end", "Time to stop using the alt speed limits (in hhmm)", nullptr, Arg::Required, "<time>" },
+    { 978, "alt-speed-days", "Numbers for any/all days of the week - eg. \"1-7\"", nullptr, Arg::Required, "<days>" },
+    { 963, "blocklist-update", "Blocklist update", nullptr, Arg::None, nullptr },
+    { 'c', "incomplete-dir", "Where to store new torrents until they're complete", "c", Arg::Required, "<dir>" },
+    { 'C', "no-incomplete-dir", "Don't store incomplete torrents in a different location", "C", Arg::None, nullptr },
+    { 'b', "debug", "Print debugging information", "b", Arg::None, nullptr },
+    { 730, "bandwidth-group", "Set the current torrents' bandwidth group", "bwg", Arg::Required, "<group>" },
+    { 731, "no-bandwidth-group", "Reset the current torrents' bandwidth group", "nwg", Arg::None, nullptr },
+    { 732, "list-groups", "Show bandwidth groups with their parameters", "lg", Arg::None, nullptr },
+    { 'd',
+      "downlimit",
+      "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
+      "d",
+      Arg::Required,
+      "<speed>" },
+    { 'D', "no-downlimit", "Disable max download speed for the current torrent(s) or globally", "D", Arg::None, nullptr },
+    { 'e', "cache", "Set the maximum size of the session's memory cache (in " MEM_M_STR ")", "e", Arg::Required, "<size>" },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
+    { 850, "exit", "Tell the transmission session to shut down", nullptr, Arg::None, nullptr },
+    { 940, "files", "List the current torrent(s)' files", "f", Arg::None, nullptr },
+    { 'F', "filter", "Filter the current torrent(s)", "F", Arg::Required, "criterion" },
+    { 'g', "get", "Mark files for download", "g", Arg::Required, "<files>" },
+    { 'G', "no-get", "Mark files for not downloading", "G", Arg::Required, "<files>" },
+    { 'i', "info", "Show the current torrent(s)' details", "i", Arg::None, nullptr },
+    { 944, "print-ids", "Print the current torrent(s)' ids", "ids", Arg::None, nullptr },
+    { 940, "info-files", "List the current torrent(s)' files", "if", Arg::None, nullptr },
+    { 941, "info-peers", "List the current torrent(s)' peers", "ip", Arg::None, nullptr },
+    { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", Arg::None, nullptr },
+    { 943, "info-trackers", "List the current torrent(s)' trackers", "it", Arg::None, nullptr },
+    { 'j', "json", "Return RPC response as a JSON string", "j", Arg::None, nullptr },
+    { 920, "session-info", "Show the session's details", "si", Arg::None, nullptr },
+    { 921, "session-stats", "Show the session's statistics", "st", Arg::None, nullptr },
+    { 'l', "list", "List all torrents", "l", Arg::None, nullptr },
+    { 'L', "labels", "Set the current torrents' labels", "L", Arg::Required, "<label[,label...]>" },
+    { 960, "move", "Move current torrent's data to a new folder", nullptr, Arg::Required, "<path>" },
+    { 968, "unix-socket", "Use a Unix domain socket", nullptr, Arg::Required, "<path>" },
+    { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, Arg::Required, "<path>" },
+    { 964, "rename", "Rename torrents root folder or a file", nullptr, Arg::Required, "<name>" },
+    { 965, "path", "Provide path for rename functions", nullptr, Arg::Required, "<path>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
+    { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
+    { 'n', "auth", "Set username and password", "n", Arg::Required, "<user:pw>" },
+    { 810, "authenv", "Set authentication info from the TR_AUTH environment variable (user:pw)", "ne", Arg::None, nullptr },
+    { 'N', "netrc", "Set authentication info from a .netrc file", "N", Arg::Required, "<file>" },
+    { 820, "ssl", "Use SSL when talking to daemon", nullptr, Arg::None, nullptr },
+    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", Arg::None, nullptr },
+    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", Arg::None, nullptr },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 962, "port-test", "Port testing", "pt", Arg::None, nullptr },
+    { 'P', "random-port", "Random port for incoming peers", "P", Arg::None, nullptr },
+    { 900, "priority-high", "Try to download these file(s) first", "ph", Arg::Required, "<files>" },
+    { 901, "priority-normal", "Try to download these file(s) normally", "pn", Arg::Required, "<files>" },
+    { 902, "priority-low", "Try to download these file(s) last", "pl", Arg::Required, "<files>" },
+    { 700, "bandwidth-high", "Give this torrent first chance at available bandwidth", "Bh", Arg::None, nullptr },
+    { 701, "bandwidth-normal", "Give this torrent bandwidth left over by high priority torrents", "Bn", Arg::None, nullptr },
+    { 702,
+      "bandwidth-low",
+      "Give this torrent bandwidth left over by high and normal priority torrents",
+      "Bl",
+      Arg::None,
+      nullptr },
+    { 600, "reannounce", "Reannounce the current torrent(s)", nullptr, Arg::None, nullptr },
+    { 'r', "remove", "Remove the current torrent(s)", "r", Arg::None, nullptr },
+    { 930, "peers", "Set the maximum number of peers for the current torrent(s) or globally", "pr", Arg::Required, "<max>" },
+    { 840, "remove-and-delete", "Remove the current torrent(s) and delete local data", "rad", Arg::None, nullptr },
+    { 800, "torrent-done-script", "A script to run when a torrent finishes downloading", nullptr, Arg::Required, "<file>" },
+    { 801, "no-torrent-done-script", "Don't run the done-downloading script", nullptr, Arg::None, nullptr },
+    { 802, "torrent-done-seeding-script", "A script to run when a torrent finishes seeding", nullptr, Arg::Required, "<file>" },
+    { 803, "no-torrent-done-seeding-script", "Don't run the done-seeding script", nullptr, Arg::None, nullptr },
+    { 950, "seedratio", "Let the current torrent(s) seed until a specific ratio", "sr", Arg::Required, "ratio" },
+    { 951, "seedratio-default", "Let the current torrent(s) use the global seedratio settings", "srd", Arg::None, nullptr },
+    { 952, "no-seedratio", "Let the current torrent(s) seed regardless of ratio", "SR", Arg::None, nullptr },
+    { 953,
+      "global-seedratio",
+      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+      "gsr",
+      Arg::Required,
+      "ratio" },
+    { 954,
+      "no-global-seedratio",
+      "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+      "GSR",
+      Arg::None,
+      nullptr },
+    { 955,
+      "idle-seeding-limit",
+      "Let the current torrent(s) seed until a specific amount idle time",
+      "isl",
+      Arg::Required,
+      "<minutes>" },
+    { 956,
+      "default-idle-seeding-limit",
+      "Let the current torrent(s) use the default idle seeding settings",
+      "isld",
+      Arg::None,
+      nullptr },
+    { 957, "no-idle-seeding-limit", "Let the current torrent(s) seed regardless of idle time", "ISL", Arg::None, nullptr },
+    { 958,
+      "global-idle-seeding-limit",
+      "All torrents, unless overridden by a per-torrent setting, should seed until a specific amount of idle time",
+      "gisl",
+      Arg::Required,
+      "<minutes>" },
+    { 959,
+      "no-global-idle-seeding-limit",
+      "All torrents, unless overridden by a per-torrent setting, should seed regardless of idle time",
+      "GISL",
+      Arg::None,
+      nullptr },
+    { 710, "tracker-add", "Add a tracker to a torrent", "td", Arg::Required, "<tracker>" },
+    { 712, "tracker-remove", "Remove a tracker from a torrent", "tr", Arg::Required, "<trackerId>" },
+    { 's', "start", "Start the current torrent(s)", "s", Arg::None, nullptr },
+    { 'S', "stop", "Stop the current torrent(s)", "S", Arg::None, nullptr },
+    { 't', "torrent", "Set the current torrent(s)", "t", Arg::Required, "<torrent>" },
+    { 990, "start-paused", "Start added torrents paused", nullptr, Arg::None, nullptr },
+    { 991, "no-start-paused", "Start added torrents unpaused", nullptr, Arg::None, nullptr },
+    { 992, "trash-torrent", "Delete torrents after adding", nullptr, Arg::None, nullptr },
+    { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, Arg::None, nullptr },
+    { 994, "sequential-download", "Download the torrent sequentially", "seq", Arg::None, nullptr },
+    { 995, "no-sequential-download", "Download the torrent normally", "SEQ", Arg::None, nullptr },
+    { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", Arg::None, nullptr },
+    { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", Arg::None, nullptr },
+    { 'u',
+      "uplimit",
+      "Set the max upload speed in " SPEED_K_STR " for the current torrent(s) or globally",
+      "u",
+      Arg::Required,
+      "<speed>" },
+    { 'U', "no-uplimit", "Disable max upload speed for the current torrent(s) or globally", "U", Arg::None, nullptr },
+    { 830, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 831, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 'v', "verify", "Verify the current torrent(s)", "v", Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 'w',
+      "download-dir",
+      "When used in conjunction with --add, set the new torrent's download folder. "
+      "Otherwise, set the default download folder",
+      "w",
+      Arg::Required,
+      "<path>" },
+    { 'x', "pex", "Enable peer exchange (PEX)", "x", Arg::None, nullptr },
+    { 'X', "no-pex", "Disable peer exchange (PEX)", "X", Arg::None, nullptr },
+    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", Arg::None, nullptr },
+    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", Arg::None, nullptr },
+    { 941, "peer-info", "List the current torrent(s)' peers", "pi", Arg::None, nullptr },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
 static_assert(Options[std::size(Options) - 2].val != 0);
+} // namespace
 
+namespace
+{
 void show_usage()
 {
     tr_getopt_usage(MyName, Usage, std::data(Options));
@@ -693,7 +696,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
 };
 static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
-auto constexpr DetailsKeys = std::array<tr_quark, 55>{
+auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -726,6 +729,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_peersGettingFromUs,
     TR_KEY_peersSendingToUs,
     TR_KEY_peer_limit,
+    TR_KEY_percentDone,
     TR_KEY_pieceCount,
     TR_KEY_pieceSize,
     TR_KEY_rateDownload,
@@ -773,30 +777,27 @@ static_assert(ListKeys[std::size(ListKeys) - 1] != tr_quark{});
 
 [[nodiscard]] size_t write_func(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
-    auto* const buf = static_cast<evbuffer*>(vbuf);
-    size_t const byteCount = size * nmemb;
-    evbuffer_add(buf, ptr, byteCount);
-    return byteCount;
+    auto const n_bytes = size * nmemb;
+    static_cast<std::string*>(vbuf)->append(static_cast<char const*>(ptr), n_bytes);
+    return n_bytes;
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
 [[nodiscard]] size_t parse_response_header(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
     auto& config = *static_cast<RemoteConfig*>(vconfig);
-    auto const* const line = static_cast<char const*>(ptr);
-    size_t const line_len = size * nmemb;
-    char const* key = TR_RPC_SESSION_ID_HEADER ": ";
-    size_t const key_len = strlen(key);
+    auto const line = std::string_view{ static_cast<char const*>(ptr), size * nmemb };
+    auto const key = tr_strlower(TR_RPC_SESSION_ID_HEADER ": ");
 
-    if (line_len >= key_len && evutil_ascii_strncasecmp(line, key, key_len) == 0)
+    if (tr_strv_starts_with(tr_strlower(line), key))
     {
-        char const* begin = line + key_len;
-        char const* end = std::find_if(begin, line + line_len, [](char c) { return isspace(c); });
-
-        config.session_id.assign(begin, end - begin);
+        std::string_view const val = line.substr(std::size(key));
+        auto const begin = std::begin(val);
+        auto const end = std::find_if(begin, std::end(val), [](char c) { return isspace(c); });
+        config.session_id.assign(begin, end);
     }
 
-    return line_len;
+    return std::size(line);
 }
 
 [[nodiscard]] long get_timeout_secs(std::string_view req)
@@ -883,7 +884,7 @@ template<size_t N>
 std::string_view format_date(std::array<char, N>& buf, time_t now)
 {
     auto begin = std::data(buf);
-    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", fmt::localtime(now)).out;
+    auto end = fmt::format_to_n(begin, N, "{:%a %b %d %T %Y}", *std::localtime(&now)).out;
     return { begin, static_cast<size_t>(end - begin) };
 }
 
@@ -941,7 +942,7 @@ void print_details(tr_variant::Map const& map)
             {
                 if (auto sv = it->value_if<std::string_view>(); sv)
                 {
-                    fmt::print("{:s}{:s}", it == begin ? ", " : "", *sv);
+                    fmt::print("{:s}{:s}", it != begin ? ", " : "", *sv);
                 }
             }
 
@@ -968,9 +969,9 @@ void print_details(tr_variant::Map const& map)
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
         }
 
-        if (auto i = t->value_if<int64_t>(TR_KEY_sizeWhenDone), j = t->value_if<int64_t>(TR_KEY_leftUntilDone); i && j)
+        if (auto d = t->value_if<double>(TR_KEY_percentDone); d)
         {
-            fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * (*i - *j) / *i));
+            fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * *d));
         }
 
         if (auto i = t->value_if<int64_t>(TR_KEY_eta); i)
@@ -2311,7 +2312,7 @@ int process_response(char const* rpcurl, std::string_view response, RemoteConfig
     return status;
 }
 
-CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
+CURL* tr_curl_easy_init(std::string* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format("{:s}/{:s}", MyName, LONG_VERSION_STRING).c_str());
@@ -2383,8 +2384,8 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
     auto const rpcurl_http = fmt::format("{:s}://{:s}", scheme, rpcurl);
 
-    auto* const buf = evbuffer_new();
-    auto* curl = tr_curl_easy_init(buf, config);
+    auto buf = std::string{};
+    auto* curl = tr_curl_easy_init(&buf, config);
     (void)curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
     (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, get_timeout_secs(json));
@@ -2408,10 +2409,7 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
         switch (response)
         {
         case 200:
-            status |= process_response(
-                rpcurl,
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) },
-                config);
+            status |= process_response(rpcurl, buf, config);
             break;
 
         case 409:
@@ -2424,18 +2422,13 @@ int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
             break;
 
         default:
-            fmt::print(
-                stderr,
-                "Unexpected response: {:s}\n",
-                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), evbuffer_get_length(buf) });
+            fmt::print(stderr, "Unexpected response: {:s}\n", buf);
             status |= EXIT_FAILURE;
             break;
         }
     }
 
     /* cleanup */
-    evbuffer_free(buf);
-
     if (curl != nullptr)
     {
         tr_curl_easy_cleanup(curl);
