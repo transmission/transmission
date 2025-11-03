@@ -273,7 +273,7 @@
 "2185.title" = "Fält med delar";
 
 /* Class = "NSMenuItem"; title = "Availability"; ObjectID = "2279"; */
-"2279.title" = "Tillgänglighet:";
+"2279.title" = "Tillgänglighet";
 
 /* Class = "NSMenuItem"; title = "Statistics"; ObjectID = "2301"; */
 "2301.title" = "Statistik";

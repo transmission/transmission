@@ -6,9 +6,8 @@ Documentation=man:@TR_NAME@-daemon(1)
 
 [Service]
 User=transmission
-Type=notify
+Type=notify-reload
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/@TR_NAME@-daemon -f --log-level=error
-ExecReload=/bin/kill -s HUP $MAINPID
 
 # Hardening
 CapabilityBoundingSet=

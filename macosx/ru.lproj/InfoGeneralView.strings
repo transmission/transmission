@@ -21,7 +21,7 @@
 "28.title" = "Местоположение";
 
 /* Class = "NSTextFieldCell"; title = "Creator:"; ObjectID = "30"; */
-"30.title" = "Программма:";
+"30.title" = "Создано в:";
 
 /* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
 "31.placeholderString" = "Нет данных";
@@ -48,4 +48,4 @@
 "7YU-bS-UkI.placeholderString" = "Нет данных";
 
 /* Class = "NSTextFieldCell"; title = "Was:"; ObjectID = "uaW-NM-PTU"; */
-/* "uaW-NM-PTU.title" = ""; */
+"uaW-NM-PTU.title" = "Был:";

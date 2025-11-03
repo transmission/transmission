@@ -52,7 +52,7 @@
 "%lu IP address rules in list" = "清單中有 %lu 個 IP 位置規則";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu 已知：";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu 本機探索";
@@ -217,7 +217,7 @@
 "Available" = "可用";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "頻寬";
@@ -486,7 +486,7 @@
 "KB/s" = "KB/秒";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "已知：";
 
 /* Tracker last announce */
 "Last Announce" = "最後宣告於";
@@ -690,7 +690,7 @@
 "Port is open" = "連接埠已開啟";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "連接埠：%@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "視窗大小偏好設定";
@@ -890,7 +890,7 @@
 "Show the data file in Finder" = "在 Finder 中顯示資料檔案";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "顯示工具列";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -994,7 +994,7 @@
 "This folder contains no files." = "該資料夾中沒有檔案。";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "如果預設位置設為與 torrent 檔相同，則此選項不可用。";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "這個傳輸仍在活躍中。若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。";

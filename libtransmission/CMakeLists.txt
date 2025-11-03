@@ -14,6 +14,11 @@ add_compile_options(
 
 add_library(${TR_NAME} STATIC)
 
+set(IS_APPLE_CLANG FALSE)
+if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(IS_APPLE_CLANG TRUE)
+endif()
+
 target_sources(${TR_NAME}
     PRIVATE
         announce-list.cc
@@ -156,7 +161,7 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
-        utils.mm
+        $<$<BOOL:${IS_APPLE_CLANG}>:utils.mm>
         variant-benc.cc
         variant-json.cc
         variant.cc
@@ -201,8 +206,6 @@ tr_allow_compile_if(
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
-    [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
-        utils.mm
     [=[[WIN32]]=]
         file-win32.cc
         subprocess-win32.cc
@@ -282,6 +285,7 @@ target_link_libraries(${TR_NAME}
         utf8::cpp
         wildmat
         WideInteger::WideInteger
+        Crc32c::crc32c
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"

@@ -94,7 +94,7 @@ struct http_announce_data
     }
 
     tr_sha1_digest_t info_hash = {};
-    std::optional<tr_announce_response> previous_response;
+    std::optional<tr_announce_response> failed_response;
 
     tr_announce_response_func on_response;
 
@@ -158,22 +158,17 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
         {
             data->on_response(response);
         }
-        else if (got_all_responses)
-        {
-            // All requests have been answered, but none were successful.
-            // Choose the one that went further to report.
-            if (data->previous_response)
-            {
-                data->on_response(response.did_connect || response.did_timeout ? response : *data->previous_response);
-            }
-        }
         else
         {
-            // There is still one request pending that might succeed, so store
-            // the response for later. There is only room for 1 previous response,
-            // because there can be at most 2 requests.
-            TR_ASSERT(!data->previous_response);
-            data->previous_response = std::move(response);
+            if (!data->failed_response || tr_announce_response::compare_failed(*data->failed_response, response) < 0)
+            {
+                data->failed_response = std::move(response);
+            }
+
+            if (got_all_responses)
+            {
+                data->on_response(*data->failed_response);
+            }
         }
     }
 
