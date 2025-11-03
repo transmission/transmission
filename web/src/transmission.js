@@ -303,6 +303,7 @@ export class Transmission extends EventTarget {
       torrent_list: document.querySelector('#torrent-list'),
     };
 
+
     const context_menu = () => {
       // open context menu
       const popup = new ContextMenu(this.action_manager);
@@ -348,6 +349,8 @@ export class Transmission extends EventTarget {
     };
 
     this.pointer_event(this.elements.torrent_list, right_click);
+
+    this.elements.torrent_list.addEventListener('click', this._onRowClicked.bind(this));
 
     // Get preferences & torrents from the daemon
     this.loadDaemonPrefs();
