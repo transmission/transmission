@@ -81,7 +81,7 @@
 "456.title" = "Menu";
 
 /* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "457"; */
-"457.title" = "Mettre en pause la sélection";
+"457.title" = "Suspendre la sélection";
 
 /* Class = "NSMenuItem"; title = "Show Inspector"; ObjectID = "459"; */
 "459.title" = "Afficher l’inspecteur";
@@ -120,13 +120,13 @@
 "1400.title" = "Transferts";
 
 /* Class = "NSMenuItem"; title = "Pause Selected"; ObjectID = "1403"; */
-"1403.title" = "Mettre en pause la sélection";
+"1403.title" = "Suspendre la sélection";
 
 /* Class = "NSMenuItem"; title = "Resume Selected"; ObjectID = "1404"; */
 "1404.title" = "Reprendre la sélection";
 
 /* Class = "NSMenuItem"; title = "Pause All"; ObjectID = "1413"; */
-"1413.title" = "Tout mettre en pause";
+"1413.title" = "Tout suspendre";
 
 /* Class = "NSMenuItem"; title = "Resume All"; ObjectID = "1414"; */
 "1414.title" = "Tout reprendre";

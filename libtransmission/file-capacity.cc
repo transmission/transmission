@@ -11,8 +11,6 @@
 #include <string>
 #include <string_view>
 
-#include <event2/util.h> /* evutil_ascii_strcasecmp() */
-
 #ifndef _WIN32
 #include <unistd.h> /* getuid() */
 #include <sys/types.h> /* types needed by quota.h */
@@ -428,7 +426,7 @@ extern "C"
 
 #ifndef _WIN32
 
-    if (evutil_ascii_strcasecmp(info.fstype.c_str(), "xfs") == 0)
+    if (tr_strlower(info.fstype) == "xfs")
     {
 #ifdef HAVE_XQM
         ret = getxfsquota(info.device.c_str());

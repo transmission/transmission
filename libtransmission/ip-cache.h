@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
-    bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
+    bool set_global_addr(tr_address const& addr_new) noexcept;
 
     void update_addr(tr_address_type type) noexcept;
     void update_global_addr(tr_address_type type) noexcept;
@@ -97,7 +97,7 @@ private:
     using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
 
     void unset_global_addr(tr_address_type type) noexcept;
-    void set_source_addr(tr_address const& addr) noexcept;
+    void set_source_addr(tr_address const& addr_new) noexcept;
     void unset_addr(tr_address_type type) noexcept;
 
     void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
@@ -129,6 +129,7 @@ private:
     array_ip_t<std::optional<tr_address>> global_addr_;
     mutable array_ip_t<std::shared_mutex> source_addr_mutex_;
     array_ip_t<std::optional<tr_address>> source_addr_;
+    array_ip_t<bool> source_addr_checked_ = {};
 
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed

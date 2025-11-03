@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt5Version = '5.15.11'
+$global:Qt5Version = '5.15.17'
 
 $global:Qt5Deps = @(
     'DBus'
@@ -10,7 +10,7 @@ $global:Qt5Deps = @(
 
 function global:Build-Qt5([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir) {
     $Filename = "qt-everywhere-opensource-src-${Qt5Version}.zip" # tar.xz has some names truncated (e.g. .../double-conversion.h -> .../double-conv)
-    $Url = "http://qt.mirror.constant.com/archive/qt/$($Qt5Version -replace '\.\d+$', '')/${Qt5Version}/single/${Filename}"
+    $Url = "https://qt.mirror.constant.com/archive/qt/$($Qt5Version -replace '\.\d+$', '')/${Qt5Version}/single/${Filename}"
 
     $ArchiveBase = "qt-everywhere-src-${Qt5Version}"
     $UnpackFlags = @(

@@ -233,9 +233,8 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     auto const& [addr, port] = socket_address;
 
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
+    if (!session->allowsTCP() || !socket_address.is_valid())
     {
         return TR_BAD_SOCKET;
     }
@@ -326,13 +325,17 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)evutil_make_listen_socket_reuseable(fd);
 
-    if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
+#ifdef IPV6_V6ONLY
+    // TODO(tearfur): Consider using `evutil_make_listen_socket_ipv6only` once minimum libevent version is bumped to 2.1.9 or above
+    if (addr.is_ipv6() &&
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
+#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
