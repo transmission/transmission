@@ -401,7 +401,7 @@ export class Torrent extends EventTarget {
     if (pass && search) {
       const searchLower = search.toLowerCase();
       const nameMatch = this.getCollatedName().includes(searchLower);
-      const location = this.getDownloadDir() ? this.getDownloadDir().toLowerCase() : '';
+      const location = this.getDownloadDir()?.toLowerCase() ?? '';
       const locationMatch = location.includes(searchLower);
       pass = nameMatch || locationMatch;
     }
