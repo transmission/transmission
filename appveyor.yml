@@ -8,6 +8,8 @@ environment:
   AWS_S3_BUCKET_NAME:
     secure: Bf3x1Iruxg+l3tp+an+g9oE36EHxvyWrE8GTJzZh4Ss=
 
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x86
@@ -38,10 +40,6 @@ for:
   cache:
   - '%SystemDrive%\%TR_ARCH%-ccache'
 
-  init:
-  - pwsh: |
-      $Env:APPVEYOR_SAVE_CACHE_ON_ERROR = 'true'
-
   install:
   - pwsh: |
       $Version = git describe --tags --abbrev=10 --always
@@ -58,14 +56,14 @@ for:
 
       git submodule update --init --recursive
 
-      choco install python3 --pre
+      # choco install python3
       choco install nasm
       choco install jom
-      choco install wixtoolset --version 3.14.0
-      choco install ccache --version 4.8.3
+      # choco install wixtoolset --version 3.14.0
+      choco install ccache
 
-      Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
-      Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -Recurse
+      Rename-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -NewName OpenSSL-Win32_
+      Rename-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -NewName OpenSSL-Win64_
 
       Install-Module -Name SignPath
 

@@ -22,7 +22,13 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { debounce, deepEqual, setEnabled, setTextContent } from './utils.js';
+import {
+  icon,
+  debounce,
+  deepEqual,
+  setEnabled,
+  setTextContent,
+} from './utils.js';
 import Clusterize from 'clusterize.js';
 
 export class Transmission extends EventTarget {
@@ -34,6 +40,30 @@ export class Transmission extends EventTarget {
     this.notifications = notifications;
     this.prefs = prefs;
     this.remote = new Remote(this);
+    this.speed = {
+      down: document.querySelector('#speed-down'),
+      up: document.querySelector('#speed-up'),
+    };
+
+    for (const [selector, name] of [
+      ['#toolbar-open', 'open'],
+      ['#toolbar-delete', 'delete'],
+      ['#toolbar-start', 'start'],
+      ['#toolbar-pause', 'pause'],
+      ['#toolbar-inspector', 'inspector'],
+      ['#toolbar-overflow', 'overflow'],
+    ]) {
+      const e = document.querySelector(selector);
+      while (e.firstChild) {
+        e.lastChild.remove();
+      }
+      e.append(icon[name]());
+    }
+
+    document.querySelector('.speed-container').append(icon.speedDown());
+    document
+      .querySelector('.speed-container + .speed-container')
+      .append(icon.speedUp());
 
     this.addEventListener('torrent-selection-changed', (event_) =>
       this.action_manager.update(event_),
@@ -53,7 +83,7 @@ export class Transmission extends EventTarget {
     this.refilterAllSoon = debounce(() => this._refilter());
 
     this.pointer_device = Object.seal({
-      is_touch_device: 'ontouchstart' in window,
+      is_touch_device: 'ontouchstart' in globalThis,
       long_press_callback: null,
       x: 0,
       y: 0,
@@ -238,7 +268,7 @@ export class Transmission extends EventTarget {
       while (row_element && !row_element.classList.contains('torrent')) {
         row_element = row_element.parentNode;
       }
-      
+
       // Find torrent by data-torrent-id instead of row object
       const torrentId = row_element?.dataset?.torrentId;
       if (torrentId && !this._selectedTorrentIds.has(Number.parseInt(torrentId, 10))) {
@@ -341,33 +371,33 @@ export class Transmission extends EventTarget {
     // Use existing renderers to create a temporary DOM element, then extract HTML
     const isCompact = this.prefs.display_mode === Prefs.DisplayCompact;
     const renderer = isCompact ? new TorrentRendererCompact() : new TorrentRendererFull();
-    
+
     // Create temporary row using existing renderer
     const tempRow = renderer.createRow(torrent);
     tempRow.dataset.torrentId = torrent.getId();
-    
+
     // Add selection class if needed
     if (this._selectedTorrentIds.has(torrent.getId())) {
       tempRow.classList.add('selected');
     }
-    
+
     // Render the content using existing renderer
     renderer.render(this, torrent, tempRow);
-    
+
     // Return the HTML string
     return tempRow.outerHTML;
   }
 
   _openTorrentFromUrl() {
     setTimeout(() => {
-      const addTorrent = new URLSearchParams(window.location.search).get(
+      const addTorrent = new URLSearchParams(globalThis.location.search).get(
         'addtorrent',
       );
       if (addTorrent) {
         this.setCurrentPopup(new OpenDialog(this, this.remote, addTorrent));
-        const newUrl = new URL(window.location);
+        const newUrl = new URL(globalThis.location);
         newUrl.search = '';
-        window.history.pushState('', '', newUrl.toString());
+        globalThis.history.pushState('', '', newUrl.toString());
       }
     }, 0);
   }
@@ -417,8 +447,7 @@ export class Transmission extends EventTarget {
       }
       case Prefs.ContrastMode: {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
-        document.body.classList.remove('contrast-more');
-        document.body.classList.remove('contrast-less');
+        document.body.classList.remove('contrast-more', 'contrast-less');
         document.body.classList.add(`contrast-${value}`);
         // this.refilterAllSoon();
         break;
@@ -584,7 +613,7 @@ export class Transmission extends EventTarget {
     // Find indices in the current torrent order
     const currentIndex = this._torrentOrder.findIndex(t => t.getId() === torrentId);
     const lastIndex = this._torrentOrder.findIndex(t => t.getId() === this._last_torrent_clicked);
-    
+
     if (currentIndex === -1 || lastIndex === -1) {
       this._selectTorrent(torrentId);
       return;
@@ -601,7 +630,7 @@ export class Transmission extends EventTarget {
   _dispatchSelectionChanged() {
     const selected = [];
     const nonselected = [];
-    
+
     for (const torrent of Object.values(this._torrents)) {
       if (this._selectedTorrentIds.has(torrent.getId())) {
         selected.push(torrent);
@@ -913,17 +942,17 @@ TODO: fix this when notifications get fixed
     while (rowElement && !rowElement.classList.contains('torrent')) {
       rowElement = rowElement.parentNode;
     }
-    
+
     if (!rowElement || !rowElement.dataset.torrentId) {
       return;
     }
-    
+
     const torrentId = Number.parseInt(rowElement.dataset.torrentId, 10);
     const torrent = this._torrents[torrentId];
     if (!torrent) {
       return;
     }
-    
+
     const meta_key = event_.metaKey || event_.ctrlKey;
     const isSelected = this._selectedTorrentIds.has(torrentId);
 
@@ -938,7 +967,7 @@ TODO: fix this when notifications get fixed
     if (event_.shiftKey) {
       this._selectRangeToTorrent(torrentId);
       // Need to deselect any selected text
-      window.focus();
+      globalThis.focus();
 
       // Apple-Click, not selected
     } else if (!isSelected && meta_key) {
@@ -1057,7 +1086,7 @@ TODO: fix this when notifications get fixed
   ///
 
   _updateGuiFromSession(o) {
-    const [, version, checksum] = o.version.match(/(.*)\s\(([\da-f]+)\)/);
+    const [, version, checksum] = o.version.match(/^(.*)\s\(([\da-f]+)\)/);
     this.version_info = {
       checksum,
       version,
@@ -1081,8 +1110,8 @@ TODO: fix this when notifications get fixed
     );
     const string = fmt.countString('Transfer', 'Transfers', this._torrentOrder.length);
 
-    setTextContent(document.querySelector('#speed-up-label'), fmt.speedBps(u));
-    setTextContent(document.querySelector('#speed-dn-label'), fmt.speedBps(d));
+    setTextContent(this.speed.down, fmt.speedBps(d));
+    setTextContent(this.speed.up, fmt.speedBps(u));
     setTextContent(document.querySelector('#filter-count'), string);
   }
 
@@ -1096,7 +1125,7 @@ TODO: fix this when notifications get fixed
 
   _updateFilterSelect() {
     const trackers = this._getTrackerCounts();
-    const sitenames = Object.keys(trackers).sort();
+    const sitenames = Object.keys(trackers).toSorted();
 
     // build the new html
     let string = '';
@@ -1141,6 +1170,9 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
+    // TODO: This regex is wrong and is about to be removed in https://github.com/transmission/transmission/pull/7008,
+    // so it is left alone for now.
+    // eslint-disable-next-line sonarjs/slow-regex
     const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
@@ -1161,7 +1193,7 @@ TODO: fix this when notifications get fixed
     }
 
     // Sort the torrents
-    filteredTorrents.sort((a, b) => 
+    filteredTorrents.sort((a, b) =>
       Torrent.compareTorrents(a, b, sort_mode, sort_direction)
     );
 
@@ -1169,7 +1201,7 @@ TODO: fix this when notifications get fixed
     this._torrentOrder = filteredTorrents;
 
     // Generate HTML for each torrent
-    const rowsHTML = filteredTorrents.map(torrent => 
+    const rowsHTML = filteredTorrents.map(torrent =>
       this._generateTorrentRowHTML(torrent)
     );
 

@@ -91,6 +91,7 @@ wix_candle(WIX_OBJS
         "ThirdPartyDir=${TR_THIRD_PARTY_DIR}"
         "QtDir=${TR_QT_DIR}"
         "QtMajorVer=${Qt_VERSION_MAJOR}"
+        "QtMinorVer=${Qt_VERSION_MINOR}"
         "LicenseFile=${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
         "WebSrcDir=${WEBSRCDIR}"
         "TrQmSrcDir=${TRQMSRCDIR}"

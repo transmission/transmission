@@ -765,6 +765,7 @@ public:
         return open_files_;
     }
 
+    void flush_torrent_files(tr_torrent_id_t tor_id) const noexcept;
     void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
     void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
 
@@ -1034,7 +1035,7 @@ public:
 
     bool set_global_address(tr_address const& addr) noexcept
     {
-        return ip_cache_.set_global_addr(addr.type, addr);
+        return ip_cache_.set_global_addr(addr);
     }
 
     [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
