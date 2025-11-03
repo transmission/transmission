@@ -189,6 +189,19 @@ export function makeUUID() {
   );
 }
 
+export function newOpts(element, l, a) {
+  const opts = a.map((t) => new Option(...t));
+
+  if (l) {
+    const e = document.createElement('OPTGROUP');
+    e.label = l;
+    e.append(...opts);
+    element.append(e);
+  } else {
+    element.append(...opts);
+  }
+}
+
 export const icon = Object.freeze({
   delete: () => {
     return renderIcon(
