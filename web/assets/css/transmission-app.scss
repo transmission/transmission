@@ -385,12 +385,6 @@ a {
   height: 30px;
   padding-left: 5px;
 
-  @include viewport-small {
-    :not(select):not(input):not(option):not(.flexible-space) {
-      display: none;
-    }
-  }
-
   #torrent-search {
     width: 100%;
     max-width: 160px;
@@ -416,6 +410,13 @@ a {
 
     + .speed-container {
       min-width: 100px;
+    }
+  }
+
+  @include viewport-small {
+    .speed-container,
+    span:not(.flexible-space) {
+      display: none;
     }
   }
 }
