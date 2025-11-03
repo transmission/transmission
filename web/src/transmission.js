@@ -350,8 +350,12 @@ export class Transmission extends EventTarget {
 
       // Find torrent by data-torrent-id instead of row object
       const torrentId = row_element?.dataset?.torrentId;
-      if (torrentId && !this._selectedTorrentIds.has(Number.parseInt(torrentId, 10))) {
-        this._setSelectedTorrent(Number.parseInt(torrentId, 10));
+      if (torrentId) {
+        const torrentIdNum = Number.parseInt(torrentId, 10);
+        if (!this._selectedTorrentIds.has(torrentIdNum)) {
+          this._setSelectedTorrent(torrentIdNum);
+          this._last_torrent_clicked = torrentIdNum;
+        }
       }
 
       if (this.handler) {
