@@ -143,7 +143,7 @@ export function createDialogContainer(id) {
   win.append(buttons);
 
   const bbegin = document.createElement('span');
-  bbegin.classList.add('dialog-buttons-begin');
+  bbegin.className = 'flexible-space';
   buttons.append(bbegin);
 
   const dismiss = document.createElement('button');
@@ -160,10 +160,6 @@ export function createDialogContainer(id) {
       confirm.click();
     }
   });
-
-  const bend = document.createElement('span');
-  bend.classList.add('dialog-buttons-end');
-  buttons.append(bend);
 
   return {
     confirm,
@@ -187,6 +183,19 @@ export function makeUUID() {
       (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
     ).toString(16),
   );
+}
+
+export function newOpts(element, l, a) {
+  const opts = a.map((t) => new Option(...t));
+
+  if (l) {
+    const e = document.createElement('OPTGROUP');
+    e.label = l;
+    e.append(...opts);
+    element.append(e);
+  } else {
+    element.append(...opts);
+  }
 }
 
 export const icon = Object.freeze({
