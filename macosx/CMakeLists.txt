@@ -418,6 +418,7 @@ target_link_libraries(${TR_NAME}-mac
         "-framework Foundation"
         "-framework Quartz"
         "-framework Security"
+        "-weak_framework Sparkle"
         "-weak_framework UserNotifications")
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
