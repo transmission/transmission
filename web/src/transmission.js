@@ -73,7 +73,6 @@ export class Transmission extends EventTarget {
     // Initialize the implementation fields
     this.filterText = '';
     this._torrents = {};
-    this._rows = [];
     this.oldTrackers = [];
     this.dirtyTorrents = new Set();
     this._selectedTorrentIds = new Set(); // Track selected torrents by ID
