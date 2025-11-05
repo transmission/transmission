@@ -184,6 +184,7 @@
 		A267927C130DFF2700CB7464 /* libutp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E38544130DFEE3001F501B /* libutp.a */; };
 		A2679294130E00A000CB7464 /* tr-utp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2679292130E00A000CB7464 /* tr-utp.cc */; };
 		A2679295130E00A000CB7464 /* tr-utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2679293130E00A000CB7464 /* tr-utp.h */; };
+		A267C2842E9F2B23003B87D7 /* Transmission_Tahoe.icon in Resources */ = {isa = PBXBuildFile; fileRef = A267C2832E9F2B23003B87D7 /* Transmission_Tahoe.icon */; };
 		A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2190D2DA35A00FF7140 /* FileOutlineController.mm */; };
 		A26AF27E0D2DBDDF00FF7140 /* AddWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */; };
 		A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A26AF2830D2DC27C00FF7140 /* AddWindowController.mm */; };
@@ -994,6 +995,7 @@
 		A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilterBarView.mm; sourceTree = "<group>"; };
 		A2679292130E00A000CB7464 /* tr-utp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-utp.cc"; sourceTree = "<group>"; };
 		A2679293130E00A000CB7464 /* tr-utp.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "tr-utp.h"; sourceTree = "<group>"; };
+		A267C2832E9F2B23003B87D7 /* Transmission_Tahoe.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = Transmission_Tahoe.icon; path = Images/Transmission_Tahoe.icon; sourceTree = "<group>"; };
 		A26AF1050D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A26AF1070D2855FC00FF7140 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A26AF2180D2DA35A00FF7140 /* FileOutlineController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileOutlineController.h; sourceTree = "<group>"; };
@@ -1890,6 +1892,7 @@
 				A2451E6816ACE4EB00586E0E /* FileRenameSheetController.xib */,
 				F63480621E1D7274005B9E09 /* Images.xcassets */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
+				A267C2832E9F2B23003B87D7 /* Transmission_Tahoe.icon */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -3251,6 +3254,7 @@
 				A209EAEC1142D294002B02D1 /* InfoActivityView.xib in Resources */,
 				A209EAED1142D294002B02D1 /* InfoGeneralView.xib in Resources */,
 				A209EB201142DD85002B02D1 /* InfoTrackersView.xib in Resources */,
+				A267C2842E9F2B23003B87D7 /* Transmission_Tahoe.icon in Resources */,
 				A209EBA71142EAF3002B02D1 /* InfoPeersView.xib in Resources */,
 				A209EBD91142F52B002B02D1 /* InfoFileView.xib in Resources */,
 				A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */,
@@ -4363,7 +4367,7 @@
 		0053D3D50C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Transmission_Tahoe;
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -4626,7 +4630,7 @@
 		4DF0C599089918A300DD8943 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Transmission_Tahoe;
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -4831,7 +4835,7 @@
 		A250CFEC0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Transmission_Tahoe;
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
