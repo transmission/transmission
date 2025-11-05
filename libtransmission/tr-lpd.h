@@ -59,4 +59,5 @@ public:
 
     virtual ~tr_lpd() = default;
     static std::unique_ptr<tr_lpd> create(Mediator& mediator, event_base* event_base);
+    static std::unique_ptr<tr_lpd> create_libuv(Mediator& mediator, struct uv_loop_s* uv_loop);
 };

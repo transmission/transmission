@@ -197,6 +197,11 @@ public:
         return evbase_.get();
     }
 
+    [[nodiscard]] struct uv_loop_s* uv_loop() noexcept override
+    {
+        return nullptr;
+    }
+
     [[nodiscard]] bool am_in_session_thread() const noexcept override
     {
         return thread_id_ == std::this_thread::get_id();

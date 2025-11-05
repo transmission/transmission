@@ -9,6 +9,7 @@
 #include <csignal>
 #include <cstddef> // size_t
 #include <cstdint>
+#include <cstdio>
 #include <ctime>
 #include <future>
 #include <iterator> // for std::back_inserter
@@ -47,6 +48,7 @@
 #include "libtransmission/session.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/timer-ev.h"
+#include "libtransmission/timer-libuv.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/tr-assert.h"
@@ -818,14 +820,16 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const addr = bind_address(TR_AF_INET);
-            bound_ipv4_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            // bound_ipv4_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv4_.emplace(uv_loop(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const addr = bind_address(TR_AF_INET6);
-            bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            // bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv6_.emplace(uv_loop(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
     }
@@ -848,7 +852,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     if (!udp_core_ || force || port_changed || utp_changed)
     {
-        udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
+        udp_core_ = std::make_unique<tr_session::tr_udp_core_libuv>(*this, udpPort());
     }
 
     // Sends out announce messages with advertisedPeerPort(), so this
@@ -857,7 +861,8 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     {
         if (val)
         {
-            lpd_ = tr_lpd::create(lpd_mediator_, event_base());
+            // lpd_ = tr_lpd::create(lpd_mediator_, event_base());
+            lpd_ = tr_lpd::create_libuv(lpd_mediator_, uv_loop());
         }
         else
         {
@@ -2170,9 +2175,11 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
-    , blocklist_dir_{ makeBlocklistDir(config_dir) }
-    , session_thread_{ tr_session_thread::create() }
-    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , blocklist_dir_{ makeBlocklistDir(config_dir) } //
+    // , session_thread_{ tr_session_thread::create() }
+    , session_thread_{ tr_session_thread::create_libuv() } //
+    // , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , timer_maker_{ std::make_unique<libtransmission::UvTimerMaker>(uv_loop()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }

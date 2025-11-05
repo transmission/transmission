@@ -83,6 +83,9 @@ target_sources(${TR_NAME}
         open-files.h
         peer-common.h
         peer-io.cc
+        peer-io-event-handler.h
+        peer-io-libevent.cc
+        peer-io-libuv.cc
         peer-io.h
         peer-mgr-wishlist.cc
         peer-mgr-wishlist.h
@@ -115,8 +118,10 @@ target_sources(${TR_NAME}
         session-id.cc
         session-id.h
         session-thread.cc
+        session-thread-libuv.cc
         session-thread.h
         session.cc
+        session-libuv.cc
         session.h
         settings.cc
         settings.h
@@ -127,6 +132,8 @@ target_sources(${TR_NAME}
         subprocess.h
         timer-ev.cc
         timer-ev.h
+        timer-libuv.cc
+        timer-libuv.h
         timer.h
         torrent-ctor.cc
         torrent-ctor.h
@@ -150,10 +157,12 @@ target_sources(${TR_NAME}
         tr-getopt.cc
         tr-getopt.h
         tr-lpd.cc
+        tr-lpd-libuv.cc
         tr-lpd.h
         tr-macros.h
         tr-strbuf.h
         tr-udp.cc
+        tr-udp-libuv.cc
         tr-utp.cc
         tr-utp.h
         transmission.h
@@ -292,6 +301,7 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
+        "-L/opt/homebrew/lib/ -luv" # TODO: proper libuv library intergration into the build infra.
         transmission::crypto_impl
         fmt::fmt-header-only
         small::small
@@ -313,6 +323,7 @@ if(INSTALL_LIB)
             rpcimpl.h
             session-id.h
             timer-ev.h
+            timer-libuv.h
             timer.h
             tr-assert.h
             tr-buffer.h

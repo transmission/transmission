@@ -23,13 +23,19 @@
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h"
+#include "libtransmission/peer-io-event-handler.h"
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
-#include "libtransmission/utils-ev.h"
 
 struct struct_utp_context;
+struct uv_loop_s;
+
+namespace libtransmission
+{
+class PeerIoEventHandler;
+}
 struct tr_error;
 struct tr_session;
 struct tr_socket_address;
@@ -54,6 +60,12 @@ enum tr_preferred_transport : uint8_t
     TR_NUM_PREFERRED_TRANSPORT
 };
 
+enum class EventBackend : uint8_t
+{
+    Libevent,
+    Libuv
+};
+
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
     using DH = tr_message_stream_encryption::DH;
@@ -64,6 +76,7 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 
 public:
     tr_peerIo(
+        EventBackend backend,
         tr_session* session,
         tr_peer_socket&& socket,
         tr_bandwidth* parent_bandwidth,
@@ -79,6 +92,7 @@ public:
     tr_peerIo& operator=(tr_peerIo&&) = delete;
 
     static std::shared_ptr<tr_peerIo> new_outgoing(
+        EventBackend backend,
         tr_session* session,
         tr_bandwidth* parent,
         tr_socket_address const& socket_address,
@@ -86,7 +100,11 @@ public:
         bool client_is_seed,
         bool utp);
 
-    static std::shared_ptr<tr_peerIo> new_incoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
+    static std::shared_ptr<tr_peerIo> new_incoming(
+        EventBackend backend,
+        tr_session* session,
+        tr_bandwidth* parent,
+        tr_peer_socket socket);
 
     constexpr void set_callbacks(CanRead can_read, DidWrite did_write, GotError got_error, void* user_data)
     {
@@ -310,6 +328,10 @@ public:
 
     static void utp_init(struct_utp_context* ctx);
 
+    // Public methods for event handlers to call
+    void handle_read_ready();
+    void handle_write_ready();
+
 private:
     // Our target socket receive buffer size.
     // Gets read from the socket buffer into the PeerBuffer inbuf_.
@@ -342,11 +364,8 @@ private:
 
     void close();
 
-    static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
-    static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
-
-    void event_enable(short event);
-    void event_disable(short event);
+    void event_enable(libtransmission::PeerIoEventHandler::EventType event);
+    void event_disable(libtransmission::PeerIoEventHandler::EventType event);
 
     void can_read_wrapper(size_t bytes_transferred);
     void did_write_wrapper(size_t bytes_transferred);
@@ -357,6 +376,7 @@ private:
     // this is only public for testing purposes.
     // production code should use new_outgoing() or new_incoming()
     static std::shared_ptr<tr_peerIo> create(
+        EventBackend backend,
         tr_session* session,
         tr_peer_socket&& socket,
         tr_bandwidth* parent,
@@ -385,10 +405,8 @@ private:
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
 
-    libtransmission::evhelpers::event_unique_ptr event_read_;
-    libtransmission::evhelpers::event_unique_ptr event_write_;
-
-    short int pending_events_ = 0;
+    EventBackend const backend_;
+    std::unique_ptr<libtransmission::PeerIoEventHandler> event_handler_;
 
     tr_priority_t priority_ = TR_PRI_NORMAL;
 

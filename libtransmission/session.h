@@ -76,6 +76,8 @@ struct tr_pex;
 struct tr_torrent;
 struct struct_utp_context;
 struct tr_variant;
+struct uv_poll_s;
+struct uv_loop_s;
 
 namespace libtransmission::test
 {
@@ -113,6 +115,26 @@ private:
         void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
         libtransmission::evhelpers::event_unique_ptr ev_;
+    };
+
+    class BoundSocketLibuv
+    {
+    public:
+        using IncomingCallback = void (*)(tr_socket_t, void*);
+        BoundSocketLibuv(struct uv_loop_s* loop, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocketLibuv(BoundSocketLibuv&&) = delete;
+        BoundSocketLibuv(BoundSocketLibuv const&) = delete;
+        BoundSocketLibuv operator=(BoundSocketLibuv&&) = delete;
+        BoundSocketLibuv operator=(BoundSocketLibuv const&) = delete;
+        ~BoundSocketLibuv();
+
+    private:
+        static void onCanRead(struct uv_poll_s* handle, int status, int events);
+
+        IncomingCallback cb_;
+        void* cb_data_;
+        tr_socket_t socket_ = TR_BAD_SOCKET;
+        struct uv_poll_s* poll_handle_ = nullptr;
     };
 
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
@@ -381,6 +403,40 @@ private:
         libtransmission::evhelpers::event_unique_ptr udp6_event_;
     };
 
+    class tr_udp_core_libuv
+    {
+    public:
+        tr_udp_core_libuv(tr_session& session, tr_port udp_port);
+        ~tr_udp_core_libuv();
+
+        tr_udp_core_libuv(tr_udp_core_libuv const&) = delete;
+        tr_udp_core_libuv(tr_udp_core_libuv&&) = delete;
+        tr_udp_core_libuv& operator=(tr_udp_core_libuv const&) = delete;
+        tr_udp_core_libuv& operator=(tr_udp_core_libuv&&) = delete;
+
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen) const;
+
+        [[nodiscard]] constexpr auto socket4() const noexcept
+        {
+            return udp4_socket_;
+        }
+
+        [[nodiscard]] constexpr auto socket6() const noexcept
+        {
+            return udp6_socket_;
+        }
+
+    private:
+        static void on_udp_readable(struct uv_poll_s* handle, int status, int events);
+
+        tr_port const udp_port_;
+        tr_session& session_;
+        tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
+        tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
+        struct uv_poll_s* udp4_poll_ = nullptr;
+        struct uv_poll_s* udp6_poll_ = nullptr;
+    };
+
 public:
     struct Settings final : public libtransmission::Settings
     {
@@ -560,6 +616,11 @@ public:
     [[nodiscard]] auto* event_base() noexcept
     {
         return session_thread_->event_base();
+    }
+
+    [[nodiscard]] auto* uv_loop() noexcept
+    {
+        return session_thread_->uv_loop();
     }
 
     [[nodiscard]] constexpr tr_torrents& torrents()
@@ -1346,15 +1407,17 @@ private:
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    std::optional<BoundSocket> bound_ipv4_;
+    // std::optional<BoundSocket> bound_ipv4_;
+    std::optional<BoundSocketLibuv> bound_ipv4_;
 
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    std::optional<BoundSocket> bound_ipv6_;
+    // std::optional<BoundSocket> bound_ipv6_;
+    std::optional<BoundSocketLibuv> bound_ipv6_;
 
 public:
     // depends-on: settings_, announcer_udp_, global_ip_cache_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
-    std::unique_ptr<tr_udp_core> udp_core_;
+    std::unique_ptr<tr_udp_core_libuv> udp_core_;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_{ true };
