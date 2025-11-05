@@ -24,15 +24,15 @@ export const Utils = {
   },
 };
 
-const icon32 = {
+const icon26 = {
   fill: 'none',
-  height: 32,
+  height: 26,
   stroke: 'currentColor',
   'stroke-linecap': 'round',
   'stroke-linejoin': 'round',
   'stroke-width': 2,
   viewBox: '0 0 24 24',
-  width: 32,
+  width: 26,
 };
 
 function toggleClass(buttons, button, pages, page, callback) {
@@ -59,7 +59,7 @@ function namespace(tagname, attrs) {
 
 function renderIcon(...svgca) {
   // SVG Command Array
-  const svg = namespace('svg', icon32);
+  const svg = namespace('svg', icon26);
   for (const [tagname, attrs] of svgca) {
     svg.append(namespace(tagname, attrs));
   }
@@ -226,7 +226,7 @@ export const icon = Object.freeze({
       namespace('circle', {
         cx: 12,
         cy: 12,
-        r: 12,
+        r: 11,
         'stroke-linecap': 'round',
         'stroke-linejoin': 'round',
         'stroke-width': 2,

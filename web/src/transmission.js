@@ -54,11 +54,9 @@ export class Transmission extends EventTarget {
       ['#toolbar-inspector', 'inspector'],
       ['#toolbar-overflow', 'overflow'],
     ]) {
-      const e = document.querySelector(selector);
-      while (e.firstChild) {
-        e.lastChild.remove();
-      }
-      e.append(icon[name]());
+      document
+        .querySelector(selector)
+        .prepend(icon[name](), document.createElement('BR'));
     }
 
     document.querySelector('.speed-container').append(icon.speedDown());
