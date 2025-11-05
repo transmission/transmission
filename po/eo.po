@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-27 09:20+0000\n"
+"POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Esperanto (https://app.transifex.com/transmissionbt/teams/33778/eo/)\n"
@@ -31,67 +31,71 @@ msgstr "Neniom"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:207 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
+#: ../daemon/daemon.cc:211 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:232 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
+#: ../daemon/daemon.cc:236 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:241
+#: ../daemon/daemon.cc:245
 msgid "Removing torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:246 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
+#: ../daemon/daemon.cc:250 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:655
+#: ../daemon/daemon.cc:659
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:703
+#: ../daemon/daemon.cc:707
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:717
+#: ../daemon/daemon.cc:719
+msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
+msgstr ""
+
+#: ../daemon/daemon.cc:740
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:741
+#: ../daemon/daemon.cc:766
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:753
+#: ../daemon/daemon.cc:778
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:774
+#: ../daemon/daemon.cc:799
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:780 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1008 ../libtransmission/torrent.cc:1997 ../libtransmission/variant.cc:876
+#: ../daemon/daemon.cc:805 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1008 ../libtransmission/torrent.cc:1997 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:789
+#: ../daemon/daemon.cc:814
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:811
+#: ../daemon/daemon.cc:836
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:856 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
+#: ../daemon/daemon.cc:881 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:866 ../libtransmission/watchdir-kqueue.cc:126
+#: ../daemon/daemon.cc:891 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:880
+#: ../daemon/daemon.cc:905
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
@@ -2094,23 +2098,23 @@ msgstr "Malfermi torenton el URL"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:462
+#: ../libtransmission/announcer-http.cc:453
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:682
+#: ../libtransmission/announcer-http.cc:673
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:261
+#: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:308
 msgid "Unknown error"
 msgstr "Nekonata eraro"
 
-#: ../libtransmission/announcer-udp.cc:376
+#: ../libtransmission/announcer-udp.cc:423
 msgid "{ip_protocol} connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:495
+#: ../libtransmission/announcer-udp.cc:542
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr ""
 
@@ -2124,15 +2128,15 @@ msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1035 ../libtransmission/announcer.cc:1363
+#: ../libtransmission/announcer.cc:1046 ../libtransmission/announcer.cc:1368
 msgid "Could not connect to tracker"
 msgstr "Ne povis konekti kun la ŝanĝospurilo"
 
-#: ../libtransmission/announcer.cc:1039 ../libtransmission/announcer.cc:1367
+#: ../libtransmission/announcer.cc:1050 ../libtransmission/announcer.cc:1372
 msgid "Tracker did not respond"
 msgstr "Ŝanĝospurilo ne respondis"
 
-#: ../libtransmission/announcer.cc:1095
+#: ../libtransmission/announcer.cc:1110
 msgid "Success"
 msgstr "Sukceso"
 
@@ -2187,19 +2191,19 @@ msgstr ""
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:269
+#: ../libtransmission/net.cc:268
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:288
+#: ../libtransmission/net.cc:287
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/net.cc:352
+#: ../libtransmission/net.cc:351
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr ""
 
-#: ../libtransmission/net.cc:353
+#: ../libtransmission/net.cc:352
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr ""
 
@@ -2215,7 +2219,7 @@ msgstr ""
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/peer-io.cc:674
+#: ../libtransmission/peer-io.cc:673
 msgid "Unknown state: {state}"
 msgstr ""
 
@@ -2575,25 +2579,25 @@ msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:138
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:141
+#: ../utils/remote.cc:139
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:142 ../utils/remote.cc:162
+#: ../utils/remote.cc:140 ../utils/remote.cc:160
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../utils/remote.cc:146
+#: ../utils/remote.cc:144
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
