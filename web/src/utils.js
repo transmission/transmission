@@ -201,11 +201,10 @@ export function newOpts(element, l, a) {
 export const icon = Object.freeze({
   delete: () => {
     return renderIcon(
-      ['polyline', { points: '3 6 5 6 21 6' }],
       [
         'path',
         {
-          d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
+          d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2L21 6L3 6',
         },
       ],
       ['line', { x1: 10, x2: 10, y1: 11, y2: 17 }],
