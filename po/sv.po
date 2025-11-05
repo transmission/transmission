@@ -7,8 +7,8 @@
 # 553bfca145c93e26efcabc21d311cd2f, 2020
 # Josef Andersson <janderssonse@proton.me>, 2022
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
-# Daniel, 2025
 # Mike Gelfand <mikedld@mikedld.com>, 2025
+# Daniel, 2025
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
+"Last-Translator: Daniel, 2025\n"
 "Language-Team: Swedish (https://app.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -2159,7 +2159,7 @@ msgstr "Uppdaterade källans {protocol}-adress till {ip}"
 
 #: ../libtransmission/ip-cache.cc:297
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Kunde inte hämta källadressen i något IP-protokoll, inga nätverksanslutningar möjliga"
 
 #: ../libtransmission/ip-cache.cc:305
 msgid "Your machine does not support {protocol}"

@@ -14,6 +14,7 @@
 # YFdyh000 <yfdyh000@gmail.com>, 2024
 # watchout, 2025
 # Mike Gelfand <mikedld@mikedld.com>, 2025
+# Phonebook3599, 2025
 #
 #, fuzzy
 msgid ""
@@ -22,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
+"Last-Translator: Phonebook3599, 2025\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -2169,7 +2170,7 @@ msgstr "成功更新源{protocol}地址到{ip}"
 
 #: ../libtransmission/ip-cache.cc:297
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "无法在任何 IP 协议中获取源地址，无法建立网络连接"
 
 #: ../libtransmission/ip-cache.cc:305
 msgid "Your machine does not support {protocol}"

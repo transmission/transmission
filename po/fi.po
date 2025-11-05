@@ -6,8 +6,8 @@
 # Translators:
 # Otto Koskelah <otto@nise.fi>, 2017
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2023
-# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2025
 # Mike Gelfand <mikedld@mikedld.com>, 2025
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2025\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2025\n"
 "Language-Team: Finnish (https://app.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -2182,7 +2182,7 @@ msgstr "Lähteen päivitys onnistui {protocol} osoitteeseen {ip}"
 
 #: ../libtransmission/ip-cache.cc:297
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Ei saatu osoitetta yhdestäkään protokollasta, yhteydet eivät ole mahdollisia."
 
 #: ../libtransmission/ip-cache.cc:305
 msgid "Your machine does not support {protocol}"

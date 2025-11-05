@@ -8,9 +8,9 @@
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
 # c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
 # Béla Bajza, 2022
-# Balázs Meskó <meskobalazs@mailbox.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
 # Anon, 2024
+# Balázs Meskó <meskobalazs@mailbox.org>, 2025
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Anon, 2024\n"
+"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2025\n"
 "Language-Team: Hungarian (https://app.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -878,35 +878,35 @@ msgstr "Új tiltólista beszerzése…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "ismeretlen"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "ellenőrzés…"
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "nyitva"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "zárva"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "hiba"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Állapot: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Állapot: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2137,11 +2137,11 @@ msgstr "Ismeretlen hiba"
 
 #: ../libtransmission/announcer-udp.cc:423
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} kapcsolat sikertelen"
 
 #: ../libtransmission/announcer-udp.cc:542
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Nem sikerült lekérni a „{address}:{port}” {ip_protocol} protokollon: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2194,7 +2194,7 @@ msgstr "Sikeresen frissítette a forrás {protocol} címet {ip}-re"
 
 #: ../libtransmission/ip-cache.cc:297
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Egyetlen IP protokollon sem sikerült lekérni a forráscímet, a hálózati kapcsolat nem lehetséges"
 
 #: ../libtransmission/ip-cache.cc:305
 msgid "Your machine does not support {protocol}"
@@ -2270,7 +2270,7 @@ msgstr "A helyi cím: '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "A helyi port ({local_port}) nincs ide továbbítva: {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2282,7 +2282,7 @@ msgstr "Porttovábbítás '{url}' címen keresztül, szolgáltatás: '{type}'. (
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "Helyi port ({local_port}) továbbítva ide: {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"

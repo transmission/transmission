@@ -8,7 +8,7 @@
 # Nathan Follens, 2020
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
-# Gideon van Melle <translations@gvmelle.com>, 2024
+# Gideon van Melle <translations@gvmelle.com>, 2025
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Gideon van Melle <translations@gvmelle.com>, 2024\n"
+"Last-Translator: Gideon van Melle <translations@gvmelle.com>, 2025\n"
 "Language-Team: Dutch (https://app.transifex.com/transmissionbt/teams/33778/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -876,35 +876,35 @@ msgstr "Nieuwe blokkadelijst wordt opgehaald…"
 #: ../gtk/PrefsDialog.cc:954
 msgctxt "Port test status"
 msgid "unknown"
-msgstr ""
+msgstr "onbekend"
 
 #: ../gtk/PrefsDialog.cc:956
 msgctxt "Port test status"
 msgid "checking…"
-msgstr ""
+msgstr "controleren..."
 
 #: ../gtk/PrefsDialog.cc:958
 msgctxt "Port test status"
 msgid "open"
-msgstr ""
+msgstr "open"
 
 #: ../gtk/PrefsDialog.cc:960
 msgctxt "Port test status"
 msgid "closed"
-msgstr ""
+msgstr "gesloten"
 
 #: ../gtk/PrefsDialog.cc:962
 msgctxt "Port test status"
 msgid "error"
-msgstr ""
+msgstr "fout"
 
 #: ../gtk/PrefsDialog.cc:975
 msgid "Status: <b>{status}</b>"
-msgstr ""
+msgstr "Status: <b>{status}</b>"
 
 #: ../gtk/PrefsDialog.cc:977
 msgid "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
-msgstr ""
+msgstr "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)"
 
 #: ../gtk/RelocateDialog.cc:86
 msgid "Moving '{torrent_name}'"
@@ -2135,11 +2135,11 @@ msgstr "Onbekende fout"
 
 #: ../libtransmission/announcer-udp.cc:423
 msgid "{ip_protocol} connection failed"
-msgstr ""
+msgstr "{ip_protocol} verbinding mislukt"
 
 #: ../libtransmission/announcer-udp.cc:542
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
-msgstr ""
+msgstr "Kon niet nakijken '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 
 #: ../libtransmission/announcer.cc:898
 msgid "Announce error: {error} ({url})"
@@ -2192,7 +2192,7 @@ msgstr "Succesvol geüpdatete bron {protocol} naar adres {ip}"
 
 #: ../libtransmission/ip-cache.cc:297
 msgid "Couldn't obtain source address in any IP protocol, no network connections possible"
-msgstr ""
+msgstr "Kan geen bronadres verkrijgen in een IP-protocol, geen netwerkverbindingen mogelijk"
 
 #: ../libtransmission/ip-cache.cc:305
 msgid "Your machine does not support {protocol}"
@@ -2268,7 +2268,7 @@ msgstr "Lokaal adres is '{address}'"
 
 #: ../libtransmission/port-forwarding-upnp.cc:300
 msgid "Local port {local_port} is not forwarded to {advertised_port}"
-msgstr ""
+msgstr "Lokale poort {local_port} wordt niet doorgestuurd naar {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:312
 msgid "Stopping port forwarding through '{url}', service '{type}'"
@@ -2280,7 +2280,7 @@ msgstr "Port forwarding door '{url}', service '{type}'. (lokaal adres: {address}
 
 #: ../libtransmission/port-forwarding-upnp.cc:354
 msgid "Forwarded local port {local_port} to {advertised_port}"
-msgstr ""
+msgstr "Doorgestuurde lokale poort {local_port} naar {advertised_port}"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
@@ -2316,27 +2316,27 @@ msgstr "Unix socket pad moet minder zijn dan {count} lettertekens (inclusief '{p
 
 #: ../libtransmission/rpc-server.cc:342
 msgid "Rejected request from {host} (possible directory traversal attack)"
-msgstr ""
+msgstr "Afgewezen verzoek van {host} (Mogelijke directory traversal-aanval)"
 
 #: ../libtransmission/rpc-server.cc:506
 msgid "Rejected request from {host} (brute force protection active)"
-msgstr ""
+msgstr "Afgewezen verzoek van {host} (Brute Force bescherming actief)"
 
 #: ../libtransmission/rpc-server.cc:515
 msgid "Rejected request from {host} (IP not whitelisted)"
-msgstr ""
+msgstr "Afgewezen verzoek van {host} (IP niet op de witte lijst)"
 
 #: ../libtransmission/rpc-server.cc:538
 msgid "Rejected request from {host} (failed authentication)"
-msgstr ""
+msgstr "Afgewezen verzoek van {host} (Mislukte authenticatie)"
 
 #: ../libtransmission/rpc-server.cc:580
 msgid "Rejected request from {host} (Host not whitelisted)"
-msgstr ""
+msgstr "Afgewezen verzoek van {host} (Host niet op de witte lijst)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unknown URI from {host}: '{uri}'"
-msgstr ""
+msgstr "Onbekende URI van {host}: '{uri}'"
 
 #: ../libtransmission/rpc-server.cc:631
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
@@ -2464,7 +2464,7 @@ msgstr "Torrent pauzeren"
 
 #: ../libtransmission/torrent.cc:723
 msgid "Couldn't remove all torrent files: {error} ({error_code})"
-msgstr ""
+msgstr "Kan niet alle torrent-bestanden verwijderen: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:789
 msgid "Removing torrent"
@@ -2492,11 +2492,11 @@ msgstr "Kon '{address}niet opzoeken:{port}': {error} ({error_code})"
 
 #: ../libtransmission/tr-lpd.cc:270 ../libtransmission/tr-lpd.cc:283
 msgid "Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Kan niet initialiseren {ip_protocol} LPD: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:180
 msgid "Couldn't make IPv4 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kan de IPv4-socket niet niet-blokkerend maken {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:191
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2504,7 +2504,7 @@ msgstr "Kan IPv4-socket {address}niet binden: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:225
 msgid "Couldn't make IPv6 socket non-blocking {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kan de IPv6-socket niet niet-blokkerend maken {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:236
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
@@ -2564,15 +2564,15 @@ msgstr "Kon niet wachten op map wijzigingen"
 
 #: ../libtransmission/web.cc:173 ../libtransmission/web.cc:182
 msgid "Consider upgrading your curl installation."
-msgstr ""
+msgstr "Overweeg om uw curl installatie te upgraden."
 
 #: ../libtransmission/web.cc:175
 msgid "curl {curl_version} is prone to SIGPIPE crashes. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} is gevoelig voor SIGPIPE-crashes. {details_url}"
 
 #: ../libtransmission/web.cc:184
 msgid "curl {curl_version} is prone to an eventfd double close vulnerability that might cause SIGABRT crashes for the transmission-daemon systemd service. {details_url}"
-msgstr ""
+msgstr "curl {curl_version} is vatbaar voor een eventfd double close kwetsbaarheid die SIGABRT-crashes kan veroorzaken voor de transmission-daemon systemd-service. {details_url}"
 
 #: ../libtransmission/web.cc:201
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
