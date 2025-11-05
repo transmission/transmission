@@ -194,6 +194,11 @@ using tr_sha256_string = tr_strbuf<char, sizeof(tr_sha256_digest_t) * 2U + 1U>;
  */
 [[nodiscard]] std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
 
+/**
+ * @brief Calculate CRC32-C checksum for a buffer.
+ */
+[[nodiscard]] uint32_t tr_crc32c(uint8_t const* data, size_t count);
+
 // Convenience utility to efficiently get many random small values.
 // Use this instead of making a lot of calls to tr_rand_int().
 template<typename T = uint8_t, size_t N = 1024U>
@@ -202,22 +207,22 @@ class tr_salt_shaker // NOLINT(cppcoreguidelines-pro-type-member-init): buf does
 public:
     [[nodiscard]] auto operator()() noexcept
     {
-        if (pos == std::size(buf))
+        if (pos_ == std::size(buf_))
         {
-            pos = 0U;
+            pos_ = 0U;
         }
 
-        if (pos == 0U)
+        if (pos_ == 0U)
         {
-            tr_rand_buffer(std::data(buf), std::size(buf) * sizeof(T));
+            tr_rand_buffer(std::data(buf_), std::size(buf_) * sizeof(T));
         }
 
-        return buf[pos++];
+        return buf_[pos_++];
     }
 
 private:
-    size_t pos = 0;
-    std::array<T, N> buf;
+    size_t pos_ = 0;
+    std::array<T, N> buf_;
 };
 
 // UniformRandomBitGenerator impl that uses `tr_rand_buffer()`.
