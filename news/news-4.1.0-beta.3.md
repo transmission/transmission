@@ -23,6 +23,7 @@ performance improvements.
 
 * Reimplemented QuickLook previews for torrent files with Quick Look preview extension API on macOS 12+. ([#7213](https://github.com/transmission/transmission/pull/7213))
 * Use modern macOS APIs to prevent idle system sleep and add support for Low Power Mode. ([#7543](https://github.com/transmission/transmission/pull/7543))
+* Updated app icon for Liquid Glass. ([#7736](https://github.com/transmission/transmission/pull/7736))
 
 ### Qt Client
 
@@ -49,6 +50,7 @@ performance improvements.
 
 * Require CMake 3.16.3 or higher to build Transmission. ([#7576](https://github.com/transmission/transmission/pull/7576))
 * Configuring Transmission's CMake project no longer inserts third-party submodules to CMake's user package registry. ([#7648](https://github.com/transmission/transmission/pull/7648))
+* Sync translations. ([#7768](https://github.com/transmission/transmission/pull/7768))
 
 ## Thank You!
 
