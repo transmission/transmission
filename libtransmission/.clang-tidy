@@ -45,6 +45,7 @@ CheckOptions:
   - { key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor,  value: true       }
   - { key: readability-identifier-naming.ConstexprVariableCase,              value: CamelCase  }
   - { key: readability-identifier-naming.ParameterCase,                      value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,                value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,              value: _          }
   - { key: readability-identifier-naming.VariableCase,                       value: lower_case }
   - { key: readability-implicit-bool-conversion.UseUpperCaseLiteralSuffix,   value: true       }
-
