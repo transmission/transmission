@@ -42,6 +42,9 @@ target_sources(${TR_NAME}-qt
         FilterBarComboBoxDelegate.h
         Filters.cc
         Filters.h
+        FontIconEngine.cc
+        FontIconEngine.h
+        FontIcons.json
         Formatter.cc
         Formatter.h
         FreeSpaceLabel.cc

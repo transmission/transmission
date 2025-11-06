@@ -11,6 +11,7 @@
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QProcess>
 #include <QRect>
 #include <QSystemTrayIcon>
@@ -140,11 +141,15 @@ Application::Application(
     loadTranslations();
     initUnits();
 
+    auto const old_theme_name = QIcon::themeName();
+    QIcon::setThemeName(QStringLiteral("TrFontIcons"));
+    QIcon::setFallbackThemeName(old_theme_name);
+
 #if defined(_WIN32) || defined(__APPLE__)
 
     if (QIcon::themeName().isEmpty())
     {
-        QIcon::setThemeName(QStringLiteral("Faenza"));
+        QIcon::setThemeName(FontIconEngine::isValidTheme() ? FontIconEngine::themeName() : QStringLiteral("Faenza"));
     }
 
 #endif
@@ -529,9 +534,10 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(QVariantMap{ {
-            std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
-        } }); // hints
+        args.append(
+            QVariantMap{ {
+                std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
+            } }); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);
