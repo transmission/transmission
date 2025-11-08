@@ -16,6 +16,10 @@ export class ActionManager extends EventTarget {
       'move-down': { enabled: false, text: 'Down' },
       'move-top': { enabled: false, text: 'Top' },
       'move-up': { enabled: false, text: 'Up' },
+      'open-appearance-settings': {
+        enabled: true,
+        text: 'Appearance settings',
+      },
       'open-torrent': {
         enabled: true,
         shortcut: 'O',
