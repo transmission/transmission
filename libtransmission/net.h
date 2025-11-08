@@ -556,3 +556,5 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
+
+[[nodiscard]] int tr_make_listen_socket_ipv6only(tr_socket_t sock);
