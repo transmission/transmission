@@ -145,7 +145,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents(false);
+          this._removeSelectedTorrents();
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -208,9 +208,6 @@ export class Transmission extends EventTarget {
             this.prefs.display_mode === Prefs.DisplayCompact
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
-          break;
-        case 'trash-selected-torrents':
-          this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
@@ -928,12 +925,10 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _removeSelectedTorrents(trash) {
+  _removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(
-        new RemoveDialog({ remote: this.remote, torrents, trash }),
-      );
+      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
     }
   }
 
