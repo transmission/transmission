@@ -257,6 +257,8 @@ struct tr_address
         return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
     }
 
+    [[nodiscard]] std::optional<tr_address> from_ipv4_mapped() const noexcept;
+
     tr_address_type type = NUM_TR_AF_INET_TYPES;
     union
     {

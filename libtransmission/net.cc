@@ -798,6 +798,16 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     return false;
 }
 
+std::optional<tr_address> tr_address::from_ipv4_mapped() const noexcept
+{
+    if (!is_ipv4_mapped_address())
+    {
+        return {};
+    }
+
+    return from_compact_ipv4(reinterpret_cast<std::byte const*>(&addr.addr6.s6_addr) + 12).first;
+}
+
 // --- tr_socket_addrses
 
 std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
