@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-27 09:20+0000\n"
+"POT-Creation-Date: 2025-11-02 17:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Iñigo Zendegi Urzelai, 2023\n"
 "Language-Team: Basque (https://app.transifex.com/transmissionbt/teams/33778/eu/)\n"
@@ -35,67 +35,71 @@ msgstr "Bat ere ez"
 msgid "Inf"
 msgstr "Inf."
 
-#: ../daemon/daemon.cc:207 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
+#: ../daemon/daemon.cc:211 ../gtk/Session.cc:811 ../libtransmission/blocklist.cc:62 ../libtransmission/blocklist.cc:241 ../libtransmission/blocklist.cc:339 ../libtransmission/blocklist.cc:354 ../libtransmission/inout.cc:159 ../libtransmission/utils.cc:138 ../libtransmission/utils.cc:157 ../libtransmission/utils.cc:168 ../libtransmission/watchdir.cc:118
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "Ezin da irakurri '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:232 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
+#: ../daemon/daemon.cc:236 ../gtk/Session.cc:863 ../gtk/Utils.cc:280 ../libtransmission/watchdir.cc:91
 msgid "Couldn't add torrent file '{path}'"
 msgstr "Ezin da gehitu '{path}' torrent fitxategia"
 
-#: ../daemon/daemon.cc:241
+#: ../daemon/daemon.cc:245
 msgid "Removing torrent file '{path}'"
 msgstr "'{path}' torrent fitxategia ezabatzen"
 
-#: ../daemon/daemon.cc:246 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
+#: ../daemon/daemon.cc:250 ../gtk/Utils.cc:563 ../libtransmission/utils.cc:636
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "Ezin da ezabatu '{path}': {error} ({error_code})"
 
-#: ../daemon/daemon.cc:655
+#: ../daemon/daemon.cc:659
 msgid "Couldn't parse log level '{level}'"
 msgstr "Ezin da '{level}' erregistro-maila parekatu"
 
-#: ../daemon/daemon.cc:703
+#: ../daemon/daemon.cc:707
 msgid "Deferring reload until session is fully started."
 msgstr "Berriz kargatzea atzeratzen saioa guztiz hasi bitartean."
 
-#: ../daemon/daemon.cc:717
+#: ../daemon/daemon.cc:719
+msgid "Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})"
+msgstr ""
+
+#: ../daemon/daemon.cc:740
 msgid "Reloading settings from '{path}'"
 msgstr "Ezarpenak berriz kargatzen '{path}'(e)tik"
 
-#: ../daemon/daemon.cc:741
+#: ../daemon/daemon.cc:766
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "Ezin izan da daemon-a abiarazi: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:753
+#: ../daemon/daemon.cc:778
 msgid "Loading settings from '{path}'"
 msgstr "Ezarpenak '{path}' helbidetik kargatzen"
 
-#: ../daemon/daemon.cc:774
+#: ../daemon/daemon.cc:799
 msgid "Saved pidfile '{path}'"
 msgstr "Gordetako '{path}' pidfile-a"
 
-#: ../daemon/daemon.cc:780 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1008 ../libtransmission/torrent.cc:1997 ../libtransmission/variant.cc:876
+#: ../daemon/daemon.cc:805 ../gtk/MessageLogWindow.cc:244 ../libtransmission/blocklist.cc:73 ../libtransmission/blocklist.cc:475 ../libtransmission/inout.cc:154 ../libtransmission/rpcimpl.cc:1258 ../libtransmission/torrent.cc:1008 ../libtransmission/torrent.cc:1997 ../libtransmission/variant.cc:876
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "Ezin izan da '{path}' gorde: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:789
+#: ../daemon/daemon.cc:814
 msgid "Requiring authentication"
 msgstr "Autentifikazioa eskatzen"
 
-#: ../daemon/daemon.cc:811
+#: ../daemon/daemon.cc:836
 msgid "Watching '{path}' for new torrent files"
 msgstr "'{path}'  begiratzen torrent fitxategi berrien bila"
 
-#: ../daemon/daemon.cc:856 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
+#: ../daemon/daemon.cc:881 ../libtransmission/watchdir-kqueue.cc:116 ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr "Ezin izan da ekitaldia sortu: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:866 ../libtransmission/watchdir-kqueue.cc:126
+#: ../daemon/daemon.cc:891 ../libtransmission/watchdir-kqueue.cc:126
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "Ezin izan da ekitaldia gehitu: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:880
+#: ../daemon/daemon.cc:905
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "Ezin izan da daemon-ekitaldi buklea abiarazi: {error} ({error_code})"
 
@@ -2096,23 +2100,23 @@ msgstr "Ireki torrent-a URL batetik"
 msgid "_URL"
 msgstr "_URLa"
 
-#: ../libtransmission/announcer-http.cc:462
+#: ../libtransmission/announcer-http.cc:453
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "Ezin izan da iragarpen erantzuna aztertu: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:682
+#: ../libtransmission/announcer-http.cc:673
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "Ezin izan da zuriketa erantzuna aztertu: {error} ({error_code})"
 
-#: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:261
+#: ../libtransmission/announcer-udp.cc:147 ../libtransmission/announcer-udp.cc:308
 msgid "Unknown error"
 msgstr "Errore ezezaguna"
 
-#: ../libtransmission/announcer-udp.cc:376
+#: ../libtransmission/announcer-udp.cc:423
 msgid "{ip_protocol} connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:495
+#: ../libtransmission/announcer-udp.cc:542
 msgid "Couldn't look up '{address}:{port}' in {ip_protocol}: {error} ({error_code})"
 msgstr ""
 
@@ -2126,15 +2130,15 @@ msgid_plural "Announce error: {error} (Retrying in {count} seconds) ({url})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1035 ../libtransmission/announcer.cc:1363
+#: ../libtransmission/announcer.cc:1046 ../libtransmission/announcer.cc:1368
 msgid "Could not connect to tracker"
 msgstr "Ezin izan da aztarnariarekin konektatu"
 
-#: ../libtransmission/announcer.cc:1039 ../libtransmission/announcer.cc:1367
+#: ../libtransmission/announcer.cc:1050 ../libtransmission/announcer.cc:1372
 msgid "Tracker did not respond"
 msgstr "Aztarnariak ez du erantzun"
 
-#: ../libtransmission/announcer.cc:1095
+#: ../libtransmission/announcer.cc:1110
 msgid "Success"
 msgstr "Behar bezala gauzatu da"
 
@@ -2189,19 +2193,19 @@ msgstr "'{path}' alde batera uzten: {error} ({error_code})"
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr "Ezin izan da socket-a sortu: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:269
+#: ../libtransmission/net.cc:268
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr "Ezin izan da {address} jatorrizko helbidea zehaztu {socket} socket-ean: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:288
+#: ../libtransmission/net.cc:287
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr "Ezin izan da konektatu {socket}socket-a {address} helbidera:{port}: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:352
+#: ../libtransmission/net.cc:351
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "Ezin izan da lotu {port} ataka {address} helbidean: {error} ({error_code}) -- Dagoeneko Transmission-eko beste kopia bat martxan dago?"
 
-#: ../libtransmission/net.cc:353
+#: ../libtransmission/net.cc:352
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "Ezin izan da lotu {port} ataka {address}helbidean: {error} ({error_code})"
 
@@ -2217,7 +2221,7 @@ msgstr "Ezin izan da '{path}' aurrez esleitu: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "Ezin izan da '{path}' moztu: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:674
+#: ../libtransmission/peer-io.cc:673
 msgid "Unknown state: {state}"
 msgstr "Egoera ezezaguna: {state}"
 
@@ -2577,25 +2581,25 @@ msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] "{piece_count:L} zati, {piece_size}\n"
 msgstr[1] "{piece_count:L} zati, {piece_size} bakoitzak\n"
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:138
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "ordu"
 msgstr[1] "ordu"
 
-#: ../utils/remote.cc:141
+#: ../utils/remote.cc:139
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minutu"
 msgstr[1] "minutu"
 
-#: ../utils/remote.cc:142 ../utils/remote.cc:162
+#: ../utils/remote.cc:140 ../utils/remote.cc:160
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] "segundo"
 msgstr[1] "segundo"
 
-#: ../utils/remote.cc:146
+#: ../utils/remote.cc:144
 msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"

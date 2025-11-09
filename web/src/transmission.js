@@ -54,11 +54,9 @@ export class Transmission extends EventTarget {
       ['#toolbar-inspector', 'inspector'],
       ['#toolbar-overflow', 'overflow'],
     ]) {
-      const e = document.querySelector(selector);
-      while (e.firstChild) {
-        e.lastChild.remove();
-      }
-      e.append(icon[name]());
+      document
+        .querySelector(selector)
+        .prepend(icon[name](), document.createElement('BR'));
     }
 
     document.querySelector('.speed-container').append(icon.speedDown());
@@ -90,6 +88,8 @@ export class Transmission extends EventTarget {
       y: 0,
     });
     this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
+
+    this.busytyping = false;
 
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
@@ -145,7 +145,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents(false);
+          this._removeSelectedTorrents();
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -209,9 +209,6 @@ export class Transmission extends EventTarget {
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
           break;
-        case 'trash-selected-torrents':
-          this._removeSelectedTorrents(true);
-          break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
           break;
@@ -245,6 +242,20 @@ export class Transmission extends EventTarget {
 
     e = document.querySelector('#filter-tracker');
     newOpts(e, null, [['All', Prefs.FilterAll]]);
+
+    const s = document.querySelector('#torrent-search');
+    e = document.querySelector('#reset');
+    e.addEventListener('click', () => {
+      s.value = '';
+      this._setFilterText(s.value);
+      this.refilterAllSoon();
+    });
+
+    if (s.value.trim()) {
+      this.filterText = s.value;
+      e.style.display = 'block';
+      this.refilterAllSoon();
+    }
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -475,7 +486,11 @@ export class Transmission extends EventTarget {
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
     e.addEventListener('focus', () => e.classList.remove(blur_token));
-    e.addEventListener('keyup', () => this._setFilterText(e.value));
+    e.addEventListener('input', () => {
+      if (e.value.trim() !== this.filterText) {
+        this._setFilterText(e.value);
+      }
+    });
   }
 
   _onPrefChanged(key, value) {
@@ -885,8 +900,15 @@ export class Transmission extends EventTarget {
   }
 
   _setFilterText(search) {
-    this.filterText = search ? search.trim() : null;
-    this.refilterAllSoon();
+    clearTimeout(this.busytyping);
+    this.busytyping = setTimeout(
+      () => {
+        this.busytyping = false;
+        this.filterText = search.trim();
+        this.refilterAllSoon();
+      },
+      search ? 250 : 0,
+    );
   }
 
   _onTorrentChanged(event_) {
@@ -1042,12 +1064,10 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _removeSelectedTorrents(trash) {
+  _removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(
-        new RemoveDialog({ remote: this.remote, torrents, trash }),
-      );
+      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
     }
   }
 
