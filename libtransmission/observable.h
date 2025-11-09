@@ -83,10 +83,9 @@ public:
     {
         auto const key = next_key++;
         observers_.emplace(key, std::move(observer));
-        return ObserverTag{ [this, key]()
-                            {
-                                remove(key);
-                            } };
+        // clang-format off
+        return ObserverTag{ [this, key]() { remove(key); } };
+        // clang-format on
     }
 
     void emit(Args... args) const

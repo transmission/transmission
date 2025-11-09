@@ -258,13 +258,15 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     }
 }
 
-- (NSString*)connectedTextFrom:(NSUInteger)tracker //
+// clang-format off
+- (NSString*)connectedTextFrom:(NSUInteger)tracker
                               :(NSUInteger)incoming
                               :(NSUInteger)cache
                               :(NSUInteger)lpd
                               :(NSUInteger)pex
                               :(NSUInteger)dht
                               :(NSUInteger)ltep
+// clang-format on
 {
     NSMutableArray* fromComponents = [NSMutableArray arrayWithCapacity:7];
     if (tracker > 0)
