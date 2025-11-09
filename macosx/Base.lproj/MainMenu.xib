@@ -656,7 +656,7 @@
                                     </connections>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Copy Magnet Link to Clipboard" image="clipboard" catalog="system" id="3216">
+                            <menuItem title="Copy Magnet Link to Clipboard" id="3216">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="copyMagnetLinks:" target="206" id="3217"/>
@@ -877,7 +877,7 @@ CA
                                     <action selector="removeDeleteData:" target="206" id="1547"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove All Completed From List" image="trash.square" catalog="system" id="3407">
+                            <menuItem title="Remove All Completed From List" image="trash.circle.fill" catalog="system" id="3407">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="clearCompleted:" target="206" id="3409"/>
@@ -1000,7 +1000,7 @@ CA
                                     <action selector="showStatsWindow:" target="206" id="2302"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Message Log" image="bubble" catalog="system" keyEquivalent="3" id="1795">
+                            <menuItem title="Message Log" image="text.bubble" catalog="system" keyEquivalent="3" id="1795">
                                 <connections>
                                     <action selector="showMessageWindow:" target="206" id="1796"/>
                                 </connections>
@@ -1032,7 +1032,7 @@ CA
                                     <action selector="linkHomepage:" target="206" id="1560"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Forums" image="bubble.left.and.text.bubble.right" catalog="system" id="418">
+                            <menuItem title="Forums" image="bubble.left.and.bubble.right" catalog="system" id="418">
                                 <connections>
                                     <action selector="linkForums:" target="206" id="421"/>
                                 </connections>
@@ -1148,7 +1148,7 @@ CA
                         </connections>
                     </menu>
                 </menuItem>
-                <menuItem title="Copy Magnet Link to Clipboard" image="clipboard" catalog="system" id="3218">
+                <menuItem title="Copy Magnet Link to Clipboard" id="3218">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="copyMagnetLinks:" target="206" id="3219"/>
@@ -1180,7 +1180,7 @@ CA
         </menu>
         <menu title="Menu" id="589" userLabel="ContextNoRowMenu">
             <items>
-                <menuItem title="Create Torrent File…" image="document.badge.plus" catalog="system" id="1923">
+                <menuItem title="Create Torrent File…" image="doc.badge.plus" catalog="system" id="1923">
                     <connections>
                         <action selector="createFile:" target="206" id="1924"/>
                     </connections>
@@ -1231,9 +1231,7 @@ CA
         <image name="arrow.up.arrow.down" catalog="system" width="18" height="15"/>
         <image name="arrow.up.doc" catalog="system" width="14" height="16"/>
         <image name="bandage" catalog="system" width="16" height="16"/>
-        <image name="bubble" catalog="system" width="17" height="16"/>
-        <image name="bubble.left.and.text.bubble.right" catalog="system" width="22" height="17"/>
-        <image name="clipboard" catalog="system" width="14" height="19"/>
+        <image name="bubble.left.and.bubble.right" catalog="system" width="22" height="17"/>
         <image name="doc.badge.plus" catalog="system" width="16" height="18"/>
         <image name="document.on.trash" catalog="system" width="17" height="20"/>
         <image name="eye" catalog="system" width="21" height="13"/>
@@ -2367,8 +2365,9 @@ WQABAl4AAQJmAAAAAAAABAEAAAAAAAAARQAAAAAAAAAAAAAAAAABAmk
         <image name="puzzlepiece" catalog="system" width="22" height="15"/>
         <image name="square.and.arrow.up" catalog="system" width="15" height="18"/>
         <image name="stopwatch" catalog="system" width="15" height="17"/>
+        <image name="text.bubble" catalog="system" width="17" height="16"/>
         <image name="tortoise" catalog="system" width="25" height="13"/>
         <image name="trash" catalog="system" width="15" height="17"/>
-        <image name="trash.square" catalog="system" width="15" height="14"/>
+        <image name="trash.circle.fill" catalog="system" width="15" height="15"/>
     </resources>
 </document>
