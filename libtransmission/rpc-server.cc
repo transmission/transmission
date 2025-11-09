@@ -28,8 +28,8 @@
 #include <event2/http.h>
 #include <event2/listener.h>
 
-#include <fmt/core.h>
 #include <fmt/chrono.h>
+#include <fmt/format.h>
 
 #include <libdeflate.h>
 
@@ -389,8 +389,20 @@ bool is_address_allowed(tr_rpc_server const* server, char const* address)
         return true;
     }
 
+    // Convert IPv4-mapped address to IPv4 address
+    // so that it can match with IPv4 whitelist entries
+    auto native = std::string{};
+    if (auto ipv4_mapped = tr_address::from_string(address); ipv4_mapped)
+    {
+        if (auto addr = ipv4_mapped->from_ipv4_mapped(); addr)
+        {
+            native = addr->display_name();
+        }
+    }
+    auto const* const addr = std::empty(native) ? address : native.c_str();
+
     auto const& src = server->whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
+    return std::any_of(std::begin(src), std::end(src), [&addr](auto const& s) { return tr_wildmat(addr, s.c_str()); });
 }
 
 bool isIPAddressWithOptionalPort(char const* host)
@@ -440,7 +452,11 @@ bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request* const req)
     }
 
     auto const& src = server->host_whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&hostname](auto const& str) { return tr_wildmat(hostname, str); });
+    auto const hostname_sz = tr_urlbuf{ hostname };
+    return std::any_of(
+        std::begin(src),
+        std::end(src),
+        [&hostname_sz](auto const& str) { return tr_wildmat(hostname_sz, str.c_str()); });
 }
 
 bool test_session_id(tr_rpc_server const* server, evhttp_request* const req)
@@ -777,13 +793,15 @@ auto parse_whitelist(std::string_view whitelist)
 {
     auto list = std::vector<std::string>{};
 
-    while (!std::empty(whitelist))
+    auto item = std::string_view{};
+    while (tr_strv_sep(&whitelist, &item, ",;"sv))
     {
-        auto const pos = whitelist.find_first_of(" ,;"sv);
-        auto const token = tr_strv_strip(whitelist.substr(0, pos));
-        list.emplace_back(token);
-        tr_logAddInfo(fmt::format(fmt::runtime(_("Added '{entry}' to host whitelist")), fmt::arg("entry", token)));
-        whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
+        item = tr_strv_strip(item);
+        if (!std::empty(item))
+        {
+            list.emplace_back(item);
+            tr_logAddInfo(fmt::format(fmt::runtime(_("Added '{entry}' to host whitelist")), fmt::arg("entry", item)));
+        }
     }
 
     return list;

@@ -234,6 +234,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "peer-socket-tos"sv,
     "peerIsChoked"sv,
     "peerIsInterested"sv,
+    "peer_id"sv,
     "peers"sv,
     "peers2"sv,
     "peers2-6"sv,

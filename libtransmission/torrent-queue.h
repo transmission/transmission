@@ -31,6 +31,7 @@ public:
         : mediator_{ mediator }
     {
     }
+    ~tr_torrent_queue() = default;
     tr_torrent_queue(tr_torrent_queue const&) = delete;
     tr_torrent_queue(tr_torrent_queue&&) = delete;
     tr_torrent_queue& operator=(tr_torrent_queue const&) = delete;
@@ -42,7 +43,7 @@ public:
     [[nodiscard]] size_t get_pos(tr_torrent_id_t id);
     void set_pos(tr_torrent_id_t id, size_t new_pos);
 
-    bool to_file() const;
+    bool to_file() const; // NOLINT(modernize-use-nodiscard)
     [[nodiscard]] std::vector<std::string> from_file();
 
     static auto constexpr MinQueuePosition = size_t{};

@@ -25,7 +25,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -335,7 +335,7 @@ private:
         if constexpr (ip_protocol == TR_AF_INET6)
         {
             // must be done before binding on Linux
-            if (evutil_make_listen_socket_ipv6only(sock) == -1)
+            if (tr_make_listen_socket_ipv6only(sock) == -1)
             {
                 return false;
             }

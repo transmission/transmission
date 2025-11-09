@@ -2,13 +2,12 @@
 Description=Transmission BitTorrent Daemon
 Wants=network-online.target
 After=network-online.target
-Documentation=man:transmission-daemon(1)
+Documentation=man:@TR_NAME@-daemon(1)
 
 [Service]
 User=transmission
-Type=notify
-ExecStart=/usr/bin/transmission-daemon -f --log-level=error
-ExecReload=/bin/kill -s HUP $MAINPID
+Type=notify-reload
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/@TR_NAME@-daemon -f --log-level=error
 
 # Hardening
 CapabilityBoundingSet=

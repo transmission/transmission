@@ -96,7 +96,7 @@ protected:
         return watchdir;
     }
 
-    void createFile(std::string_view dirname, std::string_view basename, std::string_view contents = ""sv)
+    static void createFile(std::string_view dirname, std::string_view basename, std::string_view contents = ""sv)
     {
         createFileWithContents(tr_pathbuf{ dirname, '/', basename }, contents);
     }

@@ -27,7 +27,7 @@
 
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -97,6 +97,15 @@ tr_address_type tr_af_to_ip_protocol(int af)
         TR_ASSERT_MSG(false, "invalid address family");
         return NUM_TR_AF_INET_TYPES;
     }
+}
+
+int tr_make_listen_socket_ipv6only(tr_socket_t const sock)
+{
+#if defined(IPV6_V6ONLY)
+    int optval = 1;
+    return setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval));
+#endif
+    return 0;
 }
 
 // - TCP Sockets
@@ -233,9 +242,8 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     auto const& [addr, port] = socket_address;
 
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
+    if (!session->allowsTCP() || !socket_address.is_valid())
     {
         return TR_BAD_SOCKET;
     }
@@ -326,7 +334,7 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)evutil_make_listen_socket_reuseable(fd);
 
-    if (addr.is_ipv6() && evutil_make_listen_socket_ipv6only(fd) != 0 &&
+    if (addr.is_ipv6() && tr_make_listen_socket_ipv6only(fd) == -1 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
@@ -487,7 +495,7 @@ std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* comp
 
 std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {
-    auto const address_sz = tr_strbuf<char, TR_ADDRSTRLEN>{ address_sv };
+    auto const address_sz = tr_strbuf<char, TrAddrStrlen>{ address_sv };
 
     auto ss = sockaddr_storage{};
     auto sslen = int{ sizeof(ss) };
@@ -795,6 +803,16 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     return false;
 }
 
+std::optional<tr_address> tr_address::from_ipv4_mapped() const noexcept
+{
+    if (!is_ipv4_mapped_address())
+    {
+        return {};
+    }
+
+    return from_compact_ipv4(reinterpret_cast<std::byte const*>(&addr.addr6.s6_addr) + 12).first;
+}
+
 // --- tr_socket_addrses
 
 std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
@@ -814,8 +832,7 @@ std::optional<tr_socket_address> tr_socket_address::from_string(std::string_view
 {
     auto ss = sockaddr_storage{};
     auto sslen = int{ sizeof(ss) };
-    if (evutil_parse_sockaddr_port(tr_strbuf<char, TR_ADDRSTRLEN>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) !=
-        0)
+    if (evutil_parse_sockaddr_port(tr_strbuf<char, TrAddrStrlen>{ sockaddr_sv }, reinterpret_cast<sockaddr*>(&ss), &sslen) != 0)
     {
         return {};
     }

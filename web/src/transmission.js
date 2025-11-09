@@ -23,7 +23,14 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { debounce, deepEqual, setEnabled, setTextContent } from './utils.js';
+import {
+  newOpts,
+  icon,
+  debounce,
+  deepEqual,
+  setEnabled,
+  setTextContent,
+} from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -34,6 +41,28 @@ export class Transmission extends EventTarget {
     this.notifications = notifications;
     this.prefs = prefs;
     this.remote = new Remote(this);
+    this.speed = {
+      down: document.querySelector('#speed-down'),
+      up: document.querySelector('#speed-up'),
+    };
+
+    for (const [selector, name] of [
+      ['#toolbar-open', 'open'],
+      ['#toolbar-delete', 'delete'],
+      ['#toolbar-start', 'start'],
+      ['#toolbar-pause', 'pause'],
+      ['#toolbar-inspector', 'inspector'],
+      ['#toolbar-overflow', 'overflow'],
+    ]) {
+      document
+        .querySelector(selector)
+        .prepend(icon[name](), document.createElement('BR'));
+    }
+
+    document.querySelector('.speed-container').append(icon.speedDown());
+    document
+      .querySelector('.speed-container + .speed-container')
+      .append(icon.speedUp());
 
     this.addEventListener('torrent-selection-changed', (event_) =>
       this.action_manager.update(event_),
@@ -43,6 +72,7 @@ export class Transmission extends EventTarget {
     this.filterText = '';
     this._torrents = {};
     this._rows = [];
+    this.oldTrackers = [];
     this.dirtyTorrents = new Set();
 
     this.changeStatus = false;
@@ -50,12 +80,14 @@ export class Transmission extends EventTarget {
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
     this.pointer_device = Object.seal({
-      is_touch_device: 'ontouchstart' in window,
+      is_touch_device: 'ontouchstart' in globalThis,
       long_press_callback: null,
       x: 0,
       y: 0,
     });
     this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
+
+    this.busytyping = false;
 
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
@@ -70,9 +102,7 @@ export class Transmission extends EventTarget {
     document
       .querySelector('#filter-tracker')
       .addEventListener('change', (event_) => {
-        this.setFilterTracker(
-          event_.target.value === 'all' ? null : event_.target.value,
-        );
+        this.setFilterTracker(event_.target.value);
       });
 
     this.action_manager.addEventListener('change', (event_) => {
@@ -113,7 +143,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents(false);
+          this._removeSelectedTorrents();
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -177,9 +207,6 @@ export class Transmission extends EventTarget {
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
           break;
-        case 'trash-selected-torrents':
-          this._removeSelectedTorrents(true);
-          break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
           break;
@@ -188,13 +215,45 @@ export class Transmission extends EventTarget {
       }
     });
 
-    // listen to filter changes
     let e = document.querySelector('#filter-mode');
+    // Initialize filter options
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
+    newOpts(e, 'status', [
+      ['Active', Prefs.FilterActive],
+      ['Downloading', Prefs.FilterDownloading],
+      ['Seeding', Prefs.FilterSeeding],
+      ['Paused', Prefs.FilterPaused],
+      ['Finished', Prefs.FilterFinished],
+      ['Error', Prefs.FilterError],
+    ]);
+    newOpts(e, 'list', [
+      ['Private torrents', Prefs.FilterPrivate],
+      ['Public torrents', Prefs.FilterPublic],
+    ]);
+
+    // listen to filter changes
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', (event_) => {
       this.prefs.filter_mode = event_.target.value;
       this.refilterAllSoon();
     });
+
+    e = document.querySelector('#filter-tracker');
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
+
+    const s = document.querySelector('#torrent-search');
+    e = document.querySelector('#reset');
+    e.addEventListener('click', () => {
+      s.value = '';
+      this._setFilterText(s.value);
+      this.refilterAllSoon();
+    });
+
+    if (s.value.trim()) {
+      this.filterText = s.value;
+      e.style.display = 'block';
+      this.refilterAllSoon();
+    }
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -328,14 +387,14 @@ export class Transmission extends EventTarget {
 
   _openTorrentFromUrl() {
     setTimeout(() => {
-      const addTorrent = new URLSearchParams(window.location.search).get(
+      const addTorrent = new URLSearchParams(globalThis.location.search).get(
         'addtorrent',
       );
       if (addTorrent) {
         this.setCurrentPopup(new OpenDialog(this, this.remote, addTorrent));
-        const newUrl = new URL(window.location);
+        const newUrl = new URL(globalThis.location);
         newUrl.search = '';
-        window.history.pushState('', '', newUrl.toString());
+        globalThis.history.pushState('', '', newUrl.toString());
       }
     }, 0);
   }
@@ -370,7 +429,11 @@ export class Transmission extends EventTarget {
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
     e.addEventListener('focus', () => e.classList.remove(blur_token));
-    e.addEventListener('keyup', () => this._setFilterText(e.value));
+    e.addEventListener('input', () => {
+      if (e.value.trim() !== this.filterText) {
+        this._setFilterText(e.value);
+      }
+    });
   }
 
   _onPrefChanged(key, value) {
@@ -385,8 +448,7 @@ export class Transmission extends EventTarget {
       }
       case Prefs.ContrastMode: {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
-        document.body.classList.remove('contrast-more');
-        document.body.classList.remove('contrast-less');
+        document.body.classList.remove('contrast-more', 'contrast-less');
         document.body.classList.add(`contrast-${value}`);
         // this.refilterAllSoon();
         break;
@@ -713,8 +775,15 @@ export class Transmission extends EventTarget {
   }
 
   _setFilterText(search) {
-    this.filterText = search ? search.trim() : null;
-    this.refilterAllSoon();
+    clearTimeout(this.busytyping);
+    this.busytyping = setTimeout(
+      () => {
+        this.busytyping = false;
+        this.filterText = search.trim();
+        this.refilterAllSoon();
+      },
+      search ? 250 : 0,
+    );
   }
 
   _onTorrentChanged(event_) {
@@ -822,7 +891,7 @@ TODO: fix this when notifications get fixed
     if (event_.shiftKey) {
       this._selectRange(row);
       // Need to deselect any selected text
-      window.focus();
+      globalThis.focus();
 
       // Apple-Click, not selected
     } else if (!row.isSelected() && meta_key) {
@@ -854,12 +923,10 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _removeSelectedTorrents(trash) {
+  _removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(
-        new RemoveDialog({ remote: this.remote, torrents, trash }),
-      );
+      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
     }
   }
 
@@ -941,7 +1008,7 @@ TODO: fix this when notifications get fixed
   ///
 
   _updateGuiFromSession(o) {
-    const [, version, checksum] = o.version.match(/(.*)\s\(([\da-f]+)\)/);
+    const [, version, checksum] = o.version.match(/^(.*)\s\(([\da-f]+)\)/);
     this.version_info = {
       checksum,
       version,
@@ -965,8 +1032,8 @@ TODO: fix this when notifications get fixed
     );
     const string = fmt.countString('Transfer', 'Transfers', this._rows.length);
 
-    setTextContent(document.querySelector('#speed-up-label'), fmt.speedBps(u));
-    setTextContent(document.querySelector('#speed-dn-label'), fmt.speedBps(d));
+    setTextContent(this.speed.down, fmt.speedBps(d));
+    setTextContent(this.speed.up, fmt.speedBps(u));
     setTextContent(document.querySelector('#filter-count'), string);
   }
 
@@ -980,24 +1047,29 @@ TODO: fix this when notifications get fixed
 
   _updateFilterSelect() {
     const trackers = this._getTrackerCounts();
-    const sitenames = Object.keys(trackers).sort();
+    const sitenames = Object.keys(trackers).toSorted();
 
-    // build the new html
-    let string = '';
-    string += this.filterTracker
-      ? '<option value="all">All</option>'
-      : '<option value="all" selected="selected">All</option>';
-    for (const sitename of sitenames) {
-      string += `<option value="${sitename}"`;
-      if (sitename === this.filterTracker) {
-        string += ' selected="selected"';
+    // Update select box only when list of trackers has changed
+    if (
+      sitenames.length !== this.oldTrackers.length ||
+      sitenames.some((ele, idx) => ele !== this.oldTrackers[idx])
+    ) {
+      this.oldTrackers = sitenames;
+
+      const a = [
+        ['All', Prefs.FilterAll, !this.filterTracker],
+        ...sitenames.map((sitename) => [
+          Transmission._displayName(sitename),
+          sitename,
+          sitename === this.filterTracker,
+        ]),
+      ];
+
+      const e = document.querySelector('#filter-tracker');
+      while (e.firstChild) {
+        e.lastChild.remove();
       }
-      string += `>${Transmission._displayName(sitename)}</option>`;
-    }
-
-    if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
-      this.filterTrackersStr = string;
-      document.querySelector('#filter-tracker').innerHTML = string;
+      newOpts(e, null, a);
     }
   }
 
@@ -1027,6 +1099,9 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
+    // TODO: This regex is wrong and is about to be removed in https://github.com/transmission/transmission/pull/7008,
+    // so it is left alone for now.
+    // eslint-disable-next-line sonarjs/slow-regex
     const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
@@ -1053,6 +1128,9 @@ TODO: fix this when notifications get fixed
       }
       this._rows = [];
       this.dirtyTorrents = new Set(Object.keys(this._torrents));
+
+      document.querySelector('#reset').style.display =
+        this.filterText.length > 0 ? 'block' : 'none';
     }
 
     // rows that overlap with dirtyTorrents need to be refiltered.
@@ -1158,7 +1236,7 @@ TODO: fix this when notifications get fixed
     const e = document.querySelector('#filter-tracker');
     e.value = sitename;
 
-    this.filterTracker = sitename;
+    this.filterTracker = sitename === Prefs.FilterAll ? '' : sitename;
     this.refilterAllSoon();
   }
 

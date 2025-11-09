@@ -7,7 +7,7 @@
 #include <memory>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -29,17 +29,22 @@ char const* const DisplayName = "transmission-qt";
 auto constexpr FileArgsSeparator = "--"sv;
 auto constexpr QtArgsSeparator = "---"sv;
 
-std::array<tr_option, 8> const Opts = {
-    tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
-    { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
-    { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
-    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", true, "<host>" },
-    { 'u', "username", "Username to use when connecting to an existing session", "u", true, "<username>" },
-    { 'v', "version", "Show version number and exit", "v", false, nullptr },
-    { 'w', "password", "Password to use when connecting to an existing session", "w", true, "<password>" },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
-};
+using Arg = tr_option::Arg;
+auto constexpr Opts = std::array<tr_option, 8>{ {
+    { 'g', "config-dir", "Where to look for configuration files", "g", Arg::Required, "<path>" },
+    { 'm', "minimized", "Start minimized in system tray", "m", Arg::None, nullptr },
+    { 'p', "port", "Port to use when connecting to an existing session", "p", Arg::Required, "<port>" },
+    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", Arg::Required, "<host>" },
+    { 'u', "username", "Username to use when connecting to an existing session", "u", Arg::Required, "<username>" },
+    { 'v', "version", "Show version number and exit", "v", Arg::None, nullptr },
+    { 'w', "password", "Password to use when connecting to an existing session", "w", Arg::Required, "<password>" },
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
+static_assert(Opts[std::size(Opts) - 2].val != 0);
+} // namespace
 
+namespace
+{
 char const* getUsage()
 {
     return "Usage:\n"

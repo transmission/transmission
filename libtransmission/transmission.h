@@ -55,7 +55,7 @@ struct tr_variant;
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
-enum tr_verify_added_mode
+enum tr_verify_added_mode : uint8_t
 {
     // See discussion @ https://github.com/transmission/transmission/pull/2626
     // Let newly-added torrents skip upfront verify do it on-demand later.
@@ -65,7 +65,7 @@ enum tr_verify_added_mode
     TR_VERIFY_ADDED_FULL = 1
 };
 
-enum tr_encryption_mode
+enum tr_encryption_mode : uint8_t
 {
     TR_CLEAR_PREFERRED,
     TR_ENCRYPTION_PREFERRED,
@@ -79,8 +79,11 @@ enum tr_priority_t : int8_t
     TR_PRI_HIGH = 1
 };
 
-#define TR_RATIO_NA (-1)
-#define TR_RATIO_INF (-2)
+enum : int8_t
+{
+    TR_RATIO_NA = -1,
+    TR_RATIO_INF = -2
+};
 
 // --- Startup & Shutdown
 
@@ -129,15 +132,15 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
 #define TR_DEFAULT_RPC_PORT_STR "9091"
-#define TR_DEFAULT_RPC_PORT 9091
+inline auto constexpr TrDefaultRpcPort = 9091U;
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
-#define TR_DEFAULT_PEER_PORT 51413
+inline auto constexpr TrDefaultPeerPort = 51413U;
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
-#define TR_DEFAULT_PEER_LIMIT_GLOBAL 200
+inline auto constexpr TrDefaultPeerLimitGlobal = 200U;
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
-#define TR_DEFAULT_PEER_LIMIT_TORRENT 50
+inline auto constexpr TrDefaultPeerLimitTorrent = 50U;
 
 /**
  * Add libtransmission's default settings to the benc dictionary.
@@ -365,7 +368,7 @@ void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool is_enabled);
 
 void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
 
-enum tr_rpc_callback_type
+enum tr_rpc_callback_type : uint8_t
 {
     TR_RPC_TORRENT_ADDED,
     TR_RPC_TORRENT_STARTED,
@@ -379,7 +382,7 @@ enum tr_rpc_callback_type
     TR_RPC_SESSION_CLOSE
 };
 
-enum tr_rpc_callback_status
+enum tr_rpc_callback_status : uint8_t
 {
     /* no special handling is needed by the caller */
     TR_RPC_OK = 0,
@@ -465,7 +468,7 @@ uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
-enum tr_port_forwarding_state
+enum tr_port_forwarding_state : uint8_t
 {
     TR_PORT_ERROR,
     TR_PORT_UNMAPPED,
@@ -476,7 +479,7 @@ enum tr_port_forwarding_state
 
 tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
-enum tr_direction
+enum tr_direction : uint8_t
 {
     TR_CLIENT_TO_PEER = 0,
     TR_UP = 0,
@@ -509,7 +512,7 @@ void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnig
 size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
 void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
 
-enum tr_sched_day
+enum tr_sched_day : uint8_t
 {
     TR_SCHED_SUN = (1 << 0),
     TR_SCHED_MON = (1 << 1),
@@ -664,7 +667,7 @@ size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t bu
 
 // ---
 
-enum TrScript
+enum TrScript : uint8_t
 {
     TR_SCRIPT_ON_TORRENT_ADDED,
     TR_SCRIPT_ON_TORRENT_DONE,
@@ -737,7 +740,7 @@ void tr_blocklistSetURL(tr_session* session, char const* url);
  * When ready, pass the builder object to `tr_torrentNew()`.
  */
 
-enum tr_ctorMode
+enum tr_ctorMode : uint8_t
 {
     TR_FALLBACK, /* indicates the ctor value should be used only in case of missing resume settings */
     TR_FORCE /* indicates the ctor value should be used regardless of what's in the resume settings */
@@ -902,7 +905,7 @@ void tr_torrentRenamePath(
     tr_torrent_rename_done_func callback,
     void* callback_user_data);
 
-enum
+enum : uint8_t
 {
     TR_LOC_MOVING,
     TR_LOC_DONE,
@@ -973,7 +976,7 @@ void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled);
 
 // --- Ratio Limits
 
-enum tr_ratiolimit
+enum tr_ratiolimit : uint8_t
 {
     /* follow the global settings */
     TR_RATIOLIMIT_GLOBAL = 0,
@@ -993,7 +996,7 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio);
 
 // --- Idle Time Limits
 
-enum tr_idlelimit
+enum tr_idlelimit : uint8_t
 {
     /* follow the global settings */
     TR_IDLELIMIT_GLOBAL = 0,
@@ -1086,7 +1089,7 @@ bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
 
 // ---
 
-enum tr_completeness
+enum tr_completeness : uint8_t
 {
     TR_LEECH, /* doesn't have all the desired pieces */
     TR_SEED, /* has the entire torrent */
@@ -1169,6 +1172,7 @@ bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
 // --- tr_peer_stat
 
+// NOLINTBEGIN(modernize-avoid-c-arrays)
 struct tr_peer_stat
 {
     bool isUTP;
@@ -1187,9 +1191,11 @@ struct tr_peer_stat
     uint8_t from;
     uint16_t port;
 
-    char addr[TR_INET6_ADDRSTRLEN];
+    char addr[TrInet6AddrStrlen];
     char flagStr[32];
     char const* client;
+
+    tr_peer_id_t peer_id;
 
     float progress;
     double rateToPeer_KBps;
@@ -1215,6 +1221,7 @@ struct tr_peer_stat
     size_t bytes_to_peer;
     size_t bytes_to_client;
 };
+// NOLINTEND(modernize-avoid-c-arrays)
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
 
@@ -1222,7 +1229,7 @@ void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t peer_count);
 
 // --- tr_tracker_stat
 
-enum tr_tracker_state
+enum tr_tracker_state : uint8_t
 {
     /* we won't (announce,scrape) this torrent to this tracker because
      * the torrent is stopped, or because of an error, or whatever */
@@ -1237,6 +1244,7 @@ enum tr_tracker_state
     TR_TRACKER_ACTIVE = 3
 };
 
+// NOLINTBEGIN(modernize-avoid-c-arrays)
 /*
  * Unlike other _view structs, it is safe to keep a tr_tracker_view copy.
  * The announce and scrape strings are interned & never go out-of-scope.
@@ -1283,6 +1291,7 @@ struct tr_tracker_view
     bool lastScrapeSucceeded; // if hasScraped, whether or not the latest scrape succeeded
     bool lastScrapeTimedOut; // true iff the latest scrape request timed out
 };
+// NOLINTEND(modernize-avoid-c-arrays)
 
 struct tr_tracker_view tr_torrentTracker(tr_torrent const* torrent, size_t i);
 
@@ -1388,7 +1397,7 @@ bool tr_torrentHasMetadata(tr_torrent const* tor);
  * Note: these values will become a straight enum at some point in the future.
  * Do not rely on their current `bitfield` implementation
  */
-enum tr_torrent_activity
+enum tr_torrent_activity : uint8_t
 {
     TR_STATUS_STOPPED = 0, /* Torrent is stopped */
     TR_STATUS_CHECK_WAIT = 1, /* Queued to check files */
@@ -1407,15 +1416,15 @@ enum tr_peer_from : uint8_t
     TR_PEER_FROM_PEX, /* peers found from PEX */
     TR_PEER_FROM_RESUME, /* peers found in the .resume file */
     TR_PEER_FROM_LTEP, /* peer address provided in an LTEP handshake */
-    TR_PEER_FROM__MAX
+    TR_PEER_FROM_N_TYPES
 };
-enum tr_eta : time_t
+enum tr_eta : time_t // NOLINT(performance-enum-size)
 {
     TR_ETA_NOT_AVAIL = -1,
     TR_ETA_UNKNOWN = -2,
 };
 
-enum tr_stat_errtype
+enum tr_stat_errtype : uint8_t
 {
     /* everything's fine */
     TR_STAT_OK = 0,
@@ -1427,6 +1436,7 @@ enum tr_stat_errtype
     TR_STAT_LOCAL_ERROR = 3
 };
 
+// NOLINTBEGIN(modernize-avoid-c-arrays)
 /** @brief Used by `tr_torrentStat()` to tell clients about a torrent's state and statistics */
 struct tr_stat
 {
@@ -1566,11 +1576,11 @@ struct tr_stat
 
     /** How many connected peers we found out about from the tracker, or from pex,
         or from incoming connections, or from our resume file. */
-    uint16_t peersFrom[TR_PEER_FROM__MAX];
+    uint16_t peersFrom[TR_PEER_FROM_N_TYPES];
 
     /** How many known peers we found out about from the tracker, or from pex,
         or from incoming connections, or from our resume file. */
-    uint16_t knownPeersFrom[TR_PEER_FROM__MAX];
+    uint16_t knownPeersFrom[TR_PEER_FROM_N_TYPES];
 
     /** Number of peers that are sending data to us. */
     uint16_t peersSendingToUs;
@@ -1589,6 +1599,7 @@ struct tr_stat
         to be considered stalled.  @see `tr_sessionGetQueueStalledMinutes()` */
     bool isStalled;
 };
+// NOLINTEND(modernize-avoid-c-arrays)
 
 /** Return a pointer to an `tr_stat` structure with updated information
     on the torrent. This is typically called by the GUI clients every

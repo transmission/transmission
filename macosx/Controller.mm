@@ -2,8 +2,6 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-@import IOKit;
-@import IOKit.pwr_mgt;
 @import Carbon;
 @import UserNotifications;
 
@@ -56,6 +54,7 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "VersionComparator.h"
+#import "PowerManager.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -149,9 +148,9 @@ static void initUnits()
     NSString* g_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
     unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
     NSString* t_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
-    Config::Memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+    Config::memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                        m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
-    Config::Storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+    Config::storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                         m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 
     b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)");
@@ -159,7 +158,7 @@ static void initUnits()
     m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)");
     g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)");
     t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)");
-    Config::Speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+    Config::speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
@@ -174,11 +173,6 @@ static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, t
 {
     [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually
-}
-
-static void sleepCallback(void* controller, io_service_t /*y*/, natural_t messageType, void* messageArgument)
-{
-    [(__bridge Controller*)controller sleepCallback:messageType argument:messageArgument];
 }
 
 // 2.90 was infected with ransomware which we now check for and attempt to remove
@@ -271,7 +265,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate>
+@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet NSStackView* fStackView;
@@ -311,7 +305,6 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) DragOverlayWindow* fOverlayWindow;
 
-@property(nonatomic) io_connect_t fRootPort;
 @property(nonatomic) NSTimer* fTimer;
 
 @property(nonatomic) StatusBarController* fStatusBar;
@@ -338,7 +331,6 @@ static void removeKeRangerRansomware()
 @property(nonatomic) BOOL fGlobalPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 @property(nonatomic) BOOL fSoundPlaying;
-@property(nonatomic) id fNoNapActivity;
 
 @end
 
@@ -702,18 +694,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //this must be called after showStatusBar:
     [self.fStatusBar updateWithDownload:0.0 upload:0.0];
 
-    //register for sleep notifications
-    IONotificationPortRef notify;
-    io_object_t iterator;
-    if ((self.fRootPort = IORegisterForSystemPower((__bridge void*)(self), &notify, sleepCallback, &iterator)))
-    {
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
-    }
-    else
-    {
-        NSLog(@"Could not IORegisterForSystemPower");
-    }
-
     auto* const session = self.fLib;
 
     //load previous transfers
@@ -889,8 +869,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     NSApp.servicesProvider = self;
 
-    self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
-                                                                       reason:@"No napping on the job!"];
+    [PowerManager.shared setDelegate:self];
+    [PowerManager.shared start];
 
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleOpenContentsEvent:replyEvent:)
@@ -1038,7 +1018,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     self.fQuitting = YES;
 
-    [NSProcessInfo.processInfo endActivity:self.fNoNapActivity];
+    [PowerManager.shared stop];
 
     //stop the Bonjour service
     if (BonjourController.defaultControllerExists)
@@ -2378,6 +2358,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL anyCompleted = NO;
+    BOOL anyActive = NO;
+
     for (Torrent* torrent in self.fTorrents)
     {
         [torrent update];
@@ -2387,7 +2369,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         ulRate += torrent.uploadRate;
 
         anyCompleted |= torrent.finishedSeeding;
+        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
     }
+
+    PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
 
     if (!NSApp.hidden)
     {
@@ -5007,57 +4992,32 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     return YES;
 }
 
-- (void)sleepCallback:(natural_t)messageType argument:(void*)messageArgument
+- (void)systemWillSleep
 {
-    switch (messageType)
+    //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
+    BOOL anyActive = NO;
+    for (Torrent* torrent in self.fTorrents)
     {
-    case kIOMessageSystemWillSleep:
+        if (torrent.active)
         {
-            //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
-            BOOL anyActive = NO;
-            for (Torrent* torrent in self.fTorrents)
-            {
-                if (torrent.active)
-                {
-                    anyActive = YES;
-                }
-                [torrent sleep]; //have to call on all, regardless if they are active
-            }
-
-            //if there are any running transfers, wait 15 seconds for them to stop
-            if (anyActive)
-            {
-                sleep(15);
-            }
-
-            IOAllowPowerChange(self.fRootPort, (long)messageArgument);
-            break;
+            anyActive = YES;
         }
+        [torrent sleep]; //have to call on all, regardless if they are active
+    }
 
-    case kIOMessageCanSystemSleep:
-        if ([self.fDefaults boolForKey:@"SleepPrevent"])
-        {
-            //prevent idle sleep unless no torrents are active
-            for (Torrent* torrent in self.fTorrents)
-            {
-                if (torrent.active && !torrent.stalled && !torrent.error)
-                {
-                    IOCancelPowerChange(self.fRootPort, (long)messageArgument);
-                    return;
-                }
-            }
-        }
+    //if there are any running transfers, wait 15 seconds for them to stop
+    if (anyActive)
+    {
+        sleep(15);
+    }
+}
 
-        IOAllowPowerChange(self.fRootPort, (long)messageArgument);
-        break;
-
-    case kIOMessageSystemHasPoweredOn:
-        //resume sleeping transfers after we wake up
-        for (Torrent* torrent in self.fTorrents)
-        {
-            [torrent wakeUp];
-        }
-        break;
+- (void)systemDidWakeUp
+{
+    //resume sleeping transfers after we wake up
+    for (Torrent* torrent in self.fTorrents)
+    {
+        [torrent wakeUp];
     }
 }
 
