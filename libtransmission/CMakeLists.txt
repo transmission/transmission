@@ -273,6 +273,7 @@ endif()
 
 target_link_libraries(${TR_NAME}
     PRIVATE
+        "-L/opt/homebrew/lib/ -luv" # TODO: proper libuv library intergration into the build infra.
         Threads::Threads
         libdeflate::libdeflate
         CURL::libcurl
