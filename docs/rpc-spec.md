@@ -1,8 +1,8 @@
-> [!IMPORTANT] 
-> Since `4.1.0` (`rpc-version` 18), Transmission has switched from a bespoke RPC protocol to [JSON-RPC 2.0](https://www.jsonrpc.org/specification).
-> 
-> For backward compatibility, the old RPC protocol will still be available until `5.0.0`.
-> 
+> [!IMPORTANT]
+> Transmisson 4.1.0 (`rpc-version` 18) added support for the JSON-RPC 2.0 protocol.
+>
+> The old bespoke RPC protocol is still supported in Transmission 4 but is deprecated and will be removed in the future. People using the old protocol should update their code!
+>
 > For documentation of the old RPC protocol, please consult documentation from previous versions.
 > https://github.com/transmission/transmission/blob/4.0.6/docs/rpc-spec.md
 
