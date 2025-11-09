@@ -862,7 +862,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         if (val)
         {
             // lpd_ = tr_lpd::create(lpd_mediator_, event_base());
-            lpd_ = tr_lpd::create_libuv(lpd_mediator_, uv_loop());
+            lpd_ = tr_lpd::create(lpd_mediator_);
         }
         else
         {

@@ -324,6 +324,11 @@ private:
             return session_.timerMaker();
         }
 
+        [[nodiscard]] std::unique_ptr<tr_lpd::EventHandler> createEventHandler(tr_socket_t socket, tr_lpd::EventHandler::Callback callback) override
+        {
+            return std::make_unique<tr_lpd::tr_lpd_libuv_handler>(session_, socket, std::move(callback));
+        }
+
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
 
         bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
