@@ -213,14 +213,16 @@ TEST_F(NetTest, isGlobalUnicastAddress)
 
 TEST_F(NetTest, ipCompare)
 {
-    static constexpr auto IpPairs = std::array{ std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
-                                                std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
-                                                std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
-                                                std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
-                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
-                                                std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, 1 },
-                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 },
-                                                std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, 0 } };
+    static constexpr auto IpPairs = std::array{
+        std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
+        std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
+        std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
+        std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:0:0eab:dead::a0:abcd:4e]"sv, 1 },
+        std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 },
+        std::tuple{ "2001:1890:1112:1::20"sv, "[2001:1890:1112:1::20]"sv, 0 },
+    };
 
     for (auto const& [sv1, sv2, res] : IpPairs)
     {
@@ -233,5 +235,36 @@ TEST_F(NetTest, ipCompare)
         EXPECT_EQ(ip1 < ip2, res < 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 > ip2, res > 0) << sv1 << ' ' << sv2;
         EXPECT_EQ(ip1 == ip2, res == 0) << sv1 << ' ' << sv2;
+    }
+}
+
+TEST_F(NetTest, IPv4MappedAddress)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 14>{ {
+        { "::ffff:1.0.0.0"sv, "1.0.0.0"sv },
+        { "::ffff:10.0.0.0"sv, "10.0.0.0"sv },
+        { "::ffff:10.255.0.0"sv, "10.255.0.0"sv },
+        { "::ffff:10.255.0.255"sv, "10.255.0.255"sv },
+        { "::ffff:100.64.0.0"sv, "100.64.0.0"sv },
+        { "::ffff:100.128.0.0"sv, "100.128.0.0"sv },
+        { "::ffff:126.0.0.0"sv, "126.0.0.0"sv },
+        { "::ffff:127.0.0.0"sv, "127.0.0.0"sv },
+        { "::ffff:169.253.255.255"sv, "169.253.255.255"sv },
+        { "::ffff:169.254.0.0"sv, "169.254.0.0"sv },
+        { "::ffff:169.254.255.255"sv, "169.254.255.255"sv },
+        { "::ffff:169.255.0.0"sv, "169.255.0.0"sv },
+        { "::ffff:223.0.0.0"sv, "223.0.0.0"sv },
+        { "::ffff:224.0.0.0"sv, "224.0.0.0"sv },
+    } };
+
+    for (auto const& [mapped_sv, native_sv] : Tests)
+    {
+        auto const mapped = tr_address::from_string(mapped_sv);
+        ASSERT_TRUE(mapped);
+
+        auto const native = mapped->from_ipv4_mapped();
+        ASSERT_TRUE(native);
+
+        EXPECT_EQ(native_sv, native->display_name());
     }
 }
