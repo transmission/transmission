@@ -590,7 +590,7 @@
                 <menuItem title="File" id="83">
                     <menu key="submenu" title="File" id="81">
                         <items>
-                            <menuItem title="Create Torrent File…" image="document.badge.plus" catalog="system" keyEquivalent="n" id="1921">
+                            <menuItem title="Create Torrent File…" image="doc.badge.plus" catalog="system" keyEquivalent="n" id="1921">
                                 <connections>
                                     <action selector="createFile:" target="206" id="1922"/>
                                 </connections>
@@ -643,7 +643,7 @@
                             <menuItem isSeparatorItem="YES" id="3215">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Save Torrent File As…" image="document.badge.plus" catalog="system" tag="4" keyEquivalent="s" id="1533">
+                            <menuItem title="Save Torrent File As…" image="arrow.down.doc" catalog="system" tag="4" keyEquivalent="s" id="1533">
                                 <connections>
                                     <action selector="copyTorrentFiles:" target="206" id="1893"/>
                                 </connections>
@@ -1120,7 +1120,7 @@ CA
                 <menuItem isSeparatorItem="YES" id="3206">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Move Data File To…" image="document.badge.arrow.up" catalog="system" id="3209">
+                <menuItem title="Move Data File To…" image="arrow.up.doc" catalog="system" id="3209">
                     <connections>
                         <action selector="moveDataFilesSelected:" target="206" id="3210"/>
                     </connections>
@@ -1134,7 +1134,7 @@ CA
                 <menuItem isSeparatorItem="YES" id="3220">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Save Torrent File As…" image="document.badge.plus" catalog="system" tag="4" id="3207">
+                <menuItem title="Save Torrent File As…" image="arrow.down.doc" catalog="system" tag="4" id="3207">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="copyTorrentFiles:" target="206" id="3208"/>
@@ -1224,16 +1224,17 @@ CA
         <image name="arrow.clockwise.circle" catalog="system" width="15" height="15"/>
         <image name="arrow.clockwise.circle.fill" catalog="system" width="15" height="15"/>
         <image name="arrow.down" catalog="system" width="13" height="14"/>
+        <image name="arrow.down.doc" catalog="system" width="14" height="16"/>
         <image name="arrow.down.forward.and.arrow.up.backward" catalog="system" width="16" height="15"/>
         <image name="arrow.forward.folder" catalog="system" width="18" height="14"/>
         <image name="arrow.up" catalog="system" width="13" height="14"/>
         <image name="arrow.up.arrow.down" catalog="system" width="18" height="15"/>
+        <image name="arrow.up.doc" catalog="system" width="14" height="16"/>
         <image name="bandage" catalog="system" width="16" height="16"/>
         <image name="bubble" catalog="system" width="17" height="16"/>
         <image name="bubble.left.and.text.bubble.right" catalog="system" width="22" height="17"/>
         <image name="clipboard" catalog="system" width="14" height="19"/>
-        <image name="document.badge.arrow.up" catalog="system" width="16" height="18"/>
-        <image name="document.badge.plus" catalog="system" width="16" height="18"/>
+        <image name="doc.badge.plus" catalog="system" width="16" height="18"/>
         <image name="document.on.trash" catalog="system" width="17" height="20"/>
         <image name="eye" catalog="system" width="21" height="13"/>
         <image name="finder" catalog="system" width="16" height="15"/>
