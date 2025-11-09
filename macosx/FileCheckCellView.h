@@ -4,8 +4,10 @@
 
 #import <AppKit/AppKit.h>
 
-@interface FileOutlineView : NSOutlineView
+@class FileListNode;
 
-- (NSRect)iconRectForRow:(NSInteger)row;
+@interface FileCheckCellView : NSTableCellView
+
+@property(nonatomic, weak) FileListNode* node;
 
 @end

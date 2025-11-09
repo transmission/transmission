@@ -75,14 +75,16 @@ target_sources(${TR_NAME}-mac
         ExpandedPathToPathTransformer.mm
         FileListNode.h
         FileListNode.mm
-        FileNameCell.h
-        FileNameCell.mm
+        FileCheckCellView.h
+        FileCheckCellView.mm
+        FileNameCellView.h
+        FileNameCellView.mm
         FileOutlineController.h
         FileOutlineController.mm
         FileOutlineView.h
         FileOutlineView.mm
-        FilePriorityCell.h
-        FilePriorityCell.mm
+        FilePriorityCellView.h
+        FilePriorityCellView.mm
         FileRenameSheetController.h
         FileRenameSheetController.mm
         FilterBarController.h

@@ -16,7 +16,6 @@
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
 		2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB1 /* torrents.cc */; };
 		2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB3 /* torrents.h */; };
-		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
 		37D5E15E2AEFE47B00D1ADB3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
@@ -125,7 +124,6 @@
 		A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A222E9860E6B21D9009FB003 /* BlocklistDownloaderViewController.mm */; };
 		A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.mm in Sources */ = {isa = PBXBuildFile; fileRef = A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.mm */; };
 		A225A4C0187E369C00CDE823 /* ShareToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A225A4BF187E369C00CDE823 /* ShareToolbarItem.mm */; };
-		A2265F420B5EF5F40093DDA5 /* FileNameCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.mm */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */ = {isa = PBXBuildFile; fileRef = A22B00AF116A9E90003315FC /* connecthostport.h */; };
@@ -458,6 +456,9 @@
 		ED5E0F0F2CD31BC20071433B /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		ED67FB422B70FCE400D8A037 /* settings.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED67FB402B70FCE400D8A037 /* settings.cc */; };
 		ED67FB432B70FCE400D8A037 /* settings.h in Headers */ = {isa = PBXBuildFile; fileRef = ED67FB412B70FCE400D8A037 /* settings.h */; };
+		ED6F16B52EB8F1EB007CD864 /* FileNameCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */; };
+		ED6F16B62EB8F1EB007CD864 /* FilePriorityCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */; };
+		ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */; };
 		ED86936F2ADAE34D00342B1A /* DefaultAppHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */; };
 		ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */; };
 		ED8A16422735A8AA000D61F9 /* peer-mgr-wishlist.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163E2735A8AA000D61F9 /* peer-mgr-wishlist.cc */; };
@@ -686,8 +687,6 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2B9BA6C508B488FE586A0AB1 /* torrents.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = torrents.cc; sourceTree = "<group>"; };
 		2B9BA6C508B488FE586A0AB3 /* torrents.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = torrents.h; sourceTree = "<group>"; };
-		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilePriorityCell.h; sourceTree = "<group>"; };
-		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilePriorityCell.mm; sourceTree = "<group>"; };
 		3C7A118D0D0B2EB800B5701F /* libnatpmp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnatpmp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C7A11910D0B2EE300B5701F /* getgateway.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = getgateway.c; sourceTree = "<group>"; };
 		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = getgateway.h; sourceTree = "<group>"; };
@@ -921,8 +920,6 @@
 		A223AA800D220CEB00840069 /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A225A4BE187E369C00CDE823 /* ShareToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareToolbarItem.h; sourceTree = "<group>"; };
 		A225A4BF187E369C00CDE823 /* ShareToolbarItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ShareToolbarItem.mm; sourceTree = "<group>"; };
-		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileNameCell.h; sourceTree = "<group>"; };
-		A2265F400B5EF5F40093DDA5 /* FileNameCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileNameCell.mm; sourceTree = "<group>"; };
 		A22B00AE116A9E90003315FC /* connecthostport.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = connecthostport.c; sourceTree = "<group>"; };
 		A22B00AF116A9E90003315FC /* connecthostport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = connecthostport.h; sourceTree = "<group>"; };
 		A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSMutableArrayAdditions.h; sourceTree = "<group>"; };
@@ -1450,6 +1447,12 @@
 		ED5E0F0E2CD3164D0071433B /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		ED67FB402B70FCE400D8A037 /* settings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = settings.cc; sourceTree = "<group>"; };
 		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = settings.h; sourceTree = "<group>"; };
+		ED6F16AF2EB8F1EB007CD864 /* FileCheckCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileCheckCellView.h; sourceTree = "<group>"; };
+		ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileCheckCellView.mm; sourceTree = "<group>"; };
+		ED6F16B12EB8F1EB007CD864 /* FileNameCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileNameCellView.h; sourceTree = "<group>"; };
+		ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileNameCellView.mm; sourceTree = "<group>"; };
+		ED6F16B32EB8F1EB007CD864 /* FilePriorityCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilePriorityCellView.h; sourceTree = "<group>"; };
+		ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilePriorityCellView.mm; sourceTree = "<group>"; };
 		ED86936D2ADAE34D00342B1A /* DefaultAppHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAppHelper.h; sourceTree = "<group>"; };
 		ED86936E2ADAE34D00342B1A /* DefaultAppHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DefaultAppHelper.mm; sourceTree = "<group>"; };
 		ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "peer-mgr-wishlist.h"; sourceTree = "<group>"; };
@@ -2142,10 +2145,12 @@
 				A26AF2190D2DA35A00FF7140 /* FileOutlineController.mm */,
 				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
 				A2AF1C370A3D0F6200F1575D /* FileOutlineView.mm */,
-				A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */,
-				A2265F400B5EF5F40093DDA5 /* FileNameCell.mm */,
-				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
-				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */,
+				ED6F16AF2EB8F1EB007CD864 /* FileCheckCellView.h */,
+				ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */,
+				ED6F16B12EB8F1EB007CD864 /* FileNameCellView.h */,
+				ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */,
+				ED6F16B32EB8F1EB007CD864 /* FilePriorityCellView.h */,
+				ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */,
 			);
 			name = "File Outline View";
 			sourceTree = "<group>";
@@ -3545,14 +3550,15 @@
 				A2AA579D0ADFCAB400CA59F6 /* PiecesView.mm in Sources */,
 				A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.mm in Sources */,
 				A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.mm in Sources */,
-				A2265F420B5EF5F40093DDA5 /* FileNameCell.mm in Sources */,
 				A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.mm in Sources */,
 				457AF8EB28604AFC00BCF74F /* Toolbar.mm in Sources */,
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.mm in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */,
 				E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */,
+				ED6F16B52EB8F1EB007CD864 /* FileNameCellView.mm in Sources */,
+				ED6F16B62EB8F1EB007CD864 /* FilePriorityCellView.mm in Sources */,
+				ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */,
-				35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.mm in Sources */,
 				A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
