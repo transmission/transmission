@@ -214,6 +214,7 @@ The 'source' column here corresponds to the data structure there.
 | `addedDate` | number | tr_stat
 | `availability` | array (see below)| tr_torrentAvailability()
 | `bandwidthPriority` | number | tr_priority_t
+| `bytesCompleted` | array (see below)| n/a
 | `comment` | string | tr_torrent_view
 | `corruptEver`| number | tr_stat
 | `creator`| string | tr_torrent_view
@@ -290,6 +291,8 @@ The 'source' column here corresponds to the data structure there.
 
 `availability`: An array of `pieceCount` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
 
+`bytesCompleted`: An array of `tr_info.filecount` numbers. Each is the completed bytes for the corresponding file.
+
 `files`: array of objects, each containing:
 
 | Key | Value Type | transmission.h source
@@ -326,6 +329,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `isUTP`              | boolean    | tr_peer_stat
 | `peerIsChoked`       | boolean    | tr_peer_stat
 | `peerIsInterested`   | boolean    | tr_peer_stat
+| `peer_id`            | string     | tr_peer_stat
 | `port`               | number     | tr_peer_stat
 | `progress`           | double     | tr_peer_stat
 | `rateToClient` (B/s) | number     | tr_peer_stat

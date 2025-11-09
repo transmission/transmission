@@ -24,6 +24,7 @@ import {
   TorrentRendererFull,
 } from './torrent-row.js';
 import {
+  newOpts,
   icon,
   debounce,
   deepEqual,
@@ -53,11 +54,9 @@ export class Transmission extends EventTarget {
       ['#toolbar-inspector', 'inspector'],
       ['#toolbar-overflow', 'overflow'],
     ]) {
-      const e = document.querySelector(selector);
-      while (e.firstChild) {
-        e.lastChild.remove();
-      }
-      e.append(icon[name]());
+      document
+        .querySelector(selector)
+        .prepend(icon[name](), document.createElement('BR'));
     }
 
     document.querySelector('.speed-container').append(icon.speedDown());
@@ -73,6 +72,7 @@ export class Transmission extends EventTarget {
     this.filterText = '';
     this._torrents = {};
     this._rows = [];
+    this.oldTrackers = [];
     this.dirtyTorrents = new Set();
 
     this.changeStatus = false;
@@ -87,6 +87,8 @@ export class Transmission extends EventTarget {
     });
     this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
 
+    this.busytyping = false;
+
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
     for (const element of document.querySelectorAll(`button[data-action]`)) {
@@ -100,9 +102,7 @@ export class Transmission extends EventTarget {
     document
       .querySelector('#filter-tracker')
       .addEventListener('change', (event_) => {
-        this.setFilterTracker(
-          event_.target.value === 'all' ? null : event_.target.value,
-        );
+        this.setFilterTracker(event_.target.value);
       });
 
     this.action_manager.addEventListener('change', (event_) => {
@@ -143,7 +143,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents(false);
+          this._removeSelectedTorrents();
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -207,9 +207,6 @@ export class Transmission extends EventTarget {
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
           break;
-        case 'trash-selected-torrents':
-          this._removeSelectedTorrents(true);
-          break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
           break;
@@ -218,13 +215,45 @@ export class Transmission extends EventTarget {
       }
     });
 
-    // listen to filter changes
     let e = document.querySelector('#filter-mode');
+    // Initialize filter options
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
+    newOpts(e, 'status', [
+      ['Active', Prefs.FilterActive],
+      ['Downloading', Prefs.FilterDownloading],
+      ['Seeding', Prefs.FilterSeeding],
+      ['Paused', Prefs.FilterPaused],
+      ['Finished', Prefs.FilterFinished],
+      ['Error', Prefs.FilterError],
+    ]);
+    newOpts(e, 'list', [
+      ['Private torrents', Prefs.FilterPrivate],
+      ['Public torrents', Prefs.FilterPublic],
+    ]);
+
+    // listen to filter changes
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', (event_) => {
       this.prefs.filter_mode = event_.target.value;
       this.refilterAllSoon();
     });
+
+    e = document.querySelector('#filter-tracker');
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
+
+    const s = document.querySelector('#torrent-search');
+    e = document.querySelector('#reset');
+    e.addEventListener('click', () => {
+      s.value = '';
+      this._setFilterText(s.value);
+      this.refilterAllSoon();
+    });
+
+    if (s.value.trim()) {
+      this.filterText = s.value;
+      e.style.display = 'block';
+      this.refilterAllSoon();
+    }
 
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
@@ -400,7 +429,11 @@ export class Transmission extends EventTarget {
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
     e.addEventListener('focus', () => e.classList.remove(blur_token));
-    e.addEventListener('keyup', () => this._setFilterText(e.value));
+    e.addEventListener('input', () => {
+      if (e.value.trim() !== this.filterText) {
+        this._setFilterText(e.value);
+      }
+    });
   }
 
   _onPrefChanged(key, value) {
@@ -742,8 +775,15 @@ export class Transmission extends EventTarget {
   }
 
   _setFilterText(search) {
-    this.filterText = search ? search.trim() : null;
-    this.refilterAllSoon();
+    clearTimeout(this.busytyping);
+    this.busytyping = setTimeout(
+      () => {
+        this.busytyping = false;
+        this.filterText = search.trim();
+        this.refilterAllSoon();
+      },
+      search ? 250 : 0,
+    );
   }
 
   _onTorrentChanged(event_) {
@@ -883,12 +923,10 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _removeSelectedTorrents(trash) {
+  _removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(
-        new RemoveDialog({ remote: this.remote, torrents, trash }),
-      );
+      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
     }
   }
 
@@ -1011,22 +1049,27 @@ TODO: fix this when notifications get fixed
     const trackers = this._getTrackerCounts();
     const sitenames = Object.keys(trackers).toSorted();
 
-    // build the new html
-    let string = '';
-    string += this.filterTracker
-      ? '<option value="all">All</option>'
-      : '<option value="all" selected="selected">All</option>';
-    for (const sitename of sitenames) {
-      string += `<option value="${sitename}"`;
-      if (sitename === this.filterTracker) {
-        string += ' selected="selected"';
-      }
-      string += `>${Transmission._displayName(sitename)}</option>`;
-    }
+    // Update select box only when list of trackers has changed
+    if (
+      sitenames.length !== this.oldTrackers.length ||
+      sitenames.some((ele, idx) => ele !== this.oldTrackers[idx])
+    ) {
+      this.oldTrackers = sitenames;
 
-    if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
-      this.filterTrackersStr = string;
-      document.querySelector('#filter-tracker').innerHTML = string;
+      const a = [
+        ['All', Prefs.FilterAll, !this.filterTracker],
+        ...sitenames.map((sitename) => [
+          Transmission._displayName(sitename),
+          sitename,
+          sitename === this.filterTracker,
+        ]),
+      ];
+
+      const e = document.querySelector('#filter-tracker');
+      while (e.firstChild) {
+        e.lastChild.remove();
+      }
+      newOpts(e, null, a);
     }
   }
 
@@ -1085,6 +1128,9 @@ TODO: fix this when notifications get fixed
       }
       this._rows = [];
       this.dirtyTorrents = new Set(Object.keys(this._torrents));
+
+      document.querySelector('#reset').style.display =
+        this.filterText.length > 0 ? 'block' : 'none';
     }
 
     // rows that overlap with dirtyTorrents need to be refiltered.
@@ -1190,7 +1236,7 @@ TODO: fix this when notifications get fixed
     const e = document.querySelector('#filter-tracker');
     e.value = sitename;
 
-    this.filterTracker = sitename;
+    this.filterTracker = sitename === Prefs.FilterAll ? '' : sitename;
     this.refilterAllSoon();
   }
 
