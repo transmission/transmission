@@ -5,6 +5,7 @@
 #include <array>
 #include <cerrno>
 #include <cstddef>
+#include <memory>
 #include <string>
 
 #ifdef _WIN32
@@ -13,7 +14,7 @@
 #include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
 #endif
 
-#include <event2/event.h>
+#include <event2/util.h>
 
 #include <fmt/format.h>
 
@@ -84,16 +85,17 @@ void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
-void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
+} // namespace
+
+void tr_session::tr_udp_core::on_read_event(tr_socket_t socket)
 {
-    TR_ASSERT(vsession != nullptr);
-    TR_ASSERT(type == EV_READ);
+    tr_socket_t s = socket;
+    auto* const session = &session_;
 
     auto buf = std::array<unsigned char, 8192>{};
     auto from = sockaddr_storage{};
     auto fromlen = socklen_t{ sizeof(from) };
     auto* const from_sa = reinterpret_cast<sockaddr*>(&from);
-    auto* const session = static_cast<tr_session*>(vsession);
     auto got_utp_packet = false;
 
     auto const from_str = [from_sa]
@@ -155,7 +157,6 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
         }
     }
 }
-} // namespace
 
 // BEP-32 explains why we need to bind to one IPv6 address
 
@@ -209,14 +210,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketDiffServ(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(
-                tr::evhelpers::event_new_pri2(
-                    session_.event_base(),
-                    static_cast<evutil_socket_t>(udp4_socket_),
-                    EV_READ | EV_PERSIST,
-                    event_callback,
-                    &session_));
-            event_add(udp4_event_.get(), nullptr);
+            udp4_event_handler_ = std::make_unique<tr_session::tr_udp_core_libuv_handler>(
+                session,
+                udp4_socket_,
+                [this](tr_socket_t socket) { on_read_event(socket); });
+            udp4_event_handler_->start();
         }
     }
 
@@ -262,14 +260,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketDiffServ(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(
-                tr::evhelpers::event_new_pri2(
-                    session_.event_base(),
-                    static_cast<evutil_socket_t>(udp6_socket_),
-                    EV_READ | EV_PERSIST,
-                    event_callback,
-                    &session_));
-            event_add(udp6_event_.get(), nullptr);
+            udp6_event_handler_ = std::make_unique<tr_session::tr_udp_core_libuv_handler>(
+                session,
+                udp6_socket_,
+                [this](tr_socket_t socket) { on_read_event(socket); });
+            udp6_event_handler_->start();
         }
     }
 
@@ -281,7 +276,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
 
 tr_session::tr_udp_core::~tr_udp_core()
 {
-    udp6_event_.reset();
+    udp6_event_handler_.reset();
 
     if (udp6_socket_ != TR_BAD_SOCKET)
     {
@@ -289,7 +284,7 @@ tr_session::tr_udp_core::~tr_udp_core()
         udp6_socket_ = TR_BAD_SOCKET;
     }
 
-    udp4_event_.reset();
+    udp4_event_handler_.reset();
 
     if (udp4_socket_ != TR_BAD_SOCKET)
     {
