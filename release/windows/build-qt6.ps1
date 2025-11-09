@@ -13,9 +13,10 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     $Url = "https://qt.mirror.constant.com/archive/qt/$($Qt6Version -replace '\.\d+$', '')/${Qt6Version}/single/${Filename}"
 
     switch ($Arch) {
-        'x64'       { $QtPlatform = 'win32-msvc' }
-        'x64_arm64' { $QtPlatform = 'win32-arm64-msvc' }
-        default { $QtPlatform = 'win32-msvc' }
+        'x86'         { $QtPlatform = 'win32-msvc' }
+        'x64'         { $QtPlatform = 'win32-msvc' }
+        'arm64' { $QtPlatform = 'win32-arm64-msvc' }
+        default       { $QtPlatform = 'win32-msvc' }
     }
 
     $ArchiveBase = "qt-everywhere-src-${Qt6Version}"
