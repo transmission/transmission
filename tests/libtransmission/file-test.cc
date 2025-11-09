@@ -23,7 +23,7 @@
 #include <windows.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
@@ -61,29 +61,25 @@ protected:
     static bool createSymlink(char const* dst_path, char const* src_path, [[maybe_unused]] bool dst_is_dir)
     {
 #ifndef _WIN32
-
         return symlink(src_path, dst_path) != -1;
-
 #else
         auto const wide_src_path = tr_win32_utf8_to_native(src_path);
         auto const wide_dst_path = tr_win32_utf8_to_native(dst_path);
-        return CreateSymbolicLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
-
+        return CreateSymbolicLinkW(
+                   wide_dst_path.c_str(),
+                   wide_src_path.c_str(),
+                   dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0) != 0U;
 #endif
     }
 
     static bool createHardlink(char const* dst_path, char const* src_path)
     {
 #ifndef _WIN32
-
         return link(src_path, dst_path) != -1;
-
 #else
-
         auto const wide_src_path = tr_win32_utf8_to_native(src_path);
         auto const wide_dst_path = tr_win32_utf8_to_native(dst_path);
-        return CreateHardLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), nullptr);
-
+        return CreateHardLinkW(wide_dst_path.c_str(), wide_src_path.c_str(), nullptr) != 0;
 #endif
     }
 
@@ -101,14 +97,12 @@ protected:
             char const* slash_pos = strchr(p, '/');
 
 #ifdef _WIN32
-
             char const* backslash_pos = strchr(p, '\\');
 
             if (slash_pos == nullptr || (backslash_pos != nullptr && backslash_pos < slash_pos))
             {
                 slash_pos = backslash_pos;
             }
-
 #endif
 
             if (slash_pos == nullptr)
@@ -132,15 +126,11 @@ protected:
     static bool validatePermissions([[maybe_unused]] char const* path, [[maybe_unused]] unsigned int permissions)
     {
 #ifndef _WIN32
-
         struct stat sb = {};
         return stat(path, &sb) != -1 && (sb.st_mode & 0777) == permissions;
-
 #else
-
         /* No UNIX permissions on Windows */
         return true;
-
 #endif
     }
 
@@ -411,7 +401,6 @@ TEST_F(FileTest, pathIsRelative)
     EXPECT_TRUE(tr_sys_path_is_relative(":"));
 
 #ifdef _WIN32
-
     EXPECT_TRUE(tr_sys_path_is_relative("/"));
     EXPECT_TRUE(tr_sys_path_is_relative("\\x"));
     EXPECT_TRUE(tr_sys_path_is_relative("/x"));
@@ -436,14 +425,11 @@ TEST_F(FileTest, pathIsRelative)
     EXPECT_FALSE(tr_sys_path_is_relative("Z:"));
     EXPECT_FALSE(tr_sys_path_is_relative("Z:\\"));
     EXPECT_FALSE(tr_sys_path_is_relative("Z:/"));
-
 #else /* _WIN32 */
-
     EXPECT_FALSE(tr_sys_path_is_relative("/"));
     EXPECT_FALSE(tr_sys_path_is_relative("/x"));
     EXPECT_FALSE(tr_sys_path_is_relative("/x/y"));
     EXPECT_FALSE(tr_sys_path_is_relative("//x"));
-
 #endif /* _WIN32 */
 }
 
@@ -688,28 +674,26 @@ TEST_F(FileTest, pathResolve)
     tr_sys_path_remove(path1);
 
 #ifdef _WIN32
-
-    auto resolved = tr_sys_path_resolve("\\\\127.0.0.1\\NonExistent"sv, &error);
+    auto resolved = tr_sys_path_resolve(R"(\\127.0.0.1\NonExistent)"sv, &error);
     EXPECT_EQ(""sv, resolved);
     EXPECT_TRUE(error);
     error = {};
 
-    resolved = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\NonExistent"sv, &error);
+    resolved = tr_sys_path_resolve(R"(\\127.0.0.1\ADMIN$\NonExistent)"sv, &error);
     EXPECT_EQ(""sv, resolved);
     EXPECT_TRUE(error);
     error = {};
 
-    for (auto const& input : { "\\\\127.0.0.1\\ADMIN$\\System32"sv,
-                               "\\\\127.0.0.1\\ADMIN$\\\\System32"sv,
-                               "\\\\127.0.0.1\\\\ADMIN$\\System32"sv,
-                               "\\\\127.0.0.1\\\\ADMIN$\\\\System32"sv,
-                               "\\\\127.0.0.1\\ADMIN$/System32"sv })
+    for (auto const& input : { R"(\\127.0.0.1\ADMIN$\System32)"sv,
+                               R"(\\127.0.0.1\ADMIN$\\System32)"sv,
+                               R"(\\127.0.0.1\\ADMIN$\System32)"sv,
+                               R"(\\127.0.0.1\\ADMIN$\\System32)"sv,
+                               R"(\\127.0.0.1\ADMIN$/System32)"sv })
     {
         resolved = tr_sys_path_resolve(input, &error);
-        EXPECT_EQ("\\\\127.0.0.1\\ADMIN$\\System32"sv, resolved);
+        EXPECT_EQ(R"(\\127.0.0.1\ADMIN$\System32)"sv, resolved);
         EXPECT_FALSE(error) << error;
     }
-
 #endif
 }
 
@@ -721,7 +705,7 @@ TEST_F(FileTest, pathBasename)
 #ifdef _WIN32
         { "\\", "/" },
         /* Invalid paths */
-        { "\\\\\\", "" },
+        { R"(\\\)", "" },
         { "123:", "" },
         /* Reserved characters */
         { "<", "" },
@@ -738,13 +722,13 @@ TEST_F(FileTest, pathBasename)
         { "a\\|", "" },
         { "a\\?", "" },
         { "a\\*", "" },
-        { "c:\\a\\b<c\\d", "" },
-        { "c:\\a\\b>c\\d", "" },
-        { "c:\\a\\b:c\\d", "" },
-        { "c:\\a\\b\"c\\d", "" },
-        { "c:\\a\\b|c\\d", "" },
-        { "c:\\a\\b?c\\d", "" },
-        { "c:\\a\\b*c\\d", "" },
+        { R"(c:\a\b<c\d)", "" },
+        { R"(c:\a\b>c\d)", "" },
+        { R"(c:\a\b:c\d)", "" },
+        { R"(c:\a\b"c\d)", "" },
+        { R"(c:\a\b|c\d)", "" },
+        { R"(c:\a\b?c\d)", "" },
+        { R"(c:\a\b*c\d)", "" },
 #else
         { "////", "/" },
 #endif
@@ -760,13 +744,13 @@ TEST_F(FileTest, pathBasename)
         { "/a/b/c", "c" },
         { "/a/b/c/", "c" },
 #ifdef _WIN32
-        { "c:\\a\\b\\c", "c" },
+        { R"(c:\a\b\c)", "c" },
         { "c:", "/" },
         { "c:/", "/" },
         { "c:\\", "/" },
         { "c:a/b", "b" },
         { "c:a", "a" },
-        { "\\\\a\\b\\c", "c" },
+        { R"(\\a\b\c)", "c" },
         { "//a/b", "b" },
         { "//1.2.3.4/b", "b" },
         { "\\\\a", "a" },
@@ -783,49 +767,49 @@ TEST_F(FileTest, pathDirname)
 {
 #ifdef _WIN32
     static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 48>{ {
-        { "C:\\a/b\\c"sv, "C:\\a/b"sv },
-        { "C:\\a/b\\c\\"sv, "C:\\a/b"sv },
-        { "C:\\a/b"sv, "C:\\a"sv },
+        { R"(C:\a/b\c)"sv, R"(C:\a/b)"sv },
+        { R"(C:\a/b\c\)"sv, R"(C:\a/b)"sv },
+        { R"(C:\a/b)"sv, R"(C:\a)"sv },
         { "C:/a"sv, "C:/"sv },
         { "C:"sv, "C:"sv },
         { "C:/"sv, "C:/"sv },
         { "c:a/b"sv, "c:a"sv },
         { "c:a"sv, "c:"sv },
-        { "\\\\a"sv, "\\"sv },
-        { "\\\\1.2.3.4"sv, "\\"sv },
-        { "\\\\"sv, "\\"sv },
-        { "a/b\\c"sv, "a/b"sv },
+        { R"(\\a)"sv, R"(\)"sv },
+        { R"(\\1.2.3.4)"sv, R"(\)"sv },
+        { R"(\\)"sv, R"(\)"sv },
+        { R"(a/b\c)"sv, "a/b"sv },
         // taken from Node.js unit tests
         // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
-        { "c:\\"sv, "c:\\"sv },
-        { "c:\\foo"sv, "c:\\"sv },
-        { "c:\\foo\\"sv, "c:\\"sv },
-        { "c:\\foo\\bar"sv, "c:\\foo"sv },
-        { "c:\\foo\\bar\\"sv, "c:\\foo"sv },
-        { "c:\\foo\\bar\\baz"sv, "c:\\foo\\bar"sv },
-        { "c:\\foo bar\\baz"sv, "c:\\foo bar"sv },
-        { "\\"sv, "\\"sv },
-        { "\\foo"sv, "\\"sv },
-        { "\\foo\\"sv, "\\"sv },
-        { "\\foo\\bar"sv, "\\foo"sv },
-        { "\\foo\\bar\\"sv, "\\foo"sv },
-        { "\\foo\\bar\\baz"sv, "\\foo\\bar"sv },
-        { "\\foo bar\\baz"sv, "\\foo bar"sv },
+        { R"(c:\)"sv, R"(c:\)"sv },
+        { R"(c:\foo)"sv, R"(c:\)"sv },
+        { R"(c:\foo\)"sv, R"(c:\)"sv },
+        { R"(c:\foo\bar)"sv, R"(c:\foo)"sv },
+        { R"(c:\foo\bar\)"sv, R"(c:\foo)"sv },
+        { R"(c:\foo\bar\baz)"sv, R"(c:\foo\bar)"sv },
+        { R"(c:\foo bar\baz)"sv, R"(c:\foo bar)"sv },
+        { R"(\)"sv, R"(\)"sv },
+        { R"(\foo)"sv, R"(\)"sv },
+        { R"(\foo\)"sv, R"(\)"sv },
+        { R"(\foo\bar)"sv, R"(\foo)"sv },
+        { R"(\foo\bar\)"sv, R"(\foo)"sv },
+        { R"(\foo\bar\baz)"sv, R"(\foo\bar)"sv },
+        { R"(\foo bar\baz)"sv, R"(\foo bar)"sv },
         { "c:"sv, "c:"sv },
         { "c:foo"sv, "c:"sv },
-        { "c:foo\\"sv, "c:"sv },
-        { "c:foo\\bar"sv, "c:foo"sv },
-        { "c:foo\\bar\\"sv, "c:foo"sv },
-        { "c:foo\\bar\\baz"sv, "c:foo\\bar"sv },
-        { "c:foo bar\\baz"sv, "c:foo bar"sv },
+        { R"(c:foo\)"sv, "c:"sv },
+        { R"(c:foo\bar)"sv, "c:foo"sv },
+        { R"(c:foo\bar\)"sv, "c:foo"sv },
+        { R"(c:foo\bar\baz)"sv, R"(c:foo\bar)"sv },
+        { R"(c:foo bar\baz)"sv, "c:foo bar"sv },
         { "file:stream"sv, "."sv },
-        { "dir\\file:stream"sv, "dir"sv },
-        { "\\\\unc\\share"sv, "\\\\unc\\share"sv },
-        { "\\\\unc\\share\\foo"sv, "\\\\unc\\share\\"sv },
-        { "\\\\unc\\share\\foo\\"sv, "\\\\unc\\share\\"sv },
-        { "\\\\unc\\share\\foo\\bar"sv, "\\\\unc\\share\\foo"sv },
-        { "\\\\unc\\share\\foo\\bar\\"sv, "\\\\unc\\share\\foo"sv },
-        { "\\\\unc\\share\\foo\\bar\\baz"sv, "\\\\unc\\share\\foo\\bar"sv },
+        { R"(dir\file:stream)"sv, "dir"sv },
+        { R"(\\unc\share)"sv, R"(\\unc\share)"sv },
+        { R"(\\unc\share\foo)"sv, R"(\\unc\share\)"sv },
+        { R"(\\unc\share\foo\)"sv, R"(\\unc\share\)"sv },
+        { R"(\\unc\share\foo\bar)"sv, R"(\\unc\share\foo)"sv },
+        { R"(\\unc\share\foo\bar\)"sv, R"(\\unc\share\foo)"sv },
+        { R"(\\unc\share\foo\bar\baz)"sv, R"(\\unc\share\foo\bar)"sv },
         { "/a/b/"sv, "/a"sv },
         { "/a/b"sv, "/a"sv },
         { "/a"sv, "/"sv },
@@ -1128,22 +1112,11 @@ TEST_F(FileTest, fileOpen)
     tr_sys_path_remove(path1);
     createFileWithContents(path1, "test");
 
-    /* Pointer is at the end of file */
+    /* File gets truncated */
     auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
     EXPECT_TRUE(info.has_value());
     assert(info.has_value());
     EXPECT_EQ(4U, info->size);
-    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &error);
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
-    EXPECT_FALSE(error) << error;
-    tr_sys_file_write(fd, "s", 1, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
-    tr_sys_file_close(fd);
-
-    /* File gets truncated */
-    info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
-    EXPECT_EQ(5U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &error);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_FALSE(error) << error;

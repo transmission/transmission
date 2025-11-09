@@ -32,6 +32,7 @@
 #include <shellapi.h> /* CommandLineToArgv() */
 #else
 #include <arpa/inet.h>
+#include <sys/stat.h> /* umask() */
 #endif
 
 #define UTF_CPP_CPLUSPLUS 201703L
@@ -39,7 +40,7 @@
 
 #include <curl/curl.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
@@ -67,9 +68,9 @@ namespace libtransmission::Values
 {
 
 // default values; can be overridden by client apps
-Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
-Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
-Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+Config::Units<MemoryUnits> Config::memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
 } // namespace libtransmission::Values
 
@@ -134,7 +135,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (*error)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -143,7 +144,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
 
     if (!info || !info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
+        tr_logAddError(fmt::format(fmt::runtime(_("Couldn't read '{path}': Not a regular file")), fmt::arg("path", filename)));
         error->set(TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -153,7 +154,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -164,7 +165,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error->message()),
             fmt::arg("error_code", error->code())));
@@ -193,6 +194,14 @@ bool tr_file_save(std::string_view filename, std::string_view contents, tr_error
     {
         return false;
     }
+#ifndef _WIN32
+    // set file mode per settings umask()
+    {
+        auto const val = ::umask(0);
+        ::umask(val);
+        fchmod(fd, 0666 & ~val);
+    }
+#endif
 
     // Save the contents. This might take >1 pass.
     auto ok = true;
@@ -236,12 +245,12 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
     return len;
 }
 
-/* User-level routine. returns whether or not 'text' and 'p' matched */
-bool tr_wildmat(std::string_view text, std::string_view pattern)
+/* User-level routine. returns whether or not 'text' and 'pattern' matched */
+bool tr_wildmat(char const* text, char const* pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
+    return (pattern[0] == '*' && pattern[1] == '\0') || DoMatch(text, pattern) > 0;
 }
 
 char const* tr_strerror(int errnum)
@@ -552,7 +561,7 @@ std::string tr_strpercent(double x)
     return fmt::format("{:.0Lf}", x);
 }
 
-std::string tr_strratio(double ratio, char const* infinity)
+std::string tr_strratio(double ratio, std::string_view infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
     {
@@ -561,7 +570,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
     if ((int)ratio == TR_RATIO_INF)
     {
-        return infinity != nullptr ? infinity : "";
+        return std::string{ infinity };
     }
 
     return tr_strpercent(ratio);
@@ -569,7 +578,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool allow_copy, tr_error* error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
@@ -594,7 +603,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     }
 
     // ensure the target directory exists
-    auto newdir = tr_pathbuf{ newpath.sv() };
+    auto newdir = tr_pathbuf{ newpath };
     newdir.popdir();
     if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
@@ -603,9 +612,15 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     }
 
     /* they might be on the same filesystem... */
-    if (tr_sys_path_rename(oldpath, newpath))
+    if (tr_sys_path_rename(oldpath, newpath, error))
     {
         return true;
+    }
+
+    if (!allow_copy)
+    {
+        error->prefix_message("Unable to move file: ");
+        return false;
     }
 
     /* Otherwise, copy the file. */
@@ -618,7 +633,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't remove '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
             fmt::arg("path", oldpath),
             fmt::arg("error", log_error.message()),
             fmt::arg("error_code", log_error.code())));
@@ -718,36 +733,53 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 // ---
 
-tr_net_init_mgr::tr_net_init_mgr()
+namespace
 {
-    // try to init curl with default settings (currently ssl support + win32 sockets)
-    // but if that fails, we need to init win32 sockets as a bare minimum
-    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+namespace tr_net_init_impl
+{
+class tr_net_init_mgr
+{
+private:
+    tr_net_init_mgr()
     {
-        curl_global_init(CURL_GLOBAL_WIN32);
+        // try to init curl with default settings (currently ssl support + win32 sockets)
+        // but if that fails, we need to init win32 sockets as a bare minimum
+        if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+        {
+            curl_global_init(CURL_GLOBAL_WIN32);
+        }
     }
-}
 
-tr_net_init_mgr::~tr_net_init_mgr()
-{
-    curl_global_cleanup();
-}
-
-std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::create()
-{
-    if (!initialised)
+public:
+    tr_net_init_mgr(tr_net_init_mgr const&) = delete;
+    tr_net_init_mgr(tr_net_init_mgr&&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr const&) = delete;
+    tr_net_init_mgr& operator=(tr_net_init_mgr&&) = delete;
+    ~tr_net_init_mgr()
     {
-        initialised = true;
-        return std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+        curl_global_cleanup();
     }
-    return {};
-}
 
-bool tr_net_init_mgr::initialised = false;
+    static void create()
+    {
+        if (!instance)
+        {
+            instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+        }
+    }
 
-std::unique_ptr<tr_net_init_mgr> tr_lib_init()
+private:
+    static std::unique_ptr<tr_net_init_mgr> instance;
+};
+
+std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance;
+
+} // namespace tr_net_init_impl
+} // namespace
+
+void tr_lib_init()
 {
-    return tr_net_init_mgr::create();
+    tr_net_init_impl::tr_net_init_mgr::create();
 }
 
 // --- mime-type
@@ -762,8 +794,8 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, Compare);
-        if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
+        auto const it = std::lower_bound(std::begin(MimeTypeSuffixes), std::end(MimeTypeSuffixes), suffix_lc, Compare);
+        if (it != std::end(MimeTypeSuffixes) && suffix_lc == it->suffix)
         {
             return it->mime_type;
         }

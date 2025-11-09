@@ -9,7 +9,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -167,7 +167,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(fmt::format(
-                _("Couldn't create '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't create '{path}': {error} ({error_code})")),
                 fmt::arg("path", dir),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
@@ -184,12 +184,12 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 
     // open the file
     int flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
-    flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
+    flags |= TR_SYS_FILE_READ;
     auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
     if (!is_open(fd))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't open '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't open '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error.message()),
             fmt::arg("error_code", error.code())));
@@ -217,7 +217,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         if (!success)
         {
             tr_logAddError(fmt::format(
-                _("Couldn't preallocate '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't preallocate '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
@@ -236,7 +236,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't truncate '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't truncate '{path}': {error} ({error_code})")),
             fmt::arg("path", filename),
             fmt::arg("error", error.message()),
             fmt::arg("error_code", error.code())));

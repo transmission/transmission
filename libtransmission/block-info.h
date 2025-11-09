@@ -14,9 +14,7 @@ struct tr_block_info
 public:
     static auto constexpr BlockSize = uint32_t{ 1024U * 16U };
 
-    tr_block_info() noexcept
-    {
-    }
+    tr_block_info() noexcept = default;
 
     tr_block_info(uint64_t const total_size_in, uint32_t const piece_size_in) noexcept
     {
@@ -83,16 +81,8 @@ public:
         {
             loc.byte = byte_idx;
 
-            if (byte_idx == total_size()) // handle 0-byte files at the end of a torrent
-            {
-                loc.block = block_count() - 1U;
-                loc.piece = piece_count() - 1U;
-            }
-            else
-            {
-                loc.block = static_cast<tr_block_index_t>(byte_idx / BlockSize);
-                loc.piece = static_cast<tr_piece_index_t>(byte_idx / piece_size());
-            }
+            loc.block = static_cast<tr_block_index_t>(byte_idx / BlockSize);
+            loc.piece = static_cast<tr_piece_index_t>(byte_idx / piece_size());
 
             loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * BlockSize));
             loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * piece_size()));

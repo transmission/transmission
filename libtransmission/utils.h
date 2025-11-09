@@ -25,30 +25,11 @@ struct tr_error;
  * @{
  */
 
-#if !defined(_)
-#if defined(HAVE_GETTEXT) && !defined(__APPLE__)
+#ifdef ENABLE_GETTEXT
 #include <libintl.h>
-#define _(a) gettext(a)
-#else
-#define _(a) (a)
-#endif
-#endif
-
-#if defined(HAVE_NGETTEXT)
+#define _ gettext
 #define tr_ngettext ngettext
 #else
-#define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
-#endif
-
-/* #define DISABLE_GETTEXT */
-#ifndef DISABLE_GETTEXT
-#if defined(_WIN32)
-#define DISABLE_GETTEXT
-#endif
-#endif
-#ifdef DISABLE_GETTEXT
-#undef _
-#undef tr_ngettext
 #define _(a) (a)
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
@@ -63,7 +44,12 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error = nullptr);
 
-bool tr_file_move(std::string_view oldpath, std::string_view newpath, tr_error* error = nullptr);
+/**
+ * Tries to move a file by renaming, and [optionally] if that fails, by copying.
+ *
+ * Creates the destination directory if it doesn't exist.
+ */
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, bool allow_copy, tr_error* error = nullptr);
 
 bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error = nullptr);
 
@@ -126,7 +112,7 @@ template<typename T>
  * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
-[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern);
 
 template<typename T>
 [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
@@ -175,15 +161,15 @@ template<typename T>
     return 0;
 }
 
-constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
+constexpr std::string_view tr_strv_sep(std::string_view* sv, std::string_view delim)
 {
-    auto pos = sv->find(delim);
+    auto pos = sv->find_first_of(delim);
     auto const ret = sv->substr(0, pos);
     sv->remove_prefix(pos != std::string_view::npos ? pos + 1 : std::size(*sv));
     return ret;
 }
 
-constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, std::string_view delim)
 {
     if (std::empty(*sv))
     {
@@ -192,6 +178,16 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char d
 
     *token = tr_strv_sep(sv, delim);
     return true;
+}
+
+constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
+{
+    return tr_strv_sep(sv, { &delim, 1U });
+}
+
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
+{
+    return tr_strv_sep(sv, token, { &delim, 1U });
 }
 
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
@@ -251,7 +247,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 
 /** @param ratio    the ratio to convert to a string
     @param infinity the string representation of "infinity" */
-[[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
+[[nodiscard]] std::string tr_strratio(double ratio, std::string_view infinity);
 
 // ---
 
@@ -297,22 +293,5 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 
 // ---
 
-class tr_net_init_mgr
-{
-public:
-    ~tr_net_init_mgr();
-    static std::unique_ptr<tr_net_init_mgr> create();
-
-private:
-    tr_net_init_mgr();
-    tr_net_init_mgr(tr_net_init_mgr&&) = delete;
-    tr_net_init_mgr(tr_net_init_mgr const&) = delete;
-    tr_net_init_mgr& operator=(tr_net_init_mgr&&) = delete;
-    tr_net_init_mgr& operator=(tr_net_init_mgr const&) = delete;
-
-    static bool initialised;
-};
-
-/** @brief Initialise libtransmission for each app
- *  @return A manager object to be kept in scope of main() */
-std::unique_ptr<tr_net_init_mgr> tr_lib_init();
+/** @brief Initialise libtransmission for each app */
+void tr_lib_init();

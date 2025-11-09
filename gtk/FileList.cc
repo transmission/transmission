@@ -32,7 +32,7 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <memory>
@@ -101,9 +101,11 @@ public:
         Glib::ustring const& view_name,
         Glib::RefPtr<Session> const& core,
         tr_torrent_id_t torrent_id);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_torrent(tr_torrent_id_t torrent_id);
     void reset_torrent();
@@ -852,7 +854,7 @@ void FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         auto w = std::make_shared<Gtk::MessageDialog>(
             gtr_widget_get_window(widget_),
             fmt::format(
-                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
                 fmt::arg("old_path", path_string),
                 fmt::arg("path", newname),
                 fmt::arg("error", tr_strerror(error)),
@@ -937,6 +939,8 @@ FileList::Impl::Impl(
     , core_(core)
     , view_(gtr_get_widget<Gtk::TreeView>(builder, view_name))
 {
+    static constexpr auto FileAndSizeScale = 0.8;
+
     /* create the view */
     view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
     setup_item_view_button_event_handling(
@@ -944,16 +948,6 @@ FileList::Impl::Impl(
         [this](guint button, TrGdkModifierType state, double view_x, double view_y, bool /*context_menu_requested*/)
         { return onViewButtonPressed(button, state, view_x, view_y); },
         [this](double view_x, double view_y) { return on_item_view_button_released(*view_, view_x, view_y); });
-
-    auto pango_font_description = view_->create_pango_context()->get_font_description();
-    if (auto const new_size = pango_font_description.get_size() * 0.8; pango_font_description.get_size_is_absolute())
-    {
-        pango_font_description.set_absolute_size(new_size);
-    }
-    else
-    {
-        pango_font_description.set_size(new_size);
-    }
 
     /* set up view */
     auto const sel = view_->get_selection();
@@ -979,9 +973,10 @@ FileList::Impl::Impl(
         auto* text_rend = Gtk::make_managed<Gtk::CellRendererText>();
         text_rend->property_editable() = true;
         text_rend->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
-        text_rend->property_font_desc() = pango_font_description;
+        text_rend->property_scale() = FileAndSizeScale;
         text_rend->signal_edited().connect(sigc::mem_fun(*this, &Impl::cell_edited_callback));
         col->pack_start(*text_rend, true);
+        col->set_spacing(GUI_PAD_SMALL);
         col->add_attribute(text_rend->property_text(), file_cols.label);
         col->set_sort_column(file_cols.label);
         view_->append_column(*col);
@@ -991,10 +986,9 @@ FileList::Impl::Impl(
         /* add "size" column */
         auto* rend = Gtk::make_managed<Gtk::CellRendererText>();
         rend->property_alignment() = TR_PANGO_ALIGNMENT(RIGHT);
-        rend->property_font_desc() = pango_font_description;
+        rend->property_scale() = FileAndSizeScale;
         rend->property_xpad() = GUI_PAD;
         rend->property_xalign() = 1.0F;
-        rend->property_yalign() = 0.5F;
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(_("Size"), *rend);
         col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(GROW_ONLY));
         col->set_sort_column(file_cols.size);
@@ -1004,16 +998,10 @@ FileList::Impl::Impl(
 
     {
         /* add "progress" column */
-        auto const* title = _("Have");
-        int width = 0;
-        int height = 0;
-        view_->create_pango_layout(title)->get_pixel_size(width, height);
-        width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererProgress>();
-        auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
+        auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(_("Have"), *rend);
         col->add_attribute(rend->property_text(), file_cols.prog_str);
         col->add_attribute(rend->property_value(), file_cols.prog);
-        col->set_fixed_width(width);
         col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_sort_column(file_cols.prog);
         view_->append_column(*col);
@@ -1021,14 +1009,8 @@ FileList::Impl::Impl(
 
     {
         /* add "enabled" column */
-        auto const* title = _("Download");
-        int width = 0;
-        int height = 0;
-        view_->create_pango_layout(title)->get_pixel_size(width, height);
-        width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererToggle>();
-        auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_fixed_width(width);
+        auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(_("Download"), *rend);
         col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderDownload));
         col->set_sort_column(file_cols.enabled);
@@ -1037,16 +1019,9 @@ FileList::Impl::Impl(
 
     {
         /* add priority column */
-        auto const* title = _("Priority");
-        int width = 0;
-        int height = 0;
-        view_->create_pango_layout(title)->get_pixel_size(width, height);
-        width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererText>();
         rend->property_xalign() = 0.5F;
-        rend->property_yalign() = 0.5F;
-        auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_fixed_width(width);
+        auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(_("Priority"), *rend);
         col->set_sizing(TR_GTK_TREE_VIEW_COLUMN_SIZING(FIXED));
         col->set_sort_column(file_cols.priority);
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderPriority));

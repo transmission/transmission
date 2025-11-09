@@ -49,8 +49,10 @@ void ensureSoundCommandIsAList(tr_variant* dict)
         key,
         std::array<std::string_view, 5>{
             "canberra-gtk-play",
-            TR_ARG_TUPLE("-i", "complete-download"),
-            TR_ARG_TUPLE("-d", "transmission torrent downloaded"),
+            "-i",
+            "complete-download",
+            "-d",
+            "transmission torrent downloaded",
         });
 }
 
@@ -74,7 +76,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { FILTERBAR, TR_KEY_show_filterbar, QMetaType::Bool },
     { STATUSBAR, TR_KEY_show_statusbar, QMetaType::Bool },
     { STATUSBAR_STATS, TR_KEY_statusbar_stats, QMetaType::QString },
-    { SHOW_TRACKER_SCRAPES, TR_KEY_show_extra_peer_details, QMetaType::Bool },
+    { SHOW_TRACKER_SCRAPES, TR_KEY_show_tracker_scrapes, QMetaType::Bool },
     { SHOW_BACKUP_TRACKERS, TR_KEY_show_backup_trackers, QMetaType::Bool },
     { TOOLBAR, TR_KEY_show_toolbar, QMetaType::Bool },
     { BLOCKLIST_DATE, TR_KEY_blocklist_date, QMetaType::QDateTime },
@@ -444,7 +446,6 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_remote_session_enabled, false);
     settings.try_emplace(TR_KEY_remote_session_requres_authentication, false);
     settings.try_emplace(TR_KEY_show_backup_trackers, false);
-    settings.try_emplace(TR_KEY_show_extra_peer_details, false);
     settings.try_emplace(TR_KEY_show_filterbar, true);
     settings.try_emplace(TR_KEY_show_notification_area_icon, false);
     settings.try_emplace(TR_KEY_start_minimized, false);
@@ -463,7 +464,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_main_window_width, 300);
     settings.try_emplace(TR_KEY_main_window_x, 50);
     settings.try_emplace(TR_KEY_main_window_y, 50);
-    settings.try_emplace(TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
+    settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     settings.try_emplace(TR_KEY_download_dir, download_dir);
     settings.try_emplace(TR_KEY_filter_mode, FilterMode);
     settings.try_emplace(TR_KEY_main_window_layout_order, WindowLayout);

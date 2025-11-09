@@ -21,11 +21,12 @@ export const RPC = {
 };
 
 export class Remote {
+  _connection_alert = null;
+  _session_id = '';
+
   // TODO: decouple from controller
   constructor(controller) {
-    this._connection_alert = null;
     this._controller = controller;
-    this._session_id = '';
   }
 
   sendRequest(data, callback, context) {
@@ -89,10 +90,10 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
-  checkPort(ipProtocol, callback, context) {
+  checkPort(ip_protocol, callback, context) {
     const o = {
       arguments: {
-        ipProtocol,
+        ip_protocol,
       },
       method: 'port-test',
     };

@@ -1,4 +1,6 @@
 ---
+HeaderFilterRegex: .*/libtransmission/.*
+
 # PRs welcome to fix & re-enable any of these explicitly-disabled checks
 Checks: >
   bugprone-*,
@@ -39,8 +41,11 @@ Checks: >
   -readability-qualified-auto,
 
 CheckOptions:
-  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,          value: true       }
-  - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }
-  - { key: readability-identifier-naming.ParameterCase,            value: lower_case }
-  - { key: readability-identifier-naming.VariableCase,             value: lower_case }
-
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,                    value: true       }
+  - { key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor,  value: true       }
+  - { key: readability-identifier-naming.ConstexprVariableCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.ParameterCase,                      value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,                value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,              value: _          }
+  - { key: readability-identifier-naming.VariableCase,                       value: lower_case }
+  - { key: readability-implicit-bool-conversion.UseUpperCaseLiteralSuffix,   value: true       }

@@ -38,7 +38,7 @@ class RenameTest : public SessionTest
 protected:
     void torrentRemoveAndWait(tr_torrent* tor, size_t expected_torrent_count)
     {
-        tr_torrentRemove(tor, false, nullptr, nullptr);
+        tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
         auto const test = [this, expected_torrent_count]()
         {
             return std::size(session_->torrents()) == expected_torrent_count;
@@ -46,13 +46,13 @@ protected:
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
-    void createSingleFileTorrentContents(std::string_view top)
+    static void createSingleFileTorrentContents(std::string_view top)
     {
         auto const path = tr_pathbuf{ top, "/hello-world.txt" };
         createFileWithContents(path, "hello, world!\n");
     }
 
-    void createMultifileTorrentContents(std::string_view top)
+    static void createMultifileTorrentContents(std::string_view top)
     {
         auto path = tr_pathbuf{ top, "/Felidae/Felinae/Acinonyx/Cheetah/Chester"sv };
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");

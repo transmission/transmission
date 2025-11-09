@@ -6,6 +6,7 @@
 #include <algorithm> // std::all_of
 #include <array>
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -19,7 +20,7 @@
 #include <sys/socket.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/ip-cache.h"
 #include "libtransmission/log.h"
@@ -70,7 +71,7 @@ namespace global_source_ip_helpers
 {
     TR_ASSERT(dst_addr.type == bind_addr.type);
 
-    auto const save = errno;
+    [[maybe_unused]] auto const save = sockerrno;
 
     auto const [dst_ss, dst_sslen] = tr_socket_address::to_sockaddr(dst_addr, dst_port);
     auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(bind_addr, {});
@@ -87,18 +88,22 @@ namespace global_source_ip_helpers
                     if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                     {
                         tr_net_close_socket(sock);
-                        errno = save;
+                        set_sockerrno(save);
                         return addrport->address();
                     }
                 }
             }
         }
 
+        err_out = sockerrno;
         tr_net_close_socket(sock);
     }
+    else
+    {
+        err_out = sockerrno;
+    }
 
-    err_out = errno;
-    errno = save;
+    set_sockerrno(save);
     return {};
 }
 
@@ -198,13 +203,16 @@ tr_address tr_ip_cache::bind_addr(tr_address_type type) const noexcept
     return {};
 }
 
-bool tr_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
+bool tr_ip_cache::set_global_addr(tr_address const& addr_new) noexcept
 {
-    if (type == addr.type && addr.is_global_unicast_address())
+    if (addr_new.is_global_unicast_address())
     {
-        auto const lock = std::scoped_lock{ global_addr_mutex_[addr.type] };
-        global_addr_[addr.type] = addr;
-        tr_logAddTrace(fmt::format("Cached global address {}", addr.display_name()));
+        auto const lock = std::scoped_lock{ global_addr_mutex_[addr_new.type] };
+        if (auto& addr = global_addr_[addr_new.type]; addr != addr_new)
+        {
+            addr = addr_new;
+            tr_logAddInfo(fmt::format("Cached {} global address {}", tr_ip_protocol_to_sv(addr->type), addr->display_name()));
+        }
         return true;
     }
     return false;
@@ -267,11 +275,12 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
 
     auto err = 0;
     auto const& source_addr = get_global_source_address(bind_addr(type), err);
+    source_addr_checked_[type] = true;
     if (source_addr)
     {
         set_source_addr(*source_addr);
         tr_logAddDebug(fmt::format(
-            _("Successfully updated source {protocol} address to {ip}"),
+            fmt::runtime(_("Successfully updated source {protocol} address to {ip}")),
             fmt::arg("protocol", protocol),
             fmt::arg("ip", source_addr->display_name())));
     }
@@ -280,12 +289,20 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
         // Stop the update process since we have no public internet connectivity
         unset_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
-        tr_logAddDebug(fmt::format("Couldn't obtain source {} address", protocol));
+
+        tr_logAddDebug(fmt::format("Couldn't obtain source {} address: {} ({})", protocol, tr_net_strerror(err), err));
+        if (std::all_of(std::begin(source_addr_checked_), std::end(source_addr_checked_), [](bool u) { return u; }) &&
+            std::all_of(std::begin(source_addr_), std::end(source_addr_), std::logical_not{}))
+        {
+            tr_logAddError(_("Couldn't obtain source address in any IP protocol, no network connections possible"));
+        }
+
         if (err == EAFNOSUPPORT)
         {
             stop_timer(type); // No point in retrying
             has_ip_protocol = false;
-            tr_logAddInfo(fmt::format(_("Your machine does not support {protocol}"), fmt::arg("protocol", protocol)));
+            tr_logAddInfo(
+                fmt::format(fmt::runtime(_("Your machine does not support {protocol}")), fmt::arg("protocol", protocol)));
         }
     }
 
@@ -304,13 +321,14 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
     if (response.status == 200 /* HTTP_OK */)
     {
         // Update member
-        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body)); addr && set_global_addr(type, *addr))
+        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body));
+            addr && type == addr->type && set_global_addr(*addr))
         {
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);
 
             tr_logAddDebug(fmt::format(
-                _("Successfully updated global {type} address to {ip} using {url}"),
+                fmt::runtime(_("Successfully updated global {type} address to {ip} using {url}")),
                 fmt::arg("type", protocol),
                 fmt::arg("ip", addr->display_name()),
                 fmt::arg("url", IPQueryServices[type][ix_service])));
@@ -326,7 +344,12 @@ void tr_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchRespon
             return;
         }
 
-        tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
+        tr_logAddDebug(fmt::format(
+            "Couldn't obtain global {} address, HTTP status = {}, did_connect = {}, did_timeout = {}",
+            protocol,
+            response.status,
+            response.did_connect,
+            response.did_timeout));
         unset_global_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
     }
@@ -342,11 +365,14 @@ void tr_ip_cache::unset_global_addr(tr_address_type type) noexcept
     tr_logAddTrace(fmt::format("Unset {} global address cache", tr_ip_protocol_to_sv(type)));
 }
 
-void tr_ip_cache::set_source_addr(tr_address const& addr) noexcept
+void tr_ip_cache::set_source_addr(tr_address const& addr_new) noexcept
 {
-    auto const lock = std::scoped_lock{ source_addr_mutex_[addr.type] };
-    source_addr_[addr.type] = addr;
-    tr_logAddTrace(fmt::format("Cached source address {}", addr.display_name()));
+    auto const lock = std::scoped_lock{ source_addr_mutex_[addr_new.type] };
+    if (auto& addr = source_addr_[addr_new.type]; addr != addr_new)
+    {
+        addr = addr_new;
+        tr_logAddInfo(fmt::format("Cached {} source address {}", tr_ip_protocol_to_sv(addr->type), addr->display_name()));
+    }
 }
 
 void tr_ip_cache::unset_addr(tr_address_type type) noexcept

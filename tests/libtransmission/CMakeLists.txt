@@ -31,7 +31,6 @@ target_sources(libtransmission-test
         move-test.cc
         net-test.cc
         open-files-test.cc
-        peer-mgr-active-requests-test.cc
         peer-mgr-wishlist-test.cc
         peer-msgs-test.cc
         platform-test.cc
@@ -50,6 +49,7 @@ target_sources(libtransmission-test
         torrent-files-test.cc
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
+        torrent-queue-test.cc
         torrents-test.cc
         tr-peer-info-test.cc
         utils-test.cc

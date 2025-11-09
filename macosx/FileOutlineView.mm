@@ -4,14 +4,12 @@
 
 #import "InfoWindowController.h"
 #import "FileListNode.h"
-#import "FileNameCell.h"
+#import "FileNameCellView.h"
 #import "FileOutlineView.h"
-#import "FilePriorityCell.h"
+#import "FilePriorityCellView.h"
 #import "Torrent.h"
 
 @interface FileOutlineView ()
-
-@property(nonatomic) NSInteger hoveredRow;
 
 @end
 
@@ -20,16 +18,9 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    FileNameCell* nameCell = [[FileNameCell alloc] init];
-    [self tableColumnWithIdentifier:@"Name"].dataCell = nameCell;
-
-    FilePriorityCell* priorityCell = [[FilePriorityCell alloc] init];
-    [self tableColumnWithIdentifier:@"Priority"].dataCell = priorityCell;
 
     self.autoresizesOutlineColumn = NO;
     self.indentationPerLevel = 14.0;
-
-    self.hoveredRow = -1;
 }
 
 - (void)mouseDown:(NSEvent*)event
@@ -59,61 +50,22 @@
 
 - (NSRect)iconRectForRow:(NSInteger)row
 {
-    FileNameCell* cell = (FileNameCell*)[self preparedCellAtColumn:[self columnWithIdentifier:@"Name"] row:row];
-    NSRect iconRect = [cell imageRectForBounds:[self rectOfRow:row]];
+    NSView* view = [self viewAtColumn:[self columnWithIdentifier:@"Name"] row:row makeIfNecessary:NO];
+    if (![view isKindOfClass:[FileNameCellView class]])
+    {
+        return NSZeroRect;
+    }
 
+    FileNameCellView* cellView = (FileNameCellView*)view;
+    NSImageView* iconView = [cellView valueForKey:@"iconView"];
+    if (!iconView)
+    {
+        return NSZeroRect;
+    }
+
+    NSRect iconRect = [self convertRect:iconView.frame fromView:cellView];
     iconRect.origin.x += self.indentationPerLevel * (CGFloat)([self levelForRow:row] + 1);
     return iconRect;
-}
-
-- (void)updateTrackingAreas
-{
-    [super updateTrackingAreas];
-
-    for (NSTrackingArea* area in self.trackingAreas)
-    {
-        if (area.owner == self && area.userInfo[@"Row"])
-        {
-            [self removeTrackingArea:area];
-        }
-    }
-
-    NSRange visibleRows = [self rowsInRect:self.visibleRect];
-    if (visibleRows.length == 0)
-    {
-        return;
-    }
-
-    NSPoint mouseLocation = [self convertPoint:self.window.mouseLocationOutsideOfEventStream fromView:nil];
-
-    for (NSInteger row = visibleRows.location, col = [self columnWithIdentifier:@"Priority"]; (NSUInteger)row < NSMaxRange(visibleRows); row++)
-    {
-        FilePriorityCell* cell = (FilePriorityCell*)[self preparedCellAtColumn:col row:row];
-
-        NSDictionary* userInfo = @{ @"Row" : @(row) };
-        [cell addTrackingAreasForView:self inRect:[self frameOfCellAtColumn:col row:row] withUserInfo:userInfo
-                        mouseLocation:mouseLocation];
-    }
-}
-
-- (void)mouseEntered:(NSEvent*)event
-{
-    NSNumber* row;
-    if ((row = ((NSDictionary*)event.userData)[@"Row"]))
-    {
-        self.hoveredRow = row.intValue;
-        [self setNeedsDisplayInRect:[self frameOfCellAtColumn:[self columnWithIdentifier:@"Priority"] row:self.hoveredRow]];
-    }
-}
-
-- (void)mouseExited:(NSEvent*)event
-{
-    NSNumber* row;
-    if ((row = ((NSDictionary*)event.userData)[@"Row"]))
-    {
-        [self setNeedsDisplayInRect:[self frameOfCellAtColumn:[self columnWithIdentifier:@"Priority"] row:row.intValue]];
-        self.hoveredRow = -1;
-    }
 }
 
 @end

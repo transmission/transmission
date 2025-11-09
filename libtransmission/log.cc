@@ -14,19 +14,23 @@
 #include <string_view>
 #include <utility>
 
+#ifdef _WIN32
+#include <windows.h> // GetTimeZoneInformation
+#endif
+
 #ifdef __ANDROID__
 #include <android/log.h>
 #endif
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/map.hpp>
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -50,7 +54,7 @@ public:
 
     tr_log_message** queue_tail_ = &queue_;
 
-    int queue_length_ = 0;
+    size_t queue_length_ = 0;
 
     std::recursive_mutex message_mutex_;
 };
@@ -111,7 +115,7 @@ void logAddImpl(
     {
         auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
-        newmsg->when = tr_time();
+        newmsg->when = std::chrono::system_clock::now();
         newmsg->message = std::move(msg);
         newmsg->file = file;
         newmsg->line = line;
@@ -121,28 +125,28 @@ void logAddImpl(
         log_state.queue_tail_ = &newmsg->next;
         ++log_state.queue_length_;
 
-        if (log_state.queue_length_ > TR_LOG_MAX_QUEUE_LENGTH)
+        if (log_state.queue_length_ > TrLogMaxQueueLength)
         {
             tr_log_message* old = log_state.queue_;
             log_state.queue_ = old->next;
             old->next = nullptr;
             tr_logFreeQueue(old);
             --log_state.queue_length_;
-            TR_ASSERT(log_state.queue_length_ == TR_LOG_MAX_QUEUE_LENGTH);
+            TR_ASSERT(log_state.queue_length_ == TrLogMaxQueueLength);
         }
     }
     else
     {
-        auto timestr = std::array<char, 64U>{};
-        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
+        auto buf = std::array<char, 64U>{};
+        auto const timestr = tr_logGetTimeStr(std::data(buf), std::size(buf));
 
         if (std::empty(name))
         {
-            fmt::print(stderr, "[{:s}] {:s}\n", std::data(timestr), msg);
+            fmt::print(stderr, "[{:s}] {:s}\n", timestr, msg);
         }
         else
         {
-            fmt::print("[{:s}] {:s}: {:s}\n", std::data(timestr), name, msg);
+            fmt::print("[{:s}] {:s}: {:s}\n", timestr, name, msg);
         }
     }
 #endif
@@ -194,17 +198,43 @@ void tr_logFreeQueue(tr_log_message* freeme)
 
 // ---
 
-char* tr_logGetTimeStr(char* buf, size_t buflen)
+std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point const now, char* const buf, size_t const buflen)
+{
+    auto* walk = buf;
+    auto const now_time_t = std::chrono::system_clock::to_time_t(now);
+    auto const now_tm = *std::localtime(&now_time_t);
+    walk = fmt::format_to_n(
+               walk,
+               buflen,
+               "{0:%FT%R:}{1:%S}" TR_IF_WIN32("", "{0:%z}"),
+               now_tm,
+               std::chrono::time_point_cast<std::chrono::milliseconds>(now))
+               .out;
+#ifdef _WIN32
+    if (auto tz_info = TIME_ZONE_INFORMATION{}; GetTimeZoneInformation(&tz_info) != TIME_ZONE_ID_INVALID)
+    {
+        // https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-gettimezoneinformation
+        // All translations between UTC time and local time are based on the following formula:
+        //     UTC = local time + bias
+        // The bias is the difference, in minutes, between UTC time and local time.
+        auto const offset = tz_info.Bias < 0 ? -tz_info.Bias : tz_info.Bias;
+        walk = fmt::format_to_n(
+                   walk,
+                   buflen - (walk - buf),
+                   "{:c}{:02d}{:02d}",
+                   tz_info.Bias < 0 ? '+' : '-',
+                   offset / 60,
+                   offset % 60)
+                   .out;
+    }
+#endif
+    return { buf, static_cast<size_t>(walk - buf) };
+}
+
+std::string_view tr_logGetTimeStr(char* buf, size_t buflen)
 {
     auto const a = std::chrono::system_clock::now();
-    auto const [out, len] = fmt::format_to_n(
-        buf,
-        buflen - 1,
-        "{0:%F %H:%M:}{1:%S}",
-        a,
-        std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
-    *out = '\0';
-    return buf;
+    return tr_logGetTimeStr(a, buf, buflen);
 }
 
 void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string&& msg, std::string_view name)

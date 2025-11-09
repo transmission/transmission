@@ -71,14 +71,20 @@ export class Prefs extends EventTarget {
     if (value === null) {
       return fallback;
     }
-    if (value === 'true') {
-      return true;
+
+    const type = typeof fallback;
+    if (type === 'boolean') {
+      if (value === 'true') {
+        return true;
+      }
+      if (value === 'false') {
+        return false;
+      }
+      return fallback;
     }
-    if (value === 'false') {
-      return false;
-    }
-    if (/^\d+$/.test(value)) {
-      return Number.parseInt(value, 10);
+    if (type === 'number') {
+      const f = Number.parseFloat(value);
+      return Number.isNaN(f) ? fallback : f;
     }
     return value;
   }
@@ -100,9 +106,12 @@ Prefs.ContrastMode = 'contrast-mode';
 Prefs.FilterActive = 'active';
 Prefs.FilterAll = 'all';
 Prefs.FilterDownloading = 'downloading';
+Prefs.FilterError = 'error';
 Prefs.FilterFinished = 'finished';
 Prefs.FilterMode = 'filter-mode';
 Prefs.FilterPaused = 'paused';
+Prefs.FilterPrivate = 'private';
+Prefs.FilterPublic = 'public';
 Prefs.FilterSeeding = 'seeding';
 Prefs.NotificationsEnabled = 'notifications-enabled';
 Prefs.RefreshRate = 'refresh-rate-sec';
@@ -122,7 +131,8 @@ Prefs.SortMode = 'sort-mode';
 Prefs._Defaults = {
   [Prefs.AltSpeedEnabled]: false,
   [Prefs.DisplayMode]: Prefs.DisplayFull,
-  [Prefs.ContrastMode]: window.matchMedia('(prefers-contrast: more)').matches
+  [Prefs.ContrastMode]: globalThis.matchMedia('(prefers-contrast: more)')
+    .matches
     ? Prefs.ContrastMore
     : Prefs.ContrastLess,
   [Prefs.FilterMode]: Prefs.FilterAll,

@@ -13,7 +13,7 @@
 #include <utility> // for std::swap()
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -182,7 +182,7 @@ void tr_bandwidth::phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir)
     tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peers.size(), dir == TR_UP ? "upload" : "download"));
 
     // Shuffle the peers so they all have equal chance to be first in line.
-    thread_local auto urbg = tr_urbg<size_t>{};
+    static thread_local auto urbg = tr_urbg<size_t>{};
     std::shuffle(std::begin(peers), std::end(peers), urbg);
 
     // Give each peer `Increment` bandwidth bytes to use. Repeat this
@@ -298,16 +298,18 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 
     auto& band = band_[dir];
 
-    if (band.is_limited_ && is_piece_data)
-    {
-        band.bytes_left_ -= std::min(band.bytes_left_, byte_count);
-    }
-
-    notify_bandwidth_consumed_bytes(now, band.raw_, byte_count);
-
     if (is_piece_data)
     {
         notify_bandwidth_consumed_bytes(now, band.piece_, byte_count);
+    }
+    else
+    {
+        notify_bandwidth_consumed_bytes(now, band.raw_, byte_count);
+
+        if (band.is_limited_)
+        {
+            band.bytes_left_ -= std::min(band.bytes_left_, byte_count);
+        }
     }
 
     if (parent_ != nullptr)

@@ -6,6 +6,7 @@
 #import "ProgressGradients.h"
 #import "TorrentTableView.h"
 #import "Torrent.h"
+#import "NSApplicationAdditions.h"
 
 static CGFloat const kPiecesTotalPercent = 0.6;
 static NSInteger const kMaxPieces = 18 * 18;
@@ -142,10 +143,17 @@ static NSInteger const kMaxPieces = 18 * 18;
 
 - (void)drawPiecesBar:(NSRect)barRect forTorrent:(Torrent*)torrent
 {
-    //fill an all-white bar for magnet links
+    // Fill a solid color bar for magnet links
     if (torrent.magnet)
     {
-        [[NSColor colorWithCalibratedWhite:1.0 alpha:[self.fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0] set];
+        if (NSApp.darkMode)
+        {
+            [NSColor.controlColor set];
+        }
+        else
+        {
+            [[NSColor colorWithCalibratedWhite:1.0 alpha:[self.fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0] set];
+        }
         NSRectFillUsingOperation(barRect, NSCompositingOperationSourceOver);
         return;
     }
@@ -166,6 +174,8 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSIndexSet* previousFinishedIndexes = torrent.previousFinishedPieces;
     NSMutableIndexSet* finishedIndexes = [NSMutableIndexSet indexSet];
 
+    NSColor* const pieceBgColor = NSApp.darkMode ? NSColor.controlColor : NSColor.whiteColor;
+
     for (int i = 0; i < pieceCount; i++)
     {
         NSColor* pieceColor;
@@ -183,7 +193,7 @@ static NSInteger const kMaxPieces = 18 * 18;
         }
         else
         {
-            pieceColor = [NSColor.whiteColor blendedColorWithFraction:piecesPercent[i] ofColor:self.fBluePieceColor];
+            pieceColor = [pieceBgColor blendedColorWithFraction:piecesPercent[i] ofColor:self.fBluePieceColor];
         }
 
         //it's faster to just set color instead of checking previous color

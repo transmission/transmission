@@ -12,7 +12,7 @@
 "29.title" = "KB/s";
 
 /* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
-"30.title" = "Deling:";
+"30.title" = "Forhold:";
 
 /* Class = "NSTextFieldCell"; title = "Advanced"; ObjectID = "31"; */
 "31.title" = "Avanceret";

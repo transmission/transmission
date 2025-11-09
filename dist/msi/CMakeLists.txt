@@ -58,7 +58,7 @@ else()
 endif()
 
 file(
-    COPY "${PROJECT_SOURCE_DIR}/qt/icons/transmission.ico"
+    COPY "${SOURCE_ICONS_DIR}/transmission.ico"
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")
@@ -91,6 +91,7 @@ wix_candle(WIX_OBJS
         "ThirdPartyDir=${TR_THIRD_PARTY_DIR}"
         "QtDir=${TR_QT_DIR}"
         "QtMajorVer=${Qt_VERSION_MAJOR}"
+        "QtMinorVer=${Qt_VERSION_MINOR}"
         "LicenseFile=${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
         "WebSrcDir=${WEBSRCDIR}"
         "TrQmSrcDir=${TRQMSRCDIR}"

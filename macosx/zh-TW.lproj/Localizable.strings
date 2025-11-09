@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "已驗證 %@";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/秒";
 
 /* Info options -> global setting */
@@ -43,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu 個檔案";
+
+/* quicklook file header */
+/* "%lu Files" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu 個傳入連線";
@@ -53,7 +56,7 @@
 "%lu IP address rules in list" = "清單中有 %lu 個 IP 位置規則";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu 已知：";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu 本機探索";
@@ -79,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu 個追蹤器";
 
+/* quicklook tracker header */
+/* "%lu Trackers" = ""; */
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -86,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu 個網路種子";
+
+/* quicklook web seed header */
+/* "%lu Web Seeds" = ""; */
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "總計 %1$u 個區塊，區塊大小為 %2$@";
@@ -111,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 次";
 
+/* quicklook tracker header */
+/* "1 Tracker" = ""; */
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 個傳輸";
+
+/* quicklook web seed header */
+/* "1 Web Seed" = ""; */
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" 是無效的 Torrent 檔案。";
@@ -218,7 +233,7 @@
 "Available" = "可用";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "B/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "頻寬";
@@ -278,6 +293,15 @@
 /* Create toolbar item -> palette label
    Create torrent -> select file */
 "Create Torrent File" = "建立 Torrent 檔案";
+
+/* quicklook creation info */
+/* "Created on %@" = ""; */
+
+/* quicklook creation info */
+/* "Created on %@ with %@" = ""; */
+
+/* quicklook creation info */
+/* "Created with %@" = ""; */
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "無法建立 \"%@\"。";
@@ -487,7 +511,7 @@
 "KB/s" = "KB/秒";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "已知：";
 
 /* Tracker last announce */
 "Last Announce" = "最後宣告於";
@@ -503,9 +527,6 @@
 
 /* About window -> license button */
 "License" = "授權";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "限制 (%ld KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "無法儲存日誌";
@@ -694,7 +715,7 @@
 "Port is open" = "連接埠已開啟";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "連接埠：%@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "視窗大小偏好設定";
@@ -894,7 +915,7 @@
 "Show the data file in Finder" = "在 Finder 中顯示資料檔案";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "顯示工具列";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -914,9 +935,6 @@
 
 /* Stats window -> title */
 "Statistics" = "統計資料";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "達到分享率時停止 (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "停止等待啟動";
@@ -1001,7 +1019,7 @@
 "This folder contains no files." = "該資料夾中沒有檔案。";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "如果預設位置設為與 torrent 檔相同，則此選項不可用。";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "這個傳輸仍在活躍中。若您將其移除，需要使用 torrent 檔案或磁力連結才能繼續傳輸。";

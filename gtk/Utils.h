@@ -8,7 +8,6 @@
 #include "GtkCompat.h"
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/values.h>
 
 #include <glibmm/objectbase.h>
@@ -27,7 +26,7 @@
 #include <gtkmm/listview.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <cstddef>
 #include <cstdint>

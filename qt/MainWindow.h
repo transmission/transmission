@@ -17,8 +17,6 @@
 #include <QTimer>
 #include <QWidgetList>
 
-#include <libtransmission/tr-macros.h>
-
 #include "Filters.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
@@ -50,10 +48,13 @@ extern "C"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(MainWindow)
 
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minimized);
+    MainWindow(MainWindow&&) = delete;
+    MainWindow(MainWindow const&) = delete;
+    MainWindow& operator=(MainWindow&&) = delete;
+    MainWindow& operator=(MainWindow const&) = delete;
 
     [[nodiscard]] constexpr QSystemTrayIcon& trayIcon() noexcept
     {
@@ -123,9 +124,9 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
+    [[nodiscard]] QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
 
-    torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
+    [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
     void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
@@ -193,7 +194,7 @@ private:
         size_t peers_sending = 0;
         size_t peers_receiving = 0;
     };
-    TransferStats getTransferStats() const;
+    [[nodiscard]] TransferStats getTransferStats() const;
 
     enum
     {

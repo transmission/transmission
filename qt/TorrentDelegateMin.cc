@@ -119,7 +119,7 @@ ItemLayout::ItemLayout(
     bar_style.progress = 100;
     bar_style.textVisible = true;
     QSize const bar_size(
-        bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
+        (bar_style.rect.width() * 2) - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
         bar_style.rect.height());
 
     QRect base_rect{ top_left,
@@ -153,7 +153,7 @@ QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent c
                                     option.font,
                                     option.direction,
                                     QPoint{},
-                                    option.rect.width() - m.width() * 2 };
+                                    option.rect.width() - (m.width() * 2) };
     return layout.size() + m * 2;
 }
 
@@ -270,7 +270,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    StyleHelper::drawProgressBar(*painter, progress_bar_style_);
 
     painter->restore();
 }

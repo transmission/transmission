@@ -28,6 +28,7 @@ add_link_options(
     # equivalent of XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING YES for this directory
     $<$<LINK_LANGUAGE:C,CXX>:-dead_strip>)
 
+add_subdirectory(QuickLookExtension)
 add_subdirectory(QuickLookPlugin)
 add_subdirectory(VDKQueue)
 
@@ -74,14 +75,16 @@ target_sources(${TR_NAME}-mac
         ExpandedPathToPathTransformer.mm
         FileListNode.h
         FileListNode.mm
-        FileNameCell.h
-        FileNameCell.mm
+        FileCheckCellView.h
+        FileCheckCellView.mm
+        FileNameCellView.h
+        FileNameCellView.mm
         FileOutlineController.h
         FileOutlineController.mm
         FileOutlineView.h
         FileOutlineView.mm
-        FilePriorityCell.h
-        FilePriorityCell.mm
+        FilePriorityCellView.h
+        FilePriorityCellView.mm
         FileRenameSheetController.h
         FileRenameSheetController.mm
         FilterBarController.h
@@ -142,6 +145,8 @@ target_sources(${TR_NAME}-mac
         PiecesView.mm
         PortChecker.h
         PortChecker.mm
+        PowerManager.h
+        PowerManager.mm
         PredicateEditorRowTemplateAny.h
         PredicateEditorRowTemplateAny.mm
         PrefsController.h
@@ -228,7 +233,6 @@ set_source_files_properties(
 
 set(IMAGESETS
     ActionHover
-    Bandwidth
     CleanupTemplate
     CompleteCheck
     CreateLarge
@@ -236,17 +240,7 @@ set(IMAGESETS
     DownArrowTemplate
     DownloadBadge
     EllipsisTemplate
-    FavIcon
-    GearshapeTemplate
     Globe
-    Groups
-    InfoActivity
-    InfoFiles
-    InfoGeneral
-    InfoOptions
-    InfoPeers
-    InfoTracker
-    Lock
     Magnet
     PauseHover
     PauseOff
@@ -258,7 +252,6 @@ set(IMAGESETS
     PriorityHighTemplate
     PriorityLowTemplate
     PriorityNormalTemplate
-    Remote
     ResumeHover
     ResumeNoWaitHover
     ResumeNoWaitOff
@@ -268,18 +261,7 @@ set(IMAGESETS
     RevealHover
     RevealOff
     RevealOn
-    ToolbarCreateTemplate
-    ToolbarFilterTemplate
-    ToolbarInfoTemplate
-    ToolbarOpenTemplate
-    ToolbarOpenWebTemplate
-    ToolbarPauseAllTemplate
-    ToolbarPauseSelectedTemplate
-    ToolbarRemoveTemplate
-    ToolbarResumeAllTemplate
-    ToolbarResumeSelectedTemplate
     TortoiseTemplate
-    Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
     UploadBadge
@@ -434,7 +416,6 @@ target_link_libraries(${TR_NAME}-mac
         "-framework AppKit"
         "-framework Carbon"
         "-framework Foundation"
-        "-framework IOKit"
         "-framework Quartz"
         "-framework Security"
         "-weak_framework UserNotifications")

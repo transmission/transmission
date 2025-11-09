@@ -21,8 +21,8 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
+#include "libtransmission/tr-macros.h"
 #include <libtransmission/quark.h>
-#include <libtransmission/tr-macros.h>
 
 #include "IconCache.h"
 #include "Speed.h"
@@ -59,7 +59,7 @@ using PeerList = std::vector<Peer>;
 
 struct TrackerStat
 {
-    QPixmap getFavicon() const;
+    [[nodiscard]] QPixmap getFavicon() const;
 
     bool has_announced;
     bool has_scraped;
@@ -114,28 +114,13 @@ public:
     explicit TorrentHash(tr_sha1_digest_t const& data)
         : data_{ data }
     {
+        auto const hashstr = tr_sha1_to_string(data_);
+        data_str_ = QString::fromUtf8(std::data(hashstr), std::size(hashstr));
     }
 
-    explicit TorrentHash(char const* str)
+    explicit TorrentHash(std::string_view const str)
+        : TorrentHash{ tr_sha1_from_string(str).value_or(tr_sha1_digest_t{}) }
     {
-        if (auto const hash = tr_sha1_from_string(str != nullptr ? str : ""); hash)
-        {
-            data_ = *hash;
-
-            auto const tmpstr = tr_sha1_to_string(data_);
-            data_str_ = QString::fromUtf8(std::data(tmpstr), std::size(tmpstr));
-        }
-    }
-
-    explicit TorrentHash(QString const& str)
-    {
-        if (auto const hash = tr_sha1_from_string(str.toStdString()); hash)
-        {
-            data_ = *hash;
-
-            auto const tmpstr = tr_sha1_to_string(data_);
-            data_str_ = QString::fromUtf8(std::data(tmpstr), std::size(tmpstr));
-        }
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto operator==(TorrentHash const& that) const
@@ -162,10 +147,13 @@ public:
 class Torrent : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(Torrent)
 
 public:
     Torrent(Prefs const&, int id);
+    Torrent(Torrent&&) = delete;
+    Torrent(Torrent const&) = delete;
+    Torrent& operator=(Torrent&&) = delete;
+    Torrent& operator=(Torrent const&) = delete;
 
     [[nodiscard]] constexpr auto getBandwidthPriority() const noexcept
     {

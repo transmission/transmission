@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef> // size_t
 #include <ctime>
 #include <optional>
@@ -13,7 +14,7 @@
 
 // ---
 
-enum tr_log_level
+enum tr_log_level : uint8_t
 {
     // No logging at all
     TR_LOG_OFF,
@@ -53,7 +54,7 @@ struct tr_log_message
     long line;
 
     // when the message was generated
-    time_t when;
+    std::chrono::system_clock::time_point when;
 
     // torrent name or code module name associated with the message
     std::string name;
@@ -67,7 +68,7 @@ struct tr_log_message
 
 // ---
 
-#define TR_LOG_MAX_QUEUE_LENGTH 10000
+inline constexpr auto TrLogMaxQueueLength = 10000U;
 
 void tr_logSetQueueEnabled(bool is_enabled);
 
@@ -77,7 +78,7 @@ void tr_logFreeQueue(tr_log_message* freeme);
 
 // ---
 
-void tr_logSetLevel(tr_log_level);
+void tr_logSetLevel(tr_log_level level);
 
 [[nodiscard]] tr_log_level tr_logGetLevel();
 
@@ -110,4 +111,5 @@ void tr_logAddMessage(
 
 // ---
 
-char* tr_logGetTimeStr(char* buf, size_t buflen);
+std::string_view tr_logGetTimeStr(std::chrono::system_clock::time_point now, char* buf, size_t buflen);
+std::string_view tr_logGetTimeStr(char* buf, size_t buflen);

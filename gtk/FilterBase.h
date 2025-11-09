@@ -7,8 +7,6 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/tr-macros.h>
-
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/filter.h>
 #else
@@ -20,20 +18,25 @@
 template<typename T>
 class FilterBase : public IF_GTKMM4(Gtk::Filter, Glib::Object)
 {
-public:
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
-    enum class Change : uint8_t{
+public:
+    // clang-format off
+    enum class Change : uint8_t
+    {
         DIFFERENT,
         LESS_STRICT,
         MORE_STRICT,
     };
+    // clang-format on
 #endif
 
 public:
     FilterBase() = default;
+    FilterBase(FilterBase&&) = delete;
+    FilterBase(FilterBase const&) = delete;
+    FilterBase& operator=(FilterBase&&) = delete;
+    FilterBase& operator=(FilterBase const&) = delete;
     ~FilterBase() override = default;
-
-    TR_DISABLE_COPY_MOVE(FilterBase)
 
     virtual bool match(T const& item) const = 0;
 

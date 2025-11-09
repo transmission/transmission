@@ -26,7 +26,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/core.h> // fmt::ptr
+#include <fmt/format.h> // fmt::ptr
 
 #include "libtransmission/transmission.h"
 
@@ -200,7 +200,7 @@ tr_peer_id_t tr_peerIdInit()
         total += val;
         *it++ = Pool[val];
     }
-    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - (total % std::size(Pool)) : 0;
     *it = Pool[val];
 
     return peer_id;
@@ -241,6 +241,14 @@ void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, tr_pex 
     {
         tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n_pex);
     }
+}
+
+// ---
+
+std::string tr_session::QueueMediator::store_filename(tr_torrent_id_t id) const
+{
+    auto const* const tor = session_.torrents().get(id);
+    return tor != nullptr ? tor->store_filename() : std::string{};
 }
 
 // ---
@@ -341,14 +349,9 @@ size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
     return tor == nullptr ? 0U : tor->bandwidth().clamp(TR_DOWN, byte_count);
 }
 
-void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
+std::optional<std::string> tr_session::WebMediator::proxyUrl() const
 {
-    auto const lock = session_->unique_lock();
-
-    if (auto* const tor = session_->torrents().get(torrent_id); tor != nullptr)
-    {
-        tor->bandwidth().notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
-    }
+    return session_->settings().proxy_url;
 }
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
@@ -414,7 +417,7 @@ tr_session::BoundSocket::BoundSocket(
     }
 
     tr_logAddInfo(fmt::format(
-        _("Listening to incoming peer connections on {hostport}"),
+        fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
@@ -732,7 +735,8 @@ void tr_session::initImpl(init_data& data)
 
     blocklists_.load(blocklist_dir_, blocklist_enabled());
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(
+        fmt::format(fmt::runtime(_("Transmission version {version} starting")), fmt::arg("version", LONG_VERSION_STRING)));
 
     setSettings(settings, true);
 
@@ -867,7 +871,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     }
     else if (force || !dht_ || port_changed || addr_changed || new_settings.dht_enabled != old_settings.dht_enabled)
     {
-        dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
+        dht_ = tr_dht::create(dht_mediator_, advertisedPeerPort(), udp_core_->socket4(), udp_core_->socket6());
     }
 
     if (auto const& val = new_settings.sleep_per_seconds_during_verify;
@@ -1346,6 +1350,8 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     bound_ipv6_.reset();
     bound_ipv4_.reset();
 
+    torrent_queue().to_file();
+
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
     // fired out first...
@@ -1418,7 +1424,8 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->am_in_session_thread());
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(
+        fmt::format(fmt::runtime(_("Transmission version {version} shutting down")), fmt::arg("version", LONG_VERSION_STRING)));
 
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
@@ -1434,38 +1441,72 @@ namespace
 {
 namespace load_torrents_helpers
 {
+auto get_remaining_files(std::string_view folder, std::vector<std::string>& queue_order)
+{
+    auto files = tr_sys_dir_get_files(folder);
+    auto ret = std::vector<std::string>{};
+    ret.reserve(std::size(files));
+    std::sort(std::begin(queue_order), std::end(queue_order));
+    std::sort(std::begin(files), std::end(files));
+
+    std::set_difference(
+        std::begin(files),
+        std::end(files),
+        std::begin(queue_order),
+        std::end(queue_order),
+        std::back_inserter(ret));
+
+    // Read .torrent first if somehow a .magnet of the same hash exists
+    // Example of possible cause: https://github.com/transmission/transmission/issues/5007
+    std::stable_partition(
+        std::begin(ret),
+        std::end(ret),
+        [](std::string_view name) { return tr_strv_ends_with(name, ".torrent"sv); });
+
+    return ret;
+}
+
 void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
 {
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".torrent"sv); }))
+    auto load_func = [&folder, &n_torrents, ctor, buf = std::vector<char>{}](std::string_view name) mutable
     {
-        auto const path = tr_pathbuf{ folder, '/', name };
-
-        if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
+        if (tr_strv_ends_with(name, ".torrent"sv))
         {
-            ++n_torrents;
+            auto const path = tr_pathbuf{ folder, '/', name };
+            if (ctor->set_metainfo_from_file(path.sv()) && tr_torrentNew(ctor, nullptr) != nullptr)
+            {
+                ++n_torrents;
+            }
         }
+        else if (tr_strv_ends_with(name, ".magnet"sv))
+        {
+            auto const path = tr_pathbuf{ folder, '/', name };
+            if (tr_file_read(path, buf) &&
+                ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
+                tr_torrentNew(ctor, nullptr) != nullptr)
+            {
+                ++n_torrents;
+            }
+        }
+    };
+
+    auto queue_order = session->torrent_queue().from_file();
+    for (auto const& filename : queue_order)
+    {
+        load_func(filename);
     }
-
-    auto buf = std::vector<char>{};
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".magnet"sv); }))
+    for (auto const& filename : get_remaining_files(folder, queue_order))
     {
-        auto const path = tr_pathbuf{ folder, '/', name };
-
-        if (tr_file_read(path, buf) &&
-            ctor->set_metainfo_from_magnet_link(std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
-            tr_torrentNew(ctor, nullptr) != nullptr)
-        {
-            ++n_torrents;
-        }
+        load_func(filename);
     }
 
     if (n_torrents != 0U)
     {
         tr_logAddInfo(fmt::format(
-            tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents),
+            fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
             fmt::arg("count", n_torrents)));
     }
 
@@ -2020,6 +2061,10 @@ void tr_session::verify_add(tr_torrent* const tor)
 }
 
 // ---
+void tr_session::flush_torrent_files(tr_torrent_id_t const tor_id) const noexcept
+{
+    this->cache->flush_torrent(tor_id);
+}
 
 void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {
@@ -2140,6 +2185,7 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 void tr_session::addTorrent(tr_torrent* tor)
 {
     tor->init_id(torrents().add(tor));
+    torrent_queue_.add(tor->id());
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }

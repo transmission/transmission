@@ -63,7 +63,7 @@
 #include <gtkmm/selectiondata.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <csignal>
@@ -101,7 +101,7 @@ namespace
 auto const AppIconName = "transmission"sv; // TODO(C++20): Use ""s
 
 char const* const LICENSE =
-    "Copyright 2005-2024. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2025. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
     "GNU GPL, versions 2 or 3, or by any future license endorsed by Mnemosyne LLC."
@@ -121,9 +121,11 @@ class Application::Impl
 {
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool start_iconified);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void open_files(std::vector<Glib::RefPtr<Gio::File>> const& files);
 
@@ -395,7 +397,7 @@ void register_magnet_link_handler()
     catch (Gio::Error const& e)
     {
         gtr_warning(fmt::format(
-            _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
+            fmt::runtime(_("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})")),
             fmt::arg("content_type", content_type),
             fmt::arg("error", e.what()),
             fmt::arg("error_code", static_cast<int>(e.code()))));

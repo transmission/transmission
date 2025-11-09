@@ -25,7 +25,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -267,7 +267,7 @@ private:
             tr_net_close_socket(mcast_sockets_[TR_AF_INET]);
             mcast_sockets_[TR_AF_INET] = TR_BAD_SOCKET;
             tr_logAddWarn(fmt::format(
-                _("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
                 fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET)),
                 fmt::arg("error", tr_strerror(err)),
                 fmt::arg("error_code", err)));
@@ -280,7 +280,7 @@ private:
             tr_net_close_socket(mcast_sockets_[TR_AF_INET6]);
             mcast_sockets_[TR_AF_INET6] = TR_BAD_SOCKET;
             tr_logAddWarn(fmt::format(
-                _("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't initialize {ip_protocol} LPD: {error} ({error_code})")),
                 fmt::arg("ip_protocol", tr_ip_protocol_to_sv(TR_AF_INET6)),
                 fmt::arg("error", tr_strerror(err)),
                 fmt::arg("error_code", err)));
@@ -335,7 +335,7 @@ private:
         if constexpr (ip_protocol == TR_AF_INET6)
         {
             // must be done before binding on Linux
-            if (evutil_make_listen_socket_ipv6only(sock) == -1)
+            if (tr_make_listen_socket_ipv6only(sock) == -1)
             {
                 return false;
             }
@@ -568,39 +568,35 @@ private:
         };
         std::sort(std::begin(torrents), std::end(torrents), TorrentComparator);
 
-        // cram in as many as will fit in a message
-        auto baseline_size = size_t{};
-        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
-        {
-            baseline_size = std::max(
-                baseline_size,
-                std::size(makeAnnounceMsg(static_cast<tr_address_type>(ipp), cookie_, mediator_.port(), {})));
-        }
-        auto const size_per_hash = std::size(torrents.front().info_hash_str);
-        auto const max_torrents_per_announce = (MaxDatagramLength - baseline_size) / size_per_hash;
-        auto const torrents_this_announce = std::min(std::size(torrents), max_torrents_per_announce);
-        auto info_hash_strings = std::vector<std::string_view>{};
-        info_hash_strings.reserve(torrents_this_announce);
-        std::transform(
-            std::begin(torrents),
-            std::begin(torrents) + torrents_this_announce,
-            std::back_inserter(info_hash_strings),
-            [](auto const& tor) { return tor.info_hash_str; });
-
-        auto success = false;
-        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
-        {
-            success |= sendAnnounce(static_cast<tr_address_type>(ipp), info_hash_strings);
-        }
-        if (!success)
-        {
-            return;
-        }
-
         auto const next_announce_after = now + TorrentAnnounceIntervalSec;
-        for (auto const& info_hash_string : info_hash_strings)
+        for (ipp_t ipp = 0; ipp < NUM_TR_AF_INET_TYPES; ++ipp)
         {
-            mediator_.setNextAnnounceTime(info_hash_string, next_announce_after);
+            auto const ip_protocol = static_cast<tr_address_type>(ipp);
+
+            // cram in as many as will fit in a message
+            auto const baseline_size = std::size(makeAnnounceMsg(ip_protocol, cookie_, mediator_.port(), {}));
+            auto const size_with_one = std::size(
+                makeAnnounceMsg(ip_protocol, cookie_, mediator_.port(), { torrents.front().info_hash_str }));
+            auto const size_per_hash = size_with_one - baseline_size;
+            auto const max_torrents_per_announce = (MaxDatagramLength - baseline_size) / size_per_hash;
+            auto const torrents_this_announce = std::min(std::size(torrents), max_torrents_per_announce);
+            auto info_hash_strings = std::vector<std::string_view>{};
+            info_hash_strings.reserve(torrents_this_announce);
+            std::transform(
+                std::begin(torrents),
+                std::begin(torrents) + torrents_this_announce,
+                std::back_inserter(info_hash_strings),
+                [](auto const& tor) { return tor.info_hash_str; });
+
+            if (!sendAnnounce(static_cast<tr_address_type>(ipp), info_hash_strings))
+            {
+                continue;
+            }
+
+            for (auto const& info_hash_string : info_hash_strings)
+            {
+                mediator_.setNextAnnounceTime(info_hash_string, next_announce_after);
+            }
         }
     }
 

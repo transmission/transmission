@@ -18,7 +18,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/file.h>
 #include <libtransmission/utils.h> // for tr_file_save()

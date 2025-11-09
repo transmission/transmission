@@ -41,7 +41,7 @@
 #include <gtkmm/treemodelsort.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <array>
@@ -62,9 +62,11 @@ class Session::Impl
 {
 public:
     Impl(Session& core, tr_session* session);
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     tr_session* close();
 
@@ -86,6 +88,8 @@ public:
     void add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify);
     void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
+
+    void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
     void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
 
@@ -165,6 +169,8 @@ private:
 
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
+
+    void on_torrent_removal_done(tr_torrent_id_t id, bool succeeded);
 
 private:
     Session& core_;
@@ -313,7 +319,7 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     catch (Glib::Error const& e)
     {
         gtr_message(fmt::format(
-            _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
             fmt::arg("old_path", old_name),
             fmt::arg("path", new_name),
             fmt::arg("error", e.what()),
@@ -618,7 +624,14 @@ std::pair<Glib::RefPtr<Torrent>, guint> Session::Impl::find_torrent_by_id(tr_tor
             return { torrent, position };
         }
 
-        (current_torrent_id < torrent_id ? begin_position : end_position) = position;
+        if (current_torrent_id < torrent_id)
+        {
+            begin_position = position + 1;
+        }
+        else
+        {
+            end_position = position;
+        }
     }
 
     return {};
@@ -781,7 +794,7 @@ void Session::Impl::add_file_async_callback(
 
         if (!file->load_contents_finish(result, contents, length))
         {
-            gtr_message(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name())));
+            gtr_message(fmt::format(fmt::runtime(_("Couldn't read '{path}'")), fmt::arg("path", file->get_parse_name())));
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -795,7 +808,7 @@ void Session::Impl::add_file_async_callback(
     catch (Glib::Error const& e)
     {
         gtr_message(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
             fmt::arg("path", file->get_parse_name()),
             fmt::arg("error", e.what()),
             fmt::arg("error_code", e.code())));
@@ -846,7 +859,10 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     else
     {
         tr_ctorFree(ctor);
-        std::cerr << fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", file->get_parse_name())) << '\n';
+        std::cerr << fmt::format(
+                         fmt::runtime(_("Couldn't add torrent file '{path}'")),
+                         fmt::arg("path", file->get_parse_name()))
+                  << '\n';
     }
 
     return handled;
@@ -905,18 +921,46 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
-    {
-        /* remove from the gui */
-        impl_->get_raw_model()->remove(position);
+    impl_->remove_torrent(id, delete_files);
+}
 
-        /* remove the torrent */
+void Session::Impl::remove_torrent(tr_torrent_id_t id, bool delete_files)
+{
+    static auto const callback = [](tr_torrent_id_t processed_id, bool succeeded, void* user_data)
+    {
+        // "Own" the core since refcount has already been incremented before operation start — only decrement required.
+        auto const core = Glib::make_refptr_for_instance(static_cast<Session*>(user_data));
+
+        Glib::signal_idle().connect_once([processed_id, succeeded, core]()
+                                         { core->impl_->on_torrent_removal_done(processed_id, succeeded); });
+    };
+
+    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
+    {
+        // Extend core lifetime, refcount will be decremented in the callback.
+        core_.reference();
+
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
             [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
-            nullptr);
+            nullptr,
+            callback,
+            &core_);
+    }
+}
+
+void Session::Impl::on_torrent_removal_done(tr_torrent_id_t id, bool succeeded)
+{
+    if (!succeeded)
+    {
+        return;
+    }
+
+    if (auto const& [torrent, position] = find_torrent_by_id(id); torrent)
+    {
+        get_raw_model()->remove(position);
     }
 }
 
@@ -1044,7 +1088,8 @@ bool gtr_inhibit_hibernation(guint32& cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
+        tr_logAddError(
+            fmt::format(fmt::runtime(_("Couldn't inhibit desktop hibernation: {error}")), fmt::arg("error", e.what())));
     }
 
     return success;
@@ -1069,7 +1114,8 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
+        tr_logAddError(
+            fmt::format(fmt::runtime(_("Couldn't inhibit desktop hibernation: {error}")), fmt::arg("error", e.what())));
     }
 }
 
@@ -1183,7 +1229,7 @@ bool core_read_rpc_response_idle(tr_variant& response)
         }
         else
         {
-            gtr_warning(fmt::format(_("Couldn't find pending RPC request for tag {tag}"), fmt::arg("tag", tag)));
+            gtr_warning(fmt::format(fmt::runtime(_("Couldn't find pending RPC request for tag {tag}")), fmt::arg("tag", tag)));
         }
     }
 
@@ -1238,7 +1284,7 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
     auto const tag = nextTag++;
 
     auto arguments_map = tr_variant::Map{ 1U };
-    arguments_map.try_emplace(TR_KEY_ipProtocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
+    arguments_map.try_emplace(TR_KEY_ip_protocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
 
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));

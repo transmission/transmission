@@ -2,8 +2,6 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-@import IOKit;
-@import IOKit.pwr_mgt;
 @import Carbon;
 @import UserNotifications;
 
@@ -56,6 +54,7 @@
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
 #import "VersionComparator.h"
+#import "PowerManager.h"
 
 typedef NSString* ToolbarItemIdentifier NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -149,9 +148,9 @@ static void initUnits()
     NSString* g_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
     unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
     NSString* t_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
-    Config::Memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+    Config::memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                        m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
-    Config::Storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+    Config::storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                         m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 
     b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)");
@@ -159,7 +158,7 @@ static void initUnits()
     m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)");
     g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)");
     t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)");
-    Config::Speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+    Config::speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
 
@@ -174,11 +173,6 @@ static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, t
 {
     [(__bridge Controller*)controller rpcCallback:type forTorrentStruct:torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually
-}
-
-static void sleepCallback(void* controller, io_service_t /*y*/, natural_t messageType, void* messageArgument)
-{
-    [(__bridge Controller*)controller sleepCallback:messageType argument:messageArgument];
 }
 
 // 2.90 was infected with ransomware which we now check for and attempt to remove
@@ -271,7 +265,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate>
+@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet NSStackView* fStackView;
@@ -311,7 +305,6 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) DragOverlayWindow* fOverlayWindow;
 
-@property(nonatomic) io_connect_t fRootPort;
 @property(nonatomic) NSTimer* fTimer;
 
 @property(nonatomic) StatusBarController* fStatusBar;
@@ -338,7 +331,6 @@ static void removeKeRangerRansomware()
 @property(nonatomic) BOOL fGlobalPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 @property(nonatomic) BOOL fSoundPlaying;
-@property(nonatomic) id fNoNapActivity;
 
 @end
 
@@ -632,11 +624,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     toolbar.displayMode = NSToolbarDisplayModeIconOnly;
     self.fWindow.toolbar = toolbar;
 
-    if (@available(macOS 11.0, *))
-    {
-        self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
-        self.fWindow.titleVisibility = NSWindowTitleHidden;
-    }
+    self.fWindow.toolbarStyle = NSWindowToolbarStyleUnified;
+    self.fWindow.titleVisibility = NSWindowTitleHidden;
 
     self.fWindow.delegate = self; //do manually to avoid placement issue
 
@@ -704,18 +693,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
     //this must be called after showStatusBar:
     [self.fStatusBar updateWithDownload:0.0 upload:0.0];
-
-    //register for sleep notifications
-    IONotificationPortRef notify;
-    io_object_t iterator;
-    if ((self.fRootPort = IORegisterForSystemPower((__bridge void*)(self), &notify, sleepCallback, &iterator)))
-    {
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
-    }
-    else
-    {
-        NSLog(@"Could not IORegisterForSystemPower");
-    }
 
     auto* const session = self.fLib;
 
@@ -843,6 +820,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
+#pragma mark - NSApplicationDelegate
+
 - (void)applicationWillFinishLaunching:(NSNotification*)notification
 {
     // user notifications
@@ -890,8 +869,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     NSApp.servicesProvider = self;
 
-    self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
-                                                                       reason:@"No napping on the job!"];
+    [PowerManager.shared setDelegate:self];
+    [PowerManager.shared start];
 
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleOpenContentsEvent:replyEvent:)
@@ -1039,7 +1018,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     self.fQuitting = YES;
 
-    [NSProcessInfo.processInfo endActivity:self.fNoNapActivity];
+    [PowerManager.shared stop];
 
     //stop the Bonjour service
     if (BonjourController.defaultControllerExists)
@@ -1069,7 +1048,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //remove all torrent downloads
     [self.fSession invalidateAndCancel];
 
-    //remember window states and close all windows
+    //remember window states
     [self.fDefaults setBool:self.fInfoController.window.visible forKey:@"InfoVisible"];
 
     if ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible)
@@ -1077,10 +1056,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         [[QLPreviewPanel sharedPreviewPanel] updateController];
     }
 
+    // close all windows
     for (NSWindow* window in NSApp.windows)
     {
         [window close];
     }
+
+    // clear the badge
+    [self.fBadger updateBadgeWithDownload:0 upload:0];
 
     //save history
     [self updateTorrentHistory];
@@ -1088,9 +1071,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     _fileWatcherQueue = nil;
 
-    //complete cleanup
+    //complete cleanup: this can take many seconds
     tr_sessionClose(self.fLib);
 }
+
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication*)app
+{
+    return YES;
+}
+
+#pragma mark -
 
 - (tr_session*)sessionHandle
 {
@@ -2368,6 +2358,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     CGFloat dlRate = 0.0, ulRate = 0.0;
     BOOL anyCompleted = NO;
+    BOOL anyActive = NO;
+
     for (Torrent* torrent in self.fTorrents)
     {
         [torrent update];
@@ -2377,7 +2369,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         ulRate += torrent.uploadRate;
 
         anyCompleted |= torrent.finishedSeeding;
+        anyActive |= torrent.active && !torrent.stalled && !torrent.error;
     }
+
+    PowerManager.shared.shouldPreventSleep = anyActive && [self.fDefaults boolForKey:@"SleepPrevent"];
 
     if (!NSApp.hidden)
     {
@@ -4198,17 +4193,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     item.view = button;
 
-    if (@available(macOS 11.0, *))
-    {
-        //standard button sizes
-    }
-    else
-    {
-        NSSize const buttonSize = NSMakeSize(36.0, 25.0);
-        item.minSize = buttonSize;
-        item.maxSize = buttonSize;
-    }
-
     return item;
 }
 
@@ -4221,7 +4205,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Create", "Create toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"doc.badge.plus" withFallback:@"ToolbarCreateTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"doc.badge.plus" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(createFile:);
         item.autovalidates = NO;
@@ -4235,7 +4219,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Open", "Open toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"folder" withFallback:@"ToolbarOpenTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"folder" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(openShowSheet:);
         item.autovalidates = NO;
@@ -4249,7 +4233,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Open Address", "Open address toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"globe" withFallback:@"ToolbarOpenWebTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(openURLShowSheet:);
         item.autovalidates = NO;
@@ -4263,7 +4247,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Remove", "Remove toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"nosign" withFallback:@"ToolbarRemoveTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"nosign" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(removeNoDelete:);
         item.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
@@ -4278,7 +4262,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Inspector", "Inspector toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"info.circle" withFallback:@"ToolbarInfoTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(showInfo:);
 
@@ -4297,13 +4281,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         segmentedControl.segmentCount = 2;
 
         [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"pause.circle.fill" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagPause];
         [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagPause];
 
         [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise.circle.fill" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagResume];
@@ -4321,17 +4305,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         groupItem.view = segmentedControl;
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
-
-        if (@available(macOS 11.0, *))
-        {
-            //standard segment size
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
 
         [groupItem createMenu:@[
             NSLocalizedString(@"Pause All", "All toolbar item -> label"),
@@ -4353,13 +4326,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         segmentedControl.segmentCount = 2;
 
         [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"pause" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagPause];
         [segmentedControl setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagPause];
 
         [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
+        [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise" accessibilityDescription:nil]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagResume];
@@ -4378,17 +4351,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         groupItem.target = self;
         groupItem.action = @selector(selectedToolbarClicked:);
 
-        if (@available(macOS 11.0, *))
-        {
-            //standard segment size
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
-
         [groupItem createMenu:@[
             NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
             NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label")
@@ -4404,7 +4366,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         item.label = NSLocalizedString(@"Filter", "Filter toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"magnifyingglass" withFallback:@"ToolbarFilterTemplate"];
+        item.image = [NSImage imageWithSystemSymbolName:@"magnifyingglass" accessibilityDescription:nil];
         item.target = self;
         item.action = @selector(toggleFilterBar:);
 
@@ -5030,57 +4992,32 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     return YES;
 }
 
-- (void)sleepCallback:(natural_t)messageType argument:(void*)messageArgument
+- (void)systemWillSleep
 {
-    switch (messageType)
+    //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
+    BOOL anyActive = NO;
+    for (Torrent* torrent in self.fTorrents)
     {
-    case kIOMessageSystemWillSleep:
+        if (torrent.active)
         {
-            //stop all transfers (since some are active) before going to sleep and remember to resume when we wake up
-            BOOL anyActive = NO;
-            for (Torrent* torrent in self.fTorrents)
-            {
-                if (torrent.active)
-                {
-                    anyActive = YES;
-                }
-                [torrent sleep]; //have to call on all, regardless if they are active
-            }
-
-            //if there are any running transfers, wait 15 seconds for them to stop
-            if (anyActive)
-            {
-                sleep(15);
-            }
-
-            IOAllowPowerChange(self.fRootPort, (long)messageArgument);
-            break;
+            anyActive = YES;
         }
+        [torrent sleep]; //have to call on all, regardless if they are active
+    }
 
-    case kIOMessageCanSystemSleep:
-        if ([self.fDefaults boolForKey:@"SleepPrevent"])
-        {
-            //prevent idle sleep unless no torrents are active
-            for (Torrent* torrent in self.fTorrents)
-            {
-                if (torrent.active && !torrent.stalled && !torrent.error)
-                {
-                    IOCancelPowerChange(self.fRootPort, (long)messageArgument);
-                    return;
-                }
-            }
-        }
+    //if there are any running transfers, wait 15 seconds for them to stop
+    if (anyActive)
+    {
+        sleep(15);
+    }
+}
 
-        IOAllowPowerChange(self.fRootPort, (long)messageArgument);
-        break;
-
-    case kIOMessageSystemHasPoweredOn:
-        //resume sleeping transfers after we wake up
-        for (Torrent* torrent in self.fTorrents)
-        {
-            [torrent wakeUp];
-        }
-        break;
+- (void)systemDidWakeUp
+{
+    //resume sleeping transfers after we wake up
+    for (Torrent* torrent in self.fTorrents)
+    {
+        [torrent wakeUp];
     }
 }
 
@@ -5206,7 +5143,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         if (![self.fDefaults boolForKey:@"AutoSize"])
         {
-            //only set a minimum height constraint
+            // Only set a minimum height constraint
             CGFloat height = self.minScrollViewHeightAllowed;
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
@@ -5215,18 +5152,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else
         {
-            //set a fixed height constraint
-            CGFloat height = self.scrollViewHeight;
+            // Set a fixed height constraint
+            CGFloat height = [self calculateScrollViewHeightWithDockAdjustment];
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
                                                                                          views:views];
 
-            //redraw table to avoid empty cells
+            // Redraw table to avoid empty cells
             [self.fTableView reloadData];
         }
 
-        //add height constraint to fStackView
+        // Add height constraint to fStackView
         [self.fStackView addConstraints:self.fStackViewHeightConstraints];
 
         scrollView.hasVerticalScroller = YES;
@@ -5235,6 +5172,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         [self removeStackViewHeightConstraints];
     }
+}
+
+- (CGFloat)calculateScrollViewHeightWithDockAdjustment
+{
+    CGFloat height = self.scrollViewHeight;
+
+    // Get the main screen's visible frame
+    NSScreen* screen = self.fWindow.screen;
+    if (screen)
+    {
+        // This frame respects the Dock and menu bar
+        NSRect visibleFrame = screen.visibleFrame;
+        height = MIN(height, visibleFrame.size.height - [self toolbarHeight] - [self mainWindowComponentHeight]);
+    }
+
+    return height;
 }
 
 - (void)updateForAutoSize
@@ -5254,16 +5207,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //Hacky way of fixing an issue with showing the Toolbar
     if (!self.isFullScreen)
     {
-        //macOS Big Sur shows the unified toolbar by default
+        //macOS shows the unified toolbar by default
         //and we only need to "fix" the layout when showing the toolbar
-        if (@available(macOS 11.0, *))
-        {
-            if (!self.fWindow.toolbar.isVisible)
-            {
-                [self removeStackViewHeightConstraints];
-            }
-        }
-        else
+        if (!self.fWindow.toolbar.isVisible)
         {
             [self removeStackViewHeightConstraints];
         }
@@ -5280,12 +5226,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)hideToolBarBezels:(BOOL)hide
 {
-    if (@available(macOS 11.0, *))
+    for (NSToolbarItem* item in self.fWindow.toolbar.items)
     {
-        for (NSToolbarItem* item in self.fWindow.toolbar.items)
-        {
-            item.view.hidden = hide;
-        }
+        item.view.hidden = hide;
     }
 }
 
