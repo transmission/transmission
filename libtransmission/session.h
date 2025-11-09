@@ -374,6 +374,23 @@ private:
     class tr_udp_core
     {
     public:
+        class EventHandler
+        {
+        public:
+            using Callback = std::function<void(tr_socket_t)>;
+            explicit EventHandler(Callback callback)
+                : callback_(std::move(callback))
+            {
+            }
+            virtual ~EventHandler() = default;
+
+            virtual void start() = 0;
+            virtual void stop() = 0;
+
+        protected:
+            Callback callback_;
+        };
+
         tr_udp_core(tr_session& session, tr_port udp_port);
         ~tr_udp_core();
 
@@ -395,46 +412,41 @@ private:
         }
 
     private:
+        void on_read_event(tr_socket_t socket);
         tr_port const udp_port_;
         tr_session& session_;
         tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
-        libtransmission::evhelpers::event_unique_ptr udp4_event_;
-        libtransmission::evhelpers::event_unique_ptr udp6_event_;
+        std::unique_ptr<EventHandler> udp4_event_handler_;
+        std::unique_ptr<EventHandler> udp6_event_handler_;
     };
 
-    class tr_udp_core_libuv
+    class tr_udp_core_libevent_handler : public tr_udp_core::EventHandler
     {
     public:
-        tr_udp_core_libuv(tr_session& session, tr_port udp_port);
-        ~tr_udp_core_libuv();
+        tr_udp_core_libevent_handler(tr_session& session, tr_socket_t socket, Callback callback);
+        ~tr_udp_core_libevent_handler() override;
+        void start() override;
+        void stop() override;
 
-        tr_udp_core_libuv(tr_udp_core_libuv const&) = delete;
-        tr_udp_core_libuv(tr_udp_core_libuv&&) = delete;
-        tr_udp_core_libuv& operator=(tr_udp_core_libuv const&) = delete;
-        tr_udp_core_libuv& operator=(tr_udp_core_libuv&&) = delete;
+    private:
+        static void on_udp_readable(evutil_socket_t s, short type, void* vself);
+        tr_socket_t socket_ = TR_BAD_SOCKET;
+        struct event* socket_event_ = nullptr;
+    };
 
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen) const;
-
-        [[nodiscard]] constexpr auto socket4() const noexcept
-        {
-            return udp4_socket_;
-        }
-
-        [[nodiscard]] constexpr auto socket6() const noexcept
-        {
-            return udp6_socket_;
-        }
+    class tr_udp_core_libuv_handler : public tr_udp_core::EventHandler
+    {
+    public:
+        tr_udp_core_libuv_handler(tr_session& session, tr_socket_t socket, Callback callback);
+        ~tr_udp_core_libuv_handler() override;
+        void start() override;
+        void stop() override;
 
     private:
         static void on_udp_readable(struct uv_poll_s* handle, int status, int events);
-
-        tr_port const udp_port_;
-        tr_session& session_;
-        tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
-        tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
-        struct uv_poll_s* udp4_poll_ = nullptr;
-        struct uv_poll_s* udp6_poll_ = nullptr;
+        tr_socket_t socket_ = TR_BAD_SOCKET;
+        struct uv_poll_s* socket_poll_ = nullptr;
     };
 
 public:
@@ -1417,7 +1429,7 @@ private:
 public:
     // depends-on: settings_, announcer_udp_, global_ip_cache_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
-    std::unique_ptr<tr_udp_core_libuv> udp_core_;
+    std::unique_ptr<tr_udp_core> udp_core_;
 
     // monitors the "global pool" speeds
     tr_bandwidth top_bandwidth_{ true };

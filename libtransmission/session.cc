@@ -852,7 +852,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
 
     if (!udp_core_ || force || port_changed || utp_changed)
     {
-        udp_core_ = std::make_unique<tr_session::tr_udp_core_libuv>(*this, udpPort());
+        udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
 
     // Sends out announce messages with advertisedPeerPort(), so this
