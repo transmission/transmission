@@ -560,6 +560,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
     NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check Selected", "File Outline -> Menu")
                                                   action:@selector(setCheck:)
                                            keyEquivalent:@""];
+    item.image = [NSImage imageWithSystemSymbolName:@"checkmark.circle" accessibilityDescription:nil];
     item.target = self;
     item.tag = FileCheckMenuTagCheck;
     [menu addItem:item];
@@ -567,6 +568,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Uncheck Selected", "File Outline -> Menu")
                                       action:@selector(setCheck:)
                                keyEquivalent:@""];
+    item.image = [NSImage imageWithSystemSymbolName:@"circle" accessibilityDescription:nil];
     item.target = self;
     item.tag = FileCheckMenuTagUncheck;
     [menu addItem:item];
@@ -575,6 +577,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Only Check Selected", "File Outline -> Menu")
                                       action:@selector(setOnlySelectedCheck:)
                                keyEquivalent:@""];
+    item.image = [NSImage imageWithSystemSymbolName:@"checkmark.circle.dotted" accessibilityDescription:nil];
     item.target = self;
     [menu addItem:item];
 
@@ -583,6 +586,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
     //priority
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Priority", "File Outline -> Menu") action:NULL keyEquivalent:@""];
     NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@""];
+    item.image = [NSImage imageWithSystemSymbolName:@"chevron.up.chevron.down" accessibilityDescription:nil];
     item.submenu = priorityMenu;
     [menu addItem:item];
 
@@ -616,6 +620,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Show in Finder", "File Outline -> Menu")
                                       action:@selector(revealFile:)
                                keyEquivalent:@""];
+    item.image = [NSImage imageWithSystemSymbolName:@"finder" accessibilityDescription:nil];
     item.target = self;
     [menu addItem:item];
 
@@ -625,6 +630,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
     item = [[NSMenuItem alloc] initWithTitle:[NSLocalizedString(@"Rename File", "File Outline -> Menu") stringByAppendingEllipsis]
                                       action:@selector(renameSelected:)
                                keyEquivalent:@""];
+    item.image = [NSImage imageWithSystemSymbolName:@"pencil" accessibilityDescription:nil];
     item.target = self;
     [menu addItem:item];
 
