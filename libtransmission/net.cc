@@ -99,6 +99,15 @@ tr_address_type tr_af_to_ip_protocol(int af)
     }
 }
 
+int tr_make_listen_socket_ipv6only(tr_socket_t const sock)
+{
+#if defined(IPV6_V6ONLY)
+    int optval = 1;
+    return setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval));
+#endif
+    return 0;
+}
+
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
@@ -233,9 +242,8 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     auto const& [addr, port] = socket_address;
 
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
+    if (!session->allowsTCP() || !socket_address.is_valid())
     {
         return TR_BAD_SOCKET;
     }
@@ -326,17 +334,13 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)evutil_make_listen_socket_reuseable(fd);
 
-#ifdef IPV6_V6ONLY
-    // TODO(tearfur): Consider using `evutil_make_listen_socket_ipv6only` once minimum libevent version is bumped to 2.1.9 or above
-    if (addr.is_ipv6() &&
-        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1 &&
+    if (addr.is_ipv6() && tr_make_listen_socket_ipv6only(fd) == -1 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
-#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
@@ -797,6 +801,16 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     }
 
     return false;
+}
+
+std::optional<tr_address> tr_address::from_ipv4_mapped() const noexcept
+{
+    if (!is_ipv4_mapped_address())
+    {
+        return {};
+    }
+
+    return from_compact_ipv4(reinterpret_cast<std::byte const*>(&addr.addr6.s6_addr) + 12).first;
 }
 
 // --- tr_socket_addrses

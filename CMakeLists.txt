@@ -50,8 +50,8 @@ set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
-set(MBEDTLS_MINIMUM 1.3)
-set(NPM_MINIMUM 8.1.307) # Node.js 14
+set(MBEDTLS_MINIMUM 2.7)
+set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
 
@@ -79,6 +79,7 @@ tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
+tr_auto_option(USE_SYSTEM_CRC32C "Use system crc32c library" AUTO)
 tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
 tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
@@ -96,7 +97,7 @@ set(TR_NAME ${PROJECT_NAME})
 set(TR_VERSION_MAJOR "4")
 set(TR_VERSION_MINOR "1")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "2") # empty string for not beta
+set(TR_VERSION_BETA_NUMBER "3") # empty string for not beta
 set(TR_VERSION_DEV FALSE)
 
 # derived from above: release type
@@ -299,8 +300,7 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "mbedtls")
     tr_fixup_list_option(WITH_CRYPTO "mbedtls" MBEDTLS_FOUND "AUTO" MBEDTLS_IS_REQUIRED)
     if(WITH_CRYPTO STREQUAL "mbedtls")
         set(CRYPTO_PKG "mbedtls")
-        set(CRYPTO_INCLUDE_DIRS ${MBEDTLS_INCLUDE_DIRS})
-        set(CRYPTO_LIBRARIES ${MBEDTLS_LIBRARIES})
+        set(CRYPTO_LIBRARIES MbedTLS::mbedtls MbedTLS::mbedcrypto)
     endif()
 endif()
 
@@ -333,6 +333,7 @@ if(ENABLE_GTK)
             giomm-2.68>=${GIOMM_MINIMUM})
         set(GTK_VERSION 4)
         set(GTK_FOUND ${GTK4_FOUND})
+        set(GTKMM_MINIMUM ${GTKMM4_MINIMUM})
     endif()
 
     if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
@@ -342,6 +343,7 @@ if(ENABLE_GTK)
             giomm-2.4>=${GIOMM_MINIMUM})
         set(GTK_VERSION 3)
         set(GTK_FOUND ${GTK3_FOUND})
+        set(GTKMM_MINIMUM ${GTKMM3_MINIMUM})
     endif()
 
     if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
@@ -379,6 +381,14 @@ if(GTK_FOUND)
     target_link_libraries(transmission::gtk_impl
         INTERFACE
             ${GTK${GTK_VERSION}_LIBRARIES})
+
+    if(GTKMM_MINIMUM MATCHES "^([0-9]+)\.([0-9]+)\.")
+        # GDK_VERSION_x_y is only defined for stable versions, i.e. even minor version numbers
+        math(EXPR GTKMM_MINIMUM_MINOR_STABLE "(${CMAKE_MATCH_2} + 1) / 2 * 2")
+        target_compile_definitions(transmission::gtk_impl
+            INTERFACE
+                GDK_VERSION_MIN_REQUIRED=GDK_VERSION_${CMAKE_MATCH_1}_${GTKMM_MINIMUM_MINOR_STABLE})
+    endif()
 endif()
 
 if(ENABLE_QT)
@@ -563,6 +573,14 @@ tr_add_external_auto_library(B64 libb64 b64
     TARGET libb64::libb64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
+
+tr_add_external_auto_library(CRC32C crc32c crc32c
+    TARGET Crc32c::crc32c
+    CMAKE_ARGS
+        -DCRC32C_BUILD_TESTS=OFF
+        -DCRC32C_BUILD_BENCHMARKS=OFF
+        -DCRC32C_USE_GLOG=OFF
+        -DCRC32C_INSTALL=ON)
 
 set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(REBUILD_WEB)

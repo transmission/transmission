@@ -8,8 +8,9 @@
 	branch = post-1.2.1-transmission
 [submodule "third-party/libevent"]
 	path = third-party/libevent
-	url = https://github.com/transmission/libevent.git
-	branch = post-2.1.12-transmission
+	# Windows/Android build fixes (libevent/libevent#1813 and libevent/libevent#1817)
+	url = https://github.com/coeur/libevent.git
+	branch = master
 [submodule "third-party/libnatpmp"]
 	path = third-party/libnatpmp
 	url = https://github.com/transmission/libnatpmp.git
@@ -61,6 +62,9 @@
 	path = third-party/rpavlik-cmake-modules
 	# synced with https://github.com/rpavlik/cmake-modules.git
 	url = https://github.com/transmission/rpavlik-cmake-modules.git
+[submodule "third-party/crc32c"]
+	path = third-party/crc32c
+	url = https://github.com/google/crc32c.git
 [submodule "third-party/libmaxminddb"]
 	path = third-party/libmaxminddb
 	url = https://github.com/maxmind/libmaxminddb.git

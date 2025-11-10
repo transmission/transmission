@@ -1195,6 +1195,8 @@ struct tr_peer_stat
     char flagStr[32];
     char const* client;
 
+    tr_peer_id_t peer_id;
+
     float progress;
     double rateToPeer_KBps;
     double rateToClient_KBps;
@@ -1215,6 +1217,9 @@ struct tr_peer_stat
 
     /* how many requests we've made and are currently awaiting a response for */
     size_t activeReqsToPeer;
+
+    size_t bytes_to_peer;
+    size_t bytes_to_client;
 };
 // NOLINTEND(modernize-avoid-c-arrays)
 

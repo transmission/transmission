@@ -338,6 +338,19 @@ namespace make_torrent_field_helpers
     return tr_variant{ std::move(vec) };
 }
 
+[[nodiscard]] auto make_bytes_completed_vec(tr_torrent const& tor)
+{
+    auto const n_files = tor.file_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_files);
+    tr_logAddDebug("Running bytes completed");
+    for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
+    {
+        vec.emplace_back(tr_torrentFile(&tor, idx).have);
+    }
+    return tr_variant{ std::move(vec) };
+}
+
 [[nodiscard]] auto make_file_vec(tr_torrent const& tor)
 {
     auto const n_files = tor.file_count();
@@ -442,6 +455,7 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_clientIsChoked, peer.clientIsChoked);
         peer_map.try_emplace(TR_KEY_clientIsInterested, peer.clientIsInterested);
         peer_map.try_emplace(TR_KEY_clientName, peer.client);
+        peer_map.try_emplace(TR_KEY_peer_id, tr_base64_encode(std::string_view{ peer.peer_id.data(), peer.peer_id.size() }));
         peer_map.try_emplace(TR_KEY_flagStr, peer.flagStr);
         peer_map.try_emplace(TR_KEY_isDownloadingFrom, peer.isDownloadingFrom);
         peer_map.try_emplace(TR_KEY_isEncrypted, peer.isEncrypted);
@@ -454,6 +468,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
         peer_map.try_emplace(TR_KEY_rateToClient, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
         peer_map.try_emplace(TR_KEY_rateToPeer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_bytes_to_peer, peer.bytes_to_peer);
+        peer_map.try_emplace(TR_KEY_bytes_to_client, peer.bytes_to_client);
         peers_vec.emplace_back(std::move(peer_map));
     }
     tr_torrentPeersFree(peers, n_peers);
@@ -506,6 +522,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_addedDate:
     case TR_KEY_availability:
     case TR_KEY_bandwidthPriority:
+    case TR_KEY_bytesCompleted:
     case TR_KEY_comment:
     case TR_KEY_corruptEver:
     case TR_KEY_creator:
@@ -600,6 +617,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_addedDate: return st.addedDate;
     case TR_KEY_availability: return make_piece_availability_vec(tor);
     case TR_KEY_bandwidthPriority: return tor.get_priority();
+    case TR_KEY_bytesCompleted: return make_bytes_completed_vec(tor);
     case TR_KEY_comment: return tor.comment();
     case TR_KEY_corruptEver: return st.corruptEver;
     case TR_KEY_creator: return tor.creator();

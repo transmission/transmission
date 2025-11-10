@@ -112,7 +112,7 @@ template<typename T>
  * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
-[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern);
 
 template<typename T>
 [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
