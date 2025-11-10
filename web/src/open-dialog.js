@@ -196,9 +196,7 @@ export class OpenDialog extends EventTarget {
     datalist.id = 'add-dialog-folder-datalist';
     const buildDatalist = () => {
       const dirs = new Set();
-      let torrents = this.controller._rows
-        .toSorted((a, b) => b.getTorrent().getDateAdded() - a.getTorrent().getDateAdded())
-        .map(row => row.getTorrent());
+      let torrents = this.controller._rows.map(row => row.getTorrent());
       for (const torrent of torrents) {
         const dir = torrent.getDownloadDir();
         if (dir && dir.trim().length > 0) {
