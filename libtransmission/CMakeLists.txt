@@ -117,11 +117,12 @@ target_sources(${TR_NAME}
         session-alt-speeds.h
         session-id.cc
         session-id.h
-        session-thread.cc
+        session-libevent.cc
+        session-libuv.cc
         session-thread-libuv.cc
+        session-thread.cc
         session-thread.h
         session.cc
-        session-libuv.cc
         session.h
         settings.cc
         settings.h

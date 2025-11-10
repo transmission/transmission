@@ -93,23 +93,19 @@ struct tr_session
     using Speed = libtransmission::Values::Speed;
 
 private:
-    class BoundSocket
+    class BoundSocketLibevent
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(struct event_base* base, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
-        BoundSocket(BoundSocket&&) = delete;
-        BoundSocket(BoundSocket const&) = delete;
-        BoundSocket operator=(BoundSocket&&) = delete;
-        BoundSocket operator=(BoundSocket const&) = delete;
-        ~BoundSocket();
+        BoundSocketLibevent(struct event_base* base, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocketLibevent(BoundSocketLibevent&&) = delete;
+        BoundSocketLibevent(BoundSocketLibevent const&) = delete;
+        BoundSocketLibevent operator=(BoundSocketLibevent&&) = delete;
+        BoundSocketLibevent operator=(BoundSocketLibevent const&) = delete;
+        ~BoundSocketLibevent();
 
     private:
-        static void onCanRead(evutil_socket_t fd, short /*what*/, void* vself)
-        {
-            auto* const self = static_cast<BoundSocket*>(vself);
-            self->cb_(fd, self->cb_data_);
-        }
+        static void onCanRead(evutil_socket_t fd, short /*what*/, void* vself);
 
         IncomingCallback cb_;
         void* cb_data_;
@@ -1424,11 +1420,11 @@ private:
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    // std::optional<BoundSocket> bound_ipv4_;
+    // std::optional<BoundSocketLibevent> bound_ipv4_;
     std::optional<BoundSocketLibuv> bound_ipv4_;
 
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    // std::optional<BoundSocket> bound_ipv6_;
+    // std::optional<BoundSocketLibevent> bound_ipv6_;
     std::optional<BoundSocketLibuv> bound_ipv6_;
 
 public:

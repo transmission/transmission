@@ -402,39 +402,6 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     }
 }
 
-tr_session::BoundSocket::BoundSocket(
-    struct event_base* evbase,
-    tr_address const& addr,
-    tr_port port,
-    IncomingCallback cb,
-    void* cb_data)
-    : cb_{ cb }
-    , cb_data_{ cb_data }
-    , socket_{ tr_netBindTCP(addr, port, false) }
-    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
-{
-    if (socket_ == TR_BAD_SOCKET)
-    {
-        return;
-    }
-
-    tr_logAddInfo(fmt::format(
-        fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
-        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
-    event_add(ev_.get(), nullptr);
-}
-
-tr_session::BoundSocket::~BoundSocket()
-{
-    ev_.reset();
-
-    if (socket_ != TR_BAD_SOCKET)
-    {
-        tr_net_close_socket(socket_);
-        socket_ = TR_BAD_SOCKET;
-    }
-}
-
 tr_address tr_session::bind_address(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET)
