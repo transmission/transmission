@@ -1351,8 +1351,8 @@ void torrentRenamePath(
     torrents[0]->rename_path(
         oldpath,
         newname,
-        [cb = std::move(done_cb)](tr_torrent* tor, char const* oldpath, char const* newname, int error, void* user_data)
-        { torrentRenamePathDone(tor, oldpath, newname, error, cb, user_data); },
+        [cb = std::move(done_cb)](tr_torrent* tor, char const* old_path, char const* new_name, int error, void* user_data)
+        { torrentRenamePathDone(tor, old_path, new_name, error, cb, user_data); },
         idle_data);
 }
 
@@ -2505,10 +2505,10 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
         func(
             session,
             *params,
-            [cb = std::move(done_cb)](tr_rpc_idle_data* data, Error::Code code, std::string_view errmsg)
+            [cb = std::move(done_cb)](tr_rpc_idle_data* d, Error::Code code, std::string_view errmsg)
             {
-                cb(data, code, errmsg);
-                delete data;
+                cb(d, code, errmsg);
+                delete d;
             },
             new tr_rpc_idle_data{ std::move(data) });
         return;
@@ -2544,7 +2544,7 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& re
         tr_rpc_request_exec_impl(
             session,
             requests[i],
-            [responses, n_requests, n_responses, i, cb](tr_session* session, tr_variant&& response)
+            [responses, n_requests, n_responses, i, cb](tr_session* s, tr_variant&& response)
             {
                 (*responses)[i] = std::move(response);
 
@@ -2557,7 +2557,7 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& re
                         [](auto const& r) { return !r.has_value(); });
                     responses->erase(it_end, std::end(*responses));
 
-                    (*cb)(session, !std::empty(*responses) ? std::move(*responses) : tr_variant{});
+                    (*cb)(s, !std::empty(*responses) ? std::move(*responses) : tr_variant{});
                 }
             },
             true);
