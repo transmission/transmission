@@ -6,17 +6,25 @@
 import { OutsideClickListener, setEnabled } from './utils.js';
 
 export class ContextMenu extends EventTarget {
-  constructor(action_manager) {
+  constructor(controller, menu_items) {
     super();
 
     this.action_listener = this._update.bind(this);
-    this.action_manager = action_manager;
+    this.controller = controller;
+    this.action_manager = controller.action_manager;
     this.action_manager.addEventListener('change', this.action_listener);
+    this.handler = controller.handler;
+    this.menu_items = menu_items;
 
     Object.assign(this, this._create());
 
     this.outside = new OutsideClickListener(this.root);
-    this.outside.addEventListener('click', () => this.close());
+    this.outside.addEventListener('click', () => {
+      if (this.handler) {
+        this.handler.classList.remove('selected');
+      }
+      this.close();
+    });
 
     this.show();
   }
@@ -155,30 +163,36 @@ export class ContextMenu extends EventTarget {
       return item;
     };
 
-    root.append(
-      new_item('resume-selected-torrents'),
-      new_item('resume-selected-torrents-now'),
-      new_item('pause-selected-torrents'),
-      new_separator(),
-      new_submenu(
-        'Move in the queue',
-        'move-top',
-        'move-up',
-        'move-down',
-        'move-bottom',
-      ),
-      new_separator(),
-      new_item('remove-selected-torrents', true),
-      new_separator(),
-      new_item('verify-selected-torrents'),
-      new_item('show-move-dialog'),
-      new_item('show-rename-dialog'),
-      new_item('show-labels-dialog'),
-      new_separator(),
-      new_item('reannounce-selected-torrents'),
-      new_separator(),
-      new_submenu('Select operation', 'select-all', 'deselect-all'),
-    );
+    if (this.menu_items) {
+      for (const item of this.menu_items) {
+        root.append(item ? new_item(item) : new_separator());
+      }
+    } else {
+      root.append(
+        new_item('resume-selected-torrents'),
+        new_item('resume-selected-torrents-now'),
+        new_item('pause-selected-torrents'),
+        new_separator(),
+        new_submenu(
+          'Move in the queue',
+          'move-top',
+          'move-up',
+          'move-down',
+          'move-bottom',
+        ),
+        new_separator(),
+        new_item('remove-selected-torrents', true),
+        new_separator(),
+        new_item('verify-selected-torrents'),
+        new_item('show-move-dialog'),
+        new_item('show-rename-dialog'),
+        new_item('show-labels-dialog'),
+        new_separator(),
+        new_item('reannounce-selected-torrents'),
+        new_separator(),
+        new_submenu('Select operation', 'select-all', 'deselect-all'),
+      );
+    }
 
     return { actions, root };
   }
