@@ -18,9 +18,7 @@ tr_session::BoundSocketLibuv::BoundSocketLibuv(
     tr_port port,
     IncomingCallback cb,
     void* cb_data)
-    : cb_{ cb }
-    , cb_data_{ cb_data }
-    , socket_{ tr_netBindTCP(addr, port, false) }
+    : BoundSocket(tr_netBindTCP(addr, port, false), cb, cb_data)
 {
     if (socket_ == TR_BAD_SOCKET)
     {
