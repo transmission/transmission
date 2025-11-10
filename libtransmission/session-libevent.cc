@@ -19,9 +19,7 @@ tr_session::BoundSocketLibevent::BoundSocketLibevent(
     tr_port port,
     IncomingCallback cb,
     void* cb_data)
-    : cb_{ cb }
-    , cb_data_{ cb_data }
-    , socket_{ tr_netBindTCP(addr, port, false) }
+    : BoundSocket(tr_netBindTCP(addr, port, false), cb, cb_data)
     , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocketLibevent::onCanRead, this) }
 {
     if (socket_ == TR_BAD_SOCKET)

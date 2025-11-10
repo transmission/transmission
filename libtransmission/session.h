@@ -93,7 +93,24 @@ struct tr_session
     using Speed = libtransmission::Values::Speed;
 
 private:
-    class BoundSocketLibevent
+    class BoundSocket
+    {
+    public:
+        using IncomingCallback = void (*)(tr_socket_t, void*);
+        BoundSocket(tr_socket_t socket, IncomingCallback cb, void* cb_data) : cb_{ cb }, cb_data_{ cb_data }, socket_{ socket } {}
+        BoundSocket(BoundSocket&&) = delete;
+        BoundSocket(BoundSocket const&) = delete;
+        BoundSocket operator=(BoundSocket&&) = delete;
+        BoundSocket operator=(BoundSocket const&) = delete;
+        virtual ~BoundSocket() = default;
+
+    protected:
+        IncomingCallback cb_;
+        void* cb_data_;
+        tr_socket_t socket_ = TR_BAD_SOCKET;
+    };
+
+    class BoundSocketLibevent : public BoundSocket
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
@@ -102,18 +119,15 @@ private:
         BoundSocketLibevent(BoundSocketLibevent const&) = delete;
         BoundSocketLibevent operator=(BoundSocketLibevent&&) = delete;
         BoundSocketLibevent operator=(BoundSocketLibevent const&) = delete;
-        ~BoundSocketLibevent();
+        ~BoundSocketLibevent() override;
 
     private:
         static void onCanRead(evutil_socket_t fd, short /*what*/, void* vself);
 
-        IncomingCallback cb_;
-        void* cb_data_;
-        tr_socket_t socket_ = TR_BAD_SOCKET;
         libtransmission::evhelpers::event_unique_ptr ev_;
     };
 
-    class BoundSocketLibuv
+    class BoundSocketLibuv : public BoundSocket
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
@@ -122,14 +136,11 @@ private:
         BoundSocketLibuv(BoundSocketLibuv const&) = delete;
         BoundSocketLibuv operator=(BoundSocketLibuv&&) = delete;
         BoundSocketLibuv operator=(BoundSocketLibuv const&) = delete;
-        ~BoundSocketLibuv();
+        ~BoundSocketLibuv() override;
 
     private:
         static void onCanRead(struct uv_poll_s* handle, int status, int events);
 
-        IncomingCallback cb_;
-        void* cb_data_;
-        tr_socket_t socket_ = TR_BAD_SOCKET;
         struct uv_poll_s* poll_handle_ = nullptr;
     };
 
@@ -1420,12 +1431,10 @@ private:
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    // std::optional<BoundSocketLibevent> bound_ipv4_;
-    std::optional<BoundSocketLibuv> bound_ipv4_;
+    std::unique_ptr<BoundSocket> bound_ipv4_;
 
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    // std::optional<BoundSocketLibevent> bound_ipv6_;
-    std::optional<BoundSocketLibuv> bound_ipv6_;
+    std::unique_ptr<BoundSocket> bound_ipv6_;
 
 public:
     // depends-on: settings_, announcer_udp_, global_ip_cache_
