@@ -376,7 +376,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         mediator.block_span_[0] = { 0, 100 };
         mediator.block_span_[1] = { 100, 200 };
         mediator.block_span_[2] = { 200, 300 };
-        mediator.block_span_[3] = { 300, 350 };
+        mediator.block_span_[3] = { 300, 400 };
 
         // peer has all pieces
         mediator.piece_replication_[0] = 1;
@@ -397,9 +397,8 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
     };
 
-    // when we ask for blocks, apart from the last piece,
-    // which will be returned first because it is smaller,
-    // we should get pieces in order
+    // First and last piece come first in sequential download mode regardless
+    // of "sequential download from piece", piece 2 comes next.
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
@@ -407,7 +406,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
 
     for (int run = 0; run < NumRuns; ++run)
     {
-        auto requested = tr_bitfield{ 350 };
+        auto requested = tr_bitfield{ 400 };
         auto const spans = get_spans(300);
         for (auto const& [begin, end] : spans)
         {
@@ -415,10 +414,10 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         }
         EXPECT_EQ(300U, requested.count());
         EXPECT_EQ(100U, requested.count(0, 100));
-        EXPECT_EQ(50U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(100, 200));
         // piece 2 should be downloaded before piece 1
         EXPECT_EQ(100U, requested.count(200, 300));
-        EXPECT_EQ(50U, requested.count(300, 350));
+        EXPECT_EQ(100U, requested.count(300, 400));
     }
 }
 
