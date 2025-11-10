@@ -3,15 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <uv.h>
-
 #include <fmt/core.h>
+#include <uv.h>
 
 #include "libtransmission/session.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
-#include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h"
 
 // ---
 
@@ -35,7 +32,7 @@ tr_session::BoundSocketLibuv::BoundSocketLibuv(
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
 
     // Allocate and initialize the poll handle
-    poll_handle_ = new uv_poll_s;
+    poll_handle_ = new uv_poll_t{};
     uv_poll_init_socket(loop, poll_handle_, socket_);
     poll_handle_->data = this;
 
@@ -53,7 +50,7 @@ tr_session::BoundSocketLibuv::~BoundSocketLibuv()
         // Close the handle asynchronously
         uv_close(
             reinterpret_cast<uv_handle_t*>(poll_handle_),
-            [](uv_handle_t* handle) { delete reinterpret_cast<uv_poll_s*>(handle); });
+            [](uv_handle_t* handle) { delete reinterpret_cast<uv_poll_t*>(handle); });
 
         poll_handle_ = nullptr;
     }
@@ -74,12 +71,11 @@ void tr_session::BoundSocketLibuv::onCanRead(struct uv_poll_s* handle, int statu
         return;
     }
 
-    if ((events & UV_READABLE) != 0)
+    if ((events & UV_READABLE) == 0)
     {
-        auto* const self = static_cast<BoundSocketLibuv*>(handle->data);
-        TR_ASSERT(self != nullptr);
-        TR_ASSERT(self->cb_ != nullptr);
-
-        self->cb_(self->socket_, self->cb_data_);
+        return;
     }
+
+    auto* const self = static_cast<BoundSocketLibuv*>(handle->data);
+    self->cb_(self->socket_, self->cb_data_);
 }
