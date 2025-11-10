@@ -194,8 +194,7 @@ export class OpenDialog extends EventTarget {
 
     const datalist = document.createElement('datalist');
     datalist.id = 'add-dialog-folder-datalist';
-    const rebuildDatalist = () => {
-      datalist.innerHTML = '';
+    const buildDatalist = () => {
       const dirs = new Set();
       let torrents = this.controller._rows
         .toSorted((a, b) => b.getTorrent().getDateAdded() - a.getTorrent().getDateAdded())
@@ -215,12 +214,8 @@ export class OpenDialog extends EventTarget {
         datalist.append(option);
       }
     };
-    const clearDatalist = () => {
-      datalist.innerHTML = '';
-    };
-    input.addEventListener('focus', rebuildDatalist);
-    input.addEventListener('blur', clearDatalist)
     workarea.append(datalist);
+    buildDatalist();
     elements.folder_input = input;
 
     const checkarea = document.createElement('div');
