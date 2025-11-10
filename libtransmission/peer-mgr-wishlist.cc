@@ -446,6 +446,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
           mediator_in.observe_sent_request([this](tr_torrent*, tr_peer*, tr_block_span_t bs) { requested_block_span(bs); }),
           // salt
           mediator_in.observe_sequential_download_changed([this](tr_torrent*, bool) { recalculate_salt(); }),
+          // salt
           mediator_in.observe_sequential_download_from_piece_changed([this](tr_torrent*, tr_piece_index_t)
                                                                      { recalculate_salt(); }),
       } }
