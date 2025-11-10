@@ -1845,6 +1845,9 @@ namespace peer_stat_helpers
     stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
     stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
+    stats.bytes_to_peer = peer->bytes_sent_to_peer.count(now, CancelHistorySec);
+    stats.bytes_to_client = peer->bytes_sent_to_client.count(now, CancelHistorySec);
+
     stats.activeReqsToPeer = peer->active_req_count(TR_CLIENT_TO_PEER);
     stats.activeReqsToClient = peer->active_req_count(TR_PEER_TO_CLIENT);
 
