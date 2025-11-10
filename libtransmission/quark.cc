@@ -247,7 +247,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "pieceCount"sv,
     "pieceSize"sv,
     "pieces"sv,
-    "play-download-complete-sound"sv,
     "port"sv,
     "port-forwarding-enabled"sv,
     "port-is-open"sv,

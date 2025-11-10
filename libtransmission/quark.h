@@ -249,7 +249,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_pieceCount,
     TR_KEY_pieceSize,
     TR_KEY_pieces,
-    TR_KEY_play_download_complete_sound,
     TR_KEY_port,
     TR_KEY_port_forwarding_enabled,
     TR_KEY_port_is_open,
