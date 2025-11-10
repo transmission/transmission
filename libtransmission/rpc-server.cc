@@ -335,7 +335,11 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
     {
         if (auto* const con = evhttp_request_get_connection(req); con != nullptr)
         {
+#if LIBEVENT_VERSION_NUMBER >= 0x02020001
+            char const* remote_host = nullptr;
+#else
             char* remote_host = nullptr;
+#endif
             auto remote_port = ev_uint16_t{};
             evhttp_connection_get_peer(con, &remote_host, &remote_port);
             tr_logAddWarn(fmt::format(
@@ -509,7 +513,11 @@ void handle_request(struct evhttp_request* req, void* arg)
 
     auto* server = static_cast<tr_rpc_server*>(arg);
 
+#if LIBEVENT_VERSION_NUMBER >= 0x02020001
+    char const* remote_host = nullptr;
+#else
     char* remote_host = nullptr;
+#endif
     auto remote_port = ev_uint16_t{};
     evhttp_connection_get_peer(con, &remote_host, &remote_port);
 
