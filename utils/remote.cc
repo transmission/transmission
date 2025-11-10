@@ -1363,8 +1363,8 @@ void print_peers_impl(tr_variant::Vector const& peers)
                 *address,
                 *flagstr,
                 strlpercent(*progress * 100.0),
-                Speed{ *rate_to_client, Speed::Units::KByps }.count(Speed::Units::KByps),
-                Speed{ *rate_to_peer, Speed::Units::KByps }.count(Speed::Units::KByps),
+                Speed{ *rate_to_client, Speed::Units::Byps }.count(Speed::Units::KByps),
+                Speed{ *rate_to_peer, Speed::Units::Byps }.count(Speed::Units::KByps),
                 *client);
         }
     }
