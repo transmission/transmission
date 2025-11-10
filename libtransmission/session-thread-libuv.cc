@@ -39,31 +39,9 @@ class tr_session_thread_libuv_impl final : public tr_session_thread
 public:
     explicit tr_session_thread_libuv_impl()
     {
-        // Initialize the loop
-        uv_loop_ = new uv_loop_t;
-        if (uv_loop_init(uv_loop_) != 0)
-        {
-            delete uv_loop_;
-            throw std::runtime_error("Failed to initialize uv_loop");
-        }
-
-        // Initialize the async handle for work queue notifications
-        work_queue_async_ = new uv_async_t;
-        if (uv_async_init(uv_loop_, work_queue_async_, on_work_available_static) != 0)
-        {
-            delete work_queue_async_;
-            uv_loop_close(uv_loop_);
-            delete uv_loop_;
-            throw std::runtime_error("Failed to initialize uv_async");
-        }
-        work_queue_async_->data = this;
-
-        // Keep the async handle referenced so the loop doesn't exit
-        uv_ref(reinterpret_cast<uv_handle_t*>(work_queue_async_));
-
         auto lock = std::unique_lock(is_looping_mutex_);
 
-        thread_ = std::thread(&tr_session_thread_libuv_impl::session_thread_func, this, uv_loop_);
+        thread_ = std::thread(&tr_session_thread_libuv_impl::session_thread_func, this);
         thread_id_ = thread_.get_id();
 
         // wait for the session thread's main loop to start
@@ -91,14 +69,6 @@ public:
 
         // Join the thread
         thread_.join();
-
-        // Cleanup the loop
-        if (uv_loop_ != nullptr)
-        {
-            uv_loop_close(uv_loop_);
-            delete uv_loop_;
-            uv_loop_ = nullptr;
-        }
     }
 
     [[nodiscard]] struct event_base* event_base() noexcept override
@@ -144,12 +114,20 @@ private:
     using callback = std::function<void(void)>;
     using work_queue_t = std::list<callback>;
 
-    void session_thread_func(uv_loop_t* loop)
+    void session_thread_func()
     {
 #ifndef _WIN32
         /* Don't exit when writing on a broken socket */
         (void)signal(SIGPIPE, SIG_IGN);
 #endif
+        // Initialize the loop
+        uv_loop_ = new uv_loop_t;
+        uv_loop_init(uv_loop_);
+
+        // Initialize the async handle for work queue notifications
+        work_queue_async_ = new uv_async_t;
+        uv_async_init(uv_loop_, work_queue_async_, on_work_available_static);
+        work_queue_async_->data = this;
 
         // Signal that the loop is starting
         {
@@ -159,7 +137,7 @@ private:
         is_looping_cv_.notify_one();
 
         // Run the event loop until uv_stop() is called
-        uv_run(loop, UV_RUN_DEFAULT);
+        uv_run(uv_loop_, UV_RUN_DEFAULT);
 
         if (work_queue_async_ != nullptr)
         {
@@ -171,10 +149,14 @@ private:
 
         // Process any remaining events and close callbacks during shutdown
         // Use UV_RUN_DEFAULT repeatedly until no more work to do
-        while (uv_run(loop, UV_RUN_DEFAULT) != 0)
+        while (uv_run(uv_loop_, UV_RUN_DEFAULT) != 0)
         {
             // Continue processing until all callbacks complete
         }
+
+        uv_loop_close(uv_loop_);
+        delete uv_loop_;
+        uv_loop_ = nullptr;
 
         // Signal that the loop has stopped
         {
