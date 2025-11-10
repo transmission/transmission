@@ -195,12 +195,11 @@ export class OpenDialog extends EventTarget {
     const datalist = document.createElement('datalist');
     datalist.id = 'add-dialog-folder-datalist';
     const rebuildDatalist = () => {
-      while (datalist.firstChild) {
-        datalist.removeChild(datalist.firstChild);
-      }
+      datalist.innerHTML = '';
       const dirs = new Set();
-      let torrents = this.controller._getFilteredTorrents();
-      torrents = torrents.slice().sort((a, b) => b.getDateAdded() - a.getDateAdded());
+      let torrents = this.controller._rows
+        .toSorted((a, b) => b.getTorrent().getDateAdded() - a.getTorrent().getDateAdded())
+        .map(row => row.getTorrent());
       for (const torrent of torrents) {
         const dir = torrent.getDownloadDir();
         if (dir && dir.trim().length > 0) {
@@ -217,9 +216,7 @@ export class OpenDialog extends EventTarget {
       }
     };
     const clearDatalist = () => {
-      while (datalist.firstChild) {
-        datalist.removeChild(datalist.firstChild);
-      }
+      datalist.innerHTML = '';
     };
     input.addEventListener('focus', rebuildDatalist);
     input.addEventListener('blur', clearDatalist)
