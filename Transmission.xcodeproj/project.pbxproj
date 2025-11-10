@@ -433,6 +433,8 @@
 		C8B27BA328153F6300A22B5D /* create.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC02807FCE900867D3C /* create.cc */; };
 		C8B27BA428153F6600A22B5D /* edit.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC22807FCE900867D3C /* edit.cc */; };
 		C8B27BA528153F6900A22B5D /* show.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC32807FCE900867D3C /* show.cc */; };
+		C8C3508D2DEB812400E94512 /* ws.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C3508C2DEB812400E94512 /* ws.c */; };
+		C8C3508F2DEB817F00E94512 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C3508E2DEB817F00E94512 /* sha1.c */; };
 		C8ED0FB1281C10F100B44472 /* addr_is_reserved.c in Sources */ = {isa = PBXBuildFile; fileRef = C8ED0FAF281C10F100B44472 /* addr_is_reserved.c */; };
 		C8ED0FB2281C10F100B44472 /* addr_is_reserved.h in Headers */ = {isa = PBXBuildFile; fileRef = C8ED0FB0281C10F100B44472 /* addr_is_reserved.h */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
@@ -1404,6 +1406,8 @@
 		C8B27B7F28153F2B00A22B5D /* transmission-create */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-create"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27B9028153F3100A22B5D /* transmission-edit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-edit"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27BA128153F3400A22B5D /* transmission-show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-show"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8C3508C2DEB812400E94512 /* ws.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ws.c; sourceTree = "<group>"; };
+		C8C3508E2DEB817F00E94512 /* sha1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
 		C8ED0FAF281C10F100B44472 /* addr_is_reserved.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = addr_is_reserved.c; sourceTree = "<group>"; };
 		C8ED0FB0281C10F100B44472 /* addr_is_reserved.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = addr_is_reserved.h; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "mime-types.h"; sourceTree = "<group>"; };
@@ -2258,7 +2262,9 @@
 				A2074FC612BEABC800F70985 /* log.c */,
 				A207503612BEADA200F70985 /* poll.c */,
 				A207503412BEAD9C00F70985 /* select.c */,
+				C8C3508E2DEB817F00E94512 /* sha1.c */,
 				A2074FDD12BEAC5000F70985 /* signal.c */,
+				C8C3508C2DEB812400E94512 /* ws.c */,
 			);
 			name = libevent;
 			path = "third-party/libevent";
@@ -3679,6 +3685,8 @@
 				A2074F5B12BEA8E000F70985 /* bufferevent_pair.c in Sources */,
 				A2074F5D12BEA8E000F70985 /* bufferevent_sock.c in Sources */,
 				A2074F5E12BEA8E000F70985 /* bufferevent.c in Sources */,
+				C8C3508D2DEB812400E94512 /* ws.c in Sources */,
+				C8C3508F2DEB817F00E94512 /* sha1.c in Sources */,
 				A2074F7412BEAA3300F70985 /* event.c in Sources */,
 				A2074F8512BEAA6600F70985 /* evmap.c in Sources */,
 				A2074F9912BEAAAF00F70985 /* evthread.c in Sources */,
@@ -4309,8 +4317,14 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/libevent/include";
-				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
+				HEADER_SEARCH_PATHS = (
+					"third-party/libevent/include",
+					"third-party/libevent/compat",
+				);
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-DLITTLE_ENDIAN",
+				);
 				PRODUCT_NAME = event;
 			};
 			name = Debug;
@@ -4986,8 +5000,14 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/libevent/include";
-				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
+				HEADER_SEARCH_PATHS = (
+					"third-party/libevent/include",
+					"third-party/libevent/compat",
+				);
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-DLITTLE_ENDIAN",
+				);
 				PRODUCT_NAME = event;
 			};
 			name = "Release - Debug";
@@ -5140,8 +5160,14 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
-				HEADER_SEARCH_PATHS = "third-party/libevent/include";
-				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
+				HEADER_SEARCH_PATHS = (
+					"third-party/libevent/include",
+					"third-party/libevent/compat",
+				);
+				OTHER_CFLAGS = (
+					"-DHAVE_CONFIG_H",
+					"-DLITTLE_ENDIAN",
+				);
 				PRODUCT_NAME = event;
 			};
 			name = Release;
