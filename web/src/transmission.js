@@ -489,10 +489,6 @@ export class Transmission extends EventTarget {
     return Object.values(this._torrents);
   }
 
-  _getFilteredTorrents() {
-    return this._rows.map((row) => row.getTorrent());
-  }
-
   static _getTorrentIds(torrents) {
     return torrents.map((t) => t.getId());
   }
