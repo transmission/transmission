@@ -130,6 +130,11 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
+        socket-event-handler-libevent.cc
+        socket-event-handler-libevent.h
+        socket-event-handler-libuv.cc
+        socket-event-handler-libuv.h
+        socket-event-handler.h
         stats.cc
         stats.h
         string-utils.cc
@@ -165,12 +170,10 @@ target_sources(${TR_NAME}
         tr-getopt.cc
         tr-getopt.h
         tr-lpd.cc
-        tr-lpd-libuv.cc
         tr-lpd.h
         tr-macros.h
         tr-strbuf.h
         tr-udp.cc
-        tr-udp-libuv.cc
         tr-utp.cc
         tr-utp.h
         transmission.h
