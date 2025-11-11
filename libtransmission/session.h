@@ -109,40 +109,29 @@ private:
         IncomingCallback cb_;
         void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
+        std::unique_ptr<libtransmission::SocketReadEventHandler> event_handler_;
     };
 
     class BoundSocketLibevent : public BoundSocket
     {
     public:
-        using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocketLibevent(struct event_base* base, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocketLibevent(tr_session& session, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
         BoundSocketLibevent(BoundSocketLibevent&&) = delete;
         BoundSocketLibevent(BoundSocketLibevent const&) = delete;
         BoundSocketLibevent operator=(BoundSocketLibevent&&) = delete;
         BoundSocketLibevent operator=(BoundSocketLibevent const&) = delete;
         ~BoundSocketLibevent() override;
-
-    private:
-        static void onCanRead(evutil_socket_t fd, short /*what*/, void* vself);
-
-        libtransmission::evhelpers::event_unique_ptr ev_;
     };
 
     class BoundSocketLibuv : public BoundSocket
     {
     public:
-        using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocketLibuv(struct uv_loop_s* loop, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocketLibuv(tr_session& session, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
         BoundSocketLibuv(BoundSocketLibuv&&) = delete;
         BoundSocketLibuv(BoundSocketLibuv const&) = delete;
         BoundSocketLibuv operator=(BoundSocketLibuv&&) = delete;
         BoundSocketLibuv operator=(BoundSocketLibuv const&) = delete;
         ~BoundSocketLibuv() override;
-
-    private:
-        static void onCanRead(struct uv_poll_s* handle, int status, int events);
-
-        struct uv_poll_s* poll_handle_ = nullptr;
     };
 
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
@@ -332,9 +321,9 @@ private:
             return session_.timerMaker();
         }
 
-        [[nodiscard]] std::unique_ptr<libtransmission::SocketEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketEventHandler::Callback callback) override
+        [[nodiscard]] std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketReadEventHandler::Callback callback) override
         {
-            return libtransmission::SocketEventHandler::create_libuv_handler(session_, socket, std::move(callback));
+            return libtransmission::SocketReadEventHandler::create_libuv_handler(session_, socket, std::move(callback));
         }
 
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
@@ -413,8 +402,8 @@ private:
         tr_session& session_;
         tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
-        std::unique_ptr<libtransmission::SocketEventHandler> udp4_event_handler_;
-        std::unique_ptr<libtransmission::SocketEventHandler> udp6_event_handler_;
+        std::unique_ptr<libtransmission::SocketReadEventHandler> udp4_event_handler_;
+        std::unique_ptr<libtransmission::SocketReadEventHandler> udp6_event_handler_;
     };
 
 public:

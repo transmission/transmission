@@ -2,7 +2,6 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include "libtransmission/socket-event-handler.h"
 #include <array>
 #include <cerrno>
 #include <cstddef>
@@ -23,6 +22,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/session.h"
+#include "libtransmission/socket-event-handler.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 
@@ -202,7 +202,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_handler_ = libtransmission::SocketEventHandler::create_libuv_handler(session, udp4_socket_, [this](tr_socket_t socket) { on_read_event(socket); });
+            udp4_event_handler_ = libtransmission::SocketReadEventHandler::create_libuv_handler(session, udp4_socket_, [this](tr_socket_t socket) { on_read_event(socket); });
             udp4_event_handler_->start();
         }
     }
@@ -247,7 +247,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_handler_ = libtransmission::SocketEventHandler::create_libuv_handler(session, udp6_socket_, [this](tr_socket_t socket) { on_read_event(socket); });
+            udp6_event_handler_ = libtransmission::SocketReadEventHandler::create_libuv_handler(session, udp6_socket_, [this](tr_socket_t socket) { on_read_event(socket); });
             udp6_event_handler_->start();
         }
     }

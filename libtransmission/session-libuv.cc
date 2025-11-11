@@ -6,14 +6,15 @@
 #include <fmt/core.h>
 #include <uv.h>
 
-#include "libtransmission/session.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/session.h"
+#include "libtransmission/socket-event-handler.h"
 
 // ---
 
 tr_session::BoundSocketLibuv::BoundSocketLibuv(
-    struct uv_loop_s* loop,
+    tr_session& session,
     tr_address const& addr,
     tr_port port,
     IncomingCallback cb,
@@ -29,28 +30,18 @@ tr_session::BoundSocketLibuv::BoundSocketLibuv(
         fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
 
-    // Allocate and initialize the poll handle
-    poll_handle_ = new uv_poll_t{};
-    uv_poll_init_socket(loop, poll_handle_, socket_);
-    poll_handle_->data = this;
-
-    // Start polling for readable events
-    uv_poll_start(poll_handle_, UV_READABLE, &BoundSocketLibuv::onCanRead);
+    event_handler_ = libtransmission::SocketReadEventHandler::create_libuv_handler(
+          session,
+          socket_,
+          [this](tr_socket_t socket) { cb_(socket, cb_data_); });
+    event_handler_->start();
 }
 
 tr_session::BoundSocketLibuv::~BoundSocketLibuv()
 {
-    if (poll_handle_ != nullptr)
+    if (event_handler_)
     {
-        // Stop polling
-        uv_poll_stop(poll_handle_);
-
-        // Close the handle asynchronously
-        uv_close(
-            reinterpret_cast<uv_handle_t*>(poll_handle_),
-            [](uv_handle_t* handle) { delete reinterpret_cast<uv_poll_t*>(handle); });
-
-        poll_handle_ = nullptr;
+        event_handler_->stop();
     }
 
     if (socket_ != TR_BAD_SOCKET)
@@ -58,22 +49,4 @@ tr_session::BoundSocketLibuv::~BoundSocketLibuv()
         tr_net_close_socket(socket_);
         socket_ = TR_BAD_SOCKET;
     }
-}
-
-void tr_session::BoundSocketLibuv::onCanRead(struct uv_poll_s* handle, int status, int events)
-{
-    if (status < 0)
-    {
-        // Error occurred
-        tr_logAddError(fmt::format("Poll error on bound socket: {}", uv_strerror(status)));
-        return;
-    }
-
-    if ((events & UV_READABLE) == 0)
-    {
-        return;
-    }
-
-    auto* const self = static_cast<BoundSocketLibuv*>(handle->data);
-    self->cb_(self->socket_, self->cb_data_);
 }

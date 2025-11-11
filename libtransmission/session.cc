@@ -788,7 +788,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         {
             auto const addr = bind_address(TR_AF_INET);
             // bound_ipv4_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
-            bound_ipv4_ = std::make_unique<BoundSocketLibuv>(uv_loop(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv4_ = std::make_unique<BoundSocketLibuv>(*this, addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
@@ -796,7 +796,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         {
             auto const addr = bind_address(TR_AF_INET6);
             // bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
-            bound_ipv6_ = std::make_unique<BoundSocketLibuv>(uv_loop(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv6_ = std::make_unique<BoundSocketLibuv>(*this, addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
     }
