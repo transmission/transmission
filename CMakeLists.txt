@@ -82,6 +82,7 @@ option(INSTALL_LIB "Install the library" OFF)
 tr_auto_option(USE_SYSTEM_DEFAULT "Default value for USE_SYSTEM_* options" AUTO)
 tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" ${USE_SYSTEM_DEFAULT})
+tr_auto_option(USE_SYSTEM_UV "Use system libuv library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" ${USE_SYSTEM_DEFAULT})
 tr_auto_option(USE_SYSTEM_FAST_FLOAT "Use system fast_float library" ${USE_SYSTEM_DEFAULT})
@@ -531,6 +532,10 @@ if(NOT TARGET libevent::core)
     add_library(libevent::core ALIAS event_core)
     add_library(libevent::extra ALIAS event_extra)
 endif()
+
+tr_add_external_auto_library(UV libuv
+    LIBNAME libuv
+    TARGET libuv::libuv)
 
 tr_add_external_auto_library(NATPMP libnatpmp
     LIBNAME natpmp

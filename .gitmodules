@@ -64,3 +64,6 @@
 [submodule "third-party/sigslot"]
 	path = third-party/sigslot
 	url = https://github.com/transmission/sigslot
+[submodule "third-party/libuv"]
+	path = third-party/libuv
+	url = https://github.com/libuv/libuv
