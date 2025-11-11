@@ -414,8 +414,8 @@ jobs:
           path: pfx/**/*
 
   # oldest GitHub build support on macOS (Transmission supports macOS 11.0 and newer)
-  macos-13:
-    runs-on: macos-13
+  macos-14:
+    runs-on: macos-14
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
     steps:
@@ -434,8 +434,9 @@ jobs:
       # oldest GitHub build support for Xcode (Transmission supports Xcode 12.5.1 and newer)
       - name: Set Xcode to 14.1
         run: |
-          # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#xcode
-          sudo xcode-select --switch /Applications/Xcode_14.1.app
+          # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md#xcode
+          sudo xcode-select --switch /Applications/Xcode_15.0.app
+
       - name: Configure
         run: |
           cmake \
@@ -697,7 +698,7 @@ jobs:
           path: pfx/**/*
 
   # Oldest GitHub support for CLI, GTK and QT on Mac
-  macos-13-x86_64-from-tarball:
+  macos-14-x86_64-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
@@ -706,7 +707,7 @@ jobs:
             needs.what-to-make.outputs.make-qt == 'true' ||
             needs.what-to-make.outputs.make-tests == 'true' ||
             needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - name: Show Configuration
         run: |
