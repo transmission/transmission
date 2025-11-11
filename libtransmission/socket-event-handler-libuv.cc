@@ -9,10 +9,12 @@
 #include "libtransmission/session.h"
 #include "libtransmission/socket-event-handler-libuv.h"
 
-namespace libtransmission {
+namespace libtransmission
+{
 
 // static
-void SocketEventHandlerLibuv::on_readable(struct uv_poll_s* handle, int status, int events)
+template<SocketEventType EventType>
+void SocketEventHandlerLibuv<EventType>::on_event(struct uv_poll_s* handle, int status, int events)
 {
     if (status < 0)
     {
@@ -20,24 +22,28 @@ void SocketEventHandlerLibuv::on_readable(struct uv_poll_s* handle, int status, 
         return;
     }
 
-    if ((events & UV_READABLE) == 0)
+    constexpr short UvType = (EventType == SocketEventType::Read) ? UV_READABLE : UV_WRITABLE;
+
+    if ((events & UvType) == 0)
     {
         return;
     }
 
-    auto* self = static_cast<SocketEventHandlerLibuv*>(handle->data);
+    auto* self = static_cast<SocketEventHandlerLibuv<EventType>*>(handle->data);
     self->callback_(self->socket_);
 }
 
-SocketEventHandlerLibuv::SocketEventHandlerLibuv(tr_session& session, tr_socket_t socket, Callback callback)
-    : SocketEventHandler(std::move(callback)), socket_{ socket }
+template<SocketEventType EventType>
+SocketEventHandlerLibuv<EventType>::SocketEventHandlerLibuv(tr_session& session, tr_socket_t socket, Callback callback)
+    : SocketEventHandler<EventType>(std::move(callback)), socket_{ socket }
 {
     socket_poll_ = new uv_poll_t{};
     uv_poll_init_socket(session.uv_loop(), socket_poll_, socket);
     socket_poll_->data = this;
 }
 
-SocketEventHandlerLibuv::~SocketEventHandlerLibuv()
+template<SocketEventType EventType>
+SocketEventHandlerLibuv<EventType>::~SocketEventHandlerLibuv()
 {
     stop();
     uv_close(
@@ -45,20 +51,41 @@ SocketEventHandlerLibuv::~SocketEventHandlerLibuv()
         [](uv_handle_t* handle) { delete reinterpret_cast<uv_poll_t*>(handle); });
 }
 
-void SocketEventHandlerLibuv::start()
+template<SocketEventType EventType>
+void SocketEventHandlerLibuv<EventType>::start()
 {
-    uv_poll_start(socket_poll_, UV_READABLE, on_readable);
+    constexpr short UvType = (EventType == SocketEventType::Read) ? UV_READABLE : UV_WRITABLE;
+    uv_poll_start(socket_poll_, UvType, on_event);
 }
 
-void SocketEventHandlerLibuv::stop()
+template<SocketEventType EventType>
+void SocketEventHandlerLibuv<EventType>::stop()
 {
     uv_poll_stop(socket_poll_);
 }
 
 // static
-std::unique_ptr<SocketEventHandler> SocketEventHandler::create_libuv_handler(tr_session& session, tr_socket_t socket, Callback callback)
+template<SocketEventType EventType>
+std::unique_ptr<SocketEventHandler<EventType>> SocketEventHandler<EventType>::create_libuv_handler(
+    tr_session& session,
+    tr_socket_t socket,
+    Callback callback)
 {
-    return std::make_unique<SocketEventHandlerLibuv>(session, socket, std::move(callback));
+    return std::make_unique<SocketEventHandlerLibuv<EventType>>(session, socket, std::move(callback));
 }
+
+// Explicit instantiation to ensure symbols are emitted in this TU.
+template
+std::unique_ptr<SocketReadEventHandler> SocketReadEventHandler::create_libuv_handler(
+    tr_session& session,
+    tr_socket_t socket,
+    Callback callback);
+
+// Explicit instantiation to ensure symbols are emitted in this TU.
+template
+std::unique_ptr<SocketWriteEventHandler> SocketWriteEventHandler::create_libuv_handler(
+    tr_session& session,
+    tr_socket_t socket,
+    Callback callback);
 
 } // namespace libtransmission

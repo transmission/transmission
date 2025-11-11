@@ -10,16 +10,20 @@
 namespace libtransmission
 {
 
-class SocketEventHandlerLibevent : public SocketEventHandler
+template<SocketEventType EventType>
+class SocketEventHandlerLibevent : public SocketEventHandler<EventType>
 {
 public:
+    using Callback = typename SocketEventHandler<EventType>::Callback;
+
     SocketEventHandlerLibevent(tr_session& session, tr_socket_t socket, Callback callback);
     ~SocketEventHandlerLibevent() override;
     void start() override;
     void stop() override;
 
 private:
-    static void on_readable(evutil_socket_t s, short type, void* vself);
+    static void on_event(evutil_socket_t s, short type, void* vself);
+
     tr_socket_t socket_ = TR_BAD_SOCKET;
     struct event* socket_event_ = nullptr;
 };

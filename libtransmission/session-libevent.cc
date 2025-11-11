@@ -6,21 +6,20 @@
 #include <event2/event.h>
 #include <fmt/core.h>
 
-#include "libtransmission/session.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/session.h"
+#include "libtransmission/socket-event-handler.h"
 
 // ---
 
-
 tr_session::BoundSocketLibevent::BoundSocketLibevent(
-    struct event_base* evbase,
+    tr_session& session,
     tr_address const& addr,
     tr_port port,
     IncomingCallback cb,
     void* cb_data)
     : BoundSocket(tr_netBindTCP(addr, port, false), cb, cb_data)
-    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocketLibevent::onCanRead, this) }
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -30,22 +29,24 @@ tr_session::BoundSocketLibevent::BoundSocketLibevent(
     tr_logAddInfo(fmt::format(
         fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
-    event_add(ev_.get(), nullptr);
+
+    event_handler_ = libtransmission::SocketReadEventHandler::create_libevent_handler(
+          session,
+          socket_,
+          [this](tr_socket_t socket) { cb_(socket, cb_data_); });
+    event_handler_->start();
 }
 
 tr_session::BoundSocketLibevent::~BoundSocketLibevent()
 {
-    ev_.reset();
+    if (event_handler_)
+    {
+        event_handler_->stop();
+    }
 
     if (socket_ != TR_BAD_SOCKET)
     {
         tr_net_close_socket(socket_);
         socket_ = TR_BAD_SOCKET;
     }
-}
-
-void tr_session::BoundSocketLibevent::onCanRead(evutil_socket_t fd, short /*what*/, void* vself)
-{
-    auto* const self = static_cast<BoundSocketLibevent*>(vself);
-    self->cb_(fd, self->cb_data_);
 }
