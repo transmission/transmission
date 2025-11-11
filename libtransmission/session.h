@@ -98,40 +98,18 @@ private:
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(tr_socket_t socket, IncomingCallback cb, void* cb_data) : cb_{ cb }, cb_data_{ cb_data }, socket_{ socket } {}
+        BoundSocket(tr_session& session, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
         BoundSocket(BoundSocket&&) = delete;
         BoundSocket(BoundSocket const&) = delete;
         BoundSocket operator=(BoundSocket&&) = delete;
         BoundSocket operator=(BoundSocket const&) = delete;
-        virtual ~BoundSocket() = default;
+        ~BoundSocket();
 
     protected:
+        tr_socket_t socket_ = TR_BAD_SOCKET;
         IncomingCallback cb_;
         void* cb_data_;
-        tr_socket_t socket_ = TR_BAD_SOCKET;
         std::unique_ptr<libtransmission::SocketReadEventHandler> event_handler_;
-    };
-
-    class BoundSocketLibevent : public BoundSocket
-    {
-    public:
-        BoundSocketLibevent(tr_session& session, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
-        BoundSocketLibevent(BoundSocketLibevent&&) = delete;
-        BoundSocketLibevent(BoundSocketLibevent const&) = delete;
-        BoundSocketLibevent operator=(BoundSocketLibevent&&) = delete;
-        BoundSocketLibevent operator=(BoundSocketLibevent const&) = delete;
-        ~BoundSocketLibevent() override;
-    };
-
-    class BoundSocketLibuv : public BoundSocket
-    {
-    public:
-        BoundSocketLibuv(tr_session& session, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
-        BoundSocketLibuv(BoundSocketLibuv&&) = delete;
-        BoundSocketLibuv(BoundSocketLibuv const&) = delete;
-        BoundSocketLibuv operator=(BoundSocketLibuv&&) = delete;
-        BoundSocketLibuv operator=(BoundSocketLibuv const&) = delete;
-        ~BoundSocketLibuv() override;
     };
 
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
