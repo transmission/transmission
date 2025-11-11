@@ -30,8 +30,7 @@ tr_session::BoundSocketLibuv::BoundSocketLibuv(
         fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
 
-    event_handler_ = libtransmission::SocketReadEventHandler::create_libuv_handler(
-          session,
+    event_handler_ = session.socketEventHandlerMaker().create_read(
           socket_,
           [this](tr_socket_t socket) { cb_(socket, cb_data_); });
     event_handler_->start();

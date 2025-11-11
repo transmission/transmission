@@ -16,7 +16,7 @@ class SocketEventHandlerLibevent : public SocketEventHandler<EventType>
 public:
     using Callback = typename SocketEventHandler<EventType>::Callback;
 
-    SocketEventHandlerLibevent(tr_session& session, tr_socket_t socket, Callback callback);
+    SocketEventHandlerLibevent(struct event_base* event_base, tr_socket_t socket, Callback callback);
     ~SocketEventHandlerLibevent() override;
     void start() override;
     void stop() override;
@@ -26,6 +26,21 @@ private:
 
     tr_socket_t socket_ = TR_BAD_SOCKET;
     struct event* socket_event_ = nullptr;
+};
+
+class SocketEventHandlerLibeventMaker final : public SocketEventHandlerMaker
+{
+public:
+    explicit SocketEventHandlerLibeventMaker(struct event_base* event_base) noexcept
+        : event_base_{ event_base }
+    {
+    }
+
+    [[nodiscard]] std::unique_ptr<SocketReadEventHandler> create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback) override;
+    [[nodiscard]] std::unique_ptr<SocketWriteEventHandler> create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback) override;
+
+private:
+    struct event_base* event_base_;
 };
 
 } // namespace libtransmission

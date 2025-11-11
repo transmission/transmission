@@ -14,7 +14,7 @@ class SocketEventHandlerLibuv : public SocketEventHandler<EventType>
 public:
     using Callback = typename SocketEventHandler<EventType>::Callback;
 
-    SocketEventHandlerLibuv(tr_session& session, tr_socket_t socket, Callback callback);
+    SocketEventHandlerLibuv(struct uv_loop_s* loop, tr_socket_t socket, Callback callback);
     ~SocketEventHandlerLibuv() override;
     void start() override;
     void stop() override;
@@ -24,6 +24,21 @@ private:
 
     tr_socket_t socket_ = TR_BAD_SOCKET;
     struct uv_poll_s* socket_poll_ = nullptr;
+};
+
+class SocketEventHandlerLibuvMaker final : public SocketEventHandlerMaker
+{
+public:
+    explicit SocketEventHandlerLibuvMaker(struct uv_loop_s* loop) noexcept
+        : uv_loop_{ loop }
+    {
+    }
+
+    [[nodiscard]] std::unique_ptr<SocketReadEventHandler> create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback) override;
+    [[nodiscard]] std::unique_ptr<SocketWriteEventHandler> create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback) override;
+
+private:
+    struct uv_loop_s* uv_loop_;
 };
 
 } // namespace libtransmission

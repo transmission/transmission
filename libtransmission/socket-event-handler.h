@@ -35,22 +35,20 @@ public:
 
     virtual void start() = 0;
     virtual void stop() = 0;
-
-    static std::unique_ptr<SocketEventHandler<EventType>> create_libevent_handler(
-        tr_session& session,
-        tr_socket_t socket,
-        Callback callback);
-
-    static std::unique_ptr<SocketEventHandler<EventType>> create_libuv_handler(
-        tr_session& session,
-        tr_socket_t socket,
-        Callback callback);
-
 protected:
     Callback callback_;
 };
 
 using SocketReadEventHandler = SocketEventHandler<SocketEventType::Read>;
 using SocketWriteEventHandler = SocketEventHandler<SocketEventType::Write>;
+
+class SocketEventHandlerMaker
+{
+public:
+    virtual ~SocketEventHandlerMaker() = default;
+
+    [[nodiscard]] virtual std::unique_ptr<SocketReadEventHandler> create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback) = 0;
+    [[nodiscard]] virtual std::unique_ptr<SocketWriteEventHandler> create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback) = 0;
+};
 
 } // namespace libtransmission

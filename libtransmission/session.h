@@ -323,7 +323,7 @@ private:
 
         [[nodiscard]] std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketReadEventHandler::Callback callback) override
         {
-            return libtransmission::SocketReadEventHandler::create_libuv_handler(session_, socket, std::move(callback));
+            return session_.socketEventHandlerMaker().create_read(socket, std::move(callback));
         }
 
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
@@ -563,6 +563,11 @@ public:
     [[nodiscard]] libtransmission::TimerMaker& timerMaker() noexcept
     {
         return *timer_maker_;
+    }
+
+    [[nodiscard]] libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() noexcept
+    {
+        return *socket_event_handler_maker_;
     }
 
     [[nodiscard]] auto am_in_session_thread() const noexcept
@@ -1315,6 +1320,9 @@ private:
 
     // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+
+    // depends-on: session_thread_
+    std::unique_ptr<libtransmission::SocketEventHandlerMaker> const socket_event_handler_maker_;
 
     /// trivial type fields
 

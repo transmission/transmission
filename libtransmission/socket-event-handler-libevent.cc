@@ -28,13 +28,13 @@ void SocketEventHandlerLibevent<EventType>::on_event([[maybe_unused]] evutil_soc
 
 template<SocketEventType EventType>
 SocketEventHandlerLibevent<EventType>::SocketEventHandlerLibevent(
-    tr_session& session,
+    struct event_base* event_base,
     tr_socket_t socket,
     Callback callback)
     : SocketEventHandler<EventType>(std::move(callback))
 {
     constexpr short EvType = (EventType == SocketEventType::Read) ? EV_READ : EV_WRITE;
-    socket_event_ = event_new(session.event_base(), socket, EvType | EV_PERSIST, on_event, this);
+    socket_event_ = event_new(event_base, socket, EvType | EV_PERSIST, on_event, this);
 }
 
 template<SocketEventType EventType>
@@ -56,25 +56,14 @@ void SocketEventHandlerLibevent<EventType>::stop()
     event_del(socket_event_);
 }
 
-// static
-template<SocketEventType EventType>
-std::unique_ptr<SocketEventHandler<EventType>> SocketEventHandler<EventType>::create_libevent_handler(tr_session& session, tr_socket_t socket, Callback callback)
+std::unique_ptr<SocketReadEventHandler> SocketEventHandlerLibeventMaker::create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback)
 {
-    return std::make_unique<SocketEventHandlerLibevent<EventType>>(session, socket, std::move(callback));
+    return std::make_unique<SocketEventHandlerLibevent<SocketEventType::Read>>(event_base_, socket, std::move(callback));
 }
 
-// Explicit instantiation to ensure symbols are emitted in this TU.
-template
-std::unique_ptr<SocketReadEventHandler> SocketReadEventHandler::create_libevent_handler(
-    tr_session& session,
-    tr_socket_t socket,
-    Callback callback);
-
-// Explicit instantiation to ensure symbols are emitted in this TU.
-template
-std::unique_ptr<SocketWriteEventHandler> SocketWriteEventHandler::create_libevent_handler(
-    tr_session& session,
-    tr_socket_t socket,
-    Callback callback);
+std::unique_ptr<SocketWriteEventHandler> SocketEventHandlerLibeventMaker::create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback)
+{
+    return std::make_unique<SocketEventHandlerLibevent<SocketEventType::Write>>(event_base_, socket, std::move(callback));
+}
 
 } // namespace libtransmission
