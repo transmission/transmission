@@ -90,6 +90,10 @@ public:
         // the buffer itself.
         evbuffer* buffer = nullptr;
 
+        // Called periodically by the web internals when data is received.
+        // Used by webseeds to report to tr_bandwidth for data xfer stats
+        std::function<void(size_t /*n_bytes*/)> on_data_received;
+
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;
 

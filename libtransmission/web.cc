@@ -361,6 +361,11 @@ public:
         {
             evbuffer_add(body(), data, n_bytes);
             tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", n_bytes, fmt::ptr(this)));
+
+            if (options_.on_data_received)
+            {
+                options_.on_data_received(n_bytes);
+            }
         }
 
         void done()
