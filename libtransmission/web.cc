@@ -33,8 +33,6 @@
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
-
 #include <fmt/format.h>
 
 #ifdef _WIN32
@@ -42,7 +40,6 @@
 #endif
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/web-utils.h"
@@ -269,7 +266,7 @@ public:
             {
                 // preallocate the response body buffer
                 auto const& [first, last] = *options_.range;
-                evbuffer_expand(body(), last + 1U - first);
+                response.body.reserve(last + 1U - first);
             }
         }
 
@@ -359,7 +356,7 @@ public:
 
         void add_data(void const* data, size_t const n_bytes)
         {
-            evbuffer_add(body(), data, n_bytes);
+            response.body.append(static_cast<char const*>(data), n_bytes);
             tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", n_bytes, fmt::ptr(this)));
 
             if (options_.on_data_received)
@@ -375,7 +372,6 @@ public:
                 return;
             }
 
-            response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
             impl.mediator.run(std::move(options_.done_func), std::move(this->response));
             options_.done_func = {};
         }
@@ -389,11 +385,6 @@ public:
         tr_web::FetchResponse response;
 
     private:
-        [[nodiscard]] evbuffer* body() const
-        {
-            return privbuf_.get();
-        }
-
         void easy_dispose(CURL* easy)
         {
             if (easy == nullptr)
@@ -413,8 +404,6 @@ public:
                 curl_easy_cleanup(easy);
             }
         }
-
-        libtransmission::evhelpers::evbuffer_unique_ptr privbuf_{ evbuffer_new() };
 
         tr_web::FetchOptions options_;
 
