@@ -14,6 +14,7 @@ const is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // https://github.com/transmission/transmission/pull/6320#issuecomment-1896968904
 // https://caniuse.com/input-file-accept
 const can_use_input_accept = !(is_ios && is_safari);
+const max_datalist_options = 100;
 
 export class OpenDialog extends EventTarget {
   constructor(controller, remote, url = '', files = null) {
@@ -198,11 +199,11 @@ export class OpenDialog extends EventTarget {
       const dirs = new Set();
       let torrents = this.controller._rows.map(row => row.getTorrent());
       for (const torrent of torrents) {
-        const dir = torrent.getDownloadDir();
-        if (dir && dir.trim().length > 0) {
+        const dir = torrent.getDownloadDir().trim();
+        if (dir) {
           dirs.add(dir);
         }
-        if (dirs.size >= 100) { // do not explode the ui
+        if (dirs.size >= max_datalist_options) { // do not explode the ui
           break;
         }
       }
