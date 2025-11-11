@@ -2217,33 +2217,3 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
 
     callback(session, tr_variant{ std::move(response) });
 }
-
-/**
- * Munge the URI into a usable form.
- *
- * We have very loose typing on this to make the URIs as simple as possible:
- * - anything not a 'tag' or 'method' is automatically in 'arguments'
- * - values that are all-digits are numbers
- * - values that are all-digits or commas are number lists
- * - all other values are strings
- */
-tr_variant tr_rpc_parse_list_str(std::string_view str)
-{
-    auto const values = tr_num_parse_range(str);
-    auto const n_values = std::size(values);
-
-    if (n_values == 0)
-    {
-        return { str };
-    }
-
-    if (n_values == 1)
-    {
-        return { values[0] };
-    }
-
-    auto num_vec = tr_variant::Vector{};
-    num_vec.resize(n_values);
-    std::copy_n(std::cbegin(values), n_values, std::begin(num_vec));
-    return { std::move(num_vec) };
-}
