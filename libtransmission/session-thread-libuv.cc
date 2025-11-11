@@ -24,15 +24,7 @@
 #include "libtransmission/session-thread.h"
 #include "libtransmission/tr-assert.h"
 
-using namespace std::literals;
-
-// ---
-
-void tr_session_thread::tr_evthread_init()
-{
-    // libuv doesn't require explicit thread initialization like libevent
-    // This function is kept for API compatibility but is a no-op for libuv
-}
+using namespace std::chrono_literals;
 
 class tr_session_thread_libuv_impl final : public tr_session_thread
 {
