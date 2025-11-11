@@ -355,6 +355,12 @@ public:
             }
         }
 
+        void add_data(void const* data, size_t const n_bytes)
+        {
+            evbuffer_add(body(), data, n_bytes);
+            tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", n_bytes, fmt::ptr(this)));
+        }
+
         void done()
         {
             if (!options_.done_func)
@@ -522,8 +528,7 @@ public:
             }
         }
 
-        evbuffer_add(task->body(), data, bytes_used);
-        tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
+        task->add_data(data, bytes_used);
         return bytes_used;
     }
 
