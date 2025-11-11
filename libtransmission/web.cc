@@ -290,11 +290,6 @@ public:
             return easy_;
         }
 
-        [[nodiscard]] evbuffer* body() const
-        {
-            return options_.buffer != nullptr ? options_.buffer : privbuf_.get();
-        }
-
         [[nodiscard]] constexpr auto const& speedLimitTag() const
         {
             return options_.speed_limit_tag;
@@ -389,6 +384,11 @@ public:
         tr_web::FetchResponse response;
 
     private:
+        [[nodiscard]] evbuffer* body() const
+        {
+            return options_.buffer != nullptr ? options_.buffer : privbuf_.get();
+        }
+
         void easy_dispose(CURL* easy)
         {
             if (easy == nullptr)
