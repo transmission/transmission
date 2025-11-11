@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "libtransmission/socket-event-handler.h"
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
@@ -31,12 +30,7 @@
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
 
 struct struct_utp_context;
-struct uv_loop_s;
 
-namespace libtransmission
-{
-class PeerIoEventHandler;
-}
 struct tr_error;
 struct tr_session;
 struct tr_socket_address;
@@ -59,12 +53,6 @@ enum tr_preferred_transport : uint8_t
     TR_PREFER_UTP,
     TR_PREFER_TCP,
     TR_NUM_PREFERRED_TRANSPORT
-};
-
-enum class EventBackend : uint8_t
-{
-    Libevent,
-    Libuv
 };
 
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
@@ -355,6 +343,9 @@ private:
 
     void close();
 
+    void handle_read_ready();
+    void handle_write_ready();
+
     void event_enable(libtransmission::PeerIoEventHandler::EventType event);
     void event_disable(libtransmission::PeerIoEventHandler::EventType event);
 
@@ -363,9 +354,6 @@ private:
 
     size_t try_read(size_t max);
     size_t try_write(size_t max);
-
-    void handle_read_ready();
-    void handle_write_ready();
 
     // this is only public for testing purposes.
     // production code should use new_outgoing() or new_incoming()

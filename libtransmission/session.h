@@ -77,8 +77,6 @@ struct tr_pex;
 struct tr_torrent;
 struct struct_utp_context;
 struct tr_variant;
-struct uv_poll_s;
-struct uv_loop_s;
 
 namespace libtransmission::test
 {
@@ -105,10 +103,10 @@ private:
         BoundSocket operator=(BoundSocket const&) = delete;
         ~BoundSocket();
 
-    protected:
-        tr_socket_t socket_ = TR_BAD_SOCKET;
+    private:
         IncomingCallback cb_;
         void* cb_data_;
+        tr_socket_t socket_ = TR_BAD_SOCKET;
         std::unique_ptr<libtransmission::SocketReadEventHandler> event_handler_;
     };
 

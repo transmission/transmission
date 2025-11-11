@@ -159,45 +159,6 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 } // namespace bandwidth_group_helpers
 } // namespace
 
-tr_session::BoundSocket::BoundSocket(
-    tr_session& session,
-    tr_address const& addr,
-    tr_port port,
-    IncomingCallback cb,
-    void* cb_data)
-    : socket_(tr_netBindTCP(addr, port, false))
-    , cb_{ cb }
-    , cb_data_{ cb_data }
-{
-    if (socket_ == TR_BAD_SOCKET)
-    {
-        return;
-    }
-
-    tr_logAddInfo(fmt::format(
-        fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
-        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
-
-    event_handler_ = session.socketEventHandlerMaker().create_read(
-        socket_,
-        [this](tr_socket_t socket) { cb_(socket, cb_data_); });
-    event_handler_->start();
-}
-
-tr_session::BoundSocket::~BoundSocket()
-{
-    if (event_handler_)
-    {
-        event_handler_->stop();
-    }
-
-    if (socket_ != TR_BAD_SOCKET)
-    {
-        tr_net_close_socket(socket_);
-        socket_ = TR_BAD_SOCKET;
-    }
-}
-
 void tr_session::update_bandwidth(tr_direction const dir)
 {
     if (auto const limit = active_speed_limit(dir); limit)
@@ -440,6 +401,45 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
         auto const& [socket_address, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, socket_address.display_name()));
         session->addIncoming({ session, socket_address, sock });
+    }
+}
+
+tr_session::BoundSocket::BoundSocket(
+    tr_session& session,
+    tr_address const& addr,
+    tr_port port,
+    IncomingCallback cb,
+    void* cb_data)
+    : cb_{ cb }
+    , cb_data_{ cb_data }
+    , socket_(tr_netBindTCP(addr, port, false))
+{
+    if (socket_ == TR_BAD_SOCKET)
+    {
+        return;
+    }
+
+    tr_logAddInfo(fmt::format(
+        fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
+        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
+
+    event_handler_ = session.socketEventHandlerMaker().create_read(
+        socket_,
+        [this](tr_socket_t socket) { cb_(socket, cb_data_); });
+    event_handler_->start();
+}
+
+tr_session::BoundSocket::~BoundSocket()
+{
+    if (event_handler_)
+    {
+        event_handler_->stop();
+    }
+
+    if (socket_ != TR_BAD_SOCKET)
+    {
+        tr_net_close_socket(socket_);
+        socket_ = TR_BAD_SOCKET;
     }
 }
 
@@ -877,7 +877,6 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     {
         if (val)
         {
-            // lpd_ = tr_lpd::create(lpd_mediator_, event_base());
             lpd_ = tr_lpd::create(lpd_mediator_);
         }
         else
