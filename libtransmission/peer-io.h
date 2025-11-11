@@ -77,7 +77,6 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 
 public:
     tr_peerIo(
-        EventBackend backend,
         tr_session* session,
         tr_peer_socket&& socket,
         tr_bandwidth* parent_bandwidth,
@@ -93,7 +92,6 @@ public:
     tr_peerIo& operator=(tr_peerIo&&) = delete;
 
     static std::shared_ptr<tr_peerIo> new_outgoing(
-        EventBackend backend,
         tr_session* session,
         tr_bandwidth* parent,
         tr_socket_address const& socket_address,
@@ -102,7 +100,6 @@ public:
         bool utp);
 
     static std::shared_ptr<tr_peerIo> new_incoming(
-        EventBackend backend,
         tr_session* session,
         tr_bandwidth* parent,
         tr_peer_socket socket);
@@ -329,13 +326,6 @@ public:
 
     static void utp_init(struct_utp_context* ctx);
 
-    // Public methods for event handlers to call
-    void handle_read_ready();
-    void handle_write_ready();
-
-    std::unique_ptr<libtransmission::SocketReadEventHandler> create_socket_read_event_handler(tr_socket_t socket);
-    std::unique_ptr<libtransmission::SocketWriteEventHandler> create_socket_write_event_handler(tr_socket_t socket);
-
 private:
     // Our target socket receive buffer size.
     // Gets read from the socket buffer into the PeerBuffer inbuf_.
@@ -377,10 +367,12 @@ private:
     size_t try_read(size_t max);
     size_t try_write(size_t max);
 
+    void handle_read_ready();
+    void handle_write_ready();
+
     // this is only public for testing purposes.
     // production code should use new_outgoing() or new_incoming()
     static std::shared_ptr<tr_peerIo> create(
-        EventBackend backend,
         tr_session* session,
         tr_peer_socket&& socket,
         tr_bandwidth* parent,
@@ -409,7 +401,6 @@ private:
     GotError got_error_ = nullptr;
     void* user_data_ = nullptr;
 
-    EventBackend const backend_;
     std::unique_ptr<libtransmission::PeerIoEventHandler> event_handler_;
 
     tr_priority_t priority_ = TR_PRI_NORMAL;
