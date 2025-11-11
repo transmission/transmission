@@ -192,8 +192,7 @@ export class OpenDialog extends EventTarget {
     input.addEventListener('change', () => this._updateFreeSpaceInAddDialog());
     input.value = this.controller.session_properties.download_dir;
     workarea.append(input);
-
-    const buildDatalist = () => {
+    workarea.append((() => {
       const datalist = document.createElement('datalist');
       datalist.id = 'add-dialog-folder-datalist';
       const dirs = new Set();
@@ -211,8 +210,7 @@ export class OpenDialog extends EventTarget {
         }
       }
       return datalist;
-    };
-    workarea.append(buildDatalist());
+    })());
     elements.folder_input = input;
 
     const checkarea = document.createElement('div');
