@@ -323,6 +323,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_seederCount,
     TR_KEY_seeding_time_seconds,
     TR_KEY_sequential_download,
+    TR_KEY_sequential_download_from_piece,
     TR_KEY_session_count,
     TR_KEY_session_id,
     TR_KEY_sessionCount,

@@ -581,6 +581,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
     case TR_KEY_sequential_download:
+    case TR_KEY_sequential_download_from_piece:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
     case TR_KEY_startDate:
@@ -676,6 +677,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedRatioLimit: return tor.seed_ratio();
     case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
     case TR_KEY_sequential_download: return tor.is_sequential_download();
+    case TR_KEY_sequential_download_from_piece: return tor.sequential_download_from_piece();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
@@ -887,6 +889,17 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
     return nullptr; // no error
 }
 
+char const* set_sequential_download_from_piece(tr_torrent& tor, tr_piece_index_t piece)
+{
+    if (piece >= tor.piece_count())
+    {
+        return "piece to sequentially download from is outside pieces range";
+    }
+
+    tor.set_sequential_download_from_piece(piece);
+    return nullptr; // no error
+}
+
 [[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
 {
     auto const [indices, errmsg] = get_file_indices(tor, files_vec);
@@ -1029,6 +1042,11 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download))
         {
             tor->set_sequential_download(*val);
+        }
+
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val && errmsg == nullptr)
+        {
+            errmsg = set_sequential_download_from_piece(*tor, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_downloadLimited))
@@ -1473,6 +1491,11 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
     if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
     {
         ctor.set_sequential_download(TR_FORCE, *val);
+    }
+
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val)
+    {
+        ctor.set_sequential_download_from_piece(TR_FORCE, *val);
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
