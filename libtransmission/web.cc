@@ -264,6 +264,13 @@ public:
             easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
 
             response.user_data = options_.done_func_user_data;
+
+            if (options_.range)
+            {
+                // preallocate the response body buffer
+                auto const& [first, last] = *options_.range;
+                evbuffer_expand(body(), last + 1U - first);
+            }
         }
 
         // Some of the curl_easy_setopt() args took a pointer to this task.
@@ -283,7 +290,7 @@ public:
             return easy_;
         }
 
-        [[nodiscard]] auto* body() const
+        [[nodiscard]] evbuffer* body() const
         {
             return options_.buffer != nullptr ? options_.buffer : privbuf_.get();
         }
@@ -646,12 +653,9 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
 
             // set the range request
-            auto const [first, last] = *range;
-            auto const range_str = fmt::format("{:d}-{:d}", first, last);
-            (void)curl_easy_setopt(e, CURLOPT_RANGE, range_str.c_str());
-
-            // preallocate the response body buffer
-            evbuffer_expand(task.body(), last + 1U - first);
+            auto const& [first, last] = *range;
+            auto const str = fmt::format("{:d}-{:d}", first, last);
+            (void)curl_easy_setopt(e, CURLOPT_RANGE, str.c_str());
         }
 
         if (curl_avoid_http2)
