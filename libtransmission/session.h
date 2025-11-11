@@ -57,6 +57,7 @@
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/settings.h"
+#include "libtransmission/socket-event-handler.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-queue.h"
@@ -331,9 +332,9 @@ private:
             return session_.timerMaker();
         }
 
-        [[nodiscard]] std::unique_ptr<tr_lpd::EventHandler> createEventHandler(tr_socket_t socket, tr_lpd::EventHandler::Callback callback) override
+        [[nodiscard]] std::unique_ptr<libtransmission::SocketEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketEventHandler::Callback callback) override
         {
-            return std::make_unique<tr_lpd::tr_lpd_libuv_handler>(session_, socket, std::move(callback));
+            return libtransmission::SocketEventHandler::create_libuv_handler(session_, socket, std::move(callback));
         }
 
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
@@ -386,23 +387,6 @@ private:
     class tr_udp_core
     {
     public:
-        class EventHandler
-        {
-        public:
-            using Callback = std::function<void(tr_socket_t)>;
-            explicit EventHandler(Callback callback)
-                : callback_(std::move(callback))
-            {
-            }
-            virtual ~EventHandler() = default;
-
-            virtual void start() = 0;
-            virtual void stop() = 0;
-
-        protected:
-            Callback callback_;
-        };
-
         tr_udp_core(tr_session& session, tr_port udp_port);
         ~tr_udp_core();
 
@@ -429,36 +413,8 @@ private:
         tr_session& session_;
         tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
-        std::unique_ptr<EventHandler> udp4_event_handler_;
-        std::unique_ptr<EventHandler> udp6_event_handler_;
-    };
-
-    class tr_udp_core_libevent_handler : public tr_udp_core::EventHandler
-    {
-    public:
-        tr_udp_core_libevent_handler(tr_session& session, tr_socket_t socket, Callback callback);
-        ~tr_udp_core_libevent_handler() override;
-        void start() override;
-        void stop() override;
-
-    private:
-        static void on_udp_readable(evutil_socket_t s, short type, void* vself);
-        tr_socket_t socket_ = TR_BAD_SOCKET;
-        struct event* socket_event_ = nullptr;
-    };
-
-    class tr_udp_core_libuv_handler : public tr_udp_core::EventHandler
-    {
-    public:
-        tr_udp_core_libuv_handler(tr_session& session, tr_socket_t socket, Callback callback);
-        ~tr_udp_core_libuv_handler() override;
-        void start() override;
-        void stop() override;
-
-    private:
-        static void on_udp_readable(struct uv_poll_s* handle, int status, int events);
-        tr_socket_t socket_ = TR_BAD_SOCKET;
-        struct uv_poll_s* socket_poll_ = nullptr;
+        std::unique_ptr<libtransmission::SocketEventHandler> udp4_event_handler_;
+        std::unique_ptr<libtransmission::SocketEventHandler> udp6_event_handler_;
     };
 
 public:

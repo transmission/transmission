@@ -10,7 +10,6 @@
 #endif
 
 #include <ctime>
-#include <functional>
 #include <memory>
 #include <string_view>
 #include <vector>
@@ -18,6 +17,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/net.h" // for tr_address, tr_port
+#include "libtransmission/socket-event-handler.h"
 
 struct event_base;
 
@@ -29,51 +29,6 @@ class TimerMaker;
 class tr_lpd
 {
 public:
-    class EventHandler
-    {
-    public:
-        using Callback = std::function<void(tr_socket_t)>;
-        explicit EventHandler(Callback callback)
-            : callback_(std::move(callback))
-        {
-        }
-        virtual ~EventHandler() = default;
-
-        virtual void start() = 0;
-        virtual void stop() = 0;
-
-    protected:
-        Callback callback_;
-    };
-
-    class tr_lpd_libevent_handler : public EventHandler
-    {
-    public:
-        tr_lpd_libevent_handler(tr_session& session, tr_socket_t socket, Callback callback);
-        ~tr_lpd_libevent_handler() override;
-        void start() override;
-        void stop() override;
-
-    private:
-        static void on_udp_readable(tr_socket_t s, short type, void* vself);
-        tr_socket_t socket_ = TR_BAD_SOCKET;
-        struct event* socket_event_ = nullptr;
-    };
-
-    class tr_lpd_libuv_handler : public EventHandler
-    {
-    public:
-        tr_lpd_libuv_handler(tr_session& session, tr_socket_t socket, Callback callback);
-        ~tr_lpd_libuv_handler() override;
-        void start() override;
-        void stop() override;
-
-    private:
-        static void on_udp_readable(struct uv_poll_s* handle, int status, int events);
-        tr_socket_t socket_ = TR_BAD_SOCKET;
-        struct uv_poll_s* socket_poll_ = nullptr;
-    };
-
     class Mediator
     {
     public:
@@ -97,7 +52,7 @@ public:
 
         [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
 
-        [[nodiscard]] virtual std::unique_ptr<EventHandler> createEventHandler(tr_socket_t socket, EventHandler::Callback callback) = 0;
+        [[nodiscard]] virtual std::unique_ptr<libtransmission::SocketEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketEventHandler::Callback callback) = 0;
 
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 

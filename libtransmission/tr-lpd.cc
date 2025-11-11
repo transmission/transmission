@@ -639,7 +639,7 @@ private:
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
     std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_sockets_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; // multicast sockets
-    std::array<std::unique_ptr<EventHandler>, NUM_TR_AF_INET_TYPES> event_handlers_;
+    std::array<std::unique_ptr<libtransmission::SocketEventHandler>, NUM_TR_AF_INET_TYPES> event_handlers_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
     sockaddr_in mcast_addr_ = {}; // initialized from the above constants in init()
