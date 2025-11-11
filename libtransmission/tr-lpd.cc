@@ -437,9 +437,9 @@ private:
             }
         }
 
-        event_handlers_[ip_protocol] = mediator_.createEventHandler(sock, [this]([[maybe_unused]] tr_socket_t socket) {
-            onCanRead(ip_protocol);
-        });
+        event_handlers_[ip_protocol] = mediator_.createEventHandler(
+            sock,
+            [this]([[maybe_unused]] tr_socket_t socket) { onCanRead(ip_protocol); });
         event_handlers_[ip_protocol]->start();
 
         tr_logAddDebug(fmt::format("{} Local Peer Discovery initialised", tr_ip_protocol_to_sv(ip_protocol)));

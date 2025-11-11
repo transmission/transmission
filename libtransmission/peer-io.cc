@@ -105,10 +105,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     return io;
 }
 
-std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(
-    tr_session* session,
-    tr_bandwidth* parent,
-    tr_peer_socket socket)
+std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket)
 {
     TR_ASSERT(session != nullptr);
     return tr_peerIo::create(session, std::move(socket), parent, nullptr, true, false);
@@ -187,10 +184,13 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
     if (socket_.is_tcp())
     {
         event_handler_ = std::make_unique<libtransmission::PeerIoEventHandler>(
-            this, 
-            session_->socketEventHandlerMaker().create_read(socket_.handle.tcp, [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); }),
-            session_->socketEventHandlerMaker().create_write(socket_.handle.tcp, [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); })
-        );
+            this,
+            session_->socketEventHandlerMaker().create_read(
+                socket_.handle.tcp,
+                [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); }),
+            session_->socketEventHandlerMaker().create_write(
+                socket_.handle.tcp,
+                [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); }));
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())

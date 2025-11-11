@@ -99,10 +99,7 @@ public:
         bool client_is_seed,
         bool utp);
 
-    static std::shared_ptr<tr_peerIo> new_incoming(
-        tr_session* session,
-        tr_bandwidth* parent,
-        tr_peer_socket socket);
+    static std::shared_ptr<tr_peerIo> new_incoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
 
     constexpr void set_callbacks(CanRead can_read, DidWrite did_write, GotError got_error, void* user_data)
     {

@@ -15,7 +15,10 @@
 namespace libtransmission
 {
 
-PeerIoEventHandler::PeerIoEventHandler(tr_peerIo* io, std::unique_ptr<SocketReadEventHandler> read_event_handler, std::unique_ptr<SocketWriteEventHandler> write_event_handler)
+PeerIoEventHandler::PeerIoEventHandler(
+    tr_peerIo* io,
+    std::unique_ptr<SocketReadEventHandler> read_event_handler,
+    std::unique_ptr<SocketWriteEventHandler> write_event_handler)
     : io_{ io }
     , read_event_handler_{ std::move(read_event_handler) }
     , write_event_handler_{ std::move(write_event_handler) }

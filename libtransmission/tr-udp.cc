@@ -202,7 +202,9 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_handler_ = session_.socketEventHandlerMaker().create_read(udp4_socket_, [this](tr_socket_t socket) { on_read_event(socket); });
+            udp4_event_handler_ = session_.socketEventHandlerMaker().create_read(
+                udp4_socket_,
+                [this](tr_socket_t socket) { on_read_event(socket); });
             udp4_event_handler_->start();
         }
     }
@@ -247,7 +249,9 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_handler_ = session_.socketEventHandlerMaker().create_read(udp6_socket_, [this](tr_socket_t socket) { on_read_event(socket); });
+            udp6_event_handler_ = session_.socketEventHandlerMaker().create_read(
+                udp6_socket_,
+                [this](tr_socket_t socket) { on_read_event(socket); });
             udp6_event_handler_->start();
         }
     }

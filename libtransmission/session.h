@@ -299,7 +299,9 @@ private:
             return session_.timerMaker();
         }
 
-        [[nodiscard]] std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketReadEventHandler::Callback callback) override
+        [[nodiscard]] std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(
+            tr_socket_t socket,
+            libtransmission::SocketReadEventHandler::Callback callback) override
         {
             return session_.socketEventHandlerMaker().create_read(socket, std::move(callback));
         }

@@ -52,7 +52,9 @@ public:
 
         [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
 
-        [[nodiscard]] virtual std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(tr_socket_t socket, libtransmission::SocketReadEventHandler::Callback callback) = 0;
+        [[nodiscard]] virtual std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(
+            tr_socket_t socket,
+            libtransmission::SocketReadEventHandler::Callback callback) = 0;
 
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 

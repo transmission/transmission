@@ -12,11 +12,15 @@
 #include "libtransmission/socket-event-handler.h"
 #include "libtransmission/tr-assert.h"
 
-namespace libtransmission {
+namespace libtransmission
+{
 
 // static
 template<SocketEventType EventType>
-void SocketEventHandlerLibevent<EventType>::on_event([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* vself)
+void SocketEventHandlerLibevent<EventType>::on_event(
+    [[maybe_unused]] evutil_socket_t s,
+    [[maybe_unused]] short type,
+    void* vself)
 {
     TR_ASSERT(vself != nullptr);
     constexpr short EvType = (EventType == SocketEventType::Read) ? EV_READ : EV_WRITE;
@@ -56,12 +60,16 @@ void SocketEventHandlerLibevent<EventType>::stop()
     event_del(socket_event_);
 }
 
-std::unique_ptr<SocketReadEventHandler> SocketEventHandlerLibeventMaker::create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback)
+std::unique_ptr<SocketReadEventHandler> SocketEventHandlerLibeventMaker::create_read(
+    tr_socket_t socket,
+    std::function<void(tr_socket_t)> callback)
 {
     return std::make_unique<SocketEventHandlerLibevent<SocketEventType::Read>>(event_base_, socket, std::move(callback));
 }
 
-std::unique_ptr<SocketWriteEventHandler> SocketEventHandlerLibeventMaker::create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback)
+std::unique_ptr<SocketWriteEventHandler> SocketEventHandlerLibeventMaker::create_write(
+    tr_socket_t socket,
+    std::function<void(tr_socket_t)> callback)
 {
     return std::make_unique<SocketEventHandlerLibevent<SocketEventType::Write>>(event_base_, socket, std::move(callback));
 }

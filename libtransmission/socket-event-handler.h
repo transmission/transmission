@@ -20,7 +20,7 @@ enum class SocketEventType : uint8_t
 };
 
 /** @brief base class for socket event handlers, own and manages the event, but does not own the socket. */
-template <SocketEventType EventType>
+template<SocketEventType EventType>
 class SocketEventHandler
 {
 public:
@@ -35,6 +35,7 @@ public:
 
     virtual void start() = 0;
     virtual void stop() = 0;
+
 protected:
     Callback callback_;
 };
@@ -47,8 +48,12 @@ class SocketEventHandlerMaker
 public:
     virtual ~SocketEventHandlerMaker() = default;
 
-    [[nodiscard]] virtual std::unique_ptr<SocketReadEventHandler> create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback) = 0;
-    [[nodiscard]] virtual std::unique_ptr<SocketWriteEventHandler> create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback) = 0;
+    [[nodiscard]] virtual std::unique_ptr<SocketReadEventHandler> create_read(
+        tr_socket_t socket,
+        std::function<void(tr_socket_t)> callback) = 0;
+    [[nodiscard]] virtual std::unique_ptr<SocketWriteEventHandler> create_write(
+        tr_socket_t socket,
+        std::function<void(tr_socket_t)> callback) = 0;
 };
 
 } // namespace libtransmission
