@@ -6,6 +6,7 @@
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-io-event-handler.h"
 #include "libtransmission/log.h"
+#include "libtransmission/session.h"
 #include "libtransmission/socket-event-handler.h"
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
@@ -14,11 +15,11 @@
 namespace libtransmission
 {
 
-PeerIoEventHandler::PeerIoEventHandler(tr_peerIo* io, tr_socket_t socket)
+PeerIoEventHandler::PeerIoEventHandler(tr_peerIo* io, std::unique_ptr<SocketReadEventHandler> read_event_handler, std::unique_ptr<SocketWriteEventHandler> write_event_handler)
     : io_{ io }
+    , read_event_handler_{ std::move(read_event_handler) }
+    , write_event_handler_{ std::move(write_event_handler) }
 {
-    read_event_handler_ = io_->create_socket_read_event_handler(socket);
-    write_event_handler_ = io_->create_socket_write_event_handler(socket);
 }
 
 PeerIoEventHandler::~PeerIoEventHandler()

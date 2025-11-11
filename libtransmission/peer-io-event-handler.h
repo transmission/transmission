@@ -27,7 +27,7 @@ public:
         WRITE
     };
 
-    PeerIoEventHandler(tr_peerIo* io, tr_socket_t socket);
+    PeerIoEventHandler(tr_peerIo* io, std::unique_ptr<SocketReadEventHandler> read_event_handler, std::unique_ptr<SocketWriteEventHandler> write_event_handler);
     ~PeerIoEventHandler();
 
     // Enable/disable event monitoring

@@ -1366,7 +1366,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         manager->incoming_handshakes.try_emplace(
             socket_address,
             &manager->handshake_mediator_,
-            tr_peerIo::new_incoming(EventBackend::Libuv, session, &session->top_bandwidth_, std::move(socket)),
+            tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
             [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); });
     }
@@ -2614,7 +2614,6 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     }
 
     auto peer_io = tr_peerIo::new_outgoing(
-        EventBackend::Libuv,
         session,
         &session->top_bandwidth_,
         peer_info.listen_socket_address(),

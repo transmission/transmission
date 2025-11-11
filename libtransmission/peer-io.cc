@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "libtransmission/socket-event-handler.h"
 #include <cerrno>
 #include <cstdint>
 #include <functional>
@@ -76,7 +75,6 @@ size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
 // ---
 
 tr_peerIo::tr_peerIo(
-    EventBackend backend,
     tr_session* session,
     tr_peer_socket&& socket,
     tr_bandwidth* parent_bandwidth,
@@ -95,7 +93,6 @@ tr_peerIo::tr_peerIo(
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::create(
-    EventBackend backend,
     tr_session* session,
     tr_peer_socket&& socket,
     tr_bandwidth* parent,
@@ -129,17 +126,15 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(
-    EventBackend backend,
     tr_session* session,
     tr_bandwidth* parent,
     tr_peer_socket socket)
 {
     TR_ASSERT(session != nullptr);
-    return tr_peerIo::create(backend, session, std::move(socket), parent, nullptr, true, false);
+    return tr_peerIo::create(session, std::move(socket), parent, nullptr, true, false);
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
-    EventBackend backend,
     tr_session* session,
     tr_bandwidth* parent,
     tr_socket_address const& socket_address,
@@ -183,7 +178,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     {
         if (auto sock = get_socket[transport](); sock.is_valid())
         {
-            return tr_peerIo::create(backend, session, std::move(sock), parent, &info_hash, false, client_is_seed);
+            return tr_peerIo::create(session, std::move(sock), parent, &info_hash, false, client_is_seed);
         }
     }
 
@@ -211,7 +206,11 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        event_handler_ = std::make_unique<libtransmission::PeerIoEventHandler>(this, socket_.handle.tcp);
+        event_handler_ = std::make_unique<libtransmission::PeerIoEventHandler>(
+            this, 
+            session_->socketEventHandlerMaker().create_read(socket_.handle.tcp, [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); }),
+            session_->socketEventHandlerMaker().create_write(socket_.handle.tcp, [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); })
+        );
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -492,16 +491,6 @@ void tr_peerIo::handle_read_ready()
     auto const n_used = std::size(inbuf_);
     auto const n_left = n_used >= MaxLen ? 0U : MaxLen - n_used;
     try_read(n_left);
-}
-
-std::unique_ptr<libtransmission::SocketReadEventHandler> tr_peerIo::create_socket_read_event_handler(tr_socket_t socket)
-{
-    return session_->socketEventHandlerMaker().create_read(socket, [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); });
-}
-
-std::unique_ptr<libtransmission::SocketWriteEventHandler> tr_peerIo::create_socket_write_event_handler(tr_socket_t socket)
-{
-    return session_->socketEventHandlerMaker().create_write(socket, [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); });
 }
 
 // ---
