@@ -16,8 +16,6 @@
 #include <string_view>
 #include <utility>
 
-struct evbuffer;
-
 class tr_web
 {
 public:
@@ -84,11 +82,6 @@ public:
 
         // Maximum time to wait before timeout
         std::chrono::seconds timeout_secs = DefaultTimeoutSecs;
-
-        // If provided, this buffer will be used to hold the response body.
-        // Provided for webseeds, which need to set low-level callbacks on
-        // the buffer itself.
-        evbuffer* buffer = nullptr;
 
         // Called periodically by the web internals when data is received.
         // Used by webseeds to report to tr_bandwidth for data xfer stats

@@ -449,6 +449,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
         return;
     }
 
+    evbuffer_add(task->content(), std::data(body), std::size(body));
     task->use_fetched_blocks();
 
     if (task->loc_.byte < task->end_byte_)
@@ -500,7 +501,6 @@ void tr_webseed_task::request_next_chunk()
     auto options = tr_web::FetchOptions{ url.sv(), on_partial_data_fetched, this };
     options.range.emplace(file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor.id();
-    options.buffer = content();
     options.on_data_received = [this](size_t const n_bytes)
     {
         on_data_received(n_bytes);

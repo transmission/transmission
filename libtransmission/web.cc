@@ -391,7 +391,7 @@ public:
     private:
         [[nodiscard]] evbuffer* body() const
         {
-            return options_.buffer != nullptr ? options_.buffer : privbuf_.get();
+            return privbuf_.get();
         }
 
         void easy_dispose(CURL* easy)
