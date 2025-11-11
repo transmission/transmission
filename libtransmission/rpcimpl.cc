@@ -468,6 +468,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
         peer_map.try_emplace(TR_KEY_rateToClient, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
         peer_map.try_emplace(TR_KEY_rateToPeer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_bytes_to_peer, peer.bytes_to_peer);
+        peer_map.try_emplace(TR_KEY_bytes_to_client, peer.bytes_to_client);
         peers_vec.emplace_back(std::move(peer_map));
     }
     tr_torrentPeersFree(peers, n_peers);
@@ -579,6 +581,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
     case TR_KEY_sequential_download:
+    case TR_KEY_sequential_download_from_piece:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
     case TR_KEY_startDate:
@@ -674,6 +677,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedRatioLimit: return tor.seed_ratio();
     case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
     case TR_KEY_sequential_download: return tor.is_sequential_download();
+    case TR_KEY_sequential_download_from_piece: return tor.sequential_download_from_piece();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
@@ -885,6 +889,17 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
     return nullptr; // no error
 }
 
+char const* set_sequential_download_from_piece(tr_torrent& tor, tr_piece_index_t piece)
+{
+    if (piece >= tor.piece_count())
+    {
+        return "piece to sequentially download from is outside pieces range";
+    }
+
+    tor.set_sequential_download_from_piece(piece);
+    return nullptr; // no error
+}
+
 [[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
 {
     auto const [indices, errmsg] = get_file_indices(tor, files_vec);
@@ -1027,6 +1042,11 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download))
         {
             tor->set_sequential_download(*val);
+        }
+
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val && errmsg == nullptr)
+        {
+            errmsg = set_sequential_download_from_piece(*tor, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_downloadLimited))
@@ -1471,6 +1491,11 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
     if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
     {
         ctor.set_sequential_download(TR_FORCE, *val);
+    }
+
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val)
+    {
+        ctor.set_sequential_download_from_piece(TR_FORCE, *val);
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
@@ -2214,34 +2239,4 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
     }
 
     callback(session, tr_variant{ std::move(response) });
-}
-
-/**
- * Munge the URI into a usable form.
- *
- * We have very loose typing on this to make the URIs as simple as possible:
- * - anything not a 'tag' or 'method' is automatically in 'arguments'
- * - values that are all-digits are numbers
- * - values that are all-digits or commas are number lists
- * - all other values are strings
- */
-tr_variant tr_rpc_parse_list_str(std::string_view str)
-{
-    auto const values = tr_num_parse_range(str);
-    auto const n_values = std::size(values);
-
-    if (n_values == 0)
-    {
-        return { str };
-    }
-
-    if (n_values == 1)
-    {
-        return { values[0] };
-    }
-
-    auto num_vec = tr_variant::Vector{};
-    num_vec.resize(n_values);
-    std::copy_n(std::cbegin(values), n_values, std::begin(num_vec));
-    return { std::move(num_vec) };
 }

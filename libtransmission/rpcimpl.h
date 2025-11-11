@@ -6,7 +6,6 @@
 #pragma once
 
 #include <functional>
-#include <string_view>
 
 struct tr_session;
 struct tr_variant;
@@ -14,5 +13,3 @@ struct tr_variant;
 using tr_rpc_response_func = std::function<void(tr_session* session, tr_variant&& response)>;
 
 void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback = {});
-
-tr_variant tr_rpc_parse_list_str(std::string_view str);

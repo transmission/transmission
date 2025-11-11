@@ -141,32 +141,33 @@ Request arguments:
 
 | Key | Value Type | Value Description
 |:--|:--|:--
-| `bandwidthPriority`   | number   | this torrent's bandwidth tr_priority_t
-| `downloadLimit`       | number   | maximum download speed (kB/s)
-| `downloadLimited`     | boolean  | true if `downloadLimit` is honored
-| `files-unwanted`      | array    | indices of file(s) to not download
-| `files-wanted`        | array    | indices of file(s) to download
-| `group`               | string   | The name of this torrent's bandwidth group
-| `honorsSessionLimits` | boolean  | true if session upload limits are honored
-| `ids`                 | array    | torrent list, as described in 3.1
-| `labels`              | array    | array of string labels
-| `location`            | string   | new location of the torrent's content
-| `peer-limit`          | number   | maximum number of peers
-| `priority-high`       | array    | indices of high-priority file(s)
-| `priority-low`        | array    | indices of low-priority file(s)
-| `priority-normal`     | array    | indices of normal-priority file(s)
-| `queuePosition`       | number   | position of this torrent in its queue [0...n)
-| `seedIdleLimit`       | number   | torrent-level number of minutes of seeding inactivity
-| `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
-| `seedRatioLimit`      | double   | torrent-level seeding ratio
-| `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `sequential_download` | boolean  | download torrent pieces sequentially
-| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
-| `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
-| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
-| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
-| `uploadLimit`         | number   | maximum upload speed (kB/s)
-| `uploadLimited`       | boolean  | true if `uploadLimit` is honored
+| `bandwidthPriority`              | number   | this torrent's bandwidth tr_priority_t
+| `downloadLimit`                  | number   | maximum download speed (kB/s)
+| `downloadLimited`                | boolean  | true if `downloadLimit` is honored
+| `files-unwanted`                 | array    | indices of file(s) to not download
+| `files-wanted`                   | array    | indices of file(s) to download
+| `group`                          | string   | The name of this torrent's bandwidth group
+| `honorsSessionLimits`            | boolean  | true if session upload limits are honored
+| `ids`                            | array    | torrent list, as described in 3.1
+| `labels`                         | array    | array of string labels
+| `location`                       | string   | new location of the torrent's content
+| `peer-limit`                     | number   | maximum number of peers
+| `priority-high`                  | array    | indices of high-priority file(s)
+| `priority-low`                   | array    | indices of low-priority file(s)
+| `priority-normal`                | array    | indices of normal-priority file(s)
+| `queuePosition`                  | number   | position of this torrent in its queue [0...n)
+| `seedIdleLimit`                  | number   | torrent-level number of minutes of seeding inactivity
+| `seedIdleMode`                   | number   | which seeding inactivity to use. See tr_idlelimit
+| `seedRatioLimit`                 | double   | torrent-level seeding ratio
+| `seedRatioMode`                  | number   | which ratio to use. See tr_ratiolimit
+| `sequential_download`            | boolean  | download torrent pieces sequentially
+| `sequential_download_from_piece` | number   | download from a specific piece when sequential download is enabled
+| `trackerAdd`                     | array    | **DEPRECATED** use trackerList instead
+| `trackerList`                    | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `trackerRemove`                  | array    | **DEPRECATED** use trackerList instead
+| `trackerReplace`                 | array    | **DEPRECATED** use trackerList instead
+| `uploadLimit`                    | number   | maximum upload speed (kB/s)
+| `uploadLimited`                  | boolean  | true if `uploadLimit` is honored
 
 Just as an empty `ids` value is shorthand for "all ids", using an empty array
 for `files-wanted`, `files-unwanted`, `priority-high`, `priority-low`, or
@@ -273,6 +274,7 @@ The 'source' column here corresponds to the data structure there.
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
 | `sequential_download`| boolean| tr_torrent
+| `sequential_download_from_piece`| number| tr_torrent
 | `sizeWhenDone`| number| tr_stat
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
@@ -318,6 +320,8 @@ Files are returned in the order they are laid out in the torrent. References to 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `address`            | string     | tr_peer_stat
+| `bytes_to_client`    | number     | tr_peer_stat
+| `bytes_to_peer`      | number     | tr_peer_stat
 | `clientName`         | string     | tr_peer_stat
 | `clientIsChoked`     | boolean    | tr_peer_stat
 | `clientIsInterested` | boolean    | tr_peer_stat
@@ -460,20 +464,21 @@ Request arguments:
 
 | Key | Value Type | Description
 |:--|:--|:--
-| `cookies`             | string    | pointer to a string of one or more cookies.
-| `download-dir`        | string    | path to download the torrent to
-| `filename`            | string    | filename or URL of the .torrent file
-| `labels`              | array     | array of string labels
-| `metainfo`            | string    | base64-encoded .torrent content
-| `paused`              | boolean   | if true, don't start the torrent
-| `peer-limit`          | number    | maximum number of peers
-| `bandwidthPriority`   | number    | torrent's bandwidth tr_priority_t
-| `files-wanted`        | array     | indices of file(s) to download
-| `files-unwanted`      | array     | indices of file(s) to not download
-| `priority-high`       | array     | indices of high-priority file(s)
-| `priority-low`        | array     | indices of low-priority file(s)
-| `priority-normal`     | array     | indices of normal-priority file(s)
-| `sequential_download` | boolean   | download torrent pieces sequentially
+| `cookies`                        | string    | pointer to a string of one or more cookies.
+| `download-dir`                   | string    | path to download the torrent to
+| `filename`                       | string    | filename or URL of the .torrent file
+| `labels`                         | array     | array of string labels
+| `metainfo`                       | string    | base64-encoded .torrent content
+| `paused`                         | boolean   | if true, don't start the torrent
+| `peer-limit`                     | number    | maximum number of peers
+| `bandwidthPriority`              | number    | torrent's bandwidth tr_priority_t
+| `files-wanted`                   | array     | indices of file(s) to download
+| `files-unwanted`                 | array     | indices of file(s) to not download
+| `priority-high`                  | array     | indices of high-priority file(s)
+| `priority-low`                   | array     | indices of low-priority file(s)
+| `priority-normal`                | array     | indices of normal-priority file(s)
+| `sequential_download`            | boolean   | download torrent pieces sequentially
+| `sequential_download_from_piece` | number    | download from a specific piece when sequential download is enabled
 
 Either `filename` **or** `metainfo` **must** be included. All other arguments are optional.
 
@@ -1038,6 +1043,9 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-add` | new arg `sequential_download`
 | `torrent-get` | new arg `sequential_download`
 | `torrent-set` | new arg `sequential_download`
+| `torrent-add` | new arg `sequential_download_from_piece`
+| `torrent-get` | new arg `sequential_download_from_piece`
+| `torrent-set` | new arg `sequential_download_from_piece`
 | `torrent-get` | new arg `files.begin_piece`
 | `torrent-get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`

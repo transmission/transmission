@@ -32,6 +32,7 @@ protected:
         mutable std::set<tr_piece_index_t> client_wants_piece_;
         tr_piece_index_t piece_count_ = 0;
         bool is_sequential_download_ = false;
+        tr_piece_index_t sequential_download_from_piece_ = 0;
 
         PeerMgrWishlistTest& parent_;
 
@@ -58,6 +59,11 @@ protected:
         [[nodiscard]] bool is_sequential_download() const override
         {
             return is_sequential_download_;
+        }
+
+        [[nodiscard]] tr_piece_index_t sequential_download_from_piece() const override
+        {
+            return sequential_download_from_piece_;
         }
 
         [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override
@@ -159,6 +165,12 @@ protected:
         {
             return parent_.sequential_download_changed_.observe(std::move(observer));
         }
+
+        [[nodiscard]] libtransmission::ObserverTag observe_sequential_download_from_piece_changed(
+            libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t>::Observer observer) override
+        {
+            return parent_.sequential_download_from_piece_changed_.observe(std::move(observer));
+        }
     };
 
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
@@ -174,6 +186,7 @@ protected:
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     static auto constexpr PeerHasAllPieces = [](tr_piece_index_t)
     {
@@ -349,6 +362,62 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
         EXPECT_EQ(100U, requested.count(0, 100));
         EXPECT_EQ(50U, requested.count(100, 200));
         EXPECT_EQ(50U, requested.count(200, 250));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: four pieces, all missing
+        mediator.piece_count_ = 4;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+        mediator.block_span_[3] = { 300, 400 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // and we want all pieces
+        for (tr_piece_index_t i = 0; i < 4; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // we enabled sequential download, from piece 2
+        mediator.is_sequential_download_ = true;
+        mediator.sequential_download_from_piece_ = 2;
+
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // First and last piece come first in sequential download mode regardless
+    // of "sequential download from piece", piece 2 comes next.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 400 };
+        auto const spans = get_spans(300);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(300U, requested.count());
+        EXPECT_EQ(100U, requested.count(0, 100));
+        EXPECT_EQ(0U, requested.count(100, 200));
+        // piece 2 should be downloaded before piece 1
+        EXPECT_EQ(100U, requested.count(200, 300));
+        EXPECT_EQ(100U, requested.count(300, 400));
     }
 }
 
@@ -1450,6 +1519,69 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadResortsCandidates)
         EXPECT_EQ(100U, requested.count(0, 100));
         EXPECT_EQ(50U, requested.count(100, 200));
         EXPECT_EQ(100U, requested.count(200, 300));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPieceResortsCandidates)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: four pieces, all missing
+        mediator.piece_count_ = 4;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+        mediator.block_span_[3] = { 300, 400 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // and we want all pieces
+        for (tr_piece_index_t i = 0; i < 4; ++i)
+        {
+            mediator.client_wants_piece_.insert(i);
+        }
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // we enabled sequential download, from piece 2
+        mediator.is_sequential_download_ = true;
+        sequential_download_changed_.emit(nullptr, true);
+        mediator.sequential_download_from_piece_ = 2;
+        sequential_download_from_piece_changed_.emit(nullptr, 2);
+
+        // the sequential download setting was changed,
+        // the candidate list should be resorted
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // First and last piece come first in sequential download mode regardless
+    // of "sequential download from piece", piece 2 comes next.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 400 };
+        auto const spans = get_spans(300);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(300U, requested.count());
+        EXPECT_EQ(100U, requested.count(0, 100));
+        EXPECT_EQ(0U, requested.count(100, 200));
+        // piece 2 should be downloaded before piece 1
+        EXPECT_EQ(100U, requested.count(200, 300));
+        EXPECT_EQ(100U, requested.count(300, 400));
     }
 }
 

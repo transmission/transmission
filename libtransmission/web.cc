@@ -485,7 +485,7 @@ public:
         auto* task = static_cast<Task*>(vtask);
         TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
 
-        if (auto const range = task->range(); range)
+        if (auto const range = task->range())
         {
             // https://curl.se/libcurl/c/CURLINFO_RESPONSE_CODE.html
             // "The stored value will be zero if no server response code has been received"
@@ -634,12 +634,19 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_PROXY, nullptr);
         }
 
-        if (auto const& range = task.range(); range)
+        if (auto const& range = task.range())
         {
-            /* don't bother asking the server to compress webseed fragments */
+            // don't bother asking the server to compress webseed fragments
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
-            (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+
+            // set the range request
+            auto const [first, last] = *range;
+            auto const range_str = fmt::format("{:d}-{:d}", first, last);
+            (void)curl_easy_setopt(e, CURLOPT_RANGE, range_str.c_str());
+
+            // preallocate the response body buffer
+            evbuffer_expand(task.body(), last + 1U - first);
         }
 
         if (curl_avoid_http2)

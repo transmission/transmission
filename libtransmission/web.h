@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <ctime> // time_t
 #include <functional>
 #include <memory>
@@ -68,8 +69,9 @@ public:
         // option concatenated like this: "name1=content1; name2=content2;"
         std::optional<std::string> cookies;
 
+        // If set, bytes [range->first...range->second] are requested.
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
-        std::optional<std::string> range;
+        std::optional<std::pair<uint64_t, uint64_t>> range;
 
         // Tag used by tr_web::Mediator to limit some transfers' bandwidth
         std::optional<int> speed_limit_tag;
