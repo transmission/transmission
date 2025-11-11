@@ -193,28 +193,26 @@ export class OpenDialog extends EventTarget {
     input.value = this.controller.session_properties.download_dir;
     workarea.append(input);
 
-    const datalist = document.createElement('datalist');
-    datalist.id = 'add-dialog-folder-datalist';
     const buildDatalist = () => {
+      const datalist = document.createElement('datalist');
+      datalist.id = 'add-dialog-folder-datalist';
       const dirs = new Set();
-      let torrents = this.controller._rows.map(row => row.getTorrent());
-      for (const torrent of torrents) {
-        const dir = torrent.getDownloadDir().trim();
-        if (dir) {
-          dirs.add(dir);
+      for (const row of this.controller._rows) {
+        const dir = row.getTorrent().getDownloadDir().trim();
+        if (!dir || dirs.has(dir)) {
+          continue;
         }
+        dirs.add(dir);
+        const option = document.createElement('option');
+        option.value = dir;
+        datalist.append(option);
         if (dirs.size >= max_datalist_options) { // do not explode the ui
           break;
         }
       }
-      for (const dir of dirs) {
-        const option = document.createElement('option');
-        option.value = dir;
-        datalist.append(option);
-      }
+      return datalist;
     };
-    workarea.append(datalist);
-    buildDatalist();
+    workarea.append(buildDatalist());
     elements.folder_input = input;
 
     const checkarea = document.createElement('div');
