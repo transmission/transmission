@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "libtransmission/socket-event-handler.h"
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
@@ -331,6 +332,9 @@ public:
     // Public methods for event handlers to call
     void handle_read_ready();
     void handle_write_ready();
+
+    std::unique_ptr<libtransmission::SocketReadEventHandler> create_socket_read_event_handler(tr_socket_t socket);
+    std::unique_ptr<libtransmission::SocketWriteEventHandler> create_socket_write_event_handler(tr_socket_t socket);
 
 private:
     // Our target socket receive buffer size.

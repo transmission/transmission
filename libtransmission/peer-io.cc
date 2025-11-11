@@ -3,9 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "libtransmission/socket-event-handler.h"
 #include <cerrno>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <type_traits> // std::underlying_type_t
 
 #ifdef _WIN32
@@ -190,16 +192,7 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        if (backend_ == EventBackend::Libuv)
-        {
-            // Create event handler using libuv
-            event_handler_ = libtransmission::create_libuv_handler(this, session_->uv_loop(), socket_.handle.tcp);
-        }
-        else
-        {
-            // Create event handler using libevent by default
-            event_handler_ = libtransmission::create_libevent_handler(this, session_->event_base(), socket_.handle.tcp);
-        }
+        event_handler_ = std::make_unique<libtransmission::PeerIoEventHandler>(this, socket_.handle.tcp);
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -476,6 +469,16 @@ void tr_peerIo::handle_read_ready()
     auto const n_used = std::size(inbuf_);
     auto const n_left = n_used >= MaxLen ? 0U : MaxLen - n_used;
     try_read(n_left);
+}
+
+std::unique_ptr<libtransmission::SocketReadEventHandler> tr_peerIo::create_socket_read_event_handler(tr_socket_t socket)
+{
+    return session_->socketEventHandlerMaker().create_read(socket, [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); });
+}
+
+std::unique_ptr<libtransmission::SocketWriteEventHandler> tr_peerIo::create_socket_write_event_handler(tr_socket_t socket)
+{
+    return session_->socketEventHandlerMaker().create_write(socket, [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); });
 }
 
 // ---

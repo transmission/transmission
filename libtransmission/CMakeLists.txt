@@ -82,10 +82,9 @@ target_sources(${TR_NAME}
         open-files.cc
         open-files.h
         peer-common.h
-        peer-io.cc
+        peer-io-event-handler.cc
         peer-io-event-handler.h
-        peer-io-libevent.cc
-        peer-io-libuv.cc
+        peer-io.cc
         peer-io.h
         peer-mgr-wishlist.cc
         peer-mgr-wishlist.h

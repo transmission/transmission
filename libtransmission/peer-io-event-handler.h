@@ -5,17 +5,13 @@
 
 #pragma once
 
-#include <cstdint>
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
-
 #include <memory>
+
+#include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/socket-event-handler.h"
 
 // Forward declarations
 class tr_peerIo;
-struct event_base;
-struct uv_loop_s;
 
 namespace libtransmission
 {
@@ -31,25 +27,28 @@ public:
         WRITE
     };
 
-    virtual ~PeerIoEventHandler() = default;
+    PeerIoEventHandler(tr_peerIo* io, tr_socket_t socket);
+    ~PeerIoEventHandler();
 
     // Enable/disable event monitoring
-    virtual void enable_read() = 0;
-    virtual void enable_write() = 0;
-    virtual void disable_read() = 0;
-    virtual void disable_write() = 0;
+    void enable_read();
+    void enable_write();
+    void disable_read();
+    void disable_write();
 
     // Check if events are enabled
-    [[nodiscard]] virtual bool is_read_enabled() const noexcept = 0;
-    [[nodiscard]] virtual bool is_write_enabled() const noexcept = 0;
+    [[nodiscard]] bool is_read_enabled() const;
+    [[nodiscard]] bool is_write_enabled() const;
 
     // Close and cleanup
-    virtual void close() = 0;
+    void close();
+
+private:
+    tr_peerIo* io_;
+    std::unique_ptr<SocketReadEventHandler> read_event_handler_;
+    std::unique_ptr<SocketWriteEventHandler> write_event_handler_;
+    bool read_enabled_ = false;
+    bool write_enabled_ = false;
 };
-
-// Factory functions for creating event handlers
-std::unique_ptr<PeerIoEventHandler> create_libevent_handler(tr_peerIo* io, struct event_base* base, int socket_fd);
-
-std::unique_ptr<PeerIoEventHandler> create_libuv_handler(tr_peerIo* io, struct uv_loop_s* loop, int socket_fd);
 
 } // namespace libtransmission
