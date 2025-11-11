@@ -277,7 +277,6 @@ endif()
 
 target_link_libraries(${TR_NAME}
     PRIVATE
-        "-L/opt/homebrew/lib/ -luv" # TODO: proper libuv library intergration into the build infra.
         Threads::Threads
         deflate::deflate
         CURL::libcurl
@@ -303,10 +302,10 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${ANDROID}>:${log-lib}>"
         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
     PUBLIC
-        "-L/opt/homebrew/lib/ -luv" # TODO: proper libuv library intergration into the build infra.
         transmission::crypto_impl
         fmt::fmt-header-only
         small::small
+        libuv::libuv
         libevent::event)
 
 if(INSTALL_LIB)
