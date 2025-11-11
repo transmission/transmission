@@ -36,7 +36,8 @@ void SocketEventHandlerLibuv<EventType>::on_event(struct uv_poll_s* handle, int 
 
 template<SocketEventType EventType>
 SocketEventHandlerLibuv<EventType>::SocketEventHandlerLibuv(struct uv_loop_s* loop, tr_socket_t socket, Callback callback)
-    : SocketEventHandler<EventType>(std::move(callback)), socket_{ socket }
+    : SocketEventHandler<EventType>(std::move(callback))
+    , socket_{ socket }
 {
     socket_poll_ = new uv_poll_t{};
     uv_poll_init_socket(loop, socket_poll_, socket);
@@ -65,12 +66,16 @@ void SocketEventHandlerLibuv<EventType>::stop()
     uv_poll_stop(socket_poll_);
 }
 
-std::unique_ptr<SocketReadEventHandler> SocketEventHandlerLibuvMaker::create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback)
+std::unique_ptr<SocketReadEventHandler> SocketEventHandlerLibuvMaker::create_read(
+    tr_socket_t socket,
+    std::function<void(tr_socket_t)> callback)
 {
     return std::make_unique<SocketEventHandlerLibuv<SocketEventType::Read>>(uv_loop_, socket, std::move(callback));
 }
 
-std::unique_ptr<SocketWriteEventHandler> SocketEventHandlerLibuvMaker::create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback)
+std::unique_ptr<SocketWriteEventHandler> SocketEventHandlerLibuvMaker::create_write(
+    tr_socket_t socket,
+    std::function<void(tr_socket_t)> callback)
 {
     return std::make_unique<SocketEventHandlerLibuv<SocketEventType::Write>>(uv_loop_, socket, std::move(callback));
 }

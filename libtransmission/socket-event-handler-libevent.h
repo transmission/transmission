@@ -36,8 +36,12 @@ public:
     {
     }
 
-    [[nodiscard]] std::unique_ptr<SocketReadEventHandler> create_read(tr_socket_t socket, std::function<void(tr_socket_t)> callback) override;
-    [[nodiscard]] std::unique_ptr<SocketWriteEventHandler> create_write(tr_socket_t socket, std::function<void(tr_socket_t)> callback) override;
+    [[nodiscard]] std::unique_ptr<SocketReadEventHandler> create_read(
+        tr_socket_t socket,
+        std::function<void(tr_socket_t)> callback) override;
+    [[nodiscard]] std::unique_ptr<SocketWriteEventHandler> create_write(
+        tr_socket_t socket,
+        std::function<void(tr_socket_t)> callback) override;
 
 private:
     struct event_base* event_base_;
