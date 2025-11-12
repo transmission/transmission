@@ -558,6 +558,32 @@ enum
     return {};
 }
 
+/**
+ * - values that are all-digits are numbers
+ * - values that are all-digits or commas are number lists
+ * - anything else is a string
+ */
+[[nodiscard]] tr_variant rpc_parse_list_str(std::string_view str)
+{
+    auto const values = tr_num_parse_range(str);
+    auto const n_values = std::size(values);
+
+    if (n_values == 0)
+    {
+        return { str };
+    }
+
+    if (n_values == 1)
+    {
+        return { values[0] };
+    }
+
+    auto num_vec = tr_variant::Vector{};
+    num_vec.resize(n_values);
+    std::copy_n(std::cbegin(values), n_values, std::begin(num_vec));
+    return { std::move(num_vec) };
+}
+
 void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view fallback = "")
 {
     if (std::empty(id_str))
@@ -590,7 +616,7 @@ void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view
 
         if (is_num || is_list)
         {
-            args.insert_or_assign(TR_KEY_ids, tr_rpc_parse_list_str(id_str));
+            args.insert_or_assign(TR_KEY_ids, rpc_parse_list_str(id_str));
         }
         else
         {
@@ -1386,8 +1412,8 @@ void print_peers_impl(tr_variant::Vector const& peers)
                 *address,
                 *flagstr,
                 strlpercent(*progress * 100.0),
-                Speed{ *rate_to_client, Speed::Units::KByps }.count(Speed::Units::KByps),
-                Speed{ *rate_to_peer, Speed::Units::KByps }.count(Speed::Units::KByps),
+                Speed{ *rate_to_client, Speed::Units::Byps }.count(Speed::Units::KByps),
+                Speed{ *rate_to_peer, Speed::Units::Byps }.count(Speed::Units::KByps),
                 *client);
         }
     }

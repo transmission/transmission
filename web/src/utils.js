@@ -24,15 +24,15 @@ export const Utils = {
   },
 };
 
-const icon32 = {
+const icon26 = {
   fill: 'none',
-  height: 32,
+  height: 26,
   stroke: 'currentColor',
   'stroke-linecap': 'round',
   'stroke-linejoin': 'round',
   'stroke-width': 2,
   viewBox: '0 0 24 24',
-  width: 32,
+  width: 26,
 };
 
 function toggleClass(buttons, button, pages, page, callback) {
@@ -59,7 +59,7 @@ function namespace(tagname, attrs) {
 
 function renderIcon(...svgca) {
   // SVG Command Array
-  const svg = namespace('svg', icon32);
+  const svg = namespace('svg', icon26);
   for (const [tagname, attrs] of svgca) {
     svg.append(namespace(tagname, attrs));
   }
@@ -143,7 +143,7 @@ export function createDialogContainer(id) {
   win.append(buttons);
 
   const bbegin = document.createElement('span');
-  bbegin.classList.add('dialog-buttons-begin');
+  bbegin.className = 'flexible-space';
   buttons.append(bbegin);
 
   const dismiss = document.createElement('button');
@@ -160,10 +160,6 @@ export function createDialogContainer(id) {
       confirm.click();
     }
   });
-
-  const bend = document.createElement('span');
-  bend.classList.add('dialog-buttons-end');
-  buttons.append(bend);
 
   return {
     confirm,
@@ -189,14 +185,26 @@ export function makeUUID() {
   );
 }
 
+export function newOpts(element, l, a) {
+  const opts = a.map((t) => new Option(...t));
+
+  if (l) {
+    const e = document.createElement('OPTGROUP');
+    e.label = l;
+    e.append(...opts);
+    element.append(e);
+  } else {
+    element.append(...opts);
+  }
+}
+
 export const icon = Object.freeze({
   delete: () => {
     return renderIcon(
-      ['polyline', { points: '3 6 5 6 21 6' }],
       [
         'path',
         {
-          d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
+          d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2L21 6L3 6',
         },
       ],
       ['line', { x1: 10, x2: 10, y1: 11, y2: 17 }],
@@ -217,7 +225,7 @@ export const icon = Object.freeze({
       namespace('circle', {
         cx: 12,
         cy: 12,
-        r: 12,
+        r: 11,
         'stroke-linecap': 'round',
         'stroke-linejoin': 'round',
         'stroke-width': 2,

@@ -16,11 +16,18 @@ export class Torrent extends EventTarget {
     this.fieldObservers = {};
     this.fields = {};
     this.refresh(data);
+
+    this.setLazyCollatedField('name', 'collatedName');
+    this.setLazyCollatedField('trackers', 'collatedTrackers');
+  }
+
+  setLazyCollatedField(name, collated_name) {
+    this.notifyOnFieldChange(name, () => delete this.fields[collated_name]);
   }
 
   notifyOnFieldChange(field, callback) {
-    this.fieldObservers[field] = this.fieldObservers[field] || [];
-    this.fieldObservers[field].push(callback);
+    const observers = (this.fieldObservers[field] ??= []);
+    observers.push(callback);
   }
 
   setField(o, name, value) {
@@ -78,12 +85,6 @@ export class Torrent extends EventTarget {
         case 'trackers': // ...so only save 'trackers' if we don't have it already
           if (!(key in this.fields)) {
             changed |= this.setField(this.fields, key, value);
-          }
-          break;
-        case 'name':
-          if (this.setField(this.fields, key, data[key])) {
-            this.fields.collatedName = '';
-            changed = true;
           }
           break;
         default:
@@ -353,6 +354,12 @@ export class Torrent extends EventTarget {
     const s = this.getStatus();
 
     switch (state) {
+      case Prefs.FilterError:
+        return this.getError();
+      case Prefs.FilterPrivate:
+        return this.getPrivateFlag();
+      case Prefs.FilterPublic:
+        return !this.getPrivateFlag();
       case Prefs.FilterActive:
         return (
           this.getPeersGettingFromUs() > 0 ||

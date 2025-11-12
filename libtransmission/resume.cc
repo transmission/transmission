@@ -771,6 +771,15 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         }
     }
 
+    if ((fields_to_load & tr_resume::SequentialDownloadFromPiece) != 0)
+    {
+        if (auto i = map.value_if<int64_t>(TR_KEY_sequential_download_from_piece); i)
+        {
+            tor->set_sequential_download_from_piece(*i);
+            fields_loaded |= tr_resume::SequentialDownloadFromPiece;
+        }
+    }
+
     if ((fields_to_load & tr_resume::Peers) != 0)
     {
         fields_loaded |= load_peers(map, tor);
@@ -880,6 +889,15 @@ auto set_from_ctor(
         }
     }
 
+    if ((fields & tr_resume::SequentialDownloadFromPiece) != 0)
+    {
+        if (auto const& val = ctor.sequential_download_from_piece(mode); val)
+        {
+            tor->set_sequential_download_from_piece(*val);
+            ret |= tr_resume::SequentialDownloadFromPiece;
+        }
+    }
+
     return ret;
 }
 
@@ -945,6 +963,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     map.try_emplace(TR_KEY_bandwidth_priority, tor->get_priority());
     map.try_emplace(TR_KEY_paused, !helper.start_when_stable());
     map.try_emplace(TR_KEY_sequential_download, tor->is_sequential_download());
+    map.try_emplace(TR_KEY_sequential_download_from_piece, tor->sequential_download_from_piece());
     save_peers(map, tor);
 
     if (tor->has_metainfo())
