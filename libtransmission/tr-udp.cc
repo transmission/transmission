@@ -284,10 +284,10 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         return;
     }
     else if (
-        addrport && addrport->address().is_global_unicast_address() &&
-        !session_.global_source_address(tr_af_to_ip_protocol(to->sa_family)))
+        addrport && !addrport->address().is_ipv4_loopback_address() && !addrport->address().is_ipv6_loopback_address() &&
+        !session_.source_address(tr_af_to_ip_protocol(to->sa_family)))
     {
-        // don't try to connect to a global address if we don't have connectivity to public internet
+        // don't try to send if we don't have a route in this IP protocol
         return;
     }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)

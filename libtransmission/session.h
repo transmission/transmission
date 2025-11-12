@@ -1045,10 +1045,10 @@ public:
         return ip_cache_.set_global_addr(addr);
     }
 
-    [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
+    [[nodiscard]] std::optional<tr_address> source_address(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
-        return ip_cache_.global_source_addr(type);
+        return ip_cache_.source_addr(type);
     }
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
