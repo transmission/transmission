@@ -446,32 +446,10 @@ namespace is_valid_for_peers_helpers
    and is covered under the same license as third-party/dht/dht.c. */
 [[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
 {
-    static auto constexpr Zeroes = std::array<unsigned char, 16>{};
     auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
-
-    switch (addr.type)
-    {
-    case TR_AF_INET:
-        {
-            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr4);
-            return address[0] == 0 || // 0.x.x.x
-                (!loopback_allowed && address[0] == 127) || // 127.x.x.x
-                (address[0] & 0xE0) == 0xE0; // multicast address
-        }
-
-    case TR_AF_INET6:
-        {
-            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
-            return address[0] == 0xFF || // multicast address
-                (std::memcmp(address, std::data(Zeroes), 15) == 0 &&
-                 (address[15] == 0 || // ::
-                  (!loopback_allowed && address[15] == 1)) // ::1
-                );
-        }
-
-    default:
-        return true;
-    }
+    return addr.is_ipv4_current_network_address() || addr.is_ipv6_unspecified_address() ||
+        (!loopback_allowed && (addr.is_ipv4_loopback_address() || addr.is_ipv6_loopback_address())) ||
+        addr.is_ipv4_multicast_address() || addr.is_ipv6_multicast_address();
 }
 
 } // namespace is_valid_for_peers_helpers

@@ -267,6 +267,26 @@ struct tr_address
         return is_ipv6() && IN6_IS_ADDR_LOOPBACK(&addr.addr6);
     }
 
+    [[nodiscard]] constexpr bool is_ipv4_current_network_address() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 0U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_unspecified_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_UNSPECIFIED(&addr.addr6);
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_multicast_address() const noexcept
+    {
+        return is_ipv4() && (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] & 0xF0U) == 224U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_multicast_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_MULTICAST(&addr.addr6);
+    }
+
     [[nodiscard]] std::optional<tr_address> from_ipv4_mapped() const noexcept;
 
     tr_address_type type = NUM_TR_AF_INET_TYPES;
