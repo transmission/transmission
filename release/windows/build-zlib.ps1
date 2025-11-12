@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:ZlibVersion = '1.3'
+$global:ZlibVersion = '1.3.1'
 
 $global:ZlibDeps = @()
 

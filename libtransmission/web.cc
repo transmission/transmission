@@ -258,12 +258,12 @@ public:
     public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
             : impl{ impl_in }
-            , options{ std::move(options_in) }
+            , options_{ std::move(options_in) }
         {
-            auto const parsed = tr_urlParse(options.url);
+            auto const parsed = tr_urlParse(options_.url);
             easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
 
-            response.user_data = options.done_func_user_data;
+            response.user_data = options_.done_func_user_data;
         }
 
         // Some of the curl_easy_setopt() args took a pointer to this task.
@@ -285,47 +285,47 @@ public:
 
         [[nodiscard]] auto* body() const
         {
-            return options.buffer != nullptr ? options.buffer : privbuf.get();
+            return options_.buffer != nullptr ? options_.buffer : privbuf_.get();
         }
 
         [[nodiscard]] constexpr auto const& speedLimitTag() const
         {
-            return options.speed_limit_tag;
+            return options_.speed_limit_tag;
         }
 
         [[nodiscard]] constexpr auto const& url() const
         {
-            return options.url;
+            return options_.url;
         }
 
         [[nodiscard]] constexpr auto const& range() const
         {
-            return options.range;
+            return options_.range;
         }
 
         [[nodiscard]] constexpr auto const& cookies() const
         {
-            return options.cookies;
+            return options_.cookies;
         }
 
         [[nodiscard]] constexpr auto const& sndbuf() const
         {
-            return options.sndbuf;
+            return options_.sndbuf;
         }
 
         [[nodiscard]] constexpr auto const& rcvbuf() const
         {
-            return options.rcvbuf;
+            return options_.rcvbuf;
         }
 
         [[nodiscard]] constexpr auto const& timeoutSecs() const
         {
-            return options.timeout_secs;
+            return options_.timeout_secs;
         }
 
         [[nodiscard]] constexpr auto ipProtocol() const
         {
-            switch (options.ip_proto)
+            switch (options_.ip_proto)
             {
             case FetchOptions::IPProtocol::V4:
                 return CURL_IPRESOLVE_V4;
@@ -338,7 +338,7 @@ public:
 
         [[nodiscard]] auto bind_address() const
         {
-            switch (options.ip_proto)
+            switch (options_.ip_proto)
             {
             case FetchOptions::IPProtocol::V4:
                 return impl.mediator.bind_address_V4();
@@ -357,14 +357,14 @@ public:
 
         void done()
         {
-            if (!options.done_func)
+            if (!options_.done_func)
             {
                 return;
             }
 
             response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            impl.mediator.run(std::move(options.done_func), std::move(this->response));
-            options.done_func = {};
+            impl.mediator.run(std::move(options_.done_func), std::move(this->response));
+            options_.done_func = {};
         }
 
         [[nodiscard]] bool operator==(Task const& that) const noexcept
@@ -385,7 +385,7 @@ public:
 
             impl.paused_easy_handles.erase(easy_);
 
-            if (auto const url = tr_urlParse(options.url); url)
+            if (auto const url = tr_urlParse(options_.url); url)
             {
                 curl_easy_reset(easy);
                 impl.easy_pool_[std::string{ url->host }].emplace(easy);
@@ -396,9 +396,9 @@ public:
             }
         }
 
-        libtransmission::evhelpers::evbuffer_unique_ptr privbuf{ evbuffer_new() };
+        libtransmission::evhelpers::evbuffer_unique_ptr privbuf_{ evbuffer_new() };
 
-        tr_web::FetchOptions options;
+        tr_web::FetchOptions options_;
 
         CURL* easy_;
     };
@@ -485,7 +485,7 @@ public:
         auto* task = static_cast<Task*>(vtask);
         TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
 
-        if (auto const range = task->range(); range)
+        if (auto const range = task->range())
         {
             // https://curl.se/libcurl/c/CURLINFO_RESPONSE_CODE.html
             // "The stored value will be zero if no server response code has been received"
@@ -634,12 +634,19 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_PROXY, nullptr);
         }
 
-        if (auto const& range = task.range(); range)
+        if (auto const& range = task.range())
         {
-            /* don't bother asking the server to compress webseed fragments */
+            // don't bother asking the server to compress webseed fragments
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
-            (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+
+            // set the range request
+            auto const [first, last] = *range;
+            auto const range_str = fmt::format("{:d}-{:d}", first, last);
+            (void)curl_easy_setopt(e, CURLOPT_RANGE, range_str.c_str());
+
+            // preallocate the response body buffer
+            evbuffer_expand(task.body(), last + 1U - first);
         }
 
         if (curl_avoid_http2)
