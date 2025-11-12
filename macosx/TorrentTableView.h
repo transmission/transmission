@@ -8,7 +8,7 @@
 
 extern CGFloat const kGroupSeparatorHeight;
 
-@interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
+@interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate, NSMenuItemValidation>
 
 - (void)reloadVisibleRows;
 
