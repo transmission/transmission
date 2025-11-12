@@ -73,7 +73,7 @@ private:
     // the current position in the task; i.e., the next block to save
     tr_block_info::Location loc_;
 
-    libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>> content_;
+    libtransmission::StackBuffer<tr_block_info::BlockSize, std::byte, std::ratio<5, 1>> content_;
 };
 
 /**
