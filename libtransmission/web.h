@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <ctime> // time_t
 #include <functional>
 #include <memory>
@@ -14,8 +15,6 @@
 #include <string>
 #include <string_view>
 #include <utility>
-
-struct evbuffer;
 
 class tr_web
 {
@@ -68,8 +67,9 @@ public:
         // option concatenated like this: "name1=content1; name2=content2;"
         std::optional<std::string> cookies;
 
+        // If set, bytes [range->first...range->second] are requested.
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
-        std::optional<std::string> range;
+        std::optional<std::pair<uint64_t, uint64_t>> range;
 
         // Tag used by tr_web::Mediator to limit some transfers' bandwidth
         std::optional<int> speed_limit_tag;
@@ -83,10 +83,9 @@ public:
         // Maximum time to wait before timeout
         std::chrono::seconds timeout_secs = DefaultTimeoutSecs;
 
-        // If provided, this buffer will be used to hold the response body.
-        // Provided for webseeds, which need to set low-level callbacks on
-        // the buffer itself.
-        evbuffer* buffer = nullptr;
+        // Called periodically by the web internals when data is received.
+        // Used by webseeds to report to tr_bandwidth for data xfer stats
+        std::function<void(size_t /*n_bytes*/)> on_data_received;
 
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;

@@ -33,8 +33,6 @@
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
-
 #include <fmt/format.h>
 
 #ifdef _WIN32
@@ -42,7 +40,6 @@
 #endif
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/web-utils.h"
@@ -264,6 +261,13 @@ public:
             easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
 
             response.user_data = options_.done_func_user_data;
+
+            if (options_.range)
+            {
+                // preallocate the response body buffer
+                auto const& [first, last] = *options_.range;
+                response.body.reserve(last + 1U - first);
+            }
         }
 
         // Some of the curl_easy_setopt() args took a pointer to this task.
@@ -281,11 +285,6 @@ public:
         [[nodiscard]] constexpr auto* easy() const
         {
             return easy_;
-        }
-
-        [[nodiscard]] auto* body() const
-        {
-            return options_.buffer != nullptr ? options_.buffer : privbuf_.get();
         }
 
         [[nodiscard]] constexpr auto const& speedLimitTag() const
@@ -355,6 +354,17 @@ public:
             }
         }
 
+        void add_data(void const* data, size_t const n_bytes)
+        {
+            response.body.append(static_cast<char const*>(data), n_bytes);
+            tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", n_bytes, fmt::ptr(this)));
+
+            if (options_.on_data_received)
+            {
+                options_.on_data_received(n_bytes);
+            }
+        }
+
         void done()
         {
             if (!options_.done_func)
@@ -362,7 +372,6 @@ public:
                 return;
             }
 
-            response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
             impl.mediator.run(std::move(options_.done_func), std::move(this->response));
             options_.done_func = {};
         }
@@ -395,8 +404,6 @@ public:
                 curl_easy_cleanup(easy);
             }
         }
-
-        libtransmission::evhelpers::evbuffer_unique_ptr privbuf_{ evbuffer_new() };
 
         tr_web::FetchOptions options_;
 
@@ -485,7 +492,7 @@ public:
         auto* task = static_cast<Task*>(vtask);
         TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
 
-        if (auto const range = task->range(); range)
+        if (auto const range = task->range())
         {
             // https://curl.se/libcurl/c/CURLINFO_RESPONSE_CODE.html
             // "The stored value will be zero if no server response code has been received"
@@ -522,8 +529,7 @@ public:
             }
         }
 
-        evbuffer_add(task->body(), data, bytes_used);
-        tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
+        task->add_data(data, bytes_used);
         return bytes_used;
     }
 
@@ -634,12 +640,16 @@ public:
             (void)curl_easy_setopt(e, CURLOPT_PROXY, nullptr);
         }
 
-        if (auto const& range = task.range(); range)
+        if (auto const& range = task.range())
         {
-            /* don't bother asking the server to compress webseed fragments */
+            // don't bother asking the server to compress webseed fragments
             (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
-            (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+
+            // set the range request
+            auto const& [first, last] = *range;
+            auto const str = fmt::format("{:d}-{:d}", first, last);
+            (void)curl_easy_setopt(e, CURLOPT_RANGE, str.c_str());
         }
 
         if (curl_avoid_http2)
