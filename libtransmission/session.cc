@@ -447,7 +447,7 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
-        auto const source_addr = global_source_address(type);
+        auto const source_addr = source_address(type);
         auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
                                                                                             tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
@@ -1655,6 +1655,15 @@ size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->settings_.cache_size_mbytes;
+}
+
+// ---
+
+void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->settings_.torrent_complete_verify_enabled = enabled;
 }
 
 // ---

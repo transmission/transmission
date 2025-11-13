@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.6.2'
+$global:Qt6Version = '6.10.0'
 
 $global:Qt6Deps = @(
     'DBus'
@@ -10,7 +10,7 @@ $global:Qt6Deps = @(
 
 function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir) {
     $Filename = "qt-everywhere-src-${Qt6Version}.zip" # tar.xz has some names truncated (e.g. .../double-conversion.h -> .../double-conv)
-    $Url = "http://qt.mirror.constant.com/archive/qt/$($Qt6Version -replace '\.\d+$', '')/${Qt6Version}/single/${Filename}"
+    $Url = "https://qt.mirror.constant.com/archive/qt/$($Qt6Version -replace '\.\d+$', '')/${Qt6Version}/single/${Filename}"
 
     $ArchiveBase = "qt-everywhere-src-${Qt6Version}"
     $UnpackFlags = @(
@@ -19,7 +19,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         (Join-Path $ArchiveBase qtsvg '*')
         (Join-Path $ArchiveBase qttools '*')
         (Join-Path $ArchiveBase qttranslations '*')
-        (Join-Path $ArchiveBase qtwinextras '*')
         (Join-Path $ArchiveBase .gitmodules)
         (Join-Path $ArchiveBase cmake)
         (Join-Path $ArchiveBase CMakeLists.txt)
@@ -36,8 +35,10 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-opensource'
         '-confirm-license'
         '-prefix'; $PrefixDir
+        '-disable-deprecated-up-to'; '0x060000'
         '-release'
         '-force-debug-info'
+        '-unity-build'
         '-dbus'
         '-ssl'
         '-openssl'
@@ -50,43 +51,63 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-harfbuzz'
         '-no-feature-androiddeployqt'
         '-no-feature-assistant'
+        '-no-feature-brotli'
         '-no-feature-clang'
-        '-no-feature-clangcpp'
         '-no-feature-commandlinkbutton'
         '-no-feature-concurrent'
+        '-no-feature-cpp-winrt'
+        '-no-feature-datawidgetmapper'
         '-no-feature-designer'
         '-no-feature-dial'
+        '-no-feature-direct2d'
+        '-no-feature-directwrite3'
         '-no-feature-distancefieldgenerator'
         '-no-feature-dockwidget'
+        '-no-feature-emojisegmenter'
         '-no-feature-fontcombobox'
+        '-no-feature-fontdialog'
+        '-no-feature-freetype'
         '-no-feature-gestures'
-        '-no-feature-graphicsview'
+        '-no-feature-harfbuzz'
         '-no-feature-keysequenceedit'
         '-no-feature-lcdnumber'
+        '-no-feature-listwidget'
         '-no-feature-mdiarea'
+        '-no-feature-networkdiskcache'
         '-no-feature-networklistmanager'
         '-no-feature-opengl'
         '-no-feature-pdf'
         '-no-feature-pixeltool'
         '-no-feature-printsupport'
+        '-no-feature-qdbus'
         '-no-feature-qtattributionsscanner'
+        '-no-feature-qtdiag'
+        '-no-feature-qtgui-threadpool'
+        '-no-feature-qtplugininfo'
         '-no-feature-raster-64bit'
         '-no-feature-schannel'
         '-no-feature-scroller'
         '-no-feature-sharedmemory'
         '-no-feature-splashscreen'
         '-no-feature-sql'
+        '-no-feature-sqlmodel'
         '-no-feature-syntaxhighlighter'
         '-no-feature-systemsemaphore'
+        '-no-feature-tablewidget'
         '-no-feature-testlib'
         '-no-feature-textmarkdownreader'
         '-no-feature-textmarkdownwriter'
         '-no-feature-textodfwriter'
+        '-no-feature-toolbox'
+        # '-no-feature-treewidget'
         '-no-feature-tuiotouch'
         '-no-feature-undocommand'
+        '-no-feature-vkgen'
+        '-no-feature-vulkan'
         '-no-feature-whatsthis'
         '-no-feature-windeployqt'
         '-no-feature-wizard'
+        '-no-feature-zstd'
         '-nomake'; 'examples'
         '-nomake'; 'tests'
         '-I'; (Join-Path $DepsPrefixDir include).Replace('\', '/')
@@ -100,9 +121,20 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         Edit-TextFile (Join-Path $SourceDir qtbase mkspecs win32-msvc qmake.conf) '(^QMAKE_CXXFLAGS\b.*)' "`$1`nQMAKE_LFLAGS += ${env:LDFLAGS}"
     }
 
-    # No need in GUI tools
+    # No need in GUI and some other tools
     Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'TARGET Qt::Widgets' 'QT_FEATURE_designer'
-    Edit-TextFile (Join-Path $SourceDir qttools src linguist CMakeLists.txt) 'add_subdirectory[(]linguist[)]' ''
+    Edit-TextFile (Join-Path $SourceDir qttools src CMakeLists.txt) 'add_subdirectory[(]qdoc[)]' ''
+    Edit-TextFile (Join-Path $SourceDir qttools src linguist CMakeLists.txt) 'add_subdirectory[(](linguist|lprodump)[)]' ''
+
+    # No need in 'testcon' QtAx tool
+    Edit-TextFile (Join-Path $SourceDir qtactiveqt CMakeLists.txt) 'OR NOT TARGET Qt::PrintSupport' ''
+    Edit-TextFile (Join-Path $SourceDir qtactiveqt CMakeLists.txt) 'PrintSupport' ''
+    Edit-TextFile (Join-Path $SourceDir qtactiveqt tools CMakeLists.txt) 'add_subdirectory[(]testcon[)]' ''
+
+    # Fix build (including because of disabled features)
+    Edit-TextFile (Join-Path $SourceDir qtbase src gui text windows qwindowsfontdatabasebase_p.h) 'unique_ptr<QCustomFontFileLoader>' 'unique_ptr<int>'
+    Edit-TextFile (Join-Path $SourceDir qtactiveqt src activeqt container qaxwidget.cpp) '.*<(qdockwidget|qwhatsthis)[.]h>|QWhatsThis::[a-zA-Z]+[(][)]' ''
+    Edit-TextFile (Join-Path $SourceDir qtactiveqt src activeqt control qaxserverbase.cpp) '.*<qwhatsthis[.]h>|QWhatsThis::[a-zA-Z]+[(][)]' ''
 
     Invoke-NativeCommand cmake -E remove_directory $BuildDir
     $env:PATH = @(
@@ -115,7 +147,7 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     New-Item -Path $BuildDir -ItemType Directory -ErrorAction Ignore | Out-Null
     Push-Location -Path $BuildDir
     Invoke-VcEnvCommand (Join-Path $SourceDir configure) @ConfigOptions
-    Invoke-VcEnvCommand cmake --build . --parallel
+    Invoke-VcEnvCommand cmake --build .
     Invoke-VcEnvCommand cmake --install .
     Pop-Location
 

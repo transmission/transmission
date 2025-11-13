@@ -213,7 +213,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         (void)evutil_make_listen_socket_reuseable(sock);
-        (void)evutil_make_listen_socket_ipv6only(sock);
+        (void)tr_make_listen_socket_ipv6only(sock);
 
         auto const addr = session_.bind_address(TR_AF_INET6);
         auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
@@ -284,10 +284,10 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         return;
     }
     else if (
-        addrport && addrport->address().is_global_unicast_address() &&
-        !session_.global_source_address(tr_af_to_ip_protocol(to->sa_family)))
+        addrport && !addrport->address().is_ipv4_loopback_address() && !addrport->address().is_ipv6_loopback_address() &&
+        !session_.source_address(tr_af_to_ip_protocol(to->sa_family)))
     {
-        // don't try to connect to a global address if we don't have connectivity to public internet
+        // don't try to send if we don't have a route in this IP protocol
         return;
     }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)

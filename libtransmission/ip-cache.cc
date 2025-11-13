@@ -63,6 +63,15 @@ namespace global_source_ip_helpers
 // and check its source address.
 //
 // Since it's a UDP socket, this doesn't actually send any packets
+//
+// N.B. Successfully obtaining a source address does not imply
+// connectivity to the given destination address, since all connect()
+// does is setting the default remote address for subsequent send() and
+// recv() calls.
+//
+// Having said that, the connect() step is still needed because on Windows,
+// calling getsockname() might not return what we want before calling
+// connect() if we are binding to 0.0.0.0 or ::.
 [[nodiscard]] std::optional<tr_address> get_source_address(
     tr_address const& dst_addr,
     tr_port dst_port,
@@ -221,7 +230,7 @@ bool tr_ip_cache::set_global_addr(tr_address const& addr_new) noexcept
 void tr_ip_cache::update_addr(tr_address_type type) noexcept
 {
     update_source_addr(type);
-    if (global_source_addr(type))
+    if (source_addr(type))
     {
         update_global_addr(type);
     }
@@ -272,11 +281,9 @@ void tr_ip_cache::update_source_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     auto const protocol = tr_ip_protocol_to_sv(type);
-
     auto err = 0;
-    auto const& source_addr = get_global_source_address(bind_addr(type), err);
     source_addr_checked_[type] = true;
-    if (source_addr)
+    if (auto const& source_addr = get_global_source_address(bind_addr(type), err); source_addr)
     {
         set_source_addr(*source_addr);
         tr_logAddDebug(fmt::format(

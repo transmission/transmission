@@ -194,7 +194,7 @@ jobs:
         run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   sanitizer-tests-macos:
-    runs-on: macos-15
+    runs-on: macos-26
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     steps:
@@ -374,8 +374,8 @@ jobs:
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
 
-  macos-15-project:
-     runs-on: macos-15
+  macos-26-project:
+     runs-on: macos-26
      needs: [ what-to-make ]
      if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
              needs.what-to-make.outputs.make-daemon == 'true' ||
@@ -399,8 +399,8 @@ jobs:
            name: binaries-${{ github.job }}
            path: pfx/**/*
 
-  macos-15-arm64:
-    runs-on: macos-15
+  macos-26-arm64:
+    runs-on: macos-26
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
@@ -755,10 +755,10 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-15-universal-from-tarball:
+  macos-26-universal-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Show Configuration
         run: |

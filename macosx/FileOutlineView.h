@@ -6,8 +6,6 @@
 
 @interface FileOutlineView : NSOutlineView
 
-@property(nonatomic, readonly) NSInteger hoveredRow;
-
 - (NSRect)iconRectForRow:(NSInteger)row;
 
 @end

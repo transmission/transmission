@@ -51,7 +51,7 @@ set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 1.1.0)
-set(MBEDTLS_MINIMUM 1.3)
+set(MBEDTLS_MINIMUM 2.7)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
@@ -108,7 +108,7 @@ set(TR_NAME ${PROJECT_NAME})
 set(TR_VERSION_MAJOR "4")
 set(TR_VERSION_MINOR "1")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "2") # empty string for not beta
+set(TR_VERSION_BETA_NUMBER "3") # empty string for not beta
 set(TR_VERSION_DEV FALSE)
 
 # derived from above: release type
@@ -304,8 +304,7 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "mbedtls")
     tr_fixup_list_option(WITH_CRYPTO "mbedtls" MBEDTLS_FOUND "AUTO" MBEDTLS_IS_REQUIRED)
     if(WITH_CRYPTO STREQUAL "mbedtls")
         set(CRYPTO_PKG "mbedtls")
-        set(CRYPTO_INCLUDE_DIRS ${MBEDTLS_INCLUDE_DIRS})
-        set(CRYPTO_LIBRARIES ${MBEDTLS_LIBRARIES})
+        set(CRYPTO_LIBRARIES MbedTLS::mbedtls MbedTLS::mbedcrypto)
     endif()
 endif()
 

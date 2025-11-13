@@ -151,7 +151,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         }
     };
 
-    for (auto const& transport : session->preferred_transport())
+    for (auto const& transport : session->preferred_transports())
     {
         if (auto sock = get_socket[transport](); sock.is_valid())
         {

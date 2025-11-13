@@ -257,6 +257,18 @@ struct tr_address
         return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
     }
 
+    [[nodiscard]] constexpr bool is_ipv4_loopback_address() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 127U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv6_loopback_address() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LOOPBACK(&addr.addr6);
+    }
+
+    [[nodiscard]] std::optional<tr_address> from_ipv4_mapped() const noexcept;
+
     tr_address_type type = NUM_TR_AF_INET_TYPES;
     union
     {
@@ -554,3 +566,5 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
+
+[[nodiscard]] int tr_make_listen_socket_ipv6only(tr_socket_t sock);
