@@ -562,10 +562,11 @@ namespace make_torrent_field_helpers
     for (size_t idx = 0U; idx != n_trackers; ++idx)
     {
         auto const tracker = tr_torrentTracker(&tor, idx);
-        auto stats_map = tr_variant::Map{ 27U };
+        auto stats_map = tr_variant::Map{ 28U };
         stats_map.try_emplace(TR_KEY_announce, tracker.announce);
         stats_map.try_emplace(TR_KEY_announceState, tracker.announceState);
         stats_map.try_emplace(TR_KEY_downloadCount, tracker.downloadCount);
+        stats_map.try_emplace(TR_KEY_downloader_count, tracker.downloader_count);
         stats_map.try_emplace(TR_KEY_hasAnnounced, tracker.hasAnnounced);
         stats_map.try_emplace(TR_KEY_hasScraped, tracker.hasScraped);
         stats_map.try_emplace(TR_KEY_host, tracker.host_and_port);
@@ -1898,6 +1899,14 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return { Error::PATH_NOT_ABSOLUTE, "incomplete torrents directory path is not absolute"s };
     }
 
+    if (auto const iter = args_in.find(TR_KEY_preferred_transports); iter != std::end(args_in))
+    {
+        if (!session->load_preferred_transports(iter->second))
+        {
+            return { Error::INVALID_PARAMS, R"(the list must be unique with the values "utp" or "tcp")" };
+        }
+    }
+
     if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mb))
     {
         tr_sessionSetCacheLimit_MB(session, *val);
@@ -2268,6 +2277,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_peer_port_random_on_start: return session.isPortRandom();
     case TR_KEY_pex_enabled: return session.allows_pex();
     case TR_KEY_port_forwarding_enabled: return tr_sessionIsPortForwardingEnabled(&session);
+    case TR_KEY_preferred_transports: return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled: return session.queueStalledEnabled();
     case TR_KEY_queue_stalled_minutes: return session.queueStalledMinutes();
     case TR_KEY_rename_partial_files: return session.isIncompleteFileNamingEnabled();

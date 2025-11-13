@@ -210,7 +210,7 @@ enum
 // --- Command-Line Arguments
 
 using Arg = tr_option::Arg;
-auto constexpr Options = std::array<tr_option, 105>{ {
+auto constexpr Options = std::array<tr_option, 106>{ {
     { 'a', "add", "Add torrent files by filename or URL", "a", Arg::None, nullptr },
     { 970, "alt-speed", "Use the alternate Limits", "as", Arg::None, nullptr },
     { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", Arg::None, nullptr },
@@ -350,8 +350,14 @@ auto constexpr Options = std::array<tr_option, 105>{ {
       Arg::Required,
       "<speed>" },
     { 'U', "no-uplimit", "Disable max upload speed for the current torrent(s) or globally", "U", Arg::None, nullptr },
-    { 830, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
-    { 831, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 830,
+      "preferred-transports",
+      "Comma-separated list specifying preference of transport protocols",
+      nullptr,
+      Arg::Required,
+      "<protocol(s)>" },
+    { 831, "utp", "Enable µTP for peer connections", nullptr, Arg::None, nullptr },
+    { 832, "no-utp", "Disable µTP for peer connections", nullptr, Arg::None, nullptr },
     { 'v', "verify", "Verify the current torrent(s)", "v", Arg::None, nullptr },
     { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
     { 'w',
@@ -440,8 +446,9 @@ enum
     case 801: /* no-torrent-done-script */
     case 802: /* torrent-done-seeding-script */
     case 803: /* no-torrent-done-seeding-script */
-    case 830: /* utp */
-    case 831: /* no-utp */
+    case 830: /* preferred-transports */
+    case 831: /* utp */
+    case 832: /* no-utp */
     case 970: /* alt-speed */
     case 971: /* no-alt-speed */
     case 972: /* alt-speed-downlimit */
@@ -690,6 +697,22 @@ void add_labels(tr_variant::Map& args, std::string_view comma_delimited_labels)
 void set_group(tr_variant::Map& args, std::string_view group)
 {
     args.insert_or_assign(TR_KEY_group, tr_variant::unmanaged_string(group));
+}
+
+void set_preferred_transports(tr_variant::Map& args, std::string_view comma_delimited_protocols)
+{
+    auto* preferred_protocols = args.find_if<tr_variant::Vector>(TR_KEY_preferred_transports);
+    if (preferred_protocols == nullptr)
+    {
+        preferred_protocols = args.insert_or_assign(TR_KEY_preferred_transports, tr_variant::make_vector(10))
+                                  .first.get_if<tr_variant::Vector>();
+    }
+
+    auto protocol = std::string_view{};
+    while (tr_strv_sep(&comma_delimited_protocols, &protocol, ','))
+    {
+        preferred_protocols->emplace_back(protocol);
+    }
 }
 
 [[nodiscard]] auto make_files_list(std::string_view str_in)
@@ -2862,10 +2885,14 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 break;
 
             case 830:
-                args.insert_or_assign(TR_KEY_utp_enabled, true);
+                set_preferred_transports(args, optarg_sv);
                 break;
 
             case 831:
+                args.insert_or_assign(TR_KEY_utp_enabled, true);
+                break;
+
+            case 832:
                 args.insert_or_assign(TR_KEY_utp_enabled, false);
                 break;
 

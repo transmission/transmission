@@ -35,6 +35,8 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
@@ -430,7 +432,10 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
-        std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
+        small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transports = {
+            TR_PREFER_UTP,
+            TR_PREFER_TCP,
+        };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::optional<std::string> proxy_url;
         std::string announce_ip;
@@ -488,7 +493,7 @@ public:
                 { TR_KEY_pex_enabled, &pex_enabled },
                 { TR_KEY_port_forwarding_enabled, &port_forwarding_enabled },
                 { TR_KEY_preallocation, &preallocation_mode },
-                { TR_KEY_preferred_transport, &preferred_transport },
+                { TR_KEY_preferred_transports, &preferred_transports },
                 { TR_KEY_proxy_url, &proxy_url },
                 { TR_KEY_queue_stalled_enabled, &queue_stalled_enabled },
                 { TR_KEY_queue_stalled_minutes, &queue_stalled_minutes },
@@ -997,9 +1002,21 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
-    [[nodiscard]] constexpr auto const& preferred_transport() const noexcept
+    [[nodiscard]] constexpr auto const& preferred_transports() const noexcept
     {
-        return settings().preferred_transport;
+        return settings().preferred_transports;
+    }
+
+    [[nodiscard]] auto save_preferred_transports() const
+    {
+        auto var = settings().save_single(TR_KEY_preferred_transports);
+        TR_ASSERT(var.has_value());
+        return var;
+    }
+
+    bool load_preferred_transports(tr_variant const& var) noexcept
+    {
+        return settings_.load_single(TR_KEY_preferred_transports, var);
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
@@ -1045,10 +1062,10 @@ public:
         return ip_cache_.set_global_addr(addr);
     }
 
-    [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
+    [[nodiscard]] std::optional<tr_address> source_address(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
-        return ip_cache_.global_source_addr(type);
+        return ip_cache_.source_addr(type);
     }
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept

@@ -186,10 +186,10 @@ Request parameters:
 | `seedRatioMode`                  | number   | which ratio to use. See tr_ratiolimit
 | `sequential_download`            | boolean  | download torrent pieces sequentially
 | `sequential_download_from_piece` | number   | download from a specific piece when sequential download is enabled
-| `trackerAdd`                     | array    | **DEPRECATED** use trackerList instead
+| `trackerAdd`                     | array    | **DEPRECATED** use `trackerList` instead
 | `trackerList`                    | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
-| `trackerRemove`                  | array    | **DEPRECATED** use trackerList instead
-| `trackerReplace`                 | array    | **DEPRECATED** use trackerList instead
+| `trackerRemove`                  | array    | **DEPRECATED** use `trackerList` instead
+| `trackerReplace`                 | array    | **DEPRECATED** use `trackerList` instead
 | `uploadLimit`                    | number   | maximum upload speed (kB/s)
 | `uploadLimited`                  | boolean  | true if `uploadLimit` is honored
 
@@ -410,6 +410,7 @@ Files are returned in the order they are laid out in the torrent. References to 
 | `announce`                | string     | tr_tracker_view
 | `announceState`           | number     | tr_tracker_view
 | `downloadCount`           | number     | tr_tracker_view
+| `downloader_count`        | number     | tr_tracker_view
 | `hasAnnounced`            | boolean    | tr_tracker_view
 | `hasScraped`              | boolean    | tr_tracker_view
 | `host`                    | string     | tr_tracker_view
@@ -590,6 +591,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `peer-port` | number | port number
 | `pex-enabled` | boolean | true means allow PEX in public torrents
 | `port-forwarding-enabled` | boolean | true means ask upstream router to forward the configured peer port to transmission using UPnP or NAT-PMP
+| `preferred_transports` | string[] | preference of transport protocols, see `settings.json` for details
 | `queue-stalled-enabled` | boolean | whether or not to consider idle torrents as stalled
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
@@ -616,7 +618,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `start-added-torrents` | boolean | true means added torrents will be started right away
 | `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
-| `utp-enabled` | boolean | true means allow UTP
+| `utp-enabled` | boolean | **DEPRECATED** Use `preferred_transports` instead
 | `version` | string | long version string `$version ($revision)`
 
 
@@ -1077,4 +1079,9 @@ Transmission 4.1.0 (`rpc-version-semver` 6.0.0, `rpc-version`: 18)
 | `torrent-get` | new arg `files.begin_piece`
 | `torrent-get` | new arg `files.end_piece`
 | `port-test` | new arg `ip_protocol`
+| `torrent-get` | new arg `trackerStats.downloader_count`
 | `torrent-get` | :warning: **DEPRECATED** `manualAnnounceTime`, it never worked
+| `session-get` | new arg `preferred_transports`
+| `session-set` | new arg `preferred_transports`
+| `session-get` | :warning: **DEPRECATED** `utp-enabled`. Use `preferred_transports` instead.
+| `session-set` | :warning: **DEPRECATED** `utp-enabled`. Use `preferred_transports` instead.
