@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -995,7 +996,7 @@ CA
                                     <action selector="showMainWindow:" target="206" id="1702"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Statistics" image="loupe" catalog="system" keyEquivalent="2" id="2301">
+                            <menuItem title="Statistics" image="chart.bar" catalog="system" keyEquivalent="2" id="2301">
                                 <connections>
                                     <action selector="showStatsWindow:" target="206" id="2302"/>
                                 </connections>
@@ -1232,6 +1233,7 @@ CA
         <image name="arrow.up.doc" catalog="system" width="14" height="16"/>
         <image name="bandage" catalog="system" width="16" height="16"/>
         <image name="bubble.left.and.bubble.right" catalog="system" width="22" height="17"/>
+        <image name="chart.bar" catalog="system" width="20" height="14"/>
         <image name="doc.badge.plus" catalog="system" width="16" height="18"/>
         <image name="document.on.trash" catalog="system" width="17" height="20"/>
         <image name="eye" catalog="system" width="21" height="13"/>
@@ -2356,7 +2358,6 @@ WQABAl4AAQJmAAAAAAAABAEAAAAAAAAARQAAAAAAAAAAAAAAAAABAmk
         </image>
         <image name="info.circle" catalog="system" width="15" height="15"/>
         <image name="keyboard" catalog="system" width="19" height="13"/>
-        <image name="loupe" catalog="system" width="16" height="14"/>
         <image name="megaphone" catalog="system" width="18" height="16"/>
         <image name="pause" catalog="system" width="9" height="13"/>
         <image name="pause.circle.fill" catalog="system" width="15" height="15"/>
