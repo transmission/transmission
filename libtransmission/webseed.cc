@@ -14,8 +14,6 @@
 #include <string_view>
 #include <utility>
 
-#include <event2/buffer.h>
-
 #include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
@@ -30,15 +28,13 @@
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/webseed.h"
-
-struct evbuffer;
 
 using namespace std::literals;
 using namespace libtransmission::Values;
@@ -57,12 +53,6 @@ public:
         , end_byte_{ tor.block_loc(blocks.end - 1).byte + tor.block_size(blocks.end - 1) }
         , loc_{ tor.block_loc(blocks.begin) }
     {
-        evbuffer_add_cb(content_.get(), on_buffer_got_data, this);
-    }
-
-    [[nodiscard]] auto* content() const
-    {
-        return content_.get();
     }
 
     void request_next_chunk();
@@ -74,7 +64,7 @@ private:
     void use_fetched_blocks();
 
     static void on_partial_data_fetched(tr_web::FetchResponse const& web_response);
-    static void on_buffer_got_data(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
+    void on_data_received(size_t n_bytes);
 
     tr_webseed_impl* const webseed_;
     tr_session* const session_;
@@ -83,7 +73,7 @@ private:
     // the current position in the task; i.e., the next block to save
     tr_block_info::Location loc_;
 
-    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
+    libtransmission::StackBuffer<tr_block_info::BlockSize, std::byte, std::ratio<5, 1>> content_;
 };
 
 /**
@@ -377,22 +367,22 @@ void tr_webseed_task::use_fetched_blocks()
 
     auto const& tor = webseed_->tor;
 
-    for (auto* const buf = content();;)
+    for (;;)
     {
         auto const block_size = tor.block_size(loc_.block);
-        if (evbuffer_get_length(buf) < block_size)
+        if (std::size(content_) < block_size)
         {
             break;
         }
 
         if (tor.has_block(loc_.block))
         {
-            evbuffer_drain(buf, block_size);
+            content_.drain(block_size);
         }
         else
         {
             auto block_buf = new Cache::BlockData(block_size);
-            evbuffer_remove(buf, std::data(*block_buf), std::size(*block_buf));
+            content_.to_buf(std::data(*block_buf), std::size(*block_buf));
             session_->run_in_session_thread(
                 [session = session_, tor_id = tor.id(), block = loc_.block, block_buf, webseed = webseed_]()
                 {
@@ -415,17 +405,15 @@ void tr_webseed_task::use_fetched_blocks()
 
 // ---
 
-void tr_webseed_task::on_buffer_got_data(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask)
+void tr_webseed_task::on_data_received(size_t const n_bytes)
 {
-    size_t const n_added = info->n_added;
-    auto* const task = static_cast<tr_webseed_task*>(vtask);
-    if (n_added == 0 || task->dead)
+    if (n_bytes == 0 || dead)
     {
         return;
     }
 
-    auto const lock = task->session_->unique_lock();
-    task->webseed_->got_piece_data(n_added);
+    auto const lock = session_->unique_lock();
+    webseed_->got_piece_data(n_bytes);
 }
 
 void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_response)
@@ -452,6 +440,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
         return;
     }
 
+    task->content_.add(std::data(body), std::size(body));
     task->use_fetched_blocks();
 
     if (task->loc_.byte < task->end_byte_)
@@ -463,7 +452,7 @@ void tr_webseed_task::on_partial_data_fetched(tr_web::FetchResponse const& web_r
         return;
     }
 
-    TR_ASSERT(evbuffer_get_length(task->content()) == 0);
+    TR_ASSERT(std::empty(task->content_));
     TR_ASSERT(task->loc_.byte == task->end_byte_);
     webseed->tasks.erase(task);
     delete task;
@@ -488,7 +477,7 @@ void tr_webseed_task::request_next_chunk()
 {
     auto const& tor = webseed_->tor;
 
-    auto const downloaded_loc = tor.byte_loc(loc_.byte + evbuffer_get_length(content()));
+    auto const downloaded_loc = tor.byte_loc(loc_.byte + std::size(content_));
 
     auto const [file_index, file_offset] = tor.file_offset(downloaded_loc);
     auto const left_in_file = tor.file_size(file_index) - file_offset;
@@ -503,7 +492,10 @@ void tr_webseed_task::request_next_chunk()
     auto options = tr_web::FetchOptions{ url.sv(), on_partial_data_fetched, this };
     options.range.emplace(file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor.id();
-    options.buffer = content();
+    options.on_data_received = [this](size_t const n_bytes)
+    {
+        on_data_received(n_bytes);
+    };
     tor.session->fetch(std::move(options));
 }
 
