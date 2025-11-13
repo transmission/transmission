@@ -349,9 +349,19 @@ jobs:
            name: binaries-${{ github.job }}
            path: pfx/Build/Products/**/Transmission.app*
 
-  macos-26:
-    runs-on: macos-26
-    needs: [ what-to-make ]
+  macos-from-repo:
+    strategy:
+      matrix:
+        os: [
+          # This is the oldest macOS runner that GitHub Actions supports.
+          # Xref https://github.com/actions/runner-images/issues/13046
+          macos-14,
+
+          # Tahoe preview. Added Sept 2025.
+          # Xref https://github.com/actions/runner-images/pull/13007
+          macos-26
+        ]
+    needs: [what-to-make]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
             needs.what-to-make.outputs.make-daemon == 'true' ||
             needs.what-to-make.outputs.make-gtk == 'true' ||
@@ -359,6 +369,7 @@ jobs:
             needs.what-to-make.outputs.make-qt == 'true' ||
             needs.what-to-make.outputs.make-tests == 'true' ||
             needs.what-to-make.outputs.make-utils == 'true' }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Show Configuration
         run: |
@@ -409,50 +420,8 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}
+          name: binaries-${{ matrix.os }}-from-repo
           path: pfx/**/*
-
-  # oldest GitHub build support on macOS (Transmission supports macOS 11.0 and newer)
-  macos-14:
-    runs-on: macos-14
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
-    steps:
-      - name: Show Configuration
-        run: |
-          echo '${{ toJSON(needs) }}'
-          echo '${{ toJSON(runner) }}'
-          sw_vers
-      - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
-      - name: Get Source
-        uses: actions/checkout@v4
-        with:
-          path: src
-          submodules: recursive
-      # oldest GitHub build support for Xcode (Transmission supports Xcode 12.5.1 and newer)
-      - name: Set Xcode to 14.1
-        run: |
-          # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md#xcode
-          sudo xcode-select --switch /Applications/Xcode_15.0.app
-
-      - name: Configure
-        run: |
-          cmake \
-            -S src \
-            -B obj \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_GTK=OFF \
-            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=OFF \
-            -DENABLE_TESTS=OFF \
-            -DENABLE_WERROR=ON \
-            -DRUN_CLANG_TIDY=OFF \
-            -DUSE_SYSTEM_CRC32C=ON
-      - name: Make
-        run: cmake --build obj --config RelWithDebInfo
 
   alpine-musl:
     needs: [ what-to-make ]
@@ -714,7 +683,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}
+          name: binaries-${{ matrix.os }}-from-tarball
           path: pfx/**/*
 
   debian-11-from-tarball:
