@@ -15,21 +15,38 @@ jobs:
     _changed_expr: &changed "fromJSON(steps.check-diffs.outputs.components)"
     _is_ci_expr: &is_ci "contains(*changed, 'ci')"
     _is_main_or_ci_expr: &is_main_or_ci "*is_main || *is_ci"
+    _do_cli_expr: &do_cli "*is_main_or_ci || contains(*changed, 'cli')"
+    _do_daemon_expr: &do_daemon "*is_main_or_ci || contains(*changed, 'daemon')"
+    _do_gtk_expr: &do_gtk "*is_main_or_ci || contains(*changed, 'gtk')"
+    _do_mac_expr: &do_mac "*is_main_or_ci || contains(*changed, 'mac')"
+    _do_qt_expr: &do_qt "*is_main_or_ci || contains(*changed, 'qt')"
+    _do_web_expr: &do_web "*is_main || contains(*changed, 'web')"
+    _do_tests_expr: &do_tests "*is_main_or_ci || contains(*changed, 'tests')"
+    # tests require transmission-show, so do_utils |= do_tests
+    _do_utils_expr: &do_utils "*do_tests || contains(*changed, 'utils')"
     outputs:
       make_android: ${{ *is_main_or_ci || contains(*changed, 'android') }}
-      make_cli: ${{ *is_main_or_ci || contains(*changed, 'cli') }}
+      make_cli: ${{ *do_cli }}
       make_core: ${{ *is_main_or_ci || contains(*changed, 'core') }}
-      make_daemon: ${{ *is_main_or_ci || contains(*changed, 'daemon') }}
+      make_daemon: ${{ do_daemon }}
       make_dist: ${{ *is_main_or_ci || contains(*changed, 'dist') }}
       make_docs: ${{ *is_main || contains(*changed, 'docs') }}
-      make_gtk: ${{ *is_main_or_ci || contains(*changed, 'gtk') }}
-      make_mac: ${{ *is_main_or_ci || contains(*changed, 'mac') }}
-      make_qt: ${{ *is_main_or_ci || contains(*changed, 'qt') }}
+      make_gtk: ${{ *do_gtk }}
+      make_mac: ${{ *do_mac }}
+      make_qt: ${{ *do_qt }}
       make_tarball: ${{ *is_main_or_ci || contains(*changed, 'any') }}
-      make_tests: ${{ *is_main_or_ci || contains(*changed, 'tests') }}
-      make_utils: ${{ *is_main_or_ci || contains(*changed, 'utils') || contains(*changed, 'tests') }}
-      make_web: ${{ *is_main || contains(*changed, 'web') }}
+      make_tests: ${{ *do_tests }}
+      make_utils: ${{ *do_utils }}
+      make_web: ${{ *do_web }}
       test_style: ${{ *is_main_or_ci || contains(*changed, 'our_code') }}
+      cmake_enable_cli: ${{ *do_cli == 'true' && 'ON' || 'OFF' }}
+      cmake_enable_daemon: ${{ *do_daemon == 'true' && 'ON' || 'OFF' }}
+      cmake_enable_gtk: ${{ *do_gtk == 'true' && 'ON' || 'OFF' }}
+      cmake_enable_mac: ${{ *do_mac == 'true' && 'ON' || 'OFF' }}
+      cmake_enable_qt: ${{ *do_qt == 'true' && 'ON' || 'OFF' }}
+      cmake_enable_tests: ${{ *do_tests == 'true' && 'ON' || 'OFF' }}
+      cmake_enable_utils: ${{ *do_utils == 'true' && 'ON' || 'OFF' }}
+      cmake_rebuild_web: ${{ *do_web == 'true' && 'ON' || 'OFF' }}
     steps:
       - name: Check Push to Main Branch
         id: check-main-push
@@ -284,7 +301,7 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} \
             -DRUN_CLANG_TIDY=ON
       - name: Make (Core)
         run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
@@ -323,7 +340,7 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} `
             -DRUN_CLANG_TIDY=ON
       - name: Make (Core)
         run: |
@@ -402,14 +419,14 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='arm64' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.cmake_enable_mac }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_Crc32c=ON
@@ -460,7 +477,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
             -DENABLE_GTK=OFF \
-            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.cmake_enable_mac }} \
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
@@ -521,14 +538,14 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
             -DENABLE_TESTS=ON \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=ON \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_CRC32C=ON
@@ -579,14 +596,14 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DCMAKE_INSTALL_PREFIX=pfx `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_dist == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} `
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} `
             -DENABLE_GTK=OFF `
             -DENABLE_MAC=OFF `
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_dist == 'true' || needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} `
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} `
             -DENABLE_UTILS=ON `
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} `
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -678,14 +695,14 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64' \
             -DCMAKE_DISABLE_FIND_PACKAGE_Intl=ON \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
             -DENABLE_GTK=OFF \
-            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.cmake_enable_mac }}
             -DENABLE_QT=OFF \
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
@@ -751,14 +768,14 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.cmake_enable_mac }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
@@ -839,14 +856,14 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
@@ -917,14 +934,14 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
+            -DENABLE_TESTS=${{ needs.what_to_make.outputs.cmake_enable_tests }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
@@ -994,14 +1011,14 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
             -DENABLE_TESTS=OFF \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
+            -DREBUILD_WEB=${{ needs.what_to_make.outputs.cmake_rebuild_web }}
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -1119,13 +1136,13 @@ jobs:
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.cmake_enable_cli }} \
+            -DENABLE_DAEMON=${{ needs.what_to_make.outputs.cmake_enable_daemon }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.cmake_enable_gtk }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ needs.what_to_make.outputs.cmake_enable_qt }} \
             -DENABLE_TESTS=OFF \
-            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ needs.what_to_make.outputs.cmake_enable_utils }} \
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
