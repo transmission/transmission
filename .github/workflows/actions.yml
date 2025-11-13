@@ -681,7 +681,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ github.job }}
+          name: binaries-${{ matrix.os }}-from-tarball
           path: pfx/**/*
 
   debian-11-from-tarball:
