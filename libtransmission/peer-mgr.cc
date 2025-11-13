@@ -241,9 +241,9 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
     }
     /* is_connected_ should already be set */
     /* keep is_seed_ as-is */
-    /* preserve upload_only_ if TRUE already */
-    if (that.is_upload_only()) {
-        set_upload_only(true);
+    /* preserve upload_only_ when peer is still connected */
+    if (that.is_connected()) {
+        set_upload_only(that.is_upload_only());
     }
 
     if (that.outgoing_handshake_)
