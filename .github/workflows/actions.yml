@@ -9,23 +9,23 @@ on:
 env:
   GTEST_OUTPUT: xml:./
 jobs:
-  what-to-make:
+  what_to_make:
     runs-on: ubuntu-22.04
     outputs:
-      make-core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.core-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
-      make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
-      test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.core-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
+      make_gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
+      test_style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
     steps:
       - name: Check Push to Main Branch
         id: check-main-push
@@ -74,8 +74,8 @@ jobs:
 
   code-style:
     runs-on: ubuntu-22.04
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.test_style == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -122,8 +122,8 @@ jobs:
 
   sanitizer-tests-ubuntu:
     runs-on: ubuntu-22.04
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -181,8 +181,8 @@ jobs:
 
   sanitizer-tests-macos:
     runs-on: macos-26
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -222,8 +222,8 @@ jobs:
 
   clang-tidy-libtransmission:
     runs-on: ubuntu-24.04
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_core == 'true' || needs.what_to_make.outputs.make_tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -268,12 +268,12 @@ jobs:
             -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
             -DRUN_CLANG_TIDY=ON
       - name: Make (Core)
         run: cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
       - name: Make (Tests)
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         run: cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
       - name: Test for warnings
         run: |
@@ -281,8 +281,8 @@ jobs:
 
   clang-tidy-libtransmission-win32:
     runs-on: windows-2022
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-core == 'true' || needs.what-to-make.outputs.make-tests == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_core == 'true' || needs.what_to_make.outputs.make_tests == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -307,14 +307,14 @@ jobs:
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} `
             -DRUN_CLANG_TIDY=ON
       - name: Make (Core)
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target transmission 2>&1 | tee makelog
       - name: Make (Tests)
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture x64
           cmake --build obj --config Debug --target libtransmission-test 2>&1 | tee -a makelog
@@ -324,11 +324,11 @@ jobs:
 
   macos-26-project:
      runs-on: macos-26
-     needs: [ what-to-make ]
-     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-             needs.what-to-make.outputs.make-daemon == 'true' ||
-             needs.what-to-make.outputs.make-mac == 'true' ||
-             needs.what-to-make.outputs.make-utils == 'true' }}
+     needs: [ what_to_make ]
+     if: ${{ needs.what_to_make.outputs.make_cli == 'true' ||
+             needs.what_to_make.outputs.make_daemon == 'true' ||
+             needs.what_to_make.outputs.make_mac == 'true' ||
+             needs.what_to_make.outputs.make_utils == 'true' }}
      steps:
        - name: Show Configuration
          run: |
@@ -349,14 +349,14 @@ jobs:
 
   macos-26-arm64:
     runs-on: macos-26
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-            needs.what-to-make.outputs.make-daemon == 'true' ||
-            needs.what-to-make.outputs.make-gtk == 'true' ||
-            needs.what-to-make.outputs.make-mac == 'true' ||
-            needs.what-to-make.outputs.make-qt == 'true' ||
-            needs.what-to-make.outputs.make-tests == 'true' ||
-            needs.what-to-make.outputs.make-utils == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' ||
+            needs.what_to_make.outputs.make_daemon == 'true' ||
+            needs.what_to_make.outputs.make_gtk == 'true' ||
+            needs.what_to_make.outputs.make_mac == 'true' ||
+            needs.what_to_make.outputs.make_qt == 'true' ||
+            needs.what_to_make.outputs.make_tests == 'true' ||
+            needs.what_to_make.outputs.make_utils == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -366,10 +366,10 @@ jobs:
       - name: Get Dependencies
         run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: brew install --formula gtkmm3
       - name: Get Dependencies (Qt)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: brew install --formula qt
       - name: Get Source
         uses: actions/checkout@v4
@@ -386,21 +386,21 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='arm64' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_Crc32c=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         env:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
@@ -414,8 +414,8 @@ jobs:
   # oldest GitHub build support on macOS (Transmission supports macOS 11.0 and newer)
   macos-13:
     runs-on: macos-13
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_mac == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -444,7 +444,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
             -DENABLE_GTK=OFF \
-            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=OFF \
             -DENABLE_WERROR=ON \
@@ -454,11 +454,11 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
 
   alpine-musl:
-    needs: [ what-to-make ]
+    needs: [ what_to_make ]
     runs-on: ubuntu-22.04
     container:
       image: alpine:latest
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' || needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_gtk == 'true' || needs.what_to_make.outputs.make_qt == 'true' || needs.what_to_make.outputs.make_tests == 'true' || needs.what_to_make.outputs.make_utils == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -487,10 +487,10 @@ jobs:
             pkgconfig \
             xz
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: apk add --upgrade glibmm-dev gtkmm3-dev
       - name: Get Dependencies (Qt6)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: apk add --upgrade qt6-qttools-dev qt6-qtsvg-dev
       - name: Get Source
         uses: actions/checkout@v4
@@ -505,21 +505,21 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=ON \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_CRC32C=ON
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         env:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
@@ -531,9 +531,9 @@ jobs:
           path: pfx/**/*
 
   windows:
-    needs: [ what-to-make ]
+    needs: [ what_to_make ]
     runs-on: windows-2022
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' || needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_dist == 'true' || needs.what_to_make.outputs.make_qt == 'true' || needs.what_to_make.outputs.make_tests == 'true' || needs.what_to_make.outputs.make_utils == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -563,14 +563,14 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DCMAKE_INSTALL_PREFIX=pfx `
             -DCMAKE_PREFIX_PATH="${Env:DEPS_PREFIX}" `
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_dist == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_GTK=OFF `
             -DENABLE_MAC=OFF `
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_dist == 'true' || needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_UTILS=ON `
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -578,12 +578,12 @@ jobs:
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
       - name: Package
-        if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
+        if: ${{ needs.what_to_make.outputs.make_dist == 'true' || (needs.what_to_make.outputs.make_daemon == 'true' && needs.what_to_make.outputs.make_qt == 'true') }}
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake --build obj --config RelWithDebInfo --target pack-msi
@@ -598,8 +598,8 @@ jobs:
 
   make-source-tarball:
     runs-on: ubuntu-22.04
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-tarball == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_tarball == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -635,8 +635,8 @@ jobs:
           path: obj/transmission*.tar.*
 
   macos-26-universal-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-mac == 'true' }}
+    needs: [ make-source-tarball, what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_mac == 'true' }}
     runs-on: macos-26
     steps:
       - name: Show Configuration
@@ -662,14 +662,14 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64' \
             -DCMAKE_DISABLE_FIND_PACKAGE_Intl=ON \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=OFF \
-            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
             -DENABLE_QT=OFF \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
@@ -683,7 +683,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         env:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
@@ -696,14 +696,14 @@ jobs:
 
   # Oldest GitHub support for CLI, GTK and QT on Mac
   macos-13-x86_64-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-            needs.what-to-make.outputs.make-daemon == 'true' ||
-            needs.what-to-make.outputs.make-gtk == 'true' ||
-            needs.what-to-make.outputs.make-mac == 'true' ||
-            needs.what-to-make.outputs.make-qt == 'true' ||
-            needs.what-to-make.outputs.make-tests == 'true' ||
-            needs.what-to-make.outputs.make-utils == 'true' }}
+    needs: [ make-source-tarball, what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' ||
+            needs.what_to_make.outputs.make_daemon == 'true' ||
+            needs.what_to_make.outputs.make_gtk == 'true' ||
+            needs.what_to_make.outputs.make_mac == 'true' ||
+            needs.what_to_make.outputs.make_qt == 'true' ||
+            needs.what_to_make.outputs.make_tests == 'true' ||
+            needs.what_to_make.outputs.make_utils == 'true' }}
     runs-on: macos-13
     steps:
       - name: Show Configuration
@@ -714,10 +714,10 @@ jobs:
       - name: Get Dependencies
         run: brew install --formulae cmake gettext ninja node pkgconf
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: brew install --formula gtkmm3
       - name: Get Dependencies (Qt)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: brew install --formula qt
       - name: Get Source
         uses: actions/download-artifact@v4
@@ -735,14 +735,14 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_OSX_ARCHITECTURES='x86_64' \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }}  \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=${{ (needs.what_to_make.outputs.make_mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
@@ -756,7 +756,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         env:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
@@ -768,8 +768,8 @@ jobs:
           path: pfx/**/*
 
   debian-11-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    needs: [ make-source-tarball, what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' || needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_gtk == 'true' || needs.what_to_make.outputs.make_qt == 'true' || needs.what_to_make.outputs.make_tests == 'true' || needs.what_to_make.outputs.make_utils == 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: debian:11-slim
@@ -804,10 +804,10 @@ jobs:
         with:
           node-version: lts/*
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt5)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v4
@@ -823,20 +823,20 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -846,8 +846,8 @@ jobs:
           path: pfx/**/*
 
   fedora-39-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    needs: [ make-source-tarball, what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' || needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_gtk == 'true' || needs.what_to_make.outputs.make_qt == 'true' || needs.what_to_make.outputs.make_tests == 'true' || needs.what_to_make.outputs.make_utils == 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: fedora:39
@@ -882,10 +882,10 @@ jobs:
         with:
           node-version: lts/*
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
       - name: Get Dependencies (Qt6)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel
       - name: Get Source
         uses: actions/download-artifact@v4
@@ -901,14 +901,14 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what_to_make.outputs.make_tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DEPRECATED=ON \
             -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF \
@@ -916,7 +916,7 @@ jobs:
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
@@ -926,8 +926,8 @@ jobs:
           path: pfx/**/*
 
   ubuntu-22-04-from-tarball:
-    needs: [ make-source-tarball, what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    needs: [ make-source-tarball, what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' || needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_gtk == 'true' || needs.what_to_make.outputs.make_qt == 'true' || needs.what_to_make.outputs.make_tests == 'true' || needs.what_to_make.outputs.make_utils == 'true' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Show Configuration
@@ -959,10 +959,10 @@ jobs:
         with:
           node-version: lts/*
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt5)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: sudo apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v4
@@ -978,20 +978,20 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what_to_make.outputs.make_web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
         env:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
@@ -1003,8 +1003,8 @@ jobs:
           path: pfx/**/*
 
   android:
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-android == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_android == 'true' }}
     runs-on: ubuntu-22.04
     env:
       VCPKG_DEFAULT_TRIPLET: arm64-android
@@ -1053,8 +1053,8 @@ jobs:
         gradle build
 
   ubuntu-24-04-cxx-23:
-    needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    needs: [ what_to_make ]
+    if: ${{ needs.what_to_make.outputs.make_cli == 'true' || needs.what_to_make.outputs.make_daemon == 'true' || needs.what_to_make.outputs.make_gtk == 'true' || needs.what_to_make.outputs.make_qt == 'true' || needs.what_to_make.outputs.make_utils == 'true' }}
     runs-on: ubuntu-24.04
     steps:
       - name: Show Configuration
@@ -1082,10 +1082,10 @@ jobs:
             libssl-dev \
             ninja-build
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_gtk == 'true' }}
         run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt6)
-        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        if: ${{ needs.what_to_make.outputs.make_qt == 'true' }}
         run: sudo apt-get install -y --no-install-recommends qt6-svg-dev qt6-tools-dev
       - name: Get Source
         uses: actions/checkout@v4
@@ -1103,13 +1103,13 @@ jobs:
             -DCMAKE_C_COMPILER='clang' \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what_to_make.outputs.make_cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what_to_make.outputs.make_daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what_to_make.outputs.make_gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what_to_make.outputs.make_qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what_to_make.outputs.make_utils == 'true') && 'ON' || 'OFF' }} \
             -DREBUILD_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
