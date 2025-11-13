@@ -11,21 +11,25 @@ env:
 jobs:
   what_to_make:
     runs-on: ubuntu-22.04
+    _is_main_expr: &is_main "steps.check-main-push.outputs.is-main-push == '1'"
+    _changed_expr: &changed "fromJSON(steps.check-diffs.outputs.components)"
+    _is_ci_expr: &is_ci "contains(*changed, 'ci')"
+    _is_main_or_ci_expr: &is_main_or_ci "*is_main || *is_ci"
     outputs:
-      make_core: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.core-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_android: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.android-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
-      make_gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
-      make_web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
-      test_style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' || steps.check-diffs.outputs.ci-actions-changed == '1' }}
+      make_android: ${{ *is_main_or_ci || contains(*changed, 'android') }}
+      make_cli: ${{ *is_main_or_ci || contains(*changed, 'cli') }}
+      make_core: ${{ *is_main_or_ci || contains(*changed, 'core') }}
+      make_daemon: ${{ *is_main_or_ci || contains(*changed, 'daemon') }}
+      make_dist: ${{ *is_main_or_ci || contains(*changed, 'dist') }}
+      make_docs: ${{ *is_main || contains(*changed, 'docs') }}
+      make_gtk: ${{ *is_main_or_ci || contains(*changed, 'gtk') }}
+      make_mac: ${{ *is_main_or_ci || contains(*changed, 'mac') }}
+      make_qt: ${{ *is_main_or_ci || contains(*changed, 'qt') }}
+      make_tarball: ${{ *is_main_or_ci || contains(*changed, 'any') }}
+      make_tests: ${{ *is_main_or_ci || contains(*changed, 'tests') }}
+      make_utils: ${{ *is_main_or_ci || contains(*changed, 'utils') || contains(*changed, 'tests') }}
+      make_web: ${{ *is_main || contains(*changed, 'web') }}
+      test_style: ${{ *is_main_or_ci || contains(*changed, 'our_code') }}
     steps:
       - name: Check Push to Main Branch
         id: check-main-push
@@ -48,28 +52,40 @@ jobs:
         run: |
           set +e
           cd src
-          MERGE_BASE=`git merge-base origin/main HEAD`
+          MERGE_BASE=$(git merge-base origin/main HEAD)
+          components=()
           function get_changes() { # name, paths...
             local name="$1"
             shift
-            git diff --exit-code "$MERGE_BASE" -- "$@"
-            echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
+            if ! git diff --quiet --exit-code "$MERGE_BASE" -- "$@"; then
+              components+=("$name")
+            fi
           }
-          get_changes core       CMakeLists.txt cmake third-party libtransmission
-          get_changes android    CMakeLists.txt cmake third-party libtransmission android
-          get_changes cli        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
-          get_changes any-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          get_changes our-code   CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
-          get_changes daemon     CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
-          get_changes dist       dist release
-          get_changes docs       docs
-          get_changes gtk        CMakeLists.txt cmake third-party libtransmission gtk
-          get_changes mac        CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx
-          get_changes qt         CMakeLists.txt cmake third-party libtransmission qt
-          get_changes tests      CMakeLists.txt cmake third-party libtransmission utils tests
-          get_changes utils      CMakeLists.txt cmake third-party libtransmission utils
-          get_changes web        CMakeLists.txt cmake web
-          get_changes ci-actions .github/workflows/actions.yml
+
+          BUILD_FILES_CMAKE=(CMakeLists.txt cmake)
+          BUILD_FILES_XCODE=(Transmission.xcodeproj)
+          BUILD_FILES=("${BUILD_FILES_CMAKE[@]}" "${BUILD_FILES_XCODE[@]}")
+          CORE_FILES=("${BUILD_FILES[@]}" libtransmission third-party)
+          ANY_FILES=("${CORE_FILES[@]}" cli daemon gtk macosx qt tests utils web)
+          CI_FILES=(.github/workflows)
+
+          get_changes android  "${CORE_FILES[@]}" android
+          get_changes any      "${CORE_FILES[@]}" cli daemon gtk macosx qt utils tests web
+          get_changes ci       "${CI_FILES[@]}"
+          get_changes cli      "${CORE_FILES[@]}" cli
+          get_changes core     "${CORE_FILES[@]}"
+          get_changes daemon   "${CORE_FILES[@]}" daemon
+          get_changes dist     dist release
+          get_changes docs     docs
+          get_changes gtk      "${CORE_FILES[@]}" gtk
+          get_changes mac      "${CORE_FILES[@]}" macosx
+          get_changes our_code "${BUILD_FILES[@]}" libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes qt       "${CORE_FILES[@]}" qt
+          get_changes tests    "${CORE_FILES[@]}" utils tests
+          get_changes utils    "${CORE_FILES[@]}" utils
+          get_changes web      "${BUILD_FILES_CMAKE[@]}" web
+
+          printf 'components=%s\n' "$(printf '%s\n' "${components[@]}" | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
           cat "$GITHUB_OUTPUT"
 
   code-style:
@@ -122,7 +138,7 @@ jobs:
 
   sanitizer-tests-ubuntu:
     runs-on: ubuntu-22.04
-    needs: [ what_to_make ]
+    needs: [what_to_make]
     if: ${{ needs.what_to_make.outputs.make_tests == 'true' }}
     steps:
       - name: Show Configuration
