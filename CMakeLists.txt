@@ -535,7 +535,9 @@ endif()
 
 tr_add_external_auto_library(UV libuv
     LIBNAME libuv
-    TARGET libuv::libuv)
+    TARGET libuv::libuv
+    CMAKE_ARGS
+        -DLIBUV_BUILD_SHARED=OFF)
 
 tr_add_external_auto_library(NATPMP libnatpmp
     LIBNAME natpmp
