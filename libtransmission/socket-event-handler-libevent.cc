@@ -24,7 +24,7 @@ void SocketEventHandlerLibevent<EventType>::on_event(
 {
     TR_ASSERT(vself != nullptr);
     constexpr short EvType = (EventType == SocketEventType::Read) ? EV_READ : EV_WRITE;
-    TR_ASSERT(EvType == EV_READ);
+    TR_ASSERT(type == EvType);
 
     auto* self = static_cast<SocketEventHandlerLibevent<EventType>*>(vself);
     self->callback_(self->socket_);
