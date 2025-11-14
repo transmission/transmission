@@ -22,7 +22,6 @@
     <file>actions/16/process-stop.png</file>
     <file>actions/16/system-run.png</file>
     <file>actions/16/view-refresh.png</file>
-    <file>actions/16/view-sort-ascending.png</file>
     <file>actions/22/application-exit.png</file>
     <file>actions/22/dialog-ok.png</file>
     <file>actions/22/document-new.png</file>
@@ -43,7 +42,6 @@
     <file>actions/22/process-stop.png</file>
     <file>actions/22/system-run.png</file>
     <file>actions/22/view-refresh.png</file>
-    <file>actions/22/view-sort-ascending.png</file>
     <file>actions/24/application-exit.png</file>
     <file>actions/24/dialog-ok.png</file>
     <file>actions/24/document-new.png</file>
@@ -64,7 +62,6 @@
     <file>actions/24/process-stop.png</file>
     <file>actions/24/system-run.png</file>
     <file>actions/24/view-refresh.png</file>
-    <file>actions/24/view-sort-ascending.png</file>
     <file>categories/16/preferences-system.png</file>
     <file>categories/22/preferences-system.png</file>
     <file>categories/24/preferences-system.png</file>
