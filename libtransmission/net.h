@@ -385,6 +385,18 @@ struct tr_address
         return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
     }
 
+    // 2001::/32
+    [[nodiscard]] constexpr bool is_ipv6_teredo() const noexcept
+    {
+        return is_ipv6() && reinterpret_cast<uint32_t const*>(&addr.addr6)[0] == htonl(0x20010000U);
+    }
+
+    // 2002::/16
+    [[nodiscard]] constexpr bool is_ipv6_6to4() const noexcept
+    {
+        return is_ipv6() && reinterpret_cast<uint16_t const*>(&addr.addr6)[0] == htons(0x2002U);
+    }
+
     // fe80::/64 from fe80::/10
     [[nodiscard]] constexpr bool is_ipv6_link_local() const noexcept
     {

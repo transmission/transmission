@@ -125,7 +125,7 @@ namespace global_source_ip_helpers
 
     // In order for address selection to work right,
     // this should be a global unicast address, not Teredo or 6to4
-    TR_ASSERT(dst_addr && dst_addr->is_global_unicast());
+    TR_ASSERT(dst_addr && dst_addr->is_global_unicast() && !dst_addr->is_ipv6_teredo() && !dst_addr->is_ipv6_6to4());
 
     if (dst_addr)
     {
