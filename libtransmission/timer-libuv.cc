@@ -24,8 +24,8 @@ class UvTimer final : public Timer
 public:
     explicit UvTimer(uv_loop_s* loop)
         : loop_{ loop }
+        , uv_timer_{ new uv_timer_t{} }
     {
-        uv_timer_ = new uv_timer_t;
         uv_timer_init(loop_, uv_timer_);
         uv_timer_->data = this;
     }

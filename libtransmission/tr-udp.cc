@@ -88,7 +88,7 @@ void set_socket_buffers(tr_socket_t fd, bool large)
 
 void tr_session::tr_udp_core::on_read_event(tr_socket_t socket)
 {
-    tr_socket_t s = socket;
+    tr_socket_t const s = socket;
     auto* const session = &session_;
 
     auto buf = std::array<unsigned char, 8192>{};

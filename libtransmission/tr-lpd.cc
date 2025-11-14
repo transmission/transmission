@@ -218,7 +218,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
 class tr_lpd_impl final : public tr_lpd
 {
 public:
-    tr_lpd_impl(Mediator& mediator)
+    explicit tr_lpd_impl(Mediator& mediator)
         : mediator_{ mediator }
         , announce_timer_{ mediator.timerMaker().create([this]() { announceUpkeep(); }) }
         , dos_timer_{ mediator.timerMaker().create([this]() { dosUpkeep(); }) }

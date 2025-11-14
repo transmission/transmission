@@ -38,8 +38,8 @@ template<SocketEventType EventType>
 SocketEventHandlerLibuv<EventType>::SocketEventHandlerLibuv(struct uv_loop_s* loop, tr_socket_t socket, Callback callback)
     : SocketEventHandler<EventType>(std::move(callback))
     , socket_{ socket }
+    , socket_poll_{ new uv_poll_t{} }
 {
-    socket_poll_ = new uv_poll_t{};
     uv_poll_init_socket(loop, socket_poll_, socket);
     socket_poll_->data = this;
 }
