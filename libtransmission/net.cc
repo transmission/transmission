@@ -447,9 +447,9 @@ namespace is_valid_for_peers_helpers
 [[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
 {
     auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
-    return addr.is_ipv4_current_network_address() || addr.is_ipv6_unspecified_address() ||
-        (!loopback_allowed && (addr.is_ipv4_loopback_address() || addr.is_ipv6_loopback_address())) ||
-        addr.is_ipv4_multicast_address() || addr.is_ipv6_multicast_address();
+    return addr.is_ipv4_current_network() || addr.is_ipv6_unspecified() ||
+        (!loopback_allowed && (addr.is_ipv4_loopback() || addr.is_ipv6_loopback())) || addr.is_ipv4_multicast() ||
+        addr.is_ipv6_multicast();
 }
 
 } // namespace is_valid_for_peers_helpers
@@ -656,14 +656,14 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 // Multicast            11111111             FF00::/8        2.7
 // Link-Local unicast   1111111010           FE80::/10       2.5.6
 // Global Unicast       (everything else)
-[[nodiscard]] bool tr_address::is_global_unicast_address() const noexcept
+[[nodiscard]] bool tr_address::is_global_unicast() const noexcept
 {
-    return !is_ipv4_current_network_address() && //
-        !is_ipv4_10_private_address() && //
-        !is_ipv4_carrier_grade_nat_address() && //
-        !is_ipv4_loopback_address() && //
-        !is_ipv4_link_local_address() && //
-        !is_ipv4_172_private_address() && //
+    return !is_ipv4_current_network() && //
+        !is_ipv4_10_private() && //
+        !is_ipv4_carrier_grade_nat() && //
+        !is_ipv4_loopback() && //
+        !is_ipv4_link_local() && //
+        !is_ipv4_172_private() && //
         !is_ipv4_ietf_protocol_assignment() && //
         !is_ipv4_test_net_1() && //
         !is_ipv4_6to4_relay() && //
@@ -671,19 +671,19 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
         !is_ipv4_benchmark() && //
         !is_ipv4_test_net_2() && //
         !is_ipv4_test_net_3() && //
-        !is_ipv4_multicast_address() && //
+        !is_ipv4_multicast() && //
         !is_ipv4_mcast_test_net() && //
         !is_ipv4_reserved_class_e() && //
         !is_ipv4_limited_broadcast() && //
-        !is_ipv6_unspecified_address() && //
-        !is_ipv6_loopback_address() && //
-        !is_ipv6_multicast_address() && //
-        !is_ipv6_link_local_address();
+        !is_ipv6_unspecified() && //
+        !is_ipv6_loopback() && //
+        !is_ipv6_multicast() && //
+        !is_ipv6_link_local();
 }
 
 std::optional<tr_address> tr_address::from_ipv4_mapped() const noexcept
 {
-    if (!is_ipv4_mapped_address())
+    if (!is_ipv6_ipv4_mapped())
     {
         return {};
     }
@@ -702,7 +702,7 @@ bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
     using namespace is_valid_for_peers_helpers;
 
-    return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local_address() && !address_.is_ipv4_mapped_address() &&
+    return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local() && !address_.is_ipv6_ipv4_mapped() &&
         !is_martian_addr(address_, from);
 }
 

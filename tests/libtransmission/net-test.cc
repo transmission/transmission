@@ -207,7 +207,7 @@ TEST_F(NetTest, isGlobalUnicastAddress)
         auto const address = tr_address::from_string(presentation);
         EXPECT_TRUE(address.has_value());
         assert(address.has_value());
-        EXPECT_EQ(expected, address->is_global_unicast_address()) << presentation;
+        EXPECT_EQ(expected, address->is_global_unicast()) << presentation;
     }
 }
 

@@ -125,7 +125,7 @@ namespace global_source_ip_helpers
 
     // In order for address selection to work right,
     // this should be a global unicast address, not Teredo or 6to4
-    TR_ASSERT(dst_addr && dst_addr->is_global_unicast_address());
+    TR_ASSERT(dst_addr && dst_addr->is_global_unicast());
 
     if (dst_addr)
     {
@@ -214,7 +214,7 @@ tr_address tr_ip_cache::bind_addr(tr_address_type type) const noexcept
 
 bool tr_ip_cache::set_global_addr(tr_address const& addr_new) noexcept
 {
-    if (addr_new.is_global_unicast_address())
+    if (addr_new.is_global_unicast())
     {
         auto const lock = std::scoped_lock{ global_addr_mutex_[addr_new.type] };
         if (auto& addr = global_addr_[addr_new.type]; addr != addr_new)

@@ -245,61 +245,48 @@ struct tr_address
 
     // ---
 
-    [[nodiscard]] bool is_global_unicast_address() const noexcept;
+    [[nodiscard]] bool is_global_unicast() const noexcept;
 
-    [[nodiscard]] constexpr bool is_ipv4_mapped_address() const noexcept
-    {
-        return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
-    }
-
-    [[nodiscard]] constexpr bool is_ipv6_link_local_address() const noexcept
-    {
-        return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
-    }
-
-    [[nodiscard]] constexpr bool is_ipv4_loopback_address() const noexcept
-    {
-        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 127U;
-    }
-
-    [[nodiscard]] constexpr bool is_ipv6_loopback_address() const noexcept
-    {
-        return is_ipv6() && IN6_IS_ADDR_LOOPBACK(&addr.addr6);
-    }
-
-    [[nodiscard]] constexpr bool is_ipv4_current_network_address() const noexcept
+    // 0.0.0.0/8
+    [[nodiscard]] constexpr bool is_ipv4_current_network() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 0U;
     }
 
-    [[nodiscard]] constexpr bool is_ipv6_unspecified_address() const noexcept
-    {
-        return is_ipv6() && IN6_IS_ADDR_UNSPECIFIED(&addr.addr6);
-    }
-
-    [[nodiscard]] constexpr bool is_ipv4_10_private_address() const noexcept
+    // 10.0.0.0/8
+    [[nodiscard]] constexpr bool is_ipv4_10_private() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 10U;
     }
 
-    [[nodiscard]] constexpr bool is_ipv4_carrier_grade_nat_address() const noexcept
+    // 100.64.0.0/10
+    [[nodiscard]] constexpr bool is_ipv4_carrier_grade_nat() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 100U &&
             (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] & 0xC0U) == 64U;
     }
 
-    [[nodiscard]] constexpr bool is_ipv4_link_local_address() const noexcept
+    // 127.0.0.0/8
+    [[nodiscard]] constexpr bool is_ipv4_loopback() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 127U;
+    }
+
+    // 169.254.0.0/16
+    [[nodiscard]] constexpr bool is_ipv4_link_local() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 169U &&
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 254U;
     }
 
-    [[nodiscard]] constexpr bool is_ipv4_172_private_address() const noexcept
+    // 172.16.0.0/12
+    [[nodiscard]] constexpr bool is_ipv4_172_private() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 172U &&
             (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] & 0xF0U) == 16U;
     }
 
+    // 192.0.0.0/24
     [[nodiscard]] constexpr bool is_ipv4_ietf_protocol_assignment() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
@@ -307,6 +294,7 @@ struct tr_address
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 0U;
     }
 
+    // 192.0.2.0/24
     [[nodiscard]] constexpr bool is_ipv4_test_net_1() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
@@ -314,6 +302,7 @@ struct tr_address
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 2U;
     }
 
+    // 192.88.99.0/24
     [[nodiscard]] constexpr bool is_ipv4_6to4_relay() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
@@ -321,18 +310,21 @@ struct tr_address
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 99U;
     }
 
+    // 192.168.0.0/16
     [[nodiscard]] constexpr bool is_ipv4_192_168_private() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 168U;
     }
 
+    // 198.18.0.0/15
     [[nodiscard]] constexpr bool is_ipv4_benchmark() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 198U &&
             (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] & 0xFEU) == 18U;
     }
 
+    // 198.51.100.0/24
     [[nodiscard]] constexpr bool is_ipv4_test_net_2() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 198U &&
@@ -340,6 +332,7 @@ struct tr_address
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 100U;
     }
 
+    // 203.0.113.0/24
     [[nodiscard]] constexpr bool is_ipv4_test_net_3() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 203U &&
@@ -347,11 +340,13 @@ struct tr_address
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 113U;
     }
 
-    [[nodiscard]] constexpr bool is_ipv4_multicast_address() const noexcept
+    // 224.0.0.0/4
+    [[nodiscard]] constexpr bool is_ipv4_multicast() const noexcept
     {
         return is_ipv4() && (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] & 0xF0U) == 224U;
     }
 
+    // 233.252.0.0/24
     [[nodiscard]] constexpr bool is_ipv4_mcast_test_net() const noexcept
     {
         return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 233U &&
@@ -359,18 +354,45 @@ struct tr_address
             reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 0U;
     }
 
+    // 240.0.0.0/4 -255.255.255.255/32
     [[nodiscard]] constexpr bool is_ipv4_reserved_class_e() const noexcept
     {
         return is_ipv4() && !is_ipv4_limited_broadcast() &&
             (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] & 0xF0U) == 240U;
     }
 
+    // 255.255.255.255/32
     [[nodiscard]] constexpr bool is_ipv4_limited_broadcast() const noexcept
     {
         return is_ipv4() && addr.addr4.s_addr == 0xFFFFFFFFU;
     }
 
-    [[nodiscard]] constexpr bool is_ipv6_multicast_address() const noexcept
+    // ::/128
+    [[nodiscard]] constexpr bool is_ipv6_unspecified() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_UNSPECIFIED(&addr.addr6);
+    }
+
+    // ::1/128
+    [[nodiscard]] constexpr bool is_ipv6_loopback() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LOOPBACK(&addr.addr6);
+    }
+
+    // ::ffff:0:0/96
+    [[nodiscard]] constexpr bool is_ipv6_ipv4_mapped() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr6);
+    }
+
+    // fe80::/64 from fe80::/10
+    [[nodiscard]] constexpr bool is_ipv6_link_local() const noexcept
+    {
+        return is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr6);
+    }
+
+    // ff00::/8
+    [[nodiscard]] constexpr bool is_ipv6_multicast() const noexcept
     {
         return is_ipv6() && IN6_IS_ADDR_MULTICAST(&addr.addr6);
     }
