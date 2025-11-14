@@ -528,14 +528,12 @@
 		EDF9047C2EC3EEB800A4B50B /* random-getentropy.c in Sources */ = {isa = PBXBuildFile; fileRef = EDF9047B2EC3EEB800A4B50B /* random-getentropy.c */; };
 		EDF9047D2EC3EEB800A4B50B /* proctitle.c in Sources */ = {isa = PBXBuildFile; fileRef = EDF9047A2EC3EEB800A4B50B /* proctitle.c */; };
 		EDF9FCD02EC3E14100A4B50B /* timer-libuv.h in Headers */ = {isa = PBXBuildFile; fileRef = EDF9FCCE2EC3E14100A4B50B /* timer-libuv.h */; };
-		EDF9FCD12EC3E14100A4B50B /* peer-io-event-handler.h in Headers */ = {isa = PBXBuildFile; fileRef = EDF9FCC52EC3E14100A4B50B /* peer-io-event-handler.h */; };
 		EDF9FCD22EC3E14100A4B50B /* socket-event-handler-libuv.h in Headers */ = {isa = PBXBuildFile; fileRef = EDF9FCCC2EC3E14100A4B50B /* socket-event-handler-libuv.h */; };
 		EDF9FCD32EC3E14100A4B50B /* socket-event-handler.h in Headers */ = {isa = PBXBuildFile; fileRef = EDF9FCC92EC3E14100A4B50B /* socket-event-handler.h */; };
 		EDF9FCD42EC3E14100A4B50B /* socket-event-handler-libevent.h in Headers */ = {isa = PBXBuildFile; fileRef = EDF9FCCA2EC3E14100A4B50B /* socket-event-handler-libevent.h */; };
 		EDF9FCD52EC3E14100A4B50B /* socket-event-handler-libuv.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDF9FCCD2EC3E14100A4B50B /* socket-event-handler-libuv.cc */; };
 		EDF9FCD62EC3E14100A4B50B /* timer-libuv.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDF9FCCF2EC3E14100A4B50B /* timer-libuv.cc */; };
 		EDF9FCD72EC3E14100A4B50B /* session-thread-libuv.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDF9FCC82EC3E14100A4B50B /* session-thread-libuv.cc */; };
-		EDF9FCD82EC3E14100A4B50B /* peer-io-event-handler.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDF9FCC62EC3E14100A4B50B /* peer-io-event-handler.cc */; };
 		EDF9FCD92EC3E14100A4B50B /* session-thread-libevent.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDF9FCC72EC3E14100A4B50B /* session-thread-libevent.cc */; };
 		EDF9FCDA2EC3E14100A4B50B /* socket-event-handler-libevent.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDF9FCCB2EC3E14100A4B50B /* socket-event-handler-libevent.cc */; };
 		F11545ACA7C4D7A464F703AB /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A044CBD8C049AFCBD4DB411 /* block-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
@@ -1585,8 +1583,6 @@
 		EDF904772EC3EE4B00A4B50B /* kqueue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kqueue.c; sourceTree = "<group>"; };
 		EDF9047A2EC3EEB800A4B50B /* proctitle.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = proctitle.c; sourceTree = "<group>"; };
 		EDF9047B2EC3EEB800A4B50B /* random-getentropy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "random-getentropy.c"; sourceTree = "<group>"; };
-		EDF9FCC52EC3E14100A4B50B /* peer-io-event-handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-io-event-handler.h"; sourceTree = "<group>"; };
-		EDF9FCC62EC3E14100A4B50B /* peer-io-event-handler.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-io-event-handler.cc"; sourceTree = "<group>"; };
 		EDF9FCC72EC3E14100A4B50B /* session-thread-libevent.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-thread-libevent.cc"; sourceTree = "<group>"; };
 		EDF9FCC82EC3E14100A4B50B /* session-thread-libuv.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-thread-libuv.cc"; sourceTree = "<group>"; };
 		EDF9FCC92EC3E14100A4B50B /* socket-event-handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "socket-event-handler.h"; sourceTree = "<group>"; };
@@ -2112,8 +2108,6 @@
 				A292A6E40DFB45E5004B9C0A /* peer-common.h */,
 				4D36BA660CA2F00800A63CA5 /* peer-io.h */,
 				4D36BA650CA2F00800A63CA5 /* peer-io.cc */,
-				EDF9FCC52EC3E14100A4B50B /* peer-io-event-handler.h */,
-				EDF9FCC62EC3E14100A4B50B /* peer-io-event-handler.cc */,
 				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
 				4D36BA680CA2F00800A63CA5 /* peer-mgr.cc */,
 				ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */,
@@ -2826,7 +2820,6 @@
 				ED67FB432B70FCE400D8A037 /* settings.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				EDF9FCD02EC3E14100A4B50B /* timer-libuv.h in Headers */,
-				EDF9FCD12EC3E14100A4B50B /* peer-io-event-handler.h in Headers */,
 				EDF9FCD22EC3E14100A4B50B /* socket-event-handler-libuv.h in Headers */,
 				EDF9FCD32EC3E14100A4B50B /* socket-event-handler.h in Headers */,
 				EDF9FCD42EC3E14100A4B50B /* socket-event-handler-libevent.h in Headers */,
@@ -3731,7 +3724,6 @@
 				EDF9FCD52EC3E14100A4B50B /* socket-event-handler-libuv.cc in Sources */,
 				EDF9FCD62EC3E14100A4B50B /* timer-libuv.cc in Sources */,
 				EDF9FCD72EC3E14100A4B50B /* session-thread-libuv.cc in Sources */,
-				EDF9FCD82EC3E14100A4B50B /* peer-io-event-handler.cc in Sources */,
 				EDF9FCD92EC3E14100A4B50B /* session-thread-libevent.cc in Sources */,
 				EDF9FCDA2EC3E14100A4B50B /* socket-event-handler-libevent.cc in Sources */,
 				C83B17212B7341BC00B2EAE4 /* tr-assert.cc in Sources */,
