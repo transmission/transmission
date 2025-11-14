@@ -9,7 +9,7 @@ endif()
 
 if(UNIX)
     find_package(PkgConfig QUIET)
-    pkg_check_modules(_UV QUIET libevent)
+    pkg_check_modules(_UV QUIET libuv)
 endif()
 
 find_path(UV_INCLUDE_DIR
