@@ -68,11 +68,9 @@ public:
         return session_.timerMaker();
     }
 
-    [[nodiscard]] std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(
-        tr_socket_t socket,
-        libtransmission::SocketReadEventHandler::Callback callback) override
+    [[nodiscard]] libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() override
     {
-        return session_.socketEventHandlerMaker().create_read(socket, std::move(callback));
+        return session_.socketEventHandlerMaker();
     }
 
     void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_after) override

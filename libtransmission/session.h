@@ -297,11 +297,9 @@ private:
             return session_.timerMaker();
         }
 
-        [[nodiscard]] std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(
-            tr_socket_t socket,
-            libtransmission::SocketReadEventHandler::Callback callback) override
+        [[nodiscard]] libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() override
         {
-            return session_.socketEventHandlerMaker().create_read(socket, std::move(callback));
+            return session_.socketEventHandlerMaker();
         }
 
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;

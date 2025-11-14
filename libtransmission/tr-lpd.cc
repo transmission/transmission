@@ -437,7 +437,7 @@ private:
             }
         }
 
-        event_handlers_[ip_protocol] = mediator_.createEventHandler(
+        event_handlers_[ip_protocol] = mediator_.socketEventHandlerMaker().create_read(
             sock,
             [this]([[maybe_unused]] tr_socket_t socket) { onCanRead(ip_protocol); });
         event_handlers_[ip_protocol]->start();
