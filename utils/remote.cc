@@ -168,7 +168,7 @@ struct RemoteConfig
 
 [[nodiscard]] auto strlratio2(double ratio)
 {
-    return tr_strratio(ratio, "Inf");
+    return tr_strratio(ratio, "None", "Inf");
 }
 
 [[nodiscard]] auto strlratio(int64_t numerator, int64_t denominator)
