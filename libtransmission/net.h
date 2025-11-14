@@ -277,9 +277,97 @@ struct tr_address
         return is_ipv6() && IN6_IS_ADDR_UNSPECIFIED(&addr.addr6);
     }
 
+    [[nodiscard]] constexpr bool is_ipv4_10_private_address() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 10U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_carrier_grade_nat_address() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 100U &&
+            (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] & 0xC0U) == 64U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_link_local_address() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 169U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 254U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_172_private_address() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 172U &&
+            (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] & 0xF0U) == 16U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_ietf_protocol_assignment() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 0U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 0U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_test_net_1() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 0U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 2U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_6to4_relay() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 88U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 99U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_192_168_private() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 192U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 168U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_benchmark() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 198U &&
+            (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] & 0xFEU) == 18U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_test_net_2() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 198U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 51U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 100U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_test_net_3() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 203U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 0U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 113U;
+    }
+
     [[nodiscard]] constexpr bool is_ipv4_multicast_address() const noexcept
     {
         return is_ipv4() && (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] & 0xF0U) == 224U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_mcast_test_net() const noexcept
+    {
+        return is_ipv4() && reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] == 233U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[1] == 252U &&
+            reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[2] == 0U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_reserved_class_e() const noexcept
+    {
+        return is_ipv4() && !is_ipv4_limited_broadcast() &&
+            (reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr)[0] & 0xF0U) == 240U;
+    }
+
+    [[nodiscard]] constexpr bool is_ipv4_limited_broadcast() const noexcept
+    {
+        return is_ipv4() && addr.addr4.s_addr == 0xFFFFFFFFU;
     }
 
     [[nodiscard]] constexpr bool is_ipv6_multicast_address() const noexcept

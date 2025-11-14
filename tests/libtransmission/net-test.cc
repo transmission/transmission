@@ -191,7 +191,7 @@ TEST_F(NetTest, isGlobalUnicastAddress)
         { "100.64.0.0"sv, false },
         { "100.128.0.0"sv, true },
         { "126.0.0.0"sv, true },
-        { "127.0.0.0"sv, true },
+        { "127.0.0.0"sv, false },
         { "169.253.255.255"sv, true },
         { "169.254.0.0"sv, false },
         { "169.254.255.255"sv, false },
