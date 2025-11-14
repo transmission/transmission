@@ -46,6 +46,7 @@ jobs:
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
+            libuv1-dev \
             libfmt-dev \
             libglibmm-2.4-dev \
             libgtkmm-3.0-dev \
