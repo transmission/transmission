@@ -15,14 +15,12 @@
 #include <vector>
 
 #include "libtransmission/net.h" // for tr_address, tr_port
-#include "libtransmission/socket-event-handler.h"
-
-struct event_base;
 
 namespace tr
 {
 class TimerMaker;
-}
+class SocketEventHandlerMaker;
+} // namespace libtransmission
 
 class tr_lpd
 {
@@ -50,9 +48,7 @@ public:
 
         [[nodiscard]] virtual tr::TimerMaker& timerMaker() = 0;
 
-        [[nodiscard]] virtual std::unique_ptr<libtransmission::SocketReadEventHandler> createEventHandler(
-            tr_socket_t socket,
-            libtransmission::SocketReadEventHandler::Callback callback) = 0;
+        [[nodiscard]] virtual libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() = 0;
 
         virtual void setNextAnnounceTime(std::string_view info_hash_str, time_t announce_at) = 0;
 
