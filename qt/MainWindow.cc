@@ -165,7 +165,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_PauseAll->setIcon(icon_pause);
     ui_.action_Quit->setIcon(icons.getThemeIcon(QStringLiteral("application-exit")));
     ui_.action_SelectAll->setIcon(icons.getThemeIcon(QStringLiteral("edit-select-all")));
-    ui_.action_ReverseSortOrder->setIcon(icons.getThemeIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
     ui_.action_Preferences->setIcon(icons.getThemeIcon(QStringLiteral("preferences-system")));
     ui_.action_Contents->setIcon(icons.getThemeIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
     ui_.action_About->setIcon(icons.getThemeIcon(QStringLiteral("help-about")));
