@@ -52,7 +52,7 @@
 
 struct evbuffer;
 
-/* session-id is used to make cross-site request forgery attacks difficult.
+/* session_id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
  * https://en.wikipedia.org/wiki/Cross-site_request_forgery
  * https://shiflett.org/articles/cross-site-request-forgeries
@@ -356,20 +356,23 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 
 void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
-    if (auto otop = tr_variant_serde::json().inplace().parse(json); otop)
-    {
-        tr_rpc_request_exec(
-            server->session,
-            *otop,
-            [req, server](tr_session* /*session*/, tr_variant&& content)
+    tr_rpc_request_exec(
+        server->session,
+        json,
+        [req, server](tr_session* /*session*/, tr_variant&& content)
+        {
+            if (!content.has_value())
             {
-                auto* const output_headers = evhttp_request_get_output_headers(req);
-                auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(content));
-                evhttp_add_header(output_headers, "Content-Type", "application/json; charset=UTF-8");
-                evhttp_send_reply(req, HTTP_OK, "OK", response);
-                evbuffer_free(response);
-            });
-    }
+                evhttp_send_reply(req, HTTP_NOCONTENT, "OK", nullptr);
+                return;
+            }
+
+            auto* const output_headers = evhttp_request_get_output_headers(req);
+            auto* const response = make_response(req, server, tr_variant_serde::json().compact().to_string(content));
+            evhttp_add_header(output_headers, "Content-Type", "application/json; charset=UTF-8");
+            evhttp_send_reply(req, HTTP_OK, "OK", response);
+            evbuffer_free(response);
+        });
 }
 
 void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
@@ -596,7 +599,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             "<li>Enable password authentication, then any hostname is allowed.</li>"
             "<li>Add the hostname you want to use to the whitelist in settings.</li>"
             "</ul></p>"
-            "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
+            "<p>If you're editing settings.json, see the 'rpc_host_whitelist' and 'rpc_host_whitelist_enabled' entries.</p>"
             "<p>This requirement has been added to help prevent "
             "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
             "attacks.</p>";
@@ -609,9 +612,10 @@ void handle_request(struct evhttp_request* req, void* arg)
     {
         auto const session_id = std::string{ server->session->sessionId() };
         auto const body = fmt::format(
-            "<p>Your request had an invalid session-id header.</p>"
+            "<p>Your request had an invalid session_id header.</p>"
             "<p>To fix this, follow these steps:"
-            "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
+            "<ol><li> When reading a response, get its " TR_RPC_SESSION_ID_HEADER
+            " header and remember it"
             "<li> Add the updated header to your outgoing requests"
             "<li> When you get this 409 error message, resend your request with the updated header"
             "</ol></p>"

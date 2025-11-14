@@ -74,7 +74,7 @@ auto load_peers(tr_variant::Map const& map, tr_torrent* tor)
         ret = tr_resume::Peers;
     }
 
-    if (auto const* l = map.find_if<tr_variant::Vector>(TR_KEY_peers2_6); l != nullptr)
+    if (auto const* l = map.find_if<tr_variant::Vector>({ TR_KEY_peers2_6, TR_KEY_peers2_6_kebab }); l != nullptr)
     {
         auto const num_added = add_peers(tor, *l);
         tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv6 peers from resume file", num_added));
@@ -266,7 +266,7 @@ void save_idle_limits(tr_variant::Map& map, tr_torrent const* tor)
 
 void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_torrent* tor)
 {
-    if (auto const i = map.value_if<int64_t>(TR_KEY_speed_Bps); i)
+    if (auto const i = map.value_if<int64_t>({ TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab }); i)
     {
         tor->set_speed_limit(dir, Speed{ *i, Speed::Units::Byps });
     }
@@ -275,12 +275,12 @@ void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_to
         tor->set_speed_limit(dir, Speed{ *i2, Speed::Units::KByps });
     }
 
-    if (auto const b = map.value_if<bool>(TR_KEY_use_speed_limit); b)
+    if (auto const b = map.value_if<bool>({ TR_KEY_use_speed_limit, TR_KEY_use_speed_limit_kebab }); b)
     {
         tor->use_speed_limit(dir, *b);
     }
 
-    if (auto const b = map.value_if<bool>(TR_KEY_use_global_speed_limit); b)
+    if (auto const b = map.value_if<bool>({ TR_KEY_use_global_speed_limit, TR_KEY_use_global_speed_limit_kebab }); b)
     {
         tr_torrentUseSessionLimits(tor, *b);
     }
@@ -290,13 +290,15 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
-    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up); child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>({ TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab });
+        child != nullptr)
     {
         load_single_speed_limit(*child, TR_UP, tor);
         ret = tr_resume::Speedlimit;
     }
 
-    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down); child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>({ TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab });
+        child != nullptr)
     {
         load_single_speed_limit(*child, TR_DOWN, tor);
         ret = tr_resume::Speedlimit;
@@ -307,18 +309,18 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 
 tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_ratio_limit);
+    auto const* const d = map.find_if<tr_variant::Map>({ TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab });
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const dratio = d->value_if<double>(TR_KEY_ratio_limit); dratio)
+    if (auto const dratio = d->value_if<double>({ TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab }); dratio)
     {
         tor->set_seed_ratio(*dratio);
     }
 
-    if (auto const i = d->value_if<int64_t>(TR_KEY_ratio_mode); i)
+    if (auto const i = d->value_if<int64_t>({ TR_KEY_ratio_mode, TR_KEY_ratio_mode_kebab }); i)
     {
         tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(*i));
     }
@@ -328,18 +330,18 @@ tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* to
 
 tr_resume::fields_t load_idle_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_idle_limit);
+    auto const* const d = map.find_if<tr_variant::Map>({ TR_KEY_idle_limit, TR_KEY_idle_limit_kebab });
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const imin = d->value_if<int64_t>(TR_KEY_idle_limit); imin)
+    if (auto const imin = d->value_if<int64_t>({ TR_KEY_idle_limit, TR_KEY_idle_limit_kebab }); imin)
     {
         tor->set_idle_limit_minutes(*imin);
     }
 
-    if (auto const i = d->value_if<int64_t>(TR_KEY_idle_mode); i)
+    if (auto const i = d->value_if<int64_t>({ TR_KEY_idle_mode, TR_KEY_idle_mode_kebab }); i)
     {
         tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*i));
     }
@@ -665,7 +667,8 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0)
     {
-        if (auto sv = map.value_if<std::string_view>(TR_KEY_incomplete_dir); sv && !std::empty(*sv))
+        if (auto sv = map.value_if<std::string_view>({ TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab });
+            sv && !std::empty(*sv))
         {
             helper.load_incomplete_dir(*sv);
             fields_loaded |= tr_resume::IncompleteDir;
@@ -692,7 +695,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::MaxPeers) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_max_peers); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_max_peers, TR_KEY_max_peers_kebab }); i)
         {
             tor->set_peer_limit(static_cast<uint16_t>(*i));
             fields_loaded |= tr_resume::MaxPeers;
@@ -710,7 +713,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::AddedDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_added_date); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_added_date, TR_KEY_added_date_kebab }); i)
         {
             helper.load_date_added(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::AddedDate;
@@ -719,7 +722,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::DoneDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_done_date); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_done_date, TR_KEY_done_date_kebab }); i)
         {
             helper.load_date_done(static_cast<time_t>(*i));
             fields_loaded |= tr_resume::DoneDate;
@@ -728,7 +731,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::ActivityDate) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_activity_date); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_activity_date, TR_KEY_activity_date_kebab }); i)
         {
             tor->set_date_active(*i);
             fields_loaded |= tr_resume::ActivityDate;
@@ -737,7 +740,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeSeeding) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_seeding_time_seconds); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab }); i)
         {
             helper.load_seconds_seeding_before_current_start(*i);
             fields_loaded |= tr_resume::TimeSeeding;
@@ -746,7 +749,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_downloading_time_seconds); i)
+        if (auto i = map.value_if<int64_t>({ TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab }); i)
         {
             helper.load_seconds_downloading_before_current_start(*i);
             fields_loaded |= tr_resume::TimeDownloading;
@@ -755,7 +758,8 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::BandwidthPriority) != 0)
     {
-        if (auto i = map.value_if<int64_t>(TR_KEY_bandwidth_priority); i && tr_isPriority(static_cast<tr_priority_t>(*i)))
+        if (auto i = map.value_if<int64_t>({ TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab });
+            i && tr_isPriority(static_cast<tr_priority_t>(*i)))
         {
             tr_torrentSetPriority(tor, static_cast<tr_priority_t>(*i));
             fields_loaded |= tr_resume::BandwidthPriority;
