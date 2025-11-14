@@ -7,7 +7,6 @@
     <file>actions/16/document-new.png</file>
     <file>actions/16/document-open.png</file>
     <file>actions/16/document-properties.png</file>
-    <file>actions/16/edit-clear.png</file>
     <file>actions/16/edit-delete.png</file>
     <file>actions/16/edit-select-all.png</file>
     <file>actions/16/go-bottom.png</file>
@@ -29,7 +28,6 @@
     <file>actions/22/document-new.png</file>
     <file>actions/22/document-open.png</file>
     <file>actions/22/document-properties.png</file>
-    <file>actions/22/edit-clear.png</file>
     <file>actions/22/edit-delete.png</file>
     <file>actions/22/edit-select-all.png</file>
     <file>actions/22/go-bottom.png</file>
@@ -51,7 +49,6 @@
     <file>actions/24/document-new.png</file>
     <file>actions/24/document-open.png</file>
     <file>actions/24/document-properties.png</file>
-    <file>actions/24/edit-clear.png</file>
     <file>actions/24/edit-delete.png</file>
     <file>actions/24/edit-select-all.png</file>
     <file>actions/24/go-bottom.png</file>
