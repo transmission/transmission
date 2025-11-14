@@ -750,7 +750,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
 };
 static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
-auto constexpr DetailsKeys = std::array<tr_quark, 56>{
+auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -796,6 +796,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
     TR_KEY_sequential_download,
+    TR_KEY_sequential_download_from_piece,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -1021,6 +1022,10 @@ void print_details(tr_variant::Map const& map)
         if (auto b = t->value_if<bool>(TR_KEY_sequential_download); b)
         {
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
+            if (auto i = t->value_if<int64_t>(TR_KEY_sequential_download_from_piece); i)
+            {
+                fmt::print("  Sequential Download from piece: {:d}\n", *i);
+            }
         }
 
         if (auto d = t->value_if<double>(TR_KEY_percentDone); d)
