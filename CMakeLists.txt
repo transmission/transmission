@@ -519,7 +519,9 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
 tr_add_external_auto_library(UV libuv libuv
-    TARGET libuv::libuv)
+    TARGET libuv::libuv
+    CMAKE_ARGS
+        -DLIBUV_BUILD_SHARED=OFF)
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
     TARGET natpmp::natpmp
