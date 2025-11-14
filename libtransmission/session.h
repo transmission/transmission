@@ -1360,10 +1360,10 @@ private:
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    std::unique_ptr<BoundSocket> bound_ipv4_;
+    std::optional<BoundSocket> bound_ipv4_;
 
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::bind_address())
-    std::unique_ptr<BoundSocket> bound_ipv6_;
+    std::optional<BoundSocket> bound_ipv6_;
 
 public:
     // depends-on: settings_, announcer_udp_, global_ip_cache_

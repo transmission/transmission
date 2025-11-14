@@ -828,24 +828,14 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const addr = bind_address(TR_AF_INET);
-            bound_ipv4_ = std::make_unique<BoundSocket>(
-                *this,
-                addr,
-                local_peer_port_,
-                &tr_session::onIncomingPeerConnection,
-                this);
+            bound_ipv4_.emplace(*this, addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const addr = bind_address(TR_AF_INET6);
-            bound_ipv6_ = std::make_unique<BoundSocket>(
-                *this,
-                addr,
-                local_peer_port_,
-                &tr_session::onIncomingPeerConnection,
-                this);
+            bound_ipv6_.emplace(*this, addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
     }
