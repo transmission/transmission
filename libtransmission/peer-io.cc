@@ -27,7 +27,6 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-io-event-handler.h"
 #include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
 #include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
@@ -168,8 +167,8 @@ tr_peerIo::~tr_peerIo()
 
     clear_callbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
-    event_disable(libtransmission::PeerIoEventHandler::EventType::READ);
-    event_disable(libtransmission::PeerIoEventHandler::EventType::WRITE);
+    set_read_enabled(false);
+    set_write_enabled(false);
     close();
 }
 
@@ -183,14 +182,12 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        event_handler_ = std::make_unique<libtransmission::PeerIoEventHandler>(
-            this,
-            session_->socketEventHandlerMaker().create_read(
-                socket_.handle.tcp,
-                [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); }),
-            session_->socketEventHandlerMaker().create_write(
-                socket_.handle.tcp,
-                [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); }));
+        read_event_handler_ = session_->socketEventHandlerMaker().create_read(
+            socket_.handle.tcp,
+            [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); });
+        write_event_handler_ = session_->socketEventHandlerMaker().create_write(
+            socket_.handle.tcp,
+            [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); });
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -207,11 +204,8 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 void tr_peerIo::close()
 {
     socket_.close();
-    if (event_handler_)
-    {
-        event_handler_->close();
-        event_handler_.reset();
-    }
+    read_event_handler_.reset();
+    write_event_handler_.reset();
     inbuf_.clear();
     outbuf_.clear();
     outbuf_info_.clear();
@@ -233,11 +227,12 @@ bool tr_peerIo::reconnect()
     TR_ASSERT(session_->allowsTCP());
 
     // Save event state
-    bool const read_was_enabled = event_handler_ && event_handler_->is_read_enabled();
-    bool const write_was_enabled = event_handler_ && event_handler_->is_write_enabled();
+    bool const read_was_enabled = read_pending_;
+    bool const write_was_enabled = write_pending_;
 
-    event_disable(libtransmission::PeerIoEventHandler::EventType::READ);
-    event_disable(libtransmission::PeerIoEventHandler::EventType::WRITE);
+    set_read_enabled(false);
+    set_write_enabled(false);
+
     close();
 
     auto const s = tr_net_open_peer_socket(session_, socket_address(), client_is_seed());
@@ -248,14 +243,8 @@ bool tr_peerIo::reconnect()
     set_socket({ session_, socket_address(), s });
 
     // Restore event state
-    if (read_was_enabled)
-    {
-        event_enable(libtransmission::PeerIoEventHandler::EventType::READ);
-    }
-    if (write_was_enabled)
-    {
-        event_enable(libtransmission::PeerIoEventHandler::EventType::WRITE);
-    }
+    set_read_enabled(read_was_enabled);
+    set_write_enabled(write_was_enabled);
 
     return true;
 }
@@ -342,6 +331,8 @@ void tr_peerIo::handle_write_ready()
     tr_logAddTraceIo(this, "socket is ready for writing");
 
     TR_ASSERT(socket_.is_tcp());
+
+    write_pending_ = false;
 
     // Write as much as possible. Since the socket is non-blocking,
     // write() will return if it can't write any more without blocking
@@ -463,6 +454,8 @@ void tr_peerIo::handle_read_ready()
 
     TR_ASSERT(socket_.is_tcp());
 
+    read_pending_ = false;
+
     // if we don't have any bandwidth left, stop reading
     auto const n_used = std::size(inbuf_);
     auto const n_left = n_used >= MaxLen ? 0U : MaxLen - n_used;
@@ -471,41 +464,91 @@ void tr_peerIo::handle_read_ready()
 
 // ---
 
-void tr_peerIo::event_enable(libtransmission::PeerIoEventHandler::EventType event)
+void tr_peerIo::set_enabled(bool read, bool write)
 {
     TR_ASSERT(session_ != nullptr);
 
-    if (!event_handler_ || !socket_.is_tcp())
+    bool const need_events = socket_.is_tcp();
+    TR_ASSERT(!need_events || read_event_handler_);
+    TR_ASSERT(!need_events || write_event_handler_);
+
+    if (read && !read_pending_)
     {
-        return; // UTP handles events differently
+        tr_logAddTraceIo(this, "enabling ready-to-read polling");
+
+        if (need_events)
+        {
+            read_event_handler_->start();
+        }
+
+        read_pending_ = true;
     }
 
-    if (event == libtransmission::PeerIoEventHandler::EventType::READ)
+    if (write && !write_pending_)
     {
-        event_handler_->enable_read();
-    }
+        tr_logAddTraceIo(this, "enabling ready-to-write polling");
 
-    if (event == libtransmission::PeerIoEventHandler::EventType::WRITE)
-    {
-        event_handler_->enable_write();
+        if (need_events)
+        {
+            write_event_handler_->start();
+        }
+
+        write_pending_ = true;
     }
 }
 
-void tr_peerIo::event_disable(libtransmission::PeerIoEventHandler::EventType event)
+void tr_peerIo::set_disabled(bool read, bool write)
 {
-    if (!event_handler_ || !socket_.is_tcp())
+    bool const need_events = socket_.is_tcp();
+    TR_ASSERT(!need_events || read_event_handler_);
+    TR_ASSERT(!need_events || write_event_handler_);
+
+    if (read && read_pending_)
     {
-        return; // UTP handles events differently
+        tr_logAddTraceIo(this, "disabling ready-to-read polling");
+
+        if (need_events)
+        {
+            read_event_handler_->stop();
+        }
+
+        read_pending_ = false;
     }
 
-    if (event == libtransmission::PeerIoEventHandler::EventType::READ)
+    if (write && write_pending_)
     {
-        event_handler_->disable_read();
-    }
+        tr_logAddTraceIo(this, "disabling ready-to-write polling");
 
-    if (event == libtransmission::PeerIoEventHandler::EventType::WRITE)
+        if (need_events)
+        {
+            write_event_handler_->stop();
+        }
+
+        write_pending_ = false;
+    }
+}
+
+void tr_peerIo::set_read_enabled(bool is_enabled)
+{
+    if (is_enabled)
     {
-        event_handler_->disable_write();
+        set_enabled(true, false);
+    }
+    else
+    {
+        set_disabled(true, false);
+    }
+}
+
+void tr_peerIo::set_write_enabled(bool is_enabled)
+{
+    if (is_enabled)
+    {
+        set_enabled(false, true);
+    }
+    else
+    {
+        set_disabled(false, true);
     }
 }
 
@@ -513,16 +556,14 @@ void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    auto const event = dir == TR_UP ? libtransmission::PeerIoEventHandler::EventType::WRITE :
-                                      libtransmission::PeerIoEventHandler::EventType::READ;
-
-    if (is_enabled)
+    if (dir == TR_DOWN)
     {
-        event_enable(event);
+        set_read_enabled(is_enabled);
     }
-    else
+
+    if (dir == TR_UP)
     {
-        event_disable(event);
+        set_write_enabled(is_enabled);
     }
 }
 
@@ -642,7 +683,7 @@ void tr_peerIo::on_utp_state_change(int state)
         tr_logAddTraceIo(this, "utp_on_state_change -- changed to writable");
 
         // For UTP, always try to write when the state changes to writable
-        if (event_handler_ && event_handler_->is_write_enabled())
+        if (write_pending_)
         {
             try_write(SIZE_MAX);
         }
