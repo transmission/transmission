@@ -799,6 +799,11 @@ else()
     endif()
 endif()
 
+set(TR_WIN32_LIBRARIES)
+if(WIN32)
+    list(APPEND TR_WIN32_LIBRARIES userenv dbghelp)
+endif()
+
 if(RUN_CLANG_TIDY STREQUAL "AUTO" AND (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR})) # skip clang-tidy on LGTM/appveyor
     set(RUN_CLANG_TIDY OFF)
 endif()
