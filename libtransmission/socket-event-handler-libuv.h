@@ -9,12 +9,16 @@ namespace libtransmission
 {
 
 template<SocketEventType EventType>
-class SocketEventHandlerLibuv : public SocketEventHandler<EventType>
+class SocketEventHandlerLibuv final : public SocketEventHandler<EventType>
 {
 public:
     using Callback = typename SocketEventHandler<EventType>::Callback;
 
     SocketEventHandlerLibuv(struct uv_loop_s* loop, tr_socket_t socket, Callback callback);
+    SocketEventHandlerLibuv(SocketEventHandlerLibuv&&) = delete;
+    SocketEventHandlerLibuv(SocketEventHandlerLibuv const&) = delete;
+    SocketEventHandlerLibuv operator=(SocketEventHandlerLibuv&&) = delete;
+    SocketEventHandlerLibuv operator=(SocketEventHandlerLibuv const&) = delete;
     ~SocketEventHandlerLibuv() override;
     void start() override;
     void stop() override;
