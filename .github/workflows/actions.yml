@@ -676,6 +676,7 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_UV=OFF \
             -DUSE_SYSTEM_DEFLATE=OFF \
             -DUSE_SYSTEM_DHT=OFF \
             -DUSE_SYSTEM_MINIUPNPC=OFF \
