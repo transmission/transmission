@@ -284,7 +284,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         return;
     }
     else if (
-        addrport && !addrport->address().is_ipv4_loopback_address() && !addrport->address().is_ipv6_loopback_address() &&
+        addrport && !addrport->address().is_ipv4_loopback() && !addrport->address().is_ipv6_loopback() &&
         !session_.source_address(tr_af_to_ip_protocol(to->sa_family)))
     {
         // don't try to send if we don't have a route in this IP protocol

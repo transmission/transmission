@@ -551,7 +551,7 @@ private:
 
         // N.B. getaddrinfo() will return IPv4-mapped addresses by default on macOS
         auto socket_address = tr_socket_address::from_sockaddr(info->ai_addr);
-        if (!socket_address || socket_address->address().is_ipv4_mapped_address())
+        if (!socket_address || socket_address->address().is_ipv6_ipv4_mapped())
         {
             logdbg(
                 log_name(),
