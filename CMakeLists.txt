@@ -533,7 +533,7 @@ if(NOT TARGET libevent::core)
     add_library(libevent::extra ALIAS event_extra)
 endif()
 
-if(ANDROID)
+if(ANDROID OR APPLE)
     set(LIBUV_LIB_NAME uv)
 else()
     set(LIBUV_LIB_NAME libuv)
