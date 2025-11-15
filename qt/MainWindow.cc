@@ -163,7 +163,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_Delete->setIcon(icons.getThemeIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon));
     ui_.action_StartAll->setIcon(icon_play);
     ui_.action_PauseAll->setIcon(icon_pause);
-    ui_.action_Quit->setIcon(icons.getThemeIcon(QStringLiteral("application-exit")));
     ui_.action_SelectAll->setIcon(icons.getThemeIcon(QStringLiteral("edit-select-all")));
     ui_.action_Preferences->setIcon(icons.getThemeIcon(QStringLiteral("preferences-system")));
     ui_.action_Contents->setIcon(icons.getThemeIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));

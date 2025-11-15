@@ -2,7 +2,6 @@
 <RCC version="1.0">
   <qresource prefix="/icons/Faenza">
     <file>index.theme</file>
-    <file>actions/16/application-exit.png</file>
     <file>actions/16/dialog-ok.png</file>
     <file>actions/16/document-new.png</file>
     <file>actions/16/document-open.png</file>
@@ -22,7 +21,6 @@
     <file>actions/16/process-stop.png</file>
     <file>actions/16/system-run.png</file>
     <file>actions/16/view-refresh.png</file>
-    <file>actions/22/application-exit.png</file>
     <file>actions/22/dialog-ok.png</file>
     <file>actions/22/document-new.png</file>
     <file>actions/22/document-open.png</file>
@@ -42,7 +40,6 @@
     <file>actions/22/process-stop.png</file>
     <file>actions/22/system-run.png</file>
     <file>actions/22/view-refresh.png</file>
-    <file>actions/24/application-exit.png</file>
     <file>actions/24/dialog-ok.png</file>
     <file>actions/24/document-new.png</file>
     <file>actions/24/document-open.png</file>
