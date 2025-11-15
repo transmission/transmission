@@ -81,19 +81,34 @@ public:
 };
 #endif
 
-    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("play.fill"), QStringLiteral("e768"), QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay }), tr("Active") };
+    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("play.fill"),
+                                               QStringLiteral("e768"),
+                                               QStringLiteral("media-playback-start"),
+                                               QStyle::SP_MediaPlay }),
+                             tr("Active") };
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("chevron.up"), QStringLiteral("e70e"), QStringLiteral("go-up"), QStyle::SP_ArrowUp }), tr("Seeding") };
+    row = new QStandardItem{
+        NativeIcon::get({ QStringLiteral("chevron.up"), QStringLiteral("e70e"), QStringLiteral("go-up"), QStyle::SP_ArrowUp }),
+        tr("Seeding")
+    };
     row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("chevron.down"), QStringLiteral("e70d"), QStringLiteral("go-down"), QStyle::SP_ArrowUp }), tr("Downloading") };
+    row = new QStandardItem{
+        NativeIcon::get(
+            { QStringLiteral("chevron.down"), QStringLiteral("e70d"), QStringLiteral("go-down"), QStyle::SP_ArrowUp }),
+        tr("Downloading")
+    };
     row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("pause.fill"), QStringLiteral("e769"), QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause }), tr("Paused") };
+    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("pause.fill"),
+                                               QStringLiteral("e769"),
+                                               QStringLiteral("media-playback-pause"),
+                                               QStyle::SP_MediaPause }),
+                             tr("Paused") };
     row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
 
@@ -101,11 +116,19 @@ public:
     row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("arrow.clockwise"), QStringLiteral("e72c"), QStringLiteral("view-refresh"), QStyle::SP_BrowserReload }), tr("Verifying") };
+    row = new QStandardItem{ NativeIcon::get({ QStringLiteral("arrow.clockwise"),
+                                               QStringLiteral("e72c"),
+                                               QStringLiteral("view-refresh"),
+                                               QStyle::SP_BrowserReload }),
+                             tr("Verifying") };
     row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ NativeIcon::get({ tr("xmark.circle"), QStringLiteral("eb90"), QStringLiteral("dialog-error"), QStyle::SP_MessageBoxWarning }), tr("Error") };
+    row = new QStandardItem{
+        NativeIcon::get(
+            { tr("xmark.circle"), QStringLiteral("eb90"), QStringLiteral("dialog-error"), QStyle::SP_MessageBoxWarning }),
+        tr("Error")
+    };
     row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);
 

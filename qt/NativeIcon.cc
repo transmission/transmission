@@ -34,7 +34,7 @@ QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
     if (codepointHex.isEmpty())
         return {};
 
-    const QChar glyph = parseCodepoint(codepointHex);
+    QChar const glyph = parseCodepoint(codepointHex);
     if (glyph.isNull())
         return {};
 
@@ -45,18 +45,19 @@ QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
 
     // Try Fluent first
     font.setFamily("Segoe Fluent Icons");
-    if (!QFontInfo(font).exactMatch()) {
+    if (!QFontInfo(font).exactMatch())
+    {
         font.setFamily("Segoe MDL2 Assets");
     }
 
     auto const dpr = qApp->primaryScreen()->devicePixelRatio();
     auto const px = qRound(pointSize * dpr) + 8; // padding
-    QPixmap pm{px, px};
+    QPixmap pm{ px, px };
     pm.setDevicePixelRatio(dpr);
     pm.fill(Qt::transparent);
 
     auto const fg = qApp->palette().color(QPalette::ButtonText);
-    QPainter p{&pm};
+    QPainter p{ &pm };
     p.setRenderHint(QPainter::Antialiasing, true);
     p.setPen(Qt::NoPen);
     p.setBrush(fg);
@@ -67,27 +68,27 @@ QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
     p.drawText(r, Qt::AlignCenter, QString(glyph));
     p.end();
 
-    return QIcon{pm};
+    return QIcon{ pm };
 }
-# endif  // Q_OS_WIN
+#endif // Q_OS_WIN
 
-}  // namespace
+} // namespace
 
 QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    auto constexpr auto IconMetrics = std::array<QStyle::PixelMetric, 7U>{{
-        QStyle::PM_ButtonIconSize
-        QStyle::PM_LargeIconSize,
+    auto constexpr auto IconMetrics = std::array<QStyle::PixelMetric, 7U>{ {
+        QStyle::PM_ButtonIconSize QStyle::PM_LargeIconSize,
         QStyle::PM_ListViewIconSize,
         QStyle::PM_MessageBoxIconSize,
         QStyle::PM_SmallIconSize,
         QStyle::PM_TabBarIconSize,
         QStyle::PM_ToolBarIconSize,
-    }};
+    } };
 
     auto dipSizes = std::set<QSize>{};
-    for (auto const pm : IconMetrics) {
+    for (auto const pm : IconMetrics)
+    {
         auto const dip = style->pixelMetric(pm);
         dipSizes.emplace(dip, dip);
     }
@@ -99,7 +100,8 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 #endif
 
 #if defined(Q_OS_WIN)
-    if (!spec.fluentCodepoint.isEmpty()) {
+    if (!spec.fluentCodepoint.isEmpty())
+    {
         auto icon = QIcon{};
         for (auto const dipSize : dipSizes)
             if (auto pixmap = makeFluentIcon(spec.fluentCodepoint, dipSize); !pixmap.isNull())
@@ -109,17 +111,23 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
     }
 #endif
 
-    if (!spec.fdoName.isEmpty()) {
-        if (auto icon = QIcon::fromTheme(spec.fdoName + QStringLiteral("-symbolic")); !icon.isNull()) {
+    if (!spec.fdoName.isEmpty())
+    {
+        if (auto icon = QIcon::fromTheme(spec.fdoName + QStringLiteral("-symbolic")); !icon.isNull())
+        {
             std::cerr << "using fdo" << std::endl;
             return icon;
-        } else {
+        }
+        else
+        {
             std::cerr << "QIcon::fromTheme(" << qPrintable(spec.fdoName) << ") returned empty" << std::endl;
         }
     }
 
-    if (spec.fallback) {
-        if (auto icon = style->standardIcon(*spec.fallback); !icon.isNull()) {
+    if (spec.fallback)
+    {
+        if (auto icon = style->standardIcon(*spec.fallback); !icon.isNull())
+        {
             std::cerr << "Qt Standard Icon" << std::endl;
             return icon;
         }
