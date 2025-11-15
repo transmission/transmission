@@ -768,6 +768,13 @@ void start_server(tr_rpc_server* server)
     }
 
     auto* const base = server->session->event_base();
+
+    if (base == nullptr)
+    {
+        tr_logAddError("Couldn't start RPC server: event base is null");
+        return;
+    }
+
     auto* const httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
