@@ -6,6 +6,7 @@
 #pragma once
 
 #include <optional>
+#include <string_view>
 
 #include <QApplication>
 #include <QFont>
@@ -17,8 +18,22 @@ struct NativeIcon
 public:
     struct Spec
     {
+        Spec(
+            QString sf_in,
+            QString fluent_in,
+            QString fdo_in,
+            std::optional<QStyle::StandardPixmap> fallback_in,
+            QFont::Weight weight_in = QFont::Normal);
+
+        Spec(
+            std::string_view const sf_in,
+            std::string_view const fluent_in,
+            std::string_view const fdo_in,
+            std::optional<QStyle::StandardPixmap> fallback_in,
+            QFont::Weight weight_in = QFont::Normal);
+
         // https://developer.apple.com/sf-symbols
-        // https://github.com/andrewtavis/sf-symbols-online
+        // https://hotpot.ai/free-icons
         QString sfSymbolName;
 
         // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
