@@ -389,6 +389,7 @@ public:
         [[nodiscard]] tr_block_span_t block_span(tr_piece_index_t piece) const override;
         [[nodiscard]] tr_piece_index_t piece_count() const override;
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override;
+        [[nodiscard]] bool try_hotswap(tr_block_index_t block, tr_peer const* peer) const override;
 
         [[nodiscard]] libtransmission::ObserverTag observe_files_wanted_changed(
             libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
@@ -1063,6 +1064,76 @@ tr_priority_t tr_swarm::WishlistMediator::priority(tr_piece_index_t piece) const
     return tor_.piece_priority(piece);
 }
 
+bool tr_swarm::WishlistMediator::try_hotswap(tr_block_index_t block, tr_peer const* peer) const
+{
+    /* Define slow and fast speed thresholds
+     * Values are extracted from webtorrent.
+     * We will consider hotswapping:
+     * - if the current peer is faster than slow threshold
+     * - if the current block is requested by a peer slower than fast threshold */
+    static auto slow_speed_threshold = Speed{ tr_block_info::BlockSize, Speed::Units::Byps };
+    static auto fast_speed_threshold = Speed{ tr_block_info::BlockSize * 3, Speed::Units::Byps };
+
+    if (peer == nullptr)
+    {
+        return false;
+    }
+
+    auto const now_msec = tr_time_msec();
+    auto const peer_speed = peer->get_piece_speed(now_msec, TR_PEER_TO_CLIENT);
+
+    // If peer is very slow, don't bother hotswapping
+    if (peer_speed < slow_speed_threshold)
+    {
+        return false;
+    }
+
+    tr_peerMsgs* victim = nullptr;
+    auto victim_speed = Speed{};
+
+    // Find the slowest peer (victim) that has this requested block
+    for (auto* const p : swarm_.peers)
+    {
+        if (p == peer || !p->active_requests.test(block))
+        {
+            continue;
+        }
+
+        auto const p_speed = p->get_piece_speed(now_msec, TR_PEER_TO_CLIENT);
+        // Don't hotswap if one peer is already fast enough
+        if (p_speed >= fast_speed_threshold)
+        {
+            return false;
+        }
+
+        if (victim == nullptr || p_speed < victim_speed)
+        {
+            victim = p;
+            victim_speed = p_speed;
+        }
+    }
+
+    // If we didn't find a victim, or if the new peer isn't
+    // significantly faster, don't hotswap.
+    if (victim == nullptr || peer_speed <= (victim_speed * 2))
+    {
+        return false;
+    }
+
+    tr_logAddDebug(fmt::format(
+        "Hotswapping block {} from slow peer {} ({} KB/s) to faster peer {} ({} KB/s)",
+        block,
+        victim->display_name(),
+        victim_speed.count(Speed::Units::KByps),
+        peer->display_name(),
+        peer_speed.count(Speed::Units::KByps)));
+
+    // hotswap
+    victim->maybe_cancel_block_request(block);
+
+    return true;
+}
+
 libtransmission::ObserverTag tr_swarm::WishlistMediator::observe_files_wanted_changed(
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool>::Observer observer)
 {
@@ -1323,7 +1394,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     {
         return {};
     }
-    return swarm.wishlist->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); });
+    return swarm.wishlist->next(peer, numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); });
 }
 
 namespace
