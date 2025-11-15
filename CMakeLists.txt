@@ -518,7 +518,12 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library(UV libuv libuv
+if(ANDROID)
+    set(LIBUV_LIB_NAME uv)
+else()
+    set(LIBUV_LIB_NAME libuv)
+endif()
+tr_add_external_auto_library(UV libuv ${LIBUV_LIB_NAME}
     TARGET libuv::libuv
     CMAKE_ARGS
         -DLIBUV_BUILD_SHARED=OFF)
