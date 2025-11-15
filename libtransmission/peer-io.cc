@@ -184,10 +184,22 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
     {
         read_event_handler_ = session_->socketEventHandlerMaker().create_read(
             socket_.handle.tcp,
-            [this]([[maybe_unused]] tr_socket_t socket) { handle_read_ready(); });
+            [weak = this->weak_from_this()]([[maybe_unused]] tr_socket_t socket)
+            {
+                if (auto io = weak.lock())
+                {
+                    io->handle_read_ready();
+                }
+            });
         write_event_handler_ = session_->socketEventHandlerMaker().create_write(
             socket_.handle.tcp,
-            [this]([[maybe_unused]] tr_socket_t socket) { handle_write_ready(); });
+            [weak = this->weak_from_this()]([[maybe_unused]] tr_socket_t socket)
+            {
+                if (auto io = weak.lock())
+                {
+                    io->handle_write_ready();
+                }
+            });
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
