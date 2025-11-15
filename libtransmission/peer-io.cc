@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <type_traits> // std::underlying_type_t
 
 #ifdef _WIN32
@@ -13,8 +14,6 @@
 #else
 #include <arpa/inet.h> // ntohl, ntohs
 #endif
-
-#include <event2/event.h>
 
 #include <libutp/utp.h>
 
@@ -168,7 +167,8 @@ tr_peerIo::~tr_peerIo()
 
     clear_callbacks();
     tr_logAddTraceIo(this, "in tr_peerIo destructor");
-    event_disable(EV_READ | EV_WRITE);
+    set_read_enabled(false);
+    set_write_enabled(false);
     close();
 }
 
@@ -182,8 +182,24 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
-        event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, &tr_peerIo::event_write_cb, this));
+        read_event_handler_ = session_->socketEventHandlerMaker().create_read(
+            socket_.handle.tcp,
+            [weak = this->weak_from_this()]([[maybe_unused]] tr_socket_t socket)
+            {
+                if (auto io = weak.lock())
+                {
+                    io->handle_read_ready();
+                }
+            });
+        write_event_handler_ = session_->socketEventHandlerMaker().create_write(
+            socket_.handle.tcp,
+            [weak = this->weak_from_this()]([[maybe_unused]] tr_socket_t socket)
+            {
+                if (auto io = weak.lock())
+                {
+                    io->handle_write_ready();
+                }
+            });
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -200,8 +216,8 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 void tr_peerIo::close()
 {
     socket_.close();
-    event_write_.reset();
-    event_read_.reset();
+    read_event_handler_.reset();
+    write_event_handler_.reset();
     inbuf_.clear();
     outbuf_.clear();
     outbuf_info_.clear();
@@ -222,8 +238,12 @@ bool tr_peerIo::reconnect()
     TR_ASSERT(!is_incoming());
     TR_ASSERT(session_->allowsTCP());
 
-    auto const pending_events = pending_events_;
-    event_disable(EV_READ | EV_WRITE);
+    // Save event state
+    bool const read_was_enabled = read_pending_;
+    bool const write_was_enabled = write_pending_;
+
+    set_read_enabled(false);
+    set_write_enabled(false);
 
     close();
 
@@ -234,7 +254,9 @@ bool tr_peerIo::reconnect()
     }
     set_socket({ session_, socket_address(), s });
 
-    event_enable(pending_events);
+    // Restore event state
+    set_read_enabled(read_was_enabled);
+    set_write_enabled(write_was_enabled);
 
     return true;
 }
@@ -316,19 +338,17 @@ size_t tr_peerIo::try_write(size_t max)
     return n_written;
 }
 
-void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*event*/, void* vio)
+void tr_peerIo::handle_write_ready()
 {
-    auto* const io = static_cast<tr_peerIo*>(vio);
-    tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
+    tr_logAddTraceIo(this, "socket is ready for writing");
 
-    TR_ASSERT(io->socket_.is_tcp());
-    TR_ASSERT(io->socket_.handle.tcp == fd);
+    TR_ASSERT(socket_.is_tcp());
 
-    io->pending_events_ &= ~EV_WRITE;
+    write_pending_ = false;
 
     // Write as much as possible. Since the socket is non-blocking,
     // write() will return if it can't write any more without blocking
-    io->try_write(SIZE_MAX);
+    try_write(SIZE_MAX);
 }
 
 // ---
@@ -438,87 +458,109 @@ size_t tr_peerIo::try_read(size_t max)
     return n_read;
 }
 
-void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event*/, void* vio)
+void tr_peerIo::handle_read_ready()
 {
     static auto constexpr MaxLen = RcvBuf;
 
-    auto* const io = static_cast<tr_peerIo*>(vio);
-    tr_logAddTraceIo(io, "libevent says this peer socket is ready for reading");
+    tr_logAddTraceIo(this, "socket is ready for reading");
 
-    TR_ASSERT(io->socket_.is_tcp());
-    TR_ASSERT(io->socket_.handle.tcp == fd);
+    TR_ASSERT(socket_.is_tcp());
 
-    io->pending_events_ &= ~EV_READ;
+    read_pending_ = false;
 
     // if we don't have any bandwidth left, stop reading
-    auto const n_used = std::size(io->inbuf_);
+    auto const n_used = std::size(inbuf_);
     auto const n_left = n_used >= MaxLen ? 0U : MaxLen - n_used;
-    io->try_read(n_left);
+    try_read(n_left);
 }
 
 // ---
 
-void tr_peerIo::event_enable(short event)
+void tr_peerIo::set_enabled(bool read, bool write)
 {
     TR_ASSERT(session_ != nullptr);
 
     bool const need_events = socket_.is_tcp();
-    TR_ASSERT(!need_events || event_read_);
-    TR_ASSERT(!need_events || event_write_);
+    TR_ASSERT(!need_events || read_event_handler_);
+    TR_ASSERT(!need_events || write_event_handler_);
 
-    if ((event & EV_READ) != 0 && (pending_events_ & EV_READ) == 0)
+    if (read && !read_pending_)
     {
         tr_logAddTraceIo(this, "enabling ready-to-read polling");
 
         if (need_events)
         {
-            event_add(event_read_.get(), nullptr);
+            read_event_handler_->start();
         }
 
-        pending_events_ |= EV_READ;
+        read_pending_ = true;
     }
 
-    if ((event & EV_WRITE) != 0 && (pending_events_ & EV_WRITE) == 0)
+    if (write && !write_pending_)
     {
         tr_logAddTraceIo(this, "enabling ready-to-write polling");
 
         if (need_events)
         {
-            event_add(event_write_.get(), nullptr);
+            write_event_handler_->start();
         }
 
-        pending_events_ |= EV_WRITE;
+        write_pending_ = true;
     }
 }
 
-void tr_peerIo::event_disable(short event)
+void tr_peerIo::set_disabled(bool read, bool write)
 {
     bool const need_events = socket_.is_tcp();
-    TR_ASSERT(!need_events || event_read_);
-    TR_ASSERT(!need_events || event_write_);
+    TR_ASSERT(!need_events || read_event_handler_);
+    TR_ASSERT(!need_events || write_event_handler_);
 
-    if ((event & EV_READ) != 0 && (pending_events_ & EV_READ) != 0)
+    if (read && read_pending_)
     {
         tr_logAddTraceIo(this, "disabling ready-to-read polling");
 
         if (need_events)
         {
-            event_del(event_read_.get());
+            read_event_handler_->stop();
         }
 
-        pending_events_ &= ~EV_READ;
+        read_pending_ = false;
     }
 
-    if ((event & EV_WRITE) != 0 && (pending_events_ & EV_WRITE) != 0)
+    if (write && write_pending_)
     {
         tr_logAddTraceIo(this, "disabling ready-to-write polling");
 
         if (need_events)
         {
-            event_del(event_write_.get());
+            write_event_handler_->stop();
         }
 
-        pending_events_ &= ~EV_WRITE;
+        write_pending_ = false;
+    }
+}
+
+void tr_peerIo::set_read_enabled(bool is_enabled)
+{
+    if (is_enabled)
+    {
+        set_enabled(true, false);
+    }
+    else
+    {
+        set_disabled(true, false);
+    }
+}
+
+void tr_peerIo::set_write_enabled(bool is_enabled)
+{
+    if (is_enabled)
+    {
+        set_enabled(false, true);
+    }
+    else
+    {
+        set_disabled(false, true);
     }
 }
 
@@ -526,15 +568,14 @@ void tr_peerIo::set_enabled(tr_direction dir, bool is_enabled)
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    short const event = dir == TR_UP ? EV_WRITE : EV_READ;
-
-    if (is_enabled)
+    if (dir == TR_DOWN)
     {
-        event_enable(event);
+        set_read_enabled(is_enabled);
     }
-    else
+
+    if (dir == TR_UP)
     {
-        event_disable(event);
+        set_write_enabled(is_enabled);
     }
 }
 
@@ -653,7 +694,8 @@ void tr_peerIo::on_utp_state_change(int state)
     {
         tr_logAddTraceIo(this, "utp_on_state_change -- changed to writable");
 
-        if ((pending_events_ & EV_WRITE) != 0)
+        // For UTP, always try to write when the state changes to writable
+        if (write_pending_)
         {
             try_write(SIZE_MAX);
         }

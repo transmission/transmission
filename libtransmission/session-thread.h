@@ -14,6 +14,7 @@
 #include <utility>
 
 struct event_base;
+struct uv_loop_s;
 
 class tr_session_thread
 {
@@ -21,9 +22,11 @@ public:
     static void tr_evthread_init();
 
     static std::unique_ptr<tr_session_thread> create();
+    static std::unique_ptr<tr_session_thread> create_libuv();
     virtual ~tr_session_thread() = default;
 
     [[nodiscard]] virtual struct event_base* event_base() noexcept = 0;
+    [[nodiscard]] virtual struct uv_loop_s* uv_loop() noexcept = 0;
 
     [[nodiscard]] virtual bool am_in_session_thread() const noexcept = 0;
 
