@@ -95,8 +95,12 @@ private:
     class BoundSocket
     {
     public:
-        using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(tr_session& session, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        using IncomingCallback = std::function<void(tr_socket_t)>;
+        BoundSocket(
+            libtransmission::SocketEventHandlerMaker& socket_event_handler_maker,
+            tr_address const& addr,
+            tr_port port,
+            IncomingCallback cb);
         BoundSocket(BoundSocket&&) = delete;
         BoundSocket(BoundSocket const&) = delete;
         BoundSocket operator=(BoundSocket&&) = delete;
@@ -105,7 +109,6 @@ private:
 
     private:
         IncomingCallback cb_;
-        void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
         std::unique_ptr<libtransmission::SocketReadEventHandler> event_handler_;
     };
@@ -1202,7 +1205,7 @@ private:
     void on_queue_timer();
     void on_save_timer();
 
-    static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
+    void onIncomingPeerConnection(tr_socket_t fd);
 
     friend class libtransmission::test::SessionTest;
 

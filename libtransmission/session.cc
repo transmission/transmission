@@ -392,26 +392,22 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 
 // ---
 
-void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
+void tr_session::onIncomingPeerConnection(tr_socket_t fd)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
-    if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
+    if (auto const incoming_info = tr_netAccept(this, fd); incoming_info)
     {
         auto const& [socket_address, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, socket_address.display_name()));
-        session->addIncoming({ session, socket_address, sock });
+        addIncoming({ this, socket_address, sock });
     }
 }
 
 tr_session::BoundSocket::BoundSocket(
-    tr_session& session,
+    libtransmission::SocketEventHandlerMaker& socket_event_handler_maker,
     tr_address const& addr,
     tr_port port,
-    IncomingCallback cb,
-    void* cb_data)
-    : cb_{ cb }
-    , cb_data_{ cb_data }
+    IncomingCallback cb)
+    : cb_{ std::move(cb) }
     , socket_(tr_netBindTCP(addr, port, false))
 {
     if (socket_ == TR_BAD_SOCKET)
@@ -423,9 +419,7 @@ tr_session::BoundSocket::BoundSocket(
         fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
 
-    event_handler_ = session.socketEventHandlerMaker().create_read(
-        socket_,
-        [this](tr_socket_t socket) { cb_(socket, cb_data_); });
+    event_handler_ = socket_event_handler_maker.create_read(socket_, [this](tr_socket_t socket) { cb_(socket); });
     event_handler_->start();
 }
 
@@ -828,14 +822,22 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const addr = bind_address(TR_AF_INET);
-            bound_ipv4_.emplace(*this, addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv4_.emplace(
+                socketEventHandlerMaker(),
+                addr,
+                local_peer_port_,
+                [this](tr_socket_t socket) { onIncomingPeerConnection(socket); });
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const addr = bind_address(TR_AF_INET6);
-            bound_ipv6_.emplace(*this, addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv6_.emplace(
+                socketEventHandlerMaker(),
+                addr,
+                local_peer_port_,
+                [this](tr_socket_t socket) { onIncomingPeerConnection(socket); });
             addr_changed = true;
         }
     }
