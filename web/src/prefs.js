@@ -113,6 +113,7 @@ Prefs.FilterPaused = 'paused';
 Prefs.FilterPrivate = 'private';
 Prefs.FilterPublic = 'public';
 Prefs.FilterSeeding = 'seeding';
+Prefs.LimitWidth = 'limit-width';
 Prefs.NotificationsEnabled = 'notifications-enabled';
 Prefs.RefreshRate = 'refresh-rate-sec';
 Prefs.SortAscending = 'ascending';
@@ -136,6 +137,7 @@ Prefs._Defaults = {
     ? Prefs.ContrastMore
     : Prefs.ContrastLess,
   [Prefs.FilterMode]: Prefs.FilterAll,
+  [Prefs.LimitWidth]: false,
   [Prefs.NotificationsEnabled]: false,
   [Prefs.RefreshRate]: 5,
   [Prefs.SortDirection]: Prefs.SortAscending,
