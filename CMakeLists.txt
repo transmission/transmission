@@ -533,8 +533,13 @@ if(NOT TARGET libevent::core)
     add_library(libevent::extra ALIAS event_extra)
 endif()
 
+if(ANDROID)
+    set(LIBUV_LIB_NAME uv)
+else()
+    set(LIBUV_LIB_NAME libuv)
+endif()
 tr_add_external_auto_library(UV libuv
-    LIBNAME libuv
+    LIBNAME ${LIBUV_LIB_NAME}
     TARGET libuv::libuv
     CMAKE_ARGS
         -DLIBUV_BUILD_SHARED=OFF)
