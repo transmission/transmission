@@ -518,7 +518,7 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-if(ANDROID)
+if(ANDROID OR APPLE)
     set(LIBUV_LIB_NAME uv)
 else()
     set(LIBUV_LIB_NAME libuv)
