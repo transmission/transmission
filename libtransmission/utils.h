@@ -247,7 +247,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 
 /** @param ratio    the ratio to convert to a string
     @param infinity the string representation of "infinity" */
-[[nodiscard]] std::string tr_strratio(double ratio, std::string_view infinity);
+[[nodiscard]] std::string tr_strratio(double ratio, std::string_view none, std::string_view infinity);
 
 // ---
 

@@ -168,7 +168,7 @@ struct RemoteConfig
 
 [[nodiscard]] auto strlratio2(double ratio)
 {
-    return tr_strratio(ratio, "Inf");
+    return tr_strratio(ratio, "None", "Inf");
 }
 
 [[nodiscard]] auto strlratio(int64_t numerator, int64_t denominator)
@@ -339,7 +339,12 @@ auto constexpr Options = std::array<tr_option, 106>{ {
     { 991, "no-start-paused", "Start added torrents unpaused", nullptr, Arg::None, nullptr },
     { 992, "trash-torrent", "Delete torrents after adding", nullptr, Arg::None, nullptr },
     { 993, "no-trash-torrent", "Do not delete torrents after adding", nullptr, Arg::None, nullptr },
-    { 994, "sequential-download", "Download the torrent sequentially", "seq", Arg::None, nullptr },
+    { 994,
+      "sequential-download",
+      "Download the torrent sequentially, starting from <piece> or 0",
+      "seq",
+      Arg::Optional,
+      "<piece>" },
     { 995, "no-sequential-download", "Download the torrent normally", "SEQ", Arg::None, nullptr },
     { 984, "honor-session", "Make the current torrent(s) honor the session limits", "hl", Arg::None, nullptr },
     { 985, "no-honor-session", "Make the current torrent(s) not honor the session limits", "HL", Arg::None, nullptr },
@@ -745,7 +750,7 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
 };
 static_assert(FilesKeys[std::size(FilesKeys) - 1] != tr_quark{});
 
-auto constexpr DetailsKeys = std::array<tr_quark, 56>{
+auto constexpr DetailsKeys = std::array<tr_quark, 57>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
@@ -791,6 +796,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 56>{
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
     TR_KEY_sequential_download,
+    TR_KEY_sequential_download_from_piece,
     TR_KEY_sizeWhenDone,
     TR_KEY_source,
     TR_KEY_startDate,
@@ -1016,6 +1022,10 @@ void print_details(tr_variant::Map const& map)
         if (auto b = t->value_if<bool>(TR_KEY_sequential_download); b)
         {
             fmt::print("  Sequential Download: {:s}\n", *b ? "Yes" : "No");
+            if (auto i = t->value_if<int64_t>(TR_KEY_sequential_download_from_piece); i)
+            {
+                fmt::print("  Sequential Download from piece: {:d}\n", *i);
+            }
         }
 
         if (auto d = t->value_if<double>(TR_KEY_percentDone); d)
@@ -3187,6 +3197,10 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             {
             case 994:
                 args.insert_or_assign(TR_KEY_sequential_download, true);
+                if (optarg != nullptr)
+                {
+                    args.insert_or_assign(TR_KEY_sequential_download_from_piece, numarg(optarg_sv));
+                }
                 break;
 
             case 995:

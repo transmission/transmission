@@ -561,11 +561,11 @@ std::string tr_strpercent(double x)
     return fmt::format("{:.0Lf}", x);
 }
 
-std::string tr_strratio(double ratio, std::string_view infinity)
+std::string tr_strratio(double ratio, std::string_view const none, std::string_view const infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
     {
-        return _("None");
+        return std::string{ none };
     }
 
     if ((int)ratio == TR_RATIO_INF)

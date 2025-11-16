@@ -111,7 +111,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 
 Glib::ustring tr_strlratio(double ratio)
 {
-    return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
+    return tr_strratio(ratio, Q_("None"), gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
 Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
