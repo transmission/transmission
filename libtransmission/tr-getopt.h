@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 /**
  * @addtogroup utils Utilities
  * @{
@@ -15,15 +17,27 @@ extern int tr_optind;
 
 struct tr_option
 {
+    enum class Arg : uint8_t
+    {
+        None,
+        Optional,
+        Required
+    };
+
+    [[nodiscard]] constexpr bool has_arg() const noexcept
+    {
+        return arg >= Arg::Optional;
+    }
+
     int val; /* the value to return from tr_getopt() */
     char const* longName; /* --long-form */
     char const* description; /* option's description for tr_getopt_usage() */
     char const* shortName; /* short form */
-    bool has_arg; /* 0 for no argument, 1 for argument */
+    Arg arg; /* See enum class Arg */
     char const* argName; /* argument's description for tr_getopt_usage() */
 };
 
-enum
+enum : int8_t
 {
     /* all options have been processed */
     TR_OPT_DONE = 0,

@@ -37,7 +37,7 @@ protected:
     static auto constexpr DefaultMaxFileCount = size_t{ 16 };
     static auto constexpr DefaultMaxFileSize = size_t{ 1024 };
 
-    auto makeRandomFiles(
+    static auto makeRandomFiles(
         std::string_view top,
         size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int(DefaultMaxFileCount))),
         size_t max_size = DefaultMaxFileSize)

@@ -309,7 +309,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
     {
         //check buttons
         //keep synced with identical code in InfoFileViewController.m
-        NSInteger const filesCheckState = [self.torrent
+        NSControlStateValue const filesCheckState = [self.torrent
             checkForFiles:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.torrent.fileCount)]];
         self.fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
         self.fUncheckAllButton.enabled = !self.torrent.allDownloaded; //if there are any checked files that aren't finished
@@ -352,7 +352,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 {
     [self.torrent update];
 
-    [self.fFileController refresh];
+    [self.fFileController reloadVisibleRows];
 
     [self updateCheckButtons:nil]; //call in case button state changed by checking
 

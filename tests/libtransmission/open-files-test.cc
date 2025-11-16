@@ -10,7 +10,7 @@
 #include <cstdint> // uint64_t
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 

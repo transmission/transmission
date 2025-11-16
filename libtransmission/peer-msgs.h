@@ -38,12 +38,17 @@ public:
     tr_peerMsgs(
         tr_torrent const& tor,
         std::shared_ptr<tr_peer_info> peer_info_in,
-        tr_interned_string user_agent,
+        tr_peer_id_t peer_id,
         bool connection_is_encrypted,
         bool connection_is_incoming,
         bool connection_is_utp);
 
     ~tr_peerMsgs() override;
+
+    tr_peerMsgs(tr_peerMsgs const&) = delete;
+    tr_peerMsgs(tr_peerMsgs&&) = delete;
+    tr_peerMsgs& operator=(tr_peerMsgs const&) = delete;
+    tr_peerMsgs& operator=(tr_peerMsgs&&) = delete;
 
     [[nodiscard]] static auto size() noexcept
     {
@@ -90,6 +95,11 @@ public:
         return user_agent_;
     }
 
+    [[nodiscard]] constexpr auto const& peer_id() const noexcept
+    {
+        return peer_id_;
+    }
+
     [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
     {
         return is_active_[direction];
@@ -120,7 +130,7 @@ public:
         tr_torrent& torrent,
         std::shared_ptr<tr_peer_info> peer_info,
         std::shared_ptr<tr_peerIo> io,
-        tr_interned_string user_agent,
+        tr_peer_id_t peer_id,
         tr_peer_callback_bt callback,
         void* callback_data);
 
@@ -155,6 +165,11 @@ protected:
         user_agent_ = val;
     }
 
+    constexpr void set_peer_id(tr_peer_id_t val) noexcept
+    {
+        peer_id_ = val;
+    }
+
 public:
     std::shared_ptr<tr_peer_info> const peer_info;
 
@@ -164,6 +179,8 @@ private:
     // What software the peer is running.
     // Derived from the `v` string in LTEP's handshake dictionary, when available.
     tr_interned_string user_agent_;
+
+    tr_peer_id_t peer_id_;
 
     bool const connection_is_encrypted_;
     bool const connection_is_incoming_;

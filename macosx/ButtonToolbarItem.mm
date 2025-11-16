@@ -14,6 +14,7 @@
 - (NSMenuItem*)menuFormRepresentation
 {
     NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:self.label action:self.action keyEquivalent:@""];
+    menuItem.image = self.image;
     menuItem.target = self.target;
     menuItem.enabled = [self.target validateToolbarItem:self];
 

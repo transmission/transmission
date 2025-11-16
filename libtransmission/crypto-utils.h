@@ -32,6 +32,7 @@ using tr_sha256_context_t = mbedtls_sha256_context;
 using tr_sha1_context_t = EVP_MD_CTX*;
 using tr_sha256_context_t = EVP_MD_CTX*;
 #elif defined(WITH_WOLFSSL)
+#include <wolfssl/options.h>
 #include <wolfssl/wolfcrypt/sha.h>
 #include <wolfssl/wolfcrypt/sha256.h>
 using tr_sha1_context_t = wc_Sha;
@@ -174,7 +175,7 @@ using tr_sha1_string = tr_strbuf<char, sizeof(tr_sha1_digest_t) * 2U + 1U>;
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
  */
-[[nodiscard]] tr_sha1_string tr_sha1_to_string(tr_sha1_digest_t const&);
+[[nodiscard]] tr_sha1_string tr_sha1_to_string(tr_sha1_digest_t const& digest);
 
 /**
  * @brief Generate a sha1 digest from a hex string.
@@ -186,37 +187,42 @@ using tr_sha256_string = tr_strbuf<char, sizeof(tr_sha256_digest_t) * 2U + 1U>;
 /**
  * @brief Generate an ascii hex string for a sha256 digest.
  */
-[[nodiscard]] tr_sha256_string tr_sha256_to_string(tr_sha256_digest_t const&);
+[[nodiscard]] tr_sha256_string tr_sha256_to_string(tr_sha256_digest_t const& digest);
 
 /**
  * @brief Generate a sha256 digest from a hex string.
  */
 [[nodiscard]] std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
 
+/**
+ * @brief Calculate CRC32-C checksum for a buffer.
+ */
+[[nodiscard]] uint32_t tr_crc32c(uint8_t const* data, size_t count);
+
 // Convenience utility to efficiently get many random small values.
 // Use this instead of making a lot of calls to tr_rand_int().
 template<typename T = uint8_t, size_t N = 1024U>
-class tr_salt_shaker
+class tr_salt_shaker // NOLINT(cppcoreguidelines-pro-type-member-init): buf doesn't need to be initialised
 {
 public:
     [[nodiscard]] auto operator()() noexcept
     {
-        if (pos == std::size(buf))
+        if (pos_ == std::size(buf_))
         {
-            pos = 0U;
+            pos_ = 0U;
         }
 
-        if (pos == 0U)
+        if (pos_ == 0U)
         {
-            tr_rand_buffer(std::data(buf), std::size(buf) * sizeof(T));
+            tr_rand_buffer(std::data(buf_), std::size(buf_) * sizeof(T));
         }
 
-        return buf[pos++];
+        return buf_[pos_++];
     }
 
 private:
-    size_t pos = 0;
-    std::array<T, N> buf;
+    size_t pos_ = 0;
+    std::array<T, N> buf_;
 };
 
 // UniformRandomBitGenerator impl that uses `tr_rand_buffer()`.

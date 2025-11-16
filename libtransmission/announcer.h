@@ -40,7 +40,7 @@ struct tr_torrent_announcer;
 /** @brief Notification object to tell listeners about announce or scrape occurrences */
 struct tr_tracker_event
 {
-    enum class Type
+    enum class Type : uint8_t
     {
         Error,
         ErrorClear,
@@ -70,7 +70,7 @@ using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event con
 class tr_announcer
 {
 public:
-    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp&);
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp& announcer_udp);
     virtual ~tr_announcer() = default;
 
     virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback) = 0;
@@ -87,24 +87,24 @@ std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
 // --- For torrent customers
 
-void tr_announcerChangeMyPort(tr_torrent*);
+void tr_announcerChangeMyPort(tr_torrent* tor);
 
-bool tr_announcerCanManualAnnounce(tr_torrent const*);
+bool tr_announcerCanManualAnnounce(tr_torrent const* tor);
 
-void tr_announcerManualAnnounce(tr_torrent*);
+void tr_announcerManualAnnounce(tr_torrent* tor);
 
-void tr_announcerTorrentCompleted(tr_torrent*);
+void tr_announcerTorrentCompleted(tr_torrent* tor);
 
-enum
+enum : uint8_t
 {
     TR_ANN_UP,
     TR_ANN_DOWN,
     TR_ANN_CORRUPT
 };
 
-void tr_announcerAddBytes(tr_torrent*, int type, uint32_t n_bytes);
+void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes);
 
-time_t tr_announcerNextManualAnnounce(tr_torrent const*);
+time_t tr_announcerNextManualAnnounce(tr_torrent const* tor);
 
 tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t nth);
 
@@ -112,7 +112,7 @@ size_t tr_announcerTrackerCount(tr_torrent const* tor);
 
 // --- ANNOUNCE
 
-enum tr_announce_event
+enum tr_announce_event : uint8_t
 {
     /* Note: the ordering of this enum's values is important to
      * announcer.c's tr_tier.announce_event_priority. If changing
@@ -147,7 +147,7 @@ public:
 
     virtual ~tr_announcer_udp() noexcept = default;
 
-    [[nodiscard]] static std::unique_ptr<tr_announcer_udp> create(Mediator&);
+    [[nodiscard]] static std::unique_ptr<tr_announcer_udp> create(Mediator& mediator);
 
     virtual void announce(tr_announce_request const& request, tr_announce_response_func on_response) = 0;
 

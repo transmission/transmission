@@ -12,7 +12,7 @@
 #include <wolfssl/wolfcrypt/sha256.h>
 #include <wolfssl/version.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 

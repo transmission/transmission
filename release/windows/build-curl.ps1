@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:CurlVersion = '8.4.0'
+$global:CurlVersion = '8.16.0'
 
 $global:CurlDeps = @(
     'OpenSsl'
@@ -33,6 +33,7 @@ function global:Build-Curl([string] $PrefixDir, [string] $Arch, [string] $DepsPr
         '-DCURL_DISABLE_SMTP=ON'
         '-DCURL_DISABLE_TELNET=ON'
         '-DCURL_DISABLE_TFTP=ON'
+        '-DCURL_USE_LIBPSL=OFF'
         '-DCURL_USE_LIBSSH=OFF'
         '-DCURL_USE_LIBSSH2=OFF'
         '-DCURL_USE_OPENSSL=ON'

@@ -88,13 +88,13 @@
 
     if (self.fTorrents.count == 1)
     {
-        [self.fFileController refresh];
+        [self.fFileController reloadVisibleRows];
 
 #warning use TorrentFileCheckChange notification as well
         Torrent* torrent = self.fTorrents[0];
         if (torrent.folder)
         {
-            NSInteger const filesCheckState = [torrent
+            NSControlStateValue const filesCheckState = [torrent
                 checkForFiles:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, torrent.fileCount)]];
             self.fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
             self.fUncheckAllButton.enabled = !torrent.allDownloaded; //if there are any checked files that aren't finished

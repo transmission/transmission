@@ -90,6 +90,11 @@ public:
         maybe_recycle_dh();
     }
 
+    tr_handshake(tr_handshake const&) = delete;
+    tr_handshake(tr_handshake&&) = delete;
+    tr_handshake& operator=(tr_handshake const&) = delete;
+    tr_handshake& operator=(tr_handshake&&) = delete;
+
     // bittorrent handshake constants
     // https://www.bittorrent.org/beps/bep_0003.html#peer-protocol
     // https://wiki.theory.org/BitTorrentSpecification#Handshake
@@ -173,19 +178,19 @@ private:
 
     // ---
 
-    ReadState read_crypto_provide(tr_peerIo*);
-    ReadState read_crypto_select(tr_peerIo*);
-    ReadState read_handshake(tr_peerIo*);
-    ReadState read_ia(tr_peerIo*);
-    ReadState read_pad_a(tr_peerIo*);
-    ReadState read_pad_c(tr_peerIo*);
-    ReadState read_pad_d(tr_peerIo*);
-    ReadState read_peer_id(tr_peerIo*);
-    ReadState read_vc(tr_peerIo*);
-    ReadState read_ya(tr_peerIo*);
-    ReadState read_yb(tr_peerIo*);
+    ReadState read_crypto_provide(tr_peerIo* peer_io);
+    ReadState read_crypto_select(tr_peerIo* peer_io);
+    ReadState read_handshake(tr_peerIo* peer_io);
+    ReadState read_ia(tr_peerIo* peer_io);
+    ReadState read_pad_a(tr_peerIo* peer_io);
+    ReadState read_pad_c(tr_peerIo* peer_io);
+    ReadState read_pad_d(tr_peerIo* peer_io);
+    ReadState read_peer_id(tr_peerIo* peer_io);
+    ReadState read_vc(tr_peerIo* peer_io);
+    ReadState read_ya(tr_peerIo* peer_io);
+    ReadState read_yb(tr_peerIo* peer_io);
 
-    void send_ya(tr_peerIo*);
+    void send_ya(tr_peerIo* io);
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
@@ -228,7 +233,7 @@ private:
 
     static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
 
-    static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
+    static void on_error(tr_peerIo* io, tr_error const& error, void* vhandshake);
 
     bool build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const;
 

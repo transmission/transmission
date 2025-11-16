@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleName</key>
+	<string>${PRODUCT_NAME}</string>
+	<key>CFBundleShortVersionString</key>
+	<string>VERSION_STRING_INFOPLIST</string>
+	<key>CFBundleVersion</key>
+	<string>BUILD_STRING_INFOPLIST</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>QLIsDataBasedPreview</key>
+			<true/>
+			<key>QLSupportedContentTypes</key>
+			<array>
+				<string>org.bittorrent.torrent</string>
+			</array>
+			<key>QLSupportsSearchableItems</key>
+			<false/>
+		</dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.quicklook.preview</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>PreviewProvider</string>
+	</dict>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2005-2025 The Transmission Project</string>
+</dict>
+</plist>

@@ -46,13 +46,13 @@ protected:
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
-    void createSingleFileTorrentContents(std::string_view top)
+    static void createSingleFileTorrentContents(std::string_view top)
     {
         auto const path = tr_pathbuf{ top, "/hello-world.txt" };
         createFileWithContents(path, "hello, world!\n");
     }
 
-    void createMultifileTorrentContents(std::string_view top)
+    static void createMultifileTorrentContents(std::string_view top)
     {
         auto path = tr_pathbuf{ top, "/Felidae/Felinae/Acinonyx/Cheetah/Chester"sv };
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");

@@ -33,7 +33,7 @@
 #include <gtkmm/treemodelsort.h>
 #include <gtkmm/treeview.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ostream.h>
 
 #include <array>

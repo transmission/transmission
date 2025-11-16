@@ -172,7 +172,7 @@ protected:
         return files;
     }
 
-    auto createFiles(tr_torrent_files const& files, char const* parent)
+    static auto createFiles(tr_torrent_files const& files, char const* parent)
     {
         auto paths = std::set<std::string>{};
 

@@ -45,7 +45,7 @@ class tr_peer_event
     }
 
 public:
-    enum class Type
+    enum class Type : uint8_t
     {
         // Unless otherwise specified, all events are for BT peers only
         ClientGotBlock, // applies to webseed too
@@ -264,6 +264,9 @@ struct tr_peer
 
     // how many requests we made to this peer and then canceled
     tr_recentHistory<uint16_t> cancels_sent_to_peer;
+
+    tr_recentHistory<size_t> bytes_sent_to_client;
+    tr_recentHistory<size_t> bytes_sent_to_peer;
 };
 
 // ---
@@ -275,9 +278,9 @@ struct tr_swarm_stats
     // connected peers
     uint16_t peer_count;
     // connected peers by peer source
-    std::array<uint16_t, TR_PEER_FROM__MAX> peer_from_count;
+    std::array<uint16_t, TR_PEER_FROM_N_TYPES> peer_from_count;
     // known peers by peer source
-    std::array<uint16_t, TR_PEER_FROM__MAX> known_peer_from_count;
+    std::array<uint16_t, TR_PEER_FROM_N_TYPES> known_peer_from_count;
 };
 
 tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);

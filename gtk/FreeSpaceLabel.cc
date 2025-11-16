@@ -13,7 +13,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 #include <string>

@@ -42,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu fichiers";
+
+/* quicklook file header */
+/* "%lu Files" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu entrants";
@@ -78,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu traceur";
 
+/* quicklook tracker header */
+/* "%lu Trackers" = ""; */
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -85,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu semences Web";
+
+/* quicklook web seed header */
+/* "%lu Web Seeds" = ""; */
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u morceaux, %2$@ chacun";
@@ -110,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 fois";
 
+/* quicklook tracker header */
+/* "1 Tracker" = ""; */
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 transfert";
+
+/* quicklook web seed header */
+/* "1 Web Seed" = ""; */
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "« %@ » n’est pas un fichier torrent valide.";
@@ -278,6 +294,15 @@
    Create torrent -> select file */
 "Create Torrent File" = "Créer un fichier torrent";
 
+/* quicklook creation info */
+/* "Created on %@" = ""; */
+
+/* quicklook creation info */
+/* "Created on %@ with %@" = ""; */
+
+/* quicklook creation info */
+/* "Created with %@" = ""; */
+
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "La création de « %@ » a échoué.";
 
@@ -304,7 +329,7 @@
 "DL" = "Téléchargement";
 
 /* Inspector -> Peers tab -> peers */
-"DL from %lu" = "Téléchargement de %lu";
+"DL from %lu" = "Téléchargement en provenance de %lu";
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Ne plus vérifier l’espace disque";
@@ -352,10 +377,10 @@
 "Downloading blocklist" = "Téléchargement de la liste de blocage";
 
 /* Torrent -> status string */
-"Downloading from %lu of %lu peers" = "Téléchargement de %1$lu sur %2$lu pairs";
+"Downloading from %lu of %lu peers" = "Téléchargement en provenance de %1$lu de %2$lu pairs";
 
 /* Torrent -> status string */
-"Downloading from %lu of 1 peer" = "Téléchargement de %lu sur 1 pair";
+"Downloading from %lu of 1 peer" = "Téléchargement en provenance de %lu de 1 pair";
 
 /* inspector -> peer table -> header tool tip */
 "Downloading From Peer" = "Téléchargement à partir d’un pair";
@@ -644,30 +669,30 @@
 "Partial Seed" = "Semence partielle";
 
 /* All toolbar item -> palette label */
-"Pause / Resume All" = "Tout mettre en pause/tout reprendre";
+"Pause / Resume All" = "Tout suspendre, tout reprendre";
 
 /* Selected toolbar item -> palette label */
-"Pause / Resume Selected" = "Mettre en pause/reprendre la sélection";
+"Pause / Resume Selected" = "Suspendre, reprendre la sélection";
 
 /* All toolbar item -> label
    Dock item */
-"Pause All" = "Tout mettre en pause";
+"Pause All" = "Tout suspendre";
 
 /* All toolbar item -> tooltip */
-"Pause all transfers" = "Mettre tous les transferts en pause";
+"Pause all transfers" = "Suspendre tous les transferts";
 
 /* Selected toolbar item -> label */
-"Pause Selected" = "Mettre en pause la sélection";
+"Pause Selected" = "Suspendre la sélection";
 
 /* Selected toolbar item -> tooltip */
-"Pause selected transfers" = "Mettre en pause les transferts sélectionnés";
+"Pause selected transfers" = "Suspendre les transferts sélectionnés";
 
 /* Torrent Table -> tooltip */
-"Pause the transfer" = "Mettre le transfert en pause";
+"Pause the transfer" = "Suspendre le transfert";
 
 /* Filter Bar -> filter button
    Torrent -> status string */
-"Paused" = "Mis en pause";
+"Paused" = "Suspendu";
 
 /* Inspector -> peer -> status */
 "Peer is unchoking you, but you are not interested" = "Le pair ne vous étrangle plus, mais vous n’êtes pas intéressé";
@@ -955,7 +980,7 @@
 "The transfer cannot be added because it is a duplicate of an already existing transfer." = "Ce transfert ne peut être ajouté, car il est un doublon d’un transfert déjà existant.";
 
 /* Torrent disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert sera mis en pause. Libérez de l’espace sur %@ ou dessélectionnez des fichiers dans l’inspecteur de torrents afin de poursuivre.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert sera suspendu. Libérez de l’espace sur %@ ou dessélectionnez des fichiers dans l’inspecteur de torrents afin de poursuivre.";
 
 /* Create torrent -> blank address -> message */
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Le transfert ne contactera pas de traceurs pour obtenir des pairs et ne devra dépendre que de méthodes de découverte décentralisées qui ne s’appuient pas sur les traceurs, telles que PEX et DHT, pour télécharger et propager.";
@@ -964,7 +989,7 @@
 "There are %1$lu transfers (%2$lu active)." = "Il y a %1$lu transferts (%2$lu actifs).";
 
 /* Confirm Quit panel -> message */
-"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%lu transferts actifs seront mis en pause lors de la fermeture de Transmission. Les transferts reprendront automatiquement au prochain lancement.";
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%lu transferts actifs seront suspendus lors de la fermeture de Transmission. Les transferts reprendront automatiquement au prochain lancement.";
 
 /* Removal confirm panel -> message part 1 */
 "There are %lu active transfers." = "Il y a %lu transferts actifs.";
@@ -976,7 +1001,7 @@
 "There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Un exemplaire de Transmission est déjà en cours d’exécution. Nous ne pourrons en ouvrir un autre tant que le premier n’aura pas été fermé.";
 
 /* Confirm Quit panel -> message */
-"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Un transfert actif sera mis en pause lors de la fermeture de Transmission. Le transfert reprendra automatiquement au prochain lancement.";
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Un transfert actif sera suspendu lors de la fermeture de Transmission. Le transfert reprendra automatiquement au prochain lancement.";
 
 /* Create torrent -> no files -> warning */
 "There must be at least one file in a folder to create a torrent file." = "Il doit y avoir au moins un fichier dans un dossier pour créer un fichier torrent.";

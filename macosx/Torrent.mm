@@ -1547,7 +1547,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return canChange;
 }
 
-- (NSInteger)checkForFiles:(NSIndexSet*)indexSet
+- (NSControlStateValue)checkForFiles:(NSIndexSet*)indexSet
 {
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
@@ -1570,7 +1570,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return onState ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
-- (void)setFileCheckState:(NSInteger)state forIndexes:(NSIndexSet*)indexSet
+- (void)setFileCheckState:(NSControlStateValue)state forIndexes:(NSIndexSet*)indexSet
 {
     NSUInteger count = indexSet.count;
     tr_file_index_t* files = static_cast<tr_file_index_t*>(malloc(count * sizeof(tr_file_index_t)));

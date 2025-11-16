@@ -25,7 +25,7 @@
 #include <glibmm/wrap.h>
 #include <gtkmm.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <cstdio>
 #include <string>
@@ -117,9 +117,9 @@ int main(int argc, char** argv)
 
     // init the unit formatters
     using Config = libtransmission::Values::Config;
-    Config::Speed = { Config::Base::Kilo, _("B/s"), _("kB/s"), _("MB/s"), _("GB/s"), _("TB/s") };
-    Config::Memory = { Config::Base::Kibi, _("B"), _("KiB"), _("MiB"), _("GiB"), _("TiB") };
-    Config::Storage = { Config::Base::Kilo, _("B"), _("kB"), _("MB"), _("GB"), _("TB") };
+    Config::speed = { Config::Base::Kilo, _("B/s"), _("kB/s"), _("MB/s"), _("GB/s"), _("TB/s") };
+    Config::memory = { Config::Base::Kibi, _("B"), _("KiB"), _("MiB"), _("GiB"), _("TiB") };
+    Config::storage = { Config::Base::Kilo, _("B"), _("kB"), _("MB"), _("GB"), _("TB") };
 
     /* set up the config dir */
     if (std::empty(config_dir))

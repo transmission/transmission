@@ -26,7 +26,7 @@ tr_upnp* tr_upnpInit();
 void tr_upnpClose(tr_upnp* handle);
 
 tr_port_forwarding_state tr_upnpPulse(
-    tr_upnp*,
+    tr_upnp* handle,
     tr_port advertised_port,
     tr_port local_port,
     bool is_enabled,

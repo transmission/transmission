@@ -15,7 +15,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/error.h"
 #include "libtransmission/subprocess.h"

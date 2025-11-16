@@ -255,6 +255,7 @@ class StackBuffer final
 {
 public:
     StackBuffer() = default;
+    ~StackBuffer() override = default;
     StackBuffer(StackBuffer&&) = delete;
     StackBuffer(StackBuffer const&) = delete;
     StackBuffer& operator=(StackBuffer&&) = delete;

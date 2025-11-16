@@ -7,7 +7,7 @@
 #include <cerrno>
 #include <cstddef> // std::byte
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libutp/utp.h>
 
@@ -30,7 +30,7 @@ tr_peer_socket::tr_peer_socket(tr_session const* session, tr_socket_address cons
 {
     TR_ASSERT(sock != TR_BAD_SOCKET);
 
-    ++n_open_sockets_;
+    ++n_open_sockets;
     session->setSocketTOS(sock, address().type);
 
     if (auto const& algo = session->peerCongestionAlgorithm(); !std::empty(algo))
@@ -47,7 +47,7 @@ tr_peer_socket::tr_peer_socket(tr_socket_address const& socket_address, struct U
 {
     TR_ASSERT(sock != nullptr);
 
-    ++n_open_sockets_;
+    ++n_open_sockets;
     handle.utp = sock;
 
     tr_logAddTraceIo(this, fmt::format("socket (µTP) is {}", fmt::ptr(handle.utp)));
@@ -57,13 +57,13 @@ void tr_peer_socket::close()
 {
     if (is_tcp() && (handle.tcp != TR_BAD_SOCKET))
     {
-        --n_open_sockets_;
+        --n_open_sockets;
         tr_net_close_socket(handle.tcp);
     }
 #ifdef WITH_UTP
     else if (is_utp())
     {
-        --n_open_sockets_;
+        --n_open_sockets;
         utp_set_userdata(handle.utp, nullptr);
         utp_close(handle.utp);
     }
@@ -131,5 +131,5 @@ size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool bu
 
 bool tr_peer_socket::limit_reached(tr_session const* const session) noexcept
 {
-    return n_open_sockets_.load() >= session->peerLimit();
+    return n_open_sockets.load() >= session->peerLimit();
 }

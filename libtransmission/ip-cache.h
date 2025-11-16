@@ -28,10 +28,10 @@
  * This class caches 3 useful info:
  * 1. Whether your machine supports the IP protocol
  * 2. Source address used for global connections
- * 3. Global address
+ * 3. Global address (IPv4 public address/IPv6 global unicast address)
  *
  * The idea is, if this class successfully cached a source address, that means
- * you have connectivity to the public internet. And if the global address is
+ * your system is capable in that IP protocol. And if the global address is
  * the same as the source address, then you are not behind a NAT.
  */
 class tr_ip_cache
@@ -70,7 +70,7 @@ public:
         return global_addr_[type];
     }
 
-    [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept
+    [[nodiscard]] std::optional<tr_address> source_addr(tr_address_type type) const noexcept
     {
         auto const lock = std::shared_lock{ source_addr_mutex_[type] };
         return source_addr_[type];
@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
-    bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
+    bool set_global_addr(tr_address const& addr_new) noexcept;
 
     void update_addr(tr_address_type type) noexcept;
     void update_global_addr(tr_address_type type) noexcept;
@@ -97,7 +97,7 @@ private:
     using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
 
     void unset_global_addr(tr_address_type type) noexcept;
-    void set_source_addr(tr_address const& addr) noexcept;
+    void set_source_addr(tr_address const& addr_new) noexcept;
     void unset_addr(tr_address_type type) noexcept;
 
     void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
@@ -129,6 +129,7 @@ private:
     array_ip_t<std::optional<tr_address>> global_addr_;
     mutable array_ip_t<std::shared_mutex> source_addr_mutex_;
     array_ip_t<std::optional<tr_address>> source_addr_;
+    array_ip_t<bool> source_addr_checked_ = {};
 
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
