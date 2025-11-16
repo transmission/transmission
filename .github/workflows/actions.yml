@@ -335,17 +335,19 @@ jobs:
            echo '${{ toJSON(needs) }}'
            echo '${{ toJSON(runner) }}'
            sw_vers
+       - name: Get Dependencies
+         run: brew install --formulae xcbeautify
        - name: Get Source
          uses: actions/checkout@v4
          with:
            path: src
            submodules: recursive
        - name: Build
-         run: xcodebuild -project src/Transmission.xcodeproj
+         run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build | xcbeautify --renderer github-actions
        - uses: actions/upload-artifact@v4
          with:
            name: binaries-${{ github.job }}
-           path: pfx/**/*
+           path: pfx/Build/Products/**/Transmission.app*
 
   macos-26-arm64:
     runs-on: macos-26
