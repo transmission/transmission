@@ -19,7 +19,7 @@ void SessionDialog::accept()
     prefs_.set(Prefs::SESSION_REMOTE_AUTH, ui_.authCheck->isChecked());
     prefs_.set(Prefs::SESSION_REMOTE_USERNAME, ui_.usernameEdit->text());
     prefs_.set(Prefs::SESSION_REMOTE_PASSWORD, ui_.passwordEdit->text());
-    prefs_.set(Prefs::SESSION_REMOTE_RPC_URL, ui_.rpcEdit->text());
+    prefs_.set(Prefs::SESSION_REMOTE_RPC_URL_PATH, ui_.rpcEdit->text());
     session_.restart();
     BaseDialog::accept();
 }
@@ -73,7 +73,7 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
     ui_.passwordEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD));
     auth_widgets_ << ui_.passwordLabel << ui_.passwordEdit;
 
-    ui_.rpcEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_RPC_URL));
+    ui_.rpcEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_RPC_URL_PATH));
     remote_widgets_ << ui_.rpcLabel << ui_.rpcEdit;
 
     resensitize();
