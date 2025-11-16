@@ -66,12 +66,16 @@ if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
 fi
 
 # format Xcodeproj
-if ! grep -q 'objectVersion = 51' Transmission.xcodeproj/project.pbxproj; then
-  echo 'project.pbxproj needs objectVersion = 51 for compatibility with Xcode 11'
+if ! grep -q 'objectVersion = 54;' Transmission.xcodeproj/project.pbxproj; then
+  echo "project.pbxproj needs 'objectVersion = 54;' for compatibility with Xcode 12"
   exitcode=1
 fi
-if ! grep -q 'BuildIndependentTargetsInParallel = YES' Transmission.xcodeproj/project.pbxproj; then
-  echo 'please keep BuildIndependentTargetsInParallel in project.pbxproj'
+if ! grep -q 'compatibilityVersion = "Xcode 12.0";' Transmission.xcodeproj/project.pbxproj; then
+  echo "project.pbxproj needs 'compatibilityVersion = \"Xcode 12.0\";' for compatibility with Xcode 12"
+  exitcode=1
+fi
+if ! grep -q 'BuildIndependentTargetsInParallel = YES;' Transmission.xcodeproj/project.pbxproj; then
+  echo "please keep 'BuildIndependentTargetsInParallel = YES;' line in project.pbxproj"
   exitcode=1
 fi
 
