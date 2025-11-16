@@ -20,7 +20,7 @@ extern FilterSearchType const FilterSearchTypeTracker;
 
 extern NSInteger const kGroupFilterAllTag;
 
-@interface FilterBarController : NSViewController
+@interface FilterBarController : NSViewController<NSMenuItemValidation>
 
 @property(nonatomic, readonly) NSArray<NSString*>* searchStrings;
 

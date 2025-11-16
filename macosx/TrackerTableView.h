@@ -6,7 +6,7 @@
 
 @class Torrent;
 
-@interface TrackerTableView : NSTableView
+@interface TrackerTableView : NSTableView<NSMenuItemValidation>
 
 @property(nonatomic, weak) Torrent* torrent;
 @property(nonatomic, weak) NSArray* trackers;
