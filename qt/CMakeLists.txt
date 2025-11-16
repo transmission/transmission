@@ -142,12 +142,6 @@ target_sources(${TR_NAME}-qt
     PRIVATE
         application.qrc)
 
-if(WIN32 OR APPLE)
-    target_sources(${TR_NAME}-qt
-        PRIVATE
-            icons/Faenza/Faenza.qrc)
-endif()
-
 source_group(Resources
     REGULAR_EXPRESSION [[.*\.qrc$]])
 
