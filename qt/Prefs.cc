@@ -96,7 +96,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QMetaType::Int },
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QMetaType::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QMetaType::QString },
-    { SESSION_REMOTE_RPC_URL, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
+    { SESSION_REMOTE_RPC_URL_PATH, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QMetaType::QStringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QMetaType::Bool },
