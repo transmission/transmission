@@ -1,0 +1,171 @@
+// This file Copyright © Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include "NativeIcon.h"
+
+#include <QtGui/QIcon>
+#include <QtGui/QPixmap>
+#include <QtGui/QPainter>
+#include <QtGui/QFont>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QPalette>
+
+namespace
+{
+
+#if defined(Q_OS_WIN)
+QChar parseCodepoint(QString const& code)
+{
+    // Supports "E710" or "\uE710"
+    QString s = code.trimmed();
+    if (s.startsWith("\\u", Qt::CaseInsensitive))
+        s = s.mid(2);
+    bool ok = false;
+    uint u = s.toUInt(&ok, 16);
+    return ok ? QChar(u) : QChar();
+}
+
+QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
+{
+    if (codepointHex.isEmpty())
+        return {};
+
+    QChar const glyph = parseCodepoint(codepointHex);
+    if (glyph.isNull())
+        return {};
+
+    // Prefer Segoe Fluent Icons (Win11), fall back to Segoe MDL2 Assets (Win10)
+    QFont font;
+    font.setPointSize(pointSize);
+    font.setStyleStrategy(QFont::PreferDefault);
+
+    // Try Fluent first
+    font.setFamily("Segoe Fluent Icons");
+    if (!QFontInfo(font).exactMatch())
+    {
+        font.setFamily("Segoe MDL2 Assets");
+    }
+
+    auto const dpr = qApp->primaryScreen()->devicePixelRatio();
+    auto const px = qRound(pointSize * dpr) + 8; // padding
+    QPixmap pm{ px, px };
+    pm.setDevicePixelRatio(dpr);
+    pm.fill(Qt::transparent);
+
+    auto const fg = qApp->palette().color(QPalette::ButtonText);
+    QPainter p{ &pm };
+    p.setRenderHint(QPainter::Antialiasing, true);
+    p.setPen(Qt::NoPen);
+    p.setBrush(fg);
+    p.setFont(font);
+
+    // Center the glyph
+    QRectF r(0, 0, pm.width() / dpr, pm.height() / dpr);
+    p.drawText(r, Qt::AlignCenter, QString(glyph));
+    p.end();
+
+    return QIcon{ pm };
+}
+#endif // Q_OS_WIN
+
+QString qstrFromUtf8(std::string_view const sv)
+{
+    return QString::fromUtf8(std::data(sv), std::size(sv));
+}
+
+} // namespace
+
+NativeIcon::Spec::Spec(
+    QString sf_in,
+    QString fluent_in,
+    QString fdo_in,
+    std::optional<QStyle::StandardPixmap> fallback_in,
+    QFont::Weight weight_in)
+    : sfSymbolName{ sf_in }
+    , fluentCodepoint{ fluent_in }
+    , fdoName{ fdo_in }
+    , fallback{ fallback_in }
+    , weight{ weight_in }
+{
+}
+
+NativeIcon::Spec::Spec(
+    std::string_view const sf_in,
+    std::string_view const fluent_in,
+    std::string_view const fdo_in,
+    std::optional<QStyle::StandardPixmap> fallback_in,
+    QFont::Weight weight_in)
+    : Spec{ qstrFromUtf8(sf_in), qstrFromUtf8(fluent_in), qstrFromUtf8(fdo_in), fallback_in, weight_in }
+{
+}
+
+// static
+QIcon NativeIcon::get(
+    std::string_view const sf,
+    std::string_view const fluent,
+    std::string_view const fdo,
+    std::optional<QStyle::StandardPixmap> qt,
+    QStyle* style)
+{
+    return get({ sf, fluent, fdo, qt }, style);
+}
+
+QIcon NativeIcon::get(Spec const& spec, QStyle* style)
+{
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+    auto constexpr auto IconMetrics = std::array<QStyle::PixelMetric, 7U>{ {
+        QStyle::PM_ButtonIconSize QStyle::PM_LargeIconSize,
+        QStyle::PM_ListViewIconSize,
+        QStyle::PM_MessageBoxIconSize,
+        QStyle::PM_SmallIconSize,
+        QStyle::PM_TabBarIconSize,
+        QStyle::PM_ToolBarIconSize,
+    } };
+
+    auto dipSizes = std::set<QSize>{};
+    for (auto const pm : IconMetrics)
+    {
+        auto const dip = style->pixelMetric(pm);
+        dipSizes.emplace(dip, dip);
+    }
+#endif
+
+#if 0
+    if (auto const todo = QStringLiteral("TODO"); spec.sfSymbolName == todo || spec.fluentCodePoint == todo || spec.fdoName == todo)
+      abort();
+#endif
+
+#if defined(Q_OS_MAC)
+    // TODO: try sfSymbolName if on macOS
+    // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
+#endif
+
+#if defined(Q_OS_WIN)
+    // TODO: build & test on a Windows box
+    if (!spec.fluentCodepoint.isEmpty())
+    {
+        auto icon = QIcon{};
+        for (auto const dipSize : dipSizes)
+            if (auto pixmap = makeFluentIcon(spec.fluentCodepoint, dipSize); !pixmap.isNull())
+                icon.addPixmap(pixmap);
+        if (!icon.isNull())
+            return icon;
+    }
+#endif
+
+    if (!spec.fdoName.isEmpty())
+    {
+        if (auto icon = QIcon::fromTheme(spec.fdoName); !icon.isNull())
+            return icon;
+        if (auto icon = QIcon::fromTheme(spec.fdoName + QStringLiteral("-symbolic")); !icon.isNull())
+            return icon;
+    }
+
+    if (spec.fallback)
+        if (auto icon = style->standardIcon(*spec.fallback); !icon.isNull())
+            return icon;
+
+    return {};
+}

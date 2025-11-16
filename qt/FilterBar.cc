@@ -6,6 +6,7 @@
 #include "FilterBar.h"
 
 #include <cstdint> // uint64_t
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 
@@ -19,11 +20,14 @@
 #include "FilterBarComboBoxDelegate.h"
 #include "Filters.h"
 #include "IconCache.h"
+#include "NativeIcon.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
+
+using namespace std::literals;
 
 enum
 {
@@ -50,33 +54,38 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto const& icons = IconCache::get();
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("system-run")), tr("Active") };
+    auto icon = NativeIcon::get({ "play.fill"sv, "e768"sv, "media-playback-start"sv, QStyle::SP_MediaPlay });
+    row = new QStandardItem{ icon, tr("Active") };
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading") };
-    row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding") };
+    icon = NativeIcon::get({ "chevron.up"sv, "e70e"sv, "go-up"sv, QStyle::SP_ArrowUp });
+    row = new QStandardItem{ icon, tr("Seeding") };
     row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused") };
+    icon = NativeIcon::get({ "chevron.down"sv, "e70d"sv, "go-down"sv, QStyle::SP_ArrowDown });
+    row = new QStandardItem{ icon, tr("Downloading") };
+    row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
+    model->appendRow(row);
+
+    icon = NativeIcon::get({ "pause.fill"sv, "e769"sv, "media-playback-pause"sv, QStyle::SP_MediaPause });
+    row = new QStandardItem{ icon, tr("Paused") };
     row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished") };
+    icon = {};
+    row = new QStandardItem{ tr("Finished") };
     row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying") };
+    icon = NativeIcon::get({ "arrow.clockwise"sv, "e72c"sv, "view-refresh"sv, QStyle::SP_BrowserReload });
+    row = new QStandardItem{ icon, tr("Verifying") };
     row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error") };
+    icon = NativeIcon::get({ "xmark.circle"sv, "eb90"sv, "dialog-error"sv, QStyle::SP_MessageBoxWarning });
+    row = new QStandardItem{ icon, tr("Error") };
     row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);
 
