@@ -491,7 +491,7 @@
                                     <constraint firstAttribute="height" constant="24" id="dyn-PY-CuN"/>
                                     <constraint firstItem="2700" firstAttribute="centerX" secondItem="JCm-xb-Dpw" secondAttribute="centerX" id="hcK-0p-UnE"/>
                                     <constraint firstItem="3420" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="usg-NR-gmG"/>
-                                    <constraint firstItem="3435" firstAttribute="leading" secondItem="JCm-xb-Dpw" secondAttribute="leading" constant="8" id="xFe-Hi-hSp"/>
+                                    <constraint firstItem="3435" firstAttribute="leading" secondItem="JCm-xb-Dpw" secondAttribute="leading" priority="750" constant="8" id="xFe-Hi-hSp"/>
                                 </constraints>
                             </customView>
                         </subviews>

@@ -649,6 +649,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     self.fTotalTorrentsField.cell.backgroundStyle = NSBackgroundStyleRaised;
 
     self.fActionButton.toolTip = NSLocalizedString(@"Shortcuts for changing global settings.", "Main window -> 1st bottom left button (action) tooltip");
+    if (@available(macOS 26.0, *))
+    {
+        NSLayoutConstraint* constraint = [self.fActionButton.leadingAnchor constraintEqualToAnchor:self.fActionButton.superview.leadingAnchor
+                                                                                          constant:16.0];
+        constraint.priority = NSLayoutPriorityRequired;
+        constraint.active = YES;
+    }
+
     self.fSpeedLimitButton.toolTip = NSLocalizedString(
         @"Speed Limit overrides the total bandwidth limits with its own limits.",
         "Main window -> 2nd bottom left button (turtle) tooltip");
