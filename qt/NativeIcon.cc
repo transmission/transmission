@@ -5,8 +5,6 @@
 
 #include "NativeIcon.h"
 
-#include <iostream>
-
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
@@ -103,6 +101,17 @@ NativeIcon::Spec::Spec(
 {
 }
 
+// static
+QIcon NativeIcon::get(
+    std::string_view const sf,
+    std::string_view const fluent,
+    std::string_view const fdo,
+    std::optional<QStyle::StandardPixmap> qt,
+    QStyle* style)
+{
+    return get({ sf, fluent, fdo, qt }, style);
+}
+
 QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
@@ -148,26 +157,15 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 
     if (!spec.fdoName.isEmpty())
     {
-        if (auto icon = QIcon::fromTheme(spec.fdoName + QStringLiteral("-symbolic")); !icon.isNull())
-        {
-            std::cerr << "using fdo" << std::endl;
+        if (auto icon = QIcon::fromTheme(spec.fdoName); !icon.isNull())
             return icon;
-        }
-        else
-        {
-            std::cerr << "QIcon::fromTheme(" << qPrintable(spec.fdoName) << ") returned empty" << std::endl;
-        }
+        if (auto icon = QIcon::fromTheme(spec.fdoName + QStringLiteral("-symbolic")); !icon.isNull())
+            return icon;
     }
 
     if (spec.fallback)
-    {
         if (auto icon = style->standardIcon(*spec.fallback); !icon.isNull())
-        {
-            std::cerr << "Qt Standard Icon" << std::endl;
             return icon;
-        }
-    }
 
-    std::cerr << "no match" << std::endl;
     return {};
 }
