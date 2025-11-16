@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -3155,7 +3155,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 2610;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
@@ -3180,7 +3180,7 @@
 				};
 			};
 			buildConfigurationList = 4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */;
-			compatibilityVersion = "Xcode 10.0";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
