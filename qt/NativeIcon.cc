@@ -123,6 +123,11 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
     }
 #endif
 
+#if 0
+    if (auto const todo = QStringLiteral("TODO"); spec.sfSymbolName == todo || spec.fluentCodePoint == todo || spec.fdoName == todo)
+      abort();
+#endif
+
 #if defined(Q_OS_MAC)
     // TODO: try sfSymbolName if on macOS
     // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
