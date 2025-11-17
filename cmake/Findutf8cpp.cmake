@@ -12,21 +12,8 @@ if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
     return()
 endif()
 
-find_path(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
-    NAMES utf8.h
-    PATH_SUFFIXES utf8cpp)
-
-if (${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
-    add_library(utf8::cpp INTERFACE IMPORTED)
-
-    target_include_directories(utf8::cpp
-        INTERFACE
-            ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-endif()
-
-set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-
+# Always fails
 find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME}
-    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
-
-mark_as_advanced(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
+    REQUIRED_VARS
+        ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
+    VERSION_VAR ${CMAKE_FIND_PACKAGE_NAME}_VERSION)
