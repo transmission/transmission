@@ -23,40 +23,10 @@ endif()
 find_path(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
     NAMES fmt/core.h
     HINTS ${_FMT_INCLUDEDIR})
-find_library(${CMAKE_FIND_PACKAGE_NAME}_LIBRARY
-    NAMES fmt fmtd
-    HINTS ${_FMT_LIBDIR})
-
-if(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
-    if(${CMAKE_FIND_PACKAGE_NAME}_LIBRARY)
-        add_library(fmt::fmt INTERFACE IMPORTED)
-        target_include_directories(fmt::fmt
-            INTERFACE
-                ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-        target_link_libraries(fmt::fmt
-            INTERFACE
-                ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
-        target_compile_features(fmt::fmt INTERFACE cxx_std_11)
-        if(MSVC)
-            target_compile_options(fmt::fmt INTERFACE $<$<COMPILE_LANGUAGE:CXX>:/utf-8>)
-        endif()
-    endif()
-
-    add_library(fmt::fmt-header-only INTERFACE IMPORTED)
-    target_compile_definitions(fmt::fmt-header-only-only INTERFACE FMT_HEADER_ONLY=1)
-    target_compile_features(fmt::fmt-header-only-only INTERFACE cxx_std_11)
-    target_include_directories(fmt::fmt-header-only
-        INTERFACE
-            ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-    if(MSVC)
-        target_compile_options(fmt::fmt-header-only INTERFACE $<$<COMPILE_LANGUAGE:CXX>:/utf-8>)
-    endif()
-endif()
 
 if(_FMT_VERSION)
     set(${CMAKE_FIND_PACKAGE_NAME}_VERSION ${_FMT_VERSION})
 elseif(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
-    include(TrMacros)
     set(_FMT_VERSION_H_PATH "${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR}/fmt/base.h")
     if(NOT EXISTS "${_FMT_VERSION_H_PATH}")
         # fmt < 11
@@ -72,13 +42,26 @@ elseif(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
     endif()
 endif()
 
-set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
-
 find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME}
     REQUIRED_VARS
         ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
     VERSION_VAR ${CMAKE_FIND_PACKAGE_NAME}_VERSION)
+
+if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+    set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+
+    if(NOT TARGET fmt::fmt-header-only)
+        add_library(fmt::fmt-header-only INTERFACE IMPORTED)
+        target_compile_definitions(fmt::fmt-header-only-only INTERFACE FMT_HEADER_ONLY=1)
+        target_compile_features(fmt::fmt-header-only-only INTERFACE cxx_std_11)
+        target_include_directories(fmt::fmt-header-only
+            INTERFACE
+                ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+        if(MSVC)
+            target_compile_options(fmt::fmt-header-only INTERFACE $<$<COMPILE_LANGUAGE:CXX>:/utf-8>)
+        endif()
+    endif()
+endif()
 
 mark_as_advanced(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY)
 
