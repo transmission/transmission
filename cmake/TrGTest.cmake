@@ -1,6 +1,6 @@
 include(TrMacros)
 
-tr_auto_option(USE_SYSTEM_GTEST "Use system GTest library" OFF)
+option(USE_SYSTEM_GTEST "Use system GTest library" OFF)
 
 tr_add_external_auto_library(GTEST GTest
     SUBPROJECT
