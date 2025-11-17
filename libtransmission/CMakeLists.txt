@@ -227,7 +227,8 @@ target_compile_definitions(${TR_NAME}
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
     PUBLIC
-        $<IF:$<VERSION_GREATER_EQUAL:${fmt_VERSION},11.2.0>,FMT_USE_EXCEPTIONS,FMT_EXCEPTIONS>=0
+        FMT_USE_EXCEPTIONS=0 # {fmt} >= 11.2.0
+        FMT_EXCEPTIONS=0 # {fmt} < 11.2.0
         SMALL_DISABLE_EXCEPTIONS=1 # Workaround, perm fix at https://github.com/alandefreitas/small/pull/52
         $<$<STREQUAL:${CRYPTO_PKG},ccrypto>:WITH_CCRYPTO>
         $<$<STREQUAL:${CRYPTO_PKG},mbedtls>:WITH_MBEDTLS>

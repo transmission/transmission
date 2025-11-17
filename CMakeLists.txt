@@ -611,9 +611,6 @@ tr_add_external_auto_library(FMT fmt
     CMAKE_ARGS
         -DFMT_INSTALL=OFF
         -DFMT_SYSTEM_HEADERS=ON)
-if(NOT fmt_VERSION)
-    tr_get_fmt_version(fmt_VERSION, "${TR_THIRD_PARTY_SOURCE_DIR}/fmt/include")
-endif()
 
 # RapidJSON's CMakeLists.txt messes with global
 # CMAKE_* variables, so don't build as subproject
