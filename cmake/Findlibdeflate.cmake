@@ -34,19 +34,6 @@ find_library(${CMAKE_FIND_PACKAGE_NAME}_LIBRARY
     NAMES deflate
     HINTS ${_DEFLATE_LIBDIR})
 
-if(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR AND ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY)
-    add_library(libdeflate::libdeflate INTERFACE IMPORTED)
-    target_include_directories(libdeflate::libdeflate
-        INTERFACE
-            ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-    target_link_libraries(libdeflate::libdeflate
-        INTERFACE
-            ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
-endif()
-
-set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
-
 if(_DEFLATE_VERSION)
     set(${CMAKE_FIND_PACKAGE_NAME}_VERSION ${_DEFLATE_VERSION})
 elseif(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
@@ -62,6 +49,21 @@ find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME}
         ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
         ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY
     VERSION_VAR ${CMAKE_FIND_PACKAGE_NAME}_VERSION)
+
+if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+    set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+    set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
+
+    if(NOT TARGET libdeflate::libdeflate)
+        add_library(libdeflate::libdeflate INTERFACE IMPORTED)
+        target_include_directories(libdeflate::libdeflate
+            INTERFACE
+                ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+        target_link_libraries(libdeflate::libdeflate
+            INTERFACE
+                ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
+    endif()
+endif()
 
 mark_as_advanced(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY)
 
