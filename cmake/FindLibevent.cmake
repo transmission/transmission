@@ -22,7 +22,6 @@ if(UNIX)
     find_package(PkgConfig QUIET)
 endif()
 
-set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES)
 foreach(_comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
     if(UNIX)
         pkg_check_modules(_EVENT2_${_comp} QUIET libevent-${_comp})
@@ -45,18 +44,6 @@ foreach(_comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
 
     set(${CMAKE_FIND_PACKAGE_NAME}_${_comp}_FOUND FALSE)
     if(${CMAKE_FIND_PACKAGE_NAME}_${_comp}_LIBRARY)
-        set(_target "libevent::${_comp}")
-
-        add_library(libevent::${_comp} INTERFACE IMPORTED)
-        target_include_directories(libevent::${_comp}
-            INTERFACE
-                ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-        target_link_libraries(libevent::${_comp}
-            INTERFACE
-                ${${CMAKE_FIND_PACKAGE_NAME}_${_comp}_LIBRARY})
-
-        list(APPEND ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES libevent::${_comp})
-
         set(${CMAKE_FIND_PACKAGE_NAME}_${_comp}_FOUND TRUE)
     endif()
 endforeach()
@@ -69,11 +56,30 @@ if(NOT ${CMAKE_FIND_PACKAGE_NAME}_VERSION AND ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE
     endif()
 endif()
 
-set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-
 find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME}
     HANDLE_COMPONENTS
+    REQUIRED_VARS
+        ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
     VERSION_VAR ${CMAKE_FIND_PACKAGE_NAME}_VERSION)
+
+if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+    set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+
+    set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES)
+    foreach(_comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
+        if(NOT TARGET libevent::${_comp})
+            add_library(libevent::${_comp} INTERFACE IMPORTED)
+            target_include_directories(libevent::${_comp}
+                INTERFACE
+                    ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+            target_link_libraries(libevent::${_comp}
+                INTERFACE
+                    ${${CMAKE_FIND_PACKAGE_NAME}_${_comp}_LIBRARY})
+        endif()
+
+        list(APPEND ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES libevent::${_comp})
+    endforeach()
+endif()
 
 mark_as_advanced(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
 
