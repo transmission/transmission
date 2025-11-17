@@ -21,25 +21,27 @@ find_library(${CMAKE_FIND_PACKAGE_NAME}_LIBRARY
     NAMES b64
     HINTS ${_B64_LIBDIR})
 
-if(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR AND ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY)
-    add_library(libb64::libb64 INTERFACE IMPORTED)
-    target_include_directories(libb64::libb64
-        INTERFACE
-            ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-    target_link_libraries(libb64::libb64
-        INTERFACE
-            ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
-endif()
-
-set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
-set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
-
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME}
     REQUIRED_VARS
         ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY
         ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
+
+if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+    set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+    set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
+
+    if(NOT TARGET libb64::libb64)
+        add_library(libb64::libb64 INTERFACE IMPORTED)
+        target_include_directories(libb64::libb64
+            INTERFACE
+                ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
+        target_link_libraries(libb64::libb64
+            INTERFACE
+                ${${CMAKE_FIND_PACKAGE_NAME}_LIBRARY})
+    endif()
+endif()
 
 mark_as_advanced(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR ${CMAKE_FIND_PACKAGE_NAME}_LIBRARY)
 
