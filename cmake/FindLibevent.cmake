@@ -18,10 +18,13 @@ if(${CMAKE_FIND_PACKAGE_NAME}_PREFER_STATIC_LIB)
     endif()
 endif()
 
+if(UNIX)
+    find_package(PkgConfig QUIET)
+endif()
+
 set(${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES)
 foreach(_comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
     if(UNIX)
-        find_package(PkgConfig QUIET)
         pkg_check_modules(_EVENT2_${_comp} QUIET libevent-${_comp})
 
         if(_EVENT2_${_comp}_VERSION AND NOT ${CMAKE_FIND_PACKAGE_NAME}_VERSION)
