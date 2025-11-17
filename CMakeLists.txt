@@ -60,6 +60,7 @@ set(MINIUPNPC_MINIMUM 2.2.1)
 set(NPM_MINIMUM 10.2.3) # Node.js 20.10 (eslint-plugin-unicorn)
 set(PSL_MINIMUM 0.21.0)
 set(QT_MINIMUM 5.6)
+set(RAPIDJSON_MINIMUM 1.1.0)
 set(SMALL_MINIMUM 0.2.2)
 # utf8cpp v4's version file is configured with `COMPATIBILITY SameMajorVersion`
 # and does not support version range.
