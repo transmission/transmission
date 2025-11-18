@@ -107,7 +107,6 @@
 		A209EC12114301C6002B02D1 /* InfoOptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209EC11114301C6002B02D1 /* InfoOptionsView.xib */; };
 		A209ECA2114319C3002B02D1 /* InfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A209ECA1114319C3002B02D1 /* InfoWindow.xib */; };
 		A209EE5D1144B51E002B02D1 /* history.h in Headers */ = {isa = PBXBuildFile; fileRef = A209EE5B1144B51E002B02D1 /* history.h */; };
-		A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A21282A60CA6C66800EAEE0F /* StatusBarView.mm */; };
 		A215BF5C0F02EBB800350CDB /* GroupRules.xib in Resources */ = {isa = PBXBuildFile; fileRef = A215BF5B0F02EBB800350CDB /* GroupRules.xib */; };
 		A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = A219798A0D07B78400438EA7 /* GroupToolbarItem.mm */; };
 		A21A9BE2106D86A800F1C3C1 /* TrackerNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A21A9BE1106D86A800F1C3C1 /* TrackerNode.mm */; };
@@ -178,7 +177,6 @@
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.mm */; };
 		A263C6B1F6718E2486DB20E0 /* tr-buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A263C6B1F6718E2486DB20E1 /* tr-buffer.h */; };
 		A263CFC010DD67670038DE27 /* InfoTextField.mm in Sources */ = {isa = PBXBuildFile; fileRef = A263CFBF10DD67670038DE27 /* InfoTextField.mm */; };
-		A2661D6112D0E8D9004F69D5 /* FilterBarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */; };
 		A267927C130DFF2700CB7464 /* libutp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E38544130DFEE3001F501B /* libutp.a */; };
 		A2679294130E00A000CB7464 /* tr-utp.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2679292130E00A000CB7464 /* tr-utp.cc */; };
 		A2679295130E00A000CB7464 /* tr-utp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2679293130E00A000CB7464 /* tr-utp.h */; };
@@ -895,8 +893,6 @@
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoOptionsViewController.mm; sourceTree = "<group>"; };
 		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InfoWindow.xib; sourceTree = "<group>"; };
 		A209EE5B1144B51E002B02D1 /* history.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = history.h; sourceTree = "<group>"; };
-		A21282A50CA6C66800EAEE0F /* StatusBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusBarView.h; sourceTree = "<group>"; };
-		A21282A60CA6C66800EAEE0F /* StatusBarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = StatusBarView.mm; sourceTree = "<group>"; };
 		A21979890D07B78400438EA7 /* GroupToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupToolbarItem.h; sourceTree = "<group>"; };
 		A219798A0D07B78400438EA7 /* GroupToolbarItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupToolbarItem.mm; sourceTree = "<group>"; };
 		A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TrackerNode.h; sourceTree = "<group>"; };
@@ -988,8 +984,6 @@
 		A263C6B1F6718E2486DB20E1 /* tr-buffer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "tr-buffer.h"; sourceTree = "<group>"; };
 		A263CFBE10DD67670038DE27 /* InfoTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoTextField.h; sourceTree = "<group>"; };
 		A263CFBF10DD67670038DE27 /* InfoTextField.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = InfoTextField.mm; sourceTree = "<group>"; };
-		A2661D3A12D0E51A004F69D5 /* FilterBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterBarView.h; sourceTree = "<group>"; };
-		A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilterBarView.mm; sourceTree = "<group>"; };
 		A2679292130E00A000CB7464 /* tr-utp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-utp.cc"; sourceTree = "<group>"; };
 		A2679293130E00A000CB7464 /* tr-utp.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "tr-utp.h"; sourceTree = "<group>"; };
 		A267C2832E9F2B23003B87D7 /* Transmission_Tahoe.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = Transmission_Tahoe.icon; path = Images/Transmission_Tahoe.icon; sourceTree = "<group>"; };
@@ -1756,12 +1750,8 @@
 				E138A9760C04D88F00C5426C /* ProgressGradients.mm */,
 				A2E57AB91310822C00A7DAB1 /* StatusBarController.h */,
 				A2E57ABA1310822C00A7DAB1 /* StatusBarController.mm */,
-				A21282A50CA6C66800EAEE0F /* StatusBarView.h */,
-				A21282A60CA6C66800EAEE0F /* StatusBarView.mm */,
 				A2E57BA513109E6B00A7DAB1 /* FilterBarController.h */,
 				A2E57BA613109E6B00A7DAB1 /* FilterBarController.mm */,
-				A2661D3A12D0E51A004F69D5 /* FilterBarView.h */,
-				A2661D3B12D0E51B004F69D5 /* FilterBarView.mm */,
 				A2ED7D8D0CEF431B00970975 /* FilterButton.h */,
 				A2ED7D8E0CEF431B00970975 /* FilterButton.mm */,
 				A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.mm */,
@@ -3560,7 +3550,6 @@
 				ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.mm in Sources */,
-				A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
 				45489C5429AF6FB20098A812 /* TorrentCellActionButton.mm in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */,
@@ -3601,7 +3590,6 @@
 				A209EBF91142FEEE002B02D1 /* InfoOptionsViewController.mm in Sources */,
 				ED9862972B979AA2002F3035 /* Utils.mm in Sources */,
 				A21F15AC11729A8B00CF5A9C /* AddMagnetWindowController.mm in Sources */,
-				A2661D6112D0E8D9004F69D5 /* FilterBarView.mm in Sources */,
 				A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.mm in Sources */,
 				A2E57ABB1310822C00A7DAB1 /* StatusBarController.mm in Sources */,
 				A2E57BA713109E6B00A7DAB1 /* FilterBarController.mm in Sources */,

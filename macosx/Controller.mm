@@ -112,8 +112,8 @@ static NSString* const kTorrentTableViewDataType = @"TorrentTableViewDataType";
 static CGFloat const kRowHeightRegular = 62.0;
 static CGFloat const kRowHeightSmall = 22.0;
 
-static CGFloat const kStatusBarHeight = 21.0;
-static CGFloat const kFilterBarHeight = 23.0;
+static CGFloat const kStatusBarHeight = 24.0;
+static CGFloat const kFilterBarHeight = 24.0;
 static CGFloat const kBottomBarHeight = 24.0;
 
 static NSTimeInterval const kUpdateUISeconds = 1.0;
@@ -4028,14 +4028,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)toggleStatusBar:(id)sender
 {
-    BOOL const show = self.fStatusBar == nil;
+    BOOL const show = self.fStatusBar == nil || self.fStatusBar.isHidden;
     [self.fDefaults setBool:show forKey:@"StatusBar"];
     [self updateMainWindow];
 }
 
 - (void)toggleFilterBar:(id)sender
 {
-    BOOL const show = self.fFilterBar == nil;
+    BOOL const show = self.fFilterBar == nil || self.fFilterBar.isHidden;
 
     //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
@@ -4054,7 +4054,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)focusFilterField
 {
-    if (!self.fFilterBar)
+    if (self.fFilterBar == nil || self.fFilterBar.isHidden)
     {
         [self toggleFilterBar:self];
     }
@@ -4555,7 +4555,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //set filter item
     if ([ident isEqualToString:ToolbarItemIdentifierFilter])
     {
-        ((NSButton*)toolbarItem.view).state = self.fFilterBar != nil;
+        BOOL shown = !(self.fFilterBar == nil || self.fFilterBar.isHidden);
+        ((NSButton*)toolbarItem.view).state = shown ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
 
@@ -5079,59 +5080,41 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)updateMainWindow
 {
-    NSArray* subViews = self.fStackView.arrangedSubviews;
-    NSUInteger idx = 0;
+    if (self.fStatusBar == nil)
+    {
+        self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
+        self.fStatusBar.layoutAttribute = NSLayoutAttributeBottom;
+        self.fStatusBar.automaticallyAdjustsSize = NO;
 
-    //update layout
+        [self.fWindow addTitlebarAccessoryViewController:self.fStatusBar];
+    }
+
     if ([self.fDefaults boolForKey:@"StatusBar"])
     {
-        if (self.fStatusBar == nil)
-        {
-            self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
-        }
-
-        [self.fStackView insertArrangedSubview:self.fStatusBar.view atIndex:idx];
-
-        NSDictionary* views = @{ @"fStatusBar" : self.fStatusBar.view };
-        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fStatusBar(==21)]" options:0
-                                                                                metrics:nil
-                                                                                  views:views]];
-        idx = 1;
+        self.fStatusBar.hidden = NO;
     }
     else
     {
-        if ([subViews containsObject:self.fStatusBar.view])
-        {
-            [self.fStackView removeView:self.fStatusBar.view];
-            self.fStatusBar = nil;
-        }
+        self.fStatusBar.hidden = YES;
+    }
+
+    if (self.fFilterBar == nil)
+    {
+        self.fFilterBar = [[FilterBarController alloc] init];
+        self.fFilterBar.layoutAttribute = NSLayoutAttributeBottom;
+        self.fFilterBar.automaticallyAdjustsSize = NO;
+
+        [self.fWindow addTitlebarAccessoryViewController:self.fFilterBar];
     }
 
     if ([self.fDefaults boolForKey:@"FilterBar"])
     {
-        if (self.fFilterBar == nil)
-        {
-            self.fFilterBar = [[FilterBarController alloc] init];
-        }
-
-        [self.fStackView insertArrangedSubview:self.fFilterBar.view atIndex:idx];
-
-        NSDictionary* views = @{ @"fFilterBar" : self.fFilterBar.view };
-        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==23)]" options:0
-                                                                                metrics:nil
-                                                                                  views:views]];
-
+        self.fFilterBar.hidden = NO;
         [self focusFilterField];
     }
     else
     {
-        if ([subViews containsObject:self.fFilterBar.view])
-        {
-            [self.fStackView removeView:self.fFilterBar.view];
-            self.fFilterBar = nil;
-
-            [self.fWindow makeFirstResponder:self.fTableView];
-        }
+        self.fFilterBar.hidden = YES;
     }
 
     [self fullUpdateUI];
@@ -5263,12 +5246,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (CGFloat)mainWindowComponentHeight
 {
     CGFloat height = kBottomBarHeight;
-    if (self.fStatusBar)
+
+    if (self.fStatusBar != nil && !self.fStatusBar.isHidden)
     {
         height += kStatusBarHeight;
     }
 
-    if (self.fFilterBar)
+    if (self.fFilterBar != nil && !self.fFilterBar.isHidden)
     {
         height += kFilterBarHeight;
     }
