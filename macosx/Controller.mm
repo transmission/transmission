@@ -268,8 +268,8 @@ static void removeKeRangerRansomware()
 @interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, PowerManagerDelegate>
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
-@property(nonatomic) IBOutlet NSStackView* fStackView;
-@property(nonatomic) NSArray* fStackViewHeightConstraints;
+@property(nonatomic) NSLayoutConstraint* fMinHeightConstraint;
+@property(nonatomic) NSLayoutConstraint* fFixedHeightConstraint;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
 
 @property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
@@ -643,7 +643,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     self.fTableView.floatsGroupRows = YES;
     //self.fTableView.usesAlternatingRowBackgroundColors = !small;
 
-    [self.fWindow setContentBorderThickness:NSMinY(self.fTableView.enclosingScrollView.frame) forEdge:NSMinYEdge];
     self.fWindow.movableByWindowBackground = YES;
 
     self.fTotalTorrentsField.cell.backgroundStyle = NSBackgroundStyleRaised;
@@ -5129,40 +5128,47 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         scrollView.hasVerticalScroller = NO;
 
-        [self removeStackViewHeightConstraints];
-
-        NSDictionary* views = @{ @"scrollView" : scrollView };
+        [self removeHeightConstraints];
 
         if (![self.fDefaults boolForKey:@"AutoSize"])
         {
             // Only set a minimum height constraint
             CGFloat height = self.minScrollViewHeightAllowed;
-            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
-            self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
-                                                                                       metrics:nil
-                                                                                         views:views];
+            if (self.fMinHeightConstraint == nil)
+            {
+                self.fMinHeightConstraint = [scrollView.heightAnchor constraintGreaterThanOrEqualToConstant:height];
+            }
+            else
+            {
+                self.fMinHeightConstraint.constant = height;
+            }
+
+            self.fMinHeightConstraint.active = YES;
         }
         else
         {
             // Set a fixed height constraint
             CGFloat height = [self calculateScrollViewHeightWithDockAdjustment];
-            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
-            self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
-                                                                                       metrics:nil
-                                                                                         views:views];
+            if (self.fFixedHeightConstraint == nil)
+            {
+                self.fFixedHeightConstraint = [scrollView.heightAnchor constraintEqualToConstant:height];
+            }
+            else
+            {
+                self.fFixedHeightConstraint.constant = height;
+            }
 
             // Redraw table to avoid empty cells
             [self.fTableView reloadData];
-        }
 
-        // Add height constraint to fStackView
-        [self.fStackView addConstraints:self.fStackViewHeightConstraints];
+            self.fFixedHeightConstraint.active = YES;
+        }
 
         scrollView.hasVerticalScroller = YES;
     }
     else
     {
-        [self removeStackViewHeightConstraints];
+        [self removeHeightConstraints];
     }
 }
 
@@ -5190,7 +5196,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [self removeStackViewHeightConstraints];
+        [self removeHeightConstraints];
     }
 }
 
@@ -5203,7 +5209,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //and we only need to "fix" the layout when showing the toolbar
         if (!self.fWindow.toolbar.isVisible)
         {
-            [self removeStackViewHeightConstraints];
+            [self removeHeightConstraints];
         }
 
         //this fixes a macOS bug where on toggling the toolbar item bezels will show
@@ -5224,11 +5230,15 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
-- (void)removeStackViewHeightConstraints
+- (void)removeHeightConstraints
 {
-    if (self.fStackViewHeightConstraints)
+    if (self.fFixedHeightConstraint != nil)
     {
-        [self.fStackView removeConstraints:self.fStackViewHeightConstraints];
+        self.fFixedHeightConstraint.active = NO;
+    }
+    if (self.fMinHeightConstraint != nil)
+    {
+        self.fMinHeightConstraint.active = NO;
     }
 }
 
@@ -5313,7 +5323,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)windowWillEnterFullScreen:(NSNotification*)notification
 {
-    [self removeStackViewHeightConstraints];
+    [self removeHeightConstraints];
 }
 
 - (void)windowDidExitFullScreen:(NSNotification*)notification
