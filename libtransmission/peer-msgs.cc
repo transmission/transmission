@@ -186,6 +186,11 @@ auto constexpr PeerReqQDefault = 500U;
 // meet our bandwidth goals for the next N seconds
 auto constexpr RequestBufSecs = time_t{ 10 };
 
+// In sequential download mode (streaming), target a 1s buffer
+// to prevent overwhelming peers with excessive requests and maintain
+// responsiveness for hotswapping.
+auto constexpr RequestBufSecsSequential = time_t{ 1 };
+
 // ---
 
 auto constexpr MaxPexPeerCount = size_t{ 50U };
@@ -2125,12 +2130,19 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
 
     // use this desired rate to figure out how
     // many requests we should send to this peer
-    static auto constexpr Floor = size_t{ 32 };
-    static size_t constexpr Seconds = RequestBufSecs;
-    size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
+
+    auto const is_sequential = tor_.is_sequential_download();
+    size_t const seconds = is_sequential ? RequestBufSecsSequential : RequestBufSecs;
+
+    // Use a lower floor in sequential mode to avoid over-requesting from slow peers.
+    // We use 3 to target at least 3 blocks per seconds. 3 * block size is
+    // the speed for which a peer is considered fast enough in try_hotswap
+    size_t const floor = is_sequential ? size_t{ 3 } : size_t{ 32 };
+
+    size_t const estimated_blocks_in_period = (rate.base_quantity() * seconds) / tr_block_info::BlockSize;
     auto const ceil = peer_reqq_.value_or(PeerReqQDefault);
 
-    return std::clamp(estimated_blocks_in_period, Floor, ceil);
+    return std::clamp(estimated_blocks_in_period, floor, ceil);
 }
 
 } // namespace
