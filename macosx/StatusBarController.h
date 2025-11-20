@@ -6,7 +6,7 @@
 
 #include <libtransmission/transmission.h>
 
-@interface StatusBarController : NSViewController<NSMenuItemValidation>
+@interface StatusBarController : NSTitlebarAccessoryViewController<NSMenuItemValidation>
 
 - (instancetype)initWithLib:(tr_session*)lib;
 
