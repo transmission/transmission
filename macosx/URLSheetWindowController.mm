@@ -5,7 +5,7 @@
 #import "URLSheetWindowController.h"
 #import "Controller.h"
 
-@interface URLSheetWindowController ()
+@interface URLSheetWindowController ()<NSControlTextEditingDelegate>
 
 @property(nonatomic) IBOutlet NSTextField* fLabelField;
 @property(nonatomic) IBOutlet NSTextField* fTextField;

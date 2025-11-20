@@ -16,7 +16,7 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
     SegmentTagRemove = 1,
 };
 
-@interface GroupsPrefsController ()
+@interface GroupsPrefsController ()<NSControlTextEditingDelegate>
 
 @property(nonatomic) IBOutlet NSTableView* fTableView;
 @property(nonatomic) IBOutlet NSSegmentedControl* fAddRemoveControl;
