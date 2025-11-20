@@ -40,9 +40,9 @@ public:
         [[nodiscard]] virtual tr_piece_index_t piece_count() const = 0;
         [[nodiscard]] virtual tr_priority_t priority(tr_piece_index_t piece) const = 0;
 
-        [[nodiscard]] virtual bool is_requested(tr_block_index_t /*block*/) const
+        [[nodiscard]] virtual std::vector<uint8_t> active_request_count(tr_piece_index_t /*piece*/) const
         {
-            return false;
+            return {};
         }
 
         [[nodiscard]] virtual libtransmission::ObserverTag observe_files_wanted_changed(
