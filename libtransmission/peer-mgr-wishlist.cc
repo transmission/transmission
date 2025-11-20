@@ -21,6 +21,9 @@
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 
+#include <fmt/core.h>
+#include "libtransmission/log.h"
+
 namespace
 {
 [[nodiscard]] TR_CONSTEXPR_VEC std::vector<tr_block_span_t> make_spans(small::vector<tr_block_index_t> const& blocks)
@@ -586,6 +589,28 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
+    tr_logAddInfo(fmt::format("candidate list size: {}", std::size(candidates_)));
+    if (std::size(candidates_) < 2U)
+    {
+        tr_logAddInfo("candidate list:");
+        for (auto const& candidate : candidates_)
+        {
+            tr_logAddInfo(
+                fmt::format(
+                    "  {}: unrequested size = {}, block_span = [{}, {})",
+                    candidate.piece,
+                    std::size(candidate.unrequested),
+                    candidate.block_span.begin,
+                    candidate.block_span.end));
+            for (auto [block, end] = candidate.block_span; block < end; ++block)
+            {
+                if (mediator_.is_requested(block) == candidate.unrequested.contains(block))
+                {
+                    tr_logAddInfo(fmt::format("    block {} incorrect", block));
+                }
+            }
+        }
+    }
     for (auto const& candidate : candidates_)
     {
         auto const n_added = std::size(blocks);
