@@ -573,6 +573,7 @@ public:
         auto* s = static_cast<tr_swarm*>(vs);
         TR_ASSERT(msgs->swarm == s);
         auto const lock = s->unique_lock();
+        auto const now = std::chrono::system_clock::now();
 
         switch (event.type)
         {
@@ -581,6 +582,9 @@ public:
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->sent_cancel.emit(tor, msgs, loc.block);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format("cancelled to {} [{}]", msgs->display_name(), msgs->user_agent()));
             }
             break;
 
@@ -621,6 +625,15 @@ public:
 
         case tr_peer_event::Type::ClientGotChoke:
             s->got_choke.emit(s->tor, msgs->active_requests);
+            for (tr_block_index_t block = 0U; block < std::size(msgs->active_requests); ++block)
+            {
+                if (msgs->active_requests.test(block))
+                {
+                    s->block_history.try_emplace(block).first->second.emplace_back(
+                        now,
+                        fmt::format("choked by {} [{}]", msgs->display_name(), msgs->user_agent()));
+                }
+            }
             break;
 
         case tr_peer_event::Type::ClientGotPort:
@@ -637,7 +650,12 @@ public:
 
         case tr_peer_event::Type::ClientGotSuggest:
         case tr_peer_event::Type::ClientGotAllowedFast:
-            // not currently supported
+            for (auto [block, end] = s->wishlist_mediator.block_span(event.pieceIndex); block < end; ++block)
+            {
+                s->block_history.try_emplace(block).first->second.emplace_back(
+                    now,
+                    fmt::format("got suggest or allowed fast from {} [{}]", msgs->display_name(), msgs->user_agent()));
+            }
             break;
 
         case tr_peer_event::Type::Error:
@@ -659,6 +677,16 @@ public:
             }
 
             break;
+
+        case tr_peer_event::Type::ClientGotUnrequestedBlock:
+            {
+                auto* const tor = s->tor;
+                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format("got unrequested from {} [{}]", msgs->display_name(), msgs->user_agent()));
+                s->log_block_history(loc.block);
+            }
 
         default:
             peer_callback_common(msgs, event, s);
@@ -704,7 +732,23 @@ public:
         return tor->session->advertisedPeerPort();
     };
 
+    std::map<tr_block_index_t, std::vector<std::pair<std::chrono::system_clock::time_point, std::string>>> block_history;
+
 private:
+    void log_block_history(tr_block_index_t block) const
+    {
+        if (auto const it = block_history.find(block); it != std::end(block_history))
+        {
+            tr_logAddInfoTor(tor, fmt::format("block {} history:", block));
+            for (auto const& [time, str] : it->second)
+            {
+                auto buf = std::array<char, 64U>{};
+                auto const timestr = tr_logGetTimeStr(time, std::data(buf), std::size(buf));
+                tr_logAddInfoTor(tor, fmt::format("  [{}] {}", timestr, str));
+            }
+        }
+    }
+
     void rebuild_webseeds()
     {
         auto const n = tor->webseed_count();
@@ -808,6 +852,13 @@ private:
             }
         }
 
+        auto const now = std::chrono::system_clock::now();
+        for (auto [block, end] = wishlist_mediator.block_span(piece); block < end; ++block)
+        {
+            block_history.try_emplace(block).first->second.emplace_back(now, fmt::format("piece {} completed", piece));
+            log_block_history(block);
+        }
+
         if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
         {
             tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(piece));
@@ -841,6 +892,13 @@ private:
         for (auto& webseed : webseeds)
         {
             maybe_add_strike(webseed.get());
+        }
+
+        auto const now = std::chrono::system_clock::now();
+        for (auto [block, end] = wishlist_mediator.block_span(piece); block < end; ++block)
+        {
+            block_history.try_emplace(block).first->second.emplace_back(now, "got bad piece"s);
+            log_block_history(block);
         }
 
         tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
@@ -882,6 +940,7 @@ private:
 
     static void peer_callback_common(tr_peer* const peer, tr_peer_event const& event, tr_swarm* const s)
     {
+        auto const now = std::chrono::system_clock::now();
         switch (event.type)
         {
         case tr_peer_event::Type::ClientSentRequest:
@@ -890,6 +949,16 @@ private:
                 auto const loc_begin = tor->piece_loc(event.pieceIndex, event.offset);
                 auto const loc_end = tor->piece_loc(event.pieceIndex, event.offset, event.length);
                 s->sent_request.emit(tor, peer, { loc_begin.block, loc_end.block });
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                for (auto block = loc_begin.block; block < loc_end.block; ++block)
+                {
+                    s->block_history.try_emplace(block).first->second.emplace_back(
+                        now,
+                        fmt::format(
+                            "requested to {} [{}]",
+                            peer->display_name(),
+                            msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                }
             }
             break;
 
@@ -898,6 +967,13 @@ private:
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->got_reject.emit(tor, peer, loc.block);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format(
+                        "rejected by {} [{}]",
+                        peer->display_name(),
+                        msgs != nullptr ? msgs->user_agent() : "webseed"sv));
             }
             break;
 
@@ -910,6 +986,13 @@ private:
                 peer->blame.set(loc.piece);
                 s->got_block.emit(tor, loc.block); // put this line before calling tr_torrent callback
                 tor->on_block_received(loc.block);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                s->block_history.try_emplace(loc.block).first->second.emplace_back(
+                    now,
+                    fmt::format(
+                        "received from {} [{}]",
+                        peer->display_name(),
+                        msgs != nullptr ? msgs->user_agent() : "webseed"sv));
             }
             break;
 

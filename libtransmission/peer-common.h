@@ -49,6 +49,7 @@ public:
     {
         // Unless otherwise specified, all events are for BT peers only
         ClientGotBlock, // applies to webseed too
+        ClientGotUnrequestedBlock,
         ClientGotChoke,
         ClientGotPieceData, // applies to webseed too
         ClientGotAllowedFast,
@@ -78,6 +79,13 @@ public:
     {
         auto event = BlockEvent(block_info, block);
         event.type = Type::ClientGotBlock;
+        return event;
+    }
+
+    [[nodiscard]] constexpr static auto GotUnrequestedBlock(tr_block_info const& block_info, tr_block_index_t block) noexcept
+    {
+        auto event = BlockEvent(block_info, block);
+        event.type = Type::ClientGotUnrequestedBlock;
         return event;
     }
 
