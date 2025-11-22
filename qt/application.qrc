@@ -7,7 +7,4 @@
       <file alias="ratio.svg">../icons/yin-yang.svg</file>
       <file alias="transmission.svg">../icons/hicolor_apps_scalable_transmission.svg</file>
   </qresource>
-  <qresource prefix="/fonts">
-      <file alias="segoe.ttf">resources/fonts/segoe_fluent_icons.ttf</file>
-  </qresource>
 </RCC>
