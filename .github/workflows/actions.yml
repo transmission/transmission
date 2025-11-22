@@ -323,31 +323,31 @@ jobs:
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
 
   macos-xcodebuild-universal:
-     runs-on: macos-26
-     needs: [ what-to-make ]
-     if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
-             needs.what-to-make.outputs.make-daemon == 'true' ||
-             needs.what-to-make.outputs.make-mac == 'true' ||
-             needs.what-to-make.outputs.make-utils == 'true' }}
-     steps:
-       - name: Show Configuration
-         run: |
-           echo '${{ toJSON(needs) }}'
-           echo '${{ toJSON(runner) }}'
-           sw_vers
-       - name: Get Dependencies
-         run: brew install --formulae xcbeautify
-       - name: Get Source
-         uses: actions/checkout@v4
-         with:
-           path: src
-           submodules: recursive
-       - name: Build
-         run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build | xcbeautify --renderer github-actions
-       - uses: actions/upload-artifact@v4
-         with:
-           name: binaries-${{ github.job }}
-           path: pfx/Build/Products/**/Transmission.app*
+    runs-on: macos-26
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
+            needs.what-to-make.outputs.make-daemon == 'true' ||
+            needs.what-to-make.outputs.make-mac == 'true' ||
+            needs.what-to-make.outputs.make-utils == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          sw_vers
+      - name: Get Dependencies
+        run: brew install --formulae xcbeautify
+      - name: Get Source
+        uses: actions/checkout@v4
+        with:
+          path: src
+          submodules: recursive
+      - name: Build
+        run: set -o pipefail && xcodebuild -project src/Transmission.xcodeproj -scheme Transmission -configuration 'Release - Debug' -derivedDataPath pfx ONLY_ACTIVE_ARCH=NO build | xcbeautify --renderer github-actions
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/Build/Products/**/Transmission.app*
 
   macos-cmake-universal:
     strategy:
