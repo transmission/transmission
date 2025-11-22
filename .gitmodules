@@ -64,3 +64,6 @@
 [submodule "third-party/crc32c"]
 	path = third-party/crc32c
 	url = https://github.com/google/crc32c.git
+[submodule "third-party/libmaxminddb"]
+	path = third-party/libmaxminddb
+	url = https://github.com/maxmind/libmaxminddb.git
