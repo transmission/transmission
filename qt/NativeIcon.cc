@@ -6,7 +6,6 @@
 #include "NativeIcon.h"
 
 #include <iostream>
-#include <set>
 
 #include <QFontInfo>
 #include <QOperatingSystemVersion>
@@ -21,38 +20,49 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QPalette>
 
+#include <small/set.hpp>
+
+// bool const use_segoe = QOperatingSystemVersion::currentType() == QOperatingSystemVersion::Windows;
+bool const use_segoe = true;
+
 namespace
 {
 
-#if defined(Q_OS_WIN)
-QPixmap makeFluentPixmap(QChar const codepoint, int const point_size)
+auto const SegoeFontFamily = QStringLiteral("Segoe Fluent Icons");
+
+void ensure_fonts_initialized()
 {
     static auto const is_win11 = QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows11;
-    auto const fontName = is_win11 ? QStringLiteral("Segoe Fluent Icons") : QStringLiteral("Segoe MDL2 Assets");
-    auto const font = QFont{fontName, point_size};
+    static auto segoe_font_id = std::optional<int>{};
 
+    if (use_segoe && !is_win11 && !segoe_font_id)
+        segoe_font_id = QFontDatabase::addApplicationFont(QStringLiteral(":fonts/segoe.ttf"));
+}
+
+QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const point_size)
+{
+    auto const font = QFont{family, point_size - 8};
     if (!QFontMetrics{font}.inFont(codepoint))
-	    return {};
+        return {};
 
-    // TODO: HDPI, pixel size vs point size?
-    auto const rect = QRect{ QPoint{}, QSize{point_size, point_size}};
+    // FIXME: HDPI, pixel size vs point size?
+    // FIXME: light mode vs. dark mode?
+    auto const rect = QRect{ 0, 0, point_size, point_size };
     auto pixmap = QPixmap{ rect.size() };
-    pixmap.fill(Qt::red);
-    auto painter = QPainter{ &pixmap };
+    pixmap.fill(Qt::transparent);
+    auto painter = QPainter{&pixmap};
     painter.setFont(font);
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(QPen{Qt::green});
+    painter.setPen(QPen{Qt::black});
+    painter.setRenderHint(QPainter::TextAntialiasing);
     auto br = QRect{};
     painter.drawText(rect, Qt::AlignCenter, QString{codepoint}, &br);
     painter.end();
 
-    std::cerr << "br x " << br.x() << " y " << br.y() << " w " << br.width() << " h " << br.height() << std::endl;
-    // FIXME: segoe icon not rendering -- br.width() is zero??
-    // This is a blocker
+    //std::cerr << "br x " << br.x() << " y " << br.y() << " w " << br.width() << " h " << br.height() << std::endl;
 
     return pixmap;
 }
-#endif // Q_OS_WIN
 
 QString qstrFromUtf8(std::string_view const sv)
 {
@@ -98,40 +108,33 @@ QIcon NativeIcon::get(
 
 QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 {
-    auto constexpr IconMetrics = std::array<QStyle::PixelMetric, 7U>{
-        QStyle::PM_LargeIconSize, QStyle::PM_ButtonIconSize, QStyle::PM_ListViewIconSize, QStyle::PM_MessageBoxIconSize,
-        QStyle::PM_SmallIconSize, QStyle::PM_TabBarIconSize, QStyle::PM_ToolBarIconSize,
+    ensure_fonts_initialized();
+
+    // FIXME: cache
+
+    auto const point_sizes = small::set<int>{
+        style->pixelMetric(QStyle::PM_ButtonIconSize),
+        style->pixelMetric(QStyle::PM_LargeIconSize),
+        style->pixelMetric(QStyle::PM_ListViewIconSize),
+        style->pixelMetric(QStyle::PM_MessageBoxIconSize),
+        style->pixelMetric(QStyle::PM_SmallIconSize),
+        style->pixelMetric(QStyle::PM_TabBarIconSize),
+        style->pixelMetric(QStyle::PM_ToolBarIconSize)
     };
 
-    auto point_sizes = std::set<int>{};
-    for (auto const pm : IconMetrics)
-        point_sizes.emplace(style->pixelMetric(pm));
+    // TODO: macOS
+    // TODO: try sfSymbolName if on macOS
+    // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
 
-#if 0
-    if (auto const todo = QStringLiteral("TODO"); spec.sfSymbolName == todo || spec.fluentCodePoint == todo || spec.fdoName == todo)
-      abort();
-#endif
-
-#if defined(Q_OS_MAC)
-        // TODO: try sfSymbolName if on macOS
-        // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
-#endif
-
-#if defined(Q_OS_WIN)
-    if (!spec.fluentCodepoint.isNull())
+    if (use_segoe && !spec.fluentCodepoint.isNull())
     {
-#if 0
         auto icon = QIcon{};
         for (int const point_size : point_sizes)
-            if (QPixmap const pixmap = makeFluentPixmap(spec.fluentCodepoint, point_size); !pixmap.isNull())
+            if (auto const pixmap = makeIconFromCodepoint(SegoeFontFamily, spec.fluentCodepoint, point_size); !pixmap.isNull())
                 icon.addPixmap(pixmap);
         if (!icon.isNull())
             return icon;
-#else
-	return makeFluentPixmap(spec.fluentCodepoint, 24);
-#endif
     }
-#endif
 
     if (!spec.fdoName.isEmpty())
     {
