@@ -30,8 +30,8 @@ public:
         // https://doc.qt.io/qt-6/qstyle.html#StandardPixmap-enum
         std::optional<QStyle::StandardPixmap> fallback;
 
-        QFont::Weight weight = QFont::Normal; 
+        QFont::Weight weight = QFont::Normal;
     };
 
-    static QIcon get(const Spec& spec, QStyle* style = QApplication::style());
+    static QIcon get(Spec const& spec, QStyle* style = QApplication::style());
 };
