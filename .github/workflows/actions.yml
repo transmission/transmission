@@ -322,7 +322,7 @@ jobs:
         run: |
           if (Select-String -Path makelog -Pattern 'warning:') { exit 1 }
 
-  macos-26-project:
+  macos-xcodebuild-universal:
      runs-on: macos-26
      needs: [ what-to-make ]
      if: ${{ needs.what-to-make.outputs.make-cli == 'true' ||
@@ -349,7 +349,7 @@ jobs:
            name: binaries-${{ github.job }}
            path: pfx/Build/Products/**/Transmission.app*
 
-  macos-from-repo:
+  macos-cmake-universal:
     strategy:
       matrix:
         os: [
@@ -420,7 +420,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.os }}-from-repo
+          name: binaries-${{ matrix.os }}-cmake-universal
           path: pfx/**/*
 
   alpine-musl:
