@@ -5,6 +5,7 @@
 
 #include "NativeIcon.h"
 
+#include <QScreen>
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
@@ -20,14 +21,14 @@ QChar parseCodepoint(QString const& code)
 {
     // Supports "E710" or "\uE710"
     QString s = code.trimmed();
-    if (s.startsWith("\\u", Qt::CaseInsensitive))
+    if (s.startsWith(QStringLiteral("\\u"), Qt::CaseInsensitive))
         s = s.mid(2);
     bool ok = false;
     uint u = s.toUInt(&ok, 16);
     return ok ? QChar(u) : QChar();
 }
 
-QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
+QPixmap makeFluentPixmap(QString const& codepointHex, int const point_size)
 {
     if (codepointHex.isEmpty())
         return {};
@@ -38,18 +39,18 @@ QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
 
     // Prefer Segoe Fluent Icons (Win11), fall back to Segoe MDL2 Assets (Win10)
     QFont font;
-    font.setPointSize(pointSize);
+    font.setPointSize(point_size);
     font.setStyleStrategy(QFont::PreferDefault);
 
     // Try Fluent first
-    font.setFamily("Segoe Fluent Icons");
+    font.setFamily(QStringLiteral("Segoe Fluent Icons"));
     if (!QFontInfo(font).exactMatch())
     {
-        font.setFamily("Segoe MDL2 Assets");
+        font.setFamily(QStringLiteral("Segoe MDL2 Assets"));
     }
 
     auto const dpr = qApp->primaryScreen()->devicePixelRatio();
-    auto const px = qRound(pointSize * dpr) + 8; // padding
+    auto const px = qRound(point_size * dpr) + 8; // padding
     QPixmap pm{ px, px };
     pm.setDevicePixelRatio(dpr);
     pm.fill(Qt::transparent);
@@ -66,7 +67,7 @@ QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
     p.drawText(r, Qt::AlignCenter, QString(glyph));
     p.end();
 
-    return QIcon{ pm };
+    return pm;
 }
 #endif // Q_OS_WIN
 
@@ -115,21 +116,14 @@ QIcon NativeIcon::get(
 QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    auto constexpr auto IconMetrics = std::array<QStyle::PixelMetric, 7U>{ {
-        QStyle::PM_ButtonIconSize QStyle::PM_LargeIconSize,
-        QStyle::PM_ListViewIconSize,
-        QStyle::PM_MessageBoxIconSize,
-        QStyle::PM_SmallIconSize,
-        QStyle::PM_TabBarIconSize,
-        QStyle::PM_ToolBarIconSize,
-    } };
+    auto constexpr IconMetrics = std::array<QStyle::PixelMetric, 7U>{
+        QStyle::PM_LargeIconSize, QStyle::PM_ButtonIconSize, QStyle::PM_ListViewIconSize, QStyle::PM_MessageBoxIconSize,
+        QStyle::PM_SmallIconSize, QStyle::PM_TabBarIconSize, QStyle::PM_ToolBarIconSize,
+    };
 
-    auto dipSizes = std::set<QSize>{};
+    auto point_sizes = std::set<int>{};
     for (auto const pm : IconMetrics)
-    {
-        auto const dip = style->pixelMetric(pm);
-        dipSizes.emplace(dip, dip);
-    }
+        point_sizes.emplace(style->pixelMetric(pm));
 #endif
 
 #if 0
@@ -138,8 +132,8 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 #endif
 
 #if defined(Q_OS_MAC)
-    // TODO: try sfSymbolName if on macOS
-    // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
+        // TODO: try sfSymbolName if on macOS
+        // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
 #endif
 
 #if defined(Q_OS_WIN)
@@ -147,8 +141,8 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
     if (!spec.fluentCodepoint.isEmpty())
     {
         auto icon = QIcon{};
-        for (auto const dipSize : dipSizes)
-            if (auto pixmap = makeFluentIcon(spec.fluentCodepoint, dipSize); !pixmap.isNull())
+        for (int const point_size : point_sizes)
+            if (QPixmap const pixmap = makeFluentPixmap(spec.fluentCodepoint, point_size); !pixmap.isNull())
                 icon.addPixmap(pixmap);
         if (!icon.isNull())
             return icon;
