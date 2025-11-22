@@ -704,10 +704,33 @@ void Application::on_open(std::vector<Glib::RefPtr<Gio::File>> const& files, Gli
 namespace
 {
 
+/* The application ID in GTK is used to identify "application uniqueness",
+ * to prevent things like inadvertently launching multiple instances of an
+ * application. We use the device and inode of the configuration directory
+ * to uniquely identify an instance of transmission-gtk, so that multiple
+ * instances are allowed as long as they're all using unique configuration
+ * directories.
+ * 
+ * Unfortunately, this ID is also used in e.g. GNOME to identify which .desktop
+ * file an application is associated with, and thus which icon to show in the
+ * dock, which means that, at least on GNOME Wayland, no icon will appear.
+ * 
+ * To work around this, solve for the common case of a user using the default
+ * configuration directory by returning a static string, while any other config
+ * directory results in the previous unique string.
+ */
 std::string get_application_id(std::string const& config_dir)
 {
     struct stat sb = {};
     (void)::stat(config_dir.c_str(), &sb);
+
+    std::string default_config_dir = tr_getDefaultConfigDir("transmission");
+
+    if (config_dir == default_config_dir)
+    {
+        return "com.transmissionbt.transmission";
+    }
+
     return fmt::format("com.transmissionbt.transmission_{}_{}", sb.st_dev, sb.st_ino);
 }
 
