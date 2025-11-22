@@ -161,30 +161,6 @@ constexpr auto Other = MenuMode{ 1 << 3U };
     return (get_menu_mode() & type).any();
 }
 
-[[nodiscard]] auto addEmblem(QIcon base_icon, QIcon emblem_icon, Qt::LayoutDirection layout_direction)
-{
-    auto icon = QIcon{};
-
-    for (QSize const& size : base_icon.availableSizes())
-    {
-        std::cerr << " available size " << size.width() << 'x' << size.height() << std::endl;
-        auto const emblem_size = size * 0.666;
-        auto const emblem_rect = QStyle::alignedRect(
-            layout_direction,
-            Qt::AlignBottom | Qt::AlignRight,
-            emblem_size,
-            QRect{ QPoint{ 0, 0 }, size });
-
-        auto pixmap = base_icon.pixmap(size);
-        auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
-        QPainter{ &pixmap }.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
-
-        icon.addPixmap(pixmap);
-    }
-
-    return icon;
-}
-
 } // namespace icons
 } // namespace
 
