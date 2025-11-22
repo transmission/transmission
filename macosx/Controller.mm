@@ -2522,7 +2522,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             //not found - must be filtering
             NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
-            [self.fFilterBar reset:YES];
+            [self.fFilterBar reset];
 
             row = [self.fTableView rowForItem:torrent];
 
@@ -4039,7 +4039,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
-        [self.fFilterBar reset:YES];
+        [self.fFilterBar reset];
     }
 
     [self.fDefaults setBool:show forKey:@"FilterBar"];
