@@ -22,7 +22,9 @@
 
 #include <small/set.hpp>
 
+#if defined(Q_OS_MAC)
 extern QPixmap loadSFSymbol(QString symbol_name, int pixel_size);
+#endif
 
 namespace
 {
@@ -139,6 +141,7 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
         style->pixelMetric(QStyle::PM_ToolBarIconSize)
     };
 
+#if defined(Q_OS_MAC)
     if (!spec.sfSymbolName.isEmpty())
     {
         auto icon = QIcon{};
@@ -148,6 +151,7 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
         if (!icon.isNull())
             return icon;
     }
+#endif
 
     if (!spec.fluentCodepoint.isNull())
     {
