@@ -149,14 +149,15 @@ TEST_F(PeerInfoTest, updateCanonicalPriority)
             continue;
         }
 
-        auto const info = tr_peer_info{ *peer_sockaddr,
-                                        0,
-                                        TR_PEER_FROM_PEX,
-                                        client_sockaddr->address(),
-                                        [&client_sockaddr]
-                                        {
-                                            return client_sockaddr->port();
-                                        } };
+        auto const info = tr_peer_info{
+            *peer_sockaddr,
+            0,
+            TR_PEER_FROM_PEX,
+            client_sockaddr->address(),
+            // clang-format off
+            [&client_sockaddr] { return client_sockaddr->port(); }
+            // clang-format on
+        };
         EXPECT_EQ(info.get_canonical_priority(), expected);
     }
 }
