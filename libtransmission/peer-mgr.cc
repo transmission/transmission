@@ -241,7 +241,11 @@ void tr_peer_info::merge(tr_peer_info& that) noexcept
     }
     /* is_connected_ should already be set */
     /* keep is_seed_ as-is */
-    /* keep upload_only_ as-is */
+    /* preserve upload_only_ when peer is still connected */
+    if (that.is_connected())
+    {
+        set_upload_only(that.is_upload_only());
+    }
 
     if (that.outgoing_handshake_)
     {
@@ -2111,7 +2115,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     auto salter = tr_salt_shaker{};
     for (auto* const peer : peers)
     {
-        if (peer->is_seed())
+        if (peer->peer_info->is_upload_only())
         {
             /* choke seeds and partial seeds */
             peer->set_choke(true);
@@ -2251,8 +2255,8 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     auto const* tor = s->tor;
     auto const& info = peer->peer_info;
 
-    /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->is_done() && peer->is_seed())
+    /* disconnect if we're both seeds or partial seeds and enough time has passed for PEX */
+    if (tor->is_done() && info->is_upload_only())
     {
         return !tor->allows_pex() || info->idle_secs(now).value_or(0U) >= 30U;
     }
