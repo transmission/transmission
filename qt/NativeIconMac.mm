@@ -5,12 +5,78 @@
 
 #import <AppKit/AppKit.h>
 
-#include <QtGui/private/qcoregraphics_p.h>
+// Source: https://stackoverflow.com/a/74756071
+// Posted by Bri Bri
+// Retrieved 2025-11-22, License - CC BY-SA 4.0
+namespace bribri
+{
+
+CGBitmapInfo CGBitmapInfoForQImage(QImage const& image)
+{
+    CGBitmapInfo bitmapInfo = kCGImageAlphaNone;
+
+    switch (image.format())
+    {
+    case QImage::Format_ARGB32:
+        bitmapInfo = kCGImageAlphaFirst | kCGBitmapByteOrder32Host;
+        break;
+    case QImage::Format_RGB32:
+        bitmapInfo = kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Host;
+        break;
+    case QImage::Format_RGBA8888_Premultiplied:
+        bitmapInfo = kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big;
+        break;
+    case QImage::Format_RGBA8888:
+        bitmapInfo = kCGImageAlphaLast | kCGBitmapByteOrder32Big;
+        break;
+    case QImage::Format_RGBX8888:
+        bitmapInfo = kCGImageAlphaNoneSkipLast | kCGBitmapByteOrder32Big;
+        break;
+    case QImage::Format_ARGB32_Premultiplied:
+        bitmapInfo = kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host;
+        break;
+    default:
+        break;
+    }
+
+    return bitmapInfo;
+}
+
+QImage CGImageToQImage(CGImageRef cgImage)
+{
+    size_t const width = CGImageGetWidth(cgImage);
+    size_t const height = CGImageGetHeight(cgImage);
+    QImage image(width, height, QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+    CGContextRef context = CGBitmapContextCreate((void*)image.bits(), image.width(), image.height(), 8, image.bytesPerLine(), colorSpace, CGBitmapInfoForQImage(image));
+
+    // Scale the context so that painting happens in device-independent pixels
+    qreal const devicePixelRatio = image.devicePixelRatio();
+    CGContextScaleCTM(context, devicePixelRatio, devicePixelRatio);
+
+    CGRect rect = CGRectMake(0, 0, width, height);
+    CGContextDrawImage(context, rect, cgImage);
+
+    CFRelease(colorSpace);
+    CFRelease(context);
+
+    return image;
+}
+
+} // namespace bribri
 
 QPixmap loadSFSymbol(QString const symbol_name, int const pixel_size)
 {
-    auto const size = QSizeF{ pixel_size, pixel_size };
-    if (NSImage* image = [NSImage systemSymbolNamed:symbolName.toNSString()])
-        return qt_mac_toQPixmap(nsImage, QSizeF{ pixel_size, pixel_size });
-    return {};
+    if (NSImage* image = [NSImage imageWithSystemSymbolName:symbol_name.toNSString() accessibilityDescription:nil])
+    {
+        NSRect image_rect = NSMakeRect(0, 0, pixel_size, pixel_size);
+        CGImageRef cgimg = [image CGImageForProposedRect:&image_rect context:nil hints:nil];
+        return QPixmap::fromImage(CGImageToQImage(cgimg));
+    }
+
+    return
+    {
+    }
 }
