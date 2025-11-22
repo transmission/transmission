@@ -359,23 +359,23 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     icon = NativeIcon::get("arrow.down.to.line"sv, "eac4"sv, "go-bottom"sv);
     set(action, icon, type);
 
-    icon_network_error_ = NativeIcon::get("wifi.exclamationmark"sv, "e783"sv, "network-error"sv, QStyle::SP_MessageBoxCritical);
+    // network icons
 
-    icon_network_idle_ = NativeIcon::get("wifi"sv, "e77b"sv, "network-idle"sv);
+    auto constexpr NetworkIconSize = QSize{ 16, 16 };
+    icon = NativeIcon::get("wifi"sv, "e77b"sv, "network-idle"sv);
+    pixmap_network_idle_ = icon.pixmap(NetworkIconSize);
 
-    icon_network_receive_ = NativeIcon::get("arrow.down.circle"sv, "e896"sv, "network-receive"sv);
+    icon = NativeIcon::get("wifi.exclamationmark"sv, "e783"sv, "network-error"sv, QStyle::SP_MessageBoxCritical);
+    pixmap_network_error_ = icon.pixmap(NetworkIconSize);
 
-    icon_network_transmit_ = NativeIcon::get("arrow.up.circle"sv, "e898"sv, "network-transmit"sv);
+    icon = NativeIcon::get("arrow.down.circle"sv, "e896"sv, "network-receive"sv);
+    pixmap_network_receive_ = icon.pixmap(NetworkIconSize);
 
-    icon_network_transmit_receive_ = NativeIcon::get("arrow.up.arrow.down.circle"sv, "e895"sv, "network-transmit-receive"sv);
+    icon = NativeIcon::get("arrow.up.circle"sv, "e898"sv, "network-transmit"sv);
+    pixmap_network_transmit_ = icon.pixmap(NetworkIconSize);
 
-#if 0
-    pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
-    pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
-    pixmap_network_receive_ = make_network_pixmap(QStringLiteral("network-receive"));
-    pixmap_network_transmit_ = make_network_pixmap(QStringLiteral("network-transmit"));
-    pixmap_network_transmit_receive_ = make_network_pixmap(QStringLiteral("network-transmit-receive"));
-#endif
+    icon = NativeIcon::get("arrow.up.arrow.down.circle"sv, "e895"sv, "network-transmit-receive"sv);
+    pixmap_network_transmit_receive_ = icon.pixmap(NetworkIconSize);
 
     // ui signals
     connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::setToolbarVisible);

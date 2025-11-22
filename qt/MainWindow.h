@@ -144,12 +144,6 @@ private:
 
     std::shared_ptr<ListViewProxyStyle> lvp_style_;
 
-    QIcon icon_network_error_;
-    QIcon icon_network_idle_;
-    QIcon icon_network_receive_;
-    QIcon icon_network_transmit_;
-    QIcon icon_network_transmit_receive_;
-
     QPixmap pixmap_network_error_;
     QPixmap pixmap_network_idle_;
     QPixmap pixmap_network_receive_;
