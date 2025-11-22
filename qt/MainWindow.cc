@@ -167,7 +167,8 @@ constexpr auto Other = MenuMode{ 1 << 3U };
 
     for (QSize const& size : base_icon.availableSizes())
     {
-        auto const emblem_size = size / 2;
+        std::cerr << " available size " << size.width() << 'x' << size.height() << std::endl;
+        auto const emblem_size = size * 0.666;
         auto const emblem_rect = QStyle::alignedRect(
             layout_direction,
             Qt::AlignBottom | Qt::AlignRight,
@@ -241,12 +242,12 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto* action = ui_.action_OpenFile;
     auto type = icons::Standard | icons::Verb;
-    auto icon = NativeIcon::get("folder.open"sv, segoe::FolderOpen, "folder"sv, QStyle::SP_DirOpenIcon);
+    auto icon = NativeIcon::get("folder.open"sv, segoe::OpenFile, "folder"sv, QStyle::SP_DirOpenIcon);
     set(action, icon, type);
 
     action = ui_.action_AddURL;
     type = icons::Verb;
-    icon = icons::addEmblem(icon, NativeIcon::get("globe"sv, segoe::Globe, "emblem-symbolic-link"sv), layoutDirection());
+    icon = NativeIcon::get("globe"sv, segoe::Globe, "globe"sv, QStyle::SP_DirOpenIcon);
     set(action, icon, type);
 
     action = ui_.action_New;
@@ -311,7 +312,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     action = ui_.action_Statistics;
     type = icons::Verb;
-    icon = NativeIcon::get("chart.bar"sv, segoe::ReportDocument, "info"sv);
+    icon = NativeIcon::get("chart.bar"sv, segoe::Ruler, "info"sv);
     set(action, icon, type);
 
     action = ui_.action_Donate;
