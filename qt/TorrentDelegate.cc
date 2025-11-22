@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <string_view>
 #include <utility>
 
 #include <QApplication>
@@ -16,12 +17,14 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
-#include "IconCache.h"
+#include "NativeIcon.h"
 #include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
 #include "Utils.h"
+
+using namespace std::literals;
 
 enum
 {
@@ -450,7 +453,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = IconCache::get().getThemeIcon(QStringLiteral("emblem-important"), QStyle::SP_MessageBoxWarning);
+        icon = NativeIcon::get("exclamationmark.circle"sv, "e7ba"sv, "emblem-important"sv, QStyle::SP_MessageBoxWarning);
     }
 
     return icon;
