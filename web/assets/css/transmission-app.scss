@@ -1657,6 +1657,12 @@ dialog {
   #auto-start-label {
     margin-left: 5px;
   }
+
+  &.drag-over {
+    border: 2px dashed var(--blue-300);
+    background: rgb(44 127 234 / 5%);
+    transition: all 0.2s ease;
+  }
 }
 
 /// HOTKEYS DIALOG
