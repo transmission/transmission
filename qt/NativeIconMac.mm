@@ -77,10 +77,15 @@ QPixmap loadSFSymbol(QString const symbol_name, int const pixel_size)
 {
     if (NSImage* image = [NSImage imageWithSystemSymbolName:symbol_name.toNSString() accessibilityDescription:nil])
     {
-        // use whatever color QPalette::ButtonText is using
-        QColor const qfg = qApp->palette().color(QPalette::ButtonText);
-        NSColor* nsfg = [NSColor colorWithCalibratedRed:qfg.redF() green:qfg.greenF() blue:qfg.blueF() alpha:qfg.alphaF()];
-        auto* configuration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:nsfg];
+        auto* configuration = [NSImageSymbolConfiguration configurationWithPointSize:pixel_size];
+        if (@available(macOS 12.0, *)) {
+            // use whatever color QPalette::ButtonText is using
+            // @available check needed for configurationWithHierarchicalColor
+            QColor const qfg = qApp->palette().color(QPalette::ButtonText);
+            NSColor* nsfg = [NSColor colorWithCalibratedRed:qfg.redF() green:qfg.greenF() blue:qfg.blueF() alpha:qfg.alphaF()];
+            auto* colorConfig = [NSImageSymbolConfiguration configurationWithHierarchicalColor:nsfg];
+            configuration = [configuration configurationByApplyingConfiguration:colorConfig];
+        }
         image = [image imageWithSymbolConfiguration:configuration];
 
         // NSImage -> QPixmap
