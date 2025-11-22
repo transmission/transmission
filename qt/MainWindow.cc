@@ -6,6 +6,7 @@
 #include <array>
 #include <cassert>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include <QCheckBox>
@@ -43,6 +44,8 @@
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
+
+using namespace std::literals;
 
 namespace
 {
@@ -305,7 +308,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_Announce->setIcon(icon);
     ui_.action_Announce->setIconVisibleInMenu(icons::visible(icons::Verb));
 
-    icon = icons.getThemeIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
+    icon = NativeIcon::get({ "pause.fill"sv, "e769"sv, "media-playback-pause"sv, QStyle::SP_MediaPause });
     ui_.action_Pause->setIcon(icon);
     ui_.action_Pause->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
 

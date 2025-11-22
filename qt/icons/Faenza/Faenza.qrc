@@ -17,7 +17,6 @@
     <file>actions/16/help-contents.png</file>
     <file>actions/16/list-add.png</file>
     <file>actions/16/list-remove.png</file>
-    <file>actions/16/media-playback-pause.png</file>
     <file>actions/16/media-playback-start.png</file>
     <file>actions/16/process-stop.png</file>
     <file>actions/22/application-exit.png</file>
@@ -35,7 +34,6 @@
     <file>actions/22/help-contents.png</file>
     <file>actions/22/list-add.png</file>
     <file>actions/22/list-remove.png</file>
-    <file>actions/22/media-playback-pause.png</file>
     <file>actions/22/media-playback-start.png</file>
     <file>actions/22/process-stop.png</file>
     <file>actions/24/application-exit.png</file>
@@ -53,7 +51,6 @@
     <file>actions/24/help-contents.png</file>
     <file>actions/24/list-add.png</file>
     <file>actions/24/list-remove.png</file>
-    <file>actions/24/media-playback-pause.png</file>
     <file>actions/24/media-playback-start.png</file>
     <file>actions/24/process-stop.png</file>
     <file>categories/16/preferences-system.png</file>
