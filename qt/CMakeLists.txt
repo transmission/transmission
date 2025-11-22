@@ -61,6 +61,8 @@ target_sources(${TR_NAME}-qt
         MainWindow.h
         MakeDialog.cc
         MakeDialog.h
+        NativeIcon.cc
+        NativeIcon.h
         OptionsDialog.cc
         OptionsDialog.h
         PathButton.cc
