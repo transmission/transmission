@@ -1590,9 +1590,9 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_.get());
     ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
-    ui_.addTrackerButton->setIcon(NativeIcon::get("plus"sv, "e710"sv, "list-add"sv));
-    ui_.editTrackersButton->setIcon(NativeIcon::get("pencil"sv, "e70f"sv, "document-edit"sv));
-    ui_.removeTrackerButton->setIcon(NativeIcon::get("minus"sv, "e738"sv, "list-remove"sv));
+    ui_.addTrackerButton->setIcon(NativeIcon::get("plus"sv, segoe::Add, "list-add"sv));
+    ui_.editTrackersButton->setIcon(NativeIcon::get("pencil"sv, segoe::Edit, "document-edit"sv));
+    ui_.removeTrackerButton->setIcon(NativeIcon::get("minus"sv, segoe::Remove, "list-remove"sv));
 
     ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));

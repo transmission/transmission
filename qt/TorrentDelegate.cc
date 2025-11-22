@@ -453,7 +453,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = NativeIcon::get("exclamationmark.circle"sv, "e7ba"sv, "emblem-important"sv, QStyle::SP_MessageBoxWarning);
+        icon = NativeIcon::get("exclamationmark.circle"sv, segoe::Warning, "emblem-important"sv, QStyle::SP_MessageBoxWarning);
     }
 
     return icon;

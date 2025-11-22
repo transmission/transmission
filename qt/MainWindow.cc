@@ -241,140 +241,140 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto* action = ui_.action_OpenFile;
     auto type = icons::Standard | icons::Verb;
-    auto icon = NativeIcon::get("folder.open"sv, "e838"sv, "folder"sv, QStyle::SP_DirOpenIcon);
+    auto icon = NativeIcon::get("folder.open"sv, segoe::FolderOpen, "folder"sv, QStyle::SP_DirOpenIcon);
     set(action, icon, type);
 
     action = ui_.action_AddURL;
     type = icons::Verb;
-    icon = icons::addEmblem(icon, NativeIcon::get("globe"sv, "e774"sv, "emblem-symbolic-link"sv), layoutDirection());
+    icon = icons::addEmblem(icon, NativeIcon::get("globe"sv, segoe::Globe, "emblem-symbolic-link"sv), layoutDirection());
     set(action, icon, type);
 
     action = ui_.action_New;
     type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("plus"sv, "e710"sv, "document-new", QStyle::SP_FileIcon);
+    icon = NativeIcon::get("plus"sv, segoe::Add, "document-new", QStyle::SP_FileIcon);
     set(action, icon, type);
 
     action = ui_.action_Properties;
     type = icons::Standard | icons::Noun;
-    icon = NativeIcon::get("doc.text.magnifyingglass"sv, "e946"sv, "document-properties"sv, QStyle::SP_FileIcon);
+    icon = NativeIcon::get("doc.text.magnifyingglass"sv, segoe::Info, "document-properties"sv, QStyle::SP_FileIcon);
     set(action, icon, type);
 
     action = ui_.action_OpenFolder;
     type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("folder"sv, "ed25"sv, "folder-open"sv, QStyle::SP_DirOpenIcon);
+    icon = NativeIcon::get("folder"sv, segoe::OpenFolder, "folder-open"sv, QStyle::SP_DirOpenIcon);
     set(action, icon, type);
 
     action = ui_.action_Start;
     type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("play.fill"sv, "e768"sv, "media-playback-start"sv, QStyle::SP_MediaPlay);
+    icon = NativeIcon::get("play.fill"sv, segoe::Play, "media-playback-start"sv, QStyle::SP_MediaPlay);
     set(action, icon, type);
 
     action = ui_.action_Pause;
     type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("pause.fill"sv, "e769"sv, "media-playback-pause"sv, QStyle::SP_MediaPause);
+    icon = NativeIcon::get("pause.fill"sv, segoe::Pause, "media-playback-pause"sv, QStyle::SP_MediaPause);
     set(action, icon, type);
 
     action = ui_.action_Remove;
     type = icons::Verb;
-    icon = NativeIcon::get("minus"sv, "e738"sv, "list-remove"sv, QStyle::SP_DialogCancelButton);
+    icon = NativeIcon::get("minus"sv, segoe::Remove, "list-remove"sv, QStyle::SP_DialogCancelButton);
     set(action, icon, type);
 
     action = ui_.action_Delete;
     type = icons::Verb;
-    icon = NativeIcon::get("trash"sv, "e74d"sv, "edit-delete"sv, QStyle::SP_TrashIcon);
+    icon = NativeIcon::get("trash"sv, segoe::Delete, "edit-delete"sv, QStyle::SP_TrashIcon);
     set(action, icon, type);
 
     action = ui_.action_SetLocation;
     type = icons::Verb;
-    icon = NativeIcon::get("doc.on.clipboard"sv, "e8c8"sv, "edit-copy"sv);
+    icon = NativeIcon::get("doc.on.clipboard"sv, segoe::Copy, "edit-copy"sv);
     set(action, icon, type);
 
     action = ui_.action_Quit;
-    icon = NativeIcon::get("power"sv, "e7e8"sv, "application-exit"sv);
+    icon = NativeIcon::get("power"sv, segoe::PowerButton, "application-exit"sv);
     type = icons::Standard | icons::Verb;
     set(action, icon, type);
 
     action = ui_.action_SelectAll;
     type = icons::Verb;
-    icon = NativeIcon::get("checkmark.square"sv, "e8b3"sv, "edit-select-all"sv);
+    icon = NativeIcon::get("checkmark.square"sv, segoe::SelectAll, "edit-select-all"sv);
     set(action, icon, type);
 
     action = ui_.action_DeselectAll;
     type = icons::Verb;
-    icon = NativeIcon::get("checkmark"sv, "e739"sv, "edit-select-none"sv);
+    icon = NativeIcon::get("checkmark"sv, segoe::Checkbox, "edit-select-none"sv);
     set(action, icon, type);
 
     action = ui_.action_Preferences;
-    icon = NativeIcon::get("gearshape"sv, "e713"sv, "preferences-system"sv);
+    icon = NativeIcon::get("gearshape"sv, segoe::Settings, "preferences-system"sv);
     type = icons::Standard | icons::Verb;
     set(action, icon, type);
 
     action = ui_.action_Statistics;
     type = icons::Verb;
-    icon = NativeIcon::get("chart.bar"sv, "e9e4"sv, "info"sv);
+    icon = NativeIcon::get("chart.bar"sv, segoe::ReportDocument, "info"sv);
     set(action, icon, type);
 
     action = ui_.action_Donate;
     type = icons::Verb;
-    icon = NativeIcon::get("heart"sv, "eb51"sv, "donate"sv);
+    icon = NativeIcon::get("heart"sv, segoe::Heart, "donate"sv);
     set(action, icon, type);
 
     action = ui_.action_About;
     type = icons::Standard;
-    icon = NativeIcon::get("info.circle"sv, "e946"sv, "help-about"sv, QStyle::SP_MessageBoxInformation);
+    icon = NativeIcon::get("info.circle"sv, segoe::Info, "help-about"sv, QStyle::SP_MessageBoxInformation);
     set(action, icon, type);
 
     action = ui_.action_CopyMagnetToClipboard;
     type = icons::Verb;
-    icon = NativeIcon::get("doc.on.clipboard"sv, "e8c8"sv, "edit-copy"sv);
+    icon = NativeIcon::get("doc.on.clipboard"sv, segoe::Copy, "edit-copy"sv);
     set(action, icon, type);
 
     action = ui_.action_Verify;
     type = icons::Verb;
-    icon = NativeIcon::get("arrow.clockwise"sv, "e72c"sv, "view-refresh"sv, QStyle::SP_BrowserReload);
+    icon = NativeIcon::get("arrow.clockwise"sv, segoe::Refresh, "view-refresh"sv, QStyle::SP_BrowserReload);
     set(action, icon, type);
 
     action = ui_.action_Contents;
     type = icons::Standard;
-    icon = NativeIcon::get("questionmark.circle"sv, "e897"sv, "help-faq"sv, QStyle::SP_DialogHelpButton);
+    icon = NativeIcon::get("questionmark.circle"sv, segoe::Help, "help-faq"sv, QStyle::SP_DialogHelpButton);
     set(action, icon, type);
 
     action = ui_.action_QueueMoveTop;
     type = icons::Verb;
-    icon = NativeIcon::get("arrow.up.to.line"sv, "eac3"sv, "go-top"sv);
+    icon = NativeIcon::get("arrow.up.to.line"sv, segoe::CaretUpSolid8, "go-top"sv);
     set(action, icon, type);
 
     action = ui_.action_QueueMoveUp;
     type = icons::Verb;
-    icon = NativeIcon::get("arrow.up"sv, "e74a"sv, "go-up"sv);
+    icon = NativeIcon::get("arrow.up"sv, segoe::CaretUp8, "go-up"sv);
     set(action, icon, type);
 
     action = ui_.action_QueueMoveDown;
     type = icons::Verb;
-    icon = NativeIcon::get("arrow.down"sv, "e74b"sv, "go-down"sv);
+    icon = NativeIcon::get("arrow.down"sv, segoe::CaretDown8, "go-down"sv);
     set(action, icon, type);
 
     action = ui_.action_QueueMoveBottom;
     type = icons::Verb;
-    icon = NativeIcon::get("arrow.down.to.line"sv, "eac4"sv, "go-bottom"sv);
+    icon = NativeIcon::get("arrow.down.to.line"sv, segoe::CaretDownSolid8, "go-bottom"sv);
     set(action, icon, type);
 
     // network icons
 
     auto constexpr NetworkIconSize = QSize{ 16, 16 };
-    icon = NativeIcon::get("wifi"sv, "e77b"sv, "network-idle"sv);
+    icon = NativeIcon::get(""sv, QChar{}, "network-idle"sv);
     pixmap_network_idle_ = icon.pixmap(NetworkIconSize);
 
-    icon = NativeIcon::get("wifi.exclamationmark"sv, "e783"sv, "network-error"sv, QStyle::SP_MessageBoxCritical);
+    icon = NativeIcon::get("wifi.exclamationmark"sv, segoe::Error, "network-error"sv, QStyle::SP_MessageBoxCritical);
     pixmap_network_error_ = icon.pixmap(NetworkIconSize);
 
-    icon = NativeIcon::get("arrow.down.circle"sv, "e896"sv, "network-receive"sv);
+    icon = NativeIcon::get("arrow.down.circle"sv, segoe::Download, "network-receive"sv);
     pixmap_network_receive_ = icon.pixmap(NetworkIconSize);
 
-    icon = NativeIcon::get("arrow.up.circle"sv, "e898"sv, "network-transmit"sv);
+    icon = NativeIcon::get("arrow.up.circle"sv, segoe::Upload, "network-transmit"sv);
     pixmap_network_transmit_ = icon.pixmap(NetworkIconSize);
 
-    icon = NativeIcon::get("arrow.up.arrow.down.circle"sv, "e895"sv, "network-transmit-receive"sv);
+    icon = NativeIcon::get("arrow.up.arrow.down.circle"sv, segoe::UploadDownload, "network-transmit-receive"sv);
     pixmap_network_transmit_receive_ = icon.pixmap(NetworkIconSize);
 
     // ui signals
