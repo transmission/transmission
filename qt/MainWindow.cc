@@ -31,6 +31,7 @@
 #include "IconCache.h"
 #include "MainWindow.h"
 #include "MakeDialog.h"
+#include "NativeIcon.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
@@ -300,7 +301,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_OpenFolder->setIcon(icon);
     ui_.action_OpenFolder->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
 
-    icon = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
+    icon = NativeIcon::get({ "play.fill"sv, "e768"sv, "media-playback-start"sv, QStyle::SP_MediaPlay });
     ui_.action_Start->setIcon(icon);
     ui_.action_Start->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
 
