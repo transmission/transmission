@@ -71,31 +71,14 @@ constexpr auto Other = MenuMode{ 1 << 3U };
     if (!value)
     {
         auto const override = qgetenv("TR_ICON_MODE").toLower();
-
-        if (override == "all")
-        {
+        if (override.contains("all"))
             value = Noun | Standard | Verb | Other;
-            qInfo("Using TR_ICON_MODE all");
-        }
-        else if (override == "standard")
-        {
-            value = Standard;
-            qInfo("Using TR_ICON_MODE standard");
-        }
-        else if (override == "noun")
-        {
+        if (override.contains("noun"))
             value = Noun;
-            qInfo("Using TR_ICON_MODE noun");
-        }
-        else if (override == "none")
-        {
-            value = MenuMode{};
-            qInfo("Using TR_ICON_MODE none");
-        }
-        else if (!override.isEmpty())
-        {
-            qWarning("Unrecognized TR_ICON_MODE value");
-        }
+        if (override.contains("standard"))
+            value = Standard;
+        if (override.contains("verb"))
+            value = Verb;
     }
 
 #if defined(Q_OS_WIN)
@@ -171,13 +154,35 @@ constexpr auto Other = MenuMode{ 1 << 3U };
 
 #endif
 
-    std::cerr << "value is " << value->to_string();
     return *value;
 }
 
 [[nodiscard]] bool visible(MenuMode const type)
 {
     return (get_menu_mode() & type).any();
+}
+
+[[nodiscard]] auto addEmblem(QIcon base_icon, QIcon emblem_icon, Qt::LayoutDirection layout_direction)
+{
+    auto icon = QIcon{};
+
+    for (QSize const& size : base_icon.availableSizes())
+    {
+        auto const emblem_size = size / 2;
+        auto const emblem_rect = QStyle::alignedRect(
+            layout_direction,
+            Qt::AlignBottom | Qt::AlignRight,
+            emblem_size,
+            QRect{ QPoint{ 0, 0 }, size });
+
+        auto pixmap = base_icon.pixmap(size);
+        auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
+        QPainter{ &pixmap }.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
+
+        icon.addPixmap(pixmap);
+    }
+
+    return icon;
 }
 
 } // namespace icons
@@ -206,6 +211,7 @@ public:
     }
 };
 
+#if 0
 QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) const
 {
     if (base_icon.isNull())
@@ -251,6 +257,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
 
     return icon;
 }
+#endif
 
 MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized)
     : session_{ session }
@@ -263,8 +270,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     , network_timer_{ this }
     , refresh_timer_{ this }
 {
-    auto icon = QIcon{};
-
     setAcceptDrops(true);
 
     auto* sep = new QAction{ this };
@@ -277,95 +282,150 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     auto const& icons = IconCache::get();
 
     // icons
-    auto const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
 
-    icon = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
-    ui_.action_OpenFile->setIcon(icon_open);
-    auto flag = icons::visible(icons::Standard | icons::Verb);
-    std::cerr << "flag " << flag << std::endl;
-    ui_.action_OpenFile->setIconVisibleInMenu(flag);
-
-    icon = addEmblem(icon_open, QStringList{} << QStringLiteral("emblem-web") << QStringLiteral("applications-internet"));
-    ui_.action_AddURL->setIcon(icon);
-    ui_.action_AddURL->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon);
-    ui_.action_New->setIcon(icon);
-    ui_.action_New->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon);
-    ui_.action_Properties->setIcon(icon);
-    ui_.action_Properties->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Noun));
-
-    icon = icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon);
-    ui_.action_OpenFolder->setIcon(icon);
-    ui_.action_OpenFolder->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
-
-    icon = NativeIcon::get({ "play.fill"sv, "e768"sv, "media-playback-start"sv, QStyle::SP_MediaPlay });
-    ui_.action_Start->setIcon(icon);
-    ui_.action_Start->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("network-transmit-receive"));
-    ui_.action_Announce->setIcon(icon);
-    ui_.action_Announce->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = NativeIcon::get({ "pause.fill"sv, "e769"sv, "media-playback-pause"sv, QStyle::SP_MediaPause });
-    ui_.action_Pause->setIcon(icon);
-    ui_.action_Pause->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("list-remove"));
-    ui_.action_Remove->setIcon(icon);
-    ui_.action_Remove->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon);
-    ui_.action_Delete->setIcon(icon);
-    ui_.action_Delete->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("application-exit"));
-    ui_.action_Quit->setIcon(icon);
-    ui_.action_Quit->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("edit-select-all"));
-    ui_.action_SelectAll->setIcon(icon);
-    ui_.action_SelectAll->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("preferences-system"));
-    ui_.action_Preferences->setIcon(icon);
-    ui_.action_Preferences->setIconVisibleInMenu(icons::visible(icons::Standard | icons::Noun));
-
-    icon = icons.getThemeIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton);
-    ui_.action_Contents->setIcon(icon);
-    ui_.action_Contents->setIconVisibleInMenu(icons::visible(icons::Standard));
-
-    icon = icons.getThemeIcon(QStringLiteral("help-about"));
-    ui_.action_About->setIcon(icon);
-    ui_.action_About->setIconVisibleInMenu(icons::visible(icons::Standard));
-
-    icon = icons.getThemeIcon(QStringLiteral("go-top"));
-    ui_.action_QueueMoveTop->setIcon(icon);
-    ui_.action_QueueMoveTop->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp);
-    ui_.action_QueueMoveUp->setIcon(icon);
-    ui_.action_QueueMoveUp->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown);
-    ui_.action_QueueMoveDown->setIcon(icon);
-    ui_.action_QueueMoveDown->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    icon = icons.getThemeIcon(QStringLiteral("go-bottom"));
-    ui_.action_QueueMoveBottom->setIcon(icon);
-    ui_.action_QueueMoveBottom->setIconVisibleInMenu(icons::visible(icons::Verb));
-
-    auto make_network_pixmap = [&icons](QString name, QSize size = { 16, 16 })
+    auto set = [](QAction* action, QIcon icon, icons::MenuMode const type)
     {
-        return icons.getThemeIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
+        action->setIcon(icon);
+        action->setIconVisibleInMenu(icons::visible(type));
     };
+
+    auto* action = ui_.action_OpenFile;
+    auto type = icons::Standard | icons::Verb;
+    auto icon = NativeIcon::get("folder.open"sv, "e838"sv, "folder"sv, QStyle::SP_DirOpenIcon);
+    set(action, icon, type);
+
+    action = ui_.action_AddURL;
+    type = icons::Verb;
+    icon = icons::addEmblem(icon, NativeIcon::get("globe"sv, "e774"sv, "emblem-symbolic-link"sv), layoutDirection());
+    set(action, icon, type);
+
+    action = ui_.action_New;
+    type = icons::Standard | icons::Verb;
+    icon = NativeIcon::get("plus"sv, "e710"sv, "document-new", QStyle::SP_FileIcon);
+    set(action, icon, type);
+
+    action = ui_.action_Properties;
+    type = icons::Standard | icons::Noun;
+    icon = NativeIcon::get("doc.text.magnifyingglass"sv, "e946"sv, "document-properties"sv, QStyle::SP_FileIcon);
+    set(action, icon, type);
+
+    action = ui_.action_OpenFolder;
+    icon = icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon);
+    type = icons::Standard | icons::Verb;
+    set(action, icon, type);
+
+    action = ui_.action_Start;
+    type = icons::Standard | icons::Verb;
+    icon = NativeIcon::get("play.fill"sv, "e768"sv, "media-playback-start"sv, QStyle::SP_MediaPlay);
+    set(action, icon, type);
+
+    action = ui_.action_Pause;
+    type = icons::Standard | icons::Verb;
+    icon = NativeIcon::get("pause.fill"sv, "e769"sv, "media-playback-pause"sv, QStyle::SP_MediaPause);
+    set(action, icon, type);
+
+    action = ui_.action_Remove;
+    type = icons::Verb;
+    icon = NativeIcon::get("minus"sv, "e738"sv, "list-remove"sv, QStyle::SP_DialogCancelButton);
+    set(action, icon, type);
+
+    action = ui_.action_Delete;
+    type = icons::Verb;
+    icon = NativeIcon::get("trash"sv, "e74d"sv, "edit-delete"sv, QStyle::SP_TrashIcon);
+    set(action, icon, type);
+
+    action = ui_.action_SetLocation;
+    type = icons::Verb;
+    icon = NativeIcon::get("doc.on.clipboard"sv, "e8c8"sv, "edit-copy"sv);
+    set(action, icon, type);
+
+    action = ui_.action_Quit;
+    icon = NativeIcon::get("power"sv, "e7e8"sv, "application-exit"sv);
+    type = icons::Standard | icons::Verb;
+    set(action, icon, type);
+
+    action = ui_.action_SelectAll;
+    type = icons::Verb;
+    icon = NativeIcon::get("checkmark.square"sv, "e8b3"sv, "edit-select-all"sv);
+    set(action, icon, type);
+
+    action = ui_.action_DeselectAll;
+    type = icons::Verb;
+    icon = NativeIcon::get("checkmark"sv, "e739"sv, "edit-select-none"sv);
+    set(action, icon, type);
+
+    action = ui_.action_Preferences;
+    icon = NativeIcon::get("gearshape"sv, "e713"sv, "preferences-system"sv);
+    type = icons::Standard | icons::Verb;
+    set(action, icon, type);
+
+    action = ui_.action_Statistics;
+    type = icons::Verb;
+    icon = NativeIcon::get("chart.bar"sv, "e9e4"sv, "info"sv);
+    set(action, icon, type);
+
+    action = ui_.action_Donate;
+    type = icons::Verb;
+    icon = NativeIcon::get("heart"sv, "eb51"sv, "donate"sv);
+    set(action, icon, type);
+
+    action = ui_.action_About;
+    type = icons::Standard;
+    icon = NativeIcon::get("info.circle"sv, "e946"sv, "help-about"sv, QStyle::SP_MessageBoxInformation);
+    set(action, icon, type);
+
+    action = ui_.action_CopyMagnetToClipboard;
+    type = icons::Verb;
+    icon = NativeIcon::get("doc.on.clipboard"sv, "e8c8"sv, "edit-copy"sv);
+    set(action, icon, type);
+
+    action = ui_.action_Verify;
+    type = icons::Verb;
+    icon = NativeIcon::get("arrow.clockwise"sv, "e72c"sv, "view-refresh"sv, QStyle::SP_BrowserReload);
+    set(action, icon, type);
+
+    action = ui_.action_Contents;
+    type = icons::Standard;
+    icon = NativeIcon::get("questionmark.circle"sv, "e897"sv, "help-faq"sv, QStyle::SP_DialogHelpButton);
+    set(action, icon, type);
+
+    action = ui_.action_QueueMoveTop;
+    type = icons::Verb;
+    icon = NativeIcon::get("arrow.up.to.line"sv, "eac3"sv, "go-top"sv);
+    set(action, icon, type);
+
+    action = ui_.action_QueueMoveUp;
+    type = icons::Verb;
+    icon = NativeIcon::get("arrow.up"sv, "e74a"sv, "go-up"sv);
+    set(action, icon, type);
+
+    action = ui_.action_QueueMoveDown;
+    type = icons::Verb;
+    icon = NativeIcon::get("arrow.down"sv, "e74b"sv, "go-down"sv);
+    set(action, icon, type);
+
+    action = ui_.action_QueueMoveBottom;
+    type = icons::Verb;
+    icon = NativeIcon::get("arrow.down.to.line"sv, "eac4"sv, "go-bottom"sv);
+    set(action, icon, type);
+
+    icon_network_error_ = NativeIcon::get("wifi.exclamationmark"sv, "e783"sv, "network-error"sv, QStyle::SP_MessageBoxCritical);
+
+    icon_network_idle_ = NativeIcon::get("wifi"sv, "e77b"sv, "network-idle"sv);
+
+    icon_network_receive_ = NativeIcon::get("arrow.down.circle"sv, "e896"sv, "network-receive"sv);
+
+    icon_network_transmit_ = NativeIcon::get("arrow.up.circle"sv, "e898"sv, "network-transmit"sv);
+
+    icon_network_transmit_receive_ = NativeIcon::get("arrow.up.arrow.down.circle"sv, "e895"sv, "network-transmit-receive"sv);
+
+#if 0
     pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
     pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
     pixmap_network_receive_ = make_network_pixmap(QStringLiteral("network-receive"));
     pixmap_network_transmit_ = make_network_pixmap(QStringLiteral("network-transmit"));
     pixmap_network_transmit_receive_ = make_network_pixmap(QStringLiteral("network-transmit-receive"));
+#endif
 
     // ui signals
     connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::setToolbarVisible);
