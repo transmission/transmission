@@ -270,6 +270,11 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     icon = NativeIcon::get("play.fill"sv, segoe::Play, "media-playback-start"sv, QStyle::SP_MediaPlay);
     set(action, icon, type);
 
+    action = ui_.action_StartNow;
+    type = icons::Standard | icons::Verb;
+    icon = NativeIcon::get(""sv, segoe::FastForward, "media-seek-forward"sv, QStyle::SP_MediaPlay);
+    set(action, icon, type);
+
     action = ui_.action_Pause;
     type = icons::Standard | icons::Verb;
     icon = NativeIcon::get("pause.fill"sv, segoe::Pause, "media-playback-pause"sv, QStyle::SP_MediaPause);
@@ -287,7 +292,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     action = ui_.action_SetLocation;
     type = icons::Verb;
-    icon = NativeIcon::get("doc.on.clipboard"sv, segoe::Copy, "edit-copy"sv);
+    icon = NativeIcon::get("doc.on.clipboard"sv, segoe::Move, "edit-copy"sv);
     set(action, icon, type);
 
     action = ui_.action_Quit;
