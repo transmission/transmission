@@ -22,6 +22,8 @@
 
 #include <small/set.hpp>
 
+extern QPixmap loadSFSymbol(QString symbol_name, int pixel_size);
+
 namespace
 {
 auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
@@ -137,9 +139,15 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
         style->pixelMetric(QStyle::PM_ToolBarIconSize)
     };
 
-    // TODO: macOS
-    // TODO: try sfSymbolName if on macOS
-    // https://stackoverflow.com/questions/74747658/how-to-convert-a-cgimageref-to-a-qpixmap-in-qt-6
+    if (!spec.sfSymbolName.isEmpty())
+    {
+        auto icon = QIcon{};
+        for (int const point_size : point_sizes)
+            if (auto const pixmap = loadSFSymbol(spec.sfSymbolName, point_size); !pixmap.isNull())
+                icon.addPixmap(pixmap);
+        if (!icon.isNull())
+            return icon;
+    }
 
     if (!spec.fluentCodepoint.isNull())
     {

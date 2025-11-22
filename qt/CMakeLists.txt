@@ -5,6 +5,11 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
 
 add_executable(${TR_NAME}-qt WIN32)
 
+set(IS_APPLE_CLANG FALSE)
+if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(IS_APPLE_CLANG TRUE)
+endif()
+
 target_sources(${TR_NAME}-qt
     PRIVATE
         AboutDialog.cc
@@ -62,6 +67,7 @@ target_sources(${TR_NAME}-qt
         MakeDialog.cc
         MakeDialog.h
         NativeIcon.cc
+        $<$<BOOL:${IS_APPLE_CLANG}>:NativeIconMac.mm>
         NativeIcon.h
         OptionsDialog.cc
         OptionsDialog.h
