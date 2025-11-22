@@ -73,7 +73,7 @@ QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int c
     auto painter = QPainter{ &pixmap };
     painter.setFont(font);
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(QPen{ Qt::black });
+    painter.setPen(qApp->palette().color(QPalette::ButtonText));
     painter.setRenderHint(QPainter::TextAntialiasing);
     auto br = QRect{};
     painter.drawText(rect, Qt::AlignCenter, QString{ codepoint }, &br);
