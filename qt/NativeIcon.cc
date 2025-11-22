@@ -27,7 +27,13 @@ namespace
 auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
 auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 
-// turn these on to force a specific icon font during development.
+// Define these two macros to force a specific icon during development.
+// Their EULA doesn't allow redistribution but does allow using them
+// during design/develop/testing.
+// 1. Snag the ttf you want to use (Win 10 uses https://aka.ms/SegoeFonts,
+//    Win 11 uses https://aka.ms/SegoeFluentIcons).
+// 2. Add it to application.qrc
+// 3. Set these two macros accordingly
 #define DEV_FORCE_FONT_FAMILY Win11IconFamily
 #define DEV_FORCE_FONT_RESOURCE QStringLiteral(":devonly/segoe_fluent_icons.ttf")
 
