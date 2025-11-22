@@ -124,8 +124,6 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    [[nodiscard]] QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
-
     [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
     void updateNetworkIcon();
 
@@ -145,6 +143,12 @@ private:
     TorrentModel& model_;
 
     std::shared_ptr<ListViewProxyStyle> lvp_style_;
+
+    QIcon icon_network_error_;
+    QIcon icon_network_idle_;
+    QIcon icon_network_receive_;
+    QIcon icon_network_transmit_;
+    QIcon icon_network_transmit_receive_;
 
     QPixmap pixmap_network_error_;
     QPixmap pixmap_network_idle_;

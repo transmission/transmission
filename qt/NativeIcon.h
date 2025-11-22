@@ -49,4 +49,11 @@ public:
     };
 
     static QIcon get(Spec const& spec, QStyle* style = QApplication::style());
+
+    static QIcon get(
+        std::string_view const sf,
+        std::string_view const fluent,
+        std::string_view const fdo,
+        std::optional<QStyle::StandardPixmap> qt = {},
+        QStyle* style = QApplication::style());
 };
