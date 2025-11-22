@@ -5,7 +5,15 @@
 
 #include "NativeIcon.h"
 
+#include <iostream>
+#include <set>
+
+#include <QFontInfo>
+#include <QOperatingSystemVersion>
+#include <QPainterPath>
+#include <QRawFont>
 #include <QScreen>
+#include <QTextLayout>
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
@@ -17,57 +25,32 @@ namespace
 {
 
 #if defined(Q_OS_WIN)
-QChar parseCodepoint(QString const& code)
+QPixmap makeFluentPixmap(QChar const codepoint, int const point_size)
 {
-    // Supports "E710" or "\uE710"
-    QString s = code.trimmed();
-    if (s.startsWith(QStringLiteral("\\u"), Qt::CaseInsensitive))
-        s = s.mid(2);
-    bool ok = false;
-    uint u = s.toUInt(&ok, 16);
-    return ok ? QChar(u) : QChar();
-}
+    static auto const is_win11 = QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows11;
+    auto const fontName = is_win11 ? QStringLiteral("Segoe Fluent Icons") : QStringLiteral("Segoe MDL2 Assets");
+    auto const font = QFont{fontName, point_size};
 
-QPixmap makeFluentPixmap(QString const& codepointHex, int const point_size)
-{
-    if (codepointHex.isEmpty())
-        return {};
+    if (!QFontMetrics{font}.inFont(codepoint))
+	    return {};
 
-    QChar const glyph = parseCodepoint(codepointHex);
-    if (glyph.isNull())
-        return {};
+    // TODO: HDPI, pixel size vs point size?
+    auto const rect = QRect{ QPoint{}, QSize{point_size, point_size}};
+    auto pixmap = QPixmap{ rect.size() };
+    pixmap.fill(Qt::red);
+    auto painter = QPainter{ &pixmap };
+    painter.setFont(font);
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen{Qt::green});
+    auto br = QRect{};
+    painter.drawText(rect, Qt::AlignCenter, QString{codepoint}, &br);
+    painter.end();
 
-    // Prefer Segoe Fluent Icons (Win11), fall back to Segoe MDL2 Assets (Win10)
-    QFont font;
-    font.setPointSize(point_size);
-    font.setStyleStrategy(QFont::PreferDefault);
+    std::cerr << "br x " << br.x() << " y " << br.y() << " w " << br.width() << " h " << br.height() << std::endl;
+    // FIXME: segoe icon not rendering -- br.width() is zero??
+    // This is a blocker
 
-    // Try Fluent first
-    font.setFamily(QStringLiteral("Segoe Fluent Icons"));
-    if (!QFontInfo(font).exactMatch())
-    {
-        font.setFamily(QStringLiteral("Segoe MDL2 Assets"));
-    }
-
-    auto const dpr = qApp->primaryScreen()->devicePixelRatio();
-    auto const px = qRound(point_size * dpr) + 8; // padding
-    QPixmap pm{ px, px };
-    pm.setDevicePixelRatio(dpr);
-    pm.fill(Qt::transparent);
-
-    auto const fg = qApp->palette().color(QPalette::ButtonText);
-    QPainter p{ &pm };
-    p.setRenderHint(QPainter::Antialiasing, true);
-    p.setPen(Qt::NoPen);
-    p.setBrush(fg);
-    p.setFont(font);
-
-    // Center the glyph
-    QRectF r(0, 0, pm.width() / dpr, pm.height() / dpr);
-    p.drawText(r, Qt::AlignCenter, QString(glyph));
-    p.end();
-
-    return pm;
+    return pixmap;
 }
 #endif // Q_OS_WIN
 
@@ -80,7 +63,7 @@ QString qstrFromUtf8(std::string_view const sv)
 
 NativeIcon::Spec::Spec(
     QString sf_in,
-    QString fluent_in,
+    QChar const fluent_in,
     QString fdo_in,
     std::optional<QStyle::StandardPixmap> fallback_in,
     QFont::Weight weight_in)
@@ -94,18 +77,18 @@ NativeIcon::Spec::Spec(
 
 NativeIcon::Spec::Spec(
     std::string_view const sf_in,
-    std::string_view const fluent_in,
+    QChar const fluent_in,
     std::string_view const fdo_in,
     std::optional<QStyle::StandardPixmap> fallback_in,
     QFont::Weight weight_in)
-    : Spec{ qstrFromUtf8(sf_in), qstrFromUtf8(fluent_in), qstrFromUtf8(fdo_in), fallback_in, weight_in }
+    : Spec{ qstrFromUtf8(sf_in), fluent_in, qstrFromUtf8(fdo_in), fallback_in, weight_in }
 {
 }
 
 // static
 QIcon NativeIcon::get(
     std::string_view const sf,
-    std::string_view const fluent,
+    QChar const fluent,
     std::string_view const fdo,
     std::optional<QStyle::StandardPixmap> qt,
     QStyle* style)
@@ -115,7 +98,6 @@ QIcon NativeIcon::get(
 
 QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 {
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     auto constexpr IconMetrics = std::array<QStyle::PixelMetric, 7U>{
         QStyle::PM_LargeIconSize, QStyle::PM_ButtonIconSize, QStyle::PM_ListViewIconSize, QStyle::PM_MessageBoxIconSize,
         QStyle::PM_SmallIconSize, QStyle::PM_TabBarIconSize, QStyle::PM_ToolBarIconSize,
@@ -124,7 +106,6 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
     auto point_sizes = std::set<int>{};
     for (auto const pm : IconMetrics)
         point_sizes.emplace(style->pixelMetric(pm));
-#endif
 
 #if 0
     if (auto const todo = QStringLiteral("TODO"); spec.sfSymbolName == todo || spec.fluentCodePoint == todo || spec.fdoName == todo)
@@ -137,15 +118,18 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 #endif
 
 #if defined(Q_OS_WIN)
-    // TODO: build & test on a Windows box
-    if (!spec.fluentCodepoint.isEmpty())
+    if (!spec.fluentCodepoint.isNull())
     {
+#if 0
         auto icon = QIcon{};
         for (int const point_size : point_sizes)
             if (QPixmap const pixmap = makeFluentPixmap(spec.fluentCodepoint, point_size); !pixmap.isNull())
                 icon.addPixmap(pixmap);
         if (!icon.isNull())
             return icon;
+#else
+	return makeFluentPixmap(spec.fluentCodepoint, 24);
+#endif
     }
 #endif
 
@@ -158,8 +142,7 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
     }
 
     if (spec.fallback)
-        if (auto icon = style->standardIcon(*spec.fallback); !icon.isNull())
-            return icon;
+        return style->standardIcon(*spec.fallback);
 
     return {};
 }

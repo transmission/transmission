@@ -13,6 +13,46 @@
 #include <QString>
 #include <QStyle>
 
+namespace segoe
+{
+
+inline constexpr auto Add = QChar{0xE710};
+inline constexpr auto CaretDown8 = QChar{0xEDD8};
+inline constexpr auto CaretDownSolid8 = QChar{0xEDDC};
+inline constexpr auto CaretUp8 = QChar{0xEDD7};
+inline constexpr auto CaretUpSolid8 = QChar{0xEDDB};
+inline constexpr auto Checkbox = QChar{0xE739};
+inline constexpr auto ChevronDown = QChar{0xE70D};
+inline constexpr auto ChevronUp = QChar{0xE70E};
+inline constexpr auto Contact = QChar{0xE77b};
+inline constexpr auto Copy = QChar{0xE8c8};
+inline constexpr auto Delete = QChar{0xE74d};
+inline constexpr auto Down = QChar{0xE74b};
+inline constexpr auto Download = QChar{0xE896};
+inline constexpr auto Edit = QChar{0xE70F};
+inline constexpr auto Error = QChar{0xE783};
+inline constexpr auto FolderOpen = QChar{0xE838};
+inline constexpr auto Globe = QChar{0xE774};
+inline constexpr auto Heart = QChar{0xEb51};
+inline constexpr auto Help = QChar{0xE897};
+inline constexpr auto Info = QChar{0xE946};
+inline constexpr auto OpenFolder = QChar{0xEd25};
+inline constexpr auto Pause = QChar{0xE769};
+inline constexpr auto Play = QChar{0xE768};
+inline constexpr auto PowerButton = QChar{0xE7e8};
+inline constexpr auto Refresh = QChar{0xE72c};
+inline constexpr auto Remove = QChar{0xE738};
+inline constexpr auto ReportDocument = QChar{0xE9F9};
+inline constexpr auto SelectAll = QChar{0xE8b3};
+inline constexpr auto Settings = QChar{0xE713};
+inline constexpr auto StatusErrorFull = QChar{0xEB90};
+inline constexpr auto Sync = QChar{0xE895};
+inline constexpr auto Upload = QChar{0xE898};
+inline constexpr auto UploadDownload = QChar{0xE174};
+inline constexpr auto Warning = QChar{0xE7BA};
+
+}  // namespace segoe
+
 struct NativeIcon
 {
 public:
@@ -20,14 +60,14 @@ public:
     {
         Spec(
             QString sf_in,
-            QString fluent_in,
+            QChar fluent_in,
             QString fdo_in,
             std::optional<QStyle::StandardPixmap> fallback_in,
             QFont::Weight weight_in = QFont::Normal);
 
         Spec(
             std::string_view const sf_in,
-            std::string_view const fluent_in,
+            QChar const fluent_in,
             std::string_view const fdo_in,
             std::optional<QStyle::StandardPixmap> fallback_in,
             QFont::Weight weight_in = QFont::Normal);
@@ -37,7 +77,7 @@ public:
         QString sfSymbolName;
 
         // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
-        QString fluentCodepoint;
+        QChar fluentCodepoint;
 
         // https://specifications.freedesktop.org/icon-naming/latest/#names
         QString fdoName;
@@ -52,7 +92,7 @@ public:
 
     static QIcon get(
         std::string_view const sf,
-        std::string_view const fluent,
+        QChar const fluent,
         std::string_view const fdo,
         std::optional<QStyle::StandardPixmap> qt = {},
         QStyle* style = QApplication::style());
