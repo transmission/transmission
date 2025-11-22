@@ -28,7 +28,6 @@
 #include "FilterBar.h"
 #include "Filters.h"
 #include "Formatter.h"
-#include "IconCache.h"
 #include "MainWindow.h"
 #include "MakeDialog.h"
 #include "NativeIcon.h"
@@ -211,54 +210,6 @@ public:
     }
 };
 
-#if 0
-QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) const
-{
-    if (base_icon.isNull())
-    {
-        return base_icon;
-    }
-
-    auto const& icons = IconCache::get();
-    QIcon emblem_icon;
-
-    for (QString const& emblem_name : emblem_names)
-    {
-        emblem_icon = icons.getThemeIcon(emblem_name);
-
-        if (!emblem_icon.isNull())
-        {
-            break;
-        }
-    }
-
-    if (emblem_icon.isNull())
-    {
-        return base_icon;
-    }
-
-    QIcon icon;
-
-    for (QSize const& size : base_icon.availableSizes())
-    {
-        auto const emblem_size = size / 2;
-        auto const emblem_rect = QStyle::alignedRect(
-            layoutDirection(),
-            Qt::AlignBottom | Qt::AlignRight,
-            emblem_size,
-            QRect{ QPoint{ 0, 0 }, size });
-
-        auto pixmap = base_icon.pixmap(size);
-        auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
-        QPainter{ &pixmap }.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
-
-        icon.addPixmap(pixmap);
-    }
-
-    return icon;
-}
-#endif
-
 MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized)
     : session_{ session }
     , prefs_{ prefs }
@@ -279,7 +230,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
-    auto const& icons = IconCache::get();
 
     // icons
 
@@ -310,8 +260,8 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     set(action, icon, type);
 
     action = ui_.action_OpenFolder;
-    icon = icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon);
     type = icons::Standard | icons::Verb;
+    icon = NativeIcon::get("folder"sv, "ed25"sv, "folder-open"sv, QStyle::SP_DirOpenIcon);
     set(action, icon, type);
 
     action = ui_.action_Start;
@@ -501,10 +451,10 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup{ this };
 
-    for (auto const& [action, mode] : sort_modes)
+    for (auto const& [qaction, mode] : sort_modes)
     {
-        action->setProperty(SortModeKey, mode);
-        action_group->addAction(action);
+        qaction->setProperty(SortModeKey, mode);
+        action_group->addAction(qaction);
     }
 
     connect(action_group, &QActionGroup::triggered, this, &MainWindow::onSortModeChanged);
