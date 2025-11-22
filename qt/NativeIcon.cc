@@ -141,9 +141,6 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
     }
 #endif
 
-    // TODO: GNOME and KDE differ in opinions on menuitem icons.
-    // check if tr_strv_contains(getenv("XDG_CURRENT_DESKTOP"), "GNOME"))
-
     if (!spec.fdoName.isEmpty())
     {
         if (auto icon = QIcon::fromTheme(spec.fdoName + QStringLiteral("-symbolic")); !icon.isNull())
