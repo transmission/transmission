@@ -16,6 +16,8 @@
 namespace segoe
 {
 
+// https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font
+// https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
 inline constexpr auto Add = QChar{0xE710};
 inline constexpr auto CaretDown8 = QChar{0xEDD8};
 inline constexpr auto CaretDownSolid8 = QChar{0xEDDC};
