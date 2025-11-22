@@ -72,7 +72,36 @@ QPixmap makeFluentPixmap(QString const& codepointHex, int const pointSize)
 }
 #endif // Q_OS_WIN
 
+QString qstrFromUtf8(std::string_view const sv)
+{
+    return QString::fromUtf8(std::data(sv), std::size(sv));
+}
+
 } // namespace
+
+NativeIcon::Spec::Spec(
+    QString sf_in,
+    QString fluent_in,
+    QString fdo_in,
+    std::optional<QStyle::StandardPixmap> fallback_in,
+    QFont::Weight weight_in)
+    : sfSymbolName{ sf_in }
+    , fluentCodepoint{ fluent_in }
+    , fdoName{ fdo_in }
+    , fallback{ fallback_in }
+    , weight{ weight_in }
+{
+}
+
+NativeIcon::Spec::Spec(
+    std::string_view const sf_in,
+    std::string_view const fluent_in,
+    std::string_view const fdo_in,
+    std::optional<QStyle::StandardPixmap> fallback_in,
+    QFont::Weight weight_in)
+    : Spec{ qstrFromUtf8(sf_in), qstrFromUtf8(fluent_in), qstrFromUtf8(fdo_in), fallback_in, weight_in }
+{
+}
 
 QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 {
