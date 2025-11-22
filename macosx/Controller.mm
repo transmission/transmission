@@ -4039,7 +4039,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
-        [self.fFilterBar reset:NO];
+        [self.fFilterBar reset:YES];
     }
 
     [self.fDefaults setBool:show forKey:@"FilterBar"];
