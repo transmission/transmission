@@ -129,6 +129,7 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
 #endif
 
 #if defined(Q_OS_WIN)
+    // TODO: build & test on a Windows box
     if (!spec.fluentCodepoint.isEmpty())
     {
         auto icon = QIcon{};
@@ -139,6 +140,9 @@ QIcon NativeIcon::get(Spec const& spec, QStyle* style)
             return icon;
     }
 #endif
+
+    // TODO: GNOME and KDE differ in opinions on menuitem icons.
+    // check if tr_strv_contains(getenv("XDG_CURRENT_DESKTOP"), "GNOME"))
 
     if (!spec.fdoName.isEmpty())
     {
