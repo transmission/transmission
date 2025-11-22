@@ -5,6 +5,12 @@
 
 #import <AppKit/AppKit.h>
 
+#import <QImage>
+#import <QPixmap>
+#import <QApplication>
+#import <QColor>
+#import <QPalette>
+
 // Source: https://stackoverflow.com/a/74756071
 // Posted by Bri Bri
 // Retrieved 2025-11-22, License - CC BY-SA 4.0
@@ -71,12 +77,17 @@ QPixmap loadSFSymbol(QString const symbol_name, int const pixel_size)
 {
     if (NSImage* image = [NSImage imageWithSystemSymbolName:symbol_name.toNSString() accessibilityDescription:nil])
     {
+        // use whatever color QPalette::ButtonText is using
+        QColor const qfg = qApp->palette().color(QPalette::ButtonText);
+        NSColor* nsfg = [NSColor colorWithCalibratedRed:qfg.redF() green:qfg.greenF() blue:qfg.blueF() alpha:qfg.alphaF()];
+        auto* configuration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:nsfg];
+        image = [image imageWithSymbolConfiguration:configuration];
+
+        // NSImage -> QPixmap
         NSRect image_rect = NSMakeRect(0, 0, pixel_size, pixel_size);
         CGImageRef cgimg = [image CGImageForProposedRect:&image_rect context:nil hints:nil];
-        return QPixmap::fromImage(CGImageToQImage(cgimg));
+        return QPixmap::fromImage(bribri::CGImageToQImage(cgimg));
     }
 
-    return
-    {
-    }
+    return {};
 }
