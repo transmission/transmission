@@ -162,6 +162,7 @@ struct Info
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "document-properties";
         fallback = QStyle::SP_FileIcon;
+        mode = Standard | Verb;
         break;
 
     case Type::OpenTorrentLocalFolder:
@@ -169,6 +170,7 @@ struct Info
         segoe_codepoint = 0xED25U; // OpenFolderHorizontal
         xdg_icon_name = "folder-open";
         fallback = QStyle::SP_DirOpenIcon;
+        mode = Standard | Verb;
         break;
 
     case Type::StartTorrent:
@@ -242,6 +244,7 @@ struct Info
         sf_symbol_name = "heart";
         segoe_codepoint = 0xEB51U; // Heart
         xdg_icon_name = "donate";
+        mode = Standard | Verb;
         break;
 
     case Type::Settings:
