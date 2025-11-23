@@ -124,8 +124,6 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    [[nodiscard]] QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
-
     [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
     void updateNetworkIcon();
 

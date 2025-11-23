@@ -140,15 +140,6 @@ Application::Application(
     loadTranslations();
     initUnits();
 
-#if defined(_WIN32) || defined(__APPLE__)
-
-    if (QIcon::themeName().isEmpty())
-    {
-        QIcon::setThemeName(QStringLiteral("Faenza"));
-    }
-
-#endif
-
     setWindowIcon(makeWindowIcon());
 
 #ifdef __APPLE__
