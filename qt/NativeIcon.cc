@@ -166,7 +166,7 @@ struct Info
 
     case Type::OpenTorrentLocalFolder:
         sf_symbol_name = "folder";
-        segoe_codepoint = 0xED25U; // OpenFolder
+        segoe_codepoint = 0xED25U; // OpenFolderHorizontal
         xdg_icon_name = "folder-open";
         fallback = QStyle::SP_DirOpenIcon;
         break;
@@ -247,7 +247,7 @@ struct Info
     case Type::Settings:
         sf_symbol_name = "gearshape";
         segoe_codepoint = 0xE713U; // Settings
-        xdg_icon_name = "perferences-system";
+        xdg_icon_name = "preferences-system";
         mode = Standard | Noun;
         break;
 
@@ -394,15 +394,19 @@ struct Info
 
     if (!value)
     {
-        auto const override = qgetenv("TR_ICON_MODE").toLower();
-        if (override.contains("all"))
-            value = Noun | Standard | Verb;
-        if (override.contains("noun"))
-            value = Noun;
-        if (override.contains("standard"))
-            value = Standard;
-        if (override.contains("verb"))
-            value = Verb;
+        if (auto const env = qgetenv("TR_ICON_MODE").toLower(); !env.isEmpty())
+        {
+            auto mode = MenuMode{};
+            if (env.contains("all"))
+                mode.set();
+            if (env.contains("noun"))
+                mode |= Noun;
+            if (env.contains("standard"))
+                mode |= Standard;
+            if (env.contains("verb"))
+                mode |= Verb;
+            value = mode;
+        }
     }
 
 #if defined(Q_OS_WIN)
