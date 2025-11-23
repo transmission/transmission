@@ -10,9 +10,7 @@
 #include <string_view>
 
 #include <QFontDatabase>
-#include <QFontInfo>
 #include <QOperatingSystemVersion>
-#include <QPainterPath>
 #include <QStyle>
 #include <QtGui/QFont>
 #include <QtGui/QGuiApplication>
