@@ -1256,7 +1256,7 @@ void MainWindow::refreshPref(int key)
         }
 
     case Prefs::READ_CLIPBOARD:
-        auto_add_clipboard_links = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        auto_add_clipboard_links_ = prefs_.getBool(Prefs::READ_CLIPBOARD);
         break;
 
     default:
@@ -1312,6 +1312,33 @@ void MainWindow::openURL()
     }
 
     addTorrent(std::move(*add), true);
+}
+
+void MainWindow::addTorrentFromClipboard()
+{
+    if (auto const text = QGuiApplication::clipboard()->text().trimmed();
+        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || tr_magnet_metainfo{}.parseMagnet(text.toStdString()))
+    {
+        for (auto const& entry : text.split(QLatin1Char('\n')))
+        {
+            auto key = entry.trimmed();
+            if (key.isEmpty())
+            {
+                continue;
+            }
+
+            if (auto const url = QUrl{ key }; url.isLocalFile())
+            {
+                key = url.toLocalFile();
+            }
+
+            if (!clipboard_processed_keys_.contains(key))
+            {
+                clipboard_processed_keys_.append(key);
+                trApp->addTorrent(AddData{ key });
+            }
+        }
+    }
 }
 
 void MainWindow::addTorrents(QStringList const& filenames)
@@ -1604,33 +1631,19 @@ void MainWindow::dropEvent(QDropEvent* event)
 
 bool MainWindow::event(QEvent* e)
 {
-    if (e->type() != QEvent::WindowActivate || !auto_add_clipboard_links)
+    switch (e->type())
     {
-        return QMainWindow::event(e);
-    }
+    case QEvent::WindowActivate:
+        addTorrentFromClipboard();
+        break;
 
-    if (auto const text = QGuiApplication::clipboard()->text().trimmed();
-        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || tr_magnet_metainfo{}.parseMagnet(text.toStdString()))
-    {
-        for (auto const& entry : text.split(QLatin1Char('\n')))
-        {
-            auto key = entry.trimmed();
-            if (key.isEmpty())
-            {
-                continue;
-            }
+    case QEvent::Clipboard:
+        if (auto_add_clipboard_links_)
+            addTorrentFromClipboard();
+        break;
 
-            if (auto const url = QUrl{ key }; url.isLocalFile())
-            {
-                key = url.toLocalFile();
-            }
-
-            if (!clipboard_processed_keys_.contains(key))
-            {
-                clipboard_processed_keys_.append(key);
-                trApp->addTorrent(AddData{ key });
-            }
-        }
+    default:
+        break;
     }
 
     return QMainWindow::event(e);
