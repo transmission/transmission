@@ -8,18 +8,17 @@
 #include <bitset>
 #include <optional>
 #include <string_view>
-#include <tuple>
 
 #include <QFontDatabase>
 #include <QFontInfo>
 #include <QOperatingSystemVersion>
 #include <QPainterPath>
-#include <QtGui/QIcon>
-#include <QtGui/QPixmap>
-#include <QtGui/QPainter>
 #include <QtGui/QFont>
 #include <QtGui/QGuiApplication>
+#include <QtGui/QIcon>
+#include <QtGui/QPainter>
 #include <QtGui/QPalette>
+#include <QtGui/QPixmap>
 
 #include <small/set.hpp>
 
@@ -38,7 +37,7 @@ auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
 // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
 auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 
-// Define these two macros to force a specific icon during development.
+// Define these two macros to force a specific icon icon during development.
 // Their EULA doesn't allow redistribution but does allow using them
 // during design/develop/testing.
 // 1. Snag the ttf you want to use (Win 10 uses https://aka.ms/SegoeFonts,
@@ -97,9 +96,16 @@ constexpr auto Standard = MenuMode{ 1 << 0U };
 constexpr auto Noun = MenuMode{ 1 << 1U };
 constexpr auto Verb = MenuMode{ 1 << 2U };
 
-using Key = std::tuple<std::string_view, char16_t, std::string_view, std::optional<QStyle::StandardPixmap>, MenuMode>;
+struct Info
+{
+    std::string_view sf_symbol_name;
+    char16_t segoe_codepoint;
+    std::string_view xdg_icon_name;
+    std::optional<QStyle::StandardPixmap> fallback;
+    MenuMode mode;
+};
 
-[[nodiscard]] constexpr Key getKey(Type const type)
+[[nodiscard]] constexpr Info getInfo(Type const type)
 {
     auto sf_symbol_name = std::string_view{};
     auto xdg_icon_name = std::string_view{};
@@ -478,8 +484,6 @@ using Key = std::tuple<std::string_view, char16_t, std::string_view, std::option
 
 QIcon icon(Type const type, QStyle* style)
 {
-    auto const [sf_symbol_name, segoe_codepoint, xdg_icon_name, fallback, mode] = getKey(type);
-
     ensureFontsLoaded();
 
     static auto const point_sizes = small::set<int>{
@@ -489,52 +493,53 @@ QIcon icon(Type const type, QStyle* style)
         style->pixelMetric(QStyle::PM_ToolBarIconSize)
     };
 
+    auto const info = getInfo(type);
+
 #if defined(Q_OS_MAC)
-    if (!std::empty(sf_symbol_name))
+    if (auto const name = info.sf_symbol_name; !std::empty(name))
     {
         auto icon = QIcon{};
-        auto const name = QString::fromUtf8(std::data(xdg_icon_name), std::size(xdg_icon_name));
+        auto const qname = QString::fromUtf8(std::data(name), std::size(name));
         for (int const point_size : point_sizes)
-            if (auto const pixmap = loadSFSymbol(name, point_size); !pixmap.isNull())
+            if (auto const pixmap = loadSFSymbol(qname, point_size); !pixmap.isNull())
                 icon.addPixmap(pixmap);
         if (!icon.isNull())
             return icon;
     }
 #endif
 
-    if (segoe_codepoint)
+    if (auto const codepoint = info.segoe_codepoint)
     {
         if (auto const font_family = getWindowsFontFamily(); !font_family.isEmpty())
         {
             auto icon = QIcon{};
+            auto const ch = QChar{ codepoint };
             for (int const point_size : point_sizes)
-                if (auto const pixmap = makeIconFromCodepoint(font_family, QChar{ segoe_codepoint }, point_size);
-                    !pixmap.isNull())
+                if (auto pixmap = makeIconFromCodepoint(font_family, ch, point_size); !pixmap.isNull())
                     icon.addPixmap(pixmap);
             if (!icon.isNull())
                 return icon;
         }
     }
 
-    if (!std::empty(xdg_icon_name))
+    if (auto const name = info.xdg_icon_name; !std::empty(name))
     {
-        auto const name = QString::fromUtf8(std::data(xdg_icon_name), std::size(xdg_icon_name));
-
-        if (auto icon = QIcon::fromTheme(name); !icon.isNull())
+        auto const qname = QString::fromUtf8(std::data(name), std::size(name));
+        if (auto icon = QIcon::fromTheme(qname); !icon.isNull())
             return icon;
-        if (auto icon = QIcon::fromTheme(name + QStringLiteral("-symbolic")); !icon.isNull())
+        if (auto icon = QIcon::fromTheme(qname + QStringLiteral("-symbolic")); !icon.isNull())
             return icon;
     }
 
-    if (fallback)
-        return style->standardIcon(*fallback);
+    if (info.fallback)
+        return style->standardIcon(*info.fallback);
 
     return {};
 }
 
 [[nodiscard]] bool shouldBeShownInMenu(Type type)
 {
-    auto const [sf_symbol_name, segoe_codepoint, xdg_icon_name, fallback, facet_mode] = getKey(type);
+    auto const facet_mode = getInfo(type).mode;
     assert(facet_mode.any());
     return (get_menu_mode() & facet_mode).any();
 }
