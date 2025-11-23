@@ -13,6 +13,7 @@
 #include <QFontInfo>
 #include <QOperatingSystemVersion>
 #include <QPainterPath>
+#include <QStyle>
 #include <QtGui/QFont>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QIcon>
@@ -101,7 +102,6 @@ struct Info
     std::string_view sf_symbol_name;
     char16_t segoe_codepoint;
     std::string_view xdg_icon_name;
-    std::optional<QStyle::StandardPixmap> fallback;
     MenuMode mode;
 };
 
@@ -110,7 +110,6 @@ struct Info
     auto sf_symbol_name = std::string_view{};
     auto xdg_icon_name = std::string_view{};
     auto segoe_codepoint = char16_t{};
-    auto fallback = std::optional<QStyle::StandardPixmap>{};
     auto mode = MenuMode{};
 
     switch (type)
@@ -137,7 +136,6 @@ struct Info
         sf_symbol_name = "folder";
         segoe_codepoint = 0xE8E5U; // OpenFile
         xdg_icon_name = "document-open";
-        fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
         break;
 
@@ -145,7 +143,6 @@ struct Info
         sf_symbol_name = "network";
         segoe_codepoint = 0xE774U; // Globe
         xdg_icon_name = "network-workgroup";
-        fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
         break;
 
@@ -153,7 +150,6 @@ struct Info
         sf_symbol_name = "plus";
         segoe_codepoint = 0xE710U; // Add
         xdg_icon_name = "document-new";
-        fallback = QStyle::SP_FileIcon;
         mode = Standard | Verb;
         break;
 
@@ -161,7 +157,6 @@ struct Info
         sf_symbol_name = "doc.text.magnifyingglass";
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "document-properties";
-        fallback = QStyle::SP_FileIcon;
         mode = Standard | Verb;
         break;
 
@@ -169,7 +164,6 @@ struct Info
         sf_symbol_name = "folder";
         segoe_codepoint = 0xED25U; // OpenFolderHorizontal
         xdg_icon_name = "folder-open";
-        fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
         break;
 
@@ -177,7 +171,6 @@ struct Info
         sf_symbol_name = "play";
         segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
-        fallback = QStyle::SP_MediaPlay;
         mode = Standard | Verb;
         break;
 
@@ -185,7 +178,6 @@ struct Info
         sf_symbol_name = "forward";
         segoe_codepoint = 0xEB9DU; // FastForward
         xdg_icon_name = "media-seek-forward";
-        fallback = QStyle::SP_MediaPlay;
         mode = Standard | Verb;
         break;
 
@@ -193,7 +185,6 @@ struct Info
         sf_symbol_name = "minus";
         segoe_codepoint = 0xE738U; // Remove
         xdg_icon_name = "list-remove";
-        fallback = QStyle::SP_DialogCancelButton;
         mode = Verb;
         break;
 
@@ -201,7 +192,6 @@ struct Info
         sf_symbol_name = "trash";
         segoe_codepoint = 0xE74DU; // Delete
         xdg_icon_name = "edit-delete";
-        fallback = QStyle::SP_TrashIcon;
         mode = Verb;
         break;
 
@@ -265,7 +255,6 @@ struct Info
         sf_symbol_name = "info.circle";
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "help-about";
-        fallback = QStyle::SP_MessageBoxInformation;
         mode = Standard | Noun;
         break;
 
@@ -273,7 +262,6 @@ struct Info
         sf_symbol_name = "questionmark.circle";
         segoe_codepoint = 0xE897U; // Help
         xdg_icon_name = "help-faq";
-        fallback = QStyle::SP_DialogHelpButton;
         mode = Standard | Noun;
         break;
 
@@ -331,28 +319,24 @@ struct Info
         sf_symbol_name = "wifi.exclamationmark";
         segoe_codepoint = 0xE783U; // Error
         xdg_icon_name = "network-error";
-        fallback = QStyle::SP_MessageBoxCritical;
         break;
 
     case Type::TorrentStateActive:
         sf_symbol_name = "play";
         segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
-        fallback = QStyle::SP_MediaPlay;
         break;
 
     case Type::TorrentStateSeeding:
         sf_symbol_name = "chevron.up";
         segoe_codepoint = 0xE70EU; // ChevronUp
         xdg_icon_name = "go-up";
-        fallback = QStyle::SP_ArrowUp;
         break;
 
     case Type::TorrentStateDownloading:
         sf_symbol_name = "chevron.down";
         segoe_codepoint = 0xE70DU; // ChevronDown
         xdg_icon_name = "go-down";
-        fallback = QStyle::SP_ArrowDown;
         break;
 
     case Type::PauseTorrent:
@@ -363,7 +347,6 @@ struct Info
         sf_symbol_name = "pause";
         segoe_codepoint = 0xE769U; // Pause
         xdg_icon_name = "media-playback-pause";
-        fallback = QStyle::SP_MediaPause;
         break;
 
     case Type::VerifyTorrent:
@@ -374,7 +357,6 @@ struct Info
         sf_symbol_name = "arrow.clockwise";
         segoe_codepoint = 0xE72CU; // Refresh
         xdg_icon_name = "view-refresh";
-        fallback = QStyle::SP_BrowserReload;
         break;
 
     case Type::TorrentErrorEmblem:
@@ -384,11 +366,10 @@ struct Info
         sf_symbol_name = "xmark.circle";
         segoe_codepoint = 0xEB90U; // StatusErrorFull
         xdg_icon_name = "dialog-error";
-        fallback = QStyle::SP_MessageBoxWarning;
         break;
     }
 
-    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, fallback, mode };
+    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, mode };
 }
 
 [[nodiscard]] MenuMode get_menu_mode()
@@ -537,9 +518,6 @@ QIcon icon(Type const type, QStyle* style)
         if (auto icon = QIcon::fromTheme(qname + QStringLiteral("-symbolic")); !icon.isNull())
             return icon;
     }
-
-    if (info.fallback)
-        return style->standardIcon(*info.fallback);
 
     return {};
 }
