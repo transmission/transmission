@@ -10,6 +10,7 @@
 #include <string_view>
 #include <tuple>
 
+#include <QFontDatabase>
 #include <QFontInfo>
 #include <QOperatingSystemVersion>
 #include <QPainterPath>
@@ -30,7 +31,11 @@ namespace icons
 {
 namespace
 {
+
+// https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font
 auto const Win10IconFamily = QStringLiteral("Segoe MDL2 Assets");
+
+// https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
 auto const Win11IconFamily = QStringLiteral("Segoe Fluent Icons");
 
 // Define these two macros to force a specific icon during development.
@@ -94,48 +99,13 @@ constexpr auto Noun = MenuMode{ 1 << 1U };
 constexpr auto Verb = MenuMode{ 1 << 2U };
 constexpr auto Other = MenuMode{ 1 << 3U };
 
-using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<QStyle::StandardPixmap>, MenuMode>;
+using Key = std::tuple<std::string_view, char16_t, std::string_view, std::optional<QStyle::StandardPixmap>, MenuMode>;
 
-[[nodiscard]] Key getKey(Facet const facet)
+[[nodiscard]] constexpr Key getKey(Facet const facet)
 {
-    // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font
-    // https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-fluent-icons-font
-    constexpr auto SegoeAdd = QChar{ 0xE710 };
-    constexpr auto SegoeCaretDown8 = QChar{ 0xEDD8 };
-    constexpr auto SegoeCaretDownSolid8 = QChar{ 0xEDDC };
-    constexpr auto SegoeCaretUp8 = QChar{ 0xEDD7 };
-    constexpr auto SegoeCaretUpSolid8 = QChar{ 0xEDDB };
-    constexpr auto SegoeCheckbox = QChar{ 0xE739 };
-    constexpr auto SegoeChevronDown = QChar{ 0xE70D };
-    constexpr auto SegoeChevronUp = QChar{ 0xE70E };
-    constexpr auto SegoeCopy = QChar{ 0xE8C8 };
-    constexpr auto SegoeDelete = QChar{ 0xE74D };
-    constexpr auto SegoeDownload = QChar{ 0xE896 };
-    constexpr auto SegoeEdit = QChar{ 0xE70F };
-    constexpr auto SegoeError = QChar{ 0xE783 };
-    constexpr auto SegoeFastForward = QChar{ 0xEB9D };
-    constexpr auto SegoeGlobe = QChar{ 0xE774 };
-    constexpr auto SegoeHeart = QChar{ 0xEB51 };
-    constexpr auto SegoeHelp = QChar{ 0xE897 };
-    constexpr auto SegoeInfo = QChar{ 0xE946 };
-    constexpr auto SegoeMove = QChar{ 0xE7C2 };
-    constexpr auto SegoeOpenFile = QChar{ 0xE8E5 };
-    constexpr auto SegoeOpenFolder = QChar{ 0xED25 };
-    constexpr auto SegoePause = QChar{ 0xE769 };
-    constexpr auto SegoePlay = QChar{ 0xE768 };
-    constexpr auto SegoePowerButton = QChar{ 0xE7E8 };
-    constexpr auto SegoeRefresh = QChar{ 0xE72C };
-    constexpr auto SegoeRemove = QChar{ 0xE738 };
-    constexpr auto SegoeRuler = QChar{ 0xED5E };
-    constexpr auto SegoeSelectAll = QChar{ 0xE8B3 };
-    constexpr auto SegoeSettings = QChar{ 0xE713 };
-    constexpr auto SegoeStatusErrorFull = QChar{ 0xEB90 };
-    constexpr auto SegoeUpload = QChar{ 0xE898 };
-    constexpr auto SegoeUploadDownload = QChar{ 0xE174 };
-
     auto sf_symbol_name = std::string_view{};
     auto xdg_icon_name = std::string_view{};
-    auto segoe_codepoint = QChar{};
+    auto segoe_codepoint = char16_t{};
     auto fallback = std::optional<QStyle::StandardPixmap>{};
     auto mode = MenuMode{};
 
@@ -143,25 +113,25 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
     {
     case Facet::AddTracker:
         sf_symbol_name = "plus";
-        segoe_codepoint = SegoeAdd;
+        segoe_codepoint = 0xE710U; // Add
         xdg_icon_name = "list-add";
         break;
 
     case Facet::EditTrackers:
         sf_symbol_name = "pencil";
-        segoe_codepoint = SegoeEdit;
+        segoe_codepoint = 0xE70FU; // Edit
         xdg_icon_name = "document-edit";
         break;
 
     case Facet::RemoveTracker:
         sf_symbol_name = "minus";
-        segoe_codepoint = SegoeRemove;
+        segoe_codepoint = 0xE738U; // Remove
         xdg_icon_name = "list-remove";
         break;
 
     case Facet::AddTorrentFromFile:
         sf_symbol_name = "folder.open";
-        segoe_codepoint = SegoeOpenFile;
+        segoe_codepoint = 0xE8E5U; // OpenFile
         xdg_icon_name = "folder";
         fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
@@ -169,7 +139,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::AddTorrentFromURL:
         sf_symbol_name = "globe";
-        segoe_codepoint = SegoeGlobe;
+        segoe_codepoint = 0xE774U; // Globe
         xdg_icon_name = "globe";
         fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
@@ -177,7 +147,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::CreateNewTorrent:
         sf_symbol_name = "plus";
-        segoe_codepoint = SegoeAdd;
+        segoe_codepoint = 0xE710U; // Add
         xdg_icon_name = "document-net";
         fallback = QStyle::SP_FileIcon;
         mode = Standard | Verb;
@@ -185,21 +155,21 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::OpenTorrentDetails:
         sf_symbol_name = "doc.text.magnifyingglass";
-        segoe_codepoint = SegoeInfo;
+        segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "document-properties";
         fallback = QStyle::SP_FileIcon;
         break;
 
     case Facet::OpenTorrentLocalFolder:
         sf_symbol_name = "folder";
-        segoe_codepoint = SegoeOpenFolder;
+        segoe_codepoint = 0xED25U; // OpenFolder
         xdg_icon_name = "folder-open";
         fallback = QStyle::SP_DirOpenIcon;
         break;
 
     case Facet::StartTorrent:
         sf_symbol_name = "play";
-        segoe_codepoint = SegoePlay;
+        segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
         fallback = QStyle::SP_MediaPlay;
         mode = Standard | Verb;
@@ -207,7 +177,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::StartTorrentNow:
         sf_symbol_name = "FIXME";
-        segoe_codepoint = SegoeFastForward;
+        segoe_codepoint = 0xEB9DU; // FastForward
         xdg_icon_name = "media-seek-forward";
         fallback = QStyle::SP_MediaPlay;
         mode = Standard | Verb;
@@ -215,7 +185,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::RemoveTorrent:
         sf_symbol_name = "minus";
-        segoe_codepoint = SegoeRemove;
+        segoe_codepoint = 0xE738U; // Remove
         xdg_icon_name = "list-remove";
         fallback = QStyle::SP_DialogCancelButton;
         mode = Verb;
@@ -223,70 +193,70 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::RemoveTorrentAndDeleteData:
         sf_symbol_name = "trash";
-        segoe_codepoint = SegoeDelete;
-        xdg_icon_name = "edit-delet";
+        segoe_codepoint = 0xE74DU; // Delete
+        xdg_icon_name = "edit-delete";
         fallback = QStyle::SP_TrashIcon;
         mode = Verb;
         break;
 
     case Facet::SetTorrentLocation:
         sf_symbol_name = "arrow.up.and.down.and.arrow.left.and.right";
-        segoe_codepoint = SegoeMove;
+        segoe_codepoint = 0xE7C2U; // Move
         xdg_icon_name = "edit-copy";
         mode = Standard | Verb;
         break;
 
     case Facet::CopyMagnetLinkToClipboard:
         sf_symbol_name = "clipboard";
-        segoe_codepoint = SegoeCopy;
+        segoe_codepoint = 0xE8C8U; // Copy
         xdg_icon_name = "edit-copy";
         mode = Standard | Verb;
         break;
 
     case Facet::SelectAll:
         sf_symbol_name = "checkmark.square";
-        segoe_codepoint = SegoeSelectAll;
+        segoe_codepoint = 0xE8B3U; // SelectAll
         xdg_icon_name = "edit-select-all";
         mode = Verb;
         break;
 
     case Facet::DeselectAll:
         sf_symbol_name = "checkmark";
-        segoe_codepoint = SegoeCheckbox;
+        segoe_codepoint = 0xE739U; // Checkbox
         xdg_icon_name = "edit-select-none";
         mode = Verb;
         break;
 
     case Facet::Statistics:
         sf_symbol_name = "chart.bar";
-        segoe_codepoint = SegoeRuler;
+        segoe_codepoint = 0xED5EU; // Ruler
         xdg_icon_name = "info";
         mode = Noun;
         break;
 
     case Facet::Donate:
         sf_symbol_name = "heart";
-        segoe_codepoint = SegoeHeart;
+        segoe_codepoint = 0xEB51U; // Heart
         xdg_icon_name = "donate";
         break;
 
     case Facet::Settings:
         sf_symbol_name = "gearshape";
-        segoe_codepoint = SegoeSettings;
+        segoe_codepoint = 0xE713U; // Settings
         xdg_icon_name = "perferences-system";
         mode = Standard | Noun;
         break;
 
     case Facet::QuitApp:
         sf_symbol_name = "power";
-        segoe_codepoint = SegoePowerButton;
+        segoe_codepoint = 0xE7E8U; // PowerButton
         xdg_icon_name = "application-exit";
         mode = Standard | Verb;
         break;
 
     case Facet::About:
         sf_symbol_name = "info.circle";
-        segoe_codepoint = SegoeInfo;
+        segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "help-about";
         fallback = QStyle::SP_MessageBoxInformation;
         mode = Standard | Noun;
@@ -294,7 +264,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::Help:
         sf_symbol_name = "questionmark.circle";
-        segoe_codepoint = SegoeHelp;
+        segoe_codepoint = 0xE897U; // Help
         xdg_icon_name = "help-faq";
         fallback = QStyle::SP_DialogHelpButton;
         mode = Standard | Noun;
@@ -302,28 +272,28 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::QueueMoveTop:
         sf_symbol_name = "arrow.up.to.line";
-        segoe_codepoint = SegoeCaretUpSolid8;
+        segoe_codepoint = 0xEDDBU; // CaretUpSolid8
         xdg_icon_name = "go-top";
         mode = Verb;
         break;
 
     case Facet::QueueMoveUp:
         sf_symbol_name = "arrow.up";
-        segoe_codepoint = SegoeCaretUp8;
+        segoe_codepoint = 0xEDD7U; // CaretUp8
         xdg_icon_name = "go-top";
         mode = Verb;
         break;
 
     case Facet::QueueMoveDown:
         sf_symbol_name = "arrow.down";
-        segoe_codepoint = SegoeCaretDown8;
+        segoe_codepoint = 0xEDD8U; // CaretDown8
         xdg_icon_name = "go-down";
         mode = Verb;
         break;
 
     case Facet::QueueMoveBottom:
         sf_symbol_name = "arrow.down.to.line";
-        segoe_codepoint = SegoeCaretDownSolid8;
+        segoe_codepoint = 0xEDDCU; // CaretDownSolid8
         xdg_icon_name = "go-bottom";
         mode = Verb;
         break;
@@ -334,46 +304,46 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::NetworkReceive:
         sf_symbol_name = "arrow.down.circle";
-        segoe_codepoint = SegoeDownload;
+        segoe_codepoint = 0xE896U; // Download
         xdg_icon_name = "network-receive";
         break;
 
     case Facet::NetworkTransmit:
         sf_symbol_name = "arrow.up.circle";
-        segoe_codepoint = SegoeUpload;
+        segoe_codepoint = 0xE898U; // Upload
         xdg_icon_name = "network-transmit";
         break;
 
     case Facet::NetworkTransmitReceive:
         sf_symbol_name = "arrow.up.arrow.down.circle";
-        segoe_codepoint = SegoeUploadDownload;
+        segoe_codepoint = 0xE174U; // UploadDownload
         xdg_icon_name = "network-transmit-receive";
         break;
 
     case Facet::NetworkError:
         sf_symbol_name = "wifi.exclamationmark";
-        segoe_codepoint = SegoeError;
+        segoe_codepoint = 0xE783U; // Error
         xdg_icon_name = "network-error";
         fallback = QStyle::SP_MessageBoxCritical;
         break;
 
     case Facet::TorrentStateActive:
         sf_symbol_name = "play";
-        segoe_codepoint = SegoePlay;
+        segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
         fallback = QStyle::SP_MediaPlay;
         break;
 
     case Facet::TorrentStateSeeding:
         sf_symbol_name = "chevron.up";
-        segoe_codepoint = SegoeChevronUp;
+        segoe_codepoint = 0xE70EU; // ChevronUp
         xdg_icon_name = "go-up";
         fallback = QStyle::SP_ArrowUp;
         break;
 
     case Facet::TorrentStateDownloading:
         sf_symbol_name = "chevron.down";
-        segoe_codepoint = SegoeChevronDown;
+        segoe_codepoint = 0xE70DU; // ChevronDown
         xdg_icon_name = "go-down";
         fallback = QStyle::SP_ArrowDown;
         break;
@@ -384,7 +354,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::TorrentStatePaused:
         sf_symbol_name = "pause";
-        segoe_codepoint = SegoePause;
+        segoe_codepoint = 0xE769U; // Pause
         xdg_icon_name = "media-playback-pause";
         fallback = QStyle::SP_MediaPause;
         break;
@@ -395,7 +365,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::TorrentStateVerifying:
         sf_symbol_name = "arrow.clockwise";
-        segoe_codepoint = SegoeRefresh;
+        segoe_codepoint = 0xE72CU; // Refresh
         xdg_icon_name = "view-refresh";
         fallback = QStyle::SP_BrowserReload;
         break;
@@ -405,7 +375,7 @@ using Key = std::tuple<std::string_view, QChar, std::string_view, std::optional<
 
     case Facet::TorrentStateError:
         sf_symbol_name = "xmark.circle";
-        segoe_codepoint = SegoeStatusErrorFull;
+        segoe_codepoint = 0xEB90U; // StatusErrorFull
         xdg_icon_name = "dialog-error";
         fallback = QStyle::SP_MessageBoxWarning;
         break;
@@ -534,13 +504,14 @@ QIcon icon(Facet const facet, QStyle* style)
     }
 #endif
 
-    if (!segoe_codepoint.isNull())
+    if (segoe_codepoint)
     {
         if (auto const font_family = getWindowsFontFamily(); !font_family.isEmpty())
         {
             auto icon = QIcon{};
             for (int const point_size : point_sizes)
-                if (auto const pixmap = makeIconFromCodepoint(font_family, segoe_codepoint, point_size); !pixmap.isNull())
+                if (auto const pixmap = makeIconFromCodepoint(font_family, QChar{ segoe_codepoint }, point_size);
+                    !pixmap.isNull())
                     icon.addPixmap(pixmap);
             if (!icon.isNull())
                 return icon;
