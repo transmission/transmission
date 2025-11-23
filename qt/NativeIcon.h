@@ -12,7 +12,7 @@
 namespace icons
 {
 
-enum class Facet
+enum class Type
 {
     AddTracker,
     EditTrackers,
@@ -64,8 +64,8 @@ enum class Facet
     TorrentStateError
 };
 
-[[nodiscard]] QIcon icon(Facet facet, QStyle* style = QApplication::style());
+[[nodiscard]] QIcon icon(Type type, QStyle* style = QApplication::style());
 
-[[nodiscard]] bool shouldBeShownInMenu(Facet facet);
+[[nodiscard]] bool shouldBeShownInMenu(Type type);
 
 } // namespace icons
