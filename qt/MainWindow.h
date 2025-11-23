@@ -122,6 +122,7 @@ private slots:
     void toggleWindows(bool do_show);
     void trayActivated(QSystemTrayIcon::ActivationReason);
     void updateNetworkLabel();
+    void updateIcons();
 
 private:
     [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
