@@ -51,8 +51,6 @@
 
 #include "ui_TrackersDialog.h"
 
-using namespace std::literals;
-
 class Prefs;
 class Session;
 

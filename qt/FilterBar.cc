@@ -6,7 +6,6 @@
 #include "FilterBar.h"
 
 #include <cstdint> // uint64_t
-#include <string_view>
 #include <unordered_map>
 #include <utility>
 
@@ -26,8 +25,6 @@
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
-
-using namespace std::literals;
 
 enum
 {

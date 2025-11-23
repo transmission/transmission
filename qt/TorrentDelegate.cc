@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <string_view>
 #include <utility>
 
 #include <QApplication>
@@ -23,8 +22,6 @@
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
 #include "Utils.h"
-
-using namespace std::literals;
 
 enum
 {

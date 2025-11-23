@@ -6,7 +6,6 @@
 #include <array>
 #include <cassert>
 #include <memory>
-#include <string_view>
 #include <utility>
 
 #include <QCheckBox>
@@ -44,8 +43,6 @@
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
-
-using namespace std::literals;
 
 namespace
 {
@@ -220,10 +217,10 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup{ this };
 
-    for (auto const& [qaction, mode] : sort_modes)
+    for (auto const& [action, mode] : sort_modes)
     {
-        qaction->setProperty(SortModeKey, mode);
-        action_group->addAction(qaction);
+        action->setProperty(SortModeKey, mode);
+        action_group->addAction(action);
     }
 
     connect(action_group, &QActionGroup::triggered, this, &MainWindow::onSortModeChanged);
