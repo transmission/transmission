@@ -649,7 +649,9 @@ public:
                 // only do disconnect & log if this the first time we see it here
                 // (likely will see it three times before it's taken down in peer pulse)
                 if (msgs->is_disconnecting())
+                {
                     break;
+                }
                 // some protocol error from the peer
                 msgs->disconnect_soon();
                 tr_logAddDebugSwarm(
