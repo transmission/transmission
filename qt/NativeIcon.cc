@@ -136,7 +136,7 @@ struct Info
     case Type::AddTorrentFromFile:
         sf_symbol_name = "folder";
         segoe_codepoint = 0xE8E5U; // OpenFile
-        xdg_icon_name = "folder";
+        xdg_icon_name = "document-open";
         fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
         break;
@@ -144,7 +144,7 @@ struct Info
     case Type::AddTorrentFromURL:
         sf_symbol_name = "network";
         segoe_codepoint = 0xE774U; // Globe
-        xdg_icon_name = "globe";
+        xdg_icon_name = "network-workgroup";
         fallback = QStyle::SP_DirOpenIcon;
         mode = Standard | Verb;
         break;
@@ -152,7 +152,7 @@ struct Info
     case Type::CreateNewTorrent:
         sf_symbol_name = "plus";
         segoe_codepoint = 0xE710U; // Add
-        xdg_icon_name = "document-net";
+        xdg_icon_name = "document-new";
         fallback = QStyle::SP_FileIcon;
         mode = Standard | Verb;
         break;
@@ -208,7 +208,7 @@ struct Info
     case Type::SetTorrentLocation:
         sf_symbol_name = "arrow.up.and.down.and.arrow.left.and.right";
         segoe_codepoint = 0xE7C2U; // Move
-        xdg_icon_name = "edit-copy";
+        xdg_icon_name = "edit-find";
         mode = Standard | Verb;
         break;
 
