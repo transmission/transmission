@@ -54,19 +54,19 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto add_filter_row = [model](auto const filter_mode, QString label, std::optional<icons::Facet> const facet)
+    auto add_filter_row = [model](auto const filter_mode, QString label, std::optional<icons::Type> const type)
     {
-        auto* row = facet ? new QStandardItem{ icons::icon(*facet), label } : new QStandardItem{ label };
+        auto* row = type ? new QStandardItem{ icons::icon(*type), label } : new QStandardItem{ label };
         row->setData(filter_mode, ACTIVITY_ROLE);
         model->appendRow(row);
     };
-    add_filter_row(FilterMode::SHOW_ACTIVE, tr("Active"), icons::Facet::TorrentStateActive);
-    add_filter_row(FilterMode::SHOW_SEEDING, tr("Seeding"), icons::Facet::TorrentStateSeeding);
-    add_filter_row(FilterMode::SHOW_DOWNLOADING, tr("Downloading"), icons::Facet::TorrentStateDownloading);
-    add_filter_row(FilterMode::SHOW_PAUSED, tr("Paused"), icons::Facet::TorrentStatePaused);
-    add_filter_row(FilterMode::SHOW_FINISHED, tr("Finished"));
-    add_filter_row(FilterMode::SHOW_VERIFYING, tr("Verifying"), icons::Facet::TorrentStateVerifying);
-    add_filter_row(FilterMode::SHOW_ERROR, tr("Error"), icons::Facet::TorrentStateError);
+    add_filter_row(FilterMode::SHOW_ACTIVE, tr("Active"), icons::Type::TorrentStateActive);
+    add_filter_row(FilterMode::SHOW_SEEDING, tr("Seeding"), icons::Type::TorrentStateSeeding);
+    add_filter_row(FilterMode::SHOW_DOWNLOADING, tr("Downloading"), icons::Type::TorrentStateDownloading);
+    add_filter_row(FilterMode::SHOW_PAUSED, tr("Paused"), icons::Type::TorrentStatePaused);
+    add_filter_row(FilterMode::SHOW_FINISHED, tr("Finished"), {});
+    add_filter_row(FilterMode::SHOW_VERIFYING, tr("Verifying"), icons::Type::TorrentStateVerifying);
+    add_filter_row(FilterMode::SHOW_ERROR, tr("Error"), icons::Type::TorrentStateError);
 
     c->setModel(model);
     return c;

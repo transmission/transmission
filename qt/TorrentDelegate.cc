@@ -453,7 +453,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = icons::icon(icons::Facet::TorrentErrorEmblem);
+        icon = icons::icon(icons::Type::TorrentErrorEmblem);
     }
 
     return icon;

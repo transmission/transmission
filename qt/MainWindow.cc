@@ -102,49 +102,49 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     // icons
 
-    auto set_icon = [](QAction* const action, icons::Facet const facet)
+    auto set_icon = [](QAction* const action, icons::Type const type)
     {
-        action->setIcon(icons::icon(facet));
-        action->setIconVisibleInMenu(icons::shouldBeShownInMenu(facet));
+        action->setIcon(icons::icon(type));
+        action->setIconVisibleInMenu(icons::shouldBeShownInMenu(type));
     };
-    set_icon(ui_.action_About, icons::Facet::About);
-    set_icon(ui_.action_AddURL, icons::Facet::AddTorrentFromURL);
-    set_icon(ui_.action_Contents, icons::Facet::Help);
-    set_icon(ui_.action_CopyMagnetToClipboard, icons::Facet::CopyMagnetLinkToClipboard);
-    set_icon(ui_.action_Delete, icons::Facet::RemoveTorrentAndDeleteData);
-    set_icon(ui_.action_DeselectAll, icons::Facet::DeselectAll);
-    set_icon(ui_.action_Donate, icons::Facet::Donate);
-    set_icon(ui_.action_New, icons::Facet::CreateNewTorrent);
-    set_icon(ui_.action_OpenFile, icons::Facet::AddTorrentFromFile);
-    set_icon(ui_.action_OpenFolder, icons::Facet::OpenTorrentLocalFolder);
-    set_icon(ui_.action_Pause, icons::Facet::PauseTorrent);
-    set_icon(ui_.action_Preferences, icons::Facet::Settings);
-    set_icon(ui_.action_Properties, icons::Facet::OpenTorrentDetails);
-    set_icon(ui_.action_QueueMoveBottom, icons::Facet::QueueMoveBottom);
-    set_icon(ui_.action_QueueMoveDown, icons::Facet::QueueMoveDown);
-    set_icon(ui_.action_QueueMoveTop, icons::Facet::QueueMoveTop);
-    set_icon(ui_.action_QueueMoveUp, icons::Facet::QueueMoveUp);
-    set_icon(ui_.action_Quit, icons::Facet::QuitApp);
-    set_icon(ui_.action_Remove, icons::Facet::RemoveTorrent);
-    set_icon(ui_.action_SelectAll, icons::Facet::SelectAll);
-    set_icon(ui_.action_SetLocation, icons::Facet::SetTorrentLocation);
-    set_icon(ui_.action_Start, icons::Facet::StartTorrent);
-    set_icon(ui_.action_StartNow, icons::Facet::StartTorrentNow);
-    set_icon(ui_.action_Statistics, icons::Facet::Statistics);
-    set_icon(ui_.action_Verify, icons::Facet::VerifyTorrent);
+    set_icon(ui_.action_About, icons::Type::About);
+    set_icon(ui_.action_AddURL, icons::Type::AddTorrentFromURL);
+    set_icon(ui_.action_Contents, icons::Type::Help);
+    set_icon(ui_.action_CopyMagnetToClipboard, icons::Type::CopyMagnetLinkToClipboard);
+    set_icon(ui_.action_Delete, icons::Type::RemoveTorrentAndDeleteData);
+    set_icon(ui_.action_DeselectAll, icons::Type::DeselectAll);
+    set_icon(ui_.action_Donate, icons::Type::Donate);
+    set_icon(ui_.action_New, icons::Type::CreateNewTorrent);
+    set_icon(ui_.action_OpenFile, icons::Type::AddTorrentFromFile);
+    set_icon(ui_.action_OpenFolder, icons::Type::OpenTorrentLocalFolder);
+    set_icon(ui_.action_Pause, icons::Type::PauseTorrent);
+    set_icon(ui_.action_Preferences, icons::Type::Settings);
+    set_icon(ui_.action_Properties, icons::Type::OpenTorrentDetails);
+    set_icon(ui_.action_QueueMoveBottom, icons::Type::QueueMoveBottom);
+    set_icon(ui_.action_QueueMoveDown, icons::Type::QueueMoveDown);
+    set_icon(ui_.action_QueueMoveTop, icons::Type::QueueMoveTop);
+    set_icon(ui_.action_QueueMoveUp, icons::Type::QueueMoveUp);
+    set_icon(ui_.action_Quit, icons::Type::QuitApp);
+    set_icon(ui_.action_Remove, icons::Type::RemoveTorrent);
+    set_icon(ui_.action_SelectAll, icons::Type::SelectAll);
+    set_icon(ui_.action_SetLocation, icons::Type::SetTorrentLocation);
+    set_icon(ui_.action_Start, icons::Type::StartTorrent);
+    set_icon(ui_.action_StartNow, icons::Type::StartTorrentNow);
+    set_icon(ui_.action_Statistics, icons::Type::Statistics);
+    set_icon(ui_.action_Verify, icons::Type::VerifyTorrent);
 
     // network icons
 
-    auto networkPixmap = [](icons::Facet facet)
+    auto networkPixmap = [](icons::Type type)
     {
         auto constexpr Size = QSize{ 16, 16 };
-        return icons::icon(facet).pixmap(Size);
+        return icons::icon(type).pixmap(Size);
     };
-    pixmap_network_idle_ = networkPixmap(icons::Facet::NetworkIdle);
-    pixmap_network_receive_ = networkPixmap(icons::Facet::NetworkReceive);
-    pixmap_network_transmit_ = networkPixmap(icons::Facet::NetworkTransmit);
-    pixmap_network_transmit_receive_ = networkPixmap(icons::Facet::NetworkTransmitReceive);
-    pixmap_network_error_ = networkPixmap(icons::Facet::NetworkError);
+    pixmap_network_idle_ = networkPixmap(icons::Type::NetworkIdle);
+    pixmap_network_receive_ = networkPixmap(icons::Type::NetworkReceive);
+    pixmap_network_transmit_ = networkPixmap(icons::Type::NetworkTransmit);
+    pixmap_network_transmit_receive_ = networkPixmap(icons::Type::NetworkTransmitReceive);
+    pixmap_network_error_ = networkPixmap(icons::Type::NetworkError);
 
     // ui signals
     connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::setToolbarVisible);
