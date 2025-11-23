@@ -6,7 +6,6 @@
 #pragma once
 
 #include <QApplication>
-#include <QString>
 #include <QStyle>
 
 namespace icons
