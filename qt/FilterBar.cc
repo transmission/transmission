@@ -54,40 +54,19 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto icon = icons::icon(icons::Facet::TorrentStateActive);
-    row = new QStandardItem{ icon, tr("Active") };
-    row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    icon = icons::icon(icons::Facet::TorrentStateSeeding);
-    row = new QStandardItem{ icon, tr("Seeding") };
-    row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    icon = icons::icon(icons::Facet::TorrentStateDownloading);
-    row = new QStandardItem{ icon, tr("Downloading") };
-    row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    icon = icons::icon(icons::Facet::TorrentStatePaused);
-    row = new QStandardItem{ icon, tr("Paused") };
-    row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    icon = {};
-    row = new QStandardItem{ tr("Finished") };
-    row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    icon = icons::icon(icons::Facet::TorrentStateVerifying);
-    row = new QStandardItem{ icon, tr("Verifying") };
-    row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
-    model->appendRow(row);
-
-    icon = icons::icon(icons::Facet::TorrentStateError);
-    row = new QStandardItem{ icon, tr("Error") };
-    row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
-    model->appendRow(row);
+    auto add_filter_row = [model](auto const filter_mode, QString label, std::optional<icons::Facet> const facet)
+    {
+        auto* row = facet ? new QStandardItem{ icons::icon(*facet), label } : new QStandardItem{ label };
+        row->setData(filter_mode, ACTIVITY_ROLE);
+        model->appendRow(row);
+    };
+    add_filter_row(FilterMode::SHOW_ACTIVE, tr("Active"), icons::Facet::TorrentStateActive);
+    add_filter_row(FilterMode::SHOW_SEEDING, tr("Seeding"), icons::Facet::TorrentStateSeeding);
+    add_filter_row(FilterMode::SHOW_DOWNLOADING, tr("Downloading"), icons::Facet::TorrentStateDownloading);
+    add_filter_row(FilterMode::SHOW_PAUSED, tr("Paused"), icons::Facet::TorrentStatePaused);
+    add_filter_row(FilterMode::SHOW_FINISHED, tr("Finished"));
+    add_filter_row(FilterMode::SHOW_VERIFYING, tr("Verifying"), icons::Facet::TorrentStateVerifying);
+    add_filter_row(FilterMode::SHOW_ERROR, tr("Error"), icons::Facet::TorrentStateError);
 
     c->setModel(model);
     return c;
