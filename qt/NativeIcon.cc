@@ -103,6 +103,48 @@ struct Info
     MenuMode mode;
 };
 
+/**
+ * # Choosing Icons
+ *
+ * ## Windows
+ *
+ * https://learn.microsoft.com/en-us/windows/apps/design/controls/menus
+ * Consider providing menu item icons for:
+ * - The most commonly used items.
+ * - Menu items whose icon is standard or well known.
+ * - Menu items whose icon well illustrates what the command does.
+ * Don't feel obligated to provide icons for commands that don't have
+ * a standard visualization. Cryptic icons aren't helpful, create visual
+ * clutter, and prevent users from focusing on the important menu items.
+ *
+ * ## macOS
+ *
+ * https://developer.apple.com/design/human-interface-guidelines/menus
+ * Represent menu item actions with familiar icons. Icons help people
+ * recognize common actions throughout your app. Use the same icons as
+ * the system to represent actions such as Copy, Share, and Delete,
+ * wherever they appear. For a list of icons that represent common
+ * actions, see Standard icons.
+ * Don’t display an icon if you can’t find one that clearly represents
+ * the menu item. Not all menu items need an icon. Be careful when adding
+ * icons for custom menu items to avoid confusion with other existing
+ * actions, and don’t add icons just for the sake of ornamentation.
+ *
+ * ## GNOME
+ *
+ * https://discourse.gnome.org/t/principle-of-icons-in-menus/4803
+ * We do not “block” icons in menus; icons are generally reserved
+ * for “nouns”, or “objects”—for instance: website favicons in
+ * bookmark menus, or file-type icons—instead of having them for
+ * “verbs”, or “actions”—for instance: save, copy, print, etc.
+ *
+ * ## KDE
+ *
+ * https://develop.kde.org/hig/icons/#icons-for-menu-items-and-buttons-with-text
+ * Set an icon on every button and menu item, making sure not to
+ * use the same icon for multiple visible buttons or menu items.
+ * Choose different icons, or use more specific ones to disambiguate.
+ */
 [[nodiscard]] constexpr Info getInfo(Type const type)
 {
     auto sf_symbol_name = std::string_view{};
@@ -393,8 +435,7 @@ struct Info
 
 #if defined(Q_OS_WIN)
 
-    if (!value)
-    {
+    if (!value) {
         // https://learn.microsoft.com/en-us/windows/apps/design/controls/menus
         // Consider providing menu item icons for:
         // The most commonly used items.
