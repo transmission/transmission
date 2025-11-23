@@ -134,7 +134,7 @@ struct Info
         break;
 
     case Type::AddTorrentFromFile:
-        sf_symbol_name = "folder.open";
+        sf_symbol_name = "folder";
         segoe_codepoint = 0xE8E5U; // OpenFile
         xdg_icon_name = "folder";
         fallback = QStyle::SP_DirOpenIcon;
@@ -142,7 +142,7 @@ struct Info
         break;
 
     case Type::AddTorrentFromURL:
-        sf_symbol_name = "globe";
+        sf_symbol_name = "network";
         segoe_codepoint = 0xE774U; // Globe
         xdg_icon_name = "globe";
         fallback = QStyle::SP_DirOpenIcon;
@@ -182,7 +182,7 @@ struct Info
         break;
 
     case Type::StartTorrentNow:
-        sf_symbol_name = "FIXME";
+        sf_symbol_name = "forward";
         segoe_codepoint = 0xEB9DU; // FastForward
         xdg_icon_name = "media-seek-forward";
         fallback = QStyle::SP_MediaPlay;
@@ -227,7 +227,7 @@ struct Info
         break;
 
     case Type::DeselectAll:
-        sf_symbol_name = "checkmark";
+        sf_symbol_name = "square";
         segoe_codepoint = 0xE739U; // Checkbox
         xdg_icon_name = "edit-select-none";
         mode = Verb;
