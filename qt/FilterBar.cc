@@ -54,22 +54,22 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto icon = NativeIcon::get({ "play.fill"sv, segoe::Play, "media-playback-start"sv, QStyle::SP_MediaPlay });
+    auto icon = icons::icon(icons::Facet::TorrentStateActive);
     row = new QStandardItem{ icon, tr("Active") };
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    icon = NativeIcon::get({ "chevron.up"sv, segoe::ChevronUp, "go-up"sv, QStyle::SP_ArrowUp });
+    icon = icons::icon(icons::Facet::TorrentStateSeeding);
     row = new QStandardItem{ icon, tr("Seeding") };
     row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    icon = NativeIcon::get({ "chevron.down"sv, segoe::ChevronDown, "go-down"sv, QStyle::SP_ArrowDown });
+    icon = icons::icon(icons::Facet::TorrentStateDownloading);
     row = new QStandardItem{ icon, tr("Downloading") };
     row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    icon = NativeIcon::get({ "pause.fill"sv, segoe::Pause, "media-playback-pause"sv, QStyle::SP_MediaPause });
+    icon = icons::icon(icons::Facet::TorrentStatePaused);
     row = new QStandardItem{ icon, tr("Paused") };
     row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
@@ -79,12 +79,12 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    icon = NativeIcon::get({ "arrow.clockwise"sv, segoe::Refresh, "view-refresh"sv, QStyle::SP_BrowserReload });
+    icon = icons::icon(icons::Facet::TorrentStateVerifying);
     row = new QStandardItem{ icon, tr("Verifying") };
     row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    icon = NativeIcon::get({ "xmark.circle"sv, segoe::StatusErrorFull, "dialog-error"sv, QStyle::SP_MessageBoxWarning });
+    icon = icons::icon(icons::Facet::TorrentStateError);
     row = new QStandardItem{ icon, tr("Error") };
     row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);

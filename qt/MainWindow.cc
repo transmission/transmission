@@ -54,114 +54,6 @@ char const* const PrefVariantsKey = "submenu";
 char const* const StatsModeKey = "stats-mode";
 char const* const SortModeKey = "sort-mode";
 
-namespace icons
-{
-
-using MenuMode = std::bitset<4U>;
-constexpr auto Standard = MenuMode{ 1 << 0U };
-constexpr auto Noun = MenuMode{ 1 << 1U };
-constexpr auto Verb = MenuMode{ 1 << 2U };
-constexpr auto Other = MenuMode{ 1 << 3U };
-
-[[nodiscard]] MenuMode get_menu_mode()
-{
-    static std::optional<MenuMode> value;
-
-    if (!value)
-    {
-        auto const override = qgetenv("TR_ICON_MODE").toLower();
-        if (override.contains("all"))
-            value = Noun | Standard | Verb | Other;
-        if (override.contains("noun"))
-            value = Noun;
-        if (override.contains("standard"))
-            value = Standard;
-        if (override.contains("verb"))
-            value = Verb;
-    }
-
-#if defined(Q_OS_WIN)
-
-    if (!value)
-    {
-        // https://learn.microsoft.com/en-us/windows/apps/design/controls/menus
-        // Consider providing menu item icons for:
-        // The most commonly used items.
-        // Menu items whose icon is standard or well known.
-        // Menu items whose icon well illustrates what the command does.
-        // Don't feel obligated to provide icons for commands that don't have
-        // a standard visualization. Cryptic icons aren't helpful, create visual
-        // clutter, and prevent users from focusing on the important menu items.
-        value = Standard;
-    }
-
-#elif defined(Q_OS_MAC)
-
-    if (!value)
-    {
-        // https://developer.apple.com/design/human-interface-guidelines/menus
-        // Represent menu item actions with familiar icons. Icons help people
-        // recognize common actions throughout your app. Use the same icons as
-        // the system to represent actions such as Copy, Share, and Delete,
-        // wherever they appear. For a list of icons that represent common
-        // actions, see Standard icons.
-        // Don’t display an icon if you can’t find one that clearly represents
-        // the menu item. Not all menu items need an icon. Be careful when adding
-        // icons for custom menu items to avoid confusion with other existing
-        // actions, and don’t add icons just for the sake of ornamentation.
-        value = Standard;
-
-        // Note: Qt 6.7.3 turned off menu icons by default on macOS.
-        // https://github.com/qt/qtbase/commit/d671e1af3b736ee7d866323246fc2190fc5e076a
-        // This seems too restrictive based on the Apple HIG guidance at
-        // https://developer.apple.com/design/human-interface-guidelines/menus
-        // Based on the HIG text above, this is probably too restrictive?
-    }
-
-#else
-
-    if (!value)
-    {
-        auto const desktop = qgetenv("XDG_CURRENT_DESKTOP");
-
-        // https://discourse.gnome.org/t/principle-of-icons-in-menus/4803
-        // We do not “block” icons in menus; icons are generally reserved
-        // for “nouns”, or “objects”—for instance: website favicons in
-        // bookmark menus, or file-type icons—instead of having them for
-        // “verbs”, or “actions”—for instance: save, copy, print, etc.
-        if (desktop.contains("GNOME"))
-        {
-            value = Noun;
-        }
-
-        // https://develop.kde.org/hig/icons/#icons-for-menu-items-and-buttons-with-text
-        // Set an icon on every button and menu item, making sure not to
-        // use the same icon for multiple visible buttons or menu items.
-        // Choose different icons, or use more specific ones to disambiguate.
-        else if (desktop.contains("KDE"))
-        {
-            value = Standard | Noun | Verb | Other;
-        }
-
-        // Unknown DE -- not GNOME or KDE, so probably no HIG.
-        // Use best guess.
-        else
-        {
-            value = Standard | Noun;
-        }
-    }
-
-#endif
-
-    return *value;
-}
-
-[[nodiscard]] bool visible(MenuMode const type)
-{
-    return (get_menu_mode() & type).any();
-}
-
-} // namespace icons
 } // namespace
 
 /**
@@ -210,154 +102,49 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     // icons
 
-    auto set = [](QAction* action, QIcon icon, icons::MenuMode const type)
+    auto set_icon = [](QAction* const action, icons::Facet const facet)
     {
-        action->setIcon(icon);
-        action->setIconVisibleInMenu(icons::visible(type));
+        action->setIcon(icons::icon(facet));
+        action->setIconVisibleInMenu(icons::shouldBeShownInMenu(facet));
     };
-
-    auto* action = ui_.action_OpenFile;
-    auto type = icons::Standard | icons::Verb;
-    auto icon = NativeIcon::get("folder.open"sv, segoe::OpenFile, "folder"sv, QStyle::SP_DirOpenIcon);
-    set(action, icon, type);
-
-    action = ui_.action_AddURL;
-    type = icons::Verb;
-    icon = NativeIcon::get("globe"sv, segoe::Globe, "globe"sv, QStyle::SP_DirOpenIcon);
-    set(action, icon, type);
-
-    action = ui_.action_New;
-    type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("plus"sv, segoe::Add, "document-new", QStyle::SP_FileIcon);
-    set(action, icon, type);
-
-    action = ui_.action_Properties;
-    type = icons::Standard | icons::Noun;
-    icon = NativeIcon::get("doc.text.magnifyingglass"sv, segoe::Info, "document-properties"sv, QStyle::SP_FileIcon);
-    set(action, icon, type);
-
-    action = ui_.action_OpenFolder;
-    type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("folder"sv, segoe::OpenFolder, "folder-open"sv, QStyle::SP_DirOpenIcon);
-    set(action, icon, type);
-
-    action = ui_.action_Start;
-    type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("play"sv, segoe::Play, "media-playback-start"sv, QStyle::SP_MediaPlay);
-    set(action, icon, type);
-
-    action = ui_.action_StartNow;
-    type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get(""sv, segoe::FastForward, "media-seek-forward"sv, QStyle::SP_MediaPlay);
-    set(action, icon, type);
-
-    action = ui_.action_Pause;
-    type = icons::Standard | icons::Verb;
-    icon = NativeIcon::get("pause"sv, segoe::Pause, "media-playback-pause"sv, QStyle::SP_MediaPause);
-    set(action, icon, type);
-
-    action = ui_.action_Remove;
-    type = icons::Verb;
-    icon = NativeIcon::get("minus"sv, segoe::Remove, "list-remove"sv, QStyle::SP_DialogCancelButton);
-    set(action, icon, type);
-
-    action = ui_.action_Delete;
-    type = icons::Verb;
-    icon = NativeIcon::get("trash"sv, segoe::Delete, "edit-delete"sv, QStyle::SP_TrashIcon);
-    set(action, icon, type);
-
-    action = ui_.action_SetLocation;
-    type = icons::Verb;
-    icon = NativeIcon::get("arrow.up.and.down.and.arrow.left.and.right"sv, segoe::Move, "edit-copy"sv);
-    set(action, icon, type);
-
-    action = ui_.action_Quit;
-    icon = NativeIcon::get("power"sv, segoe::PowerButton, "application-exit"sv);
-    type = icons::Standard | icons::Verb;
-    set(action, icon, type);
-
-    action = ui_.action_SelectAll;
-    type = icons::Verb;
-    icon = NativeIcon::get("checkmark.square"sv, segoe::SelectAll, "edit-select-all"sv);
-    set(action, icon, type);
-
-    action = ui_.action_DeselectAll;
-    type = icons::Verb;
-    icon = NativeIcon::get("checkmark"sv, segoe::Checkbox, "edit-select-none"sv);
-    set(action, icon, type);
-
-    action = ui_.action_Preferences;
-    icon = NativeIcon::get("gearshape"sv, segoe::Settings, "preferences-system"sv);
-    type = icons::Standard | icons::Verb;
-    set(action, icon, type);
-
-    action = ui_.action_Statistics;
-    type = icons::Verb;
-    icon = NativeIcon::get("chart.bar"sv, segoe::Ruler, "info"sv);
-    set(action, icon, type);
-
-    action = ui_.action_Donate;
-    type = icons::Verb;
-    icon = NativeIcon::get("heart"sv, segoe::Heart, "donate"sv);
-    set(action, icon, type);
-
-    action = ui_.action_About;
-    type = icons::Standard;
-    icon = NativeIcon::get("info.circle"sv, segoe::Info, "help-about"sv, QStyle::SP_MessageBoxInformation);
-    set(action, icon, type);
-
-    action = ui_.action_CopyMagnetToClipboard;
-    type = icons::Verb;
-    icon = NativeIcon::get("clipboard"sv, segoe::Copy, "edit-copy"sv);
-    set(action, icon, type);
-
-    action = ui_.action_Verify;
-    type = icons::Verb;
-    icon = NativeIcon::get("arrow.clockwise"sv, segoe::Refresh, "view-refresh"sv, QStyle::SP_BrowserReload);
-    set(action, icon, type);
-
-    action = ui_.action_Contents;
-    type = icons::Standard;
-    icon = NativeIcon::get("questionmark.circle"sv, segoe::Help, "help-faq"sv, QStyle::SP_DialogHelpButton);
-    set(action, icon, type);
-
-    action = ui_.action_QueueMoveTop;
-    type = icons::Verb;
-    icon = NativeIcon::get("arrow.up.to.line"sv, segoe::CaretUpSolid8, "go-top"sv);
-    set(action, icon, type);
-
-    action = ui_.action_QueueMoveUp;
-    type = icons::Verb;
-    icon = NativeIcon::get("arrow.up"sv, segoe::CaretUp8, "go-up"sv);
-    set(action, icon, type);
-
-    action = ui_.action_QueueMoveDown;
-    type = icons::Verb;
-    icon = NativeIcon::get("arrow.down"sv, segoe::CaretDown8, "go-down"sv);
-    set(action, icon, type);
-
-    action = ui_.action_QueueMoveBottom;
-    type = icons::Verb;
-    icon = NativeIcon::get("arrow.down.to.line"sv, segoe::CaretDownSolid8, "go-bottom"sv);
-    set(action, icon, type);
+    set_icon(ui_.action_About, icons::Facet::About);
+    set_icon(ui_.action_AddURL, icons::Facet::AddTorrentFromURL);
+    set_icon(ui_.action_Contents, icons::Facet::Help);
+    set_icon(ui_.action_CopyMagnetToClipboard, icons::Facet::CopyMagnetLinkToClipboard);
+    set_icon(ui_.action_Delete, icons::Facet::RemoveTorrentAndDeleteData);
+    set_icon(ui_.action_DeselectAll, icons::Facet::DeselectAll);
+    set_icon(ui_.action_Donate, icons::Facet::Donate);
+    set_icon(ui_.action_New, icons::Facet::CreateNewTorrent);
+    set_icon(ui_.action_OpenFile, icons::Facet::AddTorrentFromFile);
+    set_icon(ui_.action_OpenFolder, icons::Facet::OpenTorrentLocalFolder);
+    set_icon(ui_.action_Pause, icons::Facet::PauseTorrent);
+    set_icon(ui_.action_Preferences, icons::Facet::Settings);
+    set_icon(ui_.action_Properties, icons::Facet::OpenTorrentDetails);
+    set_icon(ui_.action_QueueMoveBottom, icons::Facet::QueueMoveBottom);
+    set_icon(ui_.action_QueueMoveDown, icons::Facet::QueueMoveDown);
+    set_icon(ui_.action_QueueMoveTop, icons::Facet::QueueMoveTop);
+    set_icon(ui_.action_QueueMoveUp, icons::Facet::QueueMoveUp);
+    set_icon(ui_.action_Quit, icons::Facet::QuitApp);
+    set_icon(ui_.action_Remove, icons::Facet::RemoveTorrent);
+    set_icon(ui_.action_SelectAll, icons::Facet::SelectAll);
+    set_icon(ui_.action_SetLocation, icons::Facet::SetTorrentLocation);
+    set_icon(ui_.action_Start, icons::Facet::StartTorrent);
+    set_icon(ui_.action_StartNow, icons::Facet::StartTorrentNow);
+    set_icon(ui_.action_Statistics, icons::Facet::Statistics);
+    set_icon(ui_.action_Verify, icons::Facet::VerifyTorrent);
 
     // network icons
 
-    auto constexpr NetworkIconSize = QSize{ 16, 16 };
-    icon = NativeIcon::get(""sv, QChar{}, "network-idle"sv);
-    pixmap_network_idle_ = icon.pixmap(NetworkIconSize);
-
-    icon = NativeIcon::get("wifi.exclamationmark"sv, segoe::Error, "network-error"sv, QStyle::SP_MessageBoxCritical);
-    pixmap_network_error_ = icon.pixmap(NetworkIconSize);
-
-    icon = NativeIcon::get("arrow.down.circle"sv, segoe::Download, "network-receive"sv);
-    pixmap_network_receive_ = icon.pixmap(NetworkIconSize);
-
-    icon = NativeIcon::get("arrow.up.circle"sv, segoe::Upload, "network-transmit"sv);
-    pixmap_network_transmit_ = icon.pixmap(NetworkIconSize);
-
-    icon = NativeIcon::get("arrow.up.arrow.down.circle"sv, segoe::UploadDownload, "network-transmit-receive"sv);
-    pixmap_network_transmit_receive_ = icon.pixmap(NetworkIconSize);
+    auto networkPixmap = [](icons::Facet facet)
+    {
+        auto constexpr Size = QSize{ 16, 16 };
+        return icons::icon(facet).pixmap(Size);
+    };
+    pixmap_network_idle_ = networkPixmap(icons::Facet::NetworkIdle);
+    pixmap_network_receive_ = networkPixmap(icons::Facet::NetworkReceive);
+    pixmap_network_transmit_ = networkPixmap(icons::Facet::NetworkTransmit);
+    pixmap_network_transmit_receive_ = networkPixmap(icons::Facet::NetworkTransmitReceive);
+    pixmap_network_error_ = networkPixmap(icons::Facet::NetworkError);
 
     // ui signals
     connect(ui_.action_Toolbar, &QAction::toggled, this, &MainWindow::setToolbarVisible);
