@@ -92,8 +92,8 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 {
     setAcceptDrops(true);
 
-    auto* sep = new QAction{ this };
-    sep->setSeparator(true);
+    // Let the icons-in-menus logic be done by icons::shouldBeShownInMenu()
+    qApp->setAttribute(Qt::ApplicationAttribute::AA_DontShowIconsInMenus, false);
 
     ui_.setupUi(this);
 
