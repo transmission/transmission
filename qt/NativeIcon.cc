@@ -5,15 +5,14 @@
 
 #include "NativeIcon.h"
 
-#include <bitset>
-#include <optional>
 #include <string_view>
 
+#include <QChar>
 #include <QFontDatabase>
 #include <QOperatingSystemVersion>
 #include <QStyle>
 #include <QtGui/QFont>
-#include <QtGui/QGuiApplication>
+#include <QtGui/QGuiApplication> // qApp
 #include <QtGui/QIcon>
 #include <QtGui/QPainter>
 #include <QtGui/QPalette>
@@ -90,21 +89,19 @@ QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int c
     return pixmap;
 }
 
-using MenuMode = std::bitset<3U>;
-constexpr auto Standard = MenuMode{ 1 << 0U };
-constexpr auto Noun = MenuMode{ 1 << 1U };
-constexpr auto Verb = MenuMode{ 1 << 2U };
-
 struct Info
 {
     std::string_view sf_symbol_name;
-    char16_t segoe_codepoint;
+    char16_t segoe_codepoint = {};
     std::string_view xdg_icon_name;
-    MenuMode mode;
+    bool ok_in_gnome_menus = false;
 };
 
 /**
  * # Choosing Icons
+ *
+ * Follow the per-platform guidelines below for each icon.
+ * Only specify an icon for that platform if it matches the guidelines.
  *
  * ## Windows
  *
@@ -150,7 +147,7 @@ struct Info
     auto sf_symbol_name = std::string_view{};
     auto xdg_icon_name = std::string_view{};
     auto segoe_codepoint = char16_t{};
-    auto mode = MenuMode{};
+    auto ok_in_gnome_menus = false;
 
     switch (type)
     {
@@ -176,161 +173,143 @@ struct Info
         sf_symbol_name = "folder";
         segoe_codepoint = 0xE8E5U; // OpenFile
         xdg_icon_name = "document-open";
-        mode = Standard | Verb;
         break;
 
     case Type::AddTorrentFromURL:
         sf_symbol_name = "network";
         segoe_codepoint = 0xE774U; // Globe
         xdg_icon_name = "network-workgroup";
-        mode = Standard | Verb;
         break;
 
     case Type::CreateNewTorrent:
         sf_symbol_name = "plus";
         segoe_codepoint = 0xE710U; // Add
         xdg_icon_name = "document-new";
-        mode = Standard | Verb;
         break;
 
     case Type::OpenTorrentDetails:
         sf_symbol_name = "doc.text.magnifyingglass";
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "document-properties";
-        mode = Standard | Verb;
+        ok_in_gnome_menus = true;
         break;
 
     case Type::OpenTorrentLocalFolder:
         sf_symbol_name = "folder";
         segoe_codepoint = 0xED25U; // OpenFolderHorizontal
         xdg_icon_name = "folder-open";
-        mode = Standard | Verb;
         break;
 
     case Type::StartTorrent:
         sf_symbol_name = "play";
         segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
-        mode = Standard | Verb;
         break;
 
     case Type::StartTorrentNow:
         sf_symbol_name = "forward";
         segoe_codepoint = 0xEB9DU; // FastForward
         xdg_icon_name = "media-seek-forward";
-        mode = Standard | Verb;
         break;
 
     case Type::RemoveTorrent:
         sf_symbol_name = "minus";
         segoe_codepoint = 0xE738U; // Remove
         xdg_icon_name = "list-remove";
-        mode = Verb;
         break;
 
     case Type::RemoveTorrentAndDeleteData:
         sf_symbol_name = "trash";
         segoe_codepoint = 0xE74DU; // Delete
         xdg_icon_name = "edit-delete";
-        mode = Verb;
         break;
 
     case Type::SetTorrentLocation:
         sf_symbol_name = "arrow.up.and.down.and.arrow.left.and.right";
         segoe_codepoint = 0xE7C2U; // Move
         xdg_icon_name = "edit-find";
-        mode = Standard | Verb;
         break;
 
     case Type::CopyMagnetLinkToClipboard:
         sf_symbol_name = "clipboard";
         segoe_codepoint = 0xE8C8U; // Copy
         xdg_icon_name = "edit-copy";
-        mode = Standard | Verb;
         break;
 
     case Type::SelectAll:
         sf_symbol_name = "checkmark.square";
         segoe_codepoint = 0xE8B3U; // SelectAll
         xdg_icon_name = "edit-select-all";
-        mode = Verb;
         break;
 
     case Type::DeselectAll:
         sf_symbol_name = "square";
         segoe_codepoint = 0xE739U; // Checkbox
         xdg_icon_name = "edit-select-none";
-        mode = Verb;
         break;
 
     case Type::Statistics:
         sf_symbol_name = "chart.bar";
         segoe_codepoint = 0xED5EU; // Ruler
         xdg_icon_name = "info";
-        mode = Noun;
+        ok_in_gnome_menus = true;
         break;
 
     case Type::Donate:
         sf_symbol_name = "heart";
         segoe_codepoint = 0xEB51U; // Heart
         xdg_icon_name = "donate";
-        mode = Standard | Verb;
         break;
 
     case Type::Settings:
         sf_symbol_name = "gearshape";
         segoe_codepoint = 0xE713U; // Settings
         xdg_icon_name = "preferences-system";
-        mode = Standard | Noun;
+        ok_in_gnome_menus = true;
         break;
 
     case Type::QuitApp:
         sf_symbol_name = "power";
         segoe_codepoint = 0xE7E8U; // PowerButton
         xdg_icon_name = "application-exit";
-        mode = Standard | Verb;
         break;
 
     case Type::About:
         sf_symbol_name = "info.circle";
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "help-about";
-        mode = Standard | Noun;
+        ok_in_gnome_menus = true;
         break;
 
     case Type::Help:
         sf_symbol_name = "questionmark.circle";
         segoe_codepoint = 0xE897U; // Help
         xdg_icon_name = "help-faq";
-        mode = Standard | Noun;
+        ok_in_gnome_menus = true;
         break;
 
     case Type::QueueMoveTop:
         sf_symbol_name = "arrow.up.to.line";
         segoe_codepoint = 0xEDDBU; // CaretUpSolid8
         xdg_icon_name = "go-top";
-        mode = Verb;
         break;
 
     case Type::QueueMoveUp:
         sf_symbol_name = "arrow.up";
         segoe_codepoint = 0xEDD7U; // CaretUp8
         xdg_icon_name = "go-up";
-        mode = Verb;
         break;
 
     case Type::QueueMoveDown:
         sf_symbol_name = "arrow.down";
         segoe_codepoint = 0xEDD8U; // CaretDown8
         xdg_icon_name = "go-down";
-        mode = Verb;
         break;
 
     case Type::QueueMoveBottom:
         sf_symbol_name = "arrow.down.to.line";
         segoe_codepoint = 0xEDDCU; // CaretDownSolid8
         xdg_icon_name = "go-bottom";
-        mode = Verb;
         break;
 
     case Type::NetworkIdle:
@@ -380,7 +359,6 @@ struct Info
         break;
 
     case Type::PauseTorrent:
-        mode = Standard | Verb;
         [[fallthrough]];
 
     case Type::TorrentStatePaused:
@@ -390,7 +368,6 @@ struct Info
         break;
 
     case Type::VerifyTorrent:
-        mode = Standard | Verb;
         [[fallthrough]];
 
     case Type::TorrentStateVerifying:
@@ -409,103 +386,7 @@ struct Info
         break;
     }
 
-    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, mode };
-}
-
-[[nodiscard]] MenuMode get_menu_mode()
-{
-    static auto value = std::optional<MenuMode>{};
-
-    if (!value)
-    {
-        if (auto const env = qgetenv("TR_ICON_MODE").toLower(); !env.isEmpty())
-        {
-            auto mode = MenuMode{};
-            if (env.contains("all"))
-                mode.set();
-            if (env.contains("noun"))
-                mode |= Noun;
-            if (env.contains("standard"))
-                mode |= Standard;
-            if (env.contains("verb"))
-                mode |= Verb;
-            value = mode;
-        }
-    }
-
-#if defined(Q_OS_WIN)
-
-    if (!value) {
-        // https://learn.microsoft.com/en-us/windows/apps/design/controls/menus
-        // Consider providing menu item icons for:
-        // The most commonly used items.
-        // Menu items whose icon is standard or well known.
-        // Menu items whose icon well illustrates what the command does.
-        // Don't feel obligated to provide icons for commands that don't have
-        // a standard visualization. Cryptic icons aren't helpful, create visual
-        // clutter, and prevent users from focusing on the important menu items.
-        value = Standard;
-    }
-
-#elif defined(Q_OS_MAC)
-
-    if (!value)
-    {
-        // https://developer.apple.com/design/human-interface-guidelines/menus
-        // Represent menu item actions with familiar icons. Icons help people
-        // recognize common actions throughout your app. Use the same icons as
-        // the system to represent actions such as Copy, Share, and Delete,
-        // wherever they appear. For a list of icons that represent common
-        // actions, see Standard icons.
-        // Don’t display an icon if you can’t find one that clearly represents
-        // the menu item. Not all menu items need an icon. Be careful when adding
-        // icons for custom menu items to avoid confusion with other existing
-        // actions, and don’t add icons just for the sake of ornamentation.
-        value = Standard;
-
-        // Note: Qt 6.7.3 turned off menu icons by default on macOS.
-        // https://github.com/qt/qtbase/commit/d671e1af3b736ee7d866323246fc2190fc5e076a
-        // This seems too restrictive based on the Apple HIG guidance at
-        // https://developer.apple.com/design/human-interface-guidelines/menus
-        // Based on the HIG text above, this is probably too restrictive?
-    }
-
-#else
-
-    if (!value)
-    {
-        auto const desktop = qgetenv("XDG_CURRENT_DESKTOP");
-
-        // https://discourse.gnome.org/t/principle-of-icons-in-menus/4803
-        // We do not “block” icons in menus; icons are generally reserved
-        // for “nouns”, or “objects”—for instance: website favicons in
-        // bookmark menus, or file-type icons—instead of having them for
-        // “verbs”, or “actions”—for instance: save, copy, print, etc.
-        if (desktop.contains("GNOME"))
-        {
-            value = Noun;
-        }
-
-        // https://develop.kde.org/hig/icons/#icons-for-menu-items-and-buttons-with-text
-        // Set an icon on every button and menu item, making sure not to
-        // use the same icon for multiple visible buttons or menu items.
-        // Choose different icons, or use more specific ones to disambiguate.
-        else if (desktop.contains("KDE"))
-        {
-            value = Standard | Noun | Verb;
-        }
-
-        // Unknown DE -- not GNOME or KDE, so probably no HIG.
-        // Use best guess.
-        else
-        {
-            value = Standard | Noun;
-        }
-    }
-
-#endif
-
-    return *value;
+    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, ok_in_gnome_menus };
 }
 } // namespace
 
@@ -523,38 +404,39 @@ QIcon icon(Type const type, QStyle* style)
     auto const info = getInfo(type);
 
 #if defined(Q_OS_MAC)
-    if (auto const name = info.sf_symbol_name; !std::empty(name))
+    if (auto const key = info.sf_symbol_name; !std::empty(key))
     {
         auto icon = QIcon{};
-        auto const qname = QString::fromUtf8(std::data(name), std::size(name));
+        auto const name = QString::fromUtf8(std::data(key), std::size(key));
         for (int const point_size : point_sizes)
-            if (auto const pixmap = loadSFSymbol(qname, point_size); !pixmap.isNull())
+            if (auto const pixmap = loadSFSymbol(name, point_size); !pixmap.isNull())
                 icon.addPixmap(pixmap);
         if (!icon.isNull())
             return icon;
     }
 #endif
 
-    if (auto const codepoint = info.segoe_codepoint)
+    if (auto const key = info.segoe_codepoint)
     {
-        if (auto const font_family = getWindowsFontFamily(); !font_family.isEmpty())
+        if (auto const family = getWindowsFontFamily(); !family.isEmpty())
         {
             auto icon = QIcon{};
-            auto const ch = QChar{ codepoint };
+            auto const ch = QChar{ key };
             for (int const point_size : point_sizes)
-                if (auto pixmap = makeIconFromCodepoint(font_family, ch, point_size); !pixmap.isNull())
+                if (auto pixmap = makeIconFromCodepoint(family, ch, point_size); !pixmap.isNull())
                     icon.addPixmap(pixmap);
             if (!icon.isNull())
                 return icon;
         }
     }
 
-    if (auto const name = info.xdg_icon_name; !std::empty(name))
+    if (auto const key = info.xdg_icon_name; !std::empty(key))
     {
-        auto const qname = QString::fromUtf8(std::data(name), std::size(name));
-        if (auto icon = QIcon::fromTheme(qname); !icon.isNull())
+        auto const name = QString::fromUtf8(std::data(key), std::size(key));
+
+        if (auto icon = QIcon::fromTheme(name); !icon.isNull())
             return icon;
-        if (auto icon = QIcon::fromTheme(qname + QStringLiteral("-symbolic")); !icon.isNull())
+        if (auto icon = QIcon::fromTheme(name + QStringLiteral("-symbolic")); !icon.isNull())
             return icon;
     }
 
@@ -563,9 +445,9 @@ QIcon icon(Type const type, QStyle* style)
 
 [[nodiscard]] bool shouldBeShownInMenu(Type type)
 {
-    auto const facet_mode = getInfo(type).mode;
-    assert(facet_mode.any());
-    return (get_menu_mode() & facet_mode).any();
+    static bool const is_gnome = qgetenv("XDG_CURRENT_DESKTOP").contains("GNOME");
+    static bool const force_icons = !qgetenv("TR_SHOW_MENU_ICONS").isEmpty();
+    return force_icons || !is_gnome || getInfo(type).ok_in_gnome_menus;
 }
 
 } // namespace icons
