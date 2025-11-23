@@ -72,6 +72,8 @@ NSString* generateIconData(UTType* type, NSUInteger width, NSMutableDictionary<N
         initWithDataOfContentType:UTTypeHTML
                       contentSize:CGSizeMake(1200, 800)
                 dataCreationBlock:^NSData* _Nullable(QLPreviewReply* _Nonnull replyToUpdate, NSError* __autoreleasing _Nullable* _Nullable error) {
+                    (void)error; // TODO(nevack): unused var, fix in another PR!
+
                     NSString* previewHTML = [self generateHTMLPreviewFor:request.fileURL andReply:replyToUpdate];
 
                     return [previewHTML dataUsingEncoding:NSUTF8StringEncoding];

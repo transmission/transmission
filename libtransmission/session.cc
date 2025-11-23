@@ -9,6 +9,7 @@
 #include <csignal>
 #include <cstddef> // size_t
 #include <cstdint>
+#include <cstdio>
 #include <ctime>
 #include <future>
 #include <iterator> // for std::back_inserter
@@ -47,6 +48,9 @@
 #include "libtransmission/session.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/timer-ev.h"
+#include "libtransmission/timer-libuv.h"
+#include "libtransmission/socket-event-handler-libevent.h"
+#include "libtransmission/socket-event-handler-libuv.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-ctor.h"
 #include "libtransmission/tr-assert.h"
@@ -388,28 +392,23 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 
 // ---
 
-void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
+void tr_session::onIncomingPeerConnection(tr_socket_t fd)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
-    if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
+    if (auto const incoming_info = tr_netAccept(this, fd); incoming_info)
     {
         auto const& [socket_address, sock] = *incoming_info;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, socket_address.display_name()));
-        session->addIncoming({ session, socket_address, sock });
+        addIncoming({ this, socket_address, sock });
     }
 }
 
 tr_session::BoundSocket::BoundSocket(
-    struct event_base* evbase,
+    libtransmission::SocketEventHandlerMaker& socket_event_handler_maker,
     tr_address const& addr,
     tr_port port,
-    IncomingCallback cb,
-    void* cb_data)
-    : cb_{ cb }
-    , cb_data_{ cb_data }
-    , socket_{ tr_netBindTCP(addr, port, false) }
-    , ev_{ event_new(evbase, socket_, EV_READ | EV_PERSIST, &BoundSocket::onCanRead, this) }
+    IncomingCallback cb)
+    : cb_{ std::move(cb) }
+    , socket_(tr_netBindTCP(addr, port, false))
 {
     if (socket_ == TR_BAD_SOCKET)
     {
@@ -419,12 +418,17 @@ tr_session::BoundSocket::BoundSocket(
     tr_logAddInfo(fmt::format(
         fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
         fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
-    event_add(ev_.get(), nullptr);
+
+    event_handler_ = socket_event_handler_maker.create_read(socket_, [this](tr_socket_t socket) { cb_(socket); });
+    event_handler_->start();
 }
 
 tr_session::BoundSocket::~BoundSocket()
 {
-    ev_.reset();
+    if (event_handler_)
+    {
+        event_handler_->stop();
+    }
 
     if (socket_ != TR_BAD_SOCKET)
     {
@@ -817,14 +821,22 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const addr = bind_address(TR_AF_INET);
-            bound_ipv4_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv4_.emplace(
+                socketEventHandlerMaker(),
+                addr,
+                local_peer_port_,
+                [this](tr_socket_t socket) { onIncomingPeerConnection(socket); });
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const addr = bind_address(TR_AF_INET6);
-            bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv6_.emplace(
+                socketEventHandlerMaker(),
+                addr,
+                local_peer_port_,
+                [this](tr_socket_t socket) { onIncomingPeerConnection(socket); });
             addr_changed = true;
         }
     }
@@ -856,7 +868,7 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     {
         if (val)
         {
-            lpd_ = tr_lpd::create(lpd_mediator_, event_base());
+            lpd_ = tr_lpd::create(lpd_mediator_);
         }
         else
         {
@@ -2169,9 +2181,13 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
-    , blocklist_dir_{ makeBlocklistDir(config_dir) }
-    , session_thread_{ tr_session_thread::create() }
-    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , blocklist_dir_{ makeBlocklistDir(config_dir) } //
+    // , session_thread_{ tr_session_thread::create() }
+    , session_thread_{ tr_session_thread::create_libuv() } //
+    // , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
+    , timer_maker_{ std::make_unique<libtransmission::UvTimerMaker>(uv_loop()) } //
+    // , socket_event_handler_maker_ { std::make_unique<libtransmission::SocketEventHandlerLibeventMaker>(event_base()) }
+    , socket_event_handler_maker_{ std::make_unique<libtransmission::SocketEventHandlerLibuvMaker>(uv_loop()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
