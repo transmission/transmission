@@ -77,7 +77,6 @@ QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int c
         return {};
 
     // FIXME: HDPI, pixel size vs point size?
-    // FIXME: light mode vs. dark mode?
     auto const rect = QRect{ 0, 0, point_size, point_size };
     auto pixmap = QPixmap{ rect.size() };
     pixmap.fill(Qt::transparent);
