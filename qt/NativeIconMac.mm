@@ -5,11 +5,11 @@
 
 #import <AppKit/AppKit.h>
 
-#import <QImage>
-#import <QPixmap>
 #import <QApplication>
 #import <QColor>
+#import <QImage>
 #import <QPalette>
+#import <QPixmap>
 
 // Source: https://stackoverflow.com/a/74756071
 // Posted by Bri Bri
