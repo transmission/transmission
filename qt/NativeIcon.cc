@@ -278,7 +278,7 @@ using Key = std::tuple<std::string_view, char16_t, std::string_view, std::option
     case Type::QueueMoveUp:
         sf_symbol_name = "arrow.up";
         segoe_codepoint = 0xEDD7U; // CaretUp8
-        xdg_icon_name = "go-top";
+        xdg_icon_name = "go-up";
         mode = Verb;
         break;
 
