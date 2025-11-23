@@ -93,11 +93,10 @@ QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int c
     return pixmap;
 }
 
-using MenuMode = std::bitset<4U>;
+using MenuMode = std::bitset<3U>;
 constexpr auto Standard = MenuMode{ 1 << 0U };
 constexpr auto Noun = MenuMode{ 1 << 1U };
 constexpr auto Verb = MenuMode{ 1 << 2U };
-constexpr auto Other = MenuMode{ 1 << 3U };
 
 using Key = std::tuple<std::string_view, char16_t, std::string_view, std::optional<QStyle::StandardPixmap>, MenuMode>;
 
@@ -392,7 +391,7 @@ using Key = std::tuple<std::string_view, char16_t, std::string_view, std::option
     {
         auto const override = qgetenv("TR_ICON_MODE").toLower();
         if (override.contains("all"))
-            value = Noun | Standard | Verb | Other;
+            value = Noun | Standard | Verb;
         if (override.contains("noun"))
             value = Noun;
         if (override.contains("standard"))
@@ -461,7 +460,7 @@ using Key = std::tuple<std::string_view, char16_t, std::string_view, std::option
         // Choose different icons, or use more specific ones to disambiguate.
         else if (desktop.contains("KDE"))
         {
-            value = Standard | Noun | Verb | Other;
+            value = Standard | Noun | Verb;
         }
 
         // Unknown DE -- not GNOME or KDE, so probably no HIG.
