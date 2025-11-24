@@ -1168,3 +1168,107 @@ jobs:
             -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in Ubuntu`
       - name: Make
         run: cmake --build obj --config RelWithDebInfo -- "-k 0"
+
+  freebsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '15.0'
+          - '14.3'
+        arch:
+          - x86_64
+          - aarch64
+        crypto:
+          - cmake: openssl
+            port: ''
+          - cmake: wolfssl
+            port: wolfssl
+          - cmake: mbedtls
+            port: mbedtls3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            set -ex
+            uname -a
+            pkg update
+            pkg upgrade -y
+            pkg install -y \
+              curl \
+              cmake \
+              crc32c \
+              dht \
+              fast_float \
+              gettext \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm30` \
+              libb64 \
+              libdeflate \
+              libevent \
+              libfmt \
+              libnatpmp \
+              libpsl \
+              miniupnpc \
+              ninja \
+              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo npm` \
+              pkgconf \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-svg qt6-tools` \
+              rapidjson \
+              utf8cpp \
+              `echo ${{ matrix.crypto.port }}`
+          run: |
+            set -ex
+            mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in FreeBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in FreeBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in FreeBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in FreeBSD` \
+              -DWITH_CRYPTO=${{ matrix.crypto.cmake }}
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto.cmake }}
+          path: pfx/**/*
