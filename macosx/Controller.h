@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 };
 
 @interface Controller
-    : NSObject<NSApplicationDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
+    : NSObject<NSApplicationDelegate, NSMenuItemValidation, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSToolbarItemValidation, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path;
 
@@ -164,7 +164,7 @@ typedef NS_ENUM(NSUInteger, AddType) { //
 - (void)setWindowSizeToFit;
 - (void)updateForAutoSize;
 - (void)updateWindowAfterToolbarChange;
-- (void)removeStackViewHeightConstraints;
+- (void)removeHeightConstraints;
 @property(nonatomic, readonly) CGFloat minScrollViewHeightAllowed;
 @property(nonatomic, readonly) CGFloat toolbarHeight;
 @property(nonatomic, readonly) CGFloat mainWindowComponentHeight;

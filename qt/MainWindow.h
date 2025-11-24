@@ -134,6 +134,7 @@ private:
     void initStatusBar();
 
     void clearSelection();
+    void addTorrentFromClipboard();
     void addTorrent(AddData add_me, bool show_options);
 
     // QWidget
@@ -178,7 +179,7 @@ private:
     QWidget* filter_bar_ = {};
     QAction* alt_speed_action_ = {};
     QString error_message_;
-    bool auto_add_clipboard_links = {};
+    bool auto_add_clipboard_links_ = {};
     QStringList clipboard_processed_keys_ = {};
 
     QString const total_ratio_stats_mode_name_ = QStringLiteral("total-ratio");
