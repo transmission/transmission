@@ -16,7 +16,6 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
-#include "NativeIcon.h"
 #include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
