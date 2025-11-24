@@ -1365,3 +1365,106 @@ jobs:
         with:
           name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
           path: pfx/**/*
+
+  netbsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '10.1'
+        arch:
+          - vmactions: x86_64
+            binary-set: amd64
+          - vmactions: aarch64
+            binary-set: evbarm-aarch64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/netbsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch.vmactions }}
+          prepare: |
+            set -ex
+            uname -a
+            export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
+            export PKG_PATH="https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/`uname -p`/`uname -r`/All"
+            /usr/sbin/pkg_add -u \
+              curl \
+              cmake \
+              fast_float \
+              fmtlib \
+              gettext-tools \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm4` \
+              libdeflate \
+              libevent \
+              libpsl \
+              miniupnpc \
+              ninja-build \
+              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo nodejs` \
+              pkgconf \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
+              rapidjson \
+              utf8-cpp
+            if [ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ]; then
+              for set in xbase xcomp; do
+                curl -sL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-`uname -r`/${{ matrix.arch.binary-set }}/binary/sets/$set.tar.xz" | tar xJpf - -C /
+              done
+            fi
+          run: |
+            set -ex
+            export PATH="/usr/pkg/bin:/usr/pkg/sbin${PATH:+:${PATH}}"
+            mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DCMAKE_PREFIX_PATH=/usr/pkg/qt6 \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_B64=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_CRC32C=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_DHT=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_NATPMP=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in NetBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in NetBSD`
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch.vmactions }}
+          path: pfx/**/*
