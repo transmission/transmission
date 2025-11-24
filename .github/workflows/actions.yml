@@ -1272,3 +1272,96 @@ jobs:
         with:
           name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.crypto.cmake }}
           path: pfx/**/*
+
+  openbsd-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: |
+      needs.what-to-make.outputs.make-cli == 'true' ||
+      needs.what-to-make.outputs.make-daemon == 'true' ||
+      needs.what-to-make.outputs.make-gtk == 'true' ||
+      needs.what-to-make.outputs.make-qt == 'true' ||
+      needs.what-to-make.outputs.make-tests == 'true' ||
+      needs.what-to-make.outputs.make-utils == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - '7.8'
+        arch:
+          - x86_64
+          - aarch64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Source
+        uses: actions/download-artifact@v7
+        with:
+          name: source-tarball
+      - name: Extract, Build, Test and Install
+        uses: vmactions/openbsd-vm@v1
+        with:
+          usesh: true
+          release: ${{ matrix.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            set -ex
+            uname -a
+            pkg_add -u
+            pkg_add -I -v \
+              curl \
+              cmake \
+              crc32c \
+              fast-float \
+              fmt \
+              gettext-tools \
+              gtar-- \
+              `[ '${{ needs.what-to-make.outputs.make-gtk }}' = 'true' ] && echo gtkmm40` \
+              libdeflate \
+              libevent \
+              libnatpmp \
+              libpsl \
+              miniupnpc \
+              ninja \
+              `[ '${{ needs.what-to-make.outputs.make-web }}' = 'true' ] && echo node` \
+              `[ '${{ needs.what-to-make.outputs.make-qt }}' = 'true' ] && echo qt6-qtsvg qt6-qttools` \
+              rapidjson \
+              utfcpp
+          run: |
+            set -ex
+            mkdir src && gtar xf transmission*.tar.* -C src --strip-components 1
+            cmake \
+              -S src \
+              -B obj \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_INSTALL_PREFIX=pfx \
+              -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+              -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+              -DENABLE_DEPRECATED=ON \
+              -DENABLE_WERROR=ON \
+              -DRUN_CLANG_TIDY=OFF \
+              -DUSE_SYSTEM_DEFAULT=ON \
+              -DUSE_SYSTEM_B64=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_DHT=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_SIGSLOT=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_SMALL=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_UTP=OFF `# Not packaged in OpenBSD` \
+              -DUSE_SYSTEM_WIDE_INTEGER=OFF `# Not packaged in OpenBSD`
+            cmake --build obj --config RelWithDebInfo
+            if [ '${{ needs.what-to-make.outputs.make-tests }}' = 'true' ]; then
+              QT_QPA_PLATFORM=offscreen cmake -E chdir obj ctest -j `getconf NPROCESSORS_ONLN` --build-config RelWithDebInfo --output-on-failure
+            fi
+            cmake --install obj --config RelWithDebInfo --strip
+            rm -rf obj src
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.release }}-${{ matrix.arch }}
+          path: pfx/**/*
