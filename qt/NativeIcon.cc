@@ -5,6 +5,7 @@
 
 #include "NativeIcon.h"
 
+#include <optional>
 #include <string_view>
 
 #include <QChar>
@@ -94,6 +95,7 @@ struct Info
     std::string_view sf_symbol_name;
     char16_t segoe_codepoint = {};
     std::string_view xdg_icon_name;
+    std::optional<QStyle::StandardPixmap> fallback;
     bool ok_in_gnome_menus = false;
 };
 
@@ -141,12 +143,20 @@ struct Info
  * Set an icon on every button and menu item, making sure not to
  * use the same icon for multiple visible buttons or menu items.
  * Choose different icons, or use more specific ones to disambiguate.
+ *
+ * ## QStyle::StandardPixmap
+ *
+ * This is an extremely limited icon set. Use with caution.
+ * https://github.com/transmission/transmission/pull/2283 has galleries.
+ * This is used as a fallback to ensure all toolbar acitions have icons,
+ * even on very old Windows / macOS systems lacking Segoe / SF Symbols.
  */
 [[nodiscard]] constexpr Info getInfo(Type const type)
 {
     auto sf_symbol_name = std::string_view{};
     auto xdg_icon_name = std::string_view{};
     auto segoe_codepoint = char16_t{};
+    auto fallback = std::optional<QStyle::StandardPixmap>{};
     auto ok_in_gnome_menus = false;
 
     switch (type)
@@ -173,18 +183,21 @@ struct Info
         sf_symbol_name = "folder";
         segoe_codepoint = 0xE8E5U; // OpenFile
         xdg_icon_name = "document-open";
+        fallback = QStyle::SP_FileIcon;
         break;
 
     case Type::AddTorrentFromURL:
         sf_symbol_name = "network";
         segoe_codepoint = 0xE774U; // Globe
         xdg_icon_name = "network-workgroup";
+        fallback = QStyle::SP_DriveNetIcon;
         break;
 
     case Type::CreateNewTorrent:
         sf_symbol_name = "plus";
         segoe_codepoint = 0xE710U; // Add
         xdg_icon_name = "document-new";
+        fallback = QStyle::SP_FileIcon;
         break;
 
     case Type::OpenTorrentDetails:
@@ -192,36 +205,42 @@ struct Info
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "document-properties";
         ok_in_gnome_menus = true;
+        fallback = QStyle::SP_FileDialogContentsView;
         break;
 
     case Type::OpenTorrentLocalFolder:
         sf_symbol_name = "folder";
         segoe_codepoint = 0xED25U; // OpenFolderHorizontal
         xdg_icon_name = "folder-open";
+        fallback = QStyle::SP_DirOpenIcon;
         break;
 
     case Type::StartTorrent:
         sf_symbol_name = "play";
         segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
+        fallback = QStyle::SP_MediaPlay;
         break;
 
     case Type::StartTorrentNow:
         sf_symbol_name = "forward";
         segoe_codepoint = 0xEB9DU; // FastForward
         xdg_icon_name = "media-seek-forward";
+        fallback = QStyle::SP_MediaSeekForward;
         break;
 
     case Type::RemoveTorrent:
         sf_symbol_name = "minus";
         segoe_codepoint = 0xE738U; // Remove
         xdg_icon_name = "list-remove";
+        fallback = QStyle::SP_DialogCancelButton;
         break;
 
     case Type::RemoveTorrentAndDeleteData:
         sf_symbol_name = "trash";
         segoe_codepoint = 0xE74DU; // Delete
         xdg_icon_name = "edit-delete";
+        fallback = QStyle::SP_TrashIcon;
         break;
 
     case Type::SetTorrentLocation:
@@ -278,6 +297,7 @@ struct Info
         sf_symbol_name = "info.circle";
         segoe_codepoint = 0xE946U; // Info
         xdg_icon_name = "help-about";
+        fallback = QStyle::SP_MessageBoxInformation;
         ok_in_gnome_menus = true;
         break;
 
@@ -285,6 +305,7 @@ struct Info
         sf_symbol_name = "questionmark.circle";
         segoe_codepoint = 0xE897U; // Help
         xdg_icon_name = "help-faq";
+        fallback = QStyle::SP_DialogHelpButton;
         ok_in_gnome_menus = true;
         break;
 
@@ -338,24 +359,28 @@ struct Info
         sf_symbol_name = "wifi.exclamationmark";
         segoe_codepoint = 0xE783U; // Error
         xdg_icon_name = "network-error";
+        fallback = QStyle::SP_MessageBoxCritical;
         break;
 
     case Type::TorrentStateActive:
         sf_symbol_name = "play";
         segoe_codepoint = 0xE768U; // Play
         xdg_icon_name = "media-playback-start";
+        fallback = QStyle::SP_MediaPlay;
         break;
 
     case Type::TorrentStateSeeding:
         sf_symbol_name = "chevron.up";
         segoe_codepoint = 0xE70EU; // ChevronUp
         xdg_icon_name = "go-up";
+        fallback = QStyle::SP_ArrowUp;
         break;
 
     case Type::TorrentStateDownloading:
         sf_symbol_name = "chevron.down";
         segoe_codepoint = 0xE70DU; // ChevronDown
         xdg_icon_name = "go-down";
+        fallback = QStyle::SP_ArrowDown;
         break;
 
     case Type::PauseTorrent:
@@ -365,6 +390,7 @@ struct Info
         sf_symbol_name = "pause";
         segoe_codepoint = 0xE769U; // Pause
         xdg_icon_name = "media-playback-pause";
+        fallback = QStyle::SP_MediaPause;
         break;
 
     case Type::VerifyTorrent:
@@ -374,6 +400,7 @@ struct Info
         sf_symbol_name = "arrow.clockwise";
         segoe_codepoint = 0xE72CU; // Refresh
         xdg_icon_name = "view-refresh";
+        fallback = QStyle::SP_BrowserReload;
         break;
 
     case Type::TorrentErrorEmblem:
@@ -383,10 +410,11 @@ struct Info
         sf_symbol_name = "xmark.circle";
         segoe_codepoint = 0xEB90U; // StatusErrorFull
         xdg_icon_name = "dialog-error";
+        fallback = QStyle::SP_MessageBoxWarning;
         break;
     }
 
-    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, ok_in_gnome_menus };
+    return { sf_symbol_name, segoe_codepoint, xdg_icon_name, fallback, ok_in_gnome_menus };
 }
 } // namespace
 
@@ -439,6 +467,9 @@ QIcon icon(Type const type, QStyle* style)
         if (auto icon = QIcon::fromTheme(name + QStringLiteral("-symbolic")); !icon.isNull())
             return icon;
     }
+
+    if (info.fallback)
+        return style->standardIcon(*info.fallback);
 
     return {};
 }
