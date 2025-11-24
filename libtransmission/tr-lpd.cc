@@ -23,7 +23,7 @@
 #include <sys/socket.h> /* socket(), bind() */
 #endif
 
-#include <event2/event.h>
+#include <event2/util.h>
 
 #include <fmt/format.h>
 
@@ -32,11 +32,11 @@
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/socket-event-handler.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/utils.h" // for tr_net_init()
-#include "libtransmission/utils-ev.h" // for tr_net_init()
 
 using namespace std::literals;
 
@@ -218,12 +218,12 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
 class tr_lpd_impl final : public tr_lpd
 {
 public:
-    tr_lpd_impl(Mediator& mediator, struct event_base* event_base)
+    explicit tr_lpd_impl(Mediator& mediator)
         : mediator_{ mediator }
         , announce_timer_{ mediator.timerMaker().create([this]() { announceUpkeep(); }) }
         , dos_timer_{ mediator.timerMaker().create([this]() { dosUpkeep(); }) }
     {
-        if (!init(event_base))
+        if (!init())
         {
             return;
         }
@@ -241,7 +241,7 @@ public:
 
     ~tr_lpd_impl() override
     {
-        for (auto& event : events_)
+        for (auto& event : event_handlers_)
         {
             event.reset();
         }
@@ -258,10 +258,10 @@ public:
     }
 
 private:
-    bool init(struct event_base* event_base)
+    bool init()
     {
         ipp_t n_success = NUM_TR_AF_INET_TYPES;
-        if (!initImpl<TR_AF_INET>(event_base))
+        if (!initImpl<TR_AF_INET>())
         {
             auto const err = sockerrno;
             tr_net_close_socket(mcast_sockets_[TR_AF_INET]);
@@ -274,7 +274,7 @@ private:
             --n_success;
         }
 
-        if (!initImpl<TR_AF_INET6>(event_base))
+        if (!initImpl<TR_AF_INET6>())
         {
             auto const err = sockerrno;
             tr_net_close_socket(mcast_sockets_[TR_AF_INET6]);
@@ -297,7 +297,7 @@ private:
      * and event-based message handling.
      */
     template<tr_address_type ip_protocol>
-    bool initImpl(struct event_base* event_base)
+    bool initImpl()
     {
         auto const opt_on = 1;
         auto& sock = mcast_sockets_[ip_protocol];
@@ -437,25 +437,14 @@ private:
             }
         }
 
-        events_[ip_protocol].reset(event_new(event_base, sock, EV_READ | EV_PERSIST, event_callback<ip_protocol>, this));
-        event_add(events_[ip_protocol].get(), nullptr);
+        event_handlers_[ip_protocol] = mediator_.socketEventHandlerMaker().create_read(
+            sock,
+            [this]([[maybe_unused]] tr_socket_t socket) { onCanRead(ip_protocol); });
+        event_handlers_[ip_protocol]->start();
 
         tr_logAddDebug(fmt::format("{} Local Peer Discovery initialised", tr_ip_protocol_to_sv(ip_protocol)));
 
         return true;
-    }
-
-    /**
-    * @brief Processing of timeout notifications and incoming data on the socket
-    * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
-    * @see DoS */
-    template<tr_address_type ip_protocol>
-    static void event_callback(evutil_socket_t /*s*/, short type, void* vself)
-    {
-        if ((type & EV_READ) != 0)
-        {
-            static_cast<tr_lpd_impl*>(vself)->onCanRead(ip_protocol);
-        }
     }
 
     void onCanRead(tr_address_type ip_protocol)
@@ -651,7 +640,7 @@ private:
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
     std::array<tr_socket_t, NUM_TR_AF_INET_TYPES> mcast_sockets_ = { TR_BAD_SOCKET, TR_BAD_SOCKET }; // multicast sockets
-    std::array<libtransmission::evhelpers::event_unique_ptr, NUM_TR_AF_INET_TYPES> events_;
+    std::array<std::unique_ptr<libtransmission::SocketReadEventHandler>, NUM_TR_AF_INET_TYPES> event_handlers_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
     sockaddr_in mcast_addr_ = {}; // initialized from the above constants in init()
@@ -679,7 +668,7 @@ private:
     static auto constexpr AnnounceScope = int{ TtlSameSubnet }; // the maximum scope for LPD datagrams
 };
 
-std::unique_ptr<tr_lpd> tr_lpd::create(Mediator& mediator, struct event_base* event_base)
+std::unique_ptr<tr_lpd> tr_lpd::create(Mediator& mediator)
 {
-    return std::make_unique<tr_lpd_impl>(mediator, event_base);
+    return std::make_unique<tr_lpd_impl>(mediator);
 }

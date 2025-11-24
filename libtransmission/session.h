@@ -57,6 +57,7 @@
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/settings.h"
+#include "libtransmission/socket-event-handler.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent-queue.h"
@@ -94,8 +95,12 @@ private:
     class BoundSocket
     {
     public:
-        using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(struct event_base* base, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        using IncomingCallback = std::function<void(tr_socket_t)>;
+        BoundSocket(
+            libtransmission::SocketEventHandlerMaker& socket_event_handler_maker,
+            tr_address const& addr,
+            tr_port port,
+            IncomingCallback cb);
         BoundSocket(BoundSocket&&) = delete;
         BoundSocket(BoundSocket const&) = delete;
         BoundSocket operator=(BoundSocket&&) = delete;
@@ -103,16 +108,9 @@ private:
         ~BoundSocket();
 
     private:
-        static void onCanRead(evutil_socket_t fd, short /*what*/, void* vself)
-        {
-            auto* const self = static_cast<BoundSocket*>(vself);
-            self->cb_(fd, self->cb_data_);
-        }
-
         IncomingCallback cb_;
-        void* cb_data_;
         tr_socket_t socket_ = TR_BAD_SOCKET;
-        libtransmission::evhelpers::event_unique_ptr ev_;
+        std::unique_ptr<libtransmission::SocketReadEventHandler> event_handler_;
     };
 
     class AltSpeedMediator final : public tr_session_alt_speeds::Mediator
@@ -302,6 +300,11 @@ private:
             return session_.timerMaker();
         }
 
+        [[nodiscard]] libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() override
+        {
+            return session_.socketEventHandlerMaker();
+        }
+
         [[nodiscard]] std::vector<TorrentInfo> torrents() const override;
 
         bool onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port) override;
@@ -373,12 +376,13 @@ private:
         }
 
     private:
+        void on_read_event(tr_socket_t socket);
         tr_port const udp_port_;
         tr_session& session_;
         tr_socket_t udp4_socket_ = TR_BAD_SOCKET;
         tr_socket_t udp6_socket_ = TR_BAD_SOCKET;
-        libtransmission::evhelpers::event_unique_ptr udp4_event_;
-        libtransmission::evhelpers::event_unique_ptr udp6_event_;
+        std::unique_ptr<libtransmission::SocketReadEventHandler> udp4_event_handler_;
+        std::unique_ptr<libtransmission::SocketReadEventHandler> udp6_event_handler_;
     };
 
 public:
@@ -540,6 +544,11 @@ public:
         return *timer_maker_;
     }
 
+    [[nodiscard]] libtransmission::SocketEventHandlerMaker& socketEventHandlerMaker() noexcept
+    {
+        return *socket_event_handler_maker_;
+    }
+
     [[nodiscard]] auto am_in_session_thread() const noexcept
     {
         return session_thread_->am_in_session_thread();
@@ -560,6 +569,11 @@ public:
     [[nodiscard]] auto* event_base() noexcept
     {
         return session_thread_->event_base();
+    }
+
+    [[nodiscard]] auto* uv_loop() noexcept
+    {
+        return session_thread_->uv_loop();
     }
 
     [[nodiscard]] constexpr tr_torrents& torrents()
@@ -1191,7 +1205,7 @@ private:
     void on_queue_timer();
     void on_save_timer();
 
-    static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
+    void onIncomingPeerConnection(tr_socket_t fd);
 
     friend class libtransmission::test::SessionTest;
 
@@ -1285,6 +1299,9 @@ private:
 
     // depends-on: session_thread_
     std::unique_ptr<libtransmission::TimerMaker> const timer_maker_;
+
+    // depends-on: session_thread_
+    std::unique_ptr<libtransmission::SocketEventHandlerMaker> const socket_event_handler_maker_;
 
     /// trivial type fields
 

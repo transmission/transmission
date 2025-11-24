@@ -154,26 +154,26 @@ void tr_session_thread::tr_evthread_init()
     std::call_once(evthread_flag, init_evthreads_once);
 }
 
-class tr_session_thread_impl final : public tr_session_thread
+class tr_session_thread_libevent_impl final : public tr_session_thread
 {
 public:
-    explicit tr_session_thread_impl()
+    explicit tr_session_thread_libevent_impl()
     {
         auto lock = std::unique_lock(is_looping_mutex_);
 
-        thread_ = std::thread(&tr_session_thread_impl::session_thread_func, this, event_base());
+        thread_ = std::thread(&tr_session_thread_libevent_impl::session_thread_func, this, event_base());
         thread_id_ = thread_.get_id();
 
         // wait for the session thread's main loop to start
         is_looping_cv_.wait(lock, [this]() { return is_looping_.load(); });
     }
 
-    tr_session_thread_impl(tr_session_thread_impl&&) = delete;
-    tr_session_thread_impl(tr_session_thread_impl const&) = delete;
-    tr_session_thread_impl& operator=(tr_session_thread_impl&&) = delete;
-    tr_session_thread_impl& operator=(tr_session_thread_impl const&) = delete;
+    tr_session_thread_libevent_impl(tr_session_thread_libevent_impl&&) = delete;
+    tr_session_thread_libevent_impl(tr_session_thread_libevent_impl const&) = delete;
+    tr_session_thread_libevent_impl& operator=(tr_session_thread_libevent_impl&&) = delete;
+    tr_session_thread_libevent_impl& operator=(tr_session_thread_libevent_impl const&) = delete;
 
-    ~tr_session_thread_impl() override
+    ~tr_session_thread_libevent_impl() override
     {
         TR_ASSERT(!am_in_session_thread());
         TR_ASSERT(is_looping_);
@@ -195,6 +195,11 @@ public:
     [[nodiscard]] struct event_base* event_base() noexcept override
     {
         return evbase_.get();
+    }
+
+    [[nodiscard]] struct uv_loop_s* uv_loop() noexcept override
+    {
+        return nullptr;
     }
 
     [[nodiscard]] bool am_in_session_thread() const noexcept override
@@ -237,7 +242,7 @@ private:
 
         constexpr auto ToggleLooping = [](evutil_socket_t, short /*evtype*/, void* vself)
         {
-            auto* const self = static_cast<tr_session_thread_impl*>(vself);
+            auto* const self = static_cast<tr_session_thread_libevent_impl*>(vself);
             self->is_looping_mutex_.lock();
             self->is_looping_ = !self->is_looping_;
             self->is_looping_mutex_.unlock();
@@ -248,7 +253,7 @@ private:
         event_base_once(evbase, -1, EV_TIMEOUT, ToggleLooping, this, nullptr);
 
         // Start the first event loop. This is the steady-state loop that runs
-        // continuously until `this` is destroyed. See: ~tr_session_thread_impl()
+        // continuously until `this` is destroyed. See: ~tr_session_thread_libevent_impl()
         TR_ASSERT(!is_shutting_down_);
         event_base_loop(evbase, EVLOOP_NO_EXIT_ON_EMPTY);
 
@@ -263,7 +268,7 @@ private:
 
     static void on_work_available_static(evutil_socket_t /*fd*/, short /*flags*/, void* vself)
     {
-        static_cast<tr_session_thread_impl*>(vself)->on_work_available();
+        static_cast<tr_session_thread_libevent_impl*>(vself)->on_work_available();
     }
     void on_work_available()
     {
@@ -303,5 +308,5 @@ private:
 
 std::unique_ptr<tr_session_thread> tr_session_thread::create()
 {
-    return std::make_unique<tr_session_thread_impl>();
+    return std::make_unique<tr_session_thread_libevent_impl>();
 }

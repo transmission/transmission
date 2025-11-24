@@ -72,6 +72,7 @@ option(INSTALL_LIB "Install the library" OFF)
 tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
 tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
+tr_auto_option(USE_SYSTEM_UV "Use system libuv library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
@@ -212,8 +213,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 if(WIN32)
     foreach(L C CXX)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32")
-        # Target version (Vista and up)
-        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWINVER=0x0600 -D_WIN32_WINNT=0x0600")
+        # Target version (Windows 10 and up)
+        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWINVER=0x0A00 -D_WIN32_WINNT=0x0A00")
         # Use Unicode API (although we always use W or A names explicitly)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DUNICODE -D_UNICODE")
         # Ignore various deprecation and security warnings (at least for now)
@@ -517,6 +518,16 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
+if(ANDROID OR APPLE)
+    set(LIBUV_LIB_NAME uv)
+else()
+    set(LIBUV_LIB_NAME libuv)
+endif()
+tr_add_external_auto_library(UV libuv ${LIBUV_LIB_NAME}
+    TARGET libuv::libuv
+    CMAKE_ARGS
+        -DLIBUV_BUILD_SHARED=OFF)
+
 tr_add_external_auto_library(NATPMP libnatpmp natpmp
     TARGET natpmp::natpmp
     CMAKE_ARGS
@@ -791,6 +802,11 @@ else()
     if(NOT LIB MATCHES "^(|c)$")
         list(APPEND TR_NETWORK_LIBRARIES ${LIB})
     endif()
+endif()
+
+set(TR_WIN32_LIBRARIES)
+if(WIN32)
+    list(APPEND TR_WIN32_LIBRARIES userenv dbghelp)
 endif()
 
 if(RUN_CLANG_TIDY STREQUAL "AUTO" AND (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR})) # skip clang-tidy on LGTM/appveyor

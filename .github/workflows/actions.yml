@@ -142,6 +142,7 @@ jobs:
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
+            libuv1-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
@@ -190,7 +191,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf
+        run: brew install --formulae cmake gettext libdeflate libevent libuv libpsl miniupnpc ninja node pkgconf
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -243,6 +244,7 @@ jobs:
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
+            libuv1-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
@@ -366,7 +368,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
+        run: brew install --formulae cmake gettext libdeflate libevent libuv libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install --formula gtkmm3
@@ -425,7 +427,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install --formulae cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkgconf crc32c
+        run: brew install --formulae cmake gettext libdeflate libevent libuv libpsl miniupnpc ninja node pkgconf crc32c
       - name: Get Source
         uses: actions/checkout@v4
         with:
@@ -481,6 +483,7 @@ jobs:
             gettext-dev \
             git \
             libevent-dev \
+            libuv-dev \
             libpsl \
             linux-headers \
             miniupnpc-dev \
@@ -675,6 +678,7 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_UV=OFF \
             -DUSE_SYSTEM_DEFLATE=OFF \
             -DUSE_SYSTEM_DHT=OFF \
             -DUSE_SYSTEM_MINIUPNPC=OFF \
@@ -748,6 +752,7 @@ jobs:
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_UV=OFF \
             -DUSE_SYSTEM_DEFLATE=OFF \
             -DUSE_SYSTEM_DHT=OFF \
             -DUSE_SYSTEM_MINIUPNPC=OFF \
@@ -769,12 +774,12 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  debian-11-from-tarball:
+  debian-12-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
     container:
-      image: debian:11-slim
+      image: debian:12-slim
     steps:
       - name: Show Configuration
         run: |
@@ -793,6 +798,7 @@ jobs:
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
+            libuv1-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
@@ -872,6 +878,7 @@ jobs:
             libcurl-devel \
             libdeflate-devel \
             libevent-devel \
+            libuv-devel \
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
@@ -950,6 +957,7 @@ jobs:
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
+            libuv1-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \
@@ -1077,6 +1085,7 @@ jobs:
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
+            libuv1-dev \
             libfmt-dev \
             libminiupnpc-dev \
             libnatpmp-dev \

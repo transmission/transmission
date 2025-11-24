@@ -64,3 +64,6 @@
 [submodule "third-party/crc32c"]
 	path = third-party/crc32c
 	url = https://github.com/google/crc32c.git
+[submodule "third-party/libuv"]
+	path = third-party/libuv
+	url = https://github.com/libuv/libuv
