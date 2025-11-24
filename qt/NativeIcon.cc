@@ -102,8 +102,8 @@ struct Info
 /**
  * # Choosing Icons
  *
- * Follow the per-platform guidelines below for each icon.
- * Only specify an icon for that platform if it matches the guidelines.
+ * Use icons that follow the per-platform guidelines below.
+ * If there's not a match, don't give that Type an icon on that platform.
  *
  * ## Windows
  *
