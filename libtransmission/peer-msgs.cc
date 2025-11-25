@@ -292,7 +292,9 @@ using ReadResult = std::pair<ReadState, size_t /*n_piece_data_bytes_read*/>;
  * @see tr_peer
  * @see tr_peer_info
  */
-class tr_peerMsgsImpl final : public tr_peerMsgs
+class tr_peerMsgsImpl final
+    : public tr_peerMsgs
+    , public std::enable_shared_from_this<tr_peerMsgsImpl>
 {
 public:
     tr_peerMsgsImpl(
@@ -1140,15 +1142,15 @@ void tr_peerMsgsImpl::send_ltep_handshake()
 
     // If connecting to global peer, then use global address
     // Otherwise we are connecting to local peer, use bind address directly
-    if (auto const addr = io_->address().is_global_unicast_address() ? session->global_address(TR_AF_INET) :
-                                                                       session->bind_address(TR_AF_INET);
+    if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET) :
+                                                               session->bind_address(TR_AF_INET);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv4());
         tr_variantDictAddRaw(&val, TR_KEY_ipv4, &addr->addr.addr4, sizeof(addr->addr.addr4));
     }
-    if (auto const addr = io_->address().is_global_unicast_address() ? session->global_address(TR_AF_INET6) :
-                                                                       session->bind_address(TR_AF_INET6);
+    if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET6) :
+                                                               session->bind_address(TR_AF_INET6);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv6());
@@ -2168,7 +2170,7 @@ tr_peerMsgs::~tr_peerMsgs()
     --n_peers;
 }
 
-tr_peerMsgs* tr_peerMsgs::create(
+std::shared_ptr<tr_peerMsgs> tr_peerMsgs::create(
     tr_torrent& torrent,
     std::shared_ptr<tr_peer_info> peer_info,
     std::shared_ptr<tr_peerIo> io,
@@ -2176,5 +2178,5 @@ tr_peerMsgs* tr_peerMsgs::create(
     tr_peer_callback_bt callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl{ torrent, std::move(peer_info), std::move(io), peer_id, callback, callback_data };
+    return std::make_shared<tr_peerMsgsImpl>(torrent, std::move(peer_info), std::move(io), peer_id, callback, callback_data);
 }

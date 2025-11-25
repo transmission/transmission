@@ -220,7 +220,13 @@ private:
     {
         for (auto& candidate : candidates_)
         {
-            for (auto [begin, i] = candidate.block_span; i > begin; --i)
+            auto const [begin, end] = candidate.block_span;
+            if (requests.count(begin, end) == 0U)
+            {
+                continue;
+            }
+
+            for (auto i = end; i > begin; --i)
             {
                 if (auto const block = i - 1U; requests.test(block))
                 {
