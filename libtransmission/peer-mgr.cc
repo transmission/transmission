@@ -692,6 +692,7 @@ public:
                     fmt::format("got unrequested from {} [{}]", msgs->display_name(), msgs->user_agent()));
                 s->log_block_history(loc.block);
             }
+            break;
 
         default:
             peer_callback_common(msgs, event, s);
@@ -1144,7 +1145,7 @@ std::vector<uint8_t> tr_swarm::WishlistMediator::active_request_count(tr_piece_i
 {
     auto const [begin, end] = block_span(piece);
     auto ret = std::vector<uint8_t>(end - begin);
-    for (auto const* const peer : swarm_.peers)
+    for (auto const& peer : swarm_.peers)
     {
         for (auto block = begin; block < end; ++block)
         {
