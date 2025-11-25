@@ -418,11 +418,11 @@ struct Info
 }
 } // namespace
 
-QIcon icon(Type const type, QStyle* style)
+QIcon icon(Type const type, QStyle const* const style)
 {
     ensureFontsLoaded();
 
-    static auto const point_sizes = small::set<int>{
+    auto const point_sizes = small::max_size_set<int, 7U>{
         style->pixelMetric(QStyle::PM_ButtonIconSize),   style->pixelMetric(QStyle::PM_LargeIconSize),
         style->pixelMetric(QStyle::PM_ListViewIconSize), style->pixelMetric(QStyle::PM_MessageBoxIconSize),
         style->pixelMetric(QStyle::PM_SmallIconSize),    style->pixelMetric(QStyle::PM_TabBarIconSize),

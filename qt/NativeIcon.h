@@ -64,7 +64,7 @@ enum class Type
     TorrentStateError
 };
 
-[[nodiscard]] QIcon icon(Type type, QStyle* style = QApplication::style());
+[[nodiscard]] QIcon icon(Type type, QStyle const* style = QApplication::style());
 
 [[nodiscard]] bool shouldBeShownInMenu(Type type);
 
