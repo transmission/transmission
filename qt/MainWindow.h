@@ -75,7 +75,6 @@ public slots:
     void queueMoveDown();
     void queueMoveBottom();
     void reannounceSelected();
-    void onNetworkTimer();
 
     void setToolbarVisible(bool);
     void setFilterbarVisible(bool);
@@ -122,12 +121,12 @@ private slots:
     void toggleSpeedMode();
     void toggleWindows(bool do_show);
     void trayActivated(QSystemTrayIcon::ActivationReason);
+    void updateNetworkLabel();
 
 private:
     [[nodiscard]] QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
 
     [[nodiscard]] torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
-    void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
     QMenu* createStatsModeMenu();
