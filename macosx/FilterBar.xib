@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24412" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24412"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,15 +22,12 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView clipsToBounds="YES" id="2" userLabel="FilterBar" customClass="FilterBarView">
-            <rect key="frame" x="0.0" y="0.0" width="501" height="23"/>
+        <customView id="2" userLabel="FilterBar">
+            <rect key="frame" x="0.0" y="0.0" width="500" height="24"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="4">
-                    <rect key="frame" x="5" y="4" width="26" height="15"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="26" id="SSy-Cy-W3L"/>
-                    </constraints>
+                    <rect key="frame" x="5" y="6" width="26" height="12"/>
                     <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="left" alignment="left" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="-999" imageScaling="proportionallyDown" inset="2" pullsDown="YES" arrowPosition="noArrow" selectedItem="57" id="16">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="miniSystem"/>
@@ -51,18 +48,21 @@
                             </connections>
                         </menu>
                     </popUpButtonCell>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="26" id="SSy-Cy-W3L"/>
+                    </constraints>
                 </popUpButton>
                 <box horizontalHuggingPriority="750" horizontalCompressionResistancePriority="1000" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5">
-                    <rect key="frame" x="34" y="5" width="5" height="13"/>
+                    <rect key="frame" x="34" y="5" width="5" height="14"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="1" id="6ed-rN-3Je"/>
                     </constraints>
                 </box>
                 <stackView distribution="fillProportionally" orientation="horizontal" alignment="centerY" spacing="1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalClippingResistancePriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mzg-HE-ptV">
-                    <rect key="frame" x="42" y="5" width="329" height="14"/>
+                    <rect key="frame" x="42" y="4" width="341" height="16"/>
                     <subviews>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="FilterButton">
-                            <rect key="frame" x="0.0" y="-1" width="29" height="15"/>
+                            <rect key="frame" x="0.0" y="0.0" width="31" height="16"/>
                             <buttonCell key="cell" type="recessed" title="All" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="12">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
@@ -72,7 +72,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3" customClass="FilterButton">
-                            <rect key="frame" x="30" y="-1" width="50" height="15"/>
+                            <rect key="frame" x="32" y="0.0" width="52" height="16"/>
                             <buttonCell key="cell" type="recessed" title="Active" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="21">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
@@ -82,7 +82,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="8" customClass="FilterButton">
-                            <rect key="frame" x="81" y="-1" width="87" height="15"/>
+                            <rect key="frame" x="85" y="0.0" width="89" height="16"/>
                             <buttonCell key="cell" type="recessed" title="Downloading" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="13">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
@@ -92,7 +92,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7" customClass="FilterButton">
-                            <rect key="frame" x="169" y="-1" width="60" height="15"/>
+                            <rect key="frame" x="175" y="0.0" width="62" height="16"/>
                             <buttonCell key="cell" type="recessed" title="Seeding" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
@@ -102,7 +102,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="6" customClass="FilterButton">
-                            <rect key="frame" x="230" y="-1" width="55" height="15"/>
+                            <rect key="frame" x="238" y="0.0" width="57" height="16"/>
                             <buttonCell key="cell" type="recessed" title="Paused" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="15">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
@@ -112,7 +112,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="nvH-xy-86S" customClass="FilterButton">
-                            <rect key="frame" x="286" y="-1" width="43" height="15"/>
+                            <rect key="frame" x="296" y="0.0" width="45" height="16"/>
                             <buttonCell key="cell" type="recessed" title="Error" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AtX-O4-Mqp">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="smallSystemBold"/>
@@ -139,15 +139,15 @@
                         <real value="3.4028234663852886e+38"/>
                     </customSpacing>
                 </stackView>
-                <searchField wantsLayer="YES" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                    <rect key="frame" x="401" y="2" width="95" height="19"/>
+                <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="10">
+                    <rect key="frame" x="400" y="4" width="95" height="16"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="95" placeholder="YES" id="RUH-hb-Ldl"/>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="Ven-bt-DjP"/>
                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="95" id="b6y-sO-sUo"/>
                     </constraints>
-                    <searchFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" bezelStyle="round" id="11">
-                        <font key="font" metaFont="smallSystem"/>
+                    <searchFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" bezelStyle="round" id="11">
+                        <font key="font" metaFont="miniSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </searchFieldCell>
@@ -156,13 +156,19 @@
                         <outlet property="searchMenuTemplate" destination="22" id="48"/>
                     </connections>
                 </searchField>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="aLy-sV-SG8">
+                    <rect key="frame" x="0.0" y="21" width="500" height="5"/>
+                </box>
             </subviews>
             <constraints>
                 <constraint firstItem="10" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mzg-HE-ptV" secondAttribute="trailing" constant="5" id="09X-9L-yc0"/>
+                <constraint firstAttribute="trailing" secondItem="aLy-sV-SG8" secondAttribute="trailing" id="1jl-i3-TIG"/>
                 <constraint firstItem="4" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="AuI-QF-CKh"/>
                 <constraint firstItem="mzg-HE-ptV" firstAttribute="leading" secondItem="5" secondAttribute="trailing" constant="5" id="KgL-2d-UXl"/>
                 <constraint firstItem="5" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="SAr-4s-SlW"/>
                 <constraint firstItem="5" firstAttribute="top" secondItem="2" secondAttribute="top" constant="5" id="SlS-3C-JDT"/>
+                <constraint firstItem="aLy-sV-SG8" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="TZo-AX-NEe"/>
+                <constraint firstItem="aLy-sV-SG8" firstAttribute="top" secondItem="2" secondAttribute="top" id="UXT-uZ-CRD"/>
                 <constraint firstItem="4" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="5" id="cB8-HO-JyJ"/>
                 <constraint firstItem="mzg-HE-ptV" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="cOt-Q3-x7T"/>
                 <constraint firstItem="5" firstAttribute="leading" secondItem="4" secondAttribute="trailing" constant="5" id="dRA-mP-tCJ"/>
@@ -170,9 +176,6 @@
                 <constraint firstAttribute="bottom" secondItem="5" secondAttribute="bottom" constant="5" id="fKx-Ct-3z1"/>
                 <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="5" id="s5c-0G-9tM"/>
             </constraints>
-            <connections>
-                <outlet property="searchFieldVerticalConstraint" destination="ecz-eJ-l9b" id="hzc-vg-t2p"/>
-            </connections>
             <point key="canvasLocation" x="139" y="150"/>
         </customView>
         <menu title="Menu" id="22" userLabel="SearchFilterMenu">

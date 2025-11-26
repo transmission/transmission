@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cerrno> // EINVAL
+#include <chrono>
 #include <cstddef> // size_t
 #include <ctime>
 #include <map>
@@ -373,6 +374,8 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         return;
     }
 
+    auto const now = tr_time();
+
     auto torrent_dir = tr_pathbuf{ tor->current_dir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
@@ -382,7 +385,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const labels_str = build_labels_string(tor->labels());
     auto const trackers_str = buildTrackersString(tor);
     auto const bytes_downloaded_str = std::to_string(tor->bytes_downloaded_.ever());
-    auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time()));
+    auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", *std::localtime(&now));
     auto const priority_str = std::to_string(tor->get_priority());
 
     auto const env = std::map<std::string_view, std::string_view>{
@@ -1783,6 +1786,12 @@ void tr_torrent::recheck_completeness()
         bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
 
+        if (new_completeness != TR_LEECH && was_running && session->shouldFullyVerifyCompleteTorrents())
+        {
+            tr_torrentVerify(this);
+            return;
+        }
+
         tr_logAddTraceTor(
             this,
             fmt::format(
@@ -1791,10 +1800,11 @@ void tr_torrent::recheck_completeness()
                 get_completion_string(new_completeness)));
 
         completeness_ = new_completeness;
-        session->close_torrent_files(id());
 
         if (is_done())
         {
+            session->close_torrent_files(id());
+
             if (recent_change)
             {
                 // https://www.bittorrent.org/beps/bep_0003.html
@@ -2156,6 +2166,13 @@ void tr_torrent::on_piece_completed(tr_piece_index_t const piece)
 
     // bookkeeping
     set_needs_completeness_check();
+
+    // in sequential mode, flush files as soon a piece
+    // is completed to let other programs read the written data
+    if (is_sequential_download())
+    {
+        session->flush_torrent_files(id());
+    }
 
     // if this piece completes any file, invoke the fileCompleted func for it
     for (auto [file, file_end] = fpm_.file_span_for_piece(piece); file < file_end; ++file)

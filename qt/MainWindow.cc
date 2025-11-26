@@ -165,7 +165,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_PauseAll->setIcon(icon_pause);
     ui_.action_Quit->setIcon(icons.getThemeIcon(QStringLiteral("application-exit")));
     ui_.action_SelectAll->setIcon(icons.getThemeIcon(QStringLiteral("edit-select-all")));
-    ui_.action_ReverseSortOrder->setIcon(icons.getThemeIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
     ui_.action_Preferences->setIcon(icons.getThemeIcon(QStringLiteral("preferences-system")));
     ui_.action_Contents->setIcon(icons.getThemeIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
     ui_.action_About->setIcon(icons.getThemeIcon(QStringLiteral("help-about")));
@@ -344,23 +343,28 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&session_, &Session::httpAuthenticationRequired, this, &MainWindow::wrongAuthentication);
     connect(&session_, &Session::networkResponse, this, &MainWindow::onNetworkResponse);
 
-    if (session_.isServer())
-    {
-        ui_.networkLabel->hide();
-    }
-    else
-    {
-        connect(&network_timer_, &QTimer::timeout, this, &MainWindow::onNetworkTimer);
-        network_timer_.start(1000);
-    }
-
+    connect(&network_timer_, &QTimer::timeout, this, &MainWindow::updateNetworkLabel);
     connect(&refresh_timer_, &QTimer::timeout, this, &MainWindow::onRefreshTimer);
+
+    onSessionSourceChanged();
     refreshSoon();
 }
 
 void MainWindow::onSessionSourceChanged()
 {
     model_.clear();
+
+    if (session_.isServer())
+    {
+        updateNetworkLabel();
+        ui_.networkLabel->show();
+        network_timer_.start(1000);
+    }
+    else
+    {
+        ui_.networkLabel->hide();
+        network_timer_.stop();
+    }
 }
 
 /****
@@ -829,8 +833,6 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
-    ui_.networkLabel->setVisible(!session_.isServer());
-
     auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
     auto str = QString{};
 
@@ -1257,7 +1259,7 @@ void MainWindow::refreshPref(int key)
         }
 
     case Prefs::READ_CLIPBOARD:
-        auto_add_clipboard_links = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        auto_add_clipboard_links_ = prefs_.getBool(Prefs::READ_CLIPBOARD);
         break;
 
     default:
@@ -1313,6 +1315,33 @@ void MainWindow::openURL()
     }
 
     addTorrent(std::move(*add), true);
+}
+
+void MainWindow::addTorrentFromClipboard()
+{
+    if (auto const text = QGuiApplication::clipboard()->text().trimmed();
+        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || tr_magnet_metainfo{}.parseMagnet(text.toStdString()))
+    {
+        for (auto const& entry : text.split(QLatin1Char('\n')))
+        {
+            auto key = entry.trimmed();
+            if (key.isEmpty())
+            {
+                continue;
+            }
+
+            if (auto const url = QUrl{ key }; url.isLocalFile())
+            {
+                key = url.toLocalFile();
+            }
+
+            if (!clipboard_processed_keys_.contains(key))
+            {
+                clipboard_processed_keys_.append(key);
+                trApp->addTorrent(AddData{ key });
+            }
+        }
+    }
 }
 
 void MainWindow::addTorrents(QStringList const& filenames)
@@ -1454,7 +1483,7 @@ void MainWindow::removeTorrents(bool const delete_files)
 ****
 ***/
 
-void MainWindow::updateNetworkIcon()
+void MainWindow::updateNetworkLabel()
 {
     static constexpr int const Period = 3;
     time_t const now = time(nullptr);
@@ -1513,11 +1542,6 @@ void MainWindow::updateNetworkIcon()
     ui_.networkLabel->setToolTip(tip);
 }
 
-void MainWindow::onNetworkTimer()
-{
-    updateNetworkIcon();
-}
-
 void MainWindow::dataReadProgress()
 {
     if (!network_error_)
@@ -1539,7 +1563,7 @@ void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString con
     network_error_ = have_error;
     error_message_ = message;
     refreshSoon(REFRESH_TRAY_ICON);
-    updateNetworkIcon();
+    updateNetworkLabel();
 
     // Refresh our model if we've just gotten a clean connection to the session.
     // That way we can rebuild after a restart of transmission-daemon
@@ -1605,33 +1629,19 @@ void MainWindow::dropEvent(QDropEvent* event)
 
 bool MainWindow::event(QEvent* e)
 {
-    if (e->type() != QEvent::WindowActivate || !auto_add_clipboard_links)
+    switch (e->type())
     {
-        return QMainWindow::event(e);
-    }
+    case QEvent::WindowActivate:
+        addTorrentFromClipboard();
+        break;
 
-    if (auto const text = QGuiApplication::clipboard()->text().trimmed();
-        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || tr_magnet_metainfo{}.parseMagnet(text.toStdString()))
-    {
-        for (auto const& entry : text.split(QLatin1Char('\n')))
-        {
-            auto key = entry.trimmed();
-            if (key.isEmpty())
-            {
-                continue;
-            }
+    case QEvent::Clipboard:
+        if (auto_add_clipboard_links_)
+            addTorrentFromClipboard();
+        break;
 
-            if (auto const url = QUrl{ key }; url.isLocalFile())
-            {
-                key = url.toLocalFile();
-            }
-
-            if (!clipboard_processed_keys_.contains(key))
-            {
-                clipboard_processed_keys_.append(key);
-                trApp->addTorrent(AddData{ key });
-            }
-        }
+    default:
+        break;
     }
 
     return QMainWindow::event(e);

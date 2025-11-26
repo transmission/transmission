@@ -119,7 +119,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool client_is_seed,
     bool utp)
 {
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
     TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
@@ -152,7 +151,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         }
     };
 
-    for (auto const& transport : session->preferred_transport())
+    for (auto const& transport : session->preferred_transports())
     {
         if (auto sock = get_socket[transport](); sock.is_valid())
         {
@@ -350,7 +349,7 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
     auto done = false;
     auto err = false;
 
-    if (bytes_transferred > 0U)
+    if (socket_.is_tcp() && bytes_transferred > 0U)
     {
         bandwidth().notify_bandwidth_consumed(TR_DOWN, bytes_transferred, false, now);
     }
@@ -358,17 +357,25 @@ void tr_peerIo::can_read_wrapper(size_t bytes_transferred)
     // In normal conditions, only continue processing if we still have bandwidth
     // quota for it.
     //
-    // The read buffer will grow indefinitely if libutp or the TCP stack keeps buffering
-    // data faster than the bandwidth limit allows. To safeguard against that, we keep
+    // The read buffer will grow indefinitely if libutp keeps buffering data faster
+    // than the bandwidth limit allows. To safeguard against that, we keep
     // processing if the read buffer is more than twice as large as the target size.
-    while (!done && !err && (read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
+    while (!done && !err &&
+           (socket_.is_tcp() || read_buffer_size() > RcvBuf * 2U || bandwidth().clamp(TR_DOWN, read_buffer_size()) != 0U))
     {
         auto piece = size_t{};
+        auto const old_size = read_buffer_size();
         auto const read_state = can_read_ != nullptr ? can_read_(this, user_data_, &piece) : ReadState::Err;
+        auto const used = old_size - read_buffer_size();
 
         if (piece > 0U)
         {
             bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
+        }
+
+        if (socket_.is_utp() && used > 0U)
+        {
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, used, false, now);
         }
 
         switch (read_state)
@@ -571,7 +578,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     outbuf_.commit_space(n_bytes);
 
     session_->queue_session_thread(
-        [ptr = std::weak_ptr{ shared_from_this() }]()
+        [ptr = weak_from_this()]()
         {
             if (auto io = ptr.lock(); io)
             {

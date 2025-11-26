@@ -41,11 +41,11 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
 
  * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
    _Note: Clicking the "Turtle" in the GUI when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
- * **alt-speed-up:** Number (KB/s, default = 50)
- * **alt-speed-down:** Number (KB/s, default = 50)
- * **speed-limit-down:** Number (KB/s, default = 100)
+ * **alt-speed-up:** Number (kB/s, default = 50)
+ * **alt-speed-down:** Number (kB/s, default = 50)
+ * **speed-limit-down:** Number (kB/s, default = 100)
  * **speed-limit-down-enabled:** Boolean (default = false)
- * **speed-limit-up:** Number (KB/s, default = 100)
+ * **speed-limit-up:** Number (kB/s, default = 100)
  * **speed-limit-up-enabled:** Boolean (default = false)
  * **upload-slots-per-torrent:** Number (default = 14)
 
@@ -73,7 +73,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
    _Note: transmission-daemon only._
 
 #### Misc
- * **cache-size-mb:** Number (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance. Set it to the smallest value tolerable by the random access performance of your storage medium to minimize data loss in case Transmission quit unexpectedly. Setting this to 0 bypasses the cache, which may be useful if your filesystem already has a cache layer that aggregates transactions.
+ * **cache-size-mb:** Number (default = 4), in MiB, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance. Set it to the smallest value tolerable by the random access performance of your storage medium to minimize data loss in case Transmission quit unexpectedly. Setting this to 0 bypasses the cache, which may be useful if your filesystem already has a cache layer that aggregates transactions. Pieces are guaranteed to be written to filesystem if sequential download is enabled. Otherwise, data might still be in cache only.
  * **default-trackers:** String (default = "") A list of double-newline separated tracker announce URLs. These are used for all torrents in addition to the per torrent trackers specified in the torrent file. If a tracker is only meant to be a backup, it should be separated from its main tracker by a single newline character. If a tracker should be used additionally to another tracker it should be separated by two newlines. (e.g. "udp://tracker.example.invalid:1337/announce\n\nudp://tracker.another-example.invalid:6969/announce\nhttps://backup-tracker.another-example.invalid:443/announce\n\nudp://tracker.yet-another-example.invalid:1337/announce", in this case tracker.example.invalid, tracker.another-example.invalid and tracker.yet-another-example.invalid would be used as trackers and backup-tracker.another-example.invalid as backup in case tracker.another-example.invalid is unreachable.
  * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
@@ -90,10 +90,12 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page.
  * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
  * **start_paused**: Boolean (default = false) Pause the torrents when daemon starts. _Note: transmission-daemon only._
- * **tcp-enabled:** Boolean (default = true) Optionally disable TCP connection to other peers. Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds. Unless you have a good reason, you should not set this to false.
+ * **tcp-enabled:** Boolean (default = true) **DEPRECATED**, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
  * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
- * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
- * **preferred_transport:** String ("utp" = Prefer µTP, "tcp" = Prefer TCP; default = "utp") Choose your preferred transport protocol (has no effect if one of them is disabled).
+ * **torrent_complete_verify_enabled**: Boolean (default = false) Whether to verify the torrent once it finishes downloading.
+ * **utp-enabled:** Boolean (default = true) ***DEPRECATED***, use `preferred_transports` instead. Leave it at default and let Transmission manage this value to minimize accidents.
+ * **preferred_transports:** String[] ("utp" = [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol), "tcp" = TCP; default = ["utp", "tcp"]) List your preference of transport protocols in the order of preferred-first. Omitting the transport protocol from the list will disable it.
+   _Note: Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds._
  * **sleep-per-seconds-during-verify:** Number (default = 100) Controls the duration in milliseconds for which the verification process will pause to reduce disk I/O pressure.
 
 #### Peers
@@ -168,9 +170,9 @@ Only keys that differ from above are listed here. These options have been replac
 
 #### 1.5x (and older)
 ##### Bandwidth
- * **download-limit:** Number (KB/s, default = 100)
+ * **download-limit:** Number (kB/s, default = 100)
  * **download-limit-enabled:** Boolean (default = false)
- * **upload-limit:** Number (KB/s, default = 100)
+ * **upload-limit:** Number (kB/s, default = 100)
  * **upload-limit-enabled:** Boolean (default = false)
 
 ##### Peer Port

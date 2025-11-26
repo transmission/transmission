@@ -245,12 +245,12 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
     return len;
 }
 
-/* User-level routine. returns whether or not 'text' and 'p' matched */
-bool tr_wildmat(std::string_view text, std::string_view pattern)
+/* User-level routine. returns whether or not 'text' and 'pattern' matched */
+bool tr_wildmat(char const* text, char const* pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
+    return (pattern[0] == '*' && pattern[1] == '\0') || DoMatch(text, pattern) > 0;
 }
 
 char const* tr_strerror(int errnum)
@@ -561,11 +561,11 @@ std::string tr_strpercent(double x)
     return fmt::format("{:.0Lf}", x);
 }
 
-std::string tr_strratio(double ratio, std::string_view infinity)
+std::string tr_strratio(double ratio, std::string_view const none, std::string_view const infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
     {
-        return _("None");
+        return std::string{ none };
     }
 
     if ((int)ratio == TR_RATIO_INF)
