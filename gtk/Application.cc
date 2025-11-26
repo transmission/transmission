@@ -726,7 +726,7 @@ std::string get_application_id(std::string const& config_dir)
 
     std::string default_config_dir = tr_getDefaultConfigDir("transmission");
 
-    if (config_dir == default_config_dir)
+    if (tr_sys_path_is_same(config_dir, default_config_dir))
     {
         return "com.transmissionbt.transmission";
     }
