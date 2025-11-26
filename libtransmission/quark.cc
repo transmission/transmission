@@ -280,6 +280,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "remote-session-port"sv,
     "remote-session-requres-authentication"sv,
     "remote-session-username"sv,
+    "remote_session_rpc_url_path"sv,
     "removed"sv,
     "rename-partial-files"sv,
     "reqq"sv,
