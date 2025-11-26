@@ -40,8 +40,6 @@ Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T
 template<typename T, typename U, typename = std::enable_if_t<!std::is_floating_point_v<T>>>
 void update_cache_value(T& value, U&& new_value, Torrent::ChangeFlags& changes, Torrent::ChangeFlag flag)
 {
-    using std::rel_ops::operator!=;
-
     if (value != new_value)
     {
         value = std::forward<U>(new_value);
