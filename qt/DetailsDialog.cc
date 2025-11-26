@@ -38,6 +38,7 @@
 #include "DetailsDialog.h"
 #include "Formatter.h"
 #include "IconCache.h"
+#include "NativeIcon.h"
 #include "Prefs.h"
 #include "Session.h"
 #include "SqueezeLabel.h"
@@ -1587,10 +1588,9 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_.get());
     ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
-    auto const& icons = IconCache::get();
-    ui_.addTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
-    ui_.editTrackersButton->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.removeTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
+    ui_.addTrackerButton->setIcon(icons::icon(icons::Type::AddTracker));
+    ui_.editTrackersButton->setIcon(icons::icon(icons::Type::EditTrackers));
+    ui_.removeTrackerButton->setIcon(icons::icon(icons::Type::RemoveTracker));
 
     ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));
