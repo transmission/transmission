@@ -453,6 +453,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt \
+            -DCMAKE_CXX_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-15-intel` \
+            -DCMAKE_C_FLAGS='--system-header-prefix=fmt/' `# Needed to supress system header warnings in macos-15-intel` \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
