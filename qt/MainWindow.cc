@@ -343,23 +343,28 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&session_, &Session::httpAuthenticationRequired, this, &MainWindow::wrongAuthentication);
     connect(&session_, &Session::networkResponse, this, &MainWindow::onNetworkResponse);
 
-    if (session_.isServer())
-    {
-        ui_.networkLabel->hide();
-    }
-    else
-    {
-        connect(&network_timer_, &QTimer::timeout, this, &MainWindow::onNetworkTimer);
-        network_timer_.start(1000);
-    }
-
+    connect(&network_timer_, &QTimer::timeout, this, &MainWindow::updateNetworkLabel);
     connect(&refresh_timer_, &QTimer::timeout, this, &MainWindow::onRefreshTimer);
+
+    onSessionSourceChanged();
     refreshSoon();
 }
 
 void MainWindow::onSessionSourceChanged()
 {
     model_.clear();
+
+    if (session_.isServer())
+    {
+        updateNetworkLabel();
+        ui_.networkLabel->show();
+        network_timer_.start(1000);
+    }
+    else
+    {
+        ui_.networkLabel->hide();
+        network_timer_.stop();
+    }
 }
 
 /****
@@ -827,8 +832,6 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     ui_.uploadSpeedLabel->setVisible(stats.peers_sending || stats.peers_receiving);
     ui_.downloadSpeedLabel->setText(stats.speed_down.to_download_qstring());
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
-
-    ui_.networkLabel->setVisible(!session_.isServer());
 
     auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
     auto str = QString{};
@@ -1480,7 +1483,7 @@ void MainWindow::removeTorrents(bool const delete_files)
 ****
 ***/
 
-void MainWindow::updateNetworkIcon()
+void MainWindow::updateNetworkLabel()
 {
     static constexpr int const Period = 3;
     time_t const now = time(nullptr);
@@ -1539,11 +1542,6 @@ void MainWindow::updateNetworkIcon()
     ui_.networkLabel->setToolTip(tip);
 }
 
-void MainWindow::onNetworkTimer()
-{
-    updateNetworkIcon();
-}
-
 void MainWindow::dataReadProgress()
 {
     if (!network_error_)
@@ -1565,7 +1563,7 @@ void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString con
     network_error_ = have_error;
     error_message_ = message;
     refreshSoon(REFRESH_TRAY_ICON);
-    updateNetworkIcon();
+    updateNetworkLabel();
 
     // Refresh our model if we've just gotten a clean connection to the session.
     // That way we can rebuild after a restart of transmission-daemon
