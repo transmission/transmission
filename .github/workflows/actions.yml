@@ -939,7 +939,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [40, 41, 42]
+        version: [41, 42, 43]
     runs-on: ubuntu-latest
     container:
       image: fedora:${{ matrix.version }}
