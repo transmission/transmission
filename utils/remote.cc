@@ -1349,8 +1349,8 @@ void print_file_list(tr_variant::Map const& map)
         }
 
         auto const n = std::size(*files);
-        fmt::print("{:s} ({:d} files):\n", *name, n);
-        fmt::print("{:>3s}  {:>5s} {:>8s} {:>3s} {:>9s}  {:s}\n", "#", "Done", "Priority", "Get", "Size", "Name");
+          auto const id = t->value_if<int64_t>(TR_KEY_id);
+    fmt::print("{:d}: {:s} ({:d} files):\n", id, *name, n);        fmt::print("{:>3s}  {:>5s} {:>8s} {:>3s} {:>9s}  {:s}\n", "#", "Done", "Priority", "Get", "Size", "Name");
 
         for (size_t i = 0; i < n; ++i)
         {
