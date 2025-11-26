@@ -351,6 +351,7 @@ jobs:
 
   macos-cmake-universal:
     strategy:
+      fail-fast: false
       matrix:
         os: [
           # This is the last and the only macOS Intel runner that GitHub Actions supports.
@@ -606,6 +607,7 @@ jobs:
 
   macos-from-tarball:
     strategy:
+      fail-fast: false
       matrix:
         os: [
           # This is the last and the only macOS Intel runner that GitHub Actions supports.
