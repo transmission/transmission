@@ -377,8 +377,8 @@ public:
 
         [[nodiscard]] bool is_unreachable() const
         {
-            return (options.ip_proto == FetchOptions::IPProtocol::V4 && !impl.mediator.has_source_address_V4()) ||
-                (options.ip_proto == FetchOptions::IPProtocol::V6 && !impl.mediator.has_source_address_V6());
+            return (options_.ip_proto == FetchOptions::IPProtocol::V4 && !impl.mediator.has_source_address_V4()) ||
+                (options_.ip_proto == FetchOptions::IPProtocol::V6 && !impl.mediator.has_source_address_V6());
         }
 
         void add_data(void const* data, size_t const n_bytes)

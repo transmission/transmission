@@ -345,12 +345,12 @@ std::optional<std::string> tr_session::WebMediator::bind_address_V6() const
 
 bool tr_session::WebMediator::has_source_address_V4() const
 {
-    return session_->global_source_address(TR_AF_INET).has_value();
+    return session_->source_address(TR_AF_INET).has_value();
 }
 
 bool tr_session::WebMediator::has_source_address_V6() const
 {
-    return session_->global_source_address(TR_AF_INET6).has_value();
+    return session_->source_address(TR_AF_INET6).has_value();
 }
 
 size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
