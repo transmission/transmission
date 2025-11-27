@@ -14,7 +14,7 @@
 struct event;
 struct event_base;
 struct evhttp;
-typedef void (*event_callback_fn)(evutil_socket_t, short, void*);
+using event_callback_fn = void(*)(evutil_socket_t, short, void*);
 
 namespace libtransmission::evhelpers
 {
