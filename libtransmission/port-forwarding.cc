@@ -192,7 +192,7 @@ private:
 
         auto const old_state = state();
 
-        auto const result = natpmp_->pulse(mediator_.local_peer_port(), is_enabled);
+        auto const result = natpmp_->pulse(mediator_.local_peer_port(), is_enabled, mediator_.gateway_address());
         natpmp_state_ = result.state;
         if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
         {
