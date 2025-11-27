@@ -95,7 +95,7 @@ struct tr_torrent
         friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
         friend struct tr_torrent;
 
-        ResumeHelper(tr_torrent& tor)
+        explicit ResumeHelper(tr_torrent& tor)
             : tor_{ tor }
         {
         }
@@ -758,6 +758,10 @@ struct tr_torrent
     {
         if (is_sequential != sequential_download_)
         {
+            if (is_sequential)
+            {
+                session->flush_torrent_files(id());
+            }
             sequential_download_ = is_sequential;
             sequential_download_changed_.emit(this, is_sequential);
             set_dirty();
@@ -767,6 +771,23 @@ struct tr_torrent
     [[nodiscard]] constexpr auto is_sequential_download() const noexcept
     {
         return sequential_download_;
+    }
+
+    bool set_sequential_download_from_piece(tr_piece_index_t piece) noexcept
+    {
+        auto const is_valid = piece < piece_count();
+        if (is_valid && piece != sequential_download_from_piece_)
+        {
+            sequential_download_from_piece_ = piece;
+            sequential_download_from_piece_changed_.emit(this, piece);
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr auto sequential_download_from_piece() const noexcept
+    {
+        return sequential_download_from_piece_;
     }
 
     [[nodiscard]] constexpr bool is_running() const noexcept
@@ -965,7 +986,7 @@ struct tr_torrent
         return session->torrent_queue().get_pos(id());
     }
 
-    void set_queue_position(size_t new_pos)
+    void set_queue_position(size_t new_pos) // NOLINT(readability-make-member-function-const)
     {
         session->torrent_queue().set_pos(id(), new_pos);
     }
@@ -988,8 +1009,10 @@ struct tr_torrent
     libtransmission::SimpleObservable<tr_torrent*> started_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_upload_only_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool> files_wanted_changed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_file_index_t const*, tr_file_index_t, tr_priority_t> priority_changed_;
     libtransmission::SimpleObservable<tr_torrent*, bool> sequential_download_changed_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> sequential_download_from_piece_changed_;
 
     CumulativeCount bytes_corrupt_;
     CumulativeCount bytes_downloaded_;
@@ -1219,6 +1242,7 @@ private:
 
         files_wanted_.set(files, n_files, wanted);
         completion_.invalidate_size_when_done();
+        files_wanted_changed_.emit(this, files, n_files, wanted);
 
         if (!is_bootstrapping)
         {
@@ -1393,7 +1417,7 @@ private:
 
     uint16_t idle_limit_minutes_ = 0;
 
-    uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
+    uint16_t max_connected_peers_ = TrDefaultPeerLimitTorrent;
 
     bool is_deleting_ = false;
     bool is_dirty_ = false;
@@ -1406,6 +1430,8 @@ private:
     bool needs_completeness_check_ = true;
 
     bool sequential_download_ = false;
+
+    tr_piece_index_t sequential_download_from_piece_ = 0;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent

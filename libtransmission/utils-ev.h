@@ -11,7 +11,6 @@
 
 #include <memory>
 
-struct evbuffer;
 struct event;
 struct event_base;
 struct evhttp;
@@ -19,13 +18,6 @@ typedef void (*event_callback_fn)(evutil_socket_t, short, void*);
 
 namespace libtransmission::evhelpers
 {
-
-struct BufferDeleter
-{
-    void operator()(struct evbuffer* buf) const noexcept;
-};
-
-using evbuffer_unique_ptr = std::unique_ptr<struct evbuffer, BufferDeleter>;
 
 struct EventBaseDeleter
 {

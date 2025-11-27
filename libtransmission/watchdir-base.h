@@ -37,6 +37,8 @@ public:
         retry_timer_->set_callback([this]() { onRetryTimer(); });
     }
 
+    ~BaseWatchdir() override = default;
+
     BaseWatchdir(BaseWatchdir&&) = delete;
     BaseWatchdir(BaseWatchdir const&) = delete;
     BaseWatchdir& operator=(BaseWatchdir&&) = delete;

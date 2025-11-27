@@ -12,7 +12,7 @@
 #include <mbedtls/sha256.h>
 #include <mbedtls/version.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 

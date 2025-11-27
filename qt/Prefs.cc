@@ -96,6 +96,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QMetaType::Int },
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QMetaType::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QMetaType::QString },
+    { SESSION_REMOTE_RPC_URL_PATH, TR_KEY_remote_session_rpc_url_path, QMetaType::QString },
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QMetaType::QStringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QMetaType::Bool },
@@ -464,7 +465,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_main_window_width, 300);
     settings.try_emplace(TR_KEY_main_window_x, 50);
     settings.try_emplace(TR_KEY_main_window_y, 50);
-    settings.try_emplace(TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
+    settings.try_emplace(TR_KEY_remote_session_port, TrDefaultRpcPort);
     settings.try_emplace(TR_KEY_download_dir, download_dir);
     settings.try_emplace(TR_KEY_filter_mode, FilterMode);
     settings.try_emplace(TR_KEY_main_window_layout_order, WindowLayout);
@@ -477,6 +478,7 @@ tr_variant Prefs::get_default_app_settings()
     settings.try_emplace(TR_KEY_statusbar_stats, StatsMode);
     settings.try_emplace(TR_KEY_watch_dir, download_dir);
     settings.try_emplace(TR_KEY_read_clipboard, false);
+    settings.try_emplace(TR_KEY_remote_session_rpc_url_path, TR_DEFAULT_RPC_URL_STR "rpc");
     return tr_variant{ std::move(settings) };
 }
 

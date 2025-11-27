@@ -30,47 +30,6 @@ namespace libtransmission::test
 
 using RpcTest = SessionTest;
 
-TEST_F(RpcTest, list)
-{
-    auto top = tr_rpc_parse_list_str("12"sv);
-    auto i = top.value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(12, *i);
-
-    top = tr_rpc_parse_list_str("6,7"sv);
-    auto* v = top.get_if<tr_variant::Vector>();
-    ASSERT_NE(v, nullptr);
-    EXPECT_EQ(2U, std::size(*v));
-    i = (*v)[0].value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(6, *i);
-    i = (*v)[1].value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(7, *i);
-
-    top = tr_rpc_parse_list_str("asdf"sv);
-    auto sv = top.value_if<std::string_view>();
-    ASSERT_TRUE(sv);
-    EXPECT_EQ("asdf"sv, *sv);
-
-    top = tr_rpc_parse_list_str("1,3-5"sv);
-    v = top.get_if<tr_variant::Vector>();
-    ASSERT_NE(v, nullptr);
-    EXPECT_EQ(4U, std::size(*v));
-    i = (*v)[0].value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(1, *i);
-    i = (*v)[1].value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(3, *i);
-    i = (*v)[2].value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(4, *i);
-    i = (*v)[3].value_if<int64_t>();
-    ASSERT_TRUE(i);
-    EXPECT_EQ(5, *i);
-}
-
 TEST_F(RpcTest, tagSync)
 {
     auto request_map = tr_variant::Map{ 2U };
@@ -206,6 +165,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_peer_port_random_on_start,
         TR_KEY_pex_enabled,
         TR_KEY_port_forwarding_enabled,
+        TR_KEY_preferred_transports,
         TR_KEY_queue_stalled_enabled,
         TR_KEY_queue_stalled_minutes,
         TR_KEY_rename_partial_files,

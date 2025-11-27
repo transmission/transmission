@@ -16,7 +16,7 @@
 #include <gtkmm/label.h>
 #include <gtkmm/messagedialog.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <memory>
 

@@ -1,5 +1,7 @@
 #pragma once
 
+// NOLINTBEGIN
+
 #define PEERID_PREFIX             "${TR_PEER_ID_PREFIX}"
 #define USERAGENT_PREFIX          "${TR_USER_AGENT_PREFIX}"
 #define VCS_REVISION              "${TR_VCS_REVISION}"
@@ -15,3 +17,5 @@
 #cmakedefine TR_BETA_RELEASE 1
 #cmakedefine TR_NIGHTLY_RELEASE 1
 #cmakedefine TR_STABLE_RELEASE 1
+
+// NOLINTEND

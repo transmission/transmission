@@ -17,7 +17,7 @@
 #include <event2/event.h>
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 

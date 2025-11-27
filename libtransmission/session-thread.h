@@ -34,12 +34,20 @@ public:
     template<typename Func, typename... Args>
     void queue(Func&& func, Args&&... args)
     {
-        queue(std::function<void(void)>{ std::bind(std::forward<Func>(func), std::forward<Args>(args)...) });
+        // TODO(tearfur): Use C++20 P0780R2, GCC 9, clang 9
+        queue(std::function<void(void)>{
+            [func = std::forward<Func>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
+            { std::apply(std::move(func), std::move(args)); },
+        });
     }
 
     template<typename Func, typename... Args>
     void run(Func&& func, Args&&... args)
     {
-        run(std::function<void(void)>{ std::bind(std::forward<Func>(func), std::forward<Args>(args)...) });
+        // TODO(tearfur): Use C++20 P0780R2, GCC 9, clang 9
+        run(std::function<void(void)>{
+            [func = std::forward<Func>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
+            { std::apply(std::move(func), std::move(args)); },
+        });
     }
 };

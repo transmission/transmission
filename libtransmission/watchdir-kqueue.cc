@@ -19,7 +19,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "libtransmission/transmission.h"

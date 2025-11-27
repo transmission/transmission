@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <small/vector.hpp>
 
@@ -32,6 +32,7 @@
 #include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/cache.h"
+#include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
@@ -291,17 +292,20 @@ using ReadResult = std::pair<ReadState, size_t /*n_piece_data_bytes_read*/>;
  * @see tr_peer
  * @see tr_peer_info
  */
-class tr_peerMsgsImpl final : public tr_peerMsgs
+class tr_peerMsgsImpl final
+    : public tr_peerMsgs
+    , public std::enable_shared_from_this<tr_peerMsgsImpl>
 {
 public:
     tr_peerMsgsImpl(
         tr_torrent& torrent_in,
         std::shared_ptr<tr_peer_info> peer_info_in,
         std::shared_ptr<tr_peerIo> io_in,
-        tr_interned_string client,
+        tr_peer_id_t peer_id,
         tr_peer_callback_bt callback,
         void* callback_data)
-        : tr_peerMsgs{ torrent_in, std::move(peer_info_in), client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
+        : tr_peerMsgs{ torrent_in,           std::move(peer_info_in), peer_id, io_in->is_encrypted(),
+                       io_in->is_incoming(), io_in->is_utp() }
         , tor_{ torrent_in }
         , io_{ std::move(io_in) }
         , have_{ torrent_in.piece_count() }
@@ -745,7 +749,7 @@ private:
     static auto constexpr SendPexInterval = 90s;
 
     // how many seconds we expect the next piece block to arrive
-    static auto constexpr RequestTimeoutSecs = time_t{ 90 };
+    static auto constexpr RequestTimeoutSecs = time_t{ 15 };
 };
 
 // ---
@@ -1138,15 +1142,15 @@ void tr_peerMsgsImpl::send_ltep_handshake()
 
     // If connecting to global peer, then use global address
     // Otherwise we are connecting to local peer, use bind address directly
-    if (auto const addr = io_->address().is_global_unicast_address() ? session->global_address(TR_AF_INET) :
-                                                                       session->bind_address(TR_AF_INET);
+    if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET) :
+                                                               session->bind_address(TR_AF_INET);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv4());
         tr_variantDictAddRaw(&val, TR_KEY_ipv4, &addr->addr.addr4, sizeof(addr->addr.addr4));
     }
-    if (auto const addr = io_->address().is_global_unicast_address() ? session->global_address(TR_AF_INET6) :
-                                                                       session->bind_address(TR_AF_INET6);
+    if (auto const addr = io_->address().is_global_unicast() ? session->global_address(TR_AF_INET6) :
+                                                               session->bind_address(TR_AF_INET6);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv6());
@@ -1179,7 +1183,7 @@ void tr_peerMsgsImpl::send_ltep_handshake()
     // you as. i.e. this is the receiver's external ip address (no port is included).
     // This may be either an IPv4 (4 bytes) or an IPv6 (16 bytes) address.
     {
-        auto buf = std::array<std::byte, TR_ADDRSTRLEN>{};
+        auto buf = std::array<std::byte, TrAddrStrlen>{};
         auto const begin = std::data(buf);
         auto const end = io_->address().to_compact(begin);
         auto const len = end - begin;
@@ -1304,7 +1308,28 @@ void tr_peerMsgsImpl::parse_ltep_handshake(MessageReader& payload)
     // peer id encoding.
     if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
     {
-        set_user_agent(tr_interned_string{ sv });
+        set_user_agent(tr_interned_string{ tr_strv_convert_utf8(sv) });
+    }
+
+    // https://www.bittorrent.org/beps/bep_0010.html
+    // A string containing the compact representation of the ip address
+    // this peer sees you as. i.e. this is the receiver's external ip
+    // address (no port is included). This may be either an IPv4 (4 bytes)
+    // or an IPv6 (16 bytes) address.
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_yourip, &sv))
+    {
+        auto const* const bytes = reinterpret_cast<std::byte const*>(std::data(sv));
+        switch (std::size(sv))
+        {
+        case tr_address::CompactAddrBytes[TR_AF_INET]:
+            peer_info->maybe_update_canonical_priority(tr_address::from_compact_ipv4(bytes).first);
+            break;
+        case tr_address::CompactAddrBytes[TR_AF_INET6]:
+            peer_info->maybe_update_canonical_priority(tr_address::from_compact_ipv6(bytes).first);
+            break;
+        default:
+            break;
+        }
     }
 
     /* get peer's listening port */
@@ -1676,6 +1701,7 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
     }
 
     peer_info->set_latest_piece_data_time(tr_time());
+    bytes_sent_to_client.add(tr_time(), len);
     publish(tr_peer_event::GotPieceData(len));
 
     if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block
@@ -1742,6 +1768,7 @@ void tr_peerMsgsImpl::did_write(tr_peerIo* /*io*/, size_t bytes_written, bool wa
     {
         msgs->peer_info->set_latest_piece_data_time(tr_time());
         msgs->publish(tr_peer_event::SentPieceData(bytes_written));
+        msgs->bytes_sent_to_peer.add(tr_time(), bytes_written);
     }
 }
 
@@ -2113,17 +2140,25 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
 tr_peerMsgs::tr_peerMsgs(
     tr_torrent const& tor,
     std::shared_ptr<tr_peer_info> peer_info_in,
-    tr_interned_string user_agent,
+    tr_peer_id_t peer_id,
     bool connection_is_encrypted,
     bool connection_is_incoming,
     bool connection_is_utp)
     : tr_peer{ tor }
     , peer_info{ std::move(peer_info_in) }
-    , user_agent_{ user_agent }
+    , peer_id_{ peer_id }
     , connection_is_encrypted_{ connection_is_encrypted }
     , connection_is_incoming_{ connection_is_incoming }
     , connection_is_utp_{ connection_is_utp }
 {
+    auto client = tr_interned_string{};
+    if (peer_id != tr_peer_id_t{})
+    {
+        auto buf = std::array<char, 128>{};
+        tr_clientForId(std::data(buf), sizeof(buf), peer_id);
+        client = tr_interned_string{ tr_quark_new(std::data(buf)) };
+    }
+    set_user_agent(client);
     peer_info->set_connected(tr_time());
     ++n_peers;
 }
@@ -2135,13 +2170,13 @@ tr_peerMsgs::~tr_peerMsgs()
     --n_peers;
 }
 
-tr_peerMsgs* tr_peerMsgs::create(
+std::shared_ptr<tr_peerMsgs> tr_peerMsgs::create(
     tr_torrent& torrent,
     std::shared_ptr<tr_peer_info> peer_info,
     std::shared_ptr<tr_peerIo> io,
-    tr_interned_string user_agent,
+    tr_peer_id_t peer_id,
     tr_peer_callback_bt callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl{ torrent, std::move(peer_info), std::move(io), user_agent, callback, callback_data };
+    return std::make_shared<tr_peerMsgsImpl>(torrent, std::move(peer_info), std::move(io), peer_id, callback, callback_data);
 }
