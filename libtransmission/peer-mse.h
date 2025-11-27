@@ -76,7 +76,7 @@ private:
 class Filter
 {
 public:
-    void decrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash);
     constexpr void decrypt_disable() noexcept
     {
         dec_active_ = false;
@@ -88,7 +88,7 @@ public:
         process(buf_in, buf_len, buf_out, dec_active_, dec_key_);
     }
 
-    void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash);
     constexpr void encrypt_disable() noexcept
     {
         enc_active_ = false;
@@ -131,8 +131,8 @@ private:
         }
     }
 
-    tr_arc4 dec_key_ = {};
-    tr_arc4 enc_key_ = {};
+    tr_arc4 dec_key_;
+    tr_arc4 enc_key_;
     bool dec_active_ = false;
     bool enc_active_ = false;
 };

@@ -23,7 +23,14 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import { debounce, deepEqual, setEnabled, setTextContent } from './utils.js';
+import {
+  newOpts,
+  icon,
+  debounce,
+  deepEqual,
+  setEnabled,
+  setTextContent,
+} from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -31,9 +38,32 @@ export class Transmission extends EventTarget {
 
     // Initialize the helper classes
     this.action_manager = action_manager;
+    this.handler = null;
     this.notifications = notifications;
     this.prefs = prefs;
     this.remote = new Remote(this);
+    this.speed = {
+      down: document.querySelector('#speed-down'),
+      up: document.querySelector('#speed-up'),
+    };
+
+    for (const [selector, name] of [
+      ['#toolbar-open', 'open'],
+      ['#toolbar-delete', 'delete'],
+      ['#toolbar-start', 'start'],
+      ['#toolbar-pause', 'pause'],
+      ['#toolbar-inspector', 'inspector'],
+      ['#toolbar-overflow', 'overflow'],
+    ]) {
+      document
+        .querySelector(selector)
+        .prepend(icon[name](), document.createElement('BR'));
+    }
+
+    document.querySelector('.speed-container').append(icon.speedDown());
+    document
+      .querySelector('.speed-container + .speed-container')
+      .append(icon.speedUp());
 
     this.addEventListener('torrent-selection-changed', (event_) =>
       this.action_manager.update(event_),
@@ -43,16 +73,22 @@ export class Transmission extends EventTarget {
     this.filterText = '';
     this._torrents = {};
     this._rows = [];
+    this.oldTrackers = [];
     this.dirtyTorrents = new Set();
 
     this.changeStatus = false;
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
-    this.boundPopupCloseListener = this.popupCloseListener.bind(this);
+    this.pointer_device = Object.seal({
+      is_touch_device: 'ontouchstart' in globalThis,
+      long_press_callback: null,
+      x: 0,
+      y: 0,
+    });
+    this.popup = Array.from({ length: Transmission.max_popups }).fill(null);
 
-    this.isTouch = 'ontouchstart' in window;
-    this.busyclick = false;
+    this.busytyping = false;
 
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
@@ -67,9 +103,7 @@ export class Transmission extends EventTarget {
     document
       .querySelector('#filter-tracker')
       .addEventListener('change', (event_) => {
-        this.setFilterTracker(
-          event_.target.value === 'all' ? null : event_.target.value,
-        );
+        this.setFilterTracker(event_.target.value);
       });
 
     this.action_manager.addEventListener('change', (event_) => {
@@ -82,6 +116,16 @@ export class Transmission extends EventTarget {
 
     this.action_manager.addEventListener('click', (event_) => {
       switch (event_.action) {
+        case 'copy-name':
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(this.handler.subtree.name);
+          } else {
+            // navigator.clipboard requires HTTPS or localhost
+            // Emergency approach
+            prompt('Select all then copy', this.handler.subtree.name);
+          }
+          this.handler.classList.remove('selected');
+          break;
         case 'deselect-all':
           this._deselectAll();
           break;
@@ -110,7 +154,7 @@ export class Transmission extends EventTarget {
           this._reannounceTorrents(this.getSelectedTorrents());
           break;
         case 'remove-selected-torrents':
-          this._removeSelectedTorrents(false);
+          this._removeSelectedTorrents();
           break;
         case 'resume-selected-torrents':
           this._startSelectedTorrents(false);
@@ -125,18 +169,20 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
         case 'show-inspector':
-          if (this.popup instanceof Inspector) {
-            this.setCurrentPopup(null);
+          if (this.popup[0] instanceof Inspector) {
+            this.popup[0].close();
           } else {
-            this.setCurrentPopup(new Inspector(this));
+            this.setCurrentPopup(new Inspector(this), 0);
           }
           break;
         case 'show-move-dialog':
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
         case 'show-overflow-menu':
-          if (this.popup instanceof OverflowMenu) {
-            this.setCurrentPopup(null);
+          if (
+            this.popup[Transmission.default_popup_level] instanceof OverflowMenu
+          ) {
+            this.popup[Transmission.default_popup_level].close();
           } else {
             this.setCurrentPopup(
               new OverflowMenu(
@@ -149,7 +195,7 @@ export class Transmission extends EventTarget {
           }
           break;
         case 'show-preferences-dialog':
-          this.setCurrentPopup(new PrefsDialog(this, this.remote));
+          this.setCurrentPopup(new PrefsDialog(this, this.remote), 0);
           break;
         case 'show-shortcuts-dialog':
           this.setCurrentPopup(new ShortcutsDialog(this.action_manager));
@@ -172,9 +218,6 @@ export class Transmission extends EventTarget {
               ? Prefs.DisplayFull
               : Prefs.DisplayCompact;
           break;
-        case 'trash-selected-torrents':
-          this._removeSelectedTorrents(true);
-          break;
         case 'verify-selected-torrents':
           this._verifyTorrents(this.getSelectedTorrents());
           break;
@@ -183,19 +226,59 @@ export class Transmission extends EventTarget {
       }
     });
 
-    // listen to filter changes
     let e = document.querySelector('#filter-mode');
+    // Initialize filter options
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
+    newOpts(e, 'status', [
+      ['Active', Prefs.FilterActive],
+      ['Downloading', Prefs.FilterDownloading],
+      ['Seeding', Prefs.FilterSeeding],
+      ['Paused', Prefs.FilterPaused],
+      ['Finished', Prefs.FilterFinished],
+      ['Error', Prefs.FilterError],
+    ]);
+    newOpts(e, 'list', [
+      ['Private torrents', Prefs.FilterPrivate],
+      ['Public torrents', Prefs.FilterPublic],
+    ]);
+
+    // listen to filter changes
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', (event_) => {
       this.prefs.filter_mode = event_.target.value;
       this.refilterAllSoon();
     });
 
+    e = document.querySelector('#filter-tracker');
+    newOpts(e, null, [['All', Prefs.FilterAll]]);
+
+    const s = document.querySelector('#torrent-search');
+    e = document.querySelector('#reset');
+    e.addEventListener('click', () => {
+      s.value = '';
+      this._setFilterText(s.value);
+      this.refilterAllSoon();
+    });
+
+    if (s.value.trim()) {
+      this.filterText = s.value;
+      e.style.display = 'block';
+      this.refilterAllSoon();
+    }
+
+    e = document.querySelector('#turtle');
+    e.addEventListener('click', (event_) => {
+      this.remote.savePrefs({
+        [RPC._TurtleState]:
+          !event_.target.classList.contains('alt-speed-enabled'),
+      });
+    });
+
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.querySelector('#torrent-container');
     e.addEventListener('click', (e_) => {
-      if (this.popup && this.popup.name !== 'inspector') {
+      if (this.popup[Transmission.default_popup_level]) {
         this.setCurrentPopup(null);
       }
       if (e_.target === e_.currentTarget) {
@@ -203,7 +286,7 @@ export class Transmission extends EventTarget {
       }
     });
     e.addEventListener('dblclick', () => {
-      if (!this.popup || this.popup.name !== 'inspector') {
+      if (!this.popup[0] || this.popup[0].name !== 'inspector') {
         this.action_manager.click('show-inspector');
       }
     });
@@ -216,11 +299,7 @@ export class Transmission extends EventTarget {
       torrent_list: document.querySelector('#torrent-list'),
     };
 
-    const rightc = (event_) => {
-      if (this.isTouch && event_.touches.length > 1) {
-        return;
-      }
-
+    const right_click = (event_) => {
       // if not already, highlight the torrent
       let row_element = event_.target;
       while (row_element && !row_element.classList.contains('torrent')) {
@@ -231,58 +310,16 @@ export class Transmission extends EventTarget {
         this._setSelectedRow(row);
       }
 
-      // open context menu
-      const popup = new ContextMenu(this.action_manager);
-      this.setCurrentPopup(popup);
+      if (this.handler) {
+        this.handler.classList.remove('selected');
+        this.handler = null;
+      }
 
-      const boundingElement = document.querySelector('#torrent-container');
-      const bounds = boundingElement.getBoundingClientRect();
-      const x = Math.min(
-        this.isTouch ? event_.touches[0].clientX : event_.x,
-        bounds.x + bounds.width - popup.root.clientWidth,
-      );
-      const y = Math.min(
-        this.isTouch ? event_.touches[0].clientY : event_.y,
-        bounds.y + bounds.height - popup.root.clientHeight,
-      );
-      popup.root.style.left = `${x > 0 ? x : 0}px`;
-      popup.root.style.top = `${y > 0 ? y : 0}px`;
+      this.context_menu('#torrent-container');
       event_.preventDefault();
     };
 
-    if (this.isTouch) {
-      this.elements.torrent_list.addEventListener('touchstart', (event_) => {
-        if (this.busyclick) {
-          clearTimeout(this.busyclick);
-          this.busyclick = false;
-        } else {
-          this.busyclick = setTimeout(rightc.bind(this), 500, event_);
-        }
-      });
-      this.elements.torrent_list.addEventListener('touchend', () => {
-        clearTimeout(this.busyclick);
-        this.busyclick = false;
-        setTimeout(() => {
-          if (this.popup) {
-            this.popup.root.style.pointerEvents = 'auto';
-          }
-        }, 1);
-      });
-      this.elements.torrent_list.addEventListener('touchmove', () => {
-        clearTimeout(this.busyclick);
-        this.busyclick = false;
-      });
-      this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
-        event_.preventDefault();
-      });
-    } else {
-      this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
-        rightc(event_);
-        if (this.popup) {
-          this.popup.root.style.pointerEvents = 'auto';
-        }
-      });
-    }
+    this.pointer_event(this.elements.torrent_list, right_click);
 
     // Get preferences & torrents from the daemon
     this.loadDaemonPrefs();
@@ -302,14 +339,14 @@ export class Transmission extends EventTarget {
 
   _openTorrentFromUrl() {
     setTimeout(() => {
-      const addTorrent = new URLSearchParams(window.location.search).get(
+      const addTorrent = new URLSearchParams(globalThis.location.search).get(
         'addtorrent',
       );
       if (addTorrent) {
         this.setCurrentPopup(new OpenDialog(this, this.remote, addTorrent));
-        const newUrl = new URL(window.location);
+        const newUrl = new URL(globalThis.location);
         newUrl.search = '';
-        window.history.pushState('', '', newUrl.toString());
+        globalThis.history.pushState('', '', newUrl.toString());
       }
     }, 0);
   }
@@ -344,7 +381,11 @@ export class Transmission extends EventTarget {
     e.classList.add(blur_token);
     e.addEventListener('blur', () => e.classList.add(blur_token));
     e.addEventListener('focus', () => e.classList.remove(blur_token));
-    e.addEventListener('keyup', () => this._setFilterText(e.value));
+    e.addEventListener('input', () => {
+      if (e.value.trim() !== this.filterText) {
+        this._setFilterText(e.value);
+      }
+    });
   }
 
   _onPrefChanged(key, value) {
@@ -359,8 +400,7 @@ export class Transmission extends EventTarget {
       }
       case Prefs.ContrastMode: {
         // Add custom class to the body/html element to get the appropriate contrast color scheme
-        document.body.classList.remove('contrast-more');
-        document.body.classList.remove('contrast-less');
+        document.body.classList.remove('contrast-more', 'contrast-less');
         document.body.classList.add(`contrast-${value}`);
         // this.refilterAllSoon();
         break;
@@ -375,7 +415,8 @@ export class Transmission extends EventTarget {
       case Prefs.RefreshRate: {
         clearInterval(this.refreshTorrentsInterval);
         const callback = this.refreshTorrents.bind(this);
-        const msec = Math.max(2, this.prefs.refresh_rate_sec) * 1000;
+        const pref = this.prefs.refresh_rate_sec;
+        const msec = pref > 0 ? pref * 1000 : 1000;
         this.refreshTorrentsInterval = setInterval(callback, msec);
         break;
       }
@@ -386,7 +427,86 @@ export class Transmission extends EventTarget {
     }
   }
 
+  context_menu(container_id, menu_items) {
+    // open context menu
+    const popup = new ContextMenu(this, menu_items);
+    this.setCurrentPopup(popup);
+
+    const bounds = document.querySelector(container_id).getBoundingClientRect();
+    const x = Math.min(
+      this.pointer_device.x,
+      bounds.right + globalThis.scrollX - popup.root.clientWidth,
+    );
+    const y = Math.min(
+      this.pointer_device.y,
+      bounds.bottom + globalThis.scrollY - popup.root.clientHeight,
+    );
+    popup.root.style.left = `${Math.max(x, 0)}px`;
+    popup.root.style.top = `${Math.max(y, 0)}px`;
+  }
+
+  pointer_event(e_, right_click) {
+    if (this.pointer_device.is_touch_device) {
+      const touch = this.pointer_device;
+      e_.addEventListener('touchstart', (event_) => {
+        touch.x = event_.touches[0].pageX;
+        touch.y = event_.touches[0].pageY;
+
+        if (touch.long_press_callback) {
+          clearTimeout(touch.long_press_callback);
+          touch.long_press_callback = null;
+        } else {
+          touch.long_press_callback = setTimeout(() => {
+            if (event_.touches.length === 1) {
+              right_click(event_);
+            }
+          }, 500);
+        }
+      });
+      e_.addEventListener('touchend', () => {
+        clearTimeout(touch.long_press_callback);
+        touch.long_press_callback = null;
+        setTimeout(() => {
+          const popup = this.popup[Transmission.default_popup_level];
+          if (popup) {
+            popup.root.style.pointerEvents = 'auto';
+          }
+        }, 1);
+      });
+      e_.addEventListener('touchmove', (event_) => {
+        touch.x = event_.touches[0].pageX;
+        touch.y = event_.touches[0].pageY;
+
+        clearTimeout(touch.long_press_callback);
+        touch.long_press_callback = null;
+      });
+      e_.addEventListener('contextmenu', (event_) => {
+        event_.preventDefault();
+      });
+    } else {
+      e_.addEventListener('mousemove', (event_) => {
+        this.pointer_device.x = event_.pageX;
+        this.pointer_device.y = event_.pageY;
+      });
+      e_.addEventListener('contextmenu', (event_) => {
+        right_click(event_);
+        const popup = this.popup[Transmission.default_popup_level];
+        if (popup) {
+          popup.root.style.pointerEvents = 'auto';
+        }
+      });
+    }
+  }
+
   /// UTILITIES
+
+  static get max_popups() {
+    return 2;
+  }
+
+  static get default_popup_level() {
+    return Transmission.max_popups - 1;
+  }
 
   _getAllTorrents() {
     return Object.values(this._torrents);
@@ -530,8 +650,8 @@ export class Transmission extends EventTarget {
     }
 
     const esc_key = keyCode === 27; // esc key pressed
-    if (esc_key && this.popup) {
-      this.setCurrentPopup(null);
+    if (esc_key && this.popup.some(Boolean)) {
+      this.setCurrentPopup(null, 0);
       event_.preventDefault();
       return;
     }
@@ -678,8 +798,15 @@ export class Transmission extends EventTarget {
   }
 
   _setFilterText(search) {
-    this.filterText = search ? search.trim() : null;
-    this.refilterAllSoon();
+    clearTimeout(this.busytyping);
+    this.busytyping = setTimeout(
+      () => {
+        this.busytyping = false;
+        this.filterText = search.trim();
+        this.refilterAllSoon();
+      },
+      search ? 250 : 0,
+    );
   }
 
   _onTorrentChanged(event_) {
@@ -776,22 +903,8 @@ TODO: fix this when notifications get fixed
     const meta_key = event_.metaKey || event_.ctrlKey,
       { row } = event_.currentTarget;
 
-    if (this.popup && this.popup.name !== 'inspector') {
+    if (this.popup[Transmission.default_popup_level]) {
       this.setCurrentPopup(null);
-    }
-
-    // handle the per-row pause/resume button
-    if (event_.target.classList.contains('torrent-pauseresume-button')) {
-      switch (event_.target.dataset.action) {
-        case 'pause':
-          this._stopTorrents([row.getTorrent()]);
-          break;
-        case 'resume':
-          this._startTorrents([row.getTorrent()]);
-          break;
-        default:
-          break;
-      }
     }
 
     // Prevents click carrying to parent element
@@ -801,7 +914,7 @@ TODO: fix this when notifications get fixed
     if (event_.shiftKey) {
       this._selectRange(row);
       // Need to deselect any selected text
-      window.focus();
+      globalThis.focus();
 
       // Apple-Click, not selected
     } else if (!row.isSelected() && meta_key) {
@@ -833,12 +946,10 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  _removeSelectedTorrents(trash) {
+  _removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
-      this.setCurrentPopup(
-        new RemoveDialog({ remote: this.remote, torrents, trash }),
-      );
+      this.setCurrentPopup(new RemoveDialog({ remote: this.remote, torrents }));
     }
   }
 
@@ -920,13 +1031,13 @@ TODO: fix this when notifications get fixed
   ///
 
   _updateGuiFromSession(o) {
-    const [, version, checksum] = o.version.match(/(.*)\s\(([\da-f]+)\)/);
+    const [, version, checksum] = o.version.match(/^(.*)\s\(([\da-f]+)\)/);
     this.version_info = {
       checksum,
       version,
     };
 
-    const element = document.querySelector('#toolbar-overflow');
+    const element = document.querySelector('#turtle');
     element.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
   }
 
@@ -944,8 +1055,8 @@ TODO: fix this when notifications get fixed
     );
     const string = fmt.countString('Transfer', 'Transfers', this._rows.length);
 
-    setTextContent(document.querySelector('#speed-up-label'), fmt.speedBps(u));
-    setTextContent(document.querySelector('#speed-dn-label'), fmt.speedBps(d));
+    setTextContent(this.speed.down, fmt.speedBps(d));
+    setTextContent(this.speed.up, fmt.speedBps(u));
     setTextContent(document.querySelector('#filter-count'), string);
   }
 
@@ -959,24 +1070,29 @@ TODO: fix this when notifications get fixed
 
   _updateFilterSelect() {
     const trackers = this._getTrackerCounts();
-    const sitenames = Object.keys(trackers).sort();
+    const sitenames = Object.keys(trackers).toSorted();
 
-    // build the new html
-    let string = '';
-    string += this.filterTracker
-      ? '<option value="all">All</option>'
-      : '<option value="all" selected="selected">All</option>';
-    for (const sitename of sitenames) {
-      string += `<option value="${sitename}"`;
-      if (sitename === this.filterTracker) {
-        string += ' selected="selected"';
+    // Update select box only when list of trackers has changed
+    if (
+      sitenames.length !== this.oldTrackers.length ||
+      sitenames.some((ele, idx) => ele !== this.oldTrackers[idx])
+    ) {
+      this.oldTrackers = sitenames;
+
+      const a = [
+        ['All', Prefs.FilterAll, !this.filterTracker],
+        ...sitenames.map((sitename) => [
+          Transmission._displayName(sitename),
+          sitename,
+          sitename === this.filterTracker,
+        ]),
+      ];
+
+      const e = document.querySelector('#filter-tracker');
+      while (e.firstChild) {
+        e.lastChild.remove();
       }
-      string += `>${Transmission._displayName(sitename)}</option>`;
-    }
-
-    if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
-      this.filterTrackersStr = string;
-      document.querySelector('#filter-tracker').innerHTML = string;
+      newOpts(e, null, a);
     }
   }
 
@@ -1006,6 +1122,9 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
+    // TODO: This regex is wrong and is about to be removed in https://github.com/transmission/transmission/pull/7008,
+    // so it is left alone for now.
+    // eslint-disable-next-line sonarjs/slow-regex
     const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
@@ -1032,6 +1151,9 @@ TODO: fix this when notifications get fixed
       }
       this._rows = [];
       this.dirtyTorrents = new Set(Object.keys(this._torrents));
+
+      document.querySelector('#reset').style.display =
+        this.filterText.length > 0 ? 'block' : 'none';
     }
 
     // rows that overlap with dirtyTorrents need to be refiltered.
@@ -1137,7 +1259,7 @@ TODO: fix this when notifications get fixed
     const e = document.querySelector('#filter-tracker');
     e.value = sitename;
 
-    this.filterTracker = sitename;
+    this.filterTracker = sitename === Prefs.FilterAll ? '' : sitename;
     this.refilterAllSoon();
   }
 
@@ -1156,23 +1278,25 @@ TODO: fix this when notifications get fixed
 
   ///
 
-  popupCloseListener(event_) {
-    if (event_.target !== this.popup) {
-      throw new Error(event_);
-    }
-    this.popup.removeEventListener('close', this.boundPopupCloseListener);
-    delete this.popup;
-  }
-
-  setCurrentPopup(popup) {
-    if (this.popup) {
-      this.popup.close();
+  setCurrentPopup(popup, level = Transmission.default_popup_level) {
+    for (let index = level; index < Transmission.max_popups; index++) {
+      if (this.popup[index]) {
+        this.popup[index].close();
+      }
     }
 
-    this.popup = popup;
+    this.popup[level] = popup;
 
-    if (this.popup) {
-      this.popup.addEventListener('close', this.boundPopupCloseListener);
+    if (this.popup[level]) {
+      const listener = () => {
+        if (this.popup[level]) {
+          this.popup[level].removeEventListener('close', listener);
+          this.popup[level] = null;
+        }
+      };
+      this.popup[level].addEventListener('close', listener);
+    } else if (this.handler) {
+      this.handler.classList.remove('selected');
     }
   }
 }

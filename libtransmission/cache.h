@@ -56,15 +56,15 @@ private:
 
     [[nodiscard]] static Key make_key(tr_torrent const& tor, tr_block_info::Location loc) noexcept;
 
-    [[nodiscard]] static std::pair<CIter, CIter> find_biggest_span(CIter begin, CIter end) noexcept;
+    [[nodiscard]] static std::pair<CIter, CIter> find_biggest_span(CIter const& begin, CIter const& end) noexcept;
 
-    [[nodiscard]] static CIter find_span_end(CIter span_begin, CIter end) noexcept;
+    [[nodiscard]] static CIter find_span_end(CIter const& span_begin, CIter const& end) noexcept;
 
     // @return any error code from tr_ioWrite()
-    [[nodiscard]] int write_contiguous(CIter begin, CIter end) const;
+    [[nodiscard]] int write_contiguous(CIter const& begin, CIter const& end) const;
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_span(CIter begin, CIter end);
+    [[nodiscard]] int flush_span(CIter const& begin, CIter const& end);
 
     // @return any error code from writeContiguous()
     [[nodiscard]] int flush_biggest();
@@ -81,7 +81,7 @@ private:
 
     tr_torrents const& torrents_;
 
-    Blocks blocks_ = {};
+    Blocks blocks_;
     size_t max_blocks_ = 0;
 
     mutable size_t disk_writes_ = 0;

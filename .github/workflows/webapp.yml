@@ -59,11 +59,10 @@ jobs:
     steps:
       - name: Get source
         uses: actions/checkout@v4
-      - name: Get dependencies
-        run: |
-          set -e # abort if any command fails
-          sudo apt-get update
-          sudo apt-get install -y npm
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Check for style diffs
         id: check-for-diffs
         run: |
@@ -111,6 +110,7 @@ jobs:
           echo
           echo Please undo your changes to these files:
           git diff --exit-code --name-only --merge-base "origin/$GITHUB_BASE_REF" -- \
+              web/package.json.buildonly \
               web/public_html/transmission-app.css \
               web/public_html/transmission-app.css.LEGAL.txt \
               web/public_html/transmission-app.css.map \
@@ -126,10 +126,10 @@ jobs:
       - name: Show env
         run: |
           env | sort
-      - name: Get dependencies
-        run: |
-          set -e # abort if any command fails
-          sudo apt-get install -y npm
+      - name: Get NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
       - name: Get source
         uses: actions/checkout@v4
         with:
@@ -140,6 +140,7 @@ jobs:
           set -e # abort if any command fails
           npm --prefix web ci
           npm --prefix web run build
+          npm --prefix web run generate-buildonly
           git diff --name-only
           git add --update web
       - name: Create pull request

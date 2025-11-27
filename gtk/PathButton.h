@@ -7,8 +7,6 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/propertyproxy.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
@@ -33,9 +31,11 @@ class PathButton : public IF_GTKMM4(Gtk::Button, Gtk::FileChooserButton)
 public:
     PathButton();
     PathButton(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder);
+    PathButton(PathButton&&) = delete;
+    PathButton(PathButton const&) = delete;
+    PathButton& operator=(PathButton&&) = delete;
+    PathButton& operator=(PathButton const&) = delete;
     ~PathButton() override;
-
-    TR_DISABLE_COPY_MOVE(PathButton)
 
     void set_shortcut_folders(std::list<std::string> const& value);
 

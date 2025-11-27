@@ -29,12 +29,17 @@
 namespace libtransmission::test
 {
 
-std::string getTestProgramPath(std::string const& filename)
+namespace
 {
-    auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front().data());
+
+std::string getTestProgramPath(std::string_view const filename)
+{
+    auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front());
     auto const exe_dir = tr_sys_path_dirname(exe_path);
     return fmt::format("{:s}/{:s}", exe_dir, filename);
 }
+
+} // unnamed namespace
 
 class SubprocessTest
     : public ::testing::Test

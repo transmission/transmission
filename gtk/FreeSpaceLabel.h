@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/tr-macros.h>
-
 #include <glibmm/refptr.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/label.h>
@@ -23,9 +21,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::string_view dir = {});
+    FreeSpaceLabel(FreeSpaceLabel&&) = delete;
+    FreeSpaceLabel(FreeSpaceLabel const&) = delete;
+    FreeSpaceLabel& operator=(FreeSpaceLabel&&) = delete;
+    FreeSpaceLabel& operator=(FreeSpaceLabel const&) = delete;
     ~FreeSpaceLabel() override;
-
-    TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
     void set_dir(std::string_view dir);
 

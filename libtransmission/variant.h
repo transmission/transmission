@@ -30,15 +30,16 @@
 struct tr_variant
 {
 public:
-    enum Type : size_t
+    enum Type : uint8_t
     {
-        NoneIndex = 0,
-        BoolIndex = 1,
-        IntIndex = 2,
-        DoubleIndex = 3,
-        StringIndex = 4,
-        VectorIndex = 5,
-        MapIndex = 6
+        NoneIndex,
+        NullIndex,
+        BoolIndex,
+        IntIndex,
+        DoubleIndex,
+        StringIndex,
+        VectorIndex,
+        MapIndex
     };
 
     using Vector = std::vector<tr_variant>;
@@ -48,7 +49,7 @@ public:
     public:
         Map() = default;
 
-        Map(size_t const n_reserve)
+        explicit Map(size_t const n_reserve)
         {
             vec_.reserve(n_reserve);
         }
@@ -192,18 +193,19 @@ public:
     };
 
     constexpr tr_variant() noexcept = default;
+    ~tr_variant() = default;
     tr_variant(tr_variant const&) = delete;
     tr_variant(tr_variant&& that) noexcept = default;
     tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
-    tr_variant(Val&& value)
+    tr_variant(Val&& value) // NOLINT(bugprone-forwarding-reference-overload, google-explicit-constructor)
     {
         *this = std::forward<Val>(value);
     }
 
-    [[nodiscard]] static auto make_map(size_t const n_reserve = 0U) noexcept
+    [[nodiscard]] static auto make_map(size_t const n_reserve = 0U)
     {
         auto ret = tr_variant{};
         ret.val_.emplace<Map>(n_reserve);
@@ -219,13 +221,13 @@ public:
 
     [[nodiscard]] static auto make_raw(void const* value, size_t n_bytes)
     {
-        return tr_variant{ std::string{ static_cast<char const*>(value), n_bytes } };
+        return tr_variant{ std::string_view{ reinterpret_cast<char const*>(value), n_bytes } };
     }
 
     template<typename CharSpan>
     [[nodiscard]] static auto make_raw(CharSpan const& value)
     {
-        static_assert(sizeof(CharSpan::value_type) == 1U);
+        static_assert(sizeof(typename CharSpan::value_type) == 1U);
         return make_raw(std::data(value), std::size(value));
     }
 
@@ -239,7 +241,11 @@ public:
     template<typename Val>
     tr_variant& operator=(Val value)
     {
-        if constexpr (std::is_same_v<Val, std::string_view>)
+        if constexpr (std::is_same_v<Val, std::nullptr_t>)
+        {
+            val_.emplace<std::nullptr_t>(value);
+        }
+        else if constexpr (std::is_same_v<Val, std::string_view>)
         {
             val_.emplace<StringHolder>(std::string{ value });
         }
@@ -377,10 +383,14 @@ private:
     {
     public:
         StringHolder() = default;
+        ~StringHolder() = default;
         explicit StringHolder(std::string&& str) noexcept;
-        explicit StringHolder(StringHolder&& that) noexcept;
+        StringHolder(StringHolder&& that) noexcept;
+        StringHolder(StringHolder const&) = delete;
         void set_unmanaged(std::string_view sv);
         StringHolder& operator=(StringHolder&& that) noexcept;
+        StringHolder& operator=(StringHolder const&) = delete;
+
         std::string_view sv_;
 
     private:
@@ -392,6 +402,7 @@ private:
     public:
         explicit Merge(tr_variant& tgt);
         void operator()(std::monostate const& src);
+        void operator()(std::nullptr_t const& src);
         void operator()(bool const& src);
         void operator()(int64_t const& src);
         void operator()(double const& src);
@@ -403,7 +414,7 @@ private:
         tr_variant& tgt_;
     };
 
-    std::variant<std::monostate, bool, int64_t, double, StringHolder, Vector, Map> val_;
+    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };
 
 template<>
@@ -554,12 +565,12 @@ public:
     // ---
 
     // Tracks errors when parsing / saving
-    tr_error error_ = {};
+    tr_error error_;
 
 private:
     friend tr_variant;
 
-    enum class Type
+    enum class Type : uint8_t
     {
         Benc,
         Json
@@ -567,6 +578,7 @@ private:
 
     struct WalkFuncs
     {
+        void (*null_func)(tr_variant const& var, std::nullptr_t val, void* user_data);
         void (*int_func)(tr_variant const& var, int64_t val, void* user_data);
         void (*bool_func)(tr_variant const& var, bool val, void* user_data);
         void (*double_func)(tr_variant const& var, double val, void* user_data);
@@ -576,7 +588,7 @@ private:
         void (*container_end_func)(tr_variant const& var, void* user_data);
     };
 
-    tr_variant_serde(Type type)
+    explicit tr_variant_serde(Type type)
         : type_{ type }
     {
     }

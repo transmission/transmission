@@ -312,19 +312,18 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
     auto const seed_ratio_limit = tor.getSeedRatioLimit();
     if ((seed_ratio_limit && tor.isSeeding()) || tor.isDownloading())
     {
+        str += QStringLiteral("    ");
         if (tor.hasETA())
         {
             //: Second (optional) part of torrent progress string,
             //: %1 is duration,
             //: notice that leading space (before the dash) is included here
-            str += QStringLiteral("    ");
             str += tr("%1 left").arg(Formatter::time_to_string(tor.getETA()));
         }
         else
         {
             //: Second (optional) part of torrent progress string,
             //: notice that leading space (before the dash) is included here
-            str += QStringLiteral("    ");
             str += tr("Remaining time unknown");
         }
     }
@@ -419,8 +418,10 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
     auto const m = margin(*QApplication::style());
-    auto const layout = ItemLayout{ tor.name(),  progressString(tor), statusString(tor), QIcon{},
-                                    option.font, option.direction,    QPoint{ 0, 0 },    option.rect.width() - m.width() * 2 };
+    auto const layout = ItemLayout{
+        tor.name(),  progressString(tor), statusString(tor), QIcon{},
+        option.font, option.direction,    QPoint{ 0, 0 },    option.rect.width() - (m.width() * 2)
+    };
     return layout.size() + m * 2;
 }
 
@@ -481,8 +482,8 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
         progress_bar_style_.direction = option.direction;
         progress_bar_style_.progress = static_cast<int>(
             progress_bar_style_.minimum +
-            (is_magnet ? tor.metadataPercentDone() : tor.percentDone()) *
-                (progress_bar_style_.maximum - progress_bar_style_.minimum));
+            ((is_magnet ? tor.metadataPercentDone() : tor.percentDone()) *
+             (progress_bar_style_.maximum - progress_bar_style_.minimum)));
     }
 }
 
@@ -594,7 +595,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    StyleHelper::drawProgressBar(*painter, progress_bar_style_);
 
     painter->restore();
 }

@@ -7,11 +7,13 @@
 license: Apache-2.0 license
 
 - horizontal-rule.svg
-- pause-circle-active.svg
-- pause-circle-idle.svg
-- play-circle-active.svg
-- play-circle-idle.svg
 - router.svg
+
+## [Twemoji](https://github.com/twitter/twemoji/blob/master/assets/svg/1f422.svg) (derived from)
+
+license: CC-BY 4.0
+
+- turtle.svg
 
 ## [Feather Icons](https://github.com/feathericons/feather)
 
@@ -51,5 +53,3 @@ license: MIT
 - toolbar-info.png
 - toolbar-pause.png
 - toolbar-start.png
-- modern-tortoise.png
-- modern-tortoise-blue.png

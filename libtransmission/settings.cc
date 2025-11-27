@@ -3,15 +3,20 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t, uint32_t
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
+
+#include <small/set.hpp>
+#include <small/vector.hpp>
 
 #include "libtransmission/transmission.h"
 
@@ -283,50 +288,91 @@ auto constexpr PreferredTransportKeys = Lookup<tr_preferred_transport, TR_NUM_PR
     { "tcp", TR_PREFER_TCP },
 } };
 
-bool load_preferred_transport(tr_variant const& src, tr_preferred_transport* tgt)
+bool load_preferred_transport(
+    tr_variant const& src,
+    small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>* tgt)
 {
-    static constexpr auto& Keys = PreferredTransportKeys;
-
-    if (auto const val = src.value_if<std::string_view>())
+    static auto constexpr LoadSingle = [](tr_variant const& var)
     {
-        auto const needle = tr_strlower(tr_strv_strip(*val));
+        static constexpr auto& Keys = PreferredTransportKeys;
 
-        for (auto const& [name, value] : Keys)
+        if (auto const val = var.value_if<std::string_view>())
         {
-            if (name == needle)
+            auto const needle = tr_strlower(tr_strv_strip(*val));
+
+            for (auto const& [name, value] : Keys)
             {
-                *tgt = value;
-                return true;
+                if (name == needle)
+                {
+                    return value;
+                }
             }
         }
-    }
 
-    if (auto const val = src.value_if<int64_t>())
-    {
-        for (auto const& [name, value] : Keys)
+        if (auto const val = var.value_if<int64_t>())
         {
-            if (value == *val)
+            if (auto const i = *val; i >= 0 && i < TR_NUM_PREFERRED_TRANSPORT)
             {
-                *tgt = value;
-                return true;
+                return static_cast<tr_preferred_transport>(i);
             }
         }
+
+        return TR_NUM_PREFERRED_TRANSPORT;
+    };
+
+    if (auto* const l = src.get_if<tr_variant::Vector>(); l != nullptr)
+    {
+        auto tmp = small::max_size_unordered_set<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{};
+        tmp.reserve(tmp.max_size());
+
+        for (size_t i = 0, n = std::min(std::size(*l), tmp.max_size()); i < n; ++i)
+        {
+            auto const value = LoadSingle((*l)[i]);
+            if (value >= TR_NUM_PREFERRED_TRANSPORT || !tmp.insert(value).second)
+            {
+                return false;
+            }
+        }
+
+        // N.B. As of small 0.2.2, small::max_size_unordered_set preserves insertion order,
+        // so we can directly copy the elements
+        tgt->assign(std::begin(tmp), std::end(tmp));
+        return true;
     }
 
-    return false;
+    auto const preferred = LoadSingle(src);
+    if (preferred >= TR_NUM_PREFERRED_TRANSPORT)
+    {
+        return false;
+    }
+
+    tgt->assign(1U, preferred);
+    return true;
 }
 
-tr_variant save_preferred_transport(tr_preferred_transport const& val)
+tr_variant save_preferred_transport(small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> const& val)
 {
-    for (auto const& [key, value] : PreferredTransportKeys)
+    static auto constexpr SaveSingle = [](tr_preferred_transport const ele) -> tr_variant
     {
-        if (value == val)
+        for (auto const& [key, value] : PreferredTransportKeys)
         {
-            return key;
+            if (value == ele)
+            {
+                return key;
+            }
         }
+
+        return ele;
+    };
+
+    auto ret = tr_variant::Vector{};
+    ret.reserve(std::size(val));
+    for (auto const ele : val)
+    {
+        ret.emplace_back(SaveSingle(ele));
     }
 
-    return static_cast<int64_t>(val);
+    return ret;
 }
 
 // ---
@@ -363,6 +409,30 @@ bool load_string(tr_variant const& src, std::string* tgt)
 tr_variant save_string(std::string const& val)
 {
     return val;
+}
+
+// ---
+
+bool load_nullable_string(tr_variant const& src, std::optional<std::string>* tgt)
+{
+    if (src.holds_alternative<std::nullptr_t>())
+    {
+        tgt->reset();
+        return true;
+    }
+
+    if (auto const val = src.value_if<std::string_view>())
+    {
+        *tgt = std::string{ *val };
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant save_nullable_string(std::optional<std::string> const& val)
+{
+    return val ? tr_variant{ *val } : nullptr;
 }
 
 // ---
@@ -461,6 +531,7 @@ Settings::Settings()
     add_type_handler(load_preferred_transport, save_preferred_transport);
     add_type_handler(load_size_t, save_size_t);
     add_type_handler(load_string, save_string);
+    add_type_handler(load_nullable_string, save_nullable_string);
     add_type_handler(load_tos_t, save_tos_t);
     add_type_handler(load_verify_added_mode, save_verify_added_mode);
 }
@@ -484,10 +555,65 @@ void Settings::load(tr_variant const& src)
     }
 }
 
-tr_variant Settings::save() const
+bool Settings::load_single(tr_quark const key, tr_variant const& src)
 {
-    auto const fields = const_cast<Settings*>(this)->fields();
+    auto const fields = this->fields();
+    auto const field_it = std::lower_bound(
+        std::begin(fields),
+        std::end(fields),
+        key,
+        [](Field const& f, tr_quark k) { return f.key < k; });
+    if (field_it == std::end(fields) || field_it->key != key)
+    {
+        return false;
+    }
 
+    auto const type_index = std::type_index{ field_it->type };
+    TR_ASSERT(load_.count(type_index) == 1U);
+    return load_.at(type_index)(src, field_it->ptr);
+}
+
+tr_variant::Map Settings::save_partial(std::vector<tr_quark> quarks) const
+{
+    static constexpr struct
+    {
+        constexpr bool operator()(Field const& lhs, tr_quark const rhs) const noexcept
+        {
+            return lhs.key < rhs;
+        }
+
+        constexpr bool operator()(tr_quark const lhs, Field const& rhs) const noexcept
+        {
+            return lhs < rhs.key;
+        }
+    } Compare;
+
+    auto const fields = const_cast<Settings*>(this)->fields();
+    auto to_save = Fields{};
+    to_save.reserve(std::min(std::size(quarks), std::size(fields)));
+
+    // N.B. `fields` is supposed to be unique and sorted, so we don't need to sort it,
+    // and we don't need to worry about duplicates in `to_save`
+    std::sort(std::begin(quarks), std::end(quarks));
+    std::set_intersection(
+        std::begin(fields),
+        std::end(fields),
+        std::begin(quarks),
+        std::end(quarks),
+        std::back_inserter(to_save),
+        Compare);
+
+    return save_impl(to_save);
+}
+
+tr_variant Settings::save_single(tr_quark quark) const
+{
+    auto map = save_partial({ quark });
+    return std::empty(map) ? tr_variant{} : std::move(std::begin(map)->second);
+}
+
+tr_variant::Map Settings::save_impl(libtransmission::Settings::Fields const& fields) const
+{
     auto map = tr_variant::Map{ std::size(fields) };
 
     for (auto const& field : fields)

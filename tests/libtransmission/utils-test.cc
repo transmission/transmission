@@ -19,7 +19,7 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
@@ -262,7 +262,7 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_pathbuf{};
 
     // save a file to GoogleTest's temp dir
-    auto const sandbox = libtransmission::test::Sandbox::create_sandbox(::testing::TempDir(), "transmission-test-XXXXXX");
+    auto const sandbox = libtransmission::test::Sandbox::createSandbox(::testing::TempDir(), "transmission-test-XXXXXX");
     filename.assign(sandbox, "filename.txt"sv);
     auto contents = "these are the contents"sv;
     auto error = tr_error{};
@@ -308,13 +308,13 @@ TEST_F(UtilsTest, ratioToString)
                                                                                          { TR_RATIO_INF, "inf" } } };
     char const nullchar = '\0';
 
-    ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
-    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "A bit longer text for infinity"), "A bit longer text for infinity");
+    ASSERT_EQ(tr_strratio(TR_RATIO_NA, "None", "Ratio is NaN"), "None");
+    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "None", "A bit longer text for infinity"), "A bit longer text for infinity");
     // Inf contains only null character
-    ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
+    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "None", &nullchar), "");
 
     for (auto const& [input, expected] : Tests)
     {
-        ASSERT_EQ(tr_strratio(input, "inf"), expected);
+        ASSERT_EQ(tr_strratio(input, "None", "inf"), expected);
     }
 }

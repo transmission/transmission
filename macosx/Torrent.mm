@@ -1038,7 +1038,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
                                        [NSString percentString:self.fStat->metadataPercentComplete longDecimals:YES]] :
             NSLocalizedString(@"torrent metadata needed", "Torrent -> progress string");
 
-        return [NSString stringWithFormat:@"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"), progressString];
+        return [NSString stringWithFormat:@"%@ — %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"), progressString];
     }
 
     NSString* string;
@@ -1090,7 +1090,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     //add time when downloading or seed limit set
     if (self.shouldShowEta)
     {
-        string = [string stringByAppendingFormat:@" - %@", self.etaString];
+        string = [string stringByAppendingFormat:@" — %@", self.etaString];
     }
 
     return string;
@@ -1216,7 +1216,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     {
         if (self.fStat->activity == TR_STATUS_DOWNLOAD)
         {
-            string = [string stringByAppendingFormat:@" - %@: %@, %@: %@",
+            string = [string stringByAppendingFormat:@" — %@: %@, %@: %@",
                                                      NSLocalizedString(@"DL", "Torrent -> status string"),
                                                      [NSString stringForSpeed:self.downloadRate],
                                                      NSLocalizedString(@"UL", "Torrent -> status string"),
@@ -1224,7 +1224,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
         }
         else
         {
-            string = [string stringByAppendingFormat:@" - %@: %@",
+            string = [string stringByAppendingFormat:@" — %@: %@",
                                                      NSLocalizedString(@"UL", "Torrent -> status string"),
                                                      [NSString stringForSpeed:self.uploadRate]];
         }
@@ -1547,7 +1547,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return canChange;
 }
 
-- (NSInteger)checkForFiles:(NSIndexSet*)indexSet
+- (NSControlStateValue)checkForFiles:(NSIndexSet*)indexSet
 {
     BOOL onState = NO, offState = NO;
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index])
@@ -1570,7 +1570,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return onState ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
-- (void)setFileCheckState:(NSInteger)state forIndexes:(NSIndexSet*)indexSet
+- (void)setFileCheckState:(NSControlStateValue)state forIndexes:(NSIndexSet*)indexSet
 {
     NSUInteger count = indexSet.count;
     tr_file_index_t* files = static_cast<tr_file_index_t*>(malloc(count * sizeof(tr_file_index_t)));

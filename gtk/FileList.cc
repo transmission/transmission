@@ -32,7 +32,7 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <memory>
@@ -101,9 +101,11 @@ public:
         Glib::ustring const& view_name,
         Glib::RefPtr<Session> const& core,
         tr_torrent_id_t torrent_id);
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
     ~Impl();
-
-    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_torrent(tr_torrent_id_t torrent_id);
     void reset_torrent();
@@ -852,7 +854,7 @@ void FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         auto w = std::make_shared<Gtk::MessageDialog>(
             gtr_widget_get_window(widget_),
             fmt::format(
-                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
                 fmt::arg("old_path", path_string),
                 fmt::arg("path", newname),
                 fmt::arg("error", tr_strerror(error)),

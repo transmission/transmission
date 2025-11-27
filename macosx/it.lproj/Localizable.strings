@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "verificati %@";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -43,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu file";
+
+/* quicklook file header */
+/* "%lu Files" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu in arrivo";
@@ -79,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu server traccia";
 
+/* quicklook tracker header */
+/* "%lu Trackers" = ""; */
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -86,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu seeder web";
+
+/* quicklook web seed header */
+/* "%lu Web Seeds" = ""; */
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u parti, %2$@ ciascuna";
@@ -111,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 volta";
 
+/* quicklook tracker header */
+/* "1 Tracker" = ""; */
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 trasferimento";
+
+/* quicklook web seed header */
+/* "1 Web Seed" = ""; */
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" non è un file torrent valido.";
@@ -278,6 +293,15 @@
 /* Create toolbar item -> palette label
    Create torrent -> select file */
 "Create Torrent File" = "Crea file torrent";
+
+/* quicklook creation info */
+/* "Created on %@" = ""; */
+
+/* quicklook creation info */
+/* "Created on %@ with %@" = ""; */
+
+/* quicklook creation info */
+/* "Created with %@" = ""; */
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creazione di \"%@\" fallita.";
@@ -503,9 +527,6 @@
 
 /* About window -> license button */
 "License" = "Licenza";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limitata (%ld KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Il registro non può essere salvato";
@@ -914,9 +935,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statistiche";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Ferma al rapporto (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Interrompi attesa per iniziare";

@@ -94,7 +94,7 @@ void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
     port_test_pending_[ip_protocol] = true;
 
     auto args = tr_variant::make_map(1U);
-    tr_variantDictAddStrView(&args, TR_KEY_ipProtocol, IpStr[ip_protocol]);
+    tr_variantDictAddStrView(&args, TR_KEY_ip_protocol, IpStr[ip_protocol]);
 
     auto const response_func = [this, ip_protocol](RpcResponse const& r)
     {
@@ -360,7 +360,7 @@ void Session::start()
         }
         url.setHost(prefs_.get<QString>(Prefs::SESSION_REMOTE_HOST));
         url.setPort(prefs_.get<int>(Prefs::SESSION_REMOTE_PORT));
-        url.setPath(QStringLiteral("/transmission/rpc"));
+        url.setPath(prefs_.get<QString>(Prefs::SESSION_REMOTE_RPC_URL_PATH));
 
         if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
         {

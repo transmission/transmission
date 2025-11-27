@@ -6,7 +6,7 @@
 #include <cstdint> // int64_t
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/benc.h>
 #include <libtransmission/error.h>

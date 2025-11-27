@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/tr-getopt.h"
 #include "libtransmission/utils.h"
@@ -21,19 +21,18 @@ int tr_optind = 1;
 
 namespace
 {
-[[nodiscard]] constexpr std::string_view getArgName(tr_option const* opt)
+[[nodiscard]] std::string getArgName(tr_option const* opt)
 {
-    if (!opt->has_arg)
+    auto const* const arg_name = opt->argName != nullptr ? opt->argName : "<args>";
+    switch (opt->arg)
     {
-        return ""sv;
+    case tr_option::Arg::None:
+        return ""s;
+    case tr_option::Arg::Optional:
+        return fmt::format("[{}]", arg_name);
+    default: // tr_option::Arg::Required
+        return arg_name;
     }
-
-    if (opt->argName != nullptr)
-    {
-        return opt->argName;
-    }
-
-    return "<args>"sv;
 }
 
 [[nodiscard]] constexpr size_t get_next_line_len(std::string_view description, size_t maxlen)
@@ -113,7 +112,7 @@ tr_option const* findOption(tr_option const* opts, char const* str, char const**
         size_t len = o->longName != nullptr ? strlen(o->longName) : 0;
 
         if (matchlen < len && str[0] == '-' && str[1] == '-' && strncmp(str + 2, o->longName, len) == 0 &&
-            (str[len + 2] == '\0' || (o->has_arg && str[len + 2] == '=')))
+            (str[len + 2] == '\0' || (o->has_arg() && str[len + 2] == '=')))
         {
             matchlen = len;
             match = o;
@@ -122,7 +121,8 @@ tr_option const* findOption(tr_option const* opts, char const* str, char const**
 
         len = o->shortName != nullptr ? strlen(o->shortName) : 0;
 
-        if (matchlen < len && str[0] == '-' && strncmp(str + 1, o->shortName, len) == 0 && (str[len + 1] == '\0' || o->has_arg))
+        if (matchlen < len && str[0] == '-' && strncmp(str + 1, o->shortName, len) == 0 &&
+            (str[len + 1] == '\0' || o->has_arg()))
         {
             matchlen = len;
             match = o;
@@ -165,7 +165,7 @@ void tr_getopt_usage(char const* app_name, char const* description, struct tr_op
         maxWidth(o, long_width, short_width, arg_width);
     }
 
-    auto const help = tr_option{ -1, "help", "Display this help page and exit", "h", false, nullptr };
+    auto const help = tr_option{ -1, "help", "Display this help page and exit", "h", tr_option::Arg::None, nullptr };
     maxWidth(&help, long_width, short_width, arg_width);
 
     if (description == nullptr)
@@ -215,7 +215,7 @@ int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option co
         return TR_OPT_UNK;
     }
 
-    if (!o->has_arg)
+    if (!o->has_arg())
     {
         /* no argument needed for this option, so we're done */
         if (arg != nullptr)
@@ -223,28 +223,28 @@ int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option co
             return TR_OPT_ERR;
         }
 
-        *setme_optarg = nullptr;
         ++tr_optind;
         return o->val;
     }
 
-    /* option needed an argument, and it was embedded in this string */
+    ++tr_optind;
+
+    /* option allows an argument, and it was embedded in this string */
     if (arg != nullptr)
     {
         *setme_optarg = arg;
-        ++tr_optind;
         return o->val;
     }
 
-    /* throw an error if the option needed an argument but didn't get one */
-    if (++tr_optind >= argc)
+    if (tr_optind >= argc || findOption(opts, argv[tr_optind], nullptr) != nullptr)
     {
-        return TR_OPT_ERR;
-    }
+        /* throw an error if the option needed an argument but didn't get one */
+        if (o->arg == tr_option::Arg::Required)
+        {
+            return TR_OPT_ERR;
+        }
 
-    if (findOption(opts, argv[tr_optind], nullptr) != nullptr)
-    {
-        return TR_OPT_ERR;
+        return o->val;
     }
 
     *setme_optarg = argv[tr_optind++];

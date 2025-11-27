@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ verified";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld KB/s";
 
 /* Info options -> global setting */
@@ -43,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu files";
+
+/* quicklook file header */
+"%lu Files" = "%lu Files";
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu incoming";
@@ -79,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu tracker";
 
+/* quicklook tracker header */
+"%lu Trackers" = "%lu Trackers";
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -86,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu web seeds";
+
+/* quicklook web seed header */
+"%lu Web Seeds" = "%lu Web Seeds";
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u pieces, %2$@ each";
@@ -111,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 time";
 
+/* quicklook tracker header */
+"1 Tracker" = "1 Tracker";
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 transfer";
+
+/* quicklook web seed header */
+"1 Web Seed" = "1 Web Seed";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" is not a valid torrent file.";
@@ -278,6 +293,15 @@
 /* Create toolbar item -> palette label
    Create torrent -> select file */
 "Create Torrent File" = "Create Torrent File";
+
+/* quicklook creation info */
+"Created on %@" = "Created on %@";
+
+/* quicklook creation info */
+"Created on %@ with %@" = "Created on %1$@ with %2$@";
+
+/* quicklook creation info */
+"Created with %@" = "Created with %@";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creation of \"%@\" failed.";
@@ -503,9 +527,6 @@
 
 /* About window -> license button */
 "License" = "License";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limit (%ld KB/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Log Could Not Be Saved";
@@ -914,9 +935,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Statistics";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Stop at Ratio (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Stop waiting to start";

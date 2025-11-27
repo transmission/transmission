@@ -18,8 +18,7 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ перевірено";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
+/* Status Bar -> speed tooltip */
 "%ld KB/s" = "%ld КБ/с";
 
 /* Info options -> global setting */
@@ -43,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu файлів";
+
+/* quicklook file header */
+/* "%lu Files" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu вхідних";
@@ -53,7 +56,7 @@
 "%lu IP address rules in list" = "%lu IP-адрес у переліку";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu Відомо:";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu місцевих корист.";
@@ -79,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu трекер";
 
+/* quicklook tracker header */
+/* "%lu Trackers" = ""; */
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -86,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu сайтів роздачі";
+
+/* quicklook web seed header */
+/* "%lu Web Seeds" = ""; */
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u частин, %2$@ кожна";
@@ -111,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 раз";
 
+/* quicklook tracker header */
+/* "1 Tracker" = ""; */
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 роздача";
+
+/* quicklook web seed header */
+/* "1 Web Seed" = ""; */
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" не є торрент-файлом.";
@@ -218,7 +233,7 @@
 "Available" = "Доступно";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "Б/с";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Пропускна здатність";
@@ -278,6 +293,15 @@
 /* Create toolbar item -> palette label
    Create torrent -> select file */
 "Create Torrent File" = "Створити Торрент-Файл";
+
+/* quicklook creation info */
+/* "Created on %@" = ""; */
+
+/* quicklook creation info */
+/* "Created on %@ with %@" = ""; */
+
+/* quicklook creation info */
+/* "Created with %@" = ""; */
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Створення \"%@\" невдалося.";
@@ -487,7 +511,7 @@
 "KB/s" = "КБ/с";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Відомо:";
 
 /* Tracker last announce */
 "Last Announce" = "Останнє Оголошення";
@@ -503,9 +527,6 @@
 
 /* About window -> license button */
 "License" = "Ліцензія";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Обмеження (%ld КБ/с)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Журнал не може бути збережений";
@@ -559,7 +580,7 @@
 "Next announce in %@" = "Наступне оголошення через %@";
 
 /* Group table row */
-"No Group" = "Немає Групи";
+"No Group" = "Без Групи";
 
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Не вибрано жодного торенту";
@@ -694,7 +715,7 @@
 "Port is open" = "Порт відкритий";
 
 /* Inspector -> Peers tab -> table row tooltip */
-/* "Port: %@" = ""; */
+"Port: %@" = "Порт: 1%@";
 
 /* No comment provided by engineer. */
 "PrefWindowSize" = "PrefWindowSize";
@@ -894,7 +915,7 @@
 "Show the data file in Finder" = "Показати дані файла у Finder";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Показати панель інструментів";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -914,9 +935,6 @@
 
 /* Stats window -> title */
 "Statistics" = "Статистика";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Зупинити за Рейтингу (%.2f) ";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Не очікувати на початок";
@@ -1001,7 +1019,7 @@
 "This folder contains no files." = "Ця тека не містить файлів";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Ця опція недоступна, якщо Розташування за замовчуванням встановлено таке саме, як у торрент-файлі.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Роздача активна. Для відновлення роздачі після її видалення буде потрібен торрент-файл або магнет-посилання.";

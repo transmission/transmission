@@ -9,7 +9,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 /**
  * A memory buffer which uses a builtin array of N bytes, using heap
@@ -35,22 +35,31 @@ public:
 
     tr_strbuf(tr_strbuf const& other)
     {
-        assign(other.sv());
+        if (this != &other)
+        {
+            assign(other.sv());
+        }
     }
 
     tr_strbuf& operator=(tr_strbuf const& other)
     {
-        assign(other.sv());
+        if (this != &other)
+        {
+            assign(other.sv());
+        }
+
         return *this;
     }
 
-    tr_strbuf(tr_strbuf&& other)
+    tr_strbuf(tr_strbuf&& other) noexcept
         : buffer_{ std::move(other.buffer_) }
     {
         ensure_sz();
     }
 
-    tr_strbuf& operator=(tr_strbuf&& other)
+    ~tr_strbuf() = default;
+
+    tr_strbuf& operator=(tr_strbuf&& other) noexcept
     {
         buffer_ = std::move(other.buffer_);
         ensure_sz();
@@ -124,7 +133,7 @@ public:
     }
 
     template<typename ContiguousRange>
-    [[nodiscard]] constexpr auto operator==(ContiguousRange const& x) const noexcept
+    [[nodiscard]] constexpr bool operator==(ContiguousRange const& x) const noexcept
     {
         return sv() == x;
     }
@@ -262,11 +271,13 @@ public:
         join(std::basic_string_view<Char>{ sz_delim }, args...);
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator std::basic_string_view<Char>() const noexcept
     {
         return sv();
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
     [[nodiscard]] constexpr operator auto() const noexcept
     {
         return c_str();
@@ -274,6 +285,7 @@ public:
 
     bool popdir() noexcept
     {
+        // NOLINTNEXTLINE(readability-redundant-declaration): P.S. This looks like some dark magic
         std::string_view tr_sys_path_dirname(std::string_view path);
         auto const parent = tr_sys_path_dirname(sv());
         auto const changed = parent != sv();

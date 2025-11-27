@@ -14,7 +14,7 @@
 
 // ---
 
-enum tr_log_level
+enum tr_log_level : uint8_t
 {
     // No logging at all
     TR_LOG_OFF,
@@ -68,7 +68,7 @@ struct tr_log_message
 
 // ---
 
-#define TR_LOG_MAX_QUEUE_LENGTH 10000
+inline constexpr auto TrLogMaxQueueLength = 10000U;
 
 void tr_logSetQueueEnabled(bool is_enabled);
 
@@ -78,7 +78,7 @@ void tr_logFreeQueue(tr_log_message* freeme);
 
 // ---
 
-void tr_logSetLevel(tr_log_level);
+void tr_logSetLevel(tr_log_level level);
 
 [[nodiscard]] tr_log_level tr_logGetLevel();
 

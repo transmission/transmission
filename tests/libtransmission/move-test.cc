@@ -37,11 +37,14 @@ class IncompleteDirTest
 protected:
     void SetUp() override
     {
-        auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir);
-        auto const incomplete_dir = GetParam().first;
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir);
-        tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
+        if (auto* map = settings()->get_if<tr_variant::Map>(); map != nullptr)
+        {
+            auto const download_dir = GetParam().second;
+            map->insert_or_assign(TR_KEY_download_dir, download_dir);
+            auto const incomplete_dir = GetParam().first;
+            map->insert_or_assign(TR_KEY_incomplete_dir, incomplete_dir);
+            map->insert_or_assign(TR_KEY_incomplete_dir_enabled, true);
+        }
 
         SessionTest::SetUp();
     }
@@ -66,9 +69,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
     EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
 
-    // auto constexpr completeness_unset = tr_completeness { -1 };
-    // auto completeness = completeness_unset;
-    int completeness = -1;
+    auto completeness = TR_LEECH;
     auto const zeroes_completeness_func =
         [](tr_torrent* /*torrent*/, tr_completeness c, bool /*was_running*/, void* vc) noexcept
     {
@@ -122,7 +123,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     auto test = [&completeness]()
     {
-        return completeness != -1;
+        return completeness != TR_LEECH;
     };
     EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_SEED, completeness);

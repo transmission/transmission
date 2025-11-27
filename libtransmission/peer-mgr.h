@@ -24,6 +24,7 @@
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
+#include "libtransmission/variant.h"
 
 /**
  * @addtogroup peers Peers
@@ -38,7 +39,7 @@ struct tr_session;
 struct tr_torrent;
 
 /* added_f's bitwise-or'ed flags */
-enum
+enum : uint8_t
 {
     /* true if the peer supports encryption */
     ADDED_F_ENCRYPTION_FLAG = 1,
@@ -60,20 +61,29 @@ enum
 class tr_peer_info
 {
 public:
-    tr_peer_info(tr_socket_address socket_address, uint8_t pex_flags, tr_peer_from from)
+    tr_peer_info(
+        tr_socket_address socket_address,
+        uint8_t pex_flags,
+        tr_peer_from from,
+        tr_address client_external_address,
+        std::function<tr_port()> get_client_advertised_port)
         : listen_socket_address_{ socket_address }
+        , client_external_address_{ std::move(client_external_address) }
         , from_first_{ from }
         , from_best_{ from }
+        , get_client_advertised_port_{ std::move(get_client_advertised_port) }
     {
         TR_ASSERT(!std::empty(socket_address.port()));
         ++n_known_connectable;
         set_pex_flags(pex_flags);
+        update_canonical_priority();
     }
 
-    tr_peer_info(tr_address address, uint8_t pex_flags, tr_peer_from from)
+    tr_peer_info(tr_address address, uint8_t pex_flags, tr_peer_from from, std::function<tr_port()> get_client_advertised_port)
         : listen_socket_address_{ address, tr_port{} }
         , from_first_{ from }
         , from_best_{ from }
+        , get_client_advertised_port_{ std::move(get_client_advertised_port) }
     {
         set_pex_flags(pex_flags);
     }
@@ -116,14 +126,15 @@ public:
 
     void set_listen_port(tr_port port_in) noexcept
     {
-        if (!std::empty(port_in))
+        if (auto& port = listen_socket_address_.port_; !std::empty(port_in) && port_in != port)
         {
-            auto& port = listen_socket_address_.port_;
-            if (std::empty(port)) // increment known connectable peers if we did not know the listening port of this peer before
+            if (std::empty(port))
             {
+                // increment known connectable peers if we did not know the listening port of this peer before
                 ++n_known_connectable;
             }
             port = port_in;
+            update_canonical_priority();
         }
     }
 
@@ -233,7 +244,7 @@ public:
 
     // ---
 
-    constexpr auto set_connected(time_t now, bool is_connected = true) noexcept
+    constexpr auto set_connected(time_t now, bool is_connected = true, bool is_disconnecting = false) noexcept
     {
         if (is_connected_ == is_connected)
         {
@@ -252,7 +263,7 @@ public:
         {
             num_consecutive_fruitless_ = {};
         }
-        else
+        else if (is_disconnecting)
         {
             on_fruitless_connection();
         }
@@ -473,6 +484,30 @@ public:
 
     // ---
 
+    void maybe_update_canonical_priority(tr_address client_external_address)
+    {
+        if (!client_external_address.is_valid() || client_external_address.type != listen_address().type)
+        {
+            return;
+        }
+
+        if (client_external_address == client_external_address_)
+        {
+            return;
+        }
+
+        client_external_address_ = client_external_address;
+
+        update_canonical_priority();
+    }
+
+    [[nodiscard]] constexpr auto get_canonical_priority() const noexcept
+    {
+        return canonical_priority_;
+    }
+
+    // ---
+
     // merge two peer info objects that supposedly describes the same peer
     void merge(tr_peer_info& that) noexcept;
 
@@ -516,6 +551,8 @@ private:
         }
     }
 
+    void update_canonical_priority();
+
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
     static auto constexpr InactiveThresSecs = time_t{ 60 * 60 };
@@ -524,6 +561,7 @@ private:
 
     // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
     tr_socket_address listen_socket_address_;
+    tr_address client_external_address_;
 
     time_t connection_attempted_at_ = {};
     time_t connection_changed_at_ = {};
@@ -541,12 +579,17 @@ private:
     uint8_t num_consecutive_fruitless_ = {};
     uint8_t pex_flags_ = {};
 
+    // https://www.bittorrent.org/beps/bep_0040.html
+    uint32_t canonical_priority_ = {};
+
     bool is_banned_ = false;
     bool is_connected_ = false;
     bool is_seed_ = false;
     bool is_upload_only_ = false;
 
     std::unique_ptr<tr_handshake> outgoing_handshake_;
+
+    std::function<tr_port()> const get_client_advertised_port_;
 };
 
 struct tr_pex
@@ -560,7 +603,7 @@ struct tr_pex
     }
 
     template<typename OutputIt>
-    OutputIt to_compact(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const // NOLINT(modernize-use-nodiscard)
     {
         return socket_address.to_compact(out);
     }
@@ -586,6 +629,21 @@ struct tr_pex
         size_t compact_len,
         uint8_t const* added_f,
         size_t added_f_len);
+
+    [[nodiscard]] tr_variant::Map to_variant() const;
+
+    [[nodiscard]] static tr_variant::Vector to_variant(tr_pex const* pex, size_t n_pex)
+    {
+        auto ret = tr_variant::Vector{};
+        ret.reserve(n_pex);
+        for (size_t i = 0; i < n_pex; ++i)
+        {
+            ret.emplace_back(pex[i].to_variant());
+        }
+        return ret;
+    }
+
+    [[nodiscard]] static std::vector<tr_pex> from_variant(tr_variant const* var, size_t n_var);
 
     [[nodiscard]] std::string display_name() const
     {
@@ -633,17 +691,11 @@ void tr_peerMgrFree(tr_peerMgr* manager);
 
 [[nodiscard]] std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 
-[[nodiscard]] bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
-
-void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span);
-
-[[nodiscard]] size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
-
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex);
 
-enum
+enum : uint8_t
 {
     TR_PEERS_CONNECTED,
     TR_PEERS_INTERESTING

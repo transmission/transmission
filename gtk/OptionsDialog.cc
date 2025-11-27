@@ -73,9 +73,11 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
-    ~Impl() = default;
-
-    TR_DISABLE_COPY_MOVE(Impl)
+    Impl(Impl&&) = delete;
+    Impl(Impl const&) = delete;
+    Impl& operator=(Impl&&) = delete;
+    Impl& operator=(Impl const&) = delete;
+    ~Impl();
 
 private:
     void sourceChanged(PathButton* b);
@@ -101,6 +103,11 @@ private:
     Gtk::ComboBox* priority_combo_ = nullptr;
     FreeSpaceLabel* freespace_label_ = nullptr;
 };
+
+OptionsDialog::Impl::~Impl()
+{
+    removeOldTorrent();
+}
 
 void OptionsDialog::Impl::removeOldTorrent()
 {
@@ -133,10 +140,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
             }
 
             gtr_save_recent_dir("download", core_, downloadDir_);
-        }
-        else if (response == TR_GTK_RESPONSE_TYPE(CANCEL))
-        {
-            removeOldTorrent();
+            tor_ = nullptr;
         }
     }
 
@@ -427,16 +431,14 @@ TorrentUrlChooserDialog::TorrentUrlChooserDialog(
     set_transient_for(parent);
 
     auto* const e = gtr_get_widget<Gtk::Entry>(builder, "url_entry");
+    auto* const accept = get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT));
     gtr_paste_clipboard_url_into_entry(*e);
 
-    signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    set_default_widget(*accept);
+#else
+    set_default(*accept);
+#endif
 
-    if (e->get_text_length() == 0)
-    {
-        e->grab_focus();
-    }
-    else
-    {
-        get_widget_for_response(TR_GTK_RESPONSE_TYPE(ACCEPT))->grab_focus();
-    }
+    signal_response().connect([this, e, core](int response) { onOpenURLResponse(response, *e, core); });
 }

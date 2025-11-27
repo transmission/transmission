@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libdeflate.h>
 
@@ -338,6 +338,19 @@ namespace make_torrent_field_helpers
     return tr_variant{ std::move(vec) };
 }
 
+[[nodiscard]] auto make_bytes_completed_vec(tr_torrent const& tor)
+{
+    auto const n_files = tor.file_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_files);
+    tr_logAddDebug("Running bytes completed");
+    for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
+    {
+        vec.emplace_back(tr_torrentFile(&tor, idx).have);
+    }
+    return tr_variant{ std::move(vec) };
+}
+
 [[nodiscard]] auto make_file_vec(tr_torrent const& tor)
 {
     auto const n_files = tor.file_count();
@@ -347,9 +360,9 @@ namespace make_torrent_field_helpers
     {
         auto const file = tr_torrentFile(&tor, idx);
         auto file_map = tr_variant::Map{ 5U };
-        file_map.try_emplace(TR_KEY_beginPiece, file.beginPiece);
+        file_map.try_emplace(TR_KEY_begin_piece, file.beginPiece);
         file_map.try_emplace(TR_KEY_bytesCompleted, file.have);
-        file_map.try_emplace(TR_KEY_endPiece, file.endPiece);
+        file_map.try_emplace(TR_KEY_end_piece, file.endPiece);
         file_map.try_emplace(TR_KEY_length, file.length);
         file_map.try_emplace(TR_KEY_name, file.name);
         vec.emplace_back(std::move(file_map));
@@ -395,10 +408,11 @@ namespace make_torrent_field_helpers
     for (size_t idx = 0U; idx != n_trackers; ++idx)
     {
         auto const tracker = tr_torrentTracker(&tor, idx);
-        auto stats_map = tr_variant::Map{ 27U };
+        auto stats_map = tr_variant::Map{ 28U };
         stats_map.try_emplace(TR_KEY_announce, tracker.announce);
         stats_map.try_emplace(TR_KEY_announceState, tracker.announceState);
         stats_map.try_emplace(TR_KEY_downloadCount, tracker.downloadCount);
+        stats_map.try_emplace(TR_KEY_downloader_count, tracker.downloader_count);
         stats_map.try_emplace(TR_KEY_hasAnnounced, tracker.hasAnnounced);
         stats_map.try_emplace(TR_KEY_hasScraped, tracker.hasScraped);
         stats_map.try_emplace(TR_KEY_host, tracker.host_and_port);
@@ -442,6 +456,7 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_clientIsChoked, peer.clientIsChoked);
         peer_map.try_emplace(TR_KEY_clientIsInterested, peer.clientIsInterested);
         peer_map.try_emplace(TR_KEY_clientName, peer.client);
+        peer_map.try_emplace(TR_KEY_peer_id, tr_base64_encode(std::string_view{ peer.peer_id.data(), peer.peer_id.size() }));
         peer_map.try_emplace(TR_KEY_flagStr, peer.flagStr);
         peer_map.try_emplace(TR_KEY_isDownloadingFrom, peer.isDownloadingFrom);
         peer_map.try_emplace(TR_KEY_isEncrypted, peer.isEncrypted);
@@ -454,6 +469,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
         peer_map.try_emplace(TR_KEY_rateToClient, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
         peer_map.try_emplace(TR_KEY_rateToPeer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_bytes_to_peer, peer.bytes_to_peer);
+        peer_map.try_emplace(TR_KEY_bytes_to_client, peer.bytes_to_client);
         peers_vec.emplace_back(std::move(peer_map));
     }
     tr_torrentPeersFree(peers, n_peers);
@@ -506,6 +523,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_addedDate:
     case TR_KEY_availability:
     case TR_KEY_bandwidthPriority:
+    case TR_KEY_bytesCompleted:
     case TR_KEY_comment:
     case TR_KEY_corruptEver:
     case TR_KEY_creator:
@@ -563,7 +581,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode:
     case TR_KEY_seedRatioLimit:
     case TR_KEY_seedRatioMode:
-    case TR_KEY_sequentialDownload:
+    case TR_KEY_sequential_download:
+    case TR_KEY_sequential_download_from_piece:
     case TR_KEY_sizeWhenDone:
     case TR_KEY_source:
     case TR_KEY_startDate:
@@ -600,6 +619,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_addedDate: return st.addedDate;
     case TR_KEY_availability: return make_piece_availability_vec(tor);
     case TR_KEY_bandwidthPriority: return tor.get_priority();
+    case TR_KEY_bytesCompleted: return make_bytes_completed_vec(tor);
     case TR_KEY_comment: return tor.comment();
     case TR_KEY_corruptEver: return st.corruptEver;
     case TR_KEY_creator: return tor.creator();
@@ -657,7 +677,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_seedIdleMode: return tor.idle_limit_mode();
     case TR_KEY_seedRatioLimit: return tor.seed_ratio();
     case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
-    case TR_KEY_sequentialDownload: return tor.is_sequential_download();
+    case TR_KEY_sequential_download: return tor.is_sequential_download();
+    case TR_KEY_sequential_download_from_piece: return tor.sequential_download_from_piece();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
@@ -869,6 +890,17 @@ char const* set_file_priorities(tr_torrent* tor, tr_priority_t priority, tr_vari
     return nullptr; // no error
 }
 
+char const* set_sequential_download_from_piece(tr_torrent& tor, tr_piece_index_t piece)
+{
+    if (piece >= tor.piece_count())
+    {
+        return "piece to sequentially download from is outside pieces range";
+    }
+
+    tor.set_sequential_download_from_piece(piece);
+    return nullptr; // no error
+}
+
 [[nodiscard]] char const* set_file_dls(tr_torrent* tor, bool wanted, tr_variant::Vector const& files_vec)
 {
     auto const [indices, errmsg] = get_file_indices(tor, files_vec);
@@ -1008,9 +1040,14 @@ char const* torrentSet(tr_session* session, tr_variant::Map const& args_in, tr_v
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, *val);
         }
 
-        if (auto const val = args_in.value_if<bool>(TR_KEY_sequentialDownload))
+        if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download))
         {
             tor->set_sequential_download(*val);
+        }
+
+        if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val && errmsg == nullptr)
+        {
+            errmsg = set_sequential_download_from_piece(*tor, *val);
         }
 
         if (auto const val = args_in.value_if<bool>(TR_KEY_downloadLimited))
@@ -1145,9 +1182,9 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (auto const addr = tr_address::from_string(primary_ip);
-        data->args_out.find_if<std::string_view>(TR_KEY_ipProtocol) == nullptr && addr && addr->is_valid())
+        data->args_out.find_if<std::string_view>(TR_KEY_ip_protocol) == nullptr && addr && addr->is_valid())
     {
-        data->args_out.try_emplace(TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+        data->args_out.try_emplace(TR_KEY_ip_protocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     }
 
     if (status != 200)
@@ -1155,7 +1192,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data,
             fmt::format(
-                _("Couldn't test port: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't test port: {error} ({error_code})")),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
         return;
@@ -1174,17 +1211,17 @@ char const* portTest(tr_session* session, tr_variant::Map const& args_in, struct
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     options.timeout_secs = TimeoutSecs;
 
-    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ipProtocol))
+    if (auto const val = args_in.value_if<std::string_view>(TR_KEY_ip_protocol))
     {
         if (*val == "ipv4"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv4"sv);
+            idle_data->args_out.try_emplace(TR_KEY_ip_protocol, "ipv4"sv);
         }
         else if (*val == "ipv6"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-            idle_data->args_out.try_emplace(TR_KEY_ipProtocol, "ipv6"sv);
+            idle_data->args_out.try_emplace(TR_KEY_ip_protocol, "ipv6"sv);
         }
         else
         {
@@ -1210,7 +1247,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data,
             fmt::format(
-                _("Couldn't fetch blocklist: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't fetch blocklist: {error} ({error_code})")),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
         return;
@@ -1255,7 +1292,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data,
             fmt::format(
-                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
                 fmt::arg("path", filename),
                 fmt::arg("error", error.message()),
                 fmt::arg("error_code", error.code())));
@@ -1337,7 +1374,7 @@ void onMetadataFetched(tr_web::FetchResponse const& web_response)
         tr_idle_function_done(
             data->data,
             fmt::format(
-                _("Couldn't fetch torrent: {error} ({error_code})"),
+                fmt::runtime(_("Couldn't fetch torrent: {error} ({error_code})")),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
     }
@@ -1450,6 +1487,16 @@ char const* torrentAdd(tr_session* session, tr_variant::Map const& args_in, tr_r
         }
 
         ctor.set_labels(std::move(labels));
+    }
+
+    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
+    {
+        ctor.set_sequential_download(TR_FORCE, *val);
+    }
+
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_sequential_download_from_piece); val)
+    {
+        ctor.set_sequential_download_from_piece(TR_FORCE, *val);
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
@@ -1593,6 +1640,14 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
     if (incomplete_dir && tr_sys_path_is_relative(*incomplete_dir))
     {
         return "incomplete torrents directory path is not absolute";
+    }
+
+    if (auto const iter = args_in.find(TR_KEY_preferred_transports); iter != std::end(args_in))
+    {
+        if (!session->load_preferred_transports(iter->second))
+        {
+            return R"(the list must be unique with the values "utp" or "tcp")";
+        }
     }
 
     if (auto const val = args_in.value_if<int64_t>(TR_KEY_cache_size_mb))
@@ -1839,6 +1894,11 @@ char const* sessionSet(tr_session* session, tr_variant::Map const& args_in, tr_v
         tr_sessionSetAntiBruteForceEnabled(session, *val);
     }
 
+    if (auto const val = args_in.value_if<bool>(TR_KEY_sequential_download); val)
+    {
+        session->set_sequential_download(*val);
+    }
+
     session->rpcNotify(TR_RPC_SESSION_CHANGED, nullptr);
 
     return nullptr;
@@ -1957,6 +2017,7 @@ char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/
     case TR_KEY_peer_port_random_on_start: return session.isPortRandom();
     case TR_KEY_pex_enabled: return session.allows_pex();
     case TR_KEY_port_forwarding_enabled: return tr_sessionIsPortForwardingEnabled(&session);
+    case TR_KEY_preferred_transports: return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled: return session.queueStalledEnabled();
     case TR_KEY_queue_stalled_minutes: return session.queueStalledMinutes();
     case TR_KEY_rename_partial_files: return session.isIncompleteFileNamingEnabled();
@@ -1974,6 +2035,7 @@ char const* sessionStats(tr_session* session, tr_variant::Map const& /*args_in*/
     case TR_KEY_seedRatioLimited: return session.isRatioLimited();
     case TR_KEY_seed_queue_enabled: return session.queueEnabled(TR_UP);
     case TR_KEY_seed_queue_size: return session.queueSize(TR_UP);
+    case TR_KEY_sequential_download: return session.sequential_download();
     case TR_KEY_session_id: return session.sessionId();
     case TR_KEY_speed_limit_down: return session.speed_limit(TR_DOWN).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_down_enabled: return session.is_speed_limited(TR_DOWN);
@@ -2187,34 +2249,4 @@ void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_
     }
 
     callback(session, tr_variant{ std::move(response) });
-}
-
-/**
- * Munge the URI into a usable form.
- *
- * We have very loose typing on this to make the URIs as simple as possible:
- * - anything not a 'tag' or 'method' is automatically in 'arguments'
- * - values that are all-digits are numbers
- * - values that are all-digits or commas are number lists
- * - all other values are strings
- */
-tr_variant tr_rpc_parse_list_str(std::string_view str)
-{
-    auto const values = tr_num_parse_range(str);
-    auto const n_values = std::size(values);
-
-    if (n_values == 0)
-    {
-        return { str };
-    }
-
-    if (n_values == 1)
-    {
-        return { values[0] };
-    }
-
-    auto num_vec = tr_variant::Vector{};
-    num_vec.resize(n_values);
-    std::copy_n(std::cbegin(values), n_values, std::begin(num_vec));
-    return { std::move(num_vec) };
 }

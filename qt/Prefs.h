@@ -12,7 +12,6 @@
 #include <QVariant>
 
 #include <libtransmission/quark.h>
-#include <libtransmission/tr-macros.h>
 
 class QDateTime;
 
@@ -24,7 +23,6 @@ extern "C"
 class Prefs : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum
@@ -66,6 +64,7 @@ public:
         SESSION_REMOTE_PORT,
         SESSION_REMOTE_AUTH,
         SESSION_REMOTE_USERNAME,
+        SESSION_REMOTE_RPC_URL_PATH,
         COMPLETE_SOUND_COMMAND,
         COMPLETE_SOUND_ENABLED,
         USER_HAS_GIVEN_INFORMED_CONSENT,
@@ -132,6 +131,10 @@ public:
     };
 
     explicit Prefs(QString config_dir);
+    Prefs(Prefs&&) = delete;
+    Prefs(Prefs const&) = delete;
+    Prefs& operator=(Prefs&&) = delete;
+    Prefs& operator=(Prefs const&) = delete;
     ~Prefs() override;
 
     [[nodiscard]] constexpr auto isCore(int key) const noexcept

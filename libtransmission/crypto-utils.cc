@@ -21,7 +21,9 @@ extern "C"
 #include <b64/cencode.h>
 }
 
-#include <fmt/core.h>
+#include <crc32c/crc32c.h>
+
+#include <fmt/format.h>
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-assert.h"
@@ -239,11 +241,16 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
     return digest;
 }
 
+uint32_t tr_crc32c(uint8_t const* data, size_t count)
+{
+    return crc32c::Crc32c(data, count);
+}
+
 // fallback implementation in case the system crypto library's RNG fails
 void tr_rand_buffer_std(void* buffer, size_t length)
 {
-    thread_local auto gen = std::mt19937{ std::random_device{}() };
-    thread_local auto dist = std::uniform_int_distribution<unsigned long long>{};
+    static thread_local auto gen = std::mt19937{ std::random_device{}() };
+    static thread_local auto dist = std::uniform_int_distribution<unsigned long long>{};
 
     for (auto *walk = static_cast<uint8_t*>(buffer), *end = walk + length; walk < end;)
     {

@@ -49,7 +49,6 @@ enum class ReadState : uint8_t
 
 enum tr_preferred_transport : uint8_t
 {
-    // More preferred transports goes on top
     TR_PREFER_UTP,
     TR_PREFER_TCP,
     TR_NUM_PREFERRED_TRANSPORT
@@ -60,18 +59,24 @@ class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
     using DH = tr_message_stream_encryption::DH;
     using Filter = tr_message_stream_encryption::Filter;
     using CanRead = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
-    using DidWrite = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-    using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* userData);
+    using DidWrite = void (*)(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* user_data);
+    using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* user_data);
 
 public:
     tr_peerIo(
-        tr_session* session_in,
+        tr_session* session,
+        tr_peer_socket&& socket,
+        tr_bandwidth* parent_bandwidth,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,
-        bool client_is_seed,
-        tr_bandwidth* parent_bandwidth);
+        bool client_is_seed);
 
     ~tr_peerIo();
+
+    tr_peerIo(tr_peerIo const&) = delete;
+    tr_peerIo(tr_peerIo&&) = delete;
+    tr_peerIo& operator=(tr_peerIo const&) = delete;
+    tr_peerIo& operator=(tr_peerIo&&) = delete;
 
     static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
@@ -96,7 +101,7 @@ public:
         set_callbacks(nullptr, nullptr, nullptr, nullptr);
     }
 
-    void set_socket(tr_peer_socket);
+    void set_socket(tr_peer_socket socket_in);
 
     [[nodiscard]] constexpr auto is_utp() const noexcept
     {
@@ -142,14 +147,7 @@ public:
 
     [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
-    {
-        outbuf_info_.emplace_back(n_bytes, is_piece_data);
-
-        auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
-        filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
-        outbuf_.commit_space(n_bytes);
-    }
+    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
@@ -256,11 +254,6 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr auto supports_utp() const noexcept
-    {
-        return utp_supported_;
-    }
-
     [[nodiscard]] constexpr auto is_incoming() const noexcept
     {
         return is_incoming_;
@@ -290,14 +283,14 @@ public:
 
     void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        decrypt_remain_len_.reset();
+        n_decrypt_remain_.reset();
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
 
     TR_CONSTEXPR20 void decrypt_disable(size_t decrypt_len = 0U) noexcept
     {
         // optionally decrypt decrypt_len more bytes before disabling decryption
-        decrypt_remain_len_ = decrypt_len;
+        n_decrypt_remain_ = decrypt_len;
     }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
@@ -355,7 +348,7 @@ private:
     void event_enable(short event);
     void event_disable(short event);
 
-    void can_read_wrapper();
+    void can_read_wrapper(size_t bytes_transferred);
     void did_write_wrapper(size_t bytes_transferred);
 
     size_t try_read(size_t max);
@@ -365,17 +358,18 @@ private:
     // production code should use new_outgoing() or new_incoming()
     static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
+        tr_peer_socket&& socket,
         tr_bandwidth* parent,
         tr_sha1_digest_t const* info_hash,
         bool is_incoming,
         bool is_seed);
 
     Filter filter_;
-    std::optional<size_t> decrypt_remain_len_;
+    std::optional<size_t> n_decrypt_remain_;
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 
-    tr_peer_socket socket_ = {};
+    tr_peer_socket socket_;
 
     tr_bandwidth bandwidth_;
 
@@ -401,7 +395,6 @@ private:
     bool const client_is_seed_;
     bool const is_incoming_;
 
-    bool utp_supported_ = false;
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;

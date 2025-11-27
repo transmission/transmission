@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "libtransmission/transmission.h"
 
@@ -95,11 +95,17 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     {
         if (state_ == State::FileTree)
         {
+            auto const path_element = currentKey();
+            if (!path_element)
+            {
+                return false;
+            }
+
             if (!std::empty(file_subpath_))
             {
                 file_subpath_ += '/';
             }
-            tr_torrent_files::sanitize_subpath(currentKey(), file_subpath_);
+            tr_torrent_files::sanitize_subpath(*path_element, file_subpath_);
         }
         else if (pathIs(InfoKey))
         {
@@ -165,7 +171,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             file_subpath_.clear();
             file_length_ = 0;
         }
-        else if (pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+        else if (pathStartsWith(InfoKey, FilesKey, ArrayKey, PathUtf8Key))
         {
             // torrent has a utf8 path, drop the other one due to probable non-utf8 encoding
             file_subpath_.clear();
@@ -219,7 +225,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.date_created_ = value;
         }
-        else if (pathIs(PrivateKey) || pathIs(InfoKey, PrivateKey))
+        else if (pathIs(InfoKey, PrivateKey))
         {
             tm_.is_private_ = value != 0;
         }
@@ -442,20 +448,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     }
 
 private:
-    template<typename... Args>
-    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
-    {
-        auto i = 1U;
-        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
-    }
-
-    template<typename... Args>
-    [[nodiscard]] bool pathIs(Args... args) const noexcept
-    {
-        auto i = 1U;
-        return (depth() == sizeof...(args)) && ((key(i++) == args) && ...);
-    }
-
     [[nodiscard]] bool addFile(Context const& context)
     {
         bool ok = true;
@@ -671,9 +663,9 @@ std::string tr_torrent_metainfo::make_filename(
     BasenameFormat format,
     std::string_view suffix)
 {
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    auto filename = tr_pathbuf{ dirname, '/' };
+    // `[${dirname}/]${name}.${info_hash}${suffix}`
+    // `[${dirname}/]${info_hash}${suffix}`
+    auto filename = std::empty(dirname) ? tr_pathbuf{} : tr_pathbuf{ dirname, '/' };
     if (format == BasenameFormat::Hash)
     {
         filename.append(info_hash_string);
@@ -710,7 +702,7 @@ bool tr_torrent_metainfo::migrate_file(
     {
         tr_logAddError(
             fmt::format(
-                _("Migrated torrent file from '{old_path}' to '{path}'"),
+                fmt::runtime(_("Migrated torrent file from '{old_path}' to '{path}'")),
                 fmt::arg("old_path", old_filename),
                 fmt::arg("path", new_filename)),
             name);

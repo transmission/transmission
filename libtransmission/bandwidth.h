@@ -30,8 +30,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    libtransmission::Values::Speed up_limit = {};
-    libtransmission::Values::Speed down_limit = {};
+    libtransmission::Values::Speed up_limit;
+    libtransmission::Values::Speed down_limit;
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -183,7 +183,7 @@ public:
             return false;
         }
 
-        auto const got = get_piece_speed(now_msec, dir);
+        auto const got = get_raw_speed(now_msec, dir);
         auto const want = get_desired_speed(dir);
         return got >= want;
     }

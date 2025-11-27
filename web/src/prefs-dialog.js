@@ -56,12 +56,12 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
-  _onPortChecked(ipProtocol, response) {
+  _onPortChecked(ip_protocol, response) {
     if (this.closed) {
       return;
     }
 
-    const element = this.elements.network.port_status_label[ipProtocol];
+    const element = this.elements.network.port_status_label[ip_protocol];
     const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
     if ('port-is-open' in response.arguments) {
@@ -170,6 +170,8 @@ export class PrefsDialog extends EventTarget {
               break;
           }
         }
+
+        element.dispatchEvent(new Event('session-change'));
       }
     }
   }
@@ -203,7 +205,7 @@ export class PrefsDialog extends EventTarget {
         element.classList.toggle('disabled', !check.checked);
       }
     };
-    check.addEventListener('change', callback);
+    check.addEventListener('session-change', callback);
     callback();
   }
 
@@ -237,7 +239,7 @@ export class PrefsDialog extends EventTarget {
   }
 
   static _toggleProtocolHandler(button) {
-    const handlerUrl = new URL(window.location.href);
+    const handlerUrl = new URL(globalThis.location.href);
     handlerUrl.search = 'addtorrent=%s';
     if (this._getProtocolHandlerRegistered()) {
       navigator.unregisterProtocolHandler?.('magnet', handlerUrl.toString());
@@ -856,7 +858,7 @@ export class PrefsDialog extends EventTarget {
         this.update_from_session,
       );
       this.elements.root.remove();
-      dispatchEvent(new Event('close'));
+      this.dispatchEvent(new Event('close'));
       for (const key of Object.keys(this)) {
         this[key] = null;
       }

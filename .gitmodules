@@ -5,15 +5,14 @@
 [submodule "third-party/libb64"]
 	path = third-party/libb64
 	url = https://github.com/transmission/libb64.git
-	branch = post-1.2.1-transmission
+	branch = post-2.0.0-transmission
 [submodule "third-party/libevent"]
 	path = third-party/libevent
 	url = https://github.com/transmission/libevent.git
-	branch = post-2.0.22-transmission
+	branch = post-2.1.12-transmission
 [submodule "third-party/libnatpmp"]
 	path = third-party/libnatpmp
 	url = https://github.com/transmission/libnatpmp.git
-	branch = post-20151025-transmission
 [submodule "third-party/libutp"]
 	path = third-party/libutp
 	url = https://github.com/transmission/libutp.git
@@ -62,3 +61,6 @@
 	path = third-party/rpavlik-cmake-modules
 	# synced with https://github.com/rpavlik/cmake-modules.git
 	url = https://github.com/transmission/rpavlik-cmake-modules.git
+[submodule "third-party/crc32c"]
+	path = third-party/crc32c
+	url = https://github.com/google/crc32c.git

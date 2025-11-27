@@ -180,14 +180,14 @@ private:
     // whether `time` hits in one of the `minutes_` that is true
     [[nodiscard]] bool is_active_minute(time_t time) const noexcept;
 
-    static auto constexpr MinutesPerHour = int{ 60 };
-    static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };
-    static auto constexpr MinutesPerWeek = int{ MinutesPerDay * 7 };
+    static int constexpr MinutesPerHour = 60;
+    static int constexpr MinutesPerDay = MinutesPerHour * 24;
+    static int constexpr MinutesPerWeek = MinutesPerDay * 7;
 
     // bitfield of all the minutes in a week.
     // Each bit's value indicates whether the scheduler wants
     // alt speeds on or off at that given minute.
-    std::bitset<10080> minutes_{};
+    std::bitset<10080> minutes_;
 
     // recent change that was made by the scheduler
     std::optional<bool> scheduler_set_is_active_to_;

@@ -18,9 +18,8 @@
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ vérifié";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld ko/s";
+/* Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld kb/s";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld minutes";
@@ -43,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu fichiers";
+
+/* quicklook file header */
+/* "%lu Files" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu entrants";
@@ -53,7 +56,7 @@
 "%lu IP address rules in list" = "%lu règles d’adresses IP dans la liste";
 
 /* Inspector -> Peers tab -> peers */
-/* "%lu Known:" = ""; */
+"%lu Known:" = "%lu connus :";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu découverte locale";
@@ -79,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu traceur";
 
+/* quicklook tracker header */
+/* "%lu Trackers" = ""; */
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -86,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu semences Web";
+
+/* quicklook web seed header */
+/* "%lu Web Seeds" = ""; */
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u morceaux, %2$@ chacun";
@@ -111,10 +120,16 @@
 /* stats window -> times opened */
 "1 time" = "1 fois";
 
+/* quicklook tracker header */
+/* "1 Tracker" = ""; */
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 transfert";
+
+/* quicklook web seed header */
+/* "1 Web Seed" = ""; */
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "« %@ » n’est pas un fichier torrent valide.";
@@ -218,7 +233,7 @@
 "Available" = "Disponible";
 
 /* Transfer speed (bytes per second) */
-/* "B/s" = ""; */
+"B/s" = "b/s";
 
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bande passante";
@@ -279,6 +294,15 @@
    Create torrent -> select file */
 "Create Torrent File" = "Créer un fichier torrent";
 
+/* quicklook creation info */
+/* "Created on %@" = ""; */
+
+/* quicklook creation info */
+/* "Created on %@ with %@" = ""; */
+
+/* quicklook creation info */
+/* "Created with %@" = ""; */
+
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "La création de « %@ » a échoué.";
 
@@ -302,10 +326,10 @@
    inspector -> web seed table -> header
    status bar -> status label
    Torrent -> status string */
-"DL" = "Téléch.";
+"DL" = "Téléchargement";
 
 /* Inspector -> Peers tab -> peers */
-"DL from %lu" = "Téléch. de %lu";
+"DL from %lu" = "Téléchargement en provenance de %lu";
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Ne plus vérifier l’espace disque";
@@ -353,10 +377,10 @@
 "Downloading blocklist" = "Téléchargement de la liste de blocage";
 
 /* Torrent -> status string */
-"Downloading from %lu of %lu peers" = "Téléchargement de %1$lu sur %2$lu pairs";
+"Downloading from %lu of %lu peers" = "Téléchargement en provenance de %1$lu de %2$lu pairs";
 
 /* Torrent -> status string */
-"Downloading from %lu of 1 peer" = "Téléchargement de %lu sur 1 pair";
+"Downloading from %lu of 1 peer" = "Téléchargement en provenance de %lu de 1 pair";
 
 /* inspector -> peer table -> header tool tip */
 "Downloading From Peer" = "Téléchargement à partir d’un pair";
@@ -407,7 +431,7 @@
 "From: tracker" = "De : traceur";
 
 /* Transfer speed (gigabytes per second) */
-"GB/s" = "Go/s";
+"GB/s" = "Gb/s";
 
 /* Preferences -> toolbar item title */
 "General" = "Général";
@@ -444,13 +468,13 @@
 "Hide Filter Bar" = "Cacher la barre du filtre";
 
 /* View menu -> Inspector */
-"Hide Inspector" = "Masquer l’inspecteur";
+"Hide Inspector" = "Cacher l’inspecteur";
 
 /* View menu -> Status Bar */
 "Hide Status Bar" = "Cacher la barre d’état";
 
 /* View menu -> Toolbar */
-"Hide Toolbar" = "Masquer la barre d'outils";
+"Hide Toolbar" = "Cacher la barre d’outils";
 
 /* File Outline -> Priority Menu */
 "High" = "Haute";
@@ -484,10 +508,10 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Il semble que le ficher « %1$@ » de %2$@ n’est pas un fichier torrent.";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "ko/s";
+"KB/s" = "kb/s";
 
 /* Inspector -> Peers tab -> peers */
-/* "Known:" = ""; */
+"Known:" = "Connus :";
 
 /* Tracker last announce */
 "Last Announce" = "Dernière annonce";
@@ -503,9 +527,6 @@
 
 /* About window -> license button */
 "License" = "Licence";
-
-/* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limiter (%ld ko/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Les messages n’ont pu être enregistrés";
@@ -524,7 +545,7 @@
 "Magnetized transfer" = "Transfert magnétisé";
 
 /* Transfer speed (megabytes per second) */
-"MB/s" = "Mo/s";
+"MB/s" = "Mb/s";
 
 /* Message window -> table column */
 "Message" = "Message";
@@ -648,30 +669,30 @@
 "Partial Seed" = "Semence partielle";
 
 /* All toolbar item -> palette label */
-"Pause / Resume All" = "Tout mettre en pause/tout reprendre";
+"Pause / Resume All" = "Tout suspendre, tout reprendre";
 
 /* Selected toolbar item -> palette label */
-"Pause / Resume Selected" = "Mettre en pause/reprendre la sélection";
+"Pause / Resume Selected" = "Suspendre, reprendre la sélection";
 
 /* All toolbar item -> label
    Dock item */
-"Pause All" = "Tout mettre en pause";
+"Pause All" = "Tout suspendre";
 
 /* All toolbar item -> tooltip */
-"Pause all transfers" = "Mettre tous les transferts en pause";
+"Pause all transfers" = "Suspendre tous les transferts";
 
 /* Selected toolbar item -> label */
-"Pause Selected" = "Mettre en pause la sélection";
+"Pause Selected" = "Suspendre la sélection";
 
 /* Selected toolbar item -> tooltip */
-"Pause selected transfers" = "Mettre en pause les transferts sélectionnés";
+"Pause selected transfers" = "Suspendre les transferts sélectionnés";
 
 /* Torrent Table -> tooltip */
-"Pause the transfer" = "Mettre le transfert en pause";
+"Pause the transfer" = "Suspendre le transfert";
 
 /* Filter Bar -> filter button
    Torrent -> status string */
-"Paused" = "Mis en pause";
+"Paused" = "Suspendu";
 
 /* Inspector -> peer -> status */
 "Peer is unchoking you, but you are not interested" = "Le pair ne vous étrangle plus, mais vous n’êtes pas intéressé";
@@ -885,7 +906,7 @@
 "Show in Finder" = "Afficher dans Finder";
 
 /* View menu -> Inspector */
-"Show Inspector" = "Montrer l’inspecteur";
+"Show Inspector" = "Afficher l’inspecteur";
 
 /* View menu -> Status Bar */
 "Show Status Bar" = "Afficher la barre d’état";
@@ -894,7 +915,7 @@
 "Show the data file in Finder" = "Afficher le fichier de données dans Finder";
 
 /* View menu -> Toolbar */
-/* "Show Toolbar" = ""; */
+"Show Toolbar" = "Afficher la barre d’outils";
 
 /* Dock item
    Status Bar -> speed tooltip */
@@ -910,13 +931,10 @@
 "Speed Limit overrides the total bandwidth limits with its own limits." = "La limite de vitesse remplace les limites de bande passante globales par ses propres limites.";
 
 /* Torrent -> status string */
-"Stalled" = "Bloqué";
+"Stalled" = "Bloqué sans réponse";
 
 /* Stats window -> title */
 "Statistics" = "Statistiques";
-
-/* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "Arrêter au ratio (%.2f)";
 
 /* Torrent cell -> button info */
 "Stop waiting to start" = "Arrêté, en attente de démarrage";
@@ -925,7 +943,7 @@
 "Support open-source indie software" = "Soutenez les logiciels indépendants à code source ouvert";
 
 /* Transfer speed (terabytes per second) */
-"TB/s" = "To/s";
+"TB/s" = "Tb/s";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "La destination du fichier n’existe pas.";
@@ -962,7 +980,7 @@
 "The transfer cannot be added because it is a duplicate of an already existing transfer." = "Ce transfert ne peut être ajouté, car il est un doublon d’un transfert déjà existant.";
 
 /* Torrent disk space alert -> message */
-"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert sera mis en pause. Libérez de l’espace sur %@ ou dessélectionnez des fichiers dans l’inspecteur de torrents afin de poursuivre.";
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "Le transfert sera suspendu. Libérez de l’espace sur %@ ou dessélectionnez des fichiers dans l’inspecteur de torrents afin de poursuivre.";
 
 /* Create torrent -> blank address -> message */
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Le transfert ne contactera pas de traceurs pour obtenir des pairs et ne devra dépendre que de méthodes de découverte décentralisées qui ne s’appuient pas sur les traceurs, telles que PEX et DHT, pour télécharger et propager.";
@@ -971,7 +989,7 @@
 "There are %1$lu transfers (%2$lu active)." = "Il y a %1$lu transferts (%2$lu actifs).";
 
 /* Confirm Quit panel -> message */
-"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%lu transferts actifs seront mis en pause lors de la fermeture de Transmission. Les transferts reprendront automatiquement au prochain lancement.";
+"There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%lu transferts actifs seront suspendus lors de la fermeture de Transmission. Les transferts reprendront automatiquement au prochain lancement.";
 
 /* Removal confirm panel -> message part 1 */
 "There are %lu active transfers." = "Il y a %lu transferts actifs.";
@@ -983,7 +1001,7 @@
 "There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Un exemplaire de Transmission est déjà en cours d’exécution. Nous ne pourrons en ouvrir un autre tant que le premier n’aura pas été fermé.";
 
 /* Confirm Quit panel -> message */
-"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Un transfert actif sera mis en pause lors de la fermeture de Transmission. Le transfert reprendra automatiquement au prochain lancement.";
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Un transfert actif sera suspendu lors de la fermeture de Transmission. Le transfert reprendra automatiquement au prochain lancement.";
 
 /* Create torrent -> no files -> warning */
 "There must be at least one file in a folder to create a torrent file." = "Il doit y avoir au moins un fichier dans un dossier pour créer un fichier torrent.";
@@ -1001,7 +1019,7 @@
 "This folder contains no files." = "Ce dossier ne comprend aucun fichier.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+"This option is not available if Default location is set to Same as torrent file." = "Cette option n’est pas proposée si Emplacement par défaut est défini sur Identique au fichier torrent.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Ce transfert est actif. Une fois supprimé, la reprise du transfert exigera le fichier torrent ou le lien aimant.";
@@ -1016,13 +1034,13 @@
 "Toggle Filter" = "Activer/désactiver le filtre";
 
 /* Inspector toolbar item -> palette label */
-"Toggle Inspector" = "Afficher/masquer l’inspecteur";
+"Toggle Inspector" = "Afficher ou cacher l’inspecteur";
 
 /* Filter toolbar item -> tooltip */
 "Toggle the filter bar" = "Activer/désactiver la barre du filtre";
 
 /* Inspector toolbar item -> tooltip */
-"Toggle the torrent inspector" = "Affiche/masque l’inspecteur";
+"Toggle the torrent inspector" = "Afficher ou cacher l’inspecteur de torrent";
 
 /* Download not a torrent -> title
    Torrent download error -> title */
