@@ -9,6 +9,7 @@
 #include "FileList.h"
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
+#include "IPToLocation.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -1144,6 +1145,7 @@ public:
         add(was_updated);
         add(address);
         add(address_collated);
+        add(location);
         add(download_rate_speed);
         add(download_rate_string);
         add(upload_rate_speed);
@@ -1171,6 +1173,7 @@ public:
     Gtk::TreeModelColumn<bool> was_updated;
     Gtk::TreeModelColumn<Glib::ustring> address;
     Gtk::TreeModelColumn<Glib::ustring> address_collated;
+    Gtk::TreeModelColumn<Glib::ustring> location;
     Gtk::TreeModelColumn<Speed> download_rate_speed;
     Gtk::TreeModelColumn<Glib::ustring> download_rate_string;
     Gtk::TreeModelColumn<Speed> upload_rate_speed;
@@ -1225,6 +1228,7 @@ void initPeerRow(
 
     (*iter)[peer_cols.address] = std::data(peer->addr);
     (*iter)[peer_cols.address_collated] = collated_name;
+    (*iter)[peer_cols.location] = get_location_from_ip(std::data(peer->addr));
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = std::string(key);
@@ -1603,6 +1607,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
     view_columns.push_back(&peer_cols.progress);
     view_columns.push_back(&peer_cols.flags);
     view_columns.push_back(&peer_cols.address);
+    view_columns.push_back(&peer_cols.location);
     view_columns.push_back(&peer_cols.client);
 
     /* remove any existing columns */
@@ -1618,6 +1623,13 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Address"), *r);
             c->add_attribute(r->property_text(), *col);
             sort_col = &peer_cols.address_collated;
+        }
+        else if (*col == peer_cols.location)
+        {
+            auto* r = Gtk::make_managed<Gtk::CellRendererText>();
+            c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Location"), *r);
+            c->add_attribute(r->property_text(), *col);
+            // sort_col = &peer_cols.location;
         }
         else if (*col == peer_cols.progress)
         {
@@ -2598,6 +2610,9 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     , file_list_(gtr_get_widget_derived<FileList>(builder, "files_view_scroll", "files_view", core, 0))
     , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
+    // Maintain the IP-to-location database in the background
+    maintain_mmdb_file_async(get_mmdb_file_path());
+
     /* return saved window size */
     auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);
     auto const height = (int)gtr_pref_int_get(TR_KEY_details_window_height);
