@@ -168,9 +168,11 @@ void maintain_mmdb_file(std::string const& mmdb_file)
 
 std::string get_location_from_ip(std::string const& ip)
 {
-    // Database file path
+    // Database file path: use the user's cache dir
     std::vector<std::string> path;
-    path.emplace_back(Glib::get_home_dir());
+    path.emplace_back(Glib::get_user_cache_dir());
+    path.emplace_back("transmission");
+    std::string const cache_dir = Glib::build_filename(path);
     path.emplace_back("dbip-city-lite.mmdb");
     std::string const mmdb_file = Glib::build_filename(path);
 
