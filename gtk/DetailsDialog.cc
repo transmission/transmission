@@ -2610,6 +2610,9 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     , file_list_(gtr_get_widget_derived<FileList>(builder, "files_view_scroll", "files_view", core, 0))
     , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
+    // Maintain the IP-to-location database in the background
+    maintain_mmdb_file_async(get_mmdb_file_path());
+
     /* return saved window size */
     auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);
     auto const height = (int)gtr_pref_int_get(TR_KEY_details_window_height);

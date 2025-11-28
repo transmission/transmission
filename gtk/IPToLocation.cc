@@ -18,7 +18,34 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <atomic>
 #include <string>
+#include <thread>
+#include <vector>
+#include <iterator>
+
+namespace {
+    // Atomic flag to prevent concurrent maintenance operations
+    std::atomic_flag maintenance_in_progress = ATOMIC_FLAG_INIT;
+}
+
+// Get the cache directory path
+std::string get_cache_dir()
+{
+    std::vector<std::string> path;
+    path.emplace_back(Glib::get_user_cache_dir());
+    path.emplace_back("transmission");
+    return Glib::build_filename(path);
+}
+
+// Get the full path to the mmdb database file
+std::string get_mmdb_file_path()
+{
+    std::vector<std::string> path;
+    path.emplace_back(get_cache_dir());
+    path.emplace_back("dbip-city-lite.mmdb");
+    return Glib::build_filename(path);
+}
 
 // Function to decompress the mmdb.gz file after download
 void decompress_gz_file(std::string filename)
@@ -76,6 +103,27 @@ void decompress_gz_file(std::string filename)
     libdeflate_free_decompressor(decompressor);
 }
 
+// Wrapper function to run maintain_mmdb_file in a background thread
+// Ensures only one maintenance task runs at a time
+void maintain_mmdb_file_async(std::string const& mmdb_file)
+{
+    // Try to acquire the lock atomically
+    if (maintenance_in_progress.test_and_set())
+    {
+        // Already in progress, skip
+        return;
+    }
+
+    // Run maintenance in background thread so it doesn't block UI
+    std::thread(
+        [mmdb_file]()
+        {
+            maintain_mmdb_file(mmdb_file);
+            // Release the lock
+            maintenance_in_progress.clear();
+        }).detach();
+}
+
 // Function to download and update the mmdb file
 // Free database with monthly updates from <https://db-ip.com/>
 void maintain_mmdb_file(std::string const& mmdb_file)
@@ -123,8 +171,9 @@ void maintain_mmdb_file(std::string const& mmdb_file)
         MMDB_close(&mmdb);
     }
 
-    if (url.empty()) // no need for a download
+    if (url.empty())
     {
+        // no need for a download
         return;
     }
 
@@ -168,15 +217,14 @@ void maintain_mmdb_file(std::string const& mmdb_file)
 
 std::string get_location_from_ip(std::string const& ip)
 {
-    // Database file path: use the user's cache dir
-    std::vector<std::string> path;
-    path.emplace_back(Glib::get_user_cache_dir());
-    path.emplace_back("transmission");
-    std::string const cache_dir = Glib::build_filename(path);
-    path.emplace_back("dbip-city-lite.mmdb");
-    std::string const mmdb_file = Glib::build_filename(path);
+    // Database file path
+    std::string const mmdb_file = get_mmdb_file_path();
 
-    maintain_mmdb_file(mmdb_file);
+    // If the database doesn't exist yet, return empty (it will be downloaded in the background)
+    if (!Glib::file_test(mmdb_file, Glib::FileTest::EXISTS))
+    {
+        return "";
+    }
 
     // Compute location from IP
     MMDB_s mmdb;
