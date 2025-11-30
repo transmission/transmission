@@ -9,6 +9,8 @@
 
 #include <QStyledItemDelegate>
 
+#include "NativeIcon.h"
+
 class QStyle;
 class QStyleOptionProgressBar;
 
@@ -32,7 +34,10 @@ public:
 protected:
     QSize margin(QStyle const& style) const;
     void setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const&) const;
-    QIcon& getWarningEmblem() const;
+    QIcon warningEmblem() const
+    {
+        return warning_emblem_;
+    }
 
     // Our own overridables
     virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
@@ -53,7 +58,7 @@ protected:
     mutable QStyleOptionProgressBar progress_bar_style_ = {};
 
 private:
+    QIcon const warning_emblem_ = icons::icon(icons::Type::TorrentErrorEmblem);
     mutable std::optional<int> height_hint_;
     mutable QFont height_font_;
-    mutable QIcon warning_emblem_;
 };
