@@ -6,19 +6,19 @@ import { AlertDialog } from './alert-dialog.js';
 
 export const RPC = {
   _DaemonVersion: 'version',
-  _DownSpeedLimit: 'speed-limit-down',
-  _DownSpeedLimited: 'speed-limit-down-enabled',
+  _DownSpeedLimit: 'speed_limit_down',
+  _DownSpeedLimited: 'speed_limit_down_enabled',
   _JsonRpcVersion: '2.0',
-  _QueueMoveBottom: 'queue-move-bottom',
-  _QueueMoveDown: 'queue-move-down',
-  _QueueMoveTop: 'queue-move-top',
-  _QueueMoveUp: 'queue-move-up',
+  _QueueMoveBottom: 'queue_move_bottom',
+  _QueueMoveDown: 'queue_move_down',
+  _QueueMoveTop: 'queue_move_top',
+  _QueueMoveUp: 'queue_move_up',
   _Root: '../rpc',
-  _TurtleDownSpeedLimit: 'alt-speed-down',
-  _TurtleState: 'alt-speed-enabled',
-  _TurtleUpSpeedLimit: 'alt-speed-up',
-  _UpSpeedLimit: 'speed-limit-up',
-  _UpSpeedLimited: 'speed-limit-up-enabled',
+  _TurtleDownSpeedLimit: 'alt_speed_down',
+  _TurtleState: 'alt_speed_enabled',
+  _TurtleUpSpeedLimit: 'alt_speed_up',
+  _UpSpeedLimit: 'speed_limit_up',
+  _UpSpeedLimited: 'speed_limit_up_enabled',
 };
 
 export class Remote {
@@ -93,7 +93,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'session-get',
+      method: 'session_get',
     };
     this.sendRequest(o, callback, context);
   }
@@ -102,7 +102,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'port-test',
+      method: 'port_test',
       params: {
         ip_protocol,
       },
@@ -114,7 +114,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-rename-path',
+      method: 'torrent_rename_path',
       params: {
         ids: torrentIds,
         name: newname,
@@ -133,7 +133,7 @@ export class Remote {
       {
         id: 'webui',
         jsonrpc: RPC._JsonRpcVersion,
-        method: 'torrent-set',
+        method: 'torrent_set',
         params,
       },
       callback,
@@ -144,7 +144,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'session-stats',
+      method: 'session_stats',
     };
     this.sendRequest(o, callback, context);
   }
@@ -153,7 +153,7 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-get',
+      method: 'torrent_get',
       params: {
         fields,
         format: 'table',
@@ -172,11 +172,11 @@ export class Remote {
     const o = {
       id: 'webui',
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'free-space',
+      method: 'free_space',
       params: { path: dir },
     };
     this.sendRequest(o, (response) => {
-      const { path, 'size-bytes': size_bytes } = response.result;
+      const { path, size_bytes } = response.result;
       callback.call(context, path, size_bytes);
     });
   }
@@ -189,7 +189,7 @@ export class Remote {
     this.sendRequest(
       {
         jsonrpc: RPC._JsonRpcVersion,
-        method: 'torrent-set',
+        method: 'torrent_set',
         params,
       },
       () => {
@@ -215,12 +215,12 @@ export class Remote {
   }
 
   startTorrents(torrent_ids, noqueue, callback, context) {
-    const name = noqueue ? 'torrent-start-now' : 'torrent-start';
+    const name = noqueue ? 'torrent_start_now' : 'torrent_start';
     this.sendTorrentActionRequests(name, torrent_ids, callback, context);
   }
   stopTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(
-      'torrent-stop',
+      'torrent_stop',
       torrent_ids,
       callback,
       context,
@@ -229,7 +229,7 @@ export class Remote {
 
   moveTorrents(torrent_ids, new_location, callback, context) {
     this.sendTorrentSetRequests(
-      'torrent-set-location',
+      'torrent_set_location',
       torrent_ids,
       {
         location: new_location,
@@ -243,9 +243,9 @@ export class Remote {
   removeTorrents(torrents, trash) {
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-remove',
+      method: 'torrent_remove',
       params: {
-        'delete-local-data': trash,
+        delete_local_data: trash,
         ids: [],
       },
     };
@@ -261,7 +261,7 @@ export class Remote {
   }
   verifyTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(
-      'torrent-verify',
+      'torrent_verify',
       torrent_ids,
       callback,
       context,
@@ -269,7 +269,7 @@ export class Remote {
   }
   reannounceTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(
-      'torrent-reannounce',
+      'torrent_reannounce',
       torrent_ids,
       callback,
       context,
@@ -281,7 +281,7 @@ export class Remote {
     }
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'torrent-add',
+      method: 'torrent_add',
       params: {
         filename: url,
         paused: options.paused,
@@ -294,7 +294,7 @@ export class Remote {
   savePrefs(params) {
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'session-set',
+      method: 'session_set',
       params,
     };
     this.sendRequest(o, () => {
@@ -304,7 +304,7 @@ export class Remote {
   updateBlocklist() {
     const o = {
       jsonrpc: RPC._JsonRpcVersion,
-      method: 'blocklist-update',
+      method: 'blocklist_update',
     };
     this.sendRequest(o, () => {
       this._controller.loadDaemonPrefs();
