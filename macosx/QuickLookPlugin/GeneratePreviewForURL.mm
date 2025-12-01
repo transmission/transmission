@@ -1,6 +1,12 @@
+#if __has_feature(modules)
 @import AppKit;
 @import CoreFoundation;
 @import QuickLook;
+#else
+#import <AppKit/AppKit.h>
+#import <CoreFoundation/CFPlugInCOM.h>
+#import <QuickLook/QuickLook.h>
+#endif
 
 #include <string>
 #include <unordered_map>
