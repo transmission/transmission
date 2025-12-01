@@ -194,7 +194,7 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char d
 
 [[nodiscard]] std::string tr_strv_convert_utf8(std::string_view sv);
 
-[[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
+[[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv);
 
 /**
  * @brief copies `src` into `buf`.

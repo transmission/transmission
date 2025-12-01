@@ -24,10 +24,6 @@
 [submodule "third-party/googletest"]
 	path = third-party/googletest
 	url = https://github.com/google/googletest.git
-[submodule "third-party/utfcpp"]
-	path = third-party/utfcpp
-	# synced with https://github.com/nemtrif/utfcpp.git
-	url = https://github.com/transmission/utfcpp.git
 [submodule "third-party/libdeflate"]
 	path = third-party/libdeflate
 	# synced with https://github.com/ebiggers/libdeflate.git

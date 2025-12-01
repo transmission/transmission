@@ -35,13 +35,10 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
-#define UTF_CPP_CPLUSPLUS 201703L
-#include <utf8.h>
-
 #include <curl/curl.h>
 
 #include <fmt/format.h>
-
+#include <small/string.hpp>
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
 
@@ -316,17 +313,15 @@ std::string tr_strv_convert_utf8(std::string_view sv)
 
 #endif
 
-std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
+std::string tr_strv_replace_invalid(std::string_view sv)
 {
     // stripping characters after first \0
     if (auto first_null = sv.find('\0'); first_null != std::string::npos)
     {
         sv = { std::data(sv), first_null };
     }
-    auto out = std::string{};
-    out.reserve(std::size(sv));
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
-    return out;
+
+    return small::string(sv).cpp_str();
 }
 
 #ifdef _WIN32

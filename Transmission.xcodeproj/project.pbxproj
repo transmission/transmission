@@ -4318,7 +4318,6 @@
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/utfcpp/source",
 					"third-party/rapidjson/include",
 					"third-party/wildmat",
 				);
@@ -4347,7 +4346,6 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/miniupnp/miniupnpc/include",
-					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
 				);
@@ -4563,7 +4561,6 @@
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/utfcpp/source",
 					"third-party/rapidjson/include",
 					"third-party/wildmat",
 				);
@@ -4592,7 +4589,6 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/miniupnp/miniupnpc/include",
-					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
 				);
@@ -4887,7 +4883,6 @@
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/utfcpp/source",
 					"third-party/rapidjson/include",
 					"third-party/wildmat",
 				);
@@ -4916,7 +4911,6 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/miniupnp/miniupnpc/include",
-					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
 				);
