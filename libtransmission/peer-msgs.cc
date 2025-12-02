@@ -1903,7 +1903,7 @@ void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 
 void tr_peerMsgsImpl::maybe_send_block_requests()
 {
-    if (!tor_.client_can_download())
+    if (is_disconnecting() || !tor_.client_can_download())
     {
         return;
     }
@@ -2127,7 +2127,7 @@ bool tr_peerMsgsImpl::is_valid_request(peer_request const& req) const
 
 size_t tr_peerMsgsImpl::max_available_reqs() const
 {
-    if (tor_.is_done() || !tor_.has_metainfo() || client_is_choked() || !client_is_interested())
+    if (is_disconnecting() || tor_.is_done() || !tor_.has_metainfo() || client_is_choked() || !client_is_interested())
     {
         return 0;
     }
