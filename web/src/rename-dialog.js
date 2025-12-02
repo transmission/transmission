@@ -65,8 +65,8 @@ export class RenameDialog extends EventTarget {
       file_path,
       new_name,
       (response) => {
-        if (response.result === 'success') {
-          const args = response.arguments;
+        if ('result' in response) {
+          const args = response.result;
           if (handler) {
             handler.subtree.name = args.name;
             setTextContent(handler.name_container, args.name);
@@ -85,11 +85,13 @@ export class RenameDialog extends EventTarget {
           } else {
             tor.refresh(args);
           }
-        } else if (response.result === 'Invalid argument') {
+        } else {
+          const error_obj = response.error;
+          const err_msg =
+            error_obj.data?.errorString ?? error_obj.message ?? '';
           const connection_alert = new AlertDialog({
             heading: `Error renaming "${file_path}"`,
-            message:
-              'Could not rename a torrent or file name. The path to file may have changed/not reflected correctly or the argument is invalid.',
+            message: `${err_msg} (${error_obj.code}`,
           });
           this.controller.setCurrentPopup(connection_alert);
         }
