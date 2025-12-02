@@ -119,6 +119,7 @@ public:
 
     virtual void set_choke(bool peer_is_choked) = 0;
     virtual void set_interested(bool client_is_interested) = 0;
+    virtual void set_only_peer(bool only_peer) = 0;
 
     virtual void pulse() = 0;
 

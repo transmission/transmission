@@ -570,6 +570,15 @@ public:
         return peer_info;
     }
 
+    void update_only_peer() noexcept
+    {
+        auto const only_peer = peerCount() == 1U;
+        for (auto const& peer : peers)
+        {
+            peer->set_only_peer(only_peer);
+        }
+    }
+
     static void peer_callback_bt(tr_peerMsgs* const msgs, tr_peer_event const& event, void* const vs)
     {
         TR_ASSERT(msgs != nullptr);
@@ -1238,6 +1247,7 @@ private:
     void peer_info_pulse();
     void rechoke_pulse() const;
     void reconnect_pulse();
+    void only_peer_pulse();
 
     void rechoke_pulse_marshall()
     {
@@ -2437,6 +2447,14 @@ void tr_peerMgr::reconnect_pulse()
     make_new_peer_connections();
 }
 
+void tr_peerMgr::only_peer_pulse()
+{
+    for (auto const* const tor : torrents_)
+    {
+        tor->swarm->update_only_peer();
+    }
+}
+
 // --- Peer Pool Size
 
 namespace
@@ -2562,6 +2580,7 @@ void tr_peerMgr::bandwidth_pulse()
     }
 
     reconnect_pulse();
+    only_peer_pulse();
 }
 
 // ---
