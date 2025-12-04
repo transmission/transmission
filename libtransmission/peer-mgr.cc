@@ -485,6 +485,18 @@ public:
 
         peer_disconnect.emit(tor, peer->has(), peer->active_requests);
 
+        auto const now = std::chrono::system_clock::now();
+        for (size_t block = 0U; block < std::size(peer->active_requests); ++block)
+        {
+            if (peer->active_requests.test(block))
+            {
+                block_history.try_emplace(block).first->second.emplace_back(
+                    now,
+                    fmt::format("disconnected with active request {} [{}]", peer->display_name(), peer->user_agent()));
+                log_block_history(block);
+            }
+        }
+
         auto const& peer_info = peer->peer_info;
         TR_ASSERT(peer_info);
 
