@@ -96,6 +96,7 @@ target_sources(${TR_NAME}
         peer-mse.h
         peer-msgs.cc
         peer-msgs.h
+        peer-socket-tcp.cc
         peer-socket-tcp.h
         peer-socket-utp.cc
         peer-socket-utp.h
