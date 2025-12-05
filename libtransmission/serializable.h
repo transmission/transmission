@@ -19,10 +19,10 @@
 
 namespace libtransmission
 {
+
 /**
  * Registry for `tr_variant` <-> `T` converters.
- *
- * Used by `Serializable` to serialize/deserialize fields in a struct/class.
+ * Used by `Serializable` to serialize/deserialize fields in a class.
  */
 class Serializers
 {
@@ -100,13 +100,12 @@ private:
 };
 
 /**
- * Base class for data structures that are convertble to a `tr_variant`.
- * Commonly used for Settings classes (e.g. tr_session::Settings) to
- * load/save its state from `settings.json`.
+ * Base class for classes that are convertble to a `tr_variant`.
+ * Settings classes use this to load and save state from `settings.json`.
  *
  * Subclasses must define a field named `fields` which is an iterable
- * collection of `Serializable::Field`. This is typically declared as
- * a `static const std::array<Field, N>`.
+ * collection of `Serializable::Field`. This is typically declared as a
+ * `static const std::array<Field, N>`.
  *
  * If your subclass has a field with a bespoke type, it must use
  * `Serializers::add_converter()` to register how to serialize that type.
