@@ -24,7 +24,7 @@
 #include "libtransmission/net.h" // for tr_port
 #include "libtransmission/open-files.h" // for tr_open_files::Preallocation
 #include "libtransmission/peer-io.h" // tr_preferred_transport
-#include "libtransmission/settings.h"
+#include "libtransmission/serializable.h"
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
 #include "libtransmission/variant.h"
 #include "libtransmission/tr-assert.h"
@@ -40,7 +40,7 @@ using Lookup = std::array<std::pair<std::string_view, T>, N>;
 
 // ---
 
-bool load_bool(tr_variant const& src, bool* tgt)
+bool to_bool(tr_variant const& src, bool* tgt)
 {
     if (auto val = src.value_if<bool>())
     {
@@ -51,14 +51,14 @@ bool load_bool(tr_variant const& src, bool* tgt)
     return false;
 }
 
-tr_variant save_bool(bool const& val)
+tr_variant from_bool(bool const& val)
 {
     return val;
 }
 
 // ---
 
-bool load_double(tr_variant const& src, double* tgt)
+bool to_double(tr_variant const& src, double* tgt)
 {
     if (auto val = src.value_if<double>())
     {
@@ -69,7 +69,7 @@ bool load_double(tr_variant const& src, double* tgt)
     return false;
 }
 
-tr_variant save_double(double const& val)
+tr_variant from_double(double const& val)
 {
     return val;
 }
@@ -82,7 +82,7 @@ auto constexpr EncryptionKeys = Lookup<tr_encryption_mode, 3U>{ {
     { "allowed", TR_CLEAR_PREFERRED },
 } };
 
-bool load_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
+bool to_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
 {
     static constexpr auto& Keys = EncryptionKeys;
 
@@ -115,7 +115,7 @@ bool load_encryption_mode(tr_variant const& src, tr_encryption_mode* tgt)
     return false;
 }
 
-tr_variant save_encryption_mode(tr_encryption_mode const& val)
+tr_variant from_encryption_mode(tr_encryption_mode const& val)
 {
     return static_cast<int64_t>(val);
 }
@@ -132,7 +132,7 @@ auto constexpr LogKeys = Lookup<tr_log_level, 7U>{ {
     { "warn", TR_LOG_WARN },
 } };
 
-bool load_log_level(tr_variant const& src, tr_log_level* tgt)
+bool to_log_level(tr_variant const& src, tr_log_level* tgt)
 {
     static constexpr auto& Keys = LogKeys;
 
@@ -165,14 +165,14 @@ bool load_log_level(tr_variant const& src, tr_log_level* tgt)
     return false;
 }
 
-tr_variant save_log_level(tr_log_level const& val)
+tr_variant from_log_level(tr_log_level const& val)
 {
     return static_cast<int64_t>(val);
 }
 
 // ---
 
-bool load_mode_t(tr_variant const& src, tr_mode_t* tgt)
+bool to_mode_t(tr_variant const& src, tr_mode_t* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
     {
@@ -192,14 +192,14 @@ bool load_mode_t(tr_variant const& src, tr_mode_t* tgt)
     return false;
 }
 
-tr_variant save_mode_t(tr_mode_t const& val)
+tr_variant from_mode_t(tr_mode_t const& val)
 {
     return fmt::format("{:#03o}", val);
 }
 
 // ---
 
-bool load_msec(tr_variant const& src, std::chrono::milliseconds* tgt)
+bool to_msec(tr_variant const& src, std::chrono::milliseconds* tgt)
 {
     if (auto val = src.value_if<int64_t>())
     {
@@ -210,14 +210,14 @@ bool load_msec(tr_variant const& src, std::chrono::milliseconds* tgt)
     return false;
 }
 
-tr_variant save_msec(std::chrono::milliseconds const& src)
+tr_variant from_msec(std::chrono::milliseconds const& src)
 {
     return src.count();
 }
 
 // ---
 
-bool load_port(tr_variant const& src, tr_port* tgt)
+bool to_port(tr_variant const& src, tr_port* tgt)
 {
     if (auto const val = src.value_if<int64_t>())
     {
@@ -228,7 +228,7 @@ bool load_port(tr_variant const& src, tr_port* tgt)
     return false;
 }
 
-tr_variant save_port(tr_port const& val)
+tr_variant from_port(tr_port const& val)
 {
     return int64_t{ val.host() };
 }
@@ -243,7 +243,7 @@ auto constexpr PreallocationKeys = Lookup<tr_open_files::Preallocation, 5U>{ {
     { "full", tr_open_files::Preallocation::Full },
 } };
 
-bool load_preallocation_mode(tr_variant const& src, tr_open_files::Preallocation* tgt)
+bool to_preallocation_mode(tr_variant const& src, tr_open_files::Preallocation* tgt)
 {
     static constexpr auto& Keys = PreallocationKeys;
 
@@ -276,7 +276,7 @@ bool load_preallocation_mode(tr_variant const& src, tr_open_files::Preallocation
     return false;
 }
 
-tr_variant save_preallocation_mode(tr_open_files::Preallocation const& val)
+tr_variant from_preallocation_mode(tr_open_files::Preallocation const& val)
 {
     return static_cast<int64_t>(val);
 }
@@ -288,7 +288,7 @@ auto constexpr PreferredTransportKeys = Lookup<tr_preferred_transport, TR_NUM_PR
     { "tcp", TR_PREFER_TCP },
 } };
 
-bool load_preferred_transport(
+bool to_preferred_transport(
     tr_variant const& src,
     small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>* tgt)
 {
@@ -350,7 +350,7 @@ bool load_preferred_transport(
     return true;
 }
 
-tr_variant save_preferred_transport(small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> const& val)
+tr_variant from_preferred_transport(small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> const& val)
 {
     static auto constexpr SaveSingle = [](tr_preferred_transport const ele) -> tr_variant
     {
@@ -377,7 +377,7 @@ tr_variant save_preferred_transport(small::max_size_vector<tr_preferred_transpor
 
 // ---
 
-bool load_size_t(tr_variant const& src, size_t* tgt)
+bool to_size_t(tr_variant const& src, size_t* tgt)
 {
     if (auto const val = src.value_if<int64_t>())
     {
@@ -388,14 +388,14 @@ bool load_size_t(tr_variant const& src, size_t* tgt)
     return false;
 }
 
-tr_variant save_size_t(size_t const& val)
+tr_variant from_size_t(size_t const& val)
 {
     return uint64_t{ val };
 }
 
 // ---
 
-bool load_string(tr_variant const& src, std::string* tgt)
+bool to_string(tr_variant const& src, std::string* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
     {
@@ -406,14 +406,14 @@ bool load_string(tr_variant const& src, std::string* tgt)
     return false;
 }
 
-tr_variant save_string(std::string const& val)
+tr_variant from_string(std::string const& val)
 {
     return val;
 }
 
 // ---
 
-bool load_nullable_string(tr_variant const& src, std::optional<std::string>* tgt)
+bool to_optional_string(tr_variant const& src, std::optional<std::string>* tgt)
 {
     if (src.holds_alternative<std::nullptr_t>())
     {
@@ -430,14 +430,14 @@ bool load_nullable_string(tr_variant const& src, std::optional<std::string>* tgt
     return false;
 }
 
-tr_variant save_nullable_string(std::optional<std::string> const& val)
+tr_variant from_optional_string(std::optional<std::string> const& val)
 {
     return val ? tr_variant{ *val } : nullptr;
 }
 
 // ---
 
-bool load_tos_t(tr_variant const& src, tr_tos_t* tgt)
+bool to_tos_t(tr_variant const& src, tr_tos_t* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
     {
@@ -459,7 +459,7 @@ bool load_tos_t(tr_variant const& src, tr_tos_t* tgt)
     return false;
 }
 
-tr_variant save_tos_t(tr_tos_t const& val)
+tr_variant from_tos_t(tr_tos_t const& val)
 {
     return val.toString();
 }
@@ -471,7 +471,7 @@ auto constexpr VerifyModeKeys = Lookup<tr_verify_added_mode, 2U>{ {
     { "full", TR_VERIFY_ADDED_FULL },
 } };
 
-bool load_verify_added_mode(tr_variant const& src, tr_verify_added_mode* tgt)
+bool to_verify_added_mode(tr_variant const& src, tr_verify_added_mode* tgt)
 {
     static constexpr auto& Keys = VerifyModeKeys;
 
@@ -504,7 +504,7 @@ bool load_verify_added_mode(tr_variant const& src, tr_verify_added_mode* tgt)
     return false;
 }
 
-tr_variant save_verify_added_mode(tr_verify_added_mode const& val)
+tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 {
     for (auto const& [key, value] : VerifyModeKeys)
     {
@@ -518,111 +518,21 @@ tr_variant save_verify_added_mode(tr_verify_added_mode const& val)
 }
 } // unnamed namespace
 
-Settings::Settings()
-{
-    add_type_handler(load_bool, save_bool);
-    add_type_handler(load_double, save_double);
-    add_type_handler(load_encryption_mode, save_encryption_mode);
-    add_type_handler(load_log_level, save_log_level);
-    add_type_handler(load_mode_t, save_mode_t);
-    add_type_handler(load_msec, save_msec);
-    add_type_handler(load_port, save_port);
-    add_type_handler(load_preallocation_mode, save_preallocation_mode);
-    add_type_handler(load_preferred_transport, save_preferred_transport);
-    add_type_handler(load_size_t, save_size_t);
-    add_type_handler(load_string, save_string);
-    add_type_handler(load_nullable_string, save_nullable_string);
-    add_type_handler(load_tos_t, save_tos_t);
-    add_type_handler(load_verify_added_mode, save_verify_added_mode);
-}
+Serializers::ConvertersMap Serializers::converters_ = { {
+    Serializers::build_converter_entry(to_bool, from_bool),
+    Serializers::build_converter_entry(to_double, from_double),
+    Serializers::build_converter_entry(to_encryption_mode, from_encryption_mode),
+    Serializers::build_converter_entry(to_log_level, from_log_level),
+    Serializers::build_converter_entry(to_mode_t, from_mode_t),
+    Serializers::build_converter_entry(to_msec, from_msec),
+    Serializers::build_converter_entry(to_optional_string, from_optional_string),
+    Serializers::build_converter_entry(to_port, from_port),
+    Serializers::build_converter_entry(to_preallocation_mode, from_preallocation_mode),
+    Serializers::build_converter_entry(to_preferred_transport, from_preferred_transport),
+    Serializers::build_converter_entry(to_size_t, from_size_t),
+    Serializers::build_converter_entry(to_string, from_string),
+    Serializers::build_converter_entry(to_tos_t, from_tos_t),
+    Serializers::build_converter_entry(to_verify_added_mode, from_verify_added_mode),
+} };
 
-void Settings::load(tr_variant const& src)
-{
-    auto const* map = src.get_if<tr_variant::Map>();
-    if (map == nullptr)
-    {
-        return;
-    }
-
-    for (auto& field : fields())
-    {
-        if (auto const iter = map->find(field.key); iter != std::end(*map))
-        {
-            auto const type_index = std::type_index{ field.type };
-            TR_ASSERT(load_.count(type_index) == 1U);
-            load_.at(type_index)(iter->second, field.ptr);
-        }
-    }
-}
-
-bool Settings::load_single(tr_quark const key, tr_variant const& src)
-{
-    auto const fields = this->fields();
-    auto const field_it = std::lower_bound(
-        std::begin(fields),
-        std::end(fields),
-        key,
-        [](Field const& f, tr_quark k) { return f.key < k; });
-    if (field_it == std::end(fields) || field_it->key != key)
-    {
-        return false;
-    }
-
-    auto const type_index = std::type_index{ field_it->type };
-    TR_ASSERT(load_.count(type_index) == 1U);
-    return load_.at(type_index)(src, field_it->ptr);
-}
-
-tr_variant::Map Settings::save_partial(std::vector<tr_quark> quarks) const
-{
-    static constexpr struct
-    {
-        constexpr bool operator()(Field const& lhs, tr_quark const rhs) const noexcept
-        {
-            return lhs.key < rhs;
-        }
-
-        constexpr bool operator()(tr_quark const lhs, Field const& rhs) const noexcept
-        {
-            return lhs < rhs.key;
-        }
-    } Compare;
-
-    auto const fields = const_cast<Settings*>(this)->fields();
-    auto to_save = Fields{};
-    to_save.reserve(std::min(std::size(quarks), std::size(fields)));
-
-    // N.B. `fields` is supposed to be unique and sorted, so we don't need to sort it,
-    // and we don't need to worry about duplicates in `to_save`
-    std::sort(std::begin(quarks), std::end(quarks));
-    std::set_intersection(
-        std::begin(fields),
-        std::end(fields),
-        std::begin(quarks),
-        std::end(quarks),
-        std::back_inserter(to_save),
-        Compare);
-
-    return save_impl(to_save);
-}
-
-tr_variant Settings::save_single(tr_quark quark) const
-{
-    auto map = save_partial({ quark });
-    return std::empty(map) ? tr_variant{} : std::move(std::begin(map)->second);
-}
-
-tr_variant::Map Settings::save_impl(libtransmission::Settings::Fields const& fields) const
-{
-    auto map = tr_variant::Map{ std::size(fields) };
-
-    for (auto const& field : fields)
-    {
-        auto const type_index = std::type_index{ field.type };
-        TR_ASSERT(save_.count(type_index) == 1U);
-        map.try_emplace(field.key, save_.at(type_index)(field.ptr));
-    }
-
-    return map;
-}
 } // namespace libtransmission
