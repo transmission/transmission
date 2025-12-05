@@ -339,6 +339,7 @@ public:
         set_active(tr_direction::Up, false);
         set_active(tr_direction::Down, false);
 
+        logtrace(this, "in ~tr_peerMsgsImpl");
         if (io_)
         {
             io_->clear();
