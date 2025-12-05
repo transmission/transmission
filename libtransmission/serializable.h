@@ -238,8 +238,6 @@ protected:
 
         Key key;
         std::type_index idx;
-        Getter getter;
-        ConstGetter const_getter;
 
     private:
         template<typename T>
@@ -256,6 +254,8 @@ protected:
             return &(self->*member);
         }
 
+        Getter getter;
+        ConstGetter const_getter;
         MemberStorage storage;
     };
 
