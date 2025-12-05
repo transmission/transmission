@@ -340,6 +340,7 @@ public:
         set_active(TR_UP, false);
         set_active(TR_DOWN, false);
 
+        logtrace(this, "in ~tr_peerMsgsImpl");
         if (io_)
         {
             io_->clear();
