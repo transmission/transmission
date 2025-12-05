@@ -34,7 +34,7 @@ public:
     }
     static tr_variant serialize(void const* const psrc, std::type_index const idx)
     {
-        auto ret = converters_.at(idx).second(psrc);
+        auto ret = converters.at(idx).second(psrc);
         return ret;
     }
 
@@ -45,7 +45,7 @@ public:
     }
     static bool deserialize(tr_variant const& src, void* const vptgt, std::type_index const idx)
     {
-        return converters_.at(idx).first(src, vptgt);
+        return converters.at(idx).first(src, vptgt);
     }
 
     template<typename T>
@@ -58,7 +58,7 @@ public:
     static void add_converter(Deserialize<T> deserialize, Serialize<T> serialize)
     {
         auto [key, val] = build_converter_entry<T>(deserialize, serialize);
-        converters_.try_emplace(std::move(key), std::move(val));
+        converters.try_emplace(std::move(key), std::move(val));
     }
 
 private:
@@ -74,29 +74,29 @@ private:
     };
 
     template<typename T>
-    static inline ConverterStorage<T> converter_storage_{};
+    static inline ConverterStorage<T> converter_storage;
 
     template<typename T>
     static std::pair<std::type_index, Converters> build_converter_entry(Deserialize<T> deserialize, Serialize<T> serialize)
     {
-        converter_storage_<T> = ConverterStorage<T>{ deserialize, serialize };
+        converter_storage<T> = ConverterStorage<T>{ deserialize, serialize };
         return { std::type_index{ typeid(T*) }, Converters{ &deserialize_impl<T>, &serialize_impl<T> } };
     }
 
     template<typename T>
     static bool deserialize_impl(tr_variant const& src, void* const tgt)
     {
-        return converter_storage_<T>.deserialize(src, static_cast<T*>(tgt));
+        return converter_storage<T>.deserialize(src, static_cast<T*>(tgt));
     }
 
     template<typename T>
     static tr_variant serialize_impl(void const* const src)
     {
-        return converter_storage_<T>.serialize(*static_cast<T const*>(src));
+        return converter_storage<T>.serialize(*static_cast<T const*>(src));
     }
 
     using ConvertersMap = small::unordered_map<std::type_index, Converters>;
-    static ConvertersMap converters_;
+    static ConvertersMap converters;
 };
 
 /**
@@ -213,22 +213,22 @@ protected:
         Field(Key key_in, T Derived::* ptr)
             : key{ std::move(key_in) }
             , idx{ typeid(T*) }
-            , getter{ &Field::template get_impl<T> }
-            , const_getter{ &Field::template get_const_impl<T> }
+            , getter_{ &Field::template get_impl<T> }
+            , const_getter_{ &Field::template get_const_impl<T> }
         {
             static_assert(sizeof(MemberStorage) >= sizeof(T Derived::*));
             static_assert(alignof(MemberStorage) >= alignof(T Derived::*));
-            new (&storage) T Derived::*(ptr);
+            new (&storage_) T Derived::*(ptr);
         }
 
         void* get(Derived* self) const noexcept
         {
-            return getter(self, &storage);
+            return getter_(self, &storage_);
         }
 
         void const* get(Derived const* self) const noexcept
         {
-            return const_getter(self, &storage);
+            return const_getter_(self, &storage_);
         }
 
         Key key;
@@ -253,9 +253,9 @@ protected:
             return &(self->*member);
         }
 
-        Getter getter;
-        ConstGetter const_getter;
-        MemberStorage storage;
+        Getter getter_;
+        ConstGetter const_getter_;
+        MemberStorage storage_;
     };
 
 private:
