@@ -209,10 +209,6 @@ public:
 protected:
     struct Field
     {
-        using Getter = void* (*)(Derived*, void const*);
-        using ConstGetter = void const* (*)(Derived const*, void const*);
-        using MemberStorage = std::aligned_storage_t<sizeof(char Derived::*), alignof(char Derived::*)>;
-
         template<typename T>
         Field(Key key_in, T Derived::* ptr)
             : key{ std::move(key_in) }
@@ -239,6 +235,10 @@ protected:
         std::type_index idx;
 
     private:
+        using Getter = void* (*)(Derived*, void const*);
+        using ConstGetter = void const* (*)(Derived const*, void const*);
+        using MemberStorage = std::aligned_storage_t<sizeof(char Derived::*), alignof(char Derived::*)>;
+
         template<typename T>
         static void* get_impl(Derived* self, void const* opaque) noexcept
         {
