@@ -518,7 +518,7 @@ tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 }
 } // unnamed namespace
 
-Serializers::ConvertersMap Serializers::converters_ = { {
+Serializers::ConvertersMap Serializers::converters = { {
     Serializers::build_converter_entry(to_bool, from_bool),
     Serializers::build_converter_entry(to_double, from_double),
     Serializers::build_converter_entry(to_encryption_mode, from_encryption_mode),
