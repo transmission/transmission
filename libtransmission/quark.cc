@@ -1092,7 +1092,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
       { "availability"sv, "availability"sv },
       { "bandwidth_priority"sv, "bandwidthPriority"sv }, // TODO(ckerr) legacy duplicate
-      { "begin_piece"sv, "begin_piece"sv },
+      { "begin_piece"sv, "begin_piece"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "blocklist_enabled"sv, "blocklist-enabled"sv },
       { "blocklist_size"sv, "blocklist-size"sv },
       { "blocklist_update"sv, "blocklist-update"sv },
@@ -1132,7 +1132,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "downloader_count"sv, "downloader_count"sv },
       { "edit_date"sv, "editDate"sv },
       { "encryption"sv, "encryption"sv },
-      { "end_piece"sv, "end_piece"sv },
+      { "end_piece"sv, "end_piece"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "error"sv, "error"sv },
       { "error_string"sv, "errorString"sv },
       { "eta"sv, "eta"sv },
@@ -1172,7 +1172,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "ids"sv, "ids"sv },
       { "incomplete_dir"sv, "incomplete-dir"sv },
       { "incomplete_dir_enabled"sv, "incomplete-dir-enabled"sv },
-      { "ip_protocol"sv, "ip_protocol"sv },
+      { "ip_protocol"sv, "ip_protocol"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "ipv4"sv, "ipv4"sv },
       { "ipv6"sv, "ipv6"sv },
       { "is_backup"sv, "isBackup"sv },
@@ -1242,7 +1242,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "port_is_open"sv, "port-is-open"sv },
       { "port_test"sv, "port-test"sv },
       { "preferred"sv, "preferred"sv },
-      { "preferred_transports"sv, "preferred_transports"sv },
+      { "preferred_transports"sv, "preferred_transports"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "primary_mime_type"sv, "primary-mime-type"sv },
       { "priorities"sv, "priorities"sv },
       { "priority"sv, "priority"sv },
@@ -1293,7 +1293,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "seed_ratio_mode"sv, "seedRatioMode"sv },
       { "seeder_count"sv, "seederCount"sv },
       { "seeding_done"sv, "seeding-done"sv },
-      { "sequential_download"sv, "sequential_download"sv },
+      { "sequential_download"sv, "sequential_download"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
       { "session_close"sv, "session-close"sv },
       { "session_count"sv, "sessionCount"sv }, // TODO(ckerr) legacy duplicate
@@ -1442,7 +1442,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "seed_queue_enabled"sv, "seed-queue-enabled"sv },
     { "seed_queue_size"sv, "seed-queue-size"sv },
     { "sequential_download"sv, "sequential_download"sv },
-    { "sleep_per_seconds_during_verify"sv, "sleep_per_seconds_during_verify"sv },
+    { "sleep_per_seconds_during_verify"sv, "sleep_per_seconds_during_verify"sv }, // kebab-case in 4.1.0-beta.1
     { "speed_limit_down"sv, "speed-limit-down"sv },
     { "speed_limit_down_enabled"sv, "speed-limit-down-enabled"sv },
     { "speed_limit_up"sv, "speed-limit-up"sv },
