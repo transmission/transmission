@@ -1359,7 +1359,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 281U>{{
     { "webseeds_sending_to_us"sv, "webseedsSendingToUs"sv },
 }};
 
-auto constexpr SessionKeys = std::array<ApiKey, 82U>{{
+auto constexpr SessionKeys = std::array<ApiKey, 123U>{{
     // tr_rpc_server::Settings
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
@@ -1447,6 +1447,49 @@ auto constexpr SessionKeys = std::array<ApiKey, 82U>{{
     { "umask"sv, "umask"sv },
     { "upload_slots_per_torrent"sv, "upload-slots-per-torrent"sv },
     { "utp_enabled"sv, "utp-enabled"sv },
+
+    // transmission-qt
+    { "show_options_window"sv, "show-options-window"sv },
+    { "open_dialog_dir"sv, "open-dialog-dir"sv },
+    { "inhibit_desktop_hibernation"sv, "inhibit-desktop-hibernation"sv },
+    { "watch_dir"sv, "watch-dir"sv },
+    { "watch_dir_enabled"sv, "watch-dir-enabled"sv },
+    { "show_notification_area_icon"sv, "show-notification-area-icon"sv },
+    { "start_minimized"sv, "start-minimized"sv },
+    { "torrent_added_notification_enabled"sv, "torrent-added-notification-enabled"sv },
+    { "torrent_complete_notification_enabled"sv, "torrent-complete-notification-enabled"sv },
+    { "prompt_before_exit"sv, "prompt-before-exit"sv },
+    { "sort_mode"sv, "sort-mode"sv },
+    { "sort_reversed"sv, "sort-reversed"sv },
+    { "compact_view"sv, "compact-view"sv },
+    { "show_filterbar"sv, "show-filterbar"sv },
+    { "show_statusbar"sv, "show-statusbar"sv },
+    { "statusbar_stats"sv, "statusbar-stats"sv },
+    { "show_tracker_scrapes"sv, "show-tracker-scrapes"sv },
+    { "show_backup_trackers"sv, "show-backup-trackers"sv },
+    { "show_toolbar"sv, "show-toolbar"sv },
+    { "blocklist_date"sv, "blocklist-date"sv },
+    { "blocklist_updates_enabled"sv, "blocklist-updates-enabled"sv },
+    { "main_window_layout_order"sv, "main-window-layout-order"sv },
+    { "main_window_height"sv, "main-window-height"sv },
+    { "main_window_width"sv, "main-window-width"sv },
+    { "main_window_x"sv, "main-window-x"sv },
+    { "main_window_y"sv, "main-window-y"sv },
+    { "filter_mode"sv, "filter-mode"sv },
+    { "filter_trackers"sv, "filter-trackers"sv },
+    { "filter_text"sv, "filter-text"sv },
+    { "remote_session_enabled"sv, "remote-session-enabled"sv },
+    { "remote_session_host"sv, "remote-session-host"sv },
+    { "remote_session_https"sv, "remote-session-https"sv },
+    { "remote_session_password"sv, "remote-session-password"sv },
+    { "remote_session_port"sv, "remote-session-port"sv },
+    { "remote_session_requres_authentication"sv, "remote-session-requres-authentication"sv },
+    { "remote_session_username"sv, "remote-session-username"sv },
+    { "remote_session_rpc_url_path"sv, "remote_session_rpc_url_path"sv },
+    { "torrent_complete_sound_command"sv, "torrent-complete-sound-command"sv },
+    { "torrent_complete_sound_enabled"sv, "torrent-complete-sound-enabled"sv },
+    { "user_has_given_informed_consent"sv, "user-has-given-informed-consent"sv },
+    { "read_clipboard"sv, "read-clipboard"sv },
 }};
 
 }  // namespace
