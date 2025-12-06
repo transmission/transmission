@@ -1064,6 +1064,7 @@ namespace libtransmission::api_compat
 namespace
 {
 
+#if 0
 using Type = std::bitset<32U>;
 
 inline constexpr auto Rpc               = Type { 1 <<  1 };
@@ -1080,6 +1081,7 @@ inline constexpr auto BtProtocol        = Type { 1 << 11 };
 inline constexpr auto TorrentFile       = Type { 1 << 12 };
 inline constexpr auto QtApp             = Type { 1 << 13 };
 inline constexpr auto GtkApp            = Type { 1 << 14 };
+#endif
 
 struct ApiKey
 {
@@ -1755,20 +1757,23 @@ auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
  * Used for ensuring we return RPC replies in style of the
  * corresponding request.
  */
-[[nodiscard]] Style detect_style(tr_variant const& variant)
+[[nodiscard]] std::optional<Style> detect_style(tr_variant const& in)
 {
-    (void)variant;
+    tr_variant::Map const* map = in.get_if<tr_variant::Map>();
+    if (!map)
+        return {};
 
-    // TODO: implement
-    return Style::Current;
+    // TODO: recursively walk the map & look at keys
+
+    return {};
 }
 
-[[nodiscard]] tr_variant apply_style(tr_variant&& in, Style style)
+[[nodiscard]] tr_variant apply_style(tr_variant const& in, Style style)
 {
     (void)style;
 
     // TODO: implement
-    return std::move(in);
+    return {};
 }
 
 } // namespace libtransmission::api_compat
