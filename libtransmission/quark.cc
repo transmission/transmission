@@ -5,13 +5,10 @@
 
 #include <algorithm>
 #include <array>
-#include <bitset>
 #include <cstddef>
-#include <cstdint>
 #include <iterator> // for std::distance()
 #include <optional>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include "libtransmission/quark.h"
@@ -1064,25 +1061,6 @@ namespace libtransmission::api_compat
 namespace
 {
 
-#if 0
-using Type = std::bitset<32U>;
-
-inline constexpr auto Rpc               = Type { 1 <<  1 };
-inline constexpr auto JsonRpc           = Type { 1 <<  2 };
-inline constexpr auto Resume            = Type { 1 <<  3 };
-inline constexpr auto RpcServerSettings = Type { 1 <<  4 };
-inline constexpr auto SpeedSettings     = Type { 1 <<  5 };
-inline constexpr auto SessionSettings   = Type { 1 <<  6 };
-inline constexpr auto Daemon            = Type { 1 <<  7 };
-inline constexpr auto StatsFile         = Type { 1 <<  8 };
-inline constexpr auto ResumeFile        = Type { 1 <<  9 };
-inline constexpr auto DhtFile           = Type { 1 << 10 };
-inline constexpr auto BtProtocol        = Type { 1 << 11 };
-inline constexpr auto TorrentFile       = Type { 1 << 12 };
-inline constexpr auto QtApp             = Type { 1 << 13 };
-inline constexpr auto GtkApp            = Type { 1 << 14 };
-#endif
-
 struct ApiKey
 {
     // snake-case string
@@ -1750,6 +1728,71 @@ auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
     { "upload_limited"sv, "uploadLimited"sv },
 } };
 
+template<size_t N>
+[[nodiscard]] bool matches(std::array<ApiKey, N> const& keys, std::string_view ApiKey::* member, std::string_view name)
+{
+    return std::any_of(std::begin(keys), std::end(keys), [member, name](ApiKey const& key) { return key.*member == name; });
+}
+
+[[nodiscard]] bool is_current_key(std::string_view name)
+{
+    return matches(RpcKeys, &ApiKey::current, name) || matches(SessionKeys, &ApiKey::current, name);
+}
+
+[[nodiscard]] bool is_legacy_rpc_key(std::string_view name)
+{
+    return matches(RpcKeys, &ApiKey::legacy, name);
+}
+
+[[nodiscard]] bool is_legacy_settings_key(std::string_view name)
+{
+    return matches(SessionKeys, &ApiKey::legacy, name);
+}
+
+template<typename Predicate>
+[[nodiscard]] bool walk_variant(tr_variant const& value, Predicate const& predicate);
+
+template<typename Predicate>
+[[nodiscard]] bool walk_map(tr_variant::Map const& map, Predicate const& predicate)
+{
+    for (auto const& [key, child] : map)
+    {
+        if (!predicate(tr_quark_get_string_view(key)))
+        {
+            return false;
+        }
+
+        if (!walk_variant(child, predicate))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template<typename Predicate>
+[[nodiscard]] bool walk_variant(tr_variant const& value, Predicate const& predicate)
+{
+    if (auto const* child_map = value.get_if<tr_variant::Map>(); child_map != nullptr)
+    {
+        return walk_map(*child_map, predicate);
+    }
+
+    if (auto const* vec = value.get_if<tr_variant::Vector>(); vec != nullptr)
+    {
+        for (auto const& item : *vec)
+        {
+            if (!walk_variant(item, predicate))
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 } // namespace
 
 /**
@@ -1757,19 +1800,35 @@ auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
  * Used for ensuring we return RPC replies in style of the
  * corresponding request.
  */
-[[nodiscard]] std::optional<Style> detect_style(tr_variant const& in)
+[[nodiscard]] std::optional<Style> detect_style(tr_variant const& variant)
 {
-    tr_variant::Map const* map = in.get_if<tr_variant::Map>();
-    if (!map)
+    auto const* top_map = variant.get_if<tr_variant::Map>();
+    if (top_map == nullptr)
+    {
         return {};
+    }
 
-    // TODO: recursively walk the map & look at keys
+    if (walk_map(*top_map, is_current_key))
+    {
+        return Style::Current;
+    }
+
+    if (walk_map(*top_map, is_legacy_rpc_key))
+    {
+        return Style::LegacyRpc;
+    }
+
+    if (walk_map(*top_map, is_legacy_settings_key))
+    {
+        return Style::LegacySettings;
+    }
 
     return {};
 }
 
 [[nodiscard]] tr_variant apply_style(tr_variant const& in, Style style)
 {
+    (void)in;
     (void)style;
 
     // TODO: implement
