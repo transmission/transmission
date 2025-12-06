@@ -9,6 +9,8 @@
 #include <optional>
 #include <string_view>
 
+struct tr_variant;
+
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 using tr_quark = size_t;
 
@@ -715,3 +717,33 @@ enum // NOLINT(performance-enum-size)
  * Note: Temporary shim just for the transition period to snake_case.
  */
 [[nodiscard]] tr_quark tr_quark_convert(tr_quark quark);
+
+namespace libtransmission::api_compat
+{
+
+enum class Style
+{
+    // RPC naming scheme before we migrated to snake case.
+    LegacyRpc,
+
+    // settings.json naming scheme before we migrated to snake case.
+    LegacySettings,
+
+    // The current style: everything in snake case..
+    Current,
+
+    // Use case for exporting to legacy: users can use the
+    // same settings.json in 4.0.x and 4.1.x.
+    // TODO: when we bump to 5.0.0, change this to `Current`
+    DefaultSettingsExportStyle = LegacySettings,
+};
+
+/**
+ * Detect what style this payload is using. Used for ensuring
+ * that RPC replies are sent in style of the corresponding request.
+ */
+[[nodiscard]] Style detect_style(tr_variant const& variant);
+
+[[nodiscard]] tr_variant apply_style(tr_variant&& in, Style style);
+
+} // namespace libtransmission::api_compat

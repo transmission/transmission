@@ -6,12 +6,15 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <iterator> // for std::distance()
 #include <optional>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "libtransmission/quark.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -1051,3 +1054,48 @@ tr_quark tr_quark_convert(tr_quark q)
     }
     // clang-format on
 }
+
+// ---
+
+namespace libtransmission::api_compat
+{
+
+namespace
+{
+
+struct ApiKey
+{
+    // snake-case string
+    std::string_view current;
+   
+    // legacy mixed-case RPC string (pre-05aef3e7)
+    std::string_view legacy_rpc;
+
+    // ignore for now
+    //std::string_view legacy_setting;
+};
+
+auto constexpr ApiKeys = std::array<ApiKey, 280U>{{
+    // TODO: populate
+}};
+
+}  // namespace
+
+/**
+ * Detect whether this payload is using Legacy or Current style.
+ * Used for ensuring we return RPC replies in style of the
+ * corresponding request.
+ */
+[[nodiscard]] Style detect_style(tr_variant const& variant)
+{
+   // TODO: implement
+   return Style::Current;
+}
+
+[[nodiscard]] tr_variant apply_style(tr_variant&& in, Style style)
+{
+    // TODO: implement
+    return std::move(in);
+}
+
+} // namespace libtransmission::api_compat
