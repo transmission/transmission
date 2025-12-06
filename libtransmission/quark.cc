@@ -1363,7 +1363,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "data"sv, "data"sv }, // string unused in legacy
       { "jsonrpc"sv, "jsonrpc"sv }, // string unused in legacy
       { "message"sv, "message"sv }, // string unused in legacy
-      { "params"sv, "params"sv }, // string unused in legacy
+      { "params"sv, "arguments"sv }, // legacy JSON-RPC alias
       { "method"sv, "method"sv } }
 };
 
