@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstddef> // size_t
 #include <memory>
 #include <string>
@@ -19,7 +20,7 @@
 
 #include "libtransmission/net.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/settings.h"
+#include "libtransmission/serializable.h"
 #include "libtransmission/utils-ev.h"
 
 class tr_rpc_address;
@@ -35,7 +36,7 @@ class Timer;
 class tr_rpc_server
 {
 public:
-    class Settings final : public libtransmission::Settings
+    class Settings final : public libtransmission::Serializable<Settings>
     {
     public:
         Settings() = default;
@@ -63,25 +64,24 @@ public:
         tr_port port = tr_port::from_host(TrDefaultRpcPort);
 
     private:
-        [[nodiscard]] Fields fields() override
-        {
-            return {
-                { TR_KEY_anti_brute_force_enabled, &is_anti_brute_force_enabled },
-                { TR_KEY_anti_brute_force_threshold, &anti_brute_force_limit },
-                { TR_KEY_rpc_authentication_required, &authentication_required },
-                { TR_KEY_rpc_bind_address, &bind_address_str },
-                { TR_KEY_rpc_enabled, &is_enabled },
-                { TR_KEY_rpc_host_whitelist, &host_whitelist_str },
-                { TR_KEY_rpc_host_whitelist_enabled, &is_host_whitelist_enabled },
-                { TR_KEY_rpc_port, &port },
-                { TR_KEY_rpc_password, &salted_password },
-                { TR_KEY_rpc_socket_mode, &socket_mode },
-                { TR_KEY_rpc_url, &url },
-                { TR_KEY_rpc_username, &username },
-                { TR_KEY_rpc_whitelist, &whitelist_str },
-                { TR_KEY_rpc_whitelist_enabled, &is_whitelist_enabled },
-            };
-        }
+        friend libtransmission::Serializable<Settings>;
+
+        static inline auto const fields = std::array<Field, 14U>{ {
+            { TR_KEY_anti_brute_force_enabled, &Settings::is_anti_brute_force_enabled },
+            { TR_KEY_anti_brute_force_threshold, &Settings::anti_brute_force_limit },
+            { TR_KEY_rpc_authentication_required, &Settings::authentication_required },
+            { TR_KEY_rpc_bind_address, &Settings::bind_address_str },
+            { TR_KEY_rpc_enabled, &Settings::is_enabled },
+            { TR_KEY_rpc_host_whitelist, &Settings::host_whitelist_str },
+            { TR_KEY_rpc_host_whitelist_enabled, &Settings::is_host_whitelist_enabled },
+            { TR_KEY_rpc_port, &Settings::port },
+            { TR_KEY_rpc_password, &Settings::salted_password },
+            { TR_KEY_rpc_socket_mode, &Settings::socket_mode },
+            { TR_KEY_rpc_url, &Settings::url },
+            { TR_KEY_rpc_username, &Settings::username },
+            { TR_KEY_rpc_whitelist, &Settings::whitelist_str },
+            { TR_KEY_rpc_whitelist_enabled, &Settings::is_whitelist_enabled },
+        } };
     };
 
     tr_rpc_server(tr_session* session, Settings&& settings);

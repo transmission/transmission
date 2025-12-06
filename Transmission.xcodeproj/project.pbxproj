@@ -452,8 +452,8 @@
 		ED5E0EA22CD314FE0071433B /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = ED5E0EA12CD314FE0071433B /* style.css */; };
 		ED5E0EFA2CD315720071433B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = ED5E0EF72CD315720071433B /* Localizable.strings */; };
 		ED5E0F0F2CD31BC20071433B /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
-		ED67FB422B70FCE400D8A037 /* settings.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED67FB402B70FCE400D8A037 /* settings.cc */; };
-		ED67FB432B70FCE400D8A037 /* settings.h in Headers */ = {isa = PBXBuildFile; fileRef = ED67FB412B70FCE400D8A037 /* settings.h */; };
+		ED67FB422B70FCE400D8A037 /* serializable.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED67FB402B70FCE400D8A037 /* serializable.cc */; };
+		ED67FB432B70FCE400D8A037 /* serializable.h in Headers */ = {isa = PBXBuildFile; fileRef = ED67FB412B70FCE400D8A037 /* serializable.h */; };
 		ED6F16B52EB8F1EB007CD864 /* FileNameCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B22EB8F1EB007CD864 /* FileNameCellView.mm */; };
 		ED6F16B62EB8F1EB007CD864 /* FilePriorityCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B42EB8F1EB007CD864 /* FilePriorityCellView.mm */; };
 		ED6F16B72EB8F1EB007CD864 /* FileCheckCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */; };
@@ -1439,8 +1439,8 @@
 		ED5E0F0C2CD3163B0071433B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		ED5E0F0D2CD316450071433B /* zh-CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-CN"; path = "zh-CN.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		ED5E0F0E2CD3164D0071433B /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		ED67FB402B70FCE400D8A037 /* settings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = settings.cc; sourceTree = "<group>"; };
-		ED67FB412B70FCE400D8A037 /* settings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = settings.h; sourceTree = "<group>"; };
+		ED67FB402B70FCE400D8A037 /* serializable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serializable.cc; sourceTree = "<group>"; };
+		ED67FB412B70FCE400D8A037 /* serializable.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = serializable.h; sourceTree = "<group>"; };
 		ED6F16AF2EB8F1EB007CD864 /* FileCheckCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileCheckCellView.h; sourceTree = "<group>"; };
 		ED6F16B02EB8F1EB007CD864 /* FileCheckCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileCheckCellView.mm; sourceTree = "<group>"; };
 		ED6F16B12EB8F1EB007CD864 /* FileNameCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileNameCellView.h; sourceTree = "<group>"; };
@@ -2005,8 +2005,8 @@
 				BEFC1E140C07861A00B0BB3C /* session.h */,
 				CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */,
 				CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */,
-				ED67FB402B70FCE400D8A037 /* settings.cc */,
-				ED67FB412B70FCE400D8A037 /* settings.h */,
+				ED67FB402B70FCE400D8A037 /* serializable.cc */,
+				ED67FB412B70FCE400D8A037 /* serializable.h */,
 				A25D2CBB0CF4C7190096A262 /* stats.cc */,
 				A25D2CBA0CF4C7190096A262 /* stats.h */,
 				C11DEA141FCD31C0009E22B9 /* subprocess-posix.cc */,
@@ -2600,7 +2600,7 @@
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
 				C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */,
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
-				ED67FB432B70FCE400D8A037 /* settings.h in Headers */,
+				ED67FB432B70FCE400D8A037 /* serializable.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				A25E03E20E4015380086C225 /* tr-getopt.h in Headers */,
 				A21FBBAB0EDA78C300BC3C51 /* bandwidth.h in Headers */,
@@ -3478,7 +3478,7 @@
 				C1033E081A3279B800EF44D8 /* crypto-utils-ccrypto.cc in Sources */,
 				A22CFCA80FC24ED80009BD3E /* tr-dht.cc in Sources */,
 				0A6169A70FE5C9A200C66CE6 /* bitfield.cc in Sources */,
-				ED67FB422B70FCE400D8A037 /* settings.cc in Sources */,
+				ED67FB422B70FCE400D8A037 /* serializable.cc in Sources */,
 				1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */,
 				A25964A6106D73A800453B31 /* announcer.cc in Sources */,
 				66F977825E65AD498C028BB0 /* announce-list.cc in Sources */,
