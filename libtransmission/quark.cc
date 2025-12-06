@@ -1075,7 +1075,7 @@ struct ApiKey
     //std::string_view legacy_setting;
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 287U>{
+auto constexpr RpcKeys = std::array<ApiKey, 288U>{
     { { "active_torrent_count"sv, "activeTorrentCount"sv },
       { "activity_date"sv, "activityDate"sv },
       { "added"sv, "added"sv },
@@ -1163,9 +1163,10 @@ auto constexpr RpcKeys = std::array<ApiKey, 287U>{
       { "hash_string"sv, "hashString"sv },
       { "have_unchecked"sv, "haveUnchecked"sv },
       { "have_valid"sv, "haveValid"sv },
-      { "honors_session_limits"sv, "honorsSessionLimits"sv },
-      { "host"sv, "host"sv },
-      { "id"sv, "id"sv },
+    { "honors_session_limits"sv, "honorsSessionLimits"sv },
+    { "host"sv, "host"sv },
+    { "id"sv, "id"sv },
+    { "id"sv, "tag"sv }, // FIXME(ckerr): edge case: id<->id elsewhere
       { "idle_seeding_limit"sv, "idle-seeding-limit"sv },
       { "idle_seeding_limit_enabled"sv, "idle-seeding-limit-enabled"sv },
       { "ids"sv, "ids"sv },
@@ -1366,7 +1367,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 287U>{
       { "method"sv, "method"sv } }
 };
 
-auto constexpr SessionKeys = std::array<ApiKey, 310U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 311U>{ {
     // tr_rpc_server::Settings
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
@@ -1643,6 +1644,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 310U>{ {
     { "remote_session_password"sv, "remote-session-password"sv },
     { "remote_session_port"sv, "remote-session-port"sv },
     { "remote_session_requres_authentication"sv, "remote-session-requres-authentication"sv },
+    { "remote_session_requires_authentication"sv, "remote-session-requres-authentication"sv },
     { "remote_session_username"sv, "remote-session-username"sv },
     { "remote_session_rpc_url_path"sv, "remote_session_rpc_url_path"sv },
     { "torrent_complete_sound_command"sv, "torrent-complete-sound-command"sv },
