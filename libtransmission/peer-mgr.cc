@@ -1766,7 +1766,11 @@ tr_swarm_stats tr_swarmGetStats(tr_swarm const* const swarm)
         return std::count_if(
             std::begin(swarm->peers),
             std::end(swarm->peers),
-            [dir](auto const& peer) { return peer && peer->is_active(dir); });
+            [dir](auto const& peer)
+            {
+                auto strong_peer = peer;
+                return strong_peer->is_active(dir);
+            });
     };
 
     auto& stats = swarm->stats;
