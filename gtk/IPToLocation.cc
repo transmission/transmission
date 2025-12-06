@@ -73,7 +73,7 @@ bool test_and_open_mmdb()
         {
             mmdb_open = true;
             // Ensure we close the database on process exit
-            std::atexit(close_mmdb);
+            (void) std::atexit(close_mmdb);
             return true;
         }
         std::cerr << "libmaxminddb: error opening " << mmdb_file << ": " << MMDB_strerror(status) << "\n";
