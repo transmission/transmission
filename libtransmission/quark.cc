@@ -1778,7 +1778,7 @@ namespace detect_style_helpers
 namespace apply_style_helpers
 {
 template<size_t N>
-[[nodiscard]] ApiKey const* find_preferred_current(std::array<ApiKey, N> const& keys, std::string_view canonical)
+[[nodiscard]] ApiKey const* find_preferred_current(std::array<ApiKey, N> const& keys, std::string_view const canonical)
 {
     auto const matches = [canonical](ApiKey const& key)
     {
@@ -1802,7 +1802,7 @@ template<size_t N>
     return nullptr;
 }
 
-[[nodiscard]] std::optional<std::string_view> key_for_style(std::string_view canonical, Style style)
+[[nodiscard]] std::optional<std::string_view> key_for_style(std::string_view const canonical, Style const style)
 {
     switch (style)
     {
@@ -1810,17 +1810,13 @@ template<size_t N>
         return canonical;
 
     case Style::LegacyRpc:
-        if (auto const* key = find_preferred_current(RpcKeys, canonical); key != nullptr)
-        {
+        if (auto const* key = find_preferred_current(RpcKeys, canonical))
             return key->legacy;
-        }
         break;
 
     case Style::LegacySettings:
-        if (auto const* key = find_preferred_current(SessionKeys, canonical); key != nullptr)
-        {
+        if (auto const* key = find_preferred_current(SessionKeys, canonical))
             return key->legacy;
-        }
         break;
     }
 
@@ -1831,7 +1827,7 @@ template<size_t N>
 [[nodiscard]] ApiKey const* find_key(
     std::array<ApiKey, N> const& keys,
     std::string_view ApiKey::* member,
-    std::string_view name)
+    std::string_view const name)
 {
     auto const it = std::find_if(
         std::begin(keys),
@@ -1840,24 +1836,24 @@ template<size_t N>
     return it != std::end(keys) ? &*it : nullptr;
 }
 
-[[nodiscard]] std::optional<std::string_view> canonicalize_key(std::string_view name, Style style)
+[[nodiscard]] std::optional<std::string_view> canonicalize_key(std::string_view const name, Style const style)
 {
     switch (style)
     {
     case Style::Current:
-        if (auto const* key = find_key(RpcKeys, &ApiKey::current, name); key != nullptr)
+        if (auto const* key = find_key(RpcKeys, &ApiKey::current, name))
             return key->current;
-        if (auto const* key = find_key(SessionKeys, &ApiKey::current, name); key != nullptr)
+        if (auto const* key = find_key(SessionKeys, &ApiKey::current, name))
             return key->current;
         break;
 
     case Style::LegacyRpc:
-        if (auto const* key = find_key(RpcKeys, &ApiKey::legacy, name); key != nullptr)
+        if (auto const* key = find_key(RpcKeys, &ApiKey::legacy, name))
             return key->current;
         break;
 
     case Style::LegacySettings:
-        if (auto const* key = find_key(SessionKeys, &ApiKey::legacy, name); key != nullptr)
+        if (auto const* key = find_key(SessionKeys, &ApiKey::legacy, name))
             return key->current;
         break;
     }
@@ -1913,16 +1909,10 @@ template<size_t N>
 
 [[nodiscard]] tr_variant convert_variant(tr_variant const& value, std::optional<Style> const& src_style, Style const tgt_style)
 {
-    if (auto const* map = value.get_if<tr_variant::Map>(); map != nullptr)
+    if (auto const* const map = value.get_if<tr_variant::Map>(); map != nullptr)
         return convert_map(*map, src_style, tgt_style);
-
-    if (auto const* vec = value.get_if<tr_variant::Vector>(); vec != nullptr)
+    if (auto const* const vec = value.get_if<tr_variant::Vector>(); vec != nullptr)
         return convert_vector(*vec, src_style, tgt_style);
-
-    auto ret = tr_variant{};
-
-    if (value.holds_alternative<std::nullptr_t>())
-        return nullptr;
     if (auto const val = value.value_if<bool>(); val)
         return *val;
     if (auto const int_val = value.value_if<int64_t>(); int_val)
@@ -1931,8 +1921,10 @@ template<size_t N>
         return *double_val;
     if (auto const string_val = value.value_if<std::string_view>(); string_val)
         return *string_val;
+    if (value.holds_alternative<std::nullptr_t>())
+        return nullptr;
 
-    return ret;
+    return {};
 }
 } // namespace apply_style_helpers
 
