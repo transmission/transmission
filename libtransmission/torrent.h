@@ -183,7 +183,7 @@ struct tr_torrent
     void rename_path(
         std::string_view oldpath,
         std::string_view newname,
-        tr_torrent_rename_done_func callback,
+        tr_torrent_rename_done_func&& callback,
         void* callback_user_data);
 
     // these functions should become private when possible,
@@ -1253,10 +1253,7 @@ private:
 
     constexpr void bump_date_changed(time_t when)
     {
-        if (date_changed_ < when)
-        {
-            date_changed_ = when;
-        }
+        date_changed_ = std::max(date_changed_, when);
     }
 
     void set_verify_state(VerifyState state);
@@ -1323,7 +1320,7 @@ private:
     void rename_path_in_session_thread(
         std::string_view oldpath,
         std::string_view newname,
-        tr_torrent_rename_done_func callback,
+        tr_torrent_rename_done_func const& callback,
         void* callback_user_data);
 
     void start_in_session_thread();
