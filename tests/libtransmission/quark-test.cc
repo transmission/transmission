@@ -119,6 +119,37 @@ constexpr std::string_view LegacySettingsJson = R"json({
     "watch-dir-enabled": false
 })json";
 
+constexpr std::string_view LegacyStatsJson = R"json({
+    "downloaded-bytes": 314159265358,
+    "files-added": 271828,
+    "seconds-active": 1618033988,
+    "session-count": 141421,
+    "uploaded-bytes": 299792458
+})json";
+
+constexpr std::string_view LegacyRpcJson = R"json({
+    "arguments": {
+        "fields": [
+            "error",
+            "errorString",
+            "eta",
+            "id",
+            "isFinished",
+            "leftUntilDone",
+            "name",
+            "peersGettingFromUs",
+            "peersSendingToUs",
+            "rateDownload",
+            "rateUpload",
+            "sizeWhenDone",
+            "status",
+            "uploadRatio"
+        ]
+    },
+    "method": "torrent-get",
+    "tag": 6
+})json";
+
 } // namespace
 
 class QuarkTest : public ::testing::Test
@@ -163,29 +194,6 @@ TEST_F(QuarkTest, canDetectLegacySettings)
 
 TEST_F(QuarkTest, canDetectLegacyRpc)
 {
-    constexpr std::string_view LegacyRpcJson = R"json({
-        "arguments": {
-            "fields": [
-                "error",
-                "errorString",
-                "eta",
-                "id",
-                "isFinished",
-                "leftUntilDone",
-                "name",
-                "peersGettingFromUs",
-                "peersSendingToUs",
-                "rateDownload",
-                "rateUpload",
-                "sizeWhenDone",
-                "status",
-                "uploadRatio"
-            ]
-        },
-        "method": "torrent-get",
-        "tag": 6
-    })json";
-
     auto serde = tr_variant_serde::json();
     auto variant = serde.parse(LegacyRpcJson);
     ASSERT_TRUE(variant);
@@ -193,4 +201,15 @@ TEST_F(QuarkTest, canDetectLegacyRpc)
     auto const style = libtransmission::api_compat::detect_style(*variant);
     ASSERT_TRUE(style);
     EXPECT_EQ(libtransmission::api_compat::Style::LegacyRpc, *style);
+}
+
+TEST_F(QuarkTest, canDetectLegacyStats)
+{
+    auto serde = tr_variant_serde::json();
+    auto variant = serde.parse(LegacyStatsJson);
+    ASSERT_TRUE(variant);
+
+    auto const style = libtransmission::api_compat::detect_style(*variant);
+    ASSERT_TRUE(style);
+    EXPECT_EQ(libtransmission::api_compat::Style::LegacySettings, *style);
 }
