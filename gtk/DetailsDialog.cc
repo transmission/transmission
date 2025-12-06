@@ -979,10 +979,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     else
     {
         auto const downloaded_str = tr_strlsize(std::accumulate(
-            std::begin(stats),
-            std::end(stats),
-            uint64_t{ 0 },
-            [](auto sum, auto const* st) { return sum + st->downloadedEver; }));
+                std::begin(stats),
+                std::end(stats),
+                uint64_t{ 0 },
+                [](auto sum, auto const* st) { return sum + st->downloadedEver; }));
 
         auto const failed = std::accumulate(
             std::begin(stats),
@@ -2610,8 +2610,10 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Gtk::Builder> cons
     , file_list_(gtr_get_widget_derived<FileList>(builder, "files_view_scroll", "files_view", core, 0))
     , file_label_(gtr_get_widget<Gtk::Label>(builder, "files_label"))
 {
-    // Maintain the IP-to-location database in the background
-    maintain_mmdb_file_async(get_mmdb_file_path());
+    // Open the IP-to-location database (if available)
+    test_and_open_mmdb();
+    // Run database maintenance in the background
+    maintain_mmdb_file_async();
 
     /* return saved window size */
     auto const width = (int)gtr_pref_int_get(TR_KEY_details_window_width);

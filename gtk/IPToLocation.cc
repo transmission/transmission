@@ -13,21 +13,30 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <atomic>
+#include <iterator>
+#include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <thread>
 #include <vector>
-#include <iterator>
 
-namespace {
-    // Atomic flag to prevent concurrent maintenance operations
-    std::atomic_flag maintenance_in_progress = ATOMIC_FLAG_INIT;
-}
+namespace
+{
+// Atomic flag to prevent concurrent maintenance operations
+std::atomic_flag maintenance_in_progress = ATOMIC_FLAG_INIT;
+
+// MMDB database handle, status, and lock
+MMDB_s mmdb;
+std::atomic_bool mmdb_open{ false };
+std::shared_mutex mmdb_lock;
+} // namespace
 
 // Get the cache directory path
 std::string get_cache_dir()
@@ -45,6 +54,43 @@ std::string get_mmdb_file_path()
     path.emplace_back(get_cache_dir());
     path.emplace_back("dbip-city-lite.mmdb");
     return Glib::build_filename(path);
+}
+
+bool test_and_open_mmdb()
+{
+    // Acquire lock, then attempt to open the database
+    std::unique_lock write_lock(mmdb_lock);
+    if (mmdb_open)
+    {
+        return true;
+    }
+
+    std::string const mmdb_file = get_mmdb_file_path();
+    if (Glib::file_test(mmdb_file, Glib::FileTest::EXISTS))
+    {
+        int const status = MMDB_open(mmdb_file.c_str(), MMDB_MODE_MMAP, &mmdb);
+        if (status == MMDB_SUCCESS)
+        {
+            mmdb_open = true;
+            // Ensure we close the database on process exit
+            std::atexit(close_mmdb);
+            return true;
+        }
+        std::cerr << "libmaxminddb: error opening " << mmdb_file << ": " << MMDB_strerror(status) << "\n";
+    }
+
+    return false;
+}
+
+void close_mmdb()
+{
+    // Wait all readers to exit, then close the database
+    std::unique_lock write_lock(mmdb_lock);
+    if (mmdb_open)
+    {
+        MMDB_close(&mmdb);
+        mmdb_open = false;
+    }
 }
 
 // Function to decompress the mmdb.gz file after download
@@ -105,7 +151,7 @@ void decompress_gz_file(std::string filename)
 
 // Wrapper function to run maintain_mmdb_file in a background thread
 // Ensures only one maintenance task runs at a time
-void maintain_mmdb_file_async(std::string const& mmdb_file)
+void maintain_mmdb_file_async()
 {
     // Try to acquire the lock atomically
     if (maintenance_in_progress.test_and_set())
@@ -115,18 +161,19 @@ void maintain_mmdb_file_async(std::string const& mmdb_file)
     }
 
     // Run maintenance in background thread so it doesn't block UI
-    std::thread(
-        [mmdb_file]()
+    std::thread{
+        []
         {
-            maintain_mmdb_file(mmdb_file);
+            maintain_mmdb_file();
             // Release the lock
             maintenance_in_progress.clear();
-        }).detach();
+        }
+    }.detach();
 }
 
 // Function to download and update the mmdb file
 // Free database with monthly updates from <https://db-ip.com/>
-void maintain_mmdb_file(std::string const& mmdb_file)
+void maintain_mmdb_file()
 {
     // UTC year and month
     using namespace std::chrono;
@@ -139,36 +186,34 @@ void maintain_mmdb_file(std::string const& mmdb_file)
     }
 
     std::string url;
-    if (!Glib::file_test(mmdb_file, Glib::FileTest::EXISTS))
+    if (!test_and_open_mmdb())
     {
+        // Database unavailable (download required)
         url = "https://download.db-ip.com/free/dbip-city-lite-" + year + "-" + month + ".mmdb.gz";
     }
     else
     {
-        MMDB_s mmdb;
-        int const status = MMDB_open(mmdb_file.c_str(), MMDB_MODE_MMAP, &mmdb);
-        if (MMDB_SUCCESS != status)
+        // Existing database file's year and month
+        time_t build_epoch = 0;
         {
-            std::cerr << "libmaxminddb: Error opening database file (" << mmdb_file << ", " << MMDB_strerror(status) << ")\n";
+            std::shared_lock read_lock(mmdb_lock);
+            if (mmdb_open)
+            {
+                build_epoch = mmdb.metadata.build_epoch;
+            }
+        }
+        date_time = Glib::DateTime::create_now_utc(build_epoch);
+        std::string const mmdb_year = std::to_string(date_time.get_year());
+        std::string mmdb_month = std::to_string(date_time.get_month());
+        if (mmdb_month.size() == 1)
+        {
+            mmdb_month = "0" + mmdb_month; // pad
+        }
+        if (month != mmdb_month || year != mmdb_year || build_epoch == 0)
+        {
+            // Database outdated (download required)
             url = "https://download.db-ip.com/free/dbip-city-lite-" + year + "-" + month + ".mmdb.gz";
         }
-        else
-        {
-            // Existing database file's year and month
-            time_t const build_epoch = mmdb.metadata.build_epoch;
-            date_time = Glib::DateTime::create_now_utc(build_epoch);
-            std::string const mmdb_year = std::to_string(date_time.get_year());
-            std::string mmdb_month = std::to_string(date_time.get_month());
-            if (mmdb_month.size() == 1)
-            {
-                mmdb_month = "0" + mmdb_month; // pad
-            }
-            if (month != mmdb_month || year != mmdb_year)
-            {
-                url = "https://download.db-ip.com/free/dbip-city-lite-" + year + "-" + month + ".mmdb.gz";
-            }
-        }
-        MMDB_close(&mmdb);
     }
 
     if (url.empty())
@@ -181,6 +226,7 @@ void maintain_mmdb_file(std::string const& mmdb_file)
     CURL* curl = curl_easy_init();
     if (curl != nullptr)
     {
+        std::string const mmdb_file = get_mmdb_file_path();
         FILE* fp = std::fopen((mmdb_file + ".gz").c_str(), "wb");
         if (fp == nullptr)
         {
@@ -212,40 +258,37 @@ void maintain_mmdb_file(std::string const& mmdb_file)
         {
             std::perror(("Error deleting " + mmdb_file + ".gz").c_str());
         }
+
+        // Close previous database (if applicable)
+        close_mmdb();
+
+        // Open database
+        test_and_open_mmdb();
     }
 }
 
 std::string get_location_from_ip(std::string const& ip)
 {
-    // Database file path
-    std::string const mmdb_file = get_mmdb_file_path();
-
-    // If the database doesn't exist yet, return empty (it will be downloaded in the background)
-    if (!Glib::file_test(mmdb_file, Glib::FileTest::EXISTS))
+    // Acquire a shared lock before reading database (non-blocking for other readers)
+    std::shared_lock read_lock(mmdb_lock);
+    if (!mmdb_open)
     {
+        // Database not available (yet)
         return "";
     }
 
     // Compute location from IP
-    MMDB_s mmdb;
-    int status = MMDB_open(mmdb_file.c_str(), MMDB_MODE_MMAP, &mmdb);
-    if (MMDB_SUCCESS != status)
-    {
-        std::cerr << "libmaxminddb: Error opening database file (" + mmdb_file + ", " + MMDB_strerror(status) + ")\n";
-        return "";
-    }
     int gai_error = 0;
     int mmdb_error = 0;
     MMDB_lookup_result_s result = MMDB_lookup_string(&mmdb, ip.c_str(), &gai_error, &mmdb_error);
     if (0 != gai_error || MMDB_SUCCESS != mmdb_error || !result.found_entry)
     {
         std::cerr << "libmaxminddb: Error looking up IP " + ip + "\n";
-        MMDB_close(&mmdb);
         return "";
     }
     std::string location;
     MMDB_entry_data_s entry_data;
-    status = MMDB_get_value(&result.entry, &entry_data, "city", "names", "en", NULL);
+    int status = MMDB_get_value(&result.entry, &entry_data, "city", "names", "en", NULL);
     if (MMDB_SUCCESS != status || !entry_data.has_data)
     {
         std::cerr << "libmaxminddb: Error getting value of city for IP " + ip + "\n";
@@ -259,10 +302,8 @@ std::string get_location_from_ip(std::string const& ip)
     if (MMDB_SUCCESS != status || !entry_data.has_data)
     {
         std::cerr << "libmaxminddb: Error getting value of country for IP " + ip + "\n";
-        MMDB_close(&mmdb);
         return "";
     }
     location.append(entry_data.utf8_string, entry_data.data_size);
-    MMDB_close(&mmdb);
     return location;
 }
