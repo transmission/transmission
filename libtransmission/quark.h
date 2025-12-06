@@ -742,8 +742,8 @@ enum class Style
  * Detect what style this payload is using. Used for ensuring
  * that RPC replies are sent in style of the corresponding request.
  */
-[[nodiscard]] std::optional<Style> detect_style(tr_variant const& variant);
+[[nodiscard]] std::optional<Style> detect_style(tr_variant const& src);
 
-[[nodiscard]] tr_variant apply_style(tr_variant const& in, Style style);
+[[nodiscard]] tr_variant apply_style(tr_variant const& src, Style tgt_style);
 
 } // namespace libtransmission::api_compat

@@ -1703,26 +1703,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "peer_limit_per_torrent"sv, "peer-limit-per-torrent"sv },
 } };
 
-template<size_t N>
-[[nodiscard]] bool matches(std::array<ApiKey, N> const& keys, std::string_view ApiKey::* member, std::string_view name)
-{
-    return std::any_of(std::begin(keys), std::end(keys), [member, name](ApiKey const& key) { return key.*member == name; });
-}
-
-[[nodiscard]] bool is_current_key(std::string_view name)
-{
-    return matches(RpcKeys, &ApiKey::current, name) || matches(SessionKeys, &ApiKey::current, name);
-}
-
-[[nodiscard]] bool is_legacy_rpc_key(std::string_view name)
-{
-    return matches(RpcKeys, &ApiKey::legacy, name);
-}
-
-[[nodiscard]] bool is_legacy_settings_key(std::string_view name)
-{
-    return matches(SessionKeys, &ApiKey::legacy, name);
-}
+// ---
 
 template<typename Predicate>
 [[nodiscard]] bool walk_variant(tr_variant const& value, Predicate const& predicate);
@@ -1749,12 +1730,12 @@ template<typename Predicate>
 template<typename Predicate>
 [[nodiscard]] bool walk_variant(tr_variant const& value, Predicate const& predicate)
 {
-    if (auto const* child_map = value.get_if<tr_variant::Map>(); child_map != nullptr)
+    if (auto const* map = value.get_if<tr_variant::Map>())
     {
-        return walk_map(*child_map, predicate);
+        return walk_map(*map, predicate);
     }
 
-    if (auto const* vec = value.get_if<tr_variant::Vector>(); vec != nullptr)
+    if (auto const* vec = value.get_if<tr_variant::Vector>())
     {
         for (auto const& item : *vec)
         {
@@ -1768,6 +1749,193 @@ template<typename Predicate>
     return true;
 }
 
+template<size_t N>
+[[nodiscard]] bool matches(std::array<ApiKey, N> const& keys, std::string_view ApiKey::* member, std::string_view name)
+{
+    return std::any_of(std::begin(keys), std::end(keys), [member, name](ApiKey const& key) { return key.*member == name; });
+}
+
+// ---
+
+namespace detect_style_helpers
+{
+[[nodiscard]] bool is_current_key(std::string_view const name)
+{
+    return matches(RpcKeys, &ApiKey::current, name) || matches(SessionKeys, &ApiKey::current, name);
+}
+
+[[nodiscard]] bool is_legacy_rpc_key(std::string_view const name)
+{
+    return matches(RpcKeys, &ApiKey::legacy, name);
+}
+
+[[nodiscard]] bool is_legacy_settings_key(std::string_view const name)
+{
+    return matches(SessionKeys, &ApiKey::legacy, name);
+}
+} // namespace detect_style_helpers
+
+namespace apply_style_helpers
+{
+template<size_t N>
+[[nodiscard]] ApiKey const* find_preferred_current(std::array<ApiKey, N> const& keys, std::string_view canonical)
+{
+    auto const matches = [canonical](ApiKey const& key)
+    {
+        return key.current == canonical;
+    };
+
+    if (auto it = std::find_if(
+            std::begin(keys),
+            std::end(keys),
+            [matches](ApiKey const& key) { return matches(key) && key.legacy != key.current; });
+        it != std::end(keys))
+    {
+        return &*it;
+    }
+
+    if (auto it = std::find_if(std::begin(keys), std::end(keys), matches); it != std::end(keys))
+    {
+        return &*it;
+    }
+
+    return nullptr;
+}
+
+[[nodiscard]] std::optional<std::string_view> key_for_style(std::string_view canonical, Style style)
+{
+    switch (style)
+    {
+    case Style::Current:
+        return canonical;
+
+    case Style::LegacyRpc:
+        if (auto const* key = find_preferred_current(RpcKeys, canonical); key != nullptr)
+        {
+            return key->legacy;
+        }
+        break;
+
+    case Style::LegacySettings:
+        if (auto const* key = find_preferred_current(SessionKeys, canonical); key != nullptr)
+        {
+            return key->legacy;
+        }
+        break;
+    }
+
+    return {};
+}
+
+template<size_t N>
+[[nodiscard]] ApiKey const* find_key(
+    std::array<ApiKey, N> const& keys,
+    std::string_view ApiKey::* member,
+    std::string_view name)
+{
+    auto const it = std::find_if(
+        std::begin(keys),
+        std::end(keys),
+        [member, name](ApiKey const& key) { return key.*member == name; });
+    return it != std::end(keys) ? &*it : nullptr;
+}
+
+[[nodiscard]] std::optional<std::string_view> canonicalize_key(std::string_view name, Style style)
+{
+    switch (style)
+    {
+    case Style::Current:
+        if (auto const* key = find_key(RpcKeys, &ApiKey::current, name); key != nullptr)
+            return key->current;
+        if (auto const* key = find_key(SessionKeys, &ApiKey::current, name); key != nullptr)
+            return key->current;
+        break;
+
+    case Style::LegacyRpc:
+        if (auto const* key = find_key(RpcKeys, &ApiKey::legacy, name); key != nullptr)
+            return key->current;
+        break;
+
+    case Style::LegacySettings:
+        if (auto const* key = find_key(SessionKeys, &ApiKey::legacy, name); key != nullptr)
+            return key->current;
+        break;
+    }
+
+    return {};
+}
+
+[[nodiscard]] std::string_view translate_key(
+    std::string_view name,
+    std::optional<Style> const& src_style,
+    Style const tgt_style)
+{
+    if (!src_style || *src_style == tgt_style)
+        return name;
+
+    if (auto const canonical = canonicalize_key(name, *src_style))
+    {
+        if (auto const mapped = key_for_style(*canonical, tgt_style))
+            return *mapped;
+    }
+
+    return name;
+}
+
+[[nodiscard]] tr_variant convert_variant(tr_variant const& value, std::optional<Style> const& src_style, Style tgt_style);
+
+[[nodiscard]] tr_variant convert_map(tr_variant::Map const& map, std::optional<Style> const& src_style, Style tgt_style)
+{
+    auto ret = tr_variant::make_map(map.size());
+    auto* tgt_map = ret.get_if<tr_variant::Map>();
+    for (auto const& [key, child] : map)
+    {
+        auto const name = tr_quark_get_string_view(key);
+        auto const mapped = translate_key(name, src_style, tgt_style);
+        auto const tgt_key = tr_quark_new(mapped);
+        (*tgt_map)[tgt_key] = convert_variant(child, src_style, tgt_style);
+    }
+
+    return ret;
+}
+
+[[nodiscard]] tr_variant convert_vector(tr_variant::Vector const& vec, std::optional<Style> const& src_style, Style tgt_style)
+{
+    auto ret = tr_variant::make_vector(std::size(vec));
+    auto* tgt_vec = ret.get_if<tr_variant::Vector>();
+    for (auto const& item : vec)
+    {
+        tgt_vec->push_back(convert_variant(item, src_style, tgt_style));
+    }
+
+    return ret;
+}
+
+[[nodiscard]] tr_variant convert_variant(tr_variant const& value, std::optional<Style> const& src_style, Style const tgt_style)
+{
+    if (auto const* map = value.get_if<tr_variant::Map>(); map != nullptr)
+        return convert_map(*map, src_style, tgt_style);
+
+    if (auto const* vec = value.get_if<tr_variant::Vector>(); vec != nullptr)
+        return convert_vector(*vec, src_style, tgt_style);
+
+    auto ret = tr_variant{};
+
+    if (value.holds_alternative<std::nullptr_t>())
+        return nullptr;
+    if (auto const val = value.value_if<bool>(); val)
+        return *val;
+    if (auto const int_val = value.value_if<int64_t>(); int_val)
+        return *int_val;
+    if (auto const double_val = value.value_if<double>(); double_val)
+        return *double_val;
+    if (auto const string_val = value.value_if<std::string_view>(); string_val)
+        return *string_val;
+
+    return ret;
+}
+} // namespace apply_style_helpers
+
 } // namespace
 
 /**
@@ -1775,39 +1943,27 @@ template<typename Predicate>
  * Used for ensuring we return RPC replies in style of the
  * corresponding request.
  */
-[[nodiscard]] std::optional<Style> detect_style(tr_variant const& variant)
+[[nodiscard]] std::optional<Style> detect_style(tr_variant const& src)
 {
-    auto const* top_map = variant.get_if<tr_variant::Map>();
-    if (top_map == nullptr)
-    {
-        return {};
-    }
+    using namespace detect_style_helpers;
 
-    if (walk_map(*top_map, is_current_key))
-    {
+    if (walk_variant(src, is_current_key))
         return Style::Current;
-    }
 
-    if (walk_map(*top_map, is_legacy_rpc_key))
-    {
+    if (walk_variant(src, is_legacy_rpc_key))
         return Style::LegacyRpc;
-    }
 
-    if (walk_map(*top_map, is_legacy_settings_key))
-    {
+    if (walk_variant(src, is_legacy_settings_key))
         return Style::LegacySettings;
-    }
 
     return {};
 }
 
-[[nodiscard]] tr_variant apply_style(tr_variant const& in, Style style)
+[[nodiscard]] tr_variant apply_style(tr_variant const& src, Style const tgt_style)
 {
-    (void)in;
-    (void)style;
-
-    // TODO: implement
-    return {};
+    using namespace apply_style_helpers;
+    auto const src_style = detect_style(src);
+    return convert_variant(src, src_style, tgt_style);
 }
 
 } // namespace libtransmission::api_compat
