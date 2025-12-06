@@ -1088,7 +1088,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 281U>{{
     { "alt_speed_time_enabled"sv, "alt-speed-time-enabled"sv },
     { "alt_speed_time_end"sv, "alt-speed-time-end"sv },
     { "alt_speed_up"sv, "alt-speed-up"sv },
-    { "announce"sv, "announce"sv },
     { "announce_state"sv, "announceState"sv },
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "availability"sv, "availability"sv },
@@ -1512,27 +1511,28 @@ auto constexpr SessionKeys = std::array<ApiKey, 266U>{{
     { "added.f"sv, "added.f"sv },
     { "added6"sv, "added6"sv },
     { "added6.f"sv, "added6.f"sv },
+    { "announce"sv, "announce"sv }, // BEP0003
+    { "complete"sv, "complete"sv }, // BEP0048
+    { "downloaded"sv, "downloaded"sv }, // BEP0048
     { "dropped"sv, "dropped"sv },
     { "dropped6"sv, "dropped6"sv },
     { "e"sv, "e"sv },
+    { "incomplete"sv, "incomplete"sv }, // BEP0048
     { "ipv4"sv, "ipv4"sv },
     { "ipv6"sv, "ipv6"sv },
-    { "metadata_size"sv, "metadata_size"sv },
-    { "p"sv, "p"sv },
-    { "reqq"sv, "reqq"sv },
-    { "yourip"sv, "yourip"sv },
-    { "v"sv, "v"sv },
-    { "upload_only"sv, "upload_only"sv },
     { "m"sv, "m"sv },
+    { "metadata_size"sv, "metadata_size"sv },
+    { "msg_type"sv, "msg_type"sv },
+    { "p"sv, "p"sv },
+    { "piece"sv, "piece"sv },
+    { "reqq"sv, "reqq"sv },
+    { "total_size"sv, "total_size"sv },
+    { "upload_only"sv, "upload_only"sv },
+    { "ut_holepunch"sv, "ut_holepunch"sv },
     { "ut_metadata"sv, "ut_metadata"sv },
     { "ut_pex"sv, "ut_pex"sv },
-    { "ut_holepunch"sv, "ut_holepunch"sv },
-    { "msg_type"sv, "msg_type"sv },
-    { "piece"sv, "piece"sv },
-    { "total_size"sv, "total_size"sv },
-    { "complete"sv, "complete"sv }, // BEP48
-    { "incomplete"sv, "incomplete"sv }, // BEP48
-    { "downloaded"sv, "downloaded"sv }, // BEP48
+    { "v"sv, "v"sv },
+    { "yourip"sv, "yourip"sv },
 
     // .torrent strings
     { "length"sv, "length"sv },
