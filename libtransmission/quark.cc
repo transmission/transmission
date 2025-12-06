@@ -1367,7 +1367,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "method"sv, "method"sv } }
 };
 
-auto constexpr SessionKeys = std::array<ApiKey, 311U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     // tr_rpc_server::Settings
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
@@ -1565,6 +1565,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 311U>{ {
     { "nodes6"sv, "nodes6"sv },
 
     // BT messages
+    { "announce-list"sv, "announce-list"sv }, // BEP0012
     { "added"sv, "added"sv }, // BEP0011
     { "added.f"sv, "added.f"sv }, // BEP0011
     { "added6"sv, "added6"sv }, // BEP0011
