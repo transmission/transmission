@@ -584,6 +584,11 @@ private:
 
     void check_request_timeout(time_t now);
 
+    void set_only_peer(bool const only_peer) override
+    {
+        is_only_peer_ = only_peer;
+    }
+
     [[nodiscard]] constexpr auto client_reqq() const noexcept
     {
         return session->reqq();
@@ -709,6 +714,8 @@ private:
 
     bool client_sent_ltep_handshake_ = false;
 
+    bool is_only_peer_ = false;
+
     size_t desired_request_count_ = 0;
 
     uint8_t ut_pex_id_ = 0;
@@ -749,7 +756,11 @@ private:
     static auto constexpr SendPexInterval = 90s;
 
     // how many seconds we expect the next piece block to arrive
-    static auto constexpr RequestTimeoutSecs = time_t{ 15 };
+    static auto constexpr RequestTimeout = time_t{ 15 };
+    // N.B. During testing, rasterbar-based clients sometimes
+    // take a long time (50-70 seconds) to respond to requests,
+    // hence the 90 seconds timeout. --2025-12-02
+    static auto constexpr RequestTimeoutLong = time_t{ 90 };
 };
 
 // ---
@@ -1892,7 +1903,7 @@ void tr_peerMsgsImpl::maybe_send_metadata_requests(time_t now) const
 
 void tr_peerMsgsImpl::maybe_send_block_requests()
 {
-    if (!tor_.client_can_download())
+    if (is_disconnecting() || !tor_.client_can_download())
     {
         return;
     }
@@ -1915,15 +1926,29 @@ void tr_peerMsgsImpl::maybe_send_block_requests()
 
 void tr_peerMsgsImpl::check_request_timeout(time_t now)
 {
-    if (active_requests.has_none() || now - request_timeout_base_ <= RequestTimeoutSecs)
+    if (active_requests.has_none())
     {
         return;
     }
 
-    // If we didn't receive any piece data from this peer for a while,
-    // cancel all active requests so that we will send a new batch.
-    // If the peer still doesn't send anything to us, then it will
-    // naturally get weeded out by the peer mgr.
+    auto const time_in_flight = now - request_timeout_base_;
+    if (!is_only_peer_)
+    {
+        if (time_in_flight > RequestTimeout)
+        {
+            // Disconnect soon to try another peer
+            disconnect_soon();
+        }
+        return;
+    }
+
+    if (time_in_flight <= RequestTimeoutLong)
+    {
+        return;
+    }
+
+    // Cancel all active requests so that we will send a new batch,
+    // hopefully getting a response from that.
     for (size_t block = 0; block < std::size(active_requests); ++block)
     {
         maybe_cancel_block_request(block);
@@ -2102,7 +2127,7 @@ bool tr_peerMsgsImpl::is_valid_request(peer_request const& req) const
 
 size_t tr_peerMsgsImpl::max_available_reqs() const
 {
-    if (tor_.is_done() || !tor_.has_metainfo() || client_is_choked() || !client_is_interested())
+    if (is_disconnecting() || tor_.is_done() || !tor_.has_metainfo() || client_is_choked() || !client_is_interested())
     {
         return 0;
     }
