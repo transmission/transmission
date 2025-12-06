@@ -1358,7 +1358,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 281U>{{
     { "webseeds_sending_to_us"sv, "webseedsSendingToUs"sv },
 }};
 
-auto constexpr SessionKeys = std::array<ApiKey, 266U>{{
+auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
     // tr_rpc_server::Settings
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
@@ -1505,6 +1505,12 @@ auto constexpr SessionKeys = std::array<ApiKey, 266U>{{
     { "bandwidth_priority"sv, "bandwidthPriority"sv },
     { "sequential_download"sv, "sequential_download"sv },
     { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
+
+    // dht.dat
+    { "id"sv, "id"sv },
+    { "id_timestamp"sv, "id_timestamp"sv },
+    { "nodes"sv, "nodes"sv },
+    { "nodes6"sv, "nodes6"sv },
 
     // BT messages
     { "added"sv, "added"sv },
