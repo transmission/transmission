@@ -101,7 +101,7 @@ public:
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
         {
-            static auto constexpr Predicate = [](auto const& item, tr_quark key)
+            auto constexpr Predicate = [](auto const& item, tr_quark key)
             {
                 return item.first == key;
             };
