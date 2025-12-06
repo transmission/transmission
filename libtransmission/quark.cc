@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cstddef>
 #include <cstdint>
 #include <iterator> // for std::distance()
@@ -1063,6 +1064,23 @@ namespace libtransmission::api_compat
 namespace
 {
 
+using Type = std::bitset<32U>;
+
+inline constexpr auto Rpc               = Type { 1 <<  1 };
+inline constexpr auto JsonRpc           = Type { 1 <<  2 };
+inline constexpr auto Resume            = Type { 1 <<  3 };
+inline constexpr auto RpcServerSettings = Type { 1 <<  4 };
+inline constexpr auto SpeedSettings     = Type { 1 <<  5 };
+inline constexpr auto SessionSettings   = Type { 1 <<  6 };
+inline constexpr auto Daemon            = Type { 1 <<  7 };
+inline constexpr auto StatsFile         = Type { 1 <<  8 };
+inline constexpr auto ResumeFile        = Type { 1 <<  9 };
+inline constexpr auto DhtFile           = Type { 1 << 10 };
+inline constexpr auto BtProtocol        = Type { 1 << 11 };
+inline constexpr auto TorrentFile       = Type { 1 << 12 };
+inline constexpr auto QtApp             = Type { 1 << 13 };
+inline constexpr auto GtkApp            = Type { 1 << 14 };
+
 struct ApiKey
 {
     // snake-case string
@@ -1368,32 +1386,128 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
 };
 
 auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
-    // tr_rpc_server::Settings
-    { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
-    { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
-    { "rpc_authentication_required"sv, "rpc-authentication-required"sv },
-    { "rpc_bind_address"sv, "rpc-bind-address"sv },
-    { "rpc_enabled"sv, "rpc-enabled"sv },
-    { "rpc_host_whitelist"sv, "rpc-host-whitelist"sv },
-    { "rpc_host_whitelist_enabled"sv, "rpc-host-whitelist-enabled"sv },
-    { "rpc_port"sv, "rpc-port"sv },
-    { "rpc_password"sv, "rpc-password"sv },
-    { "rpc_socket_mode"sv, "rpc-socket-mode"sv },
-    { "rpc_url"sv, "rpc-url"sv },
-    { "rpc_username"sv, "rpc-username"sv },
-    { "rpc_whitelist"sv, "rpc-whitelist"sv },
-    { "rpc_whitelist_enabled"sv, "rpc-whitelist-enabled"sv },
+    // BT protocol
+    // These strings must never change
+    { "announce-list"sv, "announce-list"sv }, // BEP0012
+    { "added"sv, "added"sv }, // BEP0011
+    { "added.f"sv, "added.f"sv }, // BEP0011
+    { "added6"sv, "added6"sv }, // BEP0011
+    { "added6.f"sv, "added6.f"sv }, // BEP0011
+    { "announce"sv, "announce"sv }, // BEP0003
+    { "complete"sv, "complete"sv }, // BEP0048
+    { "downloaded"sv, "downloaded"sv }, // BEP0048
+    { "dropped"sv, "dropped"sv }, // BEP0011
+    { "dropped6"sv, "dropped6"sv }, // BEP0011
+    { "e"sv, "e"sv },
+    { "incomplete"sv, "incomplete"sv }, // BEP0048
+    { "ipv4"sv, "ipv4"sv }, // BEP0010
+    { "ipv6"sv, "ipv6"sv }, // BEP0010
+    { "m"sv, "m"sv }, // BEP0010, BEP0011
+    { "metadata_size"sv, "metadata_size"sv }, // BEP0009
+    { "msg_type"sv, "msg_type"sv },
+    { "p"sv, "p"sv }, // BEP0010
+    { "piece"sv, "piece"sv },
+    { "reqq"sv, "reqq"sv }, // BEP0010
+    { "total_size"sv, "total_size"sv },
+    { "upload_only"sv, "upload_only"sv }, // BEP0021
+    { "ut_holepunch"sv, "ut_holepunch"sv },
+    { "ut_metadata"sv, "ut_metadata"sv }, // BEP0011
+    { "ut_pex"sv, "ut_pex"sv }, // BEP0010, BEP0011
+    { "v"sv, "v"sv }, // BEP0010
+    { "yourip"sv, "yourip"sv }, // BEP0010
 
-    // tr_session_alt_speeds::Settings
-    { "alt_speed_enabled"sv, "alt-speed-enabled"sv },
-    { "alt_speed_up"sv, "alt-speed-up"sv },
-    { "alt_speed_down"sv, "alt-speed-down"sv },
-    { "alt_speed_time_enabled"sv, "alt-speed-time-enabled"sv },
-    { "alt_speed_time_day"sv, "alt-speed-time-day"sv },
-    { "alt_speed_time_begin"sv, "alt-speed-time-begin"sv },
-    { "alt_speed_time_end"sv, "alt-speed-time-end"sv },
+    // file: .torrent
+    // These strings must never change
+    { "length"sv, "length"sv },
+    { "url-list"sv, "url-list"sv },
+    { "comment"sv, "comment"sv },
+    { "created by"sv, "created by"sv },
+    { "creation date"sv, "creation date"sv },
+    { "encoding"sv, "encoding"sv },
+    { "path"sv, "path"sv },
+    { "files"sv, "files"sv },
+    { "name"sv, "name"sv },
+    { "piece length"sv, "piece length"sv },
+    { "pieces"sv, "pieces"sv },
+    { "private"sv, "private"sv },
+    { "source"sv, "source"sv },
+    { "info"sv, "info"sv },
 
-    // tr_session::Settings
+    // file: .resume
+    { "peers2"sv, "peers2"sv },
+    { "peers2_6"sv, "peers2-6"sv },
+    { "peers2_6"sv, "peers2-6"sv },
+    { "socket_address"sv, "socket_address"sv }, // for pex
+    { "flags"sv, "flags"sv }, // for pex
+    { "labels"sv, "labels"sv },
+    { "group"sv, "group"sv },
+    { "dnd"sv, "dnd"sv },
+    { "priority"sv, "priority"sv },
+    { "speed_Bps"sv, "speed-Bps"sv },
+    { "use_global_speed_limit"sv, "use-global-speed-limit"sv },
+    { "use_speed_limit"sv, "use-speed-limit"sv },
+    { "speed_limit_down"sv, "speed-limit-down"sv },
+    { "speed_limit_up"sv, "speed-limit-up"sv },
+    { "ratio_limit"sv, "ratio-limit"sv },
+    { "ratio_mode"sv, "ratio-mode"sv },
+    { "idle_limit"sv, "idle-limit"sv },
+    { "idle_mode"sv, "idle-mode"sv },
+    { "speed_Bps"sv, "speed-Bps"sv },
+    { "speed"sv, "speed"sv },
+    { "use_speed_limit"sv, "use-speed-limit"sv },
+    { "use_global_speed_limit"sv, "use-global-speed-limit"sv },
+    { "speed_limit_up"sv, "speed-limit-up"sv },
+    { "speed_limit_down"sv, "speed-limit-down"sv },
+    { "ratio_limit"sv, "ratio-limit"sv },
+    { "ratio_mode"sv, "ratio-mode"sv },
+    { "idle_limit"sv, "idle-limit"sv },
+    { "idle_mode"sv, "idle-mode"sv },
+    { "name"sv, "name"sv },
+    { "files"sv, "files"sv },
+    { "mtimes"sv, "mtimes"sv },
+    { "pieces"sv, "pieces"sv },
+    { "blocks"sv, "blocks"sv },
+    { "progress"sv, "progress"sv },
+    { "time_checked"sv, "time-checked"sv },
+    { "bitfield"sv, "bitfield"sv },
+    { "corrupt"sv, "corrupt"sv },
+    { "destination"sv, "destination"sv },
+    { "incomplete_dir"sv, "incomplete-dir"sv },
+    { "incomplete_dir"sv, "incomplete-dir"sv },
+    { "downloaded"sv, "downloaded"sv },
+    { "uploaded"sv, "uploaded"sv },
+    { "max_peers"sv, "max-peers"sv },
+    { "max_peers"sv, "max-peers"sv },
+    { "paused"sv, "paused"sv },
+    { "added_date"sv, "added-date"sv }, // TODO(ckerr) legacy duplicate
+    { "added_date"sv, "added-date"sv }, // TODO(ckerr) legacy duplicate
+    { "done_date"sv, "done-date"sv }, // TODO(ckerr) legacy duplicate
+    { "done_date"sv, "done-date"sv }, // TODO(ckerr) legacy duplicate
+    { "activity_date"sv, "activity-date"sv }, // TODO(ckerr) legacy duplicate
+    { "activity_date"sv, "activity-date"sv }, // TODO(ckerr) legacy duplicate
+    { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
+    { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
+    { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
+    { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
+    { "bandwidth_priority"sv, "bandwidth-priority"sv }, // TODO(ckerr) legacy duplicate
+    { "bandwidth_priority"sv, "bandwidth-priority"sv }, // TODO(ckerr) legacy duplicate
+    { "sequential_download"sv, "sequential_download"sv },
+    { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
+
+    // file: stats.json
+    { "downloaded_bytes"sv, "downloaded-bytes"sv }, // TODO(ckerr) legacy duplicate
+    { "files_added"sv, "files-added"sv }, // TODO(ckerr) legacy duplicate
+    { "seconds_active"sv, "seconds-active"sv }, // TODO(ckerr) legacy duplicate
+    { "session_count"sv, "session-count"sv }, // TODO(ckerr) legacy duplicate
+    { "uploaded_bytes"sv, "uploaded-bytes"sv }, // TODO(ckerr) legacy duplicate
+
+    // file: dht.dat
+    { "id"sv, "id"sv },
+    { "id_timestamp"sv, "id_timestamp"sv },
+    { "nodes"sv, "nodes"sv },
+    { "nodes6"sv, "nodes6"sv },
+
+    // file: settings.json (tr_session::Settings)
     { "announce_ip"sv, "announce-ip"sv },
     { "announce_ip_enabled"sv, "announce-ip-enabled"sv },
     { "bind_address_ipv4"sv, "bind-address-ipv4"sv },
@@ -1456,160 +1570,32 @@ auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
     { "upload_slots_per_torrent"sv, "upload-slots-per-torrent"sv },
     { "utp_enabled"sv, "utp-enabled"sv },
 
-    // daemon
-    { "bind_address_ipv4"sv, "bind-address-ipv4"sv },
-    { "bind_address_ipv6"sv, "bind-address-ipv6"sv },
-    { "blocklist_enabled"sv, "blocklist-enabled"sv },
-    { "default_trackers"sv, "default-trackers"sv },
-    { "dht_enabled"sv, "dht-enabled"sv },
-    { "download_dir"sv, "download-dir"sv }, // TODO(ckerr) legacy duplicate
-    { "encryption"sv, "encryption"sv },
-    { "incomplete_dir"sv, "incomplete-dir"sv },
-    { "incomplete_dir_enabled"sv, "incomplete-dir-enabled"sv },
-    { "lpd_enabled"sv, "lpd-enabled"sv },
-    { "message_level"sv, "message-level"sv },
-    { "peer_limit_global"sv, "peer-limit-global"sv },
-    { "peer_limit_per_torrent"sv, "peer-limit-per-torrent"sv },
-    { "peer_port"sv, "peer-port"sv },
-    { "pidfile"sv, "pidfile"sv },
-    { "port_forwarding_enabled"sv, "port-forwarding-enabled"sv },
-    { "ratio_limit"sv, "ratio-limit"sv },
-    { "ratio_limit_enabled"sv, "ratio-limit-enabled"sv },
+    // file: settings.json (tr_rpc_server::Settings)
+    { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
+    { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
     { "rpc_authentication_required"sv, "rpc-authentication-required"sv },
     { "rpc_bind_address"sv, "rpc-bind-address"sv },
     { "rpc_enabled"sv, "rpc-enabled"sv },
-    { "rpc_password"sv, "rpc-password"sv },
+    { "rpc_host_whitelist"sv, "rpc-host-whitelist"sv },
+    { "rpc_host_whitelist_enabled"sv, "rpc-host-whitelist-enabled"sv },
     { "rpc_port"sv, "rpc-port"sv },
+    { "rpc_password"sv, "rpc-password"sv },
+    { "rpc_socket_mode"sv, "rpc-socket-mode"sv },
+    { "rpc_url"sv, "rpc-url"sv },
     { "rpc_username"sv, "rpc-username"sv },
     { "rpc_whitelist"sv, "rpc-whitelist"sv },
     { "rpc_whitelist_enabled"sv, "rpc-whitelist-enabled"sv },
-    { "sequential_download"sv, "sequential_download"sv },
-    { "start_paused"sv, "start_paused"sv },
-    { "utp_enabled"sv, "utp-enabled"sv },
-    { "watch_dir"sv, "watch-dir"sv },
-    { "watch_dir_enabled"sv, "watch-dir-enabled"sv },
-    { "watch_dir_force_generic"sv, "watch-dir-force-generic"sv },
 
-    // stats.json
-    { "downloaded_bytes"sv, "downloaded-bytes"sv }, // TODO(ckerr) legacy duplicate
-    { "files_added"sv, "files-added"sv }, // TODO(ckerr) legacy duplicate
-    { "seconds_active"sv, "seconds-active"sv }, // TODO(ckerr) legacy duplicate
-    { "session_count"sv, "session-count"sv }, // TODO(ckerr) legacy duplicate
-    { "uploaded_bytes"sv, "uploaded-bytes"sv }, // TODO(ckerr) legacy duplicate
+    // file: settings.json (tr_session_alt_speeds::Settings)
+    { "alt_speed_enabled"sv, "alt-speed-enabled"sv },
+    { "alt_speed_up"sv, "alt-speed-up"sv },
+    { "alt_speed_down"sv, "alt-speed-down"sv },
+    { "alt_speed_time_enabled"sv, "alt-speed-time-enabled"sv },
+    { "alt_speed_time_day"sv, "alt-speed-time-day"sv },
+    { "alt_speed_time_begin"sv, "alt-speed-time-begin"sv },
+    { "alt_speed_time_end"sv, "alt-speed-time-end"sv },
 
-    // .resume
-    { "peers2"sv, "peers2"sv },
-    { "peers2_6"sv, "peers2-6"sv },
-    { "peers2_6"sv, "peers2-6"sv },
-    { "socket_address"sv, "socket_address"sv }, // for pex
-    { "flags"sv, "flags"sv }, // for pex
-    { "labels"sv, "labels"sv },
-    { "group"sv, "group"sv },
-    { "dnd"sv, "dnd"sv },
-    { "priority"sv, "priority"sv },
-    { "speed_Bps"sv, "speed-Bps"sv },
-    { "use_global_speed_limit"sv, "use-global-speed-limit"sv },
-    { "use_speed_limit"sv, "use-speed-limit"sv },
-    { "speed_limit_down"sv, "speed-limit-down"sv },
-    { "speed_limit_up"sv, "speed-limit-up"sv },
-    { "ratio_limit"sv, "ratio-limit"sv },
-    { "ratio_mode"sv, "ratio-mode"sv },
-    { "idle_limit"sv, "idle-limit"sv },
-    { "idle_mode"sv, "idle-mode"sv },
-    { "speed_Bps"sv, "speed-Bps"sv },
-    { "speed"sv, "speed"sv },
-    { "use_speed_limit"sv, "use-speed-limit"sv },
-    { "use_global_speed_limit"sv, "use-global-speed-limit"sv },
-    { "speed_limit_up"sv, "speed-limit-up"sv },
-    { "speed_limit_down"sv, "speed-limit-down"sv },
-    { "ratio_limit"sv, "ratio-limit"sv },
-    { "ratio_mode"sv, "ratio-mode"sv },
-    { "idle_limit"sv, "idle-limit"sv },
-    { "idle_mode"sv, "idle-mode"sv },
-    { "name"sv, "name"sv },
-    { "files"sv, "files"sv },
-    { "mtimes"sv, "mtimes"sv },
-    { "pieces"sv, "pieces"sv },
-    { "blocks"sv, "blocks"sv },
-    { "progress"sv, "progress"sv },
-    { "time_checked"sv, "time-checked"sv },
-    { "bitfield"sv, "bitfield"sv },
-    { "corrupt"sv, "corrupt"sv },
-    { "destination"sv, "destination"sv },
-    { "incomplete_dir"sv, "incomplete-dir"sv },
-    { "incomplete_dir"sv, "incomplete-dir"sv },
-    { "downloaded"sv, "downloaded"sv },
-    { "uploaded"sv, "uploaded"sv },
-    { "max_peers"sv, "max-peers"sv },
-    { "max_peers"sv, "max-peers"sv },
-    { "paused"sv, "paused"sv },
-    { "added_date"sv, "added-date"sv }, // TODO(ckerr) legacy duplicate
-    { "added_date"sv, "added-date"sv }, // TODO(ckerr) legacy duplicate
-    { "done_date"sv, "done-date"sv }, // TODO(ckerr) legacy duplicate
-    { "done_date"sv, "done-date"sv }, // TODO(ckerr) legacy duplicate
-    { "activity_date"sv, "activity-date"sv }, // TODO(ckerr) legacy duplicate
-    { "activity_date"sv, "activity-date"sv }, // TODO(ckerr) legacy duplicate
-    { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
-    { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
-    { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
-    { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
-    { "bandwidth_priority"sv, "bandwidth-priority"sv }, // TODO(ckerr) legacy duplicate
-    { "bandwidth_priority"sv, "bandwidth-priority"sv }, // TODO(ckerr) legacy duplicate
-    { "sequential_download"sv, "sequential_download"sv },
-    { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
-
-    // dht.dat
-    { "id"sv, "id"sv },
-    { "id_timestamp"sv, "id_timestamp"sv },
-    { "nodes"sv, "nodes"sv },
-    { "nodes6"sv, "nodes6"sv },
-
-    // BT messages
-    { "announce-list"sv, "announce-list"sv }, // BEP0012
-    { "added"sv, "added"sv }, // BEP0011
-    { "added.f"sv, "added.f"sv }, // BEP0011
-    { "added6"sv, "added6"sv }, // BEP0011
-    { "added6.f"sv, "added6.f"sv }, // BEP0011
-    { "announce"sv, "announce"sv }, // BEP0003
-    { "complete"sv, "complete"sv }, // BEP0048
-    { "downloaded"sv, "downloaded"sv }, // BEP0048
-    { "dropped"sv, "dropped"sv }, // BEP0011
-    { "dropped6"sv, "dropped6"sv }, // BEP0011
-    { "e"sv, "e"sv },
-    { "incomplete"sv, "incomplete"sv }, // BEP0048
-    { "ipv4"sv, "ipv4"sv }, // BEP0010
-    { "ipv6"sv, "ipv6"sv }, // BEP0010
-    { "m"sv, "m"sv }, // BEP0010, BEP0011
-    { "metadata_size"sv, "metadata_size"sv },
-    { "msg_type"sv, "msg_type"sv },
-    { "p"sv, "p"sv }, // BEP0010
-    { "piece"sv, "piece"sv },
-    { "reqq"sv, "reqq"sv },
-    { "total_size"sv, "total_size"sv },
-    { "upload_only"sv, "upload_only"sv },
-    { "ut_holepunch"sv, "ut_holepunch"sv },
-    { "ut_metadata"sv, "ut_metadata"sv }, // BEP0011
-    { "ut_pex"sv, "ut_pex"sv }, // BEP0010, BEP0011
-    { "v"sv, "v"sv }, // BEP0010
-    { "yourip"sv, "yourip"sv }, // BEP0010
-
-    // .torrent strings
-    { "length"sv, "length"sv },
-    { "url-list"sv, "url-list"sv },
-    { "comment"sv, "comment"sv },
-    { "created by"sv, "created by"sv },
-    { "creation date"sv, "creation date"sv },
-    { "encoding"sv, "encoding"sv },
-    { "path"sv, "path"sv },
-    { "files"sv, "files"sv },
-    { "name"sv, "name"sv },
-    { "piece length"sv, "piece length"sv },
-    { "pieces"sv, "pieces"sv },
-    { "private"sv, "private"sv },
-    { "source"sv, "source"sv },
-    { "info"sv, "info"sv },
-
-    // transmission-qt
+    // file: settings.json (transmission-qt)
     { "show_options_window"sv, "show-options-window"sv },
     { "open_dialog_dir"sv, "open-dialog-dir"sv },
     { "inhibit_desktop_hibernation"sv, "inhibit-desktop-hibernation"sv },
@@ -1652,6 +1638,40 @@ auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
     { "torrent_complete_sound_enabled"sv, "torrent-complete-sound-enabled"sv },
     { "user_has_given_informed_consent"sv, "user-has-given-informed-consent"sv },
     { "read_clipboard"sv, "read-clipboard"sv },
+
+    // daemon
+    { "bind_address_ipv4"sv, "bind-address-ipv4"sv },
+    { "bind_address_ipv6"sv, "bind-address-ipv6"sv },
+    { "blocklist_enabled"sv, "blocklist-enabled"sv },
+    { "default_trackers"sv, "default-trackers"sv },
+    { "dht_enabled"sv, "dht-enabled"sv },
+    { "download_dir"sv, "download-dir"sv }, // TODO(ckerr) legacy duplicate
+    { "encryption"sv, "encryption"sv },
+    { "incomplete_dir"sv, "incomplete-dir"sv },
+    { "incomplete_dir_enabled"sv, "incomplete-dir-enabled"sv },
+    { "lpd_enabled"sv, "lpd-enabled"sv },
+    { "message_level"sv, "message-level"sv },
+    { "peer_limit_global"sv, "peer-limit-global"sv },
+    { "peer_limit_per_torrent"sv, "peer-limit-per-torrent"sv },
+    { "peer_port"sv, "peer-port"sv },
+    { "pidfile"sv, "pidfile"sv },
+    { "port_forwarding_enabled"sv, "port-forwarding-enabled"sv },
+    { "ratio_limit"sv, "ratio-limit"sv },
+    { "ratio_limit_enabled"sv, "ratio-limit-enabled"sv },
+    { "rpc_authentication_required"sv, "rpc-authentication-required"sv },
+    { "rpc_bind_address"sv, "rpc-bind-address"sv },
+    { "rpc_enabled"sv, "rpc-enabled"sv },
+    { "rpc_password"sv, "rpc-password"sv },
+    { "rpc_port"sv, "rpc-port"sv },
+    { "rpc_username"sv, "rpc-username"sv },
+    { "rpc_whitelist"sv, "rpc-whitelist"sv },
+    { "rpc_whitelist_enabled"sv, "rpc-whitelist-enabled"sv },
+    { "sequential_download"sv, "sequential_download"sv },
+    { "start_paused"sv, "start_paused"sv },
+    { "utp_enabled"sv, "utp-enabled"sv },
+    { "watch_dir"sv, "watch-dir"sv },
+    { "watch_dir_enabled"sv, "watch-dir-enabled"sv },
+    { "watch_dir_force_generic"sv, "watch-dir-force-generic"sv },
 
     // transmission-gtk
     { "blocklist_updates_enabled"sv, "blocklist-updates-enabled"sv },
