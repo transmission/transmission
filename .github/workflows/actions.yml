@@ -506,12 +506,12 @@ jobs:
           apk update
           apk add \
             ca-certificates \
+            clang \
             cmake \
             crc32c-dev \
             curl-dev \
             fast_float \
             fmt-dev \
-            g++ \
             gettext-dev \
             git \
             libdeflate-dev \
@@ -544,6 +544,8 @@ jobs:
             -S src \
             -B obj \
             -G Ninja \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_CXX_COMPILER='clang++' \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
