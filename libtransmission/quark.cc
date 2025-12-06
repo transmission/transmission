@@ -1075,7 +1075,7 @@ struct ApiKey
     //std::string_view legacy_setting;
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 281U>{{
+auto constexpr RpcKeys = std::array<ApiKey, 287U>{{
     { "active_torrent_count"sv, "activeTorrentCount"sv },
     { "activity_date"sv, "activityDate"sv },
     { "added"sv, "added"sv },
@@ -1356,9 +1356,17 @@ auto constexpr RpcKeys = std::array<ApiKey, 281U>{{
     { "wanted"sv, "wanted"sv },
     { "webseeds"sv, "webseeds"sv },
     { "webseeds_sending_to_us"sv, "webseedsSendingToUs"sv },
+
+    // json-rpc
+    { "code"sv, "code"sv }, // string unused in legacy
+    { "data"sv, "data"sv }, // string unused in legacy
+    { "jsonrpc"sv, "jsonrpc"sv }, // string unused in legacy
+    { "message"sv, "message"sv }, // string unused in legacy
+    { "params"sv, "params"sv }, // string unused in legacy
+    { "method"sv, "method"sv}
 }};
 
-auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
+auto constexpr SessionKeys = std::array<ApiKey, 308U>{{
     // tr_rpc_server::Settings
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
@@ -1394,7 +1402,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
     { "cache_size_mb"sv, "cache-size-mb"sv },
     { "default_trackers"sv, "default-trackers"sv },
     { "dht_enabled"sv, "dht-enabled"sv },
-    { "download_dir"sv, "downloadDir"sv },
+    { "download_dir"sv, "download-dir"sv },
     { "download_queue_enabled"sv, "download-queue-enabled"sv },
     { "download_queue_size"sv, "download-queue-size"sv },
     { "encryption"sv, "encryption"sv },
@@ -1447,6 +1455,47 @@ auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
     { "upload_slots_per_torrent"sv, "upload-slots-per-torrent"sv },
     { "utp_enabled"sv, "utp-enabled"sv },
 
+    // daemon
+    { "bind_address_ipv4"sv, "bind-address-ipv4"sv },
+    { "bind_address_ipv6"sv, "bind-address-ipv6"sv },
+    { "blocklist_enabled"sv, "blocklist-enabled"sv },
+    { "default_trackers"sv, "default-trackers"sv },
+    { "dht_enabled"sv, "dht-enabled"sv },
+    { "download_dir"sv, "download-dir"sv },
+    { "encryption"sv, "encryption"sv },
+    { "incomplete_dir"sv, "incomplete-dir"sv },
+    { "incomplete_dir_enabled"sv, "incomplete-dir-enabled"sv },
+    { "lpd_enabled"sv, "lpd-enabled"sv },
+    { "message_level"sv, "message-level"sv },
+    { "peer_limit_global"sv, "peer-limit-global"sv },
+    { "peer_limit_per_torrent"sv, "peer-limit-per-torrent"sv },
+    { "peer_port"sv, "peer-port"sv },
+    { "pidfile"sv, "pidfile"sv },
+    { "port_forwarding_enabled"sv, "port-forwarding-enabled"sv },
+    { "ratio_limit"sv, "ratio-limit"sv },
+    { "ratio_limit_enabled"sv, "ratio-limit-enabled"sv },
+    { "rpc_authentication_required"sv, "rpc-authentication-required"sv },
+    { "rpc_bind_address"sv, "rpc-bind-address"sv },
+    { "rpc_enabled"sv, "rpc-enabled"sv },
+    { "rpc_password"sv, "rpc-password"sv },
+    { "rpc_port"sv, "rpc-port"sv },
+    { "rpc_username"sv, "rpc-username"sv },
+    { "rpc_whitelist"sv, "rpc-whitelist"sv },
+    { "rpc_whitelist_enabled"sv, "rpc-whitelist-enabled"sv },
+    { "sequential_download"sv, "sequential_download"sv },
+    { "start_paused"sv, "start_paused"sv },
+    { "utp_enabled"sv, "utp-enabled"sv },
+    { "watch_dir"sv, "watch-dir"sv },
+    { "watch_dir_enabled"sv, "watch-dir-enabled"sv },
+    { "watch_dir_force_generic"sv, "watch-dir-force-generic"sv },
+
+    // stats.json
+    { "downloaded_bytes"sv, "downloaded-bytes"sv },
+    { "files_added"sv, "files-added"sv },
+    { "seconds_active"sv, "seconds-active"sv },
+    { "session_count"sv, "session-count"sv },
+    { "uploaded_bytes"sv, "uploaded-bytes"sv },
+
     // .resume
     { "peers2"sv, "peers2"sv },
     { "peers2_6"sv, "peers2-6"sv },
@@ -1491,18 +1540,18 @@ auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
     { "max_peers"sv, "max-peers"sv },
     { "max_peers"sv, "max-peers"sv },
     { "paused"sv, "paused"sv },
-    { "added_date"sv, "addedDate"sv },
-    { "added_date"sv, "addedDate"sv },
-    { "done_date"sv, "doneDate"sv },
-    { "done_date"sv, "doneDate"sv },
-    { "activity_date"sv, "activityDate"sv },
-    { "activity_date"sv, "activityDate"sv },
+    { "added_date"sv, "added-date"sv },
+    { "added_date"sv, "added-date"sv },
+    { "done_date"sv, "done-date"sv },
+    { "done_date"sv, "done-date"sv },
+    { "activity_date"sv, "activity-date"sv },
+    { "activity_date"sv, "activity-date"sv },
     { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
     { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
     { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
     { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
-    { "bandwidth_priority"sv, "bandwidthPriority"sv },
-    { "bandwidth_priority"sv, "bandwidthPriority"sv },
+    { "bandwidth_priority"sv, "bandwidth-priority"sv },
+    { "bandwidth_priority"sv, "bandwidth-priority"sv },
     { "sequential_download"sv, "sequential_download"sv },
     { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
 
@@ -1532,7 +1581,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
     { "p"sv, "p"sv },
     { "piece"sv, "piece"sv },
     { "reqq"sv, "reqq"sv },
-    { "total_size"sv, "totalSize"sv },
+    { "total_size"sv, "total_size"sv },
     { "upload_only"sv, "upload_only"sv },
     { "ut_holepunch"sv, "ut_holepunch"sv },
     { "ut_metadata"sv, "ut_metadata"sv },
@@ -1604,7 +1653,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 271U>{{
     { "compact_view"sv, "compact-view"sv },
     { "details_window_height"sv, "details-window-height"sv },
     { "details_window_width"sv, "details-window-width"sv },
-    { "download_dir"sv, "downloadDir"sv },
+    { "download_dir"sv, "download-dir"sv },
     { "inhibit_desktop_hibernation"sv, "inhibit-desktop-hibernation"sv },
     { "main_window_height"sv, "main-window-height"sv },
     { "main_window_is_maximized"sv, "main-window-is-maximized"sv },
