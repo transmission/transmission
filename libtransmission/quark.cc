@@ -1576,21 +1576,21 @@ auto constexpr SessionKeys = std::array<ApiKey, 311U>{ {
     { "dropped6"sv, "dropped6"sv }, // BEP0011
     { "e"sv, "e"sv },
     { "incomplete"sv, "incomplete"sv }, // BEP0048
-    { "ipv4"sv, "ipv4"sv },
-    { "ipv6"sv, "ipv6"sv },
-    { "m"sv, "m"sv }, // BEP0011
+    { "ipv4"sv, "ipv4"sv }, // BEP0010
+    { "ipv6"sv, "ipv6"sv }, // BEP0010
+    { "m"sv, "m"sv }, // BEP0010, BEP0011
     { "metadata_size"sv, "metadata_size"sv },
     { "msg_type"sv, "msg_type"sv },
-    { "p"sv, "p"sv },
+    { "p"sv, "p"sv }, // BEP0010
     { "piece"sv, "piece"sv },
     { "reqq"sv, "reqq"sv },
     { "total_size"sv, "total_size"sv },
     { "upload_only"sv, "upload_only"sv },
     { "ut_holepunch"sv, "ut_holepunch"sv },
     { "ut_metadata"sv, "ut_metadata"sv }, // BEP0011
-    { "ut_pex"sv, "ut_pex"sv }, // BEP0011
-    { "v"sv, "v"sv },
-    { "yourip"sv, "yourip"sv },
+    { "ut_pex"sv, "ut_pex"sv }, // BEP0010, BEP0011
+    { "v"sv, "v"sv }, // BEP0010
+    { "yourip"sv, "yourip"sv }, // BEP0010
 
     // .torrent strings
     { "length"sv, "length"sv },
