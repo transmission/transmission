@@ -1077,9 +1077,9 @@ struct ApiKey
 
 auto constexpr RpcKeys = std::array<ApiKey, 288U>{
     { { "active_torrent_count"sv, "activeTorrentCount"sv },
-      { "activity_date"sv, "activityDate"sv },
+      { "activity_date"sv, "activityDate"sv }, // TODO(ckerr) legacy duplicate
       { "added"sv, "added"sv },
-      { "added_date"sv, "addedDate"sv },
+      { "added_date"sv, "addedDate"sv }, // TODO(ckerr) legacy duplicate
       { "address"sv, "address"sv },
       { "alt_speed_down"sv, "alt-speed-down"sv },
       { "alt_speed_enabled"sv, "alt-speed-enabled"sv },
@@ -1091,7 +1091,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "announce_state"sv, "announceState"sv },
       { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
       { "availability"sv, "availability"sv },
-      { "bandwidth_priority"sv, "bandwidthPriority"sv },
+      { "bandwidth_priority"sv, "bandwidthPriority"sv }, // TODO(ckerr) legacy duplicate
       { "begin_piece"sv, "begin_piece"sv },
       { "blocklist_enabled"sv, "blocklist-enabled"sv },
       { "blocklist_size"sv, "blocklist-size"sv },
@@ -1118,16 +1118,16 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "desired_available"sv, "desiredAvailable"sv },
       { "dht_enabled"sv, "dht-enabled"sv },
       { "done"sv, "done"sv },
-      { "done_date"sv, "doneDate"sv },
+      { "done_date"sv, "doneDate"sv }, // TODO(ckerr) legacy duplicate
       { "download_count"sv, "downloadCount"sv },
-      { "download_dir"sv, "downloadDir"sv },
+      { "download_dir"sv, "downloadDir"sv }, // TODO(ckerr) legacy duplicate
       { "download_dir_free_space"sv, "download-dir-free-space"sv },
       { "download_limit"sv, "downloadLimit"sv },
       { "download_limited"sv, "downloadLimited"sv },
       { "download_queue_enabled"sv, "download-queue-enabled"sv },
       { "download_queue_size"sv, "download-queue-size"sv },
       { "download_speed"sv, "downloadSpeed"sv },
-      { "downloaded_bytes"sv, "downloadedBytes"sv },
+      { "downloaded_bytes"sv, "downloadedBytes"sv }, // TODO(ckerr) legacy duplicate
       { "downloaded_ever"sv, "downloadedEver"sv },
       { "downloader_count"sv, "downloader_count"sv },
       { "edit_date"sv, "editDate"sv },
@@ -1142,7 +1142,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "file_stats"sv, "fileStats"sv },
       { "filename"sv, "filename"sv },
       { "files"sv, "files"sv },
-      { "files_added"sv, "filesAdded"sv },
+      { "files_added"sv, "filesAdded"sv }, // TODO(ckerr) legacy duplicate
       { "files_unwanted"sv, "files-unwanted"sv },
       { "files_wanted"sv, "files-wanted"sv },
       { "flag_str"sv, "flagStr"sv },
@@ -1281,7 +1281,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "script_torrent_done_filename"sv, "script-torrent-done-filename"sv },
       { "script_torrent_done_seeding_enabled"sv, "script-torrent-done-seeding-enabled"sv },
       { "script_torrent_done_seeding_filename"sv, "script-torrent-done-seeding-filename"sv },
-      { "seconds_active"sv, "secondsActive"sv },
+      { "seconds_active"sv, "secondsActive"sv }, // TODO(ckerr) legacy duplicate
       { "seconds_downloading"sv, "secondsDownloading"sv },
       { "seconds_seeding"sv, "secondsSeeding"sv },
       { "seed_idle_limit"sv, "seedIdleLimit"sv },
@@ -1296,7 +1296,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "sequential_download"sv, "sequential_download"sv },
       { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
       { "session_close"sv, "session-close"sv },
-      { "session_count"sv, "sessionCount"sv },
+      { "session_count"sv, "sessionCount"sv }, // TODO(ckerr) legacy duplicate
       { "session_get"sv, "session-get"sv },
       { "session_id"sv, "session-id"sv },
       { "session_set"sv, "session-set"sv },
@@ -1350,7 +1350,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "upload_limited"sv, "uploadLimited"sv },
       { "upload_ratio"sv, "uploadRatio"sv },
       { "upload_speed"sv, "uploadSpeed"sv },
-      { "uploaded_bytes"sv, "uploadedBytes"sv },
+      { "uploaded_bytes"sv, "uploadedBytes"sv }, // TODO(ckerr) legacy duplicate
       { "uploaded_ever"sv, "uploadedEver"sv },
       { "utp_enabled"sv, "utp-enabled"sv },
       { "version"sv, "version"sv },
@@ -1403,7 +1403,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "cache_size_mb"sv, "cache-size-mb"sv },
     { "default_trackers"sv, "default-trackers"sv },
     { "dht_enabled"sv, "dht-enabled"sv },
-    { "download_dir"sv, "download-dir"sv },
+    { "download_dir"sv, "download-dir"sv }, // TODO(ckerr) legacy duplicate
     { "download_queue_enabled"sv, "download-queue-enabled"sv },
     { "download_queue_size"sv, "download-queue-size"sv },
     { "encryption"sv, "encryption"sv },
@@ -1462,7 +1462,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "blocklist_enabled"sv, "blocklist-enabled"sv },
     { "default_trackers"sv, "default-trackers"sv },
     { "dht_enabled"sv, "dht-enabled"sv },
-    { "download_dir"sv, "download-dir"sv },
+    { "download_dir"sv, "download-dir"sv }, // TODO(ckerr) legacy duplicate
     { "encryption"sv, "encryption"sv },
     { "incomplete_dir"sv, "incomplete-dir"sv },
     { "incomplete_dir_enabled"sv, "incomplete-dir-enabled"sv },
@@ -1491,11 +1491,11 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "watch_dir_force_generic"sv, "watch-dir-force-generic"sv },
 
     // stats.json
-    { "downloaded_bytes"sv, "downloaded-bytes"sv },
-    { "files_added"sv, "files-added"sv },
-    { "seconds_active"sv, "seconds-active"sv },
-    { "session_count"sv, "session-count"sv },
-    { "uploaded_bytes"sv, "uploaded-bytes"sv },
+    { "downloaded_bytes"sv, "downloaded-bytes"sv }, // TODO(ckerr) legacy duplicate
+    { "files_added"sv, "files-added"sv }, // TODO(ckerr) legacy duplicate
+    { "seconds_active"sv, "seconds-active"sv }, // TODO(ckerr) legacy duplicate
+    { "session_count"sv, "session-count"sv }, // TODO(ckerr) legacy duplicate
+    { "uploaded_bytes"sv, "uploaded-bytes"sv }, // TODO(ckerr) legacy duplicate
 
     // .resume
     { "peers2"sv, "peers2"sv },
@@ -1543,18 +1543,18 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "max_peers"sv, "max-peers"sv },
     { "max_peers"sv, "max-peers"sv },
     { "paused"sv, "paused"sv },
-    { "added_date"sv, "added-date"sv },
-    { "added_date"sv, "added-date"sv },
-    { "done_date"sv, "done-date"sv },
-    { "done_date"sv, "done-date"sv },
-    { "activity_date"sv, "activity-date"sv },
-    { "activity_date"sv, "activity-date"sv },
+    { "added_date"sv, "added-date"sv }, // TODO(ckerr) legacy duplicate
+    { "added_date"sv, "added-date"sv }, // TODO(ckerr) legacy duplicate
+    { "done_date"sv, "done-date"sv }, // TODO(ckerr) legacy duplicate
+    { "done_date"sv, "done-date"sv }, // TODO(ckerr) legacy duplicate
+    { "activity_date"sv, "activity-date"sv }, // TODO(ckerr) legacy duplicate
+    { "activity_date"sv, "activity-date"sv }, // TODO(ckerr) legacy duplicate
     { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
     { "seeding_time_seconds"sv, "seeding-time-seconds"sv },
     { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
     { "downloading_time_seconds"sv, "downloading-time-seconds"sv },
-    { "bandwidth_priority"sv, "bandwidth-priority"sv },
-    { "bandwidth_priority"sv, "bandwidth-priority"sv },
+    { "bandwidth_priority"sv, "bandwidth-priority"sv }, // TODO(ckerr) legacy duplicate
+    { "bandwidth_priority"sv, "bandwidth-priority"sv }, // TODO(ckerr) legacy duplicate
     { "sequential_download"sv, "sequential_download"sv },
     { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
 
@@ -1658,7 +1658,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "compact_view"sv, "compact-view"sv },
     { "details_window_height"sv, "details-window-height"sv },
     { "details_window_width"sv, "details-window-width"sv },
-    { "download_dir"sv, "download-dir"sv },
+    { "download_dir"sv, "download-dir"sv }, // TODO(ckerr) legacy duplicate
     { "inhibit_desktop_hibernation"sv, "inhibit-desktop-hibernation"sv },
     { "main_window_height"sv, "main-window-height"sv },
     { "main_window_is_maximized"sv, "main-window-is-maximized"sv },
