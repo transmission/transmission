@@ -148,10 +148,46 @@ constexpr std::string_view LegacyRpcJson = R"json({
 })json";
 
 constexpr std::string_view CurrentRpcJson = R"json({
-    "jsonrpc": "2.0",
-    "method": "session_get",
-    "id": 12345
+   "jsonrpc": "2.0",
+   "params": {
+       "fields": [ "id", "name", "total_size" ],
+       "ids": [ 7, 10 ]
+   },
+   "method": "torrent_get",
+   "id": 39693
 })json";
+
+#if 0
+constexpr std::string_view LegacySettingsShort = R"json({
+    "alt-speed-down": 50,
+    "alt-speed-enabled": false,
+    "alt-speed-time-begin": 540,
+    "alt-speed-time-day": 127,
+    "alt-speed-time-enabled": false,
+    "alt-speed-time-end": 1020,
+    "alt-speed-up": 50,
+    "blocklist-date": 0,
+    "blocklist-enabled": false,
+    "blocklist-updates-enabled": true,
+    "blocklist-url": "http://www.example.com/blocklist",
+    "compact-view": false
+})json";
+
+constexpr std::string_view CurrentSettingsShort = R"json({
+    "alt_speed_down": 50,
+    "alt_speed_enabled": false,
+    "alt_speed_time_begin": 540,
+    "alt_speed_time_day": 127,
+    "alt_speed_time_enabled": false,
+    "alt_speed_time_end": 1020,
+    "alt_speed_up": 50,
+    "blocklist_date": 0,
+    "blocklist_enabled": false,
+    "blocklist_updates_enabled": true,
+    "blocklist_url": "http://www.example.com/blocklist",
+    "compact_view": false
+})json";
+#endif
 
 } // namespace
 
@@ -198,3 +234,20 @@ TEST(ApiCompatTest, canDetectCurrentRpc)
     ASSERT_TRUE(style);
     EXPECT_EQ(libtransmission::api_compat::Style::Current, *style);
 }
+
+#if 0
+TEST(ApiCompatTest, canApplyCurrentStyleFromLegacySettings)
+{
+    auto serde = tr_variant_serde::json();
+    auto const parsed = serde.parse(LegacySettingsShort);
+    ASSERT_TRUE(parsed.has_value());
+
+    auto converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::Current);
+    auto converted_json = tr_variant_serde::json().to_string(converted);
+    EXPECT_EQ(CurrentSettingsShort, converted_json);
+
+    converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::LegacySettings);
+    converted_json = tr_variant_serde::json().to_string(converted);
+    EXPECT_EQ(LegacySettingsShort, converted_json);
+}
+#endif
