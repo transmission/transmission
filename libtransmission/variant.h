@@ -409,6 +409,8 @@ public:
         return *this;
     }
 
+    [[nodiscard]] tr_variant clone() const;
+
 private:
     // Holds a string_view to either an unmanaged/external string or to
     // one owned by the class. If the string is unmanaged, only sv_ is used.

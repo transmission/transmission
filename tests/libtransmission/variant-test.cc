@@ -406,6 +406,82 @@ TEST_F(VariantTest, merge)
     EXPECT_EQ("ghi"sv, *sv);
 }
 
+TEST_F(VariantTest, cloneCopiesManagedStrings)
+{
+    auto src = tr_variant{ "hello world"sv };
+    auto cloned = src.clone();
+
+    auto lhs = src.value_if<std::string_view>();
+    auto rhs = cloned.value_if<std::string_view>();
+    ASSERT_TRUE(lhs);
+    ASSERT_TRUE(rhs);
+    EXPECT_EQ(*lhs, *rhs);
+    EXPECT_NE(lhs->data(), rhs->data());
+}
+
+TEST_F(VariantTest, cloneCopiesUnmanagedStrings)
+{
+    auto backing = std::string{ "backing" };
+    auto src = tr_variant::unmanaged_string(backing);
+    auto cloned = src.clone();
+
+    auto lhs = src.value_if<std::string_view>();
+    auto rhs = cloned.value_if<std::string_view>();
+    ASSERT_TRUE(lhs);
+    ASSERT_TRUE(rhs);
+    EXPECT_EQ(*lhs, *rhs);
+    EXPECT_NE(rhs->data(), backing.data());
+
+    backing.front() = 'B';
+    lhs = src.value_if<std::string_view>();
+    rhs = cloned.value_if<std::string_view>();
+    ASSERT_TRUE(lhs);
+    ASSERT_TRUE(rhs);
+    EXPECT_EQ("Backing"sv, *lhs);
+    EXPECT_EQ("backing"sv, *rhs);
+}
+
+TEST_F(VariantTest, cloneDeepCopiesContainers)
+{
+    auto const foo = tr_quark_new("foo"sv);
+    auto const bar = tr_quark_new("bar"sv);
+
+    auto src = tr_variant::make_map(2U);
+    auto* map = src.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, map);
+
+    auto [foo_variant, inserted] = map->try_emplace(foo, tr_variant::make_vector());
+    ASSERT_TRUE(inserted);
+    auto* foo_vec = foo_variant.get_if<tr_variant::Vector>();
+    ASSERT_NE(nullptr, foo_vec);
+    foo_vec->push_back(1);
+    foo_vec->push_back("seed"sv);
+
+    map->try_emplace(bar, 5);
+
+    auto cloned = src.clone();
+
+    (*foo_vec)[0] = 99;
+    auto* bar_value = map->find_if<int64_t>(bar);
+    ASSERT_NE(nullptr, bar_value);
+    *bar_value = 11;
+
+    auto const* cloned_map = cloned.get_if<tr_variant::Map>();
+    ASSERT_NE(nullptr, cloned_map);
+    auto const* cloned_vec = cloned_map->find_if<tr_variant::Vector>(foo);
+    ASSERT_NE(nullptr, cloned_vec);
+    ASSERT_EQ(2U, std::size(*cloned_vec));
+    auto first_val = (*cloned_vec)[0].value_if<int64_t>();
+    ASSERT_TRUE(first_val);
+    EXPECT_EQ(1, *first_val);
+    auto second_val = (*cloned_vec)[1].value_if<std::string_view>();
+    ASSERT_TRUE(second_val);
+    EXPECT_EQ("seed"sv, *second_val);
+    auto bar_clone = cloned_map->value_if<int64_t>(bar);
+    ASSERT_TRUE(bar_clone);
+    EXPECT_EQ(5, *bar_clone);
+}
+
 TEST_F(VariantTest, stackSmash)
 {
     // make a nested list of list of lists.

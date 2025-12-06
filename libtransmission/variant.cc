@@ -199,6 +199,66 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 
 // ---
 
+tr_variant tr_variant::clone() const
+{
+    struct Visitor
+    {
+        tr_variant operator()(std::monostate const& /*unused*/) const
+        {
+            return tr_variant{};
+        }
+
+        tr_variant operator()(std::nullptr_t const& /*unused*/) const
+        {
+            return tr_variant{ nullptr };
+        }
+
+        tr_variant operator()(bool const& val) const
+        {
+            return tr_variant{ val };
+        }
+
+        tr_variant operator()(int64_t const& val) const
+        {
+            return tr_variant{ val };
+        }
+
+        tr_variant operator()(double const& val) const
+        {
+            return tr_variant{ val };
+        }
+
+        tr_variant operator()(tr_variant::StringHolder const& holder) const
+        {
+            return tr_variant{ holder.sv_ };
+        }
+
+        tr_variant operator()(tr_variant::Vector const& src) const
+        {
+            auto ret = tr_variant{};
+            auto& tgt = ret.val_.emplace<Vector>();
+            tgt.reserve(std::size(src));
+            for (auto const& val : src)
+                tgt.emplace_back(val.clone());
+            return ret;
+        }
+
+        tr_variant operator()(tr_variant::Map const& src) const
+        {
+            auto ret = tr_variant{};
+            auto& tgt = ret.val_.emplace<Map>();
+            tgt.reserve(std::size(src));
+            for (auto const& [key, val] : src)
+                tgt.insert_or_assign(key, val.clone());
+            return ret;
+        }
+    };
+
+    return std::visit(Visitor{}, val_);
+}
+
+// ---
+
 tr_variant::Merge::Merge(tr_variant& tgt)
     : tgt_{ tgt }
 {
