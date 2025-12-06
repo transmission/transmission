@@ -563,6 +563,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_size_bytes,
     TR_KEY_size_units,
     TR_KEY_size_when_done,
+    TR_KEY_sleep_per_seconds_during_verify_kebab,
     TR_KEY_sleep_per_seconds_during_verify,
     TR_KEY_socket_address,
     TR_KEY_sort_mode_kebab,
