@@ -160,3 +160,37 @@ TEST_F(QuarkTest, canDetectLegacySettings)
     ASSERT_TRUE(style);
     EXPECT_EQ(libtransmission::api_compat::Style::LegacySettings, *style);
 }
+
+TEST_F(QuarkTest, canDetectLegacyRpc)
+{
+    constexpr std::string_view LegacyRpcJson = R"json({
+        "arguments": {
+            "fields": [
+                "error",
+                "errorString",
+                "eta",
+                "id",
+                "isFinished",
+                "leftUntilDone",
+                "name",
+                "peersGettingFromUs",
+                "peersSendingToUs",
+                "rateDownload",
+                "rateUpload",
+                "sizeWhenDone",
+                "status",
+                "uploadRatio"
+            ]
+        },
+        "method": "torrent-get",
+        "tag": 6
+    })json";
+
+    auto serde = tr_variant_serde::json();
+    auto variant = serde.parse(LegacyRpcJson);
+    ASSERT_TRUE(variant);
+
+    auto const style = libtransmission::api_compat::detect_style(*variant);
+    ASSERT_TRUE(style);
+    EXPECT_EQ(libtransmission::api_compat::Style::LegacyRpc, *style);
+}

@@ -1365,7 +1365,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "method"sv, "method"sv } }
 };
 
-auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     // BT protocol
     // These strings must never change
     { "announce-list"sv, "announce-list"sv }, // BEP0012
@@ -1701,31 +1701,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 367U>{ {
     { "rpc_whitelist"sv, "rpc-whitelist"sv },
     { "trash_original_torrent_files"sv, "trash-original-torrent-files"sv },
     { "peer_limit_per_torrent"sv, "peer-limit-per-torrent"sv },
-
-    // transmission-gtk unsorted TODO(ckerr)
-    { "arguments"sv, "arguments"sv },
-    { "bandwidth_priority"sv, "bandwidthPriority"sv },
-    { "blocklist_size"sv, "blocklist-size"sv },
-    { "download_limit"sv, "downloadLimit"sv },
-    { "download_limited"sv, "downloadLimited"sv },
-    { "honors_session_limits"sv, "honorsSessionLimits"sv },
-    { "id"sv, "id"sv },
-    { "ids"sv, "ids"sv },
-    { "ip_protocol"sv, "ip-protocol"sv },
-    { "method"sv, "method"sv },
-    { "peer_limit"sv, "peer-limit"sv },
-    { "port_is_open"sv, "port-is-open"sv },
-    { "seed_idle_limit"sv, "seedIdleLimit"sv },
-    { "seed_idle_mode"sv, "seedIdleMode"sv },
-    { "seed_ratio_limit"sv, "seedRatioLimit"sv },
-    { "seed_ratio_mode"sv, "seedRatioMode"sv },
-    { "tag"sv, "tag"sv },
-    { "torrent_complete_verify_enabled"sv, "torrent-complete-verify-enabled"sv },
-    { "torrent_set"sv, "torrent-set"sv },
-    { "tracker_add"sv, "trackerAdd"sv },
-    { "tracker_remove"sv, "trackerRemove"sv },
-    { "upload_limit"sv, "uploadLimit"sv },
-    { "upload_limited"sv, "uploadLimited"sv },
 } };
 
 template<size_t N>
