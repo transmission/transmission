@@ -79,6 +79,10 @@ public:
     {
         return block_info().block_loc(block);
     }
+    [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t block) const noexcept
+    {
+        return block_info().block_last_loc(block);
+    }
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
         return block_info().piece_loc(piece, offset, length);

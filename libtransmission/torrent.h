@@ -267,6 +267,10 @@ struct tr_torrent
     {
         return metainfo_.block_loc(block);
     }
+    [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t block) const noexcept
+    {
+        return metainfo_.block_last_loc(block);
+    }
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
         return metainfo_.piece_loc(piece, offset, length);

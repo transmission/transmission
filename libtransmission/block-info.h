@@ -97,6 +97,12 @@ public:
         return byte_loc(uint64_t{ block } * BlockSize);
     }
 
+    // Location of the last byte in `block`.
+    [[nodiscard]] constexpr auto block_last_loc(tr_block_index_t const block) const noexcept
+    {
+        return byte_loc((uint64_t{ block } * BlockSize) + block_size(block) - 1U);
+    }
+
     // Location of the first byte (+ optional offset and length) in `piece`
     [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = {}, uint32_t length = {}) const noexcept
     {

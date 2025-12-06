@@ -1688,16 +1688,20 @@ ReadResult tr_peerMsgsImpl::read_piece_data(MessageReader& payload)
         return { ReadState::Err, len };
     }
 
-    if (!active_requests.test(block))
-    {
-        logwarn(this, fmt::format("got unrequested block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
-        return { ReadState::Err, len };
-    }
-
     if (tor_.has_block(block))
     {
         logtrace(this, fmt::format("got completed block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
         return { ReadState::Err, len };
+    }
+
+    if (auto const block_loc = tor_.block_loc(block); !tor_.piece_is_wanted(block_loc.piece))
+    {
+        if (auto const block_last_loc = tor_.block_last_loc(block);
+            block_loc.piece == block_last_loc.piece || !tor_.piece_is_wanted(block_last_loc.piece))
+        {
+            logwarn(this, fmt::format("got unwanted block {:d} ({:d}:{:d}->{:d})", block, piece, offset, len));
+            return { ReadState::Err, len };
+        }
     }
 
     peer_info->set_latest_piece_data_time(tr_time());
