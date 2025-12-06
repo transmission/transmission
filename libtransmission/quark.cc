@@ -1163,10 +1163,10 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "hash_string"sv, "hashString"sv },
       { "have_unchecked"sv, "haveUnchecked"sv },
       { "have_valid"sv, "haveValid"sv },
-    { "honors_session_limits"sv, "honorsSessionLimits"sv },
-    { "host"sv, "host"sv },
-    { "id"sv, "id"sv },
-    { "id"sv, "tag"sv }, // FIXME(ckerr): edge case: id<->id elsewhere
+      { "honors_session_limits"sv, "honorsSessionLimits"sv },
+      { "host"sv, "host"sv },
+      { "id"sv, "id"sv },
+      { "id"sv, "tag"sv }, // FIXME(ckerr): edge case: id<->id elsewhere
       { "idle_seeding_limit"sv, "idle-seeding-limit"sv },
       { "idle_seeding_limit_enabled"sv, "idle-seeding-limit-enabled"sv },
       { "ids"sv, "ids"sv },
