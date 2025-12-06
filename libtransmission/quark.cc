@@ -217,7 +217,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "has_scraped"sv,
     "hashString"sv,
     "hash_string"sv,
-    "have"sv,
     "haveUnchecked"sv,
     "haveValid"sv,
     "have_unchecked"sv,
