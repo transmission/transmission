@@ -14,7 +14,7 @@ std::string get_mmdb_file_path();
 bool test_and_open_mmdb();
 void close_mmdb();
 
-void decompress_gz_file(std::string filename);
+bool decompress_gz_file(std::string filename);
 
 void maintain_mmdb_file_async();
 void maintain_mmdb_file();

@@ -94,15 +94,14 @@ void close_mmdb()
 }
 
 // Function to decompress the mmdb.gz file after download
-void decompress_gz_file(std::string filename)
+bool decompress_gz_file(std::string filename)
 {
     std::ifstream gz_file(filename, std::ios::binary);
     if (!gz_file)
     {
         std::cerr << "Error opening " + filename + " to perform decompression\n";
-        return;
+        return false;
     }
-
     // Read the entire .gz file into a buffer
     std::vector<char> gz_data((std::istreambuf_iterator<char>(gz_file)), std::istreambuf_iterator<char>());
 
@@ -111,7 +110,7 @@ void decompress_gz_file(std::string filename)
     if (decompressor == nullptr)
     {
         std::cerr << "libdeflate: Failed to create decompressor\n";
-        return;
+        return false;
     }
 
     // Prepare buffer to hold decompressed data (estimate maximum decompressed size)
@@ -131,6 +130,8 @@ void decompress_gz_file(std::string filename)
     if (result != LIBDEFLATE_SUCCESS)
     {
         std::cerr << "libdeflate: Decompression of " + filename + " failed\n";
+        libdeflate_free_decompressor(decompressor);
+        return false;
     }
     else
     {
@@ -140,13 +141,16 @@ void decompress_gz_file(std::string filename)
         if (!output_file)
         {
             std::cerr << "Error opening " + filename + " to save decompression result\n";
+            libdeflate_free_decompressor(decompressor);
+            return false;
         }
         else
         {
             output_file.write(decompressed_data.data(), decompressed_len);
+            libdeflate_free_decompressor(decompressor);
+            return true;
         }
     }
-    libdeflate_free_decompressor(decompressor);
 }
 
 // Wrapper function to run maintain_mmdb_file in a background thread
@@ -253,7 +257,11 @@ void maintain_mmdb_file()
         }
 
         // Decompress mmdb.gz file
-        decompress_gz_file(mmdb_file + ".gz");
+        if (!decompress_gz_file(mmdb_file + ".gz"))
+        {
+            std::cerr << "Failed to decompress " + (mmdb_file + ".gz") + '\n';
+            return;
+        }
         if (remove((mmdb_file + ".gz").c_str()) != 0)
         {
             std::perror(("Error deleting " + mmdb_file + ".gz").c_str());
