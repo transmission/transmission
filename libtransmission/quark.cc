@@ -1366,7 +1366,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 287U>{
       { "method"sv, "method"sv } }
 };
 
-auto constexpr SessionKeys = std::array<ApiKey, 308U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 310U>{ {
     // tr_rpc_server::Settings
     { "anti_brute_force_enabled"sv, "anti-brute-force-enabled"sv },
     { "anti_brute_force_threshold"sv, "anti-brute-force-threshold"sv },
@@ -1500,6 +1500,8 @@ auto constexpr SessionKeys = std::array<ApiKey, 308U>{ {
     { "peers2"sv, "peers2"sv },
     { "peers2_6"sv, "peers2-6"sv },
     { "peers2_6"sv, "peers2-6"sv },
+    { "socket_address"sv, "socket_address"sv }, // for pex
+    { "flags"sv, "flags"sv }, // for pex
     { "labels"sv, "labels"sv },
     { "group"sv, "group"sv },
     { "dnd"sv, "dnd"sv },
@@ -1562,20 +1564,20 @@ auto constexpr SessionKeys = std::array<ApiKey, 308U>{ {
     { "nodes6"sv, "nodes6"sv },
 
     // BT messages
-    { "added"sv, "added"sv },
-    { "added.f"sv, "added.f"sv },
-    { "added6"sv, "added6"sv },
-    { "added6.f"sv, "added6.f"sv },
+    { "added"sv, "added"sv }, // BEP0011
+    { "added.f"sv, "added.f"sv }, // BEP0011
+    { "added6"sv, "added6"sv }, // BEP0011
+    { "added6.f"sv, "added6.f"sv }, // BEP0011
     { "announce"sv, "announce"sv }, // BEP0003
     { "complete"sv, "complete"sv }, // BEP0048
     { "downloaded"sv, "downloaded"sv }, // BEP0048
-    { "dropped"sv, "dropped"sv },
-    { "dropped6"sv, "dropped6"sv },
+    { "dropped"sv, "dropped"sv }, // BEP0011
+    { "dropped6"sv, "dropped6"sv }, // BEP0011
     { "e"sv, "e"sv },
     { "incomplete"sv, "incomplete"sv }, // BEP0048
     { "ipv4"sv, "ipv4"sv },
     { "ipv6"sv, "ipv6"sv },
-    { "m"sv, "m"sv },
+    { "m"sv, "m"sv }, // BEP0011
     { "metadata_size"sv, "metadata_size"sv },
     { "msg_type"sv, "msg_type"sv },
     { "p"sv, "p"sv },
@@ -1584,8 +1586,8 @@ auto constexpr SessionKeys = std::array<ApiKey, 308U>{ {
     { "total_size"sv, "total_size"sv },
     { "upload_only"sv, "upload_only"sv },
     { "ut_holepunch"sv, "ut_holepunch"sv },
-    { "ut_metadata"sv, "ut_metadata"sv },
-    { "ut_pex"sv, "ut_pex"sv },
+    { "ut_metadata"sv, "ut_metadata"sv }, // BEP0011
+    { "ut_pex"sv, "ut_pex"sv }, // BEP0011
     { "v"sv, "v"sv },
     { "yourip"sv, "yourip"sv },
 
