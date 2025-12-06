@@ -150,6 +150,12 @@ constexpr std::string_view LegacyRpcJson = R"json({
     "tag": 6
 })json";
 
+constexpr std::string_view CurrentRpcJson = R"json({
+    "jsonrpc": "2.0",
+    "method": "session_get",
+    "id": 12345
+})json";
+
 } // namespace
 
 class QuarkTest : public ::testing::Test
@@ -212,4 +218,15 @@ TEST_F(QuarkTest, canDetectLegacyStats)
     auto const style = libtransmission::api_compat::detect_style(*variant);
     ASSERT_TRUE(style);
     EXPECT_EQ(libtransmission::api_compat::Style::LegacySettings, *style);
+}
+
+TEST_F(QuarkTest, canDetectCurrentRpc)
+{
+    auto serde = tr_variant_serde::json();
+    auto variant = serde.parse(CurrentRpcJson);
+    ASSERT_TRUE(variant);
+
+    auto const style = libtransmission::api_compat::detect_style(*variant);
+    ASSERT_TRUE(style);
+    EXPECT_EQ(libtransmission::api_compat::Style::Current, *style);
 }
