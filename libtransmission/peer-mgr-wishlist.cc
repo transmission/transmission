@@ -489,8 +489,11 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates_)
     {
+        auto const n_added = std::size(blocks);
+        TR_ASSERT(n_added <= n_wanted_blocks);
+
         // do we have enough?
-        if (std::size(blocks) >= n_wanted_blocks)
+        if (n_added >= n_wanted_blocks)
         {
             break;
         }
@@ -502,15 +505,8 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
         }
 
         // walk the blocks in this piece that we don't have or not requested
-        for (auto it = std::rbegin(candidate.unrequested), end = std::rend(candidate.unrequested); it != end; ++it)
-        {
-            if (std::size(blocks) >= n_wanted_blocks)
-            {
-                break;
-            }
-
-            blocks.emplace_back(*it);
-        }
+        auto const n_to_add = std::min(std::size(candidate.unrequested), n_wanted_blocks - n_added);
+        std::copy_n(std::rbegin(candidate.unrequested), n_to_add, std::back_inserter(blocks));
     }
 
     // Ensure the list of blocks are sorted
