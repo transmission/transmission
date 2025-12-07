@@ -157,7 +157,6 @@ constexpr std::string_view CurrentRpcJson = R"json({
    "id": 39693
 })json";
 
-#if 0
 constexpr std::string_view LegacySettingsShort = R"json({
     "alt-speed-down": 50,
     "alt-speed-enabled": false,
@@ -187,8 +186,6 @@ constexpr std::string_view CurrentSettingsShort = R"json({
     "blocklist_url": "http://www.example.com/blocklist",
     "compact_view": false
 })json";
-#endif
-
 } // namespace
 
 TEST(ApiCompatTest, canDetectLegacySettings)
@@ -235,7 +232,6 @@ TEST(ApiCompatTest, canDetectCurrentRpc)
     EXPECT_EQ(libtransmission::api_compat::Style::Current, *style);
 }
 
-#if 0
 TEST(ApiCompatTest, canApplyCurrentStyleFromLegacySettings)
 {
     auto serde = tr_variant_serde::json();
@@ -246,8 +242,9 @@ TEST(ApiCompatTest, canApplyCurrentStyleFromLegacySettings)
     auto converted_json = tr_variant_serde::json().to_string(converted);
     EXPECT_EQ(CurrentSettingsShort, converted_json);
 
+#if 0
     converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::LegacySettings);
     converted_json = tr_variant_serde::json().to_string(converted);
     EXPECT_EQ(LegacySettingsShort, converted_json);
-}
 #endif
+}
