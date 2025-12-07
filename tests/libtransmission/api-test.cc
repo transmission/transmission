@@ -211,21 +211,24 @@ TEST(ApiCompatTest, convert)
     EXPECT_EQ(TR_KEY_activity_date_kebab, convert(TR_KEY_activity_date, Style::LegacySettings));
 }
 
-TEST(ApiCompatTest, canApplyCurrentStyleFromLegacyRpc)
+TEST(ApiCompatTest, canConvertRpc)
 {
-    auto serde = tr_variant_serde::json();
-    auto const parsed = serde.parse(LegacyTorrentGetRpcJson);
-    ASSERT_TRUE(parsed.has_value());
+    using Style = libtransmission::api_compat::Style;
+    using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
+    static auto constexpr TestCases = std::array<TestCase, 3U>{ {
+        { "torrent-get no-op", CurrentTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
+        { "torrent-get legacy", CurrentTorrentGetRpcJson, Style::LegacyRpc, LegacyTorrentGetRpcJson },
+        { "torrent-get current", LegacyTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
+    } };
 
-    auto converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::Current);
-    auto converted_json = tr_variant_serde::json().to_string(converted);
-    EXPECT_EQ(CurrentTorrentGetRpcJson, converted_json);
-
-#if 0
-    converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::LegacySettings);
-    converted_json = tr_variant_serde::json().to_string(converted);
-    EXPECT_EQ(LegacySettingsShort, converted_json);
-#endif
+    for (auto [name, src, tgt_style, expected] : TestCases)
+    {
+        auto serde = tr_variant_serde::json();
+        auto parsed = serde.parse(src);
+        ASSERT_TRUE(parsed.has_value());
+        auto converted = libtransmission::api_compat::apply_style(*parsed, tgt_style);
+        EXPECT_EQ(expected, serde.to_string(converted)) << name;
+    }
 }
 
 TEST(ApiCompatTest, canApplyCurrentStyleFromLegacySettings)

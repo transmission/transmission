@@ -243,7 +243,7 @@ struct tr_variant::CloneState
         {
             if (state_.convert_strings)
                 if (auto key = tr_quark_lookup(holder.sv_))
-                    return tr_variant{ tr_quark_get_string_view(tr_quark_convert(*key)) };
+                    return tr_variant{ tr_quark_get_string_view(api_compat::convert(*key, state_.style)) };
 
             return tr_variant{ holder.sv_ };
         }
@@ -266,7 +266,7 @@ struct tr_variant::CloneState
             for (auto const& [key, val] : src)
             {
                 auto const pop = state_.convert_strings;
-                auto const new_key = tr_quark_convert(key);
+                auto const new_key = api_compat::convert(key, state_.style);
                 auto const special = (state_.is_rpc_payload && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
                 state_.convert_strings |= special;
                 tgt.insert_or_assign(new_key, val.cloneToStyleImpl(state_));
