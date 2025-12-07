@@ -201,11 +201,15 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 
 namespace api_compat = libtransmission::api_compat;
 
-tr_variant tr_variant::cloneToStyle(api_compat::Style const style) const
+struct tr_variant::CloneState
 {
-    if (style != api_compat::Style::Current)
-        abort();
+    api_compat::Style style;
+    bool is_rpc_payload = false;
+    bool convert_strings = false;
+};
 
+[[nodiscard]] tr_variant tr_variant::cloneToStyleImpl(CloneState& state) const
+{
     struct Visitor
     {
         tr_variant operator()(std::monostate const& /*unused*/) const
@@ -235,33 +239,51 @@ tr_variant tr_variant::cloneToStyle(api_compat::Style const style) const
 
         tr_variant operator()(tr_variant::StringHolder const& holder) const
         {
+            if (state_.convert_strings)
+                if (auto key = tr_quark_lookup(holder.sv_))
+                    return tr_variant{ tr_quark_get_string_view(tr_quark_convert(*key)) };
+
             return tr_variant{ holder.sv_ };
         }
 
-        tr_variant operator()(tr_variant::Vector const& src) const
+        tr_variant operator()(tr_variant::Vector const& src)
         {
             auto ret = tr_variant{};
             auto& tgt = ret.val_.emplace<Vector>();
             tgt.reserve(std::size(src));
             for (auto const& val : src)
-                tgt.emplace_back(val.cloneToStyle(style_));
+                tgt.emplace_back(val.cloneToStyleImpl(state_));
             return ret;
         }
 
-        tr_variant operator()(tr_variant::Map const& src) const
+        tr_variant operator()(tr_variant::Map const& src)
         {
             auto ret = tr_variant{};
             auto& tgt = ret.val_.emplace<Map>();
             tgt.reserve(std::size(src));
             for (auto const& [key, val] : src)
-                tgt.insert_or_assign(tr_quark_convert(key), val.cloneToStyle(style_));
+            {
+                auto const pop = state_.convert_strings;
+                auto const new_key = tr_quark_convert(key);
+                auto const special = (state_.is_rpc_payload && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
+                state_.convert_strings |= special;
+                tgt.insert_or_assign(new_key, val.cloneToStyleImpl(state_));
+                state_.convert_strings = pop;
+            }
             return ret;
         }
 
-        api_compat::Style style_;
+        CloneState& state_;
     };
 
-    return std::visit(Visitor{ style }, val_);
+    return std::visit(Visitor{ state }, val_);
+}
+
+tr_variant tr_variant::cloneToStyle(api_compat::Style const style) const
+{
+    bool const is_rpc_payload = true; // FIXME
+    auto state = CloneState{ style, is_rpc_payload };
+    return cloneToStyleImpl(state);
 }
 
 // ---

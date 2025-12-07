@@ -450,6 +450,9 @@ private:
         tr_variant& tgt_;
     };
 
+    struct CloneState;
+    [[nodiscard]] tr_variant cloneToStyleImpl(CloneState& state) const;
+
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };
 
