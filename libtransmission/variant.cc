@@ -27,6 +27,7 @@
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/rpcimpl.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -200,10 +201,11 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 // ---
 
 namespace api_compat = libtransmission::api_compat;
+using Style = api_compat::Style;
 
 struct tr_variant::CloneState
 {
-    api_compat::Style style;
+    Style style;
     bool is_rpc_payload = false;
     bool convert_strings = false;
 };
@@ -279,11 +281,32 @@ struct tr_variant::CloneState
     return std::visit(Visitor{ state }, val_);
 }
 
-tr_variant tr_variant::cloneToStyle(api_compat::Style const style) const
+tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
 {
-    bool const is_rpc_payload = true; // FIXME
-    auto state = CloneState{ style, is_rpc_payload };
-    return cloneToStyleImpl(state);
+    if (val_.index() != tr_variant::MapIndex)
+        abort(); // FIXME
+
+    auto const* const src_top = get_if<tr_variant::Map>();
+    auto const src_is_legacy_rpc = src_top->contains(TR_KEY_arguments) && src_top->contains(TR_KEY_method);
+    auto const src_is_current_rpc = src_top->contains(TR_KEY_jsonrpc) && src_top->contains(TR_KEY_method);
+
+    auto state = CloneState{};
+    state.style = *api_compat::detect_style(*this);
+    state.is_rpc_payload = src_is_legacy_rpc || src_is_current_rpc;
+
+    auto ret = cloneToStyleImpl(state);
+    auto* const tgt_top = ret.get_if<tr_variant::Map>();
+
+    if (src_is_legacy_rpc && tgt_style == Style::Current)
+    {
+        tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+    }
+    else
+    {
+        tgt_top->erase(TR_KEY_jsonrpc);
+    }
+
+    return ret;
 }
 
 // ---

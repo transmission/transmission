@@ -99,6 +99,11 @@ public:
             return Vector::const_iterator{ const_cast<Map*>(this)->find(key) };
         }
 
+        [[nodiscard]] auto contains(tr_quark const key) const noexcept
+        {
+            return find(key) != end();
+        }
+
         [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
         {
             auto constexpr Predicate = [](auto const& item, tr_quark key)
