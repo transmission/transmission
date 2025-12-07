@@ -99,7 +99,7 @@ TEST_F(RpcTest, JsonRpcWrongVersion)
 {
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, "1.0");
-    request_map.try_emplace(TR_KEY_method, "session_stats");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats)));
     request_map.try_emplace(TR_KEY_id, 12345);
 
     auto response = tr_variant{};
@@ -141,7 +141,9 @@ TEST_F(RpcTest, idSync)
     {
         auto request_map = tr_variant::Map{ 3U };
         request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-        request_map.try_emplace(TR_KEY_method, "session-stats");
+        request_map.try_emplace(
+            TR_KEY_method,
+            tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats_kebab)));
         request_map[TR_KEY_id].merge(request_id); // copy
 
         auto response = tr_variant{};
@@ -187,7 +189,7 @@ TEST_F(RpcTest, idWrongType)
     {
         auto request_map = tr_variant::Map{ 3U };
         request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-        request_map.try_emplace(TR_KEY_method, "session_stats");
+        request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats)));
         request_map[TR_KEY_id].merge(request_id); // copy
 
         auto response = tr_variant{};
@@ -221,7 +223,7 @@ TEST_F(RpcTest, idWrongType)
 TEST_F(RpcTest, tagSyncLegacy)
 {
     auto request_map = tr_variant::Map{ 2U };
-    request_map.try_emplace(TR_KEY_method, "session_stats");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats)));
     request_map.try_emplace(TR_KEY_tag, 12345);
 
     auto response = tr_variant{};
@@ -255,7 +257,9 @@ TEST_F(RpcTest, idAsync)
 
         auto request_map = tr_variant::Map{ 3U };
         request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-        request_map.try_emplace(TR_KEY_method, "torrent-rename-path");
+        request_map.try_emplace(
+            TR_KEY_method,
+            tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_rename_path_kebab)));
         request_map[TR_KEY_id].merge(request_id); // copy
 
         auto params_map = tr_variant::Map{ 2U };
@@ -306,7 +310,7 @@ TEST_F(RpcTest, tagAsyncLegacy)
     EXPECT_NE(nullptr, tor);
 
     auto request_map = tr_variant::Map{ 3U };
-    request_map.try_emplace(TR_KEY_method, "torrent_rename_path");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_rename_path)));
     request_map.try_emplace(TR_KEY_tag, 12345);
 
     auto arguments_map = tr_variant::Map{ 2U };
@@ -339,7 +343,7 @@ TEST_F(RpcTest, NotificationSync)
 {
     auto request_map = tr_variant::Map{ 2U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "session_stats");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats)));
 
     auto response = tr_variant{};
     tr_rpc_request_exec(
@@ -357,7 +361,7 @@ TEST_F(RpcTest, NotificationAsync)
 
     auto request_map = tr_variant::Map{ 2U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "torrent_rename_path");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_rename_path)));
 
     auto params_map = tr_variant::Map{ 2U };
     params_map.try_emplace(TR_KEY_path, "files-filled-with-zeroes/512");
@@ -440,18 +444,18 @@ TEST_F(RpcTest, batch)
 
     auto request = tr_variant::Map{ 3U };
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "session-stats");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats_kebab)));
     request.try_emplace(TR_KEY_id, 12345);
     request_vec.emplace_back(std::move(request));
 
     request = tr_variant::Map{ 2U };
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "session-set");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_set_kebab)));
     request_vec.emplace_back(std::move(request));
 
     request = tr_variant::Map{ 3U };
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "session-stats");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats_kebab)));
     request.try_emplace(TR_KEY_id, "12345"sv);
     request_vec.emplace_back(std::move(request));
 
@@ -473,7 +477,7 @@ TEST_F(RpcTest, batch)
     request_vec.emplace_back(std::move(request));
 
     request = tr_variant::Map{ 2U };
-    request.try_emplace(TR_KEY_method, "session-stats");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats_kebab)));
     request.try_emplace(TR_KEY_tag, 12345);
     request_vec.emplace_back(std::move(request));
 
@@ -592,7 +596,7 @@ TEST_F(RpcTest, sessionGet)
 
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "session_get"sv);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_get)));
     request_map.try_emplace(TR_KEY_id, 12345);
     auto response = tr_variant{};
     tr_rpc_request_exec(
@@ -764,7 +768,7 @@ TEST_F(RpcTest, torrentGet)
     auto request = tr_variant::Map{ 3U };
 
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "torrent_get"sv);
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_get)));
     request.try_emplace(TR_KEY_id, 12345);
 
     auto params = tr_variant::Map{ 1U };
