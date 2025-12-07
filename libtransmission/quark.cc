@@ -830,6 +830,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_blocklist_date_kebab: return TR_KEY_blocklist_date;
     case TR_KEY_blocklist_enabled_kebab: return TR_KEY_blocklist_enabled;
     case TR_KEY_blocklist_size_kebab: return TR_KEY_blocklist_size;
+    case TR_KEY_blocklist_update_kebab: return TR_KEY_blocklist_update;
     case TR_KEY_blocklist_updates_enabled_kebab: return TR_KEY_blocklist_updates_enabled;
     case TR_KEY_blocklist_url_kebab: return TR_KEY_blocklist_url;
     case TR_KEY_bytes_completed_camel: return TR_KEY_bytes_completed;
@@ -881,6 +882,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_filter_text_kebab: return TR_KEY_filter_text;
     case TR_KEY_filter_trackers_kebab: return TR_KEY_filter_trackers;
     case TR_KEY_flag_str_camel: return TR_KEY_flag_str;
+    case TR_KEY_free_space_kebab: return TR_KEY_free_space;
     case TR_KEY_from_cache_camel: return TR_KEY_from_cache;
     case TR_KEY_from_dht_camel: return TR_KEY_from_dht;
     case TR_KEY_from_incoming_camel: return TR_KEY_from_incoming;
@@ -888,6 +890,8 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_from_ltep_camel: return TR_KEY_from_ltep;
     case TR_KEY_from_pex_camel: return TR_KEY_from_pex;
     case TR_KEY_from_tracker_camel: return TR_KEY_from_tracker;
+    case TR_KEY_group_get_kebab: return TR_KEY_group_get;
+    case TR_KEY_group_set_kebab: return TR_KEY_group_set;
     case TR_KEY_hash_string_camel: return TR_KEY_hash_string;
     case TR_KEY_has_announced_camel: return TR_KEY_has_announced;
     case TR_KEY_has_scraped_camel: return TR_KEY_has_scraped;
@@ -965,12 +969,17 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_piece_size_camel: return TR_KEY_piece_size;
     case TR_KEY_port_forwarding_enabled_kebab: return TR_KEY_port_forwarding_enabled;
     case TR_KEY_port_is_open_kebab: return TR_KEY_port_is_open;
+    case TR_KEY_port_test_kebab: return TR_KEY_port_test;
     case TR_KEY_primary_mime_type_kebab: return TR_KEY_primary_mime_type;
     case TR_KEY_priority_high_kebab: return TR_KEY_priority_high;
     case TR_KEY_priority_low_kebab: return TR_KEY_priority_low;
     case TR_KEY_priority_normal_kebab: return TR_KEY_priority_normal;
     case TR_KEY_prompt_before_exit_kebab: return TR_KEY_prompt_before_exit;
     case TR_KEY_queue_position_camel: return TR_KEY_queue_position;
+    case TR_KEY_queue_move_bottom_kebab: return TR_KEY_queue_move_bottom;
+    case TR_KEY_queue_move_down_kebab: return TR_KEY_queue_move_down;
+    case TR_KEY_queue_move_top_kebab: return TR_KEY_queue_move_top;
+    case TR_KEY_queue_move_up_kebab: return TR_KEY_queue_move_up;
     case TR_KEY_queue_stalled_enabled_kebab: return TR_KEY_queue_stalled_enabled;
     case TR_KEY_queue_stalled_minutes_kebab: return TR_KEY_queue_stalled_minutes;
     case TR_KEY_rate_download_camel: return TR_KEY_rate_download;
@@ -1027,10 +1036,14 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_seed_ratio_mode_camel: return TR_KEY_seed_ratio_mode;
     case TR_KEY_seeding_time_seconds_kebab: return TR_KEY_seeding_time_seconds;
     case TR_KEY_seeder_count_camel: return TR_KEY_seeder_count;
+    case TR_KEY_session_close_kebab: return TR_KEY_session_close;
     case TR_KEY_session_count_camel:
     case TR_KEY_session_count_kebab:
         return TR_KEY_session_count;
+    case TR_KEY_session_get_kebab: return TR_KEY_session_get;
     case TR_KEY_session_id_kebab: return TR_KEY_session_id;
+    case TR_KEY_session_set_kebab: return TR_KEY_session_set;
+    case TR_KEY_session_stats_kebab: return TR_KEY_session_stats;
     case TR_KEY_show_backup_trackers_kebab: return TR_KEY_show_backup_trackers;
     case TR_KEY_show_extra_peer_details_kebab: return TR_KEY_show_extra_peer_details;
     case TR_KEY_show_filterbar_kebab: return TR_KEY_show_filterbar;
@@ -1056,6 +1069,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_start_minimized_kebab: return TR_KEY_start_minimized;
     case TR_KEY_statusbar_stats_kebab: return TR_KEY_statusbar_stats;
     case TR_KEY_tcp_enabled_kebab: return TR_KEY_tcp_enabled;
+    case TR_KEY_torrent_add_kebab: return TR_KEY_torrent_add;
     case TR_KEY_torrent_added_kebab: return TR_KEY_torrent_added;
     case TR_KEY_torrent_added_notification_enabled_kebab: return TR_KEY_torrent_added_notification_enabled;
     case TR_KEY_torrent_added_verify_mode_kebab: return TR_KEY_torrent_added_verify_mode;
@@ -1066,8 +1080,15 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_torrent_duplicate_kebab: return TR_KEY_torrent_duplicate;
     case TR_KEY_torrent_file_camel: return TR_KEY_torrent_file;
     case TR_KEY_torrent_get_kebab: return TR_KEY_torrent_get;
+    case TR_KEY_torrent_reannounce_kebab: return TR_KEY_torrent_reannounce;
+    case TR_KEY_torrent_remove_kebab: return TR_KEY_torrent_remove;
+    case TR_KEY_torrent_rename_path_kebab: return TR_KEY_torrent_rename_path;
     case TR_KEY_torrent_set_kebab: return TR_KEY_torrent_set;
     case TR_KEY_torrent_set_location_kebab: return TR_KEY_torrent_set_location;
+    case TR_KEY_torrent_start_kebab: return TR_KEY_torrent_start;
+    case TR_KEY_torrent_start_now_kebab: return TR_KEY_torrent_start_now;
+    case TR_KEY_torrent_stop_kebab: return TR_KEY_torrent_stop;
+    case TR_KEY_torrent_verify_kebab: return TR_KEY_torrent_verify;
     case TR_KEY_total_size_camel: return TR_KEY_total_size;
     case TR_KEY_tracker_add_camel: return TR_KEY_tracker_add;
     case TR_KEY_tracker_list_camel: return TR_KEY_tracker_list;
