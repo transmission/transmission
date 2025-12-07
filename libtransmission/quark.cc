@@ -1136,7 +1136,7 @@ struct ApiKey
     //std::string_view legacy_setting;
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 288U>{
+auto constexpr RpcKeys = std::array<ApiKey, 284U>{
     { { "active_torrent_count"sv, "activeTorrentCount"sv },
       { "activity_date"sv, "activityDate"sv }, // TODO(ckerr) legacy duplicate
       { "added"sv, "added"sv },
@@ -1344,7 +1344,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "seed_ratio_limited"sv, "seedRatioLimited"sv },
       { "seed_ratio_mode"sv, "seedRatioMode"sv },
       { "seeder_count"sv, "seederCount"sv },
-      { "seeding_done"sv, "seeding-done"sv },
       { "sequential_download"sv, "sequential_download"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "sequential_download_from_piece"sv, "sequential_download_from_piece"sv },
       { "session_count"sv, "sessionCount"sv }, // TODO(ckerr) legacy duplicate
@@ -1362,7 +1361,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "start_added_torrents"sv, "start-added-torrents"sv },
       { "start_date"sv, "startDate"sv },
       { "status"sv, "status"sv },
-      { "success"sv, "success"sv },
       { "table"sv, "table"sv },
       { "tcp_enabled"sv, "tcp-enabled"sv },
       { "tier"sv, "tier"sv },
@@ -1373,8 +1371,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 288U>{
       { "torrent_file"sv, "torrentFile"sv },
       { "torrents"sv, "torrents"sv },
       { "total_size"sv, "totalSize"sv },
-      { "tr_file_view"sv, "tr-file-view"sv },
-      { "tr_priority_t"sv, "tr-priority-t"sv },
       { "tracker_add"sv, "trackerAdd"sv },
       { "tracker_list"sv, "trackerList"sv },
       { "tracker_remove"sv, "trackerRemove"sv },
