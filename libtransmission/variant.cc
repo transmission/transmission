@@ -199,8 +199,13 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 
 // ---
 
-tr_variant tr_variant::clone() const
+namespace api_compat = libtransmission::api_compat;
+
+tr_variant tr_variant::cloneToStyle(api_compat::Style const style) const
 {
+    if (style != api_compat::Style::Current)
+        abort();
+
     struct Visitor
     {
         tr_variant operator()(std::monostate const& /*unused*/) const
@@ -239,7 +244,7 @@ tr_variant tr_variant::clone() const
             auto& tgt = ret.val_.emplace<Vector>();
             tgt.reserve(std::size(src));
             for (auto const& val : src)
-                tgt.emplace_back(val.clone());
+                tgt.emplace_back(val.cloneToStyle(style_));
             return ret;
         }
 
@@ -249,12 +254,14 @@ tr_variant tr_variant::clone() const
             auto& tgt = ret.val_.emplace<Map>();
             tgt.reserve(std::size(src));
             for (auto const& [key, val] : src)
-                tgt.insert_or_assign(key, val.clone());
+                tgt.insert_or_assign(tr_quark_convert(key), val.cloneToStyle(style_));
             return ret;
         }
+
+        api_compat::Style style_;
     };
 
-    return std::visit(Visitor{}, val_);
+    return std::visit(Visitor{ style }, val_);
 }
 
 // ---

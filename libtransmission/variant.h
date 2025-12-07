@@ -409,7 +409,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] tr_variant clone() const;
+    [[nodiscard]] tr_variant cloneToStyle(libtransmission::api_compat::Style) const;
 
 private:
     // Holds a string_view to either an unmanaged/external string or to
