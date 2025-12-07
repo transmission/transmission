@@ -2811,7 +2811,7 @@ namespace session_get_helpers
 
 using SyncHandler = std::pair<JsonRpc::Error::Code, std::string> (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&);
 
-auto const SyncHandlers = small::max_size_map<tr_quark, std::pair<SyncHandler, bool /*has_side_effects*/>, 20U>{ {
+auto const sync_handlers = small::max_size_map<tr_quark, std::pair<SyncHandler, bool /*has_side_effects*/>, 20U>{ {
     { TR_KEY_free_space, { freeSpace, false } },
     { TR_KEY_group_get, { groupGet, false } },
     { TR_KEY_group_set, { groupSet, true } },
@@ -2836,7 +2836,7 @@ auto const SyncHandlers = small::max_size_map<tr_quark, std::pair<SyncHandler, b
 
 using AsyncHandler = void (*)(tr_session*, tr_variant::Map const&, DoneCb&&, tr_rpc_idle_data*);
 
-auto const AsyncHandlers = small::max_size_map<tr_quark, std::pair<AsyncHandler, bool /*has_side_effects*/>, 4U>{ {
+auto const async_handlers = small::max_size_map<tr_quark, std::pair<AsyncHandler, bool /*has_side_effects*/>, 4U>{ {
     { TR_KEY_blocklist_update, { blocklistUpdate, true } },
     { TR_KEY_port_test, { portTest, false } },
     { TR_KEY_torrent_add, { torrentAdd, true } },
@@ -2927,7 +2927,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
 
     auto done_cb = is_jsonrpc ? tr_rpc_idle_done : tr_rpc_idle_done_legacy;
 
-    if (auto const handler = AsyncHandlers.find(method_key); handler != std::end(AsyncHandlers))
+    if (auto const handler = async_handlers.find(method_key); handler != std::end(async_handlers))
     {
         auto const& [func, has_side_effects] = handler->second;
         if (is_notification && !has_side_effects)
@@ -2948,7 +2948,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
         return;
     }
 
-    if (auto const handler = SyncHandlers.find(method_key); handler != std::end(SyncHandlers))
+    if (auto const handler = sync_handlers.find(method_key); handler != std::end(sync_handlers))
     {
         auto const& [func, has_side_effects] = handler->second;
         if (is_notification && !has_side_effects)
