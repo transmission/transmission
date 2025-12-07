@@ -455,6 +455,8 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_ratio_mode,
     TR_KEY_read_clipboard_kebab,
     TR_KEY_read_clipboard,
+    TR_KEY_recently_active_kebab,
+    TR_KEY_recently_active,
     TR_KEY_recheck_progress_camel,
     TR_KEY_recheck_progress,
     TR_KEY_remote_session_enabled_kebab,
