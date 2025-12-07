@@ -124,7 +124,7 @@ constexpr std::string_view LegacyStatsJson = R"json({
     "uploaded-bytes": 299792458
 })json";
 
-constexpr std::string_view LegacyRpcJson = R"json({
+constexpr std::string_view LegacyTorrentGetRpcJson = R"json({
     "arguments": {
         "fields": [
             "error",
@@ -147,14 +147,28 @@ constexpr std::string_view LegacyRpcJson = R"json({
     "tag": 6
 })json";
 
-constexpr std::string_view CurrentRpcJson = R"json({
-   "jsonrpc": "2.0",
-   "params": {
-       "fields": [ "id", "name", "total_size" ],
-       "ids": [ 7, 10 ]
-   },
-   "method": "torrent_get",
-   "id": 39693
+constexpr std::string_view CurrentTorrentGetRpcJson = R"json({
+    "id": 6
+    "jsonrpc": "2.0",
+    "method": "torrent_get",
+    "params": {
+        "fields": [
+            "error",
+            "error_string",
+            "eta",
+            "id",
+            "is_finished",
+            "left_until_done",
+            "name",
+            "peers_getting_from_us",
+            "peers_sending_to_us",
+            "rate_download",
+            "rate_upload",
+            "size_when_done",
+            "status",
+            "upload_ratio"
+        ]
+    },
 })json";
 
 constexpr std::string_view LegacySettingsShort = R"json({
@@ -202,7 +216,7 @@ TEST(ApiCompatTest, canDetectLegacySettings)
 TEST(ApiCompatTest, canDetectLegacyRpc)
 {
     auto serde = tr_variant_serde::json();
-    auto variant = serde.parse(LegacyRpcJson);
+    auto variant = serde.parse(LegacyTorrentGetRpcJson);
     ASSERT_TRUE(variant);
 
     auto const style = libtransmission::api_compat::detect_style(*variant);
@@ -224,12 +238,29 @@ TEST(ApiCompatTest, canDetectLegacyStats)
 TEST(ApiCompatTest, canDetectCurrentRpc)
 {
     auto serde = tr_variant_serde::json();
-    auto variant = serde.parse(CurrentRpcJson);
+    auto variant = serde.parse(CurrentTorrentGetRpcJson);
     ASSERT_TRUE(variant);
 
     auto const style = libtransmission::api_compat::detect_style(*variant);
     ASSERT_TRUE(style);
     EXPECT_EQ(libtransmission::api_compat::Style::Current, *style);
+}
+
+TEST(ApiCompatTest, canApplyCurrentStyleFromLegacyRpc)
+{
+    auto serde = tr_variant_serde::json();
+    auto const parsed = serde.parse(LegacyTorrentGetRpcJson);
+    ASSERT_TRUE(parsed.has_value());
+
+    auto converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::Current);
+    auto converted_json = tr_variant_serde::json().to_string(converted);
+    EXPECT_EQ(CurrentTorrentGetRpcJson, converted_json);
+
+#if 0
+    converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::LegacySettings);
+    converted_json = tr_variant_serde::json().to_string(converted);
+    EXPECT_EQ(LegacySettingsShort, converted_json);
+#endif
 }
 
 TEST(ApiCompatTest, canApplyCurrentStyleFromLegacySettings)
