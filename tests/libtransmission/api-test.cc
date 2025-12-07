@@ -148,7 +148,7 @@ constexpr std::string_view LegacyTorrentGetRpcJson = R"json({
 })json";
 
 constexpr std::string_view CurrentTorrentGetRpcJson = R"json({
-    "id": 6
+    "id": 6,
     "jsonrpc": "2.0",
     "method": "torrent_get",
     "params": {
@@ -168,7 +168,7 @@ constexpr std::string_view CurrentTorrentGetRpcJson = R"json({
             "status",
             "upload_ratio"
         ]
-    },
+    }
 })json";
 
 constexpr std::string_view LegacySettingsShort = R"json({
@@ -219,7 +219,7 @@ TEST(ApiCompatTest, canApplyCurrentStyleFromLegacyRpc)
 
     auto converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::Current);
     auto converted_json = tr_variant_serde::json().to_string(converted);
-    // EXPECT_EQ(CurrentTorrentGetRpcJson, converted_json);
+    EXPECT_EQ(CurrentTorrentGetRpcJson, converted_json);
 
 #if 0
     converted = libtransmission::api_compat::apply_style(*parsed, libtransmission::api_compat::Style::LegacySettings);
