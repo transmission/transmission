@@ -465,7 +465,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "remote-session-https"sv,
     "remote-session-password"sv,
     "remote-session-port"sv,
-    "remote-session-requres-authentication"sv,
+    "remote-session-requres-authentication"sv, // SIC: misspelled prior to 4.1.0-beta.4
     "remote-session-username"sv,
     "remote_session_enabled"sv,
     "remote_session_host"sv,
@@ -1136,7 +1136,7 @@ struct ApiKey
     //std::string_view legacy_setting;
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 284U>{
+auto constexpr RpcKeys = std::array<ApiKey, 277U>{
     { { "active_torrent_count"sv, "activeTorrentCount"sv },
       { "activity_date"sv, "activityDate"sv }, // TODO(ckerr) legacy duplicate
       { "added"sv, "added"sv },
@@ -1177,7 +1177,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "delete_local_data"sv, "delete-local-data"sv },
       { "desired_available"sv, "desiredAvailable"sv },
       { "dht_enabled"sv, "dht-enabled"sv },
-      { "done"sv, "done"sv },
       { "done_date"sv, "doneDate"sv }, // TODO(ckerr) legacy duplicate
       { "download_count"sv, "downloadCount"sv },
       { "download_dir"sv, "downloadDir"sv }, // TODO(ckerr) legacy duplicate
@@ -1256,7 +1255,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "leecher_count"sv, "leecherCount"sv },
       { "left_until_done"sv, "leftUntilDone"sv },
       { "length"sv, "length"sv },
-      { "localhost"sv, "localhost"sv },
       { "location"sv, "location"sv },
       { "lpd_enabled"sv, "lpd-enabled"sv },
       { "magnet_link"sv, "magnetLink"sv },
@@ -1271,7 +1269,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "name"sv, "name"sv },
       { "next_announce_time"sv, "nextAnnounceTime"sv },
       { "next_scrape_time"sv, "nextScrapeTime"sv },
-      { "objects"sv, "objects"sv },
       { "path"sv, "path"sv },
       { "paused"sv, "paused"sv },
       { "paused_torrent_count"sv, "pausedTorrentCount"sv },
@@ -1297,7 +1294,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "port"sv, "port"sv },
       { "port_forwarding_enabled"sv, "port-forwarding-enabled"sv },
       { "port_is_open"sv, "port-is-open"sv },
-      { "preferred"sv, "preferred"sv },
       { "preferred_transports"sv, "preferred_transports"sv }, // camelCase in nightly builds pre-7b83c7d6
       { "primary_mime_type"sv, "primary-mime-type"sv },
       { "priorities"sv, "priorities"sv },
@@ -1318,7 +1314,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "removed"sv, "removed"sv },
       { "rename_partial_files"sv, "rename-partial-files"sv },
       { "reqq"sv, "reqq"sv },
-      { "required"sv, "required"sv },
       { "result"sv, "result"sv },
       { "rpc_host_whitelist"sv, "rpc-host-whitelist"sv },
       { "rpc_host_whitelist_enabled"sv, "rpc-host-whitelist-enabled"sv },
@@ -1361,10 +1356,8 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "start_added_torrents"sv, "start-added-torrents"sv },
       { "start_date"sv, "startDate"sv },
       { "status"sv, "status"sv },
-      { "table"sv, "table"sv },
       { "tcp_enabled"sv, "tcp-enabled"sv },
       { "tier"sv, "tier"sv },
-      { "tolerated"sv, "tolerated"sv },
       { "torrent_added"sv, "torrent-added"sv },
       { "torrent_count"sv, "torrentCount"sv },
       { "torrent_duplicate"sv, "torrent-duplicate"sv },
@@ -1426,7 +1419,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 284U>{
       { "method"sv, "method"sv } }
 };
 
-auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 311U>{ {
     // BT protocol
     // These strings must never change
     { "announce-list"sv, "announce-list"sv }, // BEP0012
@@ -1671,7 +1664,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 312U>{ {
     { "remote_session_https"sv, "remote-session-https"sv },
     { "remote_session_password"sv, "remote-session-password"sv },
     { "remote_session_port"sv, "remote-session-port"sv },
-    { "remote_session_requres_authentication"sv, "remote-session-requres-authentication"sv },
     { "remote_session_requires_authentication"sv, "remote-session-requres-authentication"sv },
     { "remote_session_username"sv, "remote-session-username"sv },
     { "remote_session_rpc_url_path"sv, "remote_session_rpc_url_path"sv },
