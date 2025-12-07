@@ -783,12 +783,8 @@ enum class Style
     DefaultSettingsExportStyle = LegacySettings,
 };
 
-/**
- * Detect what style this payload is using. Used for ensuring
- * that RPC replies are sent in style of the corresponding request.
- */
-[[nodiscard]] std::optional<Style> detect_style(tr_variant const& src);
-
 [[nodiscard]] tr_variant apply_style(tr_variant const& src, Style tgt_style);
+
+[[nodiscard]] tr_quark convert(tr_quark quark, Style tgt_style);
 
 } // namespace libtransmission::api_compat

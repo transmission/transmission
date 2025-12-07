@@ -291,7 +291,7 @@ tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
     auto const src_is_current_rpc = src_top->contains(TR_KEY_jsonrpc) && src_top->contains(TR_KEY_method);
 
     auto state = CloneState{};
-    state.style = *api_compat::detect_style(*this);
+    state.style = tgt_style;
     state.is_rpc_payload = src_is_legacy_rpc || src_is_current_rpc;
 
     auto ret = cloneToStyleImpl(state);

@@ -202,48 +202,13 @@ constexpr std::string_view CurrentSettingsShort = R"json({
 })json";
 } // namespace
 
-TEST(ApiCompatTest, canDetectLegacySettings)
+TEST(ApiCompatTest, convert)
 {
-    auto serde = tr_variant_serde::json();
-    auto variant = serde.parse(LegacySettingsJson);
-    ASSERT_TRUE(variant);
+    using namespace libtransmission::api_compat;
 
-    auto const style = libtransmission::api_compat::detect_style(*variant);
-    ASSERT_TRUE(style);
-    EXPECT_EQ(libtransmission::api_compat::Style::LegacySettings, *style);
-}
-
-TEST(ApiCompatTest, canDetectLegacyRpc)
-{
-    auto serde = tr_variant_serde::json();
-    auto variant = serde.parse(LegacyTorrentGetRpcJson);
-    ASSERT_TRUE(variant);
-
-    auto const style = libtransmission::api_compat::detect_style(*variant);
-    ASSERT_TRUE(style);
-    EXPECT_EQ(libtransmission::api_compat::Style::LegacyRpc, *style);
-}
-
-TEST(ApiCompatTest, canDetectLegacyStats)
-{
-    auto serde = tr_variant_serde::json();
-    auto variant = serde.parse(LegacyStatsJson);
-    ASSERT_TRUE(variant);
-
-    auto const style = libtransmission::api_compat::detect_style(*variant);
-    ASSERT_TRUE(style);
-    EXPECT_EQ(libtransmission::api_compat::Style::LegacySettings, *style);
-}
-
-TEST(ApiCompatTest, canDetectCurrentRpc)
-{
-    auto serde = tr_variant_serde::json();
-    auto variant = serde.parse(CurrentTorrentGetRpcJson);
-    ASSERT_TRUE(variant);
-
-    auto const style = libtransmission::api_compat::detect_style(*variant);
-    ASSERT_TRUE(style);
-    EXPECT_EQ(libtransmission::api_compat::Style::Current, *style);
+    EXPECT_EQ(TR_KEY_activity_date, convert(TR_KEY_activity_date, Style::Current));
+    EXPECT_EQ(TR_KEY_activity_date_camel, convert(TR_KEY_activity_date, Style::LegacyRpc));
+    EXPECT_EQ(TR_KEY_activity_date_kebab, convert(TR_KEY_activity_date, Style::LegacySettings));
 }
 
 TEST(ApiCompatTest, canApplyCurrentStyleFromLegacyRpc)

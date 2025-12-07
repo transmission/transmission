@@ -1605,103 +1605,39 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     { TR_KEY_peer_limit_per_torrent, TR_KEY_peer_limit_per_torrent_kebab },
 } };
 
-// ---
-
-template<typename Predicate>
-[[nodiscard]] bool walk_variant(tr_variant const& value, Predicate const& predicate);
-
-template<typename Predicate>
-[[nodiscard]] bool walk_map(tr_variant::Map const& map, Predicate const& predicate)
-{
-    for (auto const& [key, child] : map)
-    {
-        if (!predicate(tr_quark_get_string_view(key)))
-        {
-            return false;
-        }
-
-        if (!walk_variant(child, predicate))
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-template<typename Predicate>
-[[nodiscard]] bool walk_variant(tr_variant const& value, Predicate const& predicate)
-{
-    if (auto const* map = value.get_if<tr_variant::Map>())
-    {
-        return walk_map(*map, predicate);
-    }
-
-    if (auto const* vec = value.get_if<tr_variant::Vector>())
-    {
-        for (auto const& item : *vec)
-        {
-            if (!walk_variant(item, predicate))
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-template<size_t N>
-[[nodiscard]] bool matches(std::array<ApiKey, N> const& keys, std::string_view ApiKey::* member, std::string_view name)
-{
-    return std::any_of(std::begin(keys), std::end(keys), [member, name](ApiKey const& key) { return key.*member == name; });
-}
-
-// ---
-
-namespace detect_style_helpers
-{
-[[nodiscard]] bool is_current_key(std::string_view const name)
-{
-    return matches(RpcKeys, &ApiKey::current, name) || matches(SessionKeys, &ApiKey::current, name);
-}
-
-[[nodiscard]] bool is_legacy_rpc_key(std::string_view const name)
-{
-    return matches(RpcKeys, &ApiKey::legacy, name);
-}
-
-[[nodiscard]] bool is_legacy_settings_key(std::string_view const name)
-{
-    return matches(SessionKeys, &ApiKey::legacy, name);
-}
-} // namespace detect_style_helpers
 } // namespace
 
-/**
- * Detect whether this payload is using Legacy or Current style.
- * Used for ensuring we return RPC replies in style of the
- * corresponding request.
- */
-[[nodiscard]] std::optional<Style> detect_style(tr_variant const& src)
+[[nodiscard]] tr_variant apply_style(tr_variant const& src, Style const style)
 {
-    using namespace detect_style_helpers;
-
-    if (walk_variant(src, is_current_key))
-        return Style::Current;
-
-    if (walk_variant(src, is_legacy_rpc_key))
-        return Style::LegacyRpc;
-
-    if (walk_variant(src, is_legacy_settings_key))
-        return Style::LegacySettings;
-
-    return {};
+    return src.cloneToStyle(style);
 }
 
-[[nodiscard]] tr_variant apply_style(tr_variant const& src, Style const tgt_style)
+[[nodiscard]] tr_quark convert(tr_quark const src, Style const style)
 {
-    return src.cloneToStyle(tgt_style);
+    switch (style)
+    {
+        case Style::LegacyRpc:
+            for (auto const [current, legacy] : RpcKeys)
+                if (src == current || src == legacy)
+                    return legacy;
+            break;
+
+        case Style::LegacySettings:
+            for (auto const [current, legacy] : SessionKeys)
+                if (src == current || src == legacy)
+                    return legacy;
+            break;
+
+        case Style::Current:
+            for (auto const [current, legacy] : RpcKeys)
+                if (src == current || src == legacy)
+                    return current;
+            for (auto const [current, legacy] : SessionKeys)
+                if (src == current || src == legacy)
+                    return current;
+    }
+
+    return src;
 }
 
 } // namespace libtransmission::api_compat
