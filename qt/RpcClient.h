@@ -73,7 +73,6 @@ public:
     void start(QUrl const& url);
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
 signals:
     void httpAuthenticationRequired();
