@@ -40,7 +40,7 @@ public:
     template<typename T>
     static bool deserialize(tr_variant const& src, T* const ptgt)
     {
-        return deserialize(src, ptgt, std::type_index{ typeid(T*) });
+        return converter_storage<T>.deserialize(src, ptgt);
     }
     static bool deserialize(tr_variant const& src, void* const vptgt, std::type_index const idx)
     {
