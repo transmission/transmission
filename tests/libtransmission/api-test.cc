@@ -13,14 +13,6 @@
 namespace
 {
 
-constexpr std::string_view LegacyStatsJson = R"json({
-    "downloaded-bytes": 314159265358,
-    "files-added": 271828,
-    "seconds-active": 1618033988,
-    "session-count": 141421,
-    "uploaded-bytes": 299792458
-})json";
-
 constexpr std::string_view LegacySessionGetRpcJson = R"json({
     "method": "session-get",
     "tag": 0
@@ -271,6 +263,22 @@ constexpr std::string_view CurrentTorrentGetRpcJson = R"json({
             "upload_ratio"
         ]
     }
+})json";
+
+constexpr std::string_view LegacyStatsJson = R"json({
+    "downloaded-bytes": 12,
+    "files-added": 34,
+    "seconds-active": 56,
+    "session-count": 78,
+    "uploaded-bytes": 90
+})json";
+
+constexpr std::string_view CurrentStatsJson = R"json({
+    "downloaded_bytes": 12,
+    "files_added": 34,
+    "seconds_active": 56,
+    "session_count": 78,
+    "uploaded_bytes": 90
 })json";
 
 constexpr std::string_view LegacySettingsJson = R"json({
@@ -526,11 +534,16 @@ TEST(ApiCompatTest, canConvertDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
-    static auto constexpr TestCases = std::array<TestCase, 4U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 8U>{ {
         { "settings current -> current", CurrentSettingsJson, Style::Current, CurrentSettingsJson },
         { "settings current -> legacy", CurrentSettingsJson, Style::LegacySettings, LegacySettingsJson },
         { "settings legacy -> current", LegacySettingsJson, Style::Current, CurrentSettingsJson },
         { "settings legacy -> legacy", LegacySettingsJson, Style::LegacySettings, LegacySettingsJson },
+
+        { "stats current -> current", CurrentStatsJson, Style::Current, CurrentStatsJson },
+        { "stats current -> legacy", CurrentStatsJson, Style::LegacySettings, LegacyStatsJson },
+        { "stats legacy -> current", LegacyStatsJson, Style::Current, CurrentStatsJson },
+        { "stats legacy -> legacy", LegacyStatsJson, Style::LegacySettings, LegacyStatsJson },
     } };
 
     for (auto [name, src, tgt_style, expected] : TestCases)
