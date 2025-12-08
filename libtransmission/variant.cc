@@ -283,7 +283,6 @@ struct tr_variant::CloneState
 
 tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " hello\n";
     if (val_.index() != tr_variant::MapIndex)
         abort(); // FIXME
 
@@ -305,27 +304,21 @@ tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
     auto* const tgt_top = ret.get_if<tr_variant::Map>();
 
     // jsonrpc <-> legacy rpc conversion
-    std::cerr << __FILE__ << ':' << __LINE__ << '\n';
     if (is_rpc)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << '\n';
         if (tgt_style == Style::Current)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << '\n';
             tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
             tgt_top->replace_key(TR_KEY_tag, TR_KEY_id);
         }
         else
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << '\n';
             tgt_top->erase(TR_KEY_jsonrpc);
             tgt_top->replace_key(TR_KEY_id, TR_KEY_tag);
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << '\n';
         if (was_legacy_response && tgt_style == Style::Current)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << '\n';
             auto const success = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success";
             if (success)
             {
@@ -334,7 +327,6 @@ tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
             }
             else
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << '\n';
                 tgt_top->erase(TR_KEY_arguments);
             }
         }
