@@ -34,8 +34,7 @@ public:
     }
     static tr_variant serialize(void const* const psrc, std::type_index const idx)
     {
-        auto ret = converters.at(idx).second(psrc);
-        return ret;
+        return converters.at(idx).second(psrc);
     }
 
     template<typename T>
