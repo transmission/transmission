@@ -124,6 +124,113 @@ constexpr std::string_view LegacyStatsJson = R"json({
     "uploaded-bytes": 299792458
 })json";
 
+constexpr std::string_view LegacySessionGetRpcJson = R"json({
+    "method": "session-get",
+    "tag": 0
+})json";
+
+constexpr std::string_view CurrentSessionGetRpcJson = R"json({
+    "id": 0,
+    "jsonrpc": "2.0",
+    "method": "session_get"
+})json";
+
+constexpr std::string_view LegacySessionGetResponseJson = R"json({
+    "arguments": {
+        "alt-speed-down": 1000,
+        "alt-speed-enabled": false,
+        "alt-speed-time-begin": 540,
+        "alt-speed-time-day": 127,
+        "alt-speed-time-enabled": false,
+        "alt-speed-time-end": 1020,
+        "alt-speed-up": 1000,
+        "anti-brute-force-enabled": true,
+        "anti-brute-force-threshold": 100,
+        "blocklist-enabled": false,
+        "blocklist-size": 0,
+        "blocklist-url": "http://www.example.com/blocklist",
+        "cache-size-mb": 4,
+        "config-dir": "/home/user/.config/transmission",
+        "default-trackers": "",
+        "dht-enabled": true,
+        "download-dir": "/home/user/Downloads",
+        "download-dir-free-space": 1395465670656,
+        "download-queue-enabled": true,
+        "download-queue-size": 4,
+        "encryption": "preferred",
+        "idle-seeding-limit": 30,
+        "idle-seeding-limit-enabled": false,
+        "incomplete-dir": "/home/user/Downloads",
+        "incomplete-dir-enabled": false,
+        "lpd-enabled": false,
+        "peer-limit-global": 200,
+        "peer-limit-per-torrent": 20,
+        "peer-port": 55606,
+        "peer-port-random-on-start": false,
+        "pex-enabled": true,
+        "port-forwarding-enabled": true,
+        "queue-stalled-enabled": true,
+        "queue-stalled-minutes": 5,
+        "rename-partial-files": true,
+        "reqq": 2000,
+        "rpc-version": 18,
+        "rpc-version-minimum": 14,
+        "rpc-version-semver": "5.4.0",
+        "script-torrent-added-enabled": false,
+        "script-torrent-added-filename": "",
+        "script-torrent-done-enabled": false,
+        "script-torrent-done-filename": "/home/user/scripts/script.sh",
+        "script-torrent-done-seeding-enabled": false,
+        "script-torrent-done-seeding-filename": "",
+        "seed-queue-enabled": false,
+        "seed-queue-size": 10,
+        "seedRatioLimit": 2.0,
+        "seedRatioLimited": false,
+        "sequential_download": false,
+        "session-id": "pdvuklydohaohwwluzpmpmllkaopzzlzzpvupkpuavhjhlzhyjfwoly",
+        "speed-limit-down": 2000.0,
+        "speed-limit-down-enabled": false,
+        "speed-limit-up": 5000.0,
+        "speed-limit-up-enabled": false,
+        "start-added-torrents": true,
+        "tcp-enabled": true,
+        "trash-original-torrent-files": false,
+        "units": {
+            "memory-bytes": 1024,
+            "memory-units": [
+                "B",
+                "KiB",
+                "MiB",
+                "GiB",
+                "TiB"
+            ],
+            "size-bytes": 1000,
+            "size-units": [
+                "B",
+                "kB",
+                "MB",
+                "GB",
+                "TB"
+            ],
+            "speed-bytes": 1000,
+            "speed-units": [
+                "B/s",
+                "kB/s",
+                "MB/s",
+                "GB/s",
+                "TB/s"
+            ]
+        },
+        "utp-enabled": true,
+        "version": "2.93 (3c5870d4f5)"
+    },
+    "result": "success",
+    "tag": 0
+})json";
+
+constexpr std::string_view CurrentSessionGetResponseJson = R"json({
+})json";
+
 constexpr std::string_view LegacyTorrentGetRpcJson = R"json({
     "arguments": {
         "fields": [
@@ -215,10 +322,18 @@ TEST(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
-    static auto constexpr TestCases = std::array<TestCase, 3U>{ {
-        { "torrent-get no-op", CurrentTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
-        { "torrent-get legacy", CurrentTorrentGetRpcJson, Style::LegacyRpc, LegacyTorrentGetRpcJson },
-        { "torrent-get current", LegacyTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
+    static auto constexpr TestCases = std::array<TestCase, 8U>{ {
+        { "torrent-get current -> current", CurrentTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
+        { "torrent-get current -> legacy", CurrentTorrentGetRpcJson, Style::LegacyRpc, LegacyTorrentGetRpcJson },
+        { "torrent-get legacy -> current", LegacyTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
+        { "torrent-get legacy -> legacy", LegacyTorrentGetRpcJson, Style::LegacyRpc, LegacyTorrentGetRpcJson },
+
+        { "session-get legacy -> current", LegacySessionGetRpcJson, Style::Current, CurrentSessionGetRpcJson },
+        { "session-get current -> legacy", CurrentSessionGetRpcJson, Style::LegacyRpc, LegacySessionGetRpcJson },
+        { "session-get legacy -> legacy", LegacySessionGetRpcJson, Style::LegacyRpc, LegacySessionGetRpcJson },
+        { "session-get current -> current", CurrentSessionGetRpcJson, Style::Current, CurrentSessionGetRpcJson },
+
+        //constexpr std::string_view LegacySessionGetResponseJson = R"json({
     } };
 
     for (auto [name, src, tgt_style, expected] : TestCases)

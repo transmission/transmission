@@ -287,13 +287,11 @@ tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
         abort(); // FIXME
 
     auto const* const src_top = get_if<tr_variant::Map>();
-    auto const src_is_legacy_rpc = src_top->contains(TR_KEY_arguments) && src_top->contains(TR_KEY_method);
-    auto const src_is_current_rpc = src_top->contains(TR_KEY_jsonrpc) && src_top->contains(TR_KEY_method);
-    auto const is_rpc_payload = src_is_legacy_rpc || src_is_current_rpc;
+    auto const is_rpc_payload = src_top->contains(TR_KEY_method);
 
     auto state = CloneState{};
     state.style = tgt_style;
-    state.is_rpc_payload = src_is_legacy_rpc || src_is_current_rpc;
+    state.is_rpc_payload = is_rpc_payload;
 
     auto ret = cloneToStyleImpl(state);
 
