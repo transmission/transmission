@@ -30,7 +30,7 @@ public:
     template<typename T>
     static tr_variant serialize(T const& src)
     {
-        return serialize(&src, std::type_index{ typeid(T*) });
+        return converter_storage<T>.serialize(src);
     }
     static tr_variant serialize(void const* const psrc, std::type_index const idx)
     {
