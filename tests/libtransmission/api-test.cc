@@ -13,12 +13,12 @@
 namespace
 {
 
-constexpr std::string_view LegacySessionGetRpcJson = R"json({
+constexpr std::string_view LegacySessionGetJson = R"json({
     "method": "session-get",
     "tag": 0
 })json";
 
-constexpr std::string_view CurrentSessionGetRpcJson = R"json({
+constexpr std::string_view CurrentSessionGetJson = R"json({
     "id": 0,
     "jsonrpc": "2.0",
     "method": "session_get"
@@ -218,7 +218,7 @@ constexpr std::string_view CurrentSessionGetResponseJson = R"json({
     }
 })json";
 
-constexpr std::string_view LegacyTorrentGetRpcJson = R"json({
+constexpr std::string_view LegacyTorrentGetJson = R"json({
     "arguments": {
         "fields": [
             "error",
@@ -241,7 +241,7 @@ constexpr std::string_view LegacyTorrentGetRpcJson = R"json({
     "tag": 6
 })json";
 
-constexpr std::string_view CurrentTorrentGetRpcJson = R"json({
+constexpr std::string_view CurrentTorrentGetJson = R"json({
     "id": 6,
     "jsonrpc": "2.0",
     "method": "torrent_get",
@@ -500,15 +500,15 @@ TEST(ApiCompatTest, canConvertRpc)
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
     static auto constexpr TestCases = std::array<TestCase, 9U>{ {
-        { "torrent_get current -> current", CurrentTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
-        { "torrent_get current -> legacy", CurrentTorrentGetRpcJson, Style::LegacyRpc, LegacyTorrentGetRpcJson },
-        { "torrent_get legacy -> current", LegacyTorrentGetRpcJson, Style::Current, CurrentTorrentGetRpcJson },
-        { "torrent_get legacy -> legacy", LegacyTorrentGetRpcJson, Style::LegacyRpc, LegacyTorrentGetRpcJson },
+        { "torrent_get current -> current", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
+        { "torrent_get current -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
+        { "torrent_get legacy -> current", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
+        { "torrent_get legacy -> legacy", LegacyTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
 
-        { "session_get legacy -> current", LegacySessionGetRpcJson, Style::Current, CurrentSessionGetRpcJson },
-        { "session_get current -> legacy", CurrentSessionGetRpcJson, Style::LegacyRpc, LegacySessionGetRpcJson },
-        { "session_get legacy -> legacy", LegacySessionGetRpcJson, Style::LegacyRpc, LegacySessionGetRpcJson },
-        { "session_get current -> current", CurrentSessionGetRpcJson, Style::Current, CurrentSessionGetRpcJson },
+        { "session_get legacy -> current", LegacySessionGetJson, Style::Current, CurrentSessionGetJson },
+        { "session_get current -> legacy", CurrentSessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
+        { "session_get legacy -> legacy", LegacySessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
+        { "session_get current -> current", CurrentSessionGetJson, Style::Current, CurrentSessionGetJson },
 
         { "session_get response legacy -> current",
           LegacySessionGetResponseJson,
