@@ -484,6 +484,41 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "watch_dir": "/home/user/Downloads",
     "watch_dir_enabled": false
 })json";
+
+constexpr std::string_view BadFreeSpaceRequest = R"json({
+    "id": 39693,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": "this/path/is/not/absolute"
+    }
+})json";
+constexpr std::string_view BadFreeSpaceResponse = R"json({
+    "error": {
+        "code": 3,
+        "data": {
+            "error_string": "directory path is not absolute"
+        },
+        "message": "path is not absolute"
+    },
+    "id": 39693,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view BadFreeSpaceRequestLegacy = R"json({
+    "arguments": {
+        "path": "this/path/is/not/absolute"
+    },
+    "method": "free-space",
+    "tag": 39693
+})json";
+
+constexpr std::string_view BadFreeSpaceResponseLegacy = R"json({
+    "arguments": {},
+    "result": "directory path is not absolute",
+    "tag": 39693
+})json";
+
 } // namespace
 
 TEST(ApiCompatTest, convert)
@@ -499,7 +534,7 @@ TEST(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
-    static auto constexpr TestCases = std::array<TestCase, 9U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 17U>{ {
         { "torrent_get current -> current", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
         { "torrent_get current -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
         { "torrent_get legacy -> current", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
@@ -510,6 +545,26 @@ TEST(ApiCompatTest, canConvertRpc)
         { "session_get legacy -> legacy", LegacySessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
         { "session_get current -> current", CurrentSessionGetJson, Style::Current, CurrentSessionGetJson },
 
+        {
+            "free_space current -> current",
+            BadFreeSpaceRequest,
+            Style::Current,
+            BadFreeSpaceRequest,
+        },
+        { "free_space current -> legacy", BadFreeSpaceRequest, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
+        { "free_space legacy -> current", BadFreeSpaceRequestLegacy, Style::Current, BadFreeSpaceRequest },
+        { "free_space legacy -> legacy", BadFreeSpaceRequestLegacy, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
+
+        {
+            "free_space response current -> current",
+            BadFreeSpaceResponse,
+            Style::Current,
+            BadFreeSpaceResponse,
+        },
+        { "free_space response current -> legacy", BadFreeSpaceResponse, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+        { "free_space response legacy -> current", BadFreeSpaceResponseLegacy, Style::Current, BadFreeSpaceResponse },
+        { "free_space response legacy -> legacy", BadFreeSpaceResponseLegacy, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+
         { "session_get response legacy -> current",
           LegacySessionGetResponseJson,
           Style::Current,
@@ -517,7 +572,6 @@ TEST(ApiCompatTest, canConvertRpc)
         // TODO: current -> legacy
         // TODO: legacy -> legacy
         // TODO: current -> current
-
         // TODO: error responses
     } };
 
