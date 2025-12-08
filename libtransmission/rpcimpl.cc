@@ -2926,8 +2926,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
 
     auto const is_notification = is_jsonrpc && !data.id.has_value();
 
-    // auto done_cb = is_jsonrpc ? tr_rpc_idle_done : tr_rpc_idle_done_legacy;
-    auto done_cb = tr_rpc_idle_done;
+    auto done_cb = is_jsonrpc ? tr_rpc_idle_done : tr_rpc_idle_done_legacy;
 
     if (auto const handler = AsyncHandlers.find(method_key); handler != std::end(AsyncHandlers))
     {

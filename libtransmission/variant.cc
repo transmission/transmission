@@ -283,6 +283,9 @@ struct tr_variant::CloneState
 
 tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
 {
+    // TODO: yes I know this method is ugly rn.
+    // I've just been trying to get the tests passing.
+
     if (val_.index() != tr_variant::MapIndex)
         abort(); // FIXME
 
