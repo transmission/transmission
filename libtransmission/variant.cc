@@ -206,7 +206,7 @@ using Style = api_compat::Style;
 struct tr_variant::CloneState
 {
     Style style;
-    bool is_rpc_payload = false;
+    bool is_rpc = false;
     bool convert_strings = false;
 };
 
@@ -267,7 +267,7 @@ struct tr_variant::CloneState
             {
                 auto const pop = state_.convert_strings;
                 auto const new_key = api_compat::convert(key, state_.style);
-                auto const special = (state_.is_rpc_payload && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
+                auto const special = (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
                 state_.convert_strings |= special;
                 tgt.insert_or_assign(new_key, val.cloneToStyleImpl(state_));
                 state_.convert_strings = pop;
@@ -283,32 +283,72 @@ struct tr_variant::CloneState
 
 tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " hello\n";
     if (val_.index() != tr_variant::MapIndex)
         abort(); // FIXME
 
     auto const* const src_top = get_if<tr_variant::Map>();
-    auto const is_rpc_payload = src_top->contains(TR_KEY_method);
+    auto const is_request = src_top->contains(TR_KEY_method);
+
+    auto const was_current_response = src_top->contains(TR_KEY_jsonrpc) &&
+        (src_top->contains(TR_KEY_result) || src_top->contains(TR_KEY_error));
+    auto const was_legacy_response = !src_top->contains(TR_KEY_jsonrpc) && src_top->contains(TR_KEY_result);
+    auto const is_response = was_current_response || was_legacy_response;
+    auto const is_rpc = is_request || is_response;
 
     auto state = CloneState{};
     state.style = tgt_style;
-    state.is_rpc_payload = is_rpc_payload;
+    state.is_rpc = is_request || is_response;
 
     auto ret = cloneToStyleImpl(state);
 
-    // jsonrpc <-> legacy rpc conversion
-    if (is_rpc_payload)
-    {
-        auto* const tgt_top = ret.get_if<tr_variant::Map>();
+    auto* const tgt_top = ret.get_if<tr_variant::Map>();
 
+    // jsonrpc <-> legacy rpc conversion
+    std::cerr << __FILE__ << ':' << __LINE__ << '\n';
+    if (is_rpc)
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << '\n';
         if (tgt_style == Style::Current)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << '\n';
             tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
             tgt_top->replace_key(TR_KEY_tag, TR_KEY_id);
         }
         else
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << '\n';
             tgt_top->erase(TR_KEY_jsonrpc);
             tgt_top->replace_key(TR_KEY_id, TR_KEY_tag);
+        }
+
+        std::cerr << __FILE__ << ':' << __LINE__ << '\n';
+        if (was_legacy_response && tgt_style == Style::Current)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << '\n';
+            auto const success = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success";
+            if (success)
+            {
+                tgt_top->erase(TR_KEY_result);
+                tgt_top->replace_key(TR_KEY_arguments, TR_KEY_result);
+            }
+            else
+            {
+                std::cerr << __FILE__ << ':' << __LINE__ << '\n';
+                tgt_top->erase(TR_KEY_arguments);
+            }
+        }
+
+        if (is_request)
+        {
+            if (tgt_style == Style::Current)
+            {
+                tgt_top->replace_key(TR_KEY_arguments, TR_KEY_params);
+            }
+            else
+            {
+                tgt_top->replace_key(TR_KEY_params, TR_KEY_arguments);
+            }
         }
     }
 

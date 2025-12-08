@@ -1033,9 +1033,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 213U>{ {
     { TR_KEY_torrent_start_now, TR_KEY_torrent_start_now_kebab },
     { TR_KEY_torrent_stop, TR_KEY_torrent_stop_kebab },
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab },
-
-    // json-rpc
-    { TR_KEY_params, TR_KEY_arguments }, // legacy JSON-RPC alias
 } };
 
 auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
