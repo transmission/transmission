@@ -838,4 +838,74 @@ TEST_F(RpcTest, torrentGetLegacy)
     tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
 
+namespace FreeSpaceTest
+{
+constexpr std::string_view BadRequest = R"json({
+    "id": 39693,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": "this/path/is/not/absolute"
+    }
+})json";
+constexpr std::string_view BadResponse = R"json({
+    "error": {
+        "code": 3,
+        "data": {
+            "error_string": "directory path is not absolute"
+        },
+        "message": "path is not absolute"
+    },
+    "id": 39693,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view BadRequestLegacy = R"json({
+    "arguments": {
+        "path": "this/path/is/not/absolute"
+    },
+    "method": "free-space",
+    "tag": 39693
+})json";
+
+constexpr std::string_view BadResponseLegacy = R"json({
+    "arguments": {},
+    "result": "directory path is not absolute",
+    "tag": 39693
+})json";
+
+[[nodiscard]] std::string make_request(tr_session* session, std::string_view const jsonreq)
+{
+    auto serde = tr_variant_serde::json().inplace();
+
+    auto const request = serde.parse(jsonreq);
+    if (!request)
+        return {};
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session,
+        std::move(*request),
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    return serde.to_string(response);
+}
+
+TEST_F(RpcTest, relativeFreeSpaceError)
+{
+    auto constexpr Input = BadRequest;
+    auto constexpr Expected = BadResponse;
+    auto const actual = make_request(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+TEST_F(RpcTest, relativeFreeSpaceErrorLegacy)
+{
+    auto constexpr Input = BadRequestLegacy;
+    auto constexpr Expected = BadResponseLegacy;
+    auto const actual = make_request(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+} // namespace FreeSpaceTest
+
 } // namespace libtransmission::test
