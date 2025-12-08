@@ -885,7 +885,6 @@ auto constexpr RpcKeys = std::array<ApiKey, 213U>{ {
     { TR_KEY_have_unchecked, TR_KEY_have_unchecked_camel },
     { TR_KEY_have_valid, TR_KEY_have_valid_camel },
     { TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel },
-    { TR_KEY_id, TR_KEY_tag }, // FIXME(ckerr): edge case: id<->id elsewhere
     { TR_KEY_idle_seeding_limit, TR_KEY_idle_seeding_limit_kebab },
     { TR_KEY_idle_seeding_limit_enabled, TR_KEY_idle_seeding_limit_enabled_kebab },
     { TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab },

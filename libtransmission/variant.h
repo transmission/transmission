@@ -144,6 +144,19 @@ public:
             return 0U;
         }
 
+        bool replace_key(tr_quark const old_key, tr_quark const new_key)
+        {
+            if (contains(new_key))
+                return false;
+
+            auto iter = find(old_key);
+            if (iter == end())
+                return false;
+
+            iter->first = new_key;
+            return true;
+        }
+
         [[nodiscard]] tr_variant& operator[](tr_quark const& key)
         {
             if (auto const iter = find(key); iter != end())

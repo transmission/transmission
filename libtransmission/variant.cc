@@ -289,21 +289,29 @@ tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
     auto const* const src_top = get_if<tr_variant::Map>();
     auto const src_is_legacy_rpc = src_top->contains(TR_KEY_arguments) && src_top->contains(TR_KEY_method);
     auto const src_is_current_rpc = src_top->contains(TR_KEY_jsonrpc) && src_top->contains(TR_KEY_method);
+    auto const is_rpc_payload = src_is_legacy_rpc || src_is_current_rpc;
 
     auto state = CloneState{};
     state.style = tgt_style;
     state.is_rpc_payload = src_is_legacy_rpc || src_is_current_rpc;
 
     auto ret = cloneToStyleImpl(state);
-    auto* const tgt_top = ret.get_if<tr_variant::Map>();
 
-    if (src_is_legacy_rpc && tgt_style == Style::Current)
+    // jsonrpc <-> legacy rpc conversion
+    if (is_rpc_payload)
     {
-        tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
-    }
-    else
-    {
-        tgt_top->erase(TR_KEY_jsonrpc);
+        auto* const tgt_top = ret.get_if<tr_variant::Map>();
+
+        if (tgt_style == Style::Current)
+        {
+            tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+            tgt_top->replace_key(TR_KEY_tag, TR_KEY_id);
+        }
+        else
+        {
+            tgt_top->erase(TR_KEY_jsonrpc);
+            tgt_top->replace_key(TR_KEY_id, TR_KEY_tag);
+        }
     }
 
     return ret;
