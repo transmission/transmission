@@ -514,10 +514,11 @@ TEST(ApiCompatTest, canConvertRpc)
           LegacySessionGetResponseJson,
           Style::Current,
           CurrentSessionGetResponseJson },
-
         // TODO: current -> legacy
         // TODO: legacy -> legacy
         // TODO: current -> current
+
+        // TODO: error responses
     } };
 
     for (auto [name, src, tgt_style, expected] : TestCases)
