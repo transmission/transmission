@@ -942,9 +942,9 @@ TEST_F(RpcTest, wellFormedFreeSpace)
 constexpr std::string_view WellFormedLegacyRequest = R"json({
     "arguments": {
         "path": "/this/path/does/not/exist"
-    }
-    "method": "free_space",
-    "tag": 41414,
+    },
+    "method": "free-space",
+    "tag": 41414
 })json";
 
 constexpr std::string_view WellFormedLegacyResponse = R"json({
@@ -953,8 +953,9 @@ constexpr std::string_view WellFormedLegacyResponse = R"json({
         "size-bytes": -1,
         "size_bytes": -1,
         "total_size": -1
-    }
-    "tag": 41414,
+    },
+    "result": "success",
+    "tag": 41414
 })json";
 
 TEST_F(RpcTest, wellFormedLegacyFreeSpace)
