@@ -762,29 +762,3 @@ enum // NOLINT(performance-enum-size)
  * Note: Temporary shim just for the transition period to snake_case.
  */
 [[nodiscard]] tr_quark tr_quark_convert(tr_quark quark);
-
-namespace libtransmission::api_compat
-{
-
-enum class Style
-{
-    // RPC naming scheme before we migrated to snake case.
-    LegacyRpc,
-
-    // settings.json naming scheme before we migrated to snake case.
-    LegacySettings,
-
-    // The current style: everything in snake case..
-    Current,
-
-    // Use case for exporting to legacy: users can use the
-    // same settings.json in 4.0.x and 4.1.x.
-    // TODO: when we bump to 5.0.0, change this to `Current`
-    DefaultSettingsExportStyle = LegacySettings,
-};
-
-[[nodiscard]] tr_variant apply_style(tr_variant const& src, Style tgt_style);
-
-[[nodiscard]] tr_quark convert(tr_quark quark, Style tgt_style);
-
-} // namespace libtransmission::api_compat

@@ -581,7 +581,7 @@ TEST(ApiCompatTest, canConvertRpc)
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value());
-        auto converted = libtransmission::api_compat::apply_style(*parsed, tgt_style);
+        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(converted)) << name;
     }
 }
@@ -607,7 +607,7 @@ TEST(ApiCompatTest, canConvertDataFiles)
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
         ASSERT_TRUE(parsed.has_value());
-        auto converted = libtransmission::api_compat::apply_style(*parsed, tgt_style);
+        auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(converted)) << name;
     }
 }
