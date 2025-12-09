@@ -209,7 +209,8 @@ struct tr_variant::CloneState
     bool convert_strings = false;
 };
 
-[[nodiscard]] tr_variant tr_variant::cloneToStyleImpl(CloneState& state) const
+// static
+[[nodiscard]] tr_variant tr_variant::cloneToStyleImpl(tr_variant const& self, CloneState& state)
 {
     struct Visitor
     {
@@ -253,7 +254,7 @@ struct tr_variant::CloneState
             auto& tgt = ret.val_.emplace<Vector>();
             tgt.reserve(std::size(src));
             for (auto const& val : src)
-                tgt.emplace_back(val.cloneToStyleImpl(state_));
+                tgt.emplace_back(cloneToStyleImpl(val, state_));
             return ret;
         }
 
@@ -268,7 +269,7 @@ struct tr_variant::CloneState
                 auto const new_key = api_compat::convert(key, state_.style);
                 auto const special = (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
                 state_.convert_strings |= special;
-                tgt.insert_or_assign(new_key, val.cloneToStyleImpl(state_));
+                tgt.insert_or_assign(new_key, cloneToStyleImpl(val, state_));
                 state_.convert_strings = pop;
             }
             return ret;
@@ -277,7 +278,7 @@ struct tr_variant::CloneState
         CloneState& state_;
     };
 
-    return std::visit(Visitor{ state }, val_);
+    return std::visit(Visitor{ state }, self.val_);
 }
 
 namespace
@@ -330,15 +331,16 @@ namespace
 
 } // namespace
 
-tr_variant tr_variant::cloneToStyle(api_compat::Style const tgt_style) const
+// static
+tr_variant tr_variant::cloneToStyle(tr_variant const& src, api_compat::Style const tgt_style)
 {
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
 
-    if (val_.index() != tr_variant::MapIndex)
+    if (src.val_.index() != tr_variant::MapIndex)
         abort(); // FIXME
 
-    auto const* const src_top = get_if<tr_variant::Map>();
+    auto const* const src_top = src.get_if<tr_variant::Map>();
     auto const is_request = src_top->contains(TR_KEY_method);
 
     auto const was_current_response = src_top->contains(TR_KEY_jsonrpc) &&
@@ -351,14 +353,14 @@ tr_variant tr_variant::cloneToStyle(api_compat::Style const tgt_style) const
     state.style = tgt_style;
     state.is_rpc = is_request || is_response;
 
-    auto ret = cloneToStyleImpl(state);
+    auto ret = cloneToStyleImpl(src, state);
 
     auto* const tgt_top = ret.get_if<tr_variant::Map>();
 
     // jsonrpc <-> legacy rpc conversion
     if (is_rpc)
     {
-        auto const is_jsonrpc = tgt_style == Style::Current;
+        auto const is_jsonrpc = tgt_style == api_compat::Style::Current;
 
         // this test works for both jsonrpc and legacy:
         // - in jsonrpc, 'result' only exists on success
@@ -420,7 +422,7 @@ tr_variant tr_variant::cloneToStyle(api_compat::Style const tgt_style) const
         }
 
         //
-        if (was_legacy_response && tgt_style == Style::Current)
+        if (was_legacy_response && is_jsonrpc)
         {
             auto const success = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success";
             if (success)
@@ -436,7 +438,7 @@ tr_variant tr_variant::cloneToStyle(api_compat::Style const tgt_style) const
 
         if (is_request)
         {
-            if (tgt_style == Style::Current)
+            if (is_jsonrpc)
             {
                 tgt_top->replace_key(TR_KEY_arguments, TR_KEY_params);
             }

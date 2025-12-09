@@ -432,7 +432,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] tr_variant cloneToStyle(libtransmission::api_compat::Style) const;
+    [[nodiscard]] static tr_variant cloneToStyle(tr_variant const& src, libtransmission::api_compat::Style);
 
 private:
     // Holds a string_view to either an unmanaged/external string or to
@@ -474,7 +474,7 @@ private:
     };
 
     struct CloneState;
-    [[nodiscard]] tr_variant cloneToStyleImpl(CloneState& state) const;
+    [[nodiscard]] static tr_variant cloneToStyleImpl(tr_variant const&, CloneState& state);
 
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };

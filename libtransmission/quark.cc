@@ -1287,7 +1287,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
 
 [[nodiscard]] tr_variant apply_style(tr_variant const& src, Style const style)
 {
-    return src.cloneToStyle(style);
+    return tr_variant::cloneToStyle(src, style);
 }
 
 [[nodiscard]] tr_quark convert(tr_quark const src, Style const style)
