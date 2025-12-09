@@ -30,6 +30,28 @@ namespace libtransmission::test
 
 using RpcTest = SessionTest;
 
+namespace
+{
+[[nodiscard]] std::string makeRequest(tr_session* session, std::string_view const jsonreq)
+{
+    auto serde = tr_variant_serde::json().inplace();
+
+    auto const request = serde.parse(jsonreq);
+    if (!request)
+    {
+        return {};
+    }
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session,
+        std::move(*request),
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    return serde.to_string(response);
+}
+} // namespace
+
 TEST_F(RpcTest, EmptyRequest)
 {
     static auto constexpr Request = ""sv;
@@ -837,5 +859,122 @@ TEST_F(RpcTest, torrentGetLegacy)
     // cleanup
     tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
+
+namespace free_space_test
+{
+constexpr std::string_view BadRequest = R"json({
+    "id": 39693,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": "this/path/is/not/absolute"
+    }
+})json";
+constexpr std::string_view BadResponse = R"json({
+    "error": {
+        "code": 3,
+        "data": {
+            "error_string": "directory path is not absolute"
+        },
+        "message": "path is not absolute"
+    },
+    "id": 39693,
+    "jsonrpc": "2.0"
+})json";
+
+TEST_F(RpcTest, relativeFreeSpaceError)
+{
+    auto constexpr Input = BadRequest;
+    auto constexpr Expected = BadResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+constexpr std::string_view BadRequestLegacy = R"json({
+    "arguments": {
+        "path": "this/path/is/not/absolute"
+    },
+    "method": "free-space",
+    "tag": 39693
+})json";
+
+constexpr std::string_view BadResponseLegacy = R"json({
+    "arguments": {},
+    "result": "directory path is not absolute",
+    "tag": 39693
+})json";
+
+TEST_F(RpcTest, relativeFreeSpaceErrorLegacy)
+{
+    auto constexpr Input = BadRequestLegacy;
+    auto constexpr Expected = BadResponseLegacy;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+#ifdef _WIN32
+// JSON expects backslashes escaped, hence the double escaping here.
+#define RPC_NON_EXISTENT_PATH "C:\\\\this\\\\path\\\\does\\\\not\\\\exist"
+#else
+#define RPC_NON_EXISTENT_PATH "/this/path/does/not/exist"
+#endif
+
+constexpr std::string_view WellFormedRequest = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json("
+    }
+})json";
+
+constexpr std::string_view WellFormedResponse = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "result": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json(",
+        "size-bytes": -1,
+        "size_bytes": -1,
+        "total_size": -1
+    }
+})json";
+
+TEST_F(RpcTest, wellFormedFreeSpace)
+{
+    auto constexpr Input = WellFormedRequest;
+    auto constexpr Expected = WellFormedResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+constexpr std::string_view WellFormedLegacyRequest = R"json({
+    "arguments": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json("
+    },
+    "method": "free-space",
+    "tag": 41414
+})json";
+
+constexpr std::string_view WellFormedLegacyResponse = R"json({
+    "arguments": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json(",
+        "size-bytes": -1,
+        "size_bytes": -1,
+        "total_size": -1
+    },
+    "result": "success",
+    "tag": 41414
+})json";
+
+#undef RPC_NON_EXISTENT_PATH
+
+TEST_F(RpcTest, wellFormedLegacyFreeSpace)
+{
+    auto constexpr Input = WellFormedLegacyRequest;
+    auto constexpr Expected = WellFormedLegacyResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+} // namespace free_space_test
 
 } // namespace libtransmission::test
