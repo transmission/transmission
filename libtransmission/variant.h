@@ -272,6 +272,11 @@ public:
         return ret;
     }
 
+    [[nodiscard]] static tr_variant unmanaged_string(tr_quark const key)
+    {
+        return unmanaged_string(tr_quark_get_string_view(key));
+    }
+
     template<typename Val>
     tr_variant& operator=(Val value)
     {
