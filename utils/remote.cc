@@ -2525,7 +2525,7 @@ tr_variant::Map& ensure_sset(tr_variant& sset)
     {
         sset = tr_variant::Map{ 3 };
         map = sset.get_if<tr_variant::Map>();
-        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-set"sv));
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_set_kebab)));
     }
 
     auto* args = map->find_if<tr_variant::Map>(TR_KEY_arguments);
@@ -2561,7 +2561,7 @@ tr_variant::Map& ensure_tadd(tr_variant& tadd)
     {
         tadd = tr_variant::Map{ 3 };
         map = tadd.get_if<tr_variant::Map>();
-        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-add"sv));
+        map->try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_add_kebab)));
         map->try_emplace(TR_KEY_tag, TAG_TORRENT_ADD);
     }
 
@@ -2808,7 +2808,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             }
 
             args.insert_or_assign(TR_KEY_fields, std::move(fields));
-            map.insert_or_assign(TR_KEY_method, tr_variant::unmanaged_string("torrent-get"sv));
+            fields.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_get_kebab)));
             map.insert_or_assign(TR_KEY_arguments, std::move(args));
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
@@ -3240,7 +3240,7 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             args.try_emplace(TR_KEY_delete_local_data_kebab, c == 840);
             add_id_arg(args, config);
 
-            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-remove"sv));
+            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_remove_kebab)));
             map.try_emplace(TR_KEY_arguments, std::move(args));
 
             auto top = tr_variant{ std::move(map) };
@@ -3263,7 +3263,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 auto map = tr_variant::Map{ 2 };
                 auto args = tr_variant::Map{ 1 };
                 add_id_arg(args, config);
-                map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(is_stop ? "torrent-stop"sv : "torrent-start"sv));
+                auto const key = is_stop ? TR_KEY_torrent_stop_kebab : TR_KEY_torrent_start_kebab;
+                map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
                 map.try_emplace(TR_KEY_arguments, std::move(args));
 
                 auto top = tr_variant{ std::move(map) };
@@ -3277,12 +3278,12 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                 switch (option)
                 {
                 case 'v':
-                    return "torrent-verify"sv;
+                    return TR_KEY_torrent_verify_kebab;
                 case 600:
-                    return "torrent-reannounce"sv;
+                    return TR_KEY_torrent_reannounce_kebab;
                 default:
                     TR_ASSERT_MSG(false, "unhandled value");
-                    return ""sv;
+                    return TR_KEY_NONE;
                 }
             };
 
@@ -3300,7 +3301,8 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             auto map = tr_variant::Map{ 2 };
             auto args = tr_variant::Map{ 1 };
             add_id_arg(args, config);
-            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(Method(c)));
+            auto const key = Method(c);
+            map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(tr_quark_get_string_view(key)));
             map.try_emplace(TR_KEY_arguments, std::move(args));
             auto top = tr_variant{ std::move(map) };
             status |= flush(rpcurl, &top, config);
@@ -3312,7 +3314,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 920: /* session-info */
                 {
                     auto map = tr_variant::Map{ 2 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-get"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_get_kebab)));
                     map.try_emplace(TR_KEY_tag, TAG_SESSION);
 
                     auto top = tr_variant{ std::move(map) };
@@ -3330,7 +3334,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 850:
                 {
                     auto map = tr_variant::Map{ 1 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-close"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_close_kebab)));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3339,7 +3345,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 963:
                 {
                     auto map = tr_variant::Map{ 1 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("blocklist-update"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_blocklist_update_kebab)));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
                 }
@@ -3348,7 +3356,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 921:
                 {
                     auto map = tr_variant::Map{ 2 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("session-stats"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_session_stats_kebab)));
                     map.try_emplace(TR_KEY_tag, TAG_STATS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3358,7 +3368,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 962:
                 {
                     auto map = tr_variant::Map{ 2 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_port_test_kebab)));
                     map.try_emplace(TR_KEY_tag, TAG_PORTTEST);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3417,7 +3429,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
                     args.try_emplace(TR_KEY_path, rename_from);
                     args.try_emplace(TR_KEY_name, optarg_sv);
                     add_id_arg(args, config);
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("torrent-rename-path"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_torrent_rename_path_kebab)));
                     map.try_emplace(TR_KEY_arguments, std::move(args));
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
@@ -3432,7 +3446,9 @@ int process_args(char const* rpcurl, int argc, char const* const* argv, RemoteCo
             case 732:
                 {
                     auto map = tr_variant::Map{ 2 };
-                    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("group-get"sv));
+                    map.try_emplace(
+                        TR_KEY_method,
+                        tr_variant::unmanaged_string(tr_quark_get_string_view(TR_KEY_group_get_kebab)));
                     map.try_emplace(TR_KEY_tag, TAG_GROUPS);
                     auto top = tr_variant{ std::move(map) };
                     status |= flush(rpcurl, &top, config);
