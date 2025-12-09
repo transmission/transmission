@@ -690,17 +690,6 @@ public:
 
             break;
 
-        case tr_peer_event::Type::ClientGotUnrequestedBlock:
-            {
-                auto* const tor = s->tor;
-                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
-                s->block_history.try_emplace(loc.block).first->second.emplace_back(
-                    now,
-                    fmt::format("got unrequested from {} [{}]", msgs->display_name(), msgs->user_agent()));
-                s->log_block_history(loc.block);
-            }
-            break;
-
         default:
             peer_callback_common(msgs, event, s);
             break;
