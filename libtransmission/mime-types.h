@@ -17,7 +17,7 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1239>{
+inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1243>{
     { { R"(123)", R"(application/vnd.lotus-1-2-3)" },
       { R"(1km)", R"(application/vnd.1000minds.decision-model+xml)" },
       { R"(210)", R"(model/step)" },
@@ -108,7 +108,7 @@ inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1239>{
       { R"(boz)", R"(application/x-bzip2)" },
       { R"(bpk)", R"(application/octet-stream)" },
       { R"(brush)", R"(application/vnd.procreate.brush)" },
-      { R"(brushset)", R"(application/vnd.procrate.brushset)" },
+      { R"(brushset)", R"(application/vnd.procreate.brushset)" },
       { R"(bsp)", R"(model/vnd.valve.source.compiled-map)" },
       { R"(btf)", R"(image/prs.btif)" },
       { R"(btif)", R"(image/prs.btif)" },
@@ -300,6 +300,7 @@ inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1239>{
       { R"(f4v)", R"(video/x-f4v)" },
       { R"(f77)", R"(text/x-fortran)" },
       { R"(f90)", R"(text/x-fortran)" },
+      { R"(facti)", R"(image/vnd.blockfact.facti)" },
       { R"(fbs)", R"(image/vnd.fastbidsheet)" },
       { R"(fbx)", R"(application/vnd.autodesk.fbx)" },
       { R"(fcdt)", R"(application/vnd.adobe.formscentral.fcdt)" },
@@ -493,6 +494,7 @@ inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1239>{
       { R"(jxss)", R"(image/jxss)" },
       { R"(kar)", R"(audio/midi)" },
       { R"(karbon)", R"(application/vnd.kde.karbon)" },
+      { R"(kbl)", R"(application/kbl+xml)" },
       { R"(kdbx)", R"(application/x-keepass2)" },
       { R"(key)", R"(application/vnd.apple.keynote)" },
       { R"(kfo)", R"(application/vnd.kde.kformula)" },
@@ -994,6 +996,7 @@ inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1239>{
       { R"(sxi)", R"(application/vnd.sun.xml.impress)" },
       { R"(sxm)", R"(application/vnd.sun.xml.math)" },
       { R"(sxw)", R"(application/vnd.sun.xml.writer)" },
+      { R"(systemverify)", R"(application/vnd.pp.systemverify+xml)" },
       { R"(t)", R"(text/troff)" },
       { R"(t3)", R"(application/x-t3vm-image)" },
       { R"(t38)", R"(image/t38)" },
@@ -1102,6 +1105,7 @@ inline auto constexpr MimeTypeSuffixes = std::array<mime_type_suffix, 1239>{
       { R"(vdi)", R"(application/x-virtualbox-vdi)" },
       { R"(vds)", R"(model/vnd.sap.vds)" },
       { R"(vdx)", R"(application/vnd.ms-visio.viewer)" },
+      { R"(vec)", R"(application/vec+xml)" },
       { R"(vhd)", R"(application/x-virtualbox-vhd)" },
       { R"(vis)", R"(application/vnd.visionary)" },
       { R"(viv)", R"(video/vnd.vivo)" },

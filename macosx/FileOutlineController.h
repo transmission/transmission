@@ -13,7 +13,7 @@
 @property(nonatomic) Torrent* torrent;
 @property(nonatomic) NSString* filterText;
 
-- (void)refresh;
+- (void)reloadVisibleRows;
 
 - (void)setCheck:(id)sender;
 - (void)setOnlySelectedCheck:(id)sender;

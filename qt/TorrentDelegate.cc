@@ -16,7 +16,6 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
-#include "IconCache.h"
 #include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
@@ -444,18 +443,6 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
     return { option.rect.width(), *height_hint_ };
 }
 
-QIcon& TorrentDelegate::getWarningEmblem() const
-{
-    auto& icon = warning_emblem_;
-
-    if (icon.isNull())
-    {
-        icon = IconCache::get().getThemeIcon(QStringLiteral("emblem-important"), QStyle::SP_MessageBoxWarning);
-    }
-
-    return icon;
-}
-
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
@@ -547,7 +534,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     auto const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
-    auto const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon{};
+    auto const emblem_icon = tor.hasError() ? warningEmblem() : QIcon{};
 
     // layout
     auto const m = margin(*style);
@@ -595,7 +582,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    StyleHelper::drawProgressBar(*painter, progress_bar_style_);
 
     painter->restore();
 }

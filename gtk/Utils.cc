@@ -111,7 +111,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 
 Glib::ustring tr_strlratio(double ratio)
 {
-    return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
+    return tr_strratio(ratio, Q_("None"), gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
 Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
@@ -541,11 +541,12 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
         catch (Glib::Error const& e)
         {
             error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            gtr_message(fmt::format(
-                fmt::runtime(_("Couldn't move '{path}' to trash: {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error->message()),
-                fmt::arg("error_code", error->code())));
+            gtr_message(
+                fmt::format(
+                    fmt::runtime(_("Couldn't move '{path}' to trash: {error} ({error_code})")),
+                    fmt::arg("path", filename),
+                    fmt::arg("error", error->message()),
+                    fmt::arg("error_code", error->code())));
         }
     }
 
@@ -559,11 +560,12 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
         catch (Glib::Error const& e)
         {
             error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            gtr_message(fmt::format(
-                fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-                fmt::arg("path", filename),
-                fmt::arg("error", error->message()),
-                fmt::arg("error_code", error->code())));
+            gtr_message(
+                fmt::format(
+                    fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                    fmt::arg("path", filename),
+                    fmt::arg("error", error->message()),
+                    fmt::arg("error_code", error->code())));
             result = false;
         }
     }

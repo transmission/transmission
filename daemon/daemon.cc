@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
+#include <cstdint>
 #include <cstdio> /* printf */
 #include <iostream>
 #include <iterator> /* std::back_inserter */
@@ -48,7 +49,10 @@ struct tr_ctor;
 struct tr_session;
 struct tr_torrent;
 
-#ifdef USE_SYSTEMD
+#ifdef WITH_SYSTEMD
+
+#include <cinttypes>
+#include <ctime>
 
 #include <systemd/sd-daemon.h>
 
@@ -203,11 +207,12 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
         auto error = tr_error{};
         if (!tr_file_read(filename, content, &error))
         {
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-                fmt::arg("path", basename),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                    fmt::arg("path", basename),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
             retry = true;
         }
         else
@@ -242,11 +247,12 @@ auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view
 
             if (auto error = tr_error{}; !tr_sys_path_remove(filename, &error))
             {
-                tr_logAddError(fmt::format(
-                    fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-                    fmt::arg("path", basename),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code())));
+                tr_logAddError(
+                    fmt::format(
+                        fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                        fmt::arg("path", basename),
+                        fmt::arg("error", error.message()),
+                        fmt::arg("error_code", error.code())));
             }
         }
         else
@@ -388,13 +394,14 @@ tr_rpc_callback_status on_rpc_callback(tr_session* /*session*/, tr_rpc_callback_
 
 tr_variant load_settings(char const* config_dir)
 {
-    auto app_defaults = tr_variant::make_map();
-    tr_variantDictAddStrView(&app_defaults, TR_KEY_watch_dir, ""sv);
-    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_enabled, false);
-    tr_variantDictAddBool(&app_defaults, TR_KEY_watch_dir_force_generic, false);
-    tr_variantDictAddBool(&app_defaults, TR_KEY_rpc_enabled, true);
-    tr_variantDictAddBool(&app_defaults, TR_KEY_start_paused, false);
-    tr_variantDictAddStrView(&app_defaults, TR_KEY_pidfile, ""sv);
+    auto app_defaults_map = tr_variant::Map{ 6U };
+    app_defaults_map.try_emplace(TR_KEY_watch_dir, tr_variant::unmanaged_string(""sv));
+    app_defaults_map.try_emplace(TR_KEY_watch_dir_enabled, false);
+    app_defaults_map.try_emplace(TR_KEY_watch_dir_force_generic, false);
+    app_defaults_map.try_emplace(TR_KEY_rpc_enabled, true);
+    app_defaults_map.try_emplace(TR_KEY_start_paused, false);
+    app_defaults_map.try_emplace(TR_KEY_pidfile, tr_variant::unmanaged_string(""sv));
+    auto const app_defaults = tr_variant{ std::move(app_defaults_map) };
     return tr_sessionLoadSettings(&app_defaults, config_dir, MyName);
 }
 
@@ -456,6 +463,12 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
     *dump_settings = false;
     *foreground = false;
 
+    auto* const map = settings_.get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return false;
+    }
+
     tr_optind = 1;
 
     while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
@@ -463,46 +476,46 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
         switch (c)
         {
         case 'a':
-            tr_variantDictAddStr(&settings_, TR_KEY_rpc_whitelist, optstr);
-            tr_variantDictAddBool(&settings_, TR_KEY_rpc_whitelist_enabled, true);
+            map->insert_or_assign(TR_KEY_rpc_whitelist, optstr);
+            map->insert_or_assign(TR_KEY_rpc_whitelist_enabled, true);
             break;
 
         case 'b':
-            tr_variantDictAddBool(&settings_, TR_KEY_blocklist_enabled, true);
+            map->insert_or_assign(TR_KEY_blocklist_enabled, true);
             break;
 
         case 'B':
-            tr_variantDictAddBool(&settings_, TR_KEY_blocklist_enabled, false);
+            map->insert_or_assign(TR_KEY_blocklist_enabled, false);
             break;
 
         case 'c':
-            tr_variantDictAddStr(&settings_, TR_KEY_watch_dir, optstr);
-            tr_variantDictAddBool(&settings_, TR_KEY_watch_dir_enabled, true);
+            map->insert_or_assign(TR_KEY_watch_dir, optstr);
+            map->insert_or_assign(TR_KEY_watch_dir_enabled, true);
             break;
 
         case 'C':
-            tr_variantDictAddBool(&settings_, TR_KEY_watch_dir_enabled, false);
+            map->insert_or_assign(TR_KEY_watch_dir_enabled, false);
             break;
 
         case 941:
-            tr_variantDictAddStr(&settings_, TR_KEY_incomplete_dir, optstr);
-            tr_variantDictAddBool(&settings_, TR_KEY_incomplete_dir_enabled, true);
+            map->insert_or_assign(TR_KEY_incomplete_dir, optstr);
+            map->insert_or_assign(TR_KEY_incomplete_dir_enabled, true);
             break;
 
         case 942:
-            tr_variantDictAddBool(&settings_, TR_KEY_incomplete_dir_enabled, false);
+            map->insert_or_assign(TR_KEY_incomplete_dir_enabled, false);
             break;
 
         case 943:
-            tr_variantDictAddStr(&settings_, TR_KEY_default_trackers, optstr);
+            map->insert_or_assign(TR_KEY_default_trackers, optstr);
             break;
 
         case 994:
-            tr_variantDictAddBool(&settings_, TR_KEY_sequential_download, true);
+            map->insert_or_assign(TR_KEY_sequential_download, true);
             break;
 
         case 995:
-            tr_variantDictAddBool(&settings_, TR_KEY_sequential_download, false);
+            map->insert_or_assign(TR_KEY_sequential_download, false);
             break;
 
         case 'd':
@@ -530,125 +543,125 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             return false;
 
         case 'o':
-            tr_variantDictAddBool(&settings_, TR_KEY_dht_enabled, true);
+            map->insert_or_assign(TR_KEY_dht_enabled, true);
             break;
 
         case 'O':
-            tr_variantDictAddBool(&settings_, TR_KEY_dht_enabled, false);
+            map->insert_or_assign(TR_KEY_dht_enabled, false);
             break;
 
         case 'p':
             if (auto const rpc_port = tr_num_parse<uint16_t>(optstr); rpc_port)
             {
-                tr_variantDictAddInt(&settings_, TR_KEY_rpc_port, *rpc_port);
+                map->insert_or_assign(TR_KEY_rpc_port, *rpc_port);
             }
             break;
 
         case 't':
-            tr_variantDictAddBool(&settings_, TR_KEY_rpc_authentication_required, true);
+            map->insert_or_assign(TR_KEY_rpc_authentication_required, true);
             break;
 
         case 'T':
-            tr_variantDictAddBool(&settings_, TR_KEY_rpc_authentication_required, false);
+            map->insert_or_assign(TR_KEY_rpc_authentication_required, false);
             break;
 
         case 'u':
-            tr_variantDictAddStr(&settings_, TR_KEY_rpc_username, optstr);
+            map->insert_or_assign(TR_KEY_rpc_username, optstr);
             break;
 
         case 'v':
-            tr_variantDictAddStr(&settings_, TR_KEY_rpc_password, optstr);
+            map->insert_or_assign(TR_KEY_rpc_password, optstr);
             break;
 
         case 'w':
-            tr_variantDictAddStr(&settings_, TR_KEY_download_dir, optstr);
+            map->insert_or_assign(TR_KEY_download_dir, optstr);
             break;
 
         case 'P':
             if (auto const peer_port = tr_num_parse<uint16_t>(optstr); peer_port)
             {
-                tr_variantDictAddInt(&settings_, TR_KEY_peer_port, *peer_port);
+                map->insert_or_assign(TR_KEY_peer_port, *peer_port);
             }
             break;
 
         case 'm':
-            tr_variantDictAddBool(&settings_, TR_KEY_port_forwarding_enabled, true);
+            map->insert_or_assign(TR_KEY_port_forwarding_enabled, true);
             break;
 
         case 'M':
-            tr_variantDictAddBool(&settings_, TR_KEY_port_forwarding_enabled, false);
+            map->insert_or_assign(TR_KEY_port_forwarding_enabled, false);
             break;
 
         case 'L':
             if (auto const peer_limit_global = tr_num_parse<int64_t>(optstr); peer_limit_global && *peer_limit_global >= 0)
             {
-                tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_global, *peer_limit_global);
+                map->insert_or_assign(TR_KEY_peer_limit_global, *peer_limit_global);
             }
             break;
 
         case 'l':
             if (auto const peer_limit_tor = tr_num_parse<int64_t>(optstr); peer_limit_tor && *peer_limit_tor >= 0)
             {
-                tr_variantDictAddInt(&settings_, TR_KEY_peer_limit_per_torrent, *peer_limit_tor);
+                map->insert_or_assign(TR_KEY_peer_limit_per_torrent, *peer_limit_tor);
             }
             break;
 
         case 800:
-            tr_variantDictAddBool(&settings_, TR_KEY_start_paused, true);
+            map->insert_or_assign(TR_KEY_start_paused, true);
             break;
 
         case 910:
-            tr_variantDictAddInt(&settings_, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+            map->insert_or_assign(TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
             break;
 
         case 911:
-            tr_variantDictAddInt(&settings_, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+            map->insert_or_assign(TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
             break;
 
         case 912:
-            tr_variantDictAddInt(&settings_, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            map->insert_or_assign(TR_KEY_encryption, TR_CLEAR_PREFERRED);
             break;
 
         case 'i':
-            tr_variantDictAddStr(&settings_, TR_KEY_bind_address_ipv4, optstr);
+            map->insert_or_assign(TR_KEY_bind_address_ipv4, optstr);
             break;
 
         case 'I':
-            tr_variantDictAddStr(&settings_, TR_KEY_bind_address_ipv6, optstr);
+            map->insert_or_assign(TR_KEY_bind_address_ipv6, optstr);
             break;
 
         case 'r':
-            tr_variantDictAddStr(&settings_, TR_KEY_rpc_bind_address, optstr);
+            map->insert_or_assign(TR_KEY_rpc_bind_address, optstr);
             break;
 
         case 953:
             if (auto const ratio_limit = tr_num_parse<double>(optstr); ratio_limit)
             {
-                tr_variantDictAddReal(&settings_, TR_KEY_ratio_limit, *ratio_limit);
+                map->insert_or_assign(TR_KEY_ratio_limit, *ratio_limit);
             }
-            tr_variantDictAddBool(&settings_, TR_KEY_ratio_limit_enabled, true);
+            map->insert_or_assign(TR_KEY_ratio_limit_enabled, true);
             break;
 
         case 954:
-            tr_variantDictAddBool(&settings_, TR_KEY_ratio_limit_enabled, false);
+            map->insert_or_assign(TR_KEY_ratio_limit_enabled, false);
             break;
 
         case 'x':
-            tr_variantDictAddStr(&settings_, TR_KEY_pidfile, optstr);
+            map->insert_or_assign(TR_KEY_pidfile, optstr);
             break;
 
         case 'y':
-            tr_variantDictAddBool(&settings_, TR_KEY_lpd_enabled, true);
+            map->insert_or_assign(TR_KEY_lpd_enabled, true);
             break;
 
         case 'Y':
-            tr_variantDictAddBool(&settings_, TR_KEY_lpd_enabled, false);
+            map->insert_or_assign(TR_KEY_lpd_enabled, false);
             break;
 
         case 810:
             if (auto const level = tr_logGetLevelFromKey(optstr); level)
             {
-                tr_variantDictAddInt(&settings_, TR_KEY_message_level, *level);
+                map->insert_or_assign(TR_KEY_message_level, *level);
             }
             else
             {
@@ -659,25 +672,25 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
 
         case 811:
             std::cerr << "WARN: --log-error is deprecated. Use --log-level=error" << std::endl;
-            tr_variantDictAddInt(&settings_, TR_KEY_message_level, TR_LOG_ERROR);
+            map->insert_or_assign(TR_KEY_message_level, TR_LOG_ERROR);
             break;
 
         case 812:
             std::cerr << "WARN: --log-info is deprecated. Use --log-level=info" << std::endl;
-            tr_variantDictAddInt(&settings_, TR_KEY_message_level, TR_LOG_INFO);
+            map->insert_or_assign(TR_KEY_message_level, TR_LOG_INFO);
             break;
 
         case 813:
             std::cerr << "WARN: --log-debug is deprecated. Use --log-level=debug" << std::endl;
-            tr_variantDictAddInt(&settings_, TR_KEY_message_level, TR_LOG_DEBUG);
+            map->insert_or_assign(TR_KEY_message_level, TR_LOG_DEBUG);
             break;
 
         case 830:
-            tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, true);
+            map->insert_or_assign(TR_KEY_utp_enabled, true);
             break;
 
         case 831:
-            tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, false);
+            map->insert_or_assign(TR_KEY_utp_enabled, false);
             break;
 
         case TR_OPT_UNK:
@@ -705,6 +718,26 @@ void tr_daemon::reconfigure()
     }
     else
     {
+#ifdef WITH_SYSTEMD
+        auto ts = timespec{};
+        if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0)
+        {
+            auto error = tr_error{};
+            error.set_from_errno(errno);
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Failed to reload: Failed to get current monotonic time: {errmsg} ({errno})")),
+                    fmt::arg("errmsg", error.message()),
+                    fmt::arg("errno", error.code())));
+            return;
+        }
+
+        sd_notifyf(
+            0,
+            "STATUS=Reloading...\nRELOADING=1\nMONOTONIC_USEC=%" PRIu64 "\n",
+            static_cast<uint64_t>(ts.tv_sec) * 1000000U + static_cast<uint64_t>(ts.tv_nsec) / 1000U);
+#endif
+
         char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
@@ -718,6 +751,8 @@ void tr_daemon::reconfigure()
 
         tr_sessionSet(my_session_, load_settings(configDir));
         tr_sessionReloadBlocklists(my_session_);
+
+        sd_notify(0, "STATUS=Reload complete.\nREADY=1\n");
     }
 }
 
@@ -753,9 +788,15 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", cdir)));
     tr_sessionSaveSettings(session, cdir, settings_);
 
-    auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(&settings_, TR_KEY_pidfile, &sv);
-    auto const sz_pid_filename = std::string{ sv };
+    auto const* const settings_map = settings_.get_if<tr_variant::Map>();
+    if (settings_map == nullptr)
+    {
+        static auto constexpr Errmsg = "Unreachable code, please file a bug report"sv;
+        printMessage(log_stream_, TR_LOG_ERROR, MyName, Errmsg, __FILE__, __LINE__);
+        return 1;
+    }
+
+    auto const sz_pid_filename = std::string{ settings_map->value_if<std::string_view>(TR_KEY_pidfile).value_or(""sv) };
     auto pidfile_created = false;
     if (!std::empty(sz_pid_filename))
     {
@@ -776,15 +817,16 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         }
         else
         {
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
-                fmt::arg("path", sz_pid_filename),
-                fmt::arg("error", error.message()),
-                fmt::arg("error_code", error.code())));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't save '{path}': {error} ({error_code})")),
+                    fmt::arg("path", sz_pid_filename),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
         }
     }
 
-    if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_rpc_authentication_required, &tmp_bool) && tmp_bool)
+    if (settings_map->value_if<bool>(TR_KEY_rpc_authentication_required).value_or(false))
     {
         tr_logAddInfo(_("Requiring authentication"));
     }
@@ -799,14 +841,11 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 
     /* maybe add a watchdir */
     auto watchdir = std::unique_ptr<Watchdir>{};
-    if (auto tmp_bool = false; tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_enabled, &tmp_bool) && tmp_bool)
+    if (settings_map->value_if<bool>(TR_KEY_watch_dir_enabled).value_or(false))
     {
-        auto force_generic = false;
-        (void)tr_variantDictFindBool(&settings_, TR_KEY_watch_dir_force_generic, &force_generic);
+        auto const force_generic = settings_map->value_if<bool>(TR_KEY_watch_dir_force_generic).value_or(false);
 
-        auto dir = std::string_view{};
-        (void)tr_variantDictFindStrView(&settings_, TR_KEY_watch_dir, &dir);
-        if (!std::empty(dir))
+        if (auto dir = settings_map->value_if<std::string_view>(TR_KEY_watch_dir).value_or(""sv); !std::empty(dir))
         {
             tr_logAddInfo(fmt::format(fmt::runtime(_("Watching '{path}' for new torrent files")), fmt::arg("path", dir)));
 
@@ -825,7 +864,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     {
         tr_ctor* ctor = tr_ctorNew(my_session_);
 
-        if (auto paused = false; tr_variantDictFindBool(&settings_, TR_KEY_start_paused, &paused) && paused)
+        if (settings_map->value_if<bool>(TR_KEY_start_paused).value_or(false))
         {
             tr_ctorSetPaused(ctor, TR_FORCE, true);
         }
@@ -852,20 +891,22 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
         if (status_ev == nullptr)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't create event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
             auto const error_code = errno;
-            tr_logAddError(fmt::format(
-                fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(_("Couldn't add event: {error} ({error_code})")),
+                    fmt::arg("error", tr_strerror(error_code)),
+                    fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
     }
@@ -876,10 +917,11 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     if (event_base_dispatch(ev_base_) == -1)
     {
         auto const error_code = errno;
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't launch daemon event loop: {error} ({error_code})")),
-            fmt::arg("error", tr_strerror(error_code)),
-            fmt::arg("error_code", error_code)));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't launch daemon event loop: {error} ({error_code})")),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
         goto CLEANUP;
     }
 

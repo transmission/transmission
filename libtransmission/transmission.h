@@ -15,6 +15,7 @@
 #include <time.h> // time_t
 
 #ifdef __cplusplus
+#include <functional>
 #include <string>
 #include <string_view>
 #else
@@ -375,7 +376,7 @@ enum tr_rpc_callback_type : uint8_t
     TR_RPC_TORRENT_STOPPED,
     TR_RPC_TORRENT_REMOVING,
     TR_RPC_TORRENT_TRASHING, /* _REMOVING + delete local data */
-    TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent-set" rpc method */
+    TR_RPC_TORRENT_CHANGED, /* catch-all for the "torrent_set" rpc method */
     TR_RPC_TORRENT_MOVED,
     TR_RPC_SESSION_CHANGED,
     TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED, /* catch potentially multiple torrents being moved in the queue */
@@ -635,7 +636,7 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session);
     Stalled torrents are left running but are not counted by `tr_sessionGetQueueSize()`. */
 void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes);
 
-/** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
+/** @return true if torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
 
 /** @brief Set whether or not to count torrents idle for over N minutes as 'stalled' */
@@ -646,10 +647,14 @@ void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_se
 
 // ---
 
+/** @brief Set whether or not to verify data when torrent download is complete */
+void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
+
+// ---
+
 /**
  * Load all the torrents in the session's torrent folder.
- * This can be used at startup to kickstart all the torrents
- * from the previous session.
+ * This can be used at startup to kickstart all the torrents from the previous session.
  *
  * @return the number of torrents in the session
  */
@@ -720,11 +725,11 @@ void tr_blocklistSetEnabled(tr_session* session, bool is_enabled);
 char const* tr_blocklistGetURL(tr_session const* session);
 
 /** @brief The blocklist that gets updated when an RPC client
-           invokes the "blocklist-update" method */
+           invokes the "blocklist_update" method */
 void tr_blocklistSetURL(tr_session* session, char const* url);
 
 /** @brief the file in the $config/blocklists/ directory that's
-           used by `tr_blocklistSetContent()` and "blocklist-update" */
+           used by `tr_blocklistSetContent()` and "blocklist_update" */
 #define DEFAULT_BLOCKLIST_FILENAME "blocklist.bin"
 
 /** @} */
@@ -849,12 +854,8 @@ void tr_torrentStart(tr_torrent* torrent);
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop(tr_torrent* torrent);
 
-using tr_torrent_rename_done_func = void (*)( //
-    tr_torrent* torrent,
-    char const* oldpath,
-    char const* newname,
-    int error,
-    void* user_data);
+using tr_torrent_rename_done_func = std::function<
+    void(tr_torrent* torrent, char const* oldpath, char const* newname, int error, void* user_data)>;
 
 /**
  * @brief Rename a file or directory in a torrent.
@@ -1195,6 +1196,8 @@ struct tr_peer_stat
     char flagStr[32];
     char const* client;
 
+    tr_peer_id_t peer_id;
+
     float progress;
     double rateToPeer_KBps;
     double rateToClient_KBps;
@@ -1215,6 +1218,9 @@ struct tr_peer_stat
 
     /* how many requests we've made and are currently awaiting a response for */
     size_t activeReqsToPeer;
+
+    size_t bytes_to_peer;
+    size_t bytes_to_client;
 };
 // NOLINTEND(modernize-avoid-c-arrays)
 
@@ -1271,6 +1277,7 @@ struct tr_tracker_view
     int lastAnnouncePeerCount; // if hasAnnounced, the number of peers the tracker gave us
     int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
+    int downloader_count; // number of downloaders (BEP-21) the tracker knows of, or -1 if unknown
 
     size_t tier; // which tier this tracker is in
     tr_tracker_id_t id; // unique transmission-generated ID for use in libtransmission API

@@ -318,12 +318,13 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
     }
     catch (Glib::Error const& e)
     {
-        gtr_message(fmt::format(
-            fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
-            fmt::arg("old_path", old_name),
-            fmt::arg("path", new_name),
-            fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code())));
+        gtr_message(
+            fmt::format(
+                fmt::runtime(_("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})")),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code())));
     }
 }
 
@@ -807,11 +808,12 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        gtr_message(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", file->get_parse_name()),
-            fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code())));
+        gtr_message(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", file->get_parse_name()),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code())));
     }
 
     dec_busy();
@@ -1070,12 +1072,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
             std::string(SessionManagerObjectPath),
             std::string(SessionManagerInterface),
             "Inhibit",
-            Glib::VariantContainerBase::create_tuple({
-                Glib::Variant<Glib::ustring>::create(application),
-                Glib::Variant<guint32>::create(toplevel_xid),
-                Glib::Variant<Glib::ustring>::create(reason),
-                Glib::Variant<guint32>::create(flags),
-            }),
+            Glib::VariantContainerBase::create_tuple(
+                {
+                    Glib::Variant<Glib::ustring>::create(application),
+                    Glib::Variant<guint32>::create(toplevel_xid),
+                    Glib::Variant<Glib::ustring>::create(reason),
+                    Glib::Variant<guint32>::create(flags),
+                }),
             std::string(SessionManagerServiceName),
             1000);
 
@@ -1301,7 +1304,7 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
             auto status = std::optional<bool>{};
             if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
             {
-                if (auto result = bool{}; tr_variantDictFindBool(args, TR_KEY_port_is_open, &result))
+                if (auto result = bool{}; tr_variantDictFindBool(args, TR_KEY_port_is_open_kebab, &result))
                 {
                     status = result;
                 }
@@ -1354,7 +1357,7 @@ void Session::blocklist_update()
             int64_t ruleCount = 0;
 
             if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
-                !tr_variantDictFindInt(args, TR_KEY_blocklist_size, &ruleCount))
+                !tr_variantDictFindInt(args, TR_KEY_blocklist_size_kebab, &ruleCount))
             {
                 ruleCount = -1;
             }

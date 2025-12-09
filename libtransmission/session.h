@@ -35,6 +35,8 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
+#include <small/vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
@@ -416,6 +418,7 @@ public:
         bool speed_limit_down_enabled = false;
         bool speed_limit_up_enabled = false;
         bool tcp_enabled = true;
+        bool torrent_complete_verify_enabled = false;
         bool utp_enabled = true;
         double ratio_limit = 2.0;
         size_t cache_size_mbytes = 4U;
@@ -429,7 +432,10 @@ public:
         size_t speed_limit_down = 100U;
         size_t speed_limit_up = 100U;
         size_t upload_slots_per_torrent = 8U;
-        std::array<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transport = { TR_PREFER_UTP, TR_PREFER_TCP };
+        small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT> preferred_transports = {
+            TR_PREFER_UTP,
+            TR_PREFER_TCP,
+        };
         std::chrono::milliseconds sleep_per_seconds_during_verify = std::chrono::milliseconds{ 100 };
         std::optional<std::string> proxy_url;
         std::string announce_ip;
@@ -487,7 +493,7 @@ public:
                 { TR_KEY_pex_enabled, &pex_enabled },
                 { TR_KEY_port_forwarding_enabled, &port_forwarding_enabled },
                 { TR_KEY_preallocation, &preallocation_mode },
-                { TR_KEY_preferred_transport, &preferred_transport },
+                { TR_KEY_preferred_transports, &preferred_transports },
                 { TR_KEY_proxy_url, &proxy_url },
                 { TR_KEY_queue_stalled_enabled, &queue_stalled_enabled },
                 { TR_KEY_queue_stalled_minutes, &queue_stalled_minutes },
@@ -513,6 +519,7 @@ public:
                 { TR_KEY_start_added_torrents, &should_start_added_torrents },
                 { TR_KEY_tcp_enabled, &tcp_enabled },
                 { TR_KEY_torrent_added_verify_mode, &torrent_added_verify_mode },
+                { TR_KEY_torrent_complete_verify_enabled, &torrent_complete_verify_enabled },
                 { TR_KEY_trash_original_torrent_files, &should_delete_source_torrents },
                 { TR_KEY_umask, &umask },
                 { TR_KEY_upload_slots_per_torrent, &upload_slots_per_torrent },
@@ -765,6 +772,7 @@ public:
         return open_files_;
     }
 
+    void flush_torrent_files(tr_torrent_id_t tor_id) const noexcept;
     void close_torrent_files(tr_torrent_id_t tor_id) noexcept;
     void close_torrent_file(tr_torrent const& tor, tr_file_index_t file_num) noexcept;
 
@@ -962,6 +970,11 @@ public:
         return settings().torrent_added_verify_mode == TR_VERIFY_ADDED_FULL;
     }
 
+    [[nodiscard]] constexpr auto shouldFullyVerifyCompleteTorrents() const noexcept
+    {
+        return settings().torrent_complete_verify_enabled;
+    }
+
     [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept
     {
         return settings().should_delete_source_torrents;
@@ -989,9 +1002,21 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
-    [[nodiscard]] constexpr auto const& preferred_transport() const noexcept
+    [[nodiscard]] constexpr auto const& preferred_transports() const noexcept
     {
-        return settings().preferred_transport;
+        return settings().preferred_transports;
+    }
+
+    [[nodiscard]] auto save_preferred_transports() const
+    {
+        auto var = settings().save_single(TR_KEY_preferred_transports);
+        TR_ASSERT(var.has_value());
+        return var;
+    }
+
+    bool load_preferred_transports(tr_variant const& var) noexcept
+    {
+        return settings_.load_single(TR_KEY_preferred_transports, var);
     }
 
     [[nodiscard]] constexpr auto isIdleLimited() const noexcept
@@ -1037,10 +1062,10 @@ public:
         return ip_cache_.set_global_addr(addr);
     }
 
-    [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
+    [[nodiscard]] std::optional<tr_address> source_address(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
-        return ip_cache_.global_source_addr(type);
+        return ip_cache_.source_addr(type);
     }
 
     [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
@@ -1206,6 +1231,7 @@ private:
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
+    friend void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -1240,10 +1266,10 @@ public:
     /// constexpr fields
 
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
-        { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
-          { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
-          { TR_KEY_script_torrent_done_seeding_enabled,
-            TR_KEY_script_torrent_done_seeding_filename,
+        { { TR_KEY_script_torrent_added_enabled_kebab, TR_KEY_script_torrent_added_filename_kebab, TR_SCRIPT_ON_TORRENT_ADDED },
+          { TR_KEY_script_torrent_done_enabled_kebab, TR_KEY_script_torrent_done_filename_kebab, TR_SCRIPT_ON_TORRENT_DONE },
+          { TR_KEY_script_torrent_done_seeding_enabled_kebab,
+            TR_KEY_script_torrent_done_seeding_filename_kebab,
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 

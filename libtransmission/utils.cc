@@ -134,11 +134,12 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     auto const info = tr_sys_path_get_info(szfilename, 0, error);
     if (*error)
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message()),
-            fmt::arg("error_code", error->code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         return false;
     }
 
@@ -153,22 +154,24 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message()),
-            fmt::arg("error_code", error->code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         return false;
     }
 
     contents.resize(info->size);
     if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message()),
-            fmt::arg("error_code", error->code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't read '{path}': {error} ({error_code})")),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         tr_sys_file_close(fd);
         return false;
     }
@@ -245,12 +248,12 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
     return len;
 }
 
-/* User-level routine. returns whether or not 'text' and 'p' matched */
-bool tr_wildmat(std::string_view text, std::string_view pattern)
+/* User-level routine. returns whether or not 'text' and 'pattern' matched */
+bool tr_wildmat(char const* text, char const* pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
+    return (pattern[0] == '*' && pattern[1] == '\0') || DoMatch(text, pattern) > 0;
 }
 
 char const* tr_strerror(int errnum)
@@ -561,11 +564,11 @@ std::string tr_strpercent(double x)
     return fmt::format("{:.0Lf}", x);
 }
 
-std::string tr_strratio(double ratio, std::string_view infinity)
+std::string tr_strratio(double ratio, std::string_view const none, std::string_view const infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
     {
-        return _("None");
+        return std::string{ none };
     }
 
     if ((int)ratio == TR_RATIO_INF)
@@ -632,11 +635,12 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, bool
 
     if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
-        tr_logAddError(fmt::format(
-            fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
-            fmt::arg("path", oldpath),
-            fmt::arg("error", log_error.message()),
-            fmt::arg("error_code", log_error.code())));
+        tr_logAddError(
+            fmt::format(
+                fmt::runtime(_("Couldn't remove '{path}': {error} ({error_code})")),
+                fmt::arg("path", oldpath),
+                fmt::arg("error", log_error.message()),
+                fmt::arg("error_code", log_error.code())));
     }
 
     return true;

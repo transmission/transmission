@@ -99,6 +99,16 @@ tr_address_type tr_af_to_ip_protocol(int af)
     }
 }
 
+int tr_make_listen_socket_ipv6only(tr_socket_t const sock)
+{
+#if defined(IPV6_V6ONLY)
+    int optval = 1;
+    return setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval));
+#else
+    return 0;
+#endif
+}
+
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
@@ -188,10 +198,11 @@ tr_socket_t createSocket(int domain, int type)
     {
         if (sockerrno != EAFNOSUPPORT)
         {
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't create socket: {error} ({error_code})")),
-                fmt::arg("error", tr_net_strerror(sockerrno)),
-                fmt::arg("error_code", sockerrno)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't create socket: {error} ({error_code})")),
+                    fmt::arg("error", tr_net_strerror(sockerrno)),
+                    fmt::arg("error_code", sockerrno)));
         }
 
         return TR_BAD_SOCKET;
@@ -233,9 +244,8 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
     auto const& [addr, port] = socket_address;
 
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid())
+    if (!session->allowsTCP() || !socket_address.is_valid())
     {
         return TR_BAD_SOCKET;
     }
@@ -265,12 +275,13 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
-        tr_logAddWarn(fmt::format(
-            fmt::runtime(_("Couldn't set source address {address} on {socket}: {error} ({error_code})")),
-            fmt::arg("address", source_addr.display_name()),
-            fmt::arg("socket", s),
-            fmt::arg("error", tr_net_strerror(sockerrno)),
-            fmt::arg("error_code", sockerrno)));
+        tr_logAddWarn(
+            fmt::format(
+                fmt::runtime(_("Couldn't set source address {address} on {socket}: {error} ({error_code})")),
+                fmt::arg("address", source_addr.display_name()),
+                fmt::arg("socket", s),
+                fmt::arg("error", tr_net_strerror(sockerrno)),
+                fmt::arg("error_code", sockerrno)));
         tr_net_close_socket(s);
         return TR_BAD_SOCKET;
     }
@@ -284,13 +295,14 @@ tr_socket_t tr_net_open_peer_socket(tr_session* session, tr_socket_address const
         if (auto const tmperrno = sockerrno;
             (tmperrno != ECONNREFUSED && tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
         {
-            tr_logAddWarn(fmt::format(
-                fmt::runtime(_("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})")),
-                fmt::arg("socket", s),
-                fmt::arg("address", addr.display_name()),
-                fmt::arg("port", port.host()),
-                fmt::arg("error", tr_net_strerror(tmperrno)),
-                fmt::arg("error_code", tmperrno)));
+            tr_logAddWarn(
+                fmt::format(
+                    fmt::runtime(_("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})")),
+                    fmt::arg("socket", s),
+                    fmt::arg("address", addr.display_name()),
+                    fmt::arg("port", port.host()),
+                    fmt::arg("error", tr_net_strerror(tmperrno)),
+                    fmt::arg("error_code", tmperrno)));
         }
 
         tr_net_close_socket(s);
@@ -326,17 +338,13 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
     (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char const*>(&optval), sizeof(optval));
     (void)evutil_make_listen_socket_reuseable(fd);
 
-#ifdef IPV6_V6ONLY
-    // TODO(tearfur): Consider using `evutil_make_listen_socket_ipv6only` once minimum libevent version is bumped to 2.1.9 or above
-    if (addr.is_ipv6() &&
-        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char const*>(&optval), sizeof(optval)) == -1 &&
+    if (addr.is_ipv6() && tr_make_listen_socket_ipv6only(fd) == -1 &&
         sockerrno != ENOPROTOOPT) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
         tr_net_close_socket(fd);
         return TR_BAD_SOCKET;
     }
-#endif
 
     auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
@@ -346,15 +354,16 @@ tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool suppres
 
         if (!suppress_msgs)
         {
-            tr_logAddError(fmt::format(
-                fmt::runtime(
-                    err == EADDRINUSE ?
-                        _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
-                        _("Couldn't bind port {port} on {address}: {error} ({error_code})")),
-                fmt::arg("address", addr.display_name()),
-                fmt::arg("port", port.host()),
-                fmt::arg("error", tr_net_strerror(err)),
-                fmt::arg("error_code", err)));
+            tr_logAddError(
+                fmt::format(
+                    fmt::runtime(
+                        err == EADDRINUSE ?
+                            _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
+                            _("Couldn't bind port {port} on {address}: {error} ({error_code})")),
+                    fmt::arg("address", addr.display_name()),
+                    fmt::arg("port", port.host()),
+                    fmt::arg("error", tr_net_strerror(err)),
+                    fmt::arg("error_code", err)));
         }
 
         tr_net_close_socket(fd);
@@ -442,32 +451,10 @@ namespace is_valid_for_peers_helpers
    and is covered under the same license as third-party/dht/dht.c. */
 [[nodiscard]] auto is_martian_addr(tr_address const& addr, tr_peer_from from)
 {
-    static auto constexpr Zeroes = std::array<unsigned char, 16>{};
     auto const loopback_allowed = from == TR_PEER_FROM_INCOMING || from == TR_PEER_FROM_LPD || from == TR_PEER_FROM_RESUME;
-
-    switch (addr.type)
-    {
-    case TR_AF_INET:
-        {
-            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr4);
-            return address[0] == 0 || // 0.x.x.x
-                (!loopback_allowed && address[0] == 127) || // 127.x.x.x
-                (address[0] & 0xE0) == 0xE0; // multicast address
-        }
-
-    case TR_AF_INET6:
-        {
-            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
-            return address[0] == 0xFF || // multicast address
-                (std::memcmp(address, std::data(Zeroes), 15) == 0 &&
-                 (address[15] == 0 || // ::
-                  (!loopback_allowed && address[15] == 1)) // ::1
-                );
-        }
-
-    default:
-        return true;
-    }
+    return addr.is_ipv4_current_network() || addr.is_ipv6_unspecified() ||
+        (!loopback_allowed && (addr.is_ipv4_loopback() || addr.is_ipv6_loopback())) || addr.is_ipv4_multicast() ||
+        addr.is_ipv6_multicast();
 }
 
 } // namespace is_valid_for_peers_helpers
@@ -665,138 +652,48 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 }
 
 // https://en.wikipedia.org/wiki/Reserved_IP_addresses
-[[nodiscard]] bool tr_address::is_global_unicast_address() const noexcept
+//
+// https://www.rfc-editor.org/rfc/rfc4291.html#section-2.4
+// address type         Binary prefix        IPv6 notation   Section
+// ------------         -------------        -------------   -------
+// Unspecified          00...0  (128 bits)   ::/128          2.5.2
+// Loopback             00...1  (128 bits)   ::1/128         2.5.3
+// Multicast            11111111             FF00::/8        2.7
+// Link-Local unicast   1111111010           FE80::/10       2.5.6
+// Global Unicast       (everything else)
+[[nodiscard]] bool tr_address::is_global_unicast() const noexcept
 {
-    if (is_ipv4())
+    return !is_ipv4_current_network() && //
+        !is_ipv4_10_private() && //
+        !is_ipv4_carrier_grade_nat() && //
+        !is_ipv4_loopback() && //
+        !is_ipv4_link_local() && //
+        !is_ipv4_172_private() && //
+        !is_ipv4_ietf_protocol_assignment() && //
+        !is_ipv4_test_net_1() && //
+        !is_ipv4_6to4_relay() && //
+        !is_ipv4_192_168_private() && //
+        !is_ipv4_benchmark() && //
+        !is_ipv4_test_net_2() && //
+        !is_ipv4_test_net_3() && //
+        !is_ipv4_multicast() && //
+        !is_ipv4_mcast_test_net() && //
+        !is_ipv4_reserved_class_e() && //
+        !is_ipv4_limited_broadcast() && //
+        !is_ipv6_unspecified() && //
+        !is_ipv6_loopback() && //
+        !is_ipv6_multicast() && //
+        !is_ipv6_link_local();
+}
+
+std::optional<tr_address> tr_address::from_ipv4_mapped() const noexcept
+{
+    if (!is_ipv6_ipv4_mapped())
     {
-        auto const* const a = reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr);
-
-        // [0.0.0.0–0.255.255.255]
-        // Current network.
-        if (a[0] == 0)
-        {
-            return false;
-        }
-
-        // [10.0.0.0 – 10.255.255.255]
-        // Used for local communications within a private network.
-        if (a[0] == 10)
-        {
-            return false;
-        }
-
-        // [100.64.0.0–100.127.255.255]
-        // Shared address space for communications between a service provider
-        // and its subscribers when using a carrier-grade NAT.
-        if ((a[0] == 100) && (64 <= a[1] && a[1] <= 127))
-        {
-            return false;
-        }
-
-        // [169.254.0.0–169.254.255.255]
-        // Used for link-local addresses[5] between two hosts on a single link
-        // when no IP address is otherwise specified, such as would have
-        // normally been retrieved from a DHCP server.
-        if (a[0] == 169 && a[1] == 254)
-        {
-            return false;
-        }
-
-        // [172.16.0.0–172.31.255.255]
-        // Used for local communications within a private network.
-        if ((a[0] == 172) && (16 <= a[1] && a[1] <= 31))
-        {
-            return false;
-        }
-
-        // [192.0.0.0–192.0.0.255]
-        // IETF Protocol Assignments.
-        if (a[0] == 192 && a[1] == 0 && a[2] == 0)
-        {
-            return false;
-        }
-
-        // [192.0.2.0–192.0.2.255]
-        // Assigned as TEST-NET-1, documentation and examples.
-        if (a[0] == 192 && a[1] == 0 && a[2] == 2)
-        {
-            return false;
-        }
-
-        // [192.88.99.0–192.88.99.255]
-        // Reserved. Formerly used for IPv6 to IPv4 relay.
-        if (a[0] == 192 && a[1] == 88 && a[2] == 99)
-        {
-            return false;
-        }
-
-        // [192.168.0.0–192.168.255.255]
-        // Used for local communications within a private network.
-        if (a[0] == 192 && a[1] == 168)
-        {
-            return false;
-        }
-
-        // [198.18.0.0–198.19.255.255]
-        // Used for benchmark testing of inter-network communications
-        // between two separate subnets.
-        if (a[0] == 198 && (18 <= a[1] && a[1] <= 19))
-        {
-            return false;
-        }
-
-        // [198.51.100.0–198.51.100.255]
-        // Assigned as TEST-NET-2, documentation and examples.
-        if (a[0] == 198 && a[1] == 51 && a[2] == 100)
-        {
-            return false;
-        }
-
-        // [203.0.113.0–203.0.113.255]
-        // Assigned as TEST-NET-3, documentation and examples.
-        if (a[0] == 203 && a[1] == 0 && a[2] == 113)
-        {
-            return false;
-        }
-
-        // [224.0.0.0–239.255.255.255]
-        // In use for IP multicast. (Former Class D network.)
-        if (224 <= a[0] && a[0] <= 230)
-        {
-            return false;
-        }
-
-        // [233.252.0.0-233.252.0.255]
-        // Assigned as MCAST-TEST-NET, documentation and examples.
-        if (a[0] == 233 && a[1] == 252 && a[2] == 0)
-        {
-            return false;
-        }
-
-        // [240.0.0.0–255.255.255.254]
-        // Reserved for future use. (Former Class E network.)
-        // [255.255.255.255]
-        // Reserved for the "limited broadcast" destination address.
-        if (240 <= a[0])
-        {
-            return false;
-        }
-
-        return true;
+        return {};
     }
 
-    if (is_ipv6())
-    {
-        auto const* const a = addr.addr6.s6_addr;
-
-        // TODO: 2000::/3 is commonly used for global unicast but technically
-        // other spaces would be allowable too, so we should test those here.
-        // See RFC 4291 in the Section 2.4 listing global unicast as everything
-        // that's not link-local, multicast, loopback, or unspecified.
-        return (a[0] & 0xE0) == 0x20;
-    }
-
-    return false;
+    return from_compact_ipv4(reinterpret_cast<std::byte const*>(&addr.addr6.s6_addr) + 12).first;
 }
 
 // --- tr_socket_addrses
@@ -810,7 +707,7 @@ bool tr_socket_address::is_valid_for_peers(tr_peer_from from) const noexcept
 {
     using namespace is_valid_for_peers_helpers;
 
-    return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local_address() && !address_.is_ipv4_mapped_address() &&
+    return is_valid() && !std::empty(port_) && !address_.is_ipv6_link_local() && !address_.is_ipv6_ipv4_mapped() &&
         !is_martian_addr(address_, from);
 }
 

@@ -396,11 +396,12 @@ void register_magnet_link_handler()
     }
     catch (Gio::Error const& e)
     {
-        gtr_warning(fmt::format(
-            fmt::runtime(_("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})")),
-            fmt::arg("content_type", content_type),
-            fmt::arg("error", e.what()),
-            fmt::arg("error_code", static_cast<int>(e.code()))));
+        gtr_warning(
+            fmt::format(
+                fmt::runtime(_("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})")),
+                fmt::arg("content_type", content_type),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 }
 
@@ -1359,6 +1360,10 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         tr_sessionSetDeleteSource(tr, gtr_pref_flag_get(key));
         break;
 
+    case TR_KEY_torrent_complete_verify_enabled:
+        tr_sessionSetCompleteVerifyEnabled(tr, gtr_pref_flag_get(key));
+        break;
+
     default:
         break;
     }
@@ -1476,7 +1481,7 @@ void Application::Impl::start_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
+    tr_variantDictAddStrView(&request, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_start_kebab));
     tr_rpc_request_exec(session, request, {});
 }
 
@@ -1486,7 +1491,7 @@ void Application::Impl::pause_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
+    tr_variantDictAddStrView(&request, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_stop_kebab));
     tr_rpc_request_exec(session, request, {});
 }
 
@@ -1559,6 +1564,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         }
     }
     else if (
+        // TODO: migrate from _kebab
         action_name == "torrent-start" || action_name == "torrent-start-now" || action_name == "torrent-stop" ||
         action_name == "torrent-reannounce" || action_name == "torrent-verify" || action_name == "queue-move-top" ||
         action_name == "queue-move-up" || action_name == "queue-move-down" || action_name == "queue-move-bottom")

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24412" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24412"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="NSView safe area layout guides" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -12,513 +15,507 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Transmission" separatorStyle="line" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+        <window title="Transmission" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
-            <rect key="contentRect" x="71" y="712" width="515" height="248"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="919"/>
+            <rect key="contentRect" x="71" y="712" width="480" height="269"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1290"/>
             <value key="minSize" type="size" width="350" height="5"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="524" height="220"/>
+                <rect key="frame" x="0.0" y="0.0" width="480" height="348"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Msk-Iv-kCJ">
-                        <rect key="frame" x="0.0" y="0.0" width="524" height="220"/>
-                        <subviews>
-                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3088">
-                                <rect key="frame" x="0.0" y="24" width="524" height="196"/>
-                                <clipView key="contentView" copiesOnScroll="NO" id="5cE-5g-l0I">
-                                    <rect key="frame" x="0.0" y="0.0" width="524" height="196"/>
+                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3088">
+                        <rect key="frame" x="0.0" y="24" width="480" height="240"/>
+                        <clipView key="contentView" copiesOnScroll="NO" id="5cE-5g-l0I">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="240"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="16" indentationMarkerFollowsCell="NO" autoresizesOutlineColumn="YES" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
+                                    <rect key="frame" x="0.0" y="0.0" width="480" height="240"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="16" indentationMarkerFollowsCell="NO" autoresizesOutlineColumn="YES" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="524" height="196"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <size key="intercellSpacing" width="2" height="3"/>
-                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="gridColor" white="0.80241936000000003" alpha="1" colorSpace="calibratedWhite"/>
-                                            <tableColumns>
-                                                <tableColumn identifier="Torrent" editable="NO" width="492" minWidth="16" maxWidth="3000" id="3093">
-                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Torrent">
-                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
-                                                    </tableHeaderCell>
-                                                    <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:Uue-OE-Cnc:image" id="Uue-OE-Cnc">
-                                                        <font key="font" metaFont="system"/>
-                                                    </imageCell>
-                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
-                                                    <prototypeCellViews>
-                                                        <tableCellView identifier="GroupCell" id="0FS-PW-dzb" customClass="GroupCell">
-                                                            <rect key="frame" x="11" y="1" width="502" height="18"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Gwg-pn-lM5">
-                                                                    <rect key="frame" x="11" y="2" width="14" height="14"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="14" id="Jy3-b5-hDM"/>
-                                                                        <constraint firstAttribute="width" constant="14" id="njz-e9-z2g"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="NSStatusAvailable" id="9EY-oY-PNG"/>
-                                                                </imageView>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ubd-A0-0oW">
-                                                                    <rect key="frame" x="337" y="1" width="16" height="16"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="16" id="B9U-SP-PBV"/>
-                                                                        <constraint firstAttribute="width" constant="16" id="FmI-yQ-CfP"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="DownArrowTemplate" id="AQv-3A-dH5"/>
-                                                                </imageView>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hYZ-OW-ebc">
-                                                                    <rect key="frame" x="421" y="1" width="16" height="16"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="16" id="CGc-C8-J6A"/>
-                                                                        <constraint firstAttribute="height" constant="16" id="SqQ-wV-N6u"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="UpArrowTemplate" id="M11-HA-ONH"/>
-                                                                </imageView>
-                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JAO-DI-vbm">
-                                                                    <rect key="frame" x="351" y="2" width="64" height="14"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="MR1-WF-Gcs"/>
-                                                                    </constraints>
-                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="0.0KB/s" id="x8g-Nv-jcD">
-                                                                        <font key="font" metaFont="smallSystemBold"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kLh-dT-fWl">
-                                                                    <rect key="frame" x="435" y="2" width="64" height="14"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="FLW-3y-3Ft"/>
-                                                                    </constraints>
-                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="0.0KB/s" id="HmT-FI-amY">
-                                                                        <font key="font" metaFont="smallSystemBold"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XfM-wG-Zxc">
-                                                                    <rect key="frame" x="28" y="2" width="311" height="14"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Group Title" id="zIM-6D-jsa">
-                                                                        <font key="font" metaFont="smallSystemBold"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                            </subviews>
+                                    <size key="intercellSpacing" width="2" height="3"/>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                    <tableColumns>
+                                        <tableColumn identifier="Torrent" editable="NO" width="448" minWidth="16" maxWidth="3000" id="3093">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Torrent">
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:Uue-OE-Cnc:image" id="Uue-OE-Cnc">
+                                                <font key="font" metaFont="system"/>
+                                            </imageCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                            <prototypeCellViews>
+                                                <tableCellView identifier="GroupCell" id="0FS-PW-dzb" customClass="GroupCell">
+                                                    <rect key="frame" x="11" y="1" width="458" height="18"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Gwg-pn-lM5">
+                                                            <rect key="frame" x="11" y="2" width="14" height="14"/>
                                                             <constraints>
-                                                                <constraint firstItem="hYZ-OW-ebc" firstAttribute="leading" secondItem="JAO-DI-vbm" secondAttribute="trailing" constant="8" symbolic="YES" id="3ZJ-sm-LLQ"/>
-                                                                <constraint firstItem="XfM-wG-Zxc" firstAttribute="leading" secondItem="Gwg-pn-lM5" secondAttribute="trailing" constant="5" id="4bb-lb-TYP"/>
-                                                                <constraint firstItem="JAO-DI-vbm" firstAttribute="leading" secondItem="ubd-A0-0oW" secondAttribute="trailing" id="8gL-pL-QKz"/>
-                                                                <constraint firstAttribute="trailing" secondItem="kLh-dT-fWl" secondAttribute="trailing" constant="5" id="D4t-PI-NVX"/>
-                                                                <constraint firstItem="ubd-A0-0oW" firstAttribute="leading" secondItem="XfM-wG-Zxc" secondAttribute="trailing" id="E4I-Nb-vB5"/>
-                                                                <constraint firstItem="ubd-A0-0oW" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="GZB-R5-O8z"/>
-                                                                <constraint firstItem="hYZ-OW-ebc" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="NWK-Hj-44W"/>
-                                                                <constraint firstItem="Gwg-pn-lM5" firstAttribute="centerY" secondItem="0FS-PW-dzb" secondAttribute="centerY" id="Yau-WM-aqf"/>
-                                                                <constraint firstItem="XfM-wG-Zxc" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="pB3-eZ-C1W"/>
-                                                                <constraint firstItem="Gwg-pn-lM5" firstAttribute="leading" secondItem="0FS-PW-dzb" secondAttribute="leading" constant="11" id="qsg-vi-UIQ"/>
-                                                                <constraint firstItem="JAO-DI-vbm" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="rWB-xX-7V9"/>
-                                                                <constraint firstItem="kLh-dT-fWl" firstAttribute="leading" secondItem="hYZ-OW-ebc" secondAttribute="trailing" id="t7S-2X-ur7"/>
-                                                                <constraint firstItem="kLh-dT-fWl" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="uLM-dC-jCY"/>
+                                                                <constraint firstAttribute="height" constant="14" id="Jy3-b5-hDM"/>
+                                                                <constraint firstAttribute="width" constant="14" id="njz-e9-z2g"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="NSStatusAvailable" id="9EY-oY-PNG"/>
+                                                        </imageView>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ubd-A0-0oW">
+                                                            <rect key="frame" x="293" y="1" width="16" height="16"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="16" id="B9U-SP-PBV"/>
+                                                                <constraint firstAttribute="width" constant="16" id="FmI-yQ-CfP"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="DownArrowTemplate" id="AQv-3A-dH5"/>
+                                                        </imageView>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hYZ-OW-ebc">
+                                                            <rect key="frame" x="377" y="1" width="16" height="16"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="16" id="CGc-C8-J6A"/>
+                                                                <constraint firstAttribute="height" constant="16" id="SqQ-wV-N6u"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="UpArrowTemplate" id="M11-HA-ONH"/>
+                                                        </imageView>
+                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JAO-DI-vbm">
+                                                            <rect key="frame" x="307" y="2" width="64" height="14"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="MR1-WF-Gcs"/>
+                                                            </constraints>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="0.0KB/s" id="x8g-Nv-jcD">
+                                                                <font key="font" metaFont="smallSystemBold"/>
+                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kLh-dT-fWl">
+                                                            <rect key="frame" x="391" y="2" width="64" height="14"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="FLW-3y-3Ft"/>
+                                                            </constraints>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="0.0KB/s" id="HmT-FI-amY">
+                                                                <font key="font" metaFont="smallSystemBold"/>
+                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XfM-wG-Zxc">
+                                                            <rect key="frame" x="28" y="2" width="267" height="14"/>
+                                                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Group Title" id="zIM-6D-jsa">
+                                                                <font key="font" metaFont="smallSystemBold"/>
+                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="hYZ-OW-ebc" firstAttribute="leading" secondItem="JAO-DI-vbm" secondAttribute="trailing" constant="8" symbolic="YES" id="3ZJ-sm-LLQ"/>
+                                                        <constraint firstItem="XfM-wG-Zxc" firstAttribute="leading" secondItem="Gwg-pn-lM5" secondAttribute="trailing" constant="5" id="4bb-lb-TYP"/>
+                                                        <constraint firstItem="JAO-DI-vbm" firstAttribute="leading" secondItem="ubd-A0-0oW" secondAttribute="trailing" id="8gL-pL-QKz"/>
+                                                        <constraint firstAttribute="trailing" secondItem="kLh-dT-fWl" secondAttribute="trailing" constant="5" id="D4t-PI-NVX"/>
+                                                        <constraint firstItem="ubd-A0-0oW" firstAttribute="leading" secondItem="XfM-wG-Zxc" secondAttribute="trailing" id="E4I-Nb-vB5"/>
+                                                        <constraint firstItem="ubd-A0-0oW" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="GZB-R5-O8z"/>
+                                                        <constraint firstItem="hYZ-OW-ebc" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="NWK-Hj-44W"/>
+                                                        <constraint firstItem="Gwg-pn-lM5" firstAttribute="centerY" secondItem="0FS-PW-dzb" secondAttribute="centerY" id="Yau-WM-aqf"/>
+                                                        <constraint firstItem="XfM-wG-Zxc" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="pB3-eZ-C1W"/>
+                                                        <constraint firstItem="Gwg-pn-lM5" firstAttribute="leading" secondItem="0FS-PW-dzb" secondAttribute="leading" constant="11" id="qsg-vi-UIQ"/>
+                                                        <constraint firstItem="JAO-DI-vbm" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="rWB-xX-7V9"/>
+                                                        <constraint firstItem="kLh-dT-fWl" firstAttribute="leading" secondItem="hYZ-OW-ebc" secondAttribute="trailing" id="t7S-2X-ur7"/>
+                                                        <constraint firstItem="kLh-dT-fWl" firstAttribute="centerY" secondItem="Gwg-pn-lM5" secondAttribute="centerY" id="uLM-dC-jCY"/>
+                                                    </constraints>
+                                                    <connections>
+                                                        <outlet property="fGroupDownloadField" destination="JAO-DI-vbm" id="jls-TR-sdX"/>
+                                                        <outlet property="fGroupDownloadView" destination="ubd-A0-0oW" id="l2t-pP-sMi"/>
+                                                        <outlet property="fGroupIndicatorView" destination="Gwg-pn-lM5" id="FCY-PW-4YQ"/>
+                                                        <outlet property="fGroupTitleField" destination="XfM-wG-Zxc" id="o72-mm-63H"/>
+                                                        <outlet property="fGroupUploadAndRatioField" destination="kLh-dT-fWl" id="31q-Z9-mDX"/>
+                                                        <outlet property="fGroupUploadAndRatioView" destination="hYZ-OW-ebc" id="92U-rh-k8B"/>
+                                                    </connections>
+                                                </tableCellView>
+                                                <tableCellView identifier="TorrentCell" id="7Ic-8y-f3v" customClass="TorrentCell">
+                                                    <rect key="frame" x="11" y="22" width="458" height="62"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FLl-ue-i20">
+                                                            <rect key="frame" x="0.0" y="26" width="10" height="10"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="10" id="NhU-Lf-nCs"/>
+                                                                <constraint firstAttribute="width" constant="10" id="zar-fl-hEG"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSStatusAvailable" id="Oyo-d7-APt"/>
+                                                        </imageView>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WTV-L6-lc2">
+                                                            <rect key="frame" x="13" y="13" width="36" height="36"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="36" id="Qka-wO-mv5"/>
+                                                                <constraint firstAttribute="width" constant="36" id="tDk-n4-lHb"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSFolder" id="WGQ-kl-WZm"/>
+                                                        </imageView>
+                                                        <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vYS-eL-CGb">
+                                                            <rect key="frame" x="65" y="44" width="41" height="15"/>
+                                                            <subviews>
+                                                                <textField focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gIX-h2-fIl">
+                                                                    <rect key="frame" x="-2" y="0.0" width="29" height="15"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="Title" id="y9O-gd-sXA">
+                                                                        <font key="font" metaFont="cellTitle"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <imageView horizontalHuggingPriority="1000" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FUW-Pk-EJ8">
+                                                                    <rect key="frame" x="29" y="2" width="12" height="12"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" constant="12" id="Cs2-6B-XzK"/>
+                                                                        <constraint firstAttribute="width" constant="12" id="jRb-Kc-aSX"/>
+                                                                    </constraints>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PriorityHighTemplate" id="z1h-pZ-LtL"/>
+                                                                </imageView>
+                                                            </subviews>
+                                                            <visibilityPriorities>
+                                                                <integer value="1000"/>
+                                                                <integer value="1000"/>
+                                                            </visibilityPriorities>
+                                                            <customSpacing>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                            </customSpacing>
+                                                        </stackView>
+                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7sy-Kk-M9Y">
+                                                            <rect key="frame" x="63" y="30" width="344" height="13"/>
+                                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Progress" id="oSz-TE-8jj">
+                                                                <font key="font" metaFont="system" size="10"/>
+                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J4v-0p-u4L">
+                                                            <rect key="frame" x="63" y="1" width="344" height="13"/>
+                                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Status" id="lmp-Y3-ZQO">
+                                                                <font key="font" metaFont="system" size="10"/>
+                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="kNl-5i-USx" customClass="TorrentCellControlButton">
+                                                            <rect key="frame" x="419" y="15" width="14" height="14"/>
+                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ResumeOff" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="oxr-Hn-H15">
+                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <outlet property="torrentCell" destination="7Ic-8y-f3v" id="BrY-70-Qul"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rxb-qW-x6p" customClass="TorrentCellActionButton">
+                                                            <rect key="frame" x="23" y="23" width="16" height="16"/>
+                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ActionHover" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="9Xz-qo-fuz">
+                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="16" id="WLP-JK-i9A"/>
+                                                                <constraint firstAttribute="height" constant="16" id="bMb-uB-fO6"/>
                                                             </constraints>
                                                             <connections>
-                                                                <outlet property="fGroupDownloadField" destination="JAO-DI-vbm" id="jls-TR-sdX"/>
-                                                                <outlet property="fGroupDownloadView" destination="ubd-A0-0oW" id="l2t-pP-sMi"/>
-                                                                <outlet property="fGroupIndicatorView" destination="Gwg-pn-lM5" id="FCY-PW-4YQ"/>
-                                                                <outlet property="fGroupTitleField" destination="XfM-wG-Zxc" id="o72-mm-63H"/>
-                                                                <outlet property="fGroupUploadAndRatioField" destination="kLh-dT-fWl" id="31q-Z9-mDX"/>
-                                                                <outlet property="fGroupUploadAndRatioView" destination="hYZ-OW-ebc" id="92U-rh-k8B"/>
+                                                                <outlet property="torrentCell" destination="7Ic-8y-f3v" id="sNJ-lh-B90"/>
                                                             </connections>
-                                                        </tableCellView>
-                                                        <tableCellView identifier="TorrentCell" id="7Ic-8y-f3v" customClass="TorrentCell">
-                                                            <rect key="frame" x="11" y="22" width="502" height="62"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FLl-ue-i20">
-                                                                    <rect key="frame" x="0.0" y="26" width="10" height="10"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="10" id="NhU-Lf-nCs"/>
-                                                                        <constraint firstAttribute="width" constant="10" id="zar-fl-hEG"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSStatusAvailable" id="Oyo-d7-APt"/>
-                                                                </imageView>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WTV-L6-lc2">
-                                                                    <rect key="frame" x="13" y="13" width="36" height="36"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="36" id="Qka-wO-mv5"/>
-                                                                        <constraint firstAttribute="width" constant="36" id="tDk-n4-lHb"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSFolder" id="WGQ-kl-WZm"/>
-                                                                </imageView>
-                                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vYS-eL-CGb">
-                                                                    <rect key="frame" x="65" y="44" width="41" height="15"/>
-                                                                    <subviews>
-                                                                        <textField focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gIX-h2-fIl">
-                                                                            <rect key="frame" x="-2" y="0.0" width="29" height="15"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="Title" id="y9O-gd-sXA">
-                                                                                <font key="font" metaFont="cellTitle"/>
-                                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                        <imageView horizontalHuggingPriority="1000" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FUW-Pk-EJ8">
-                                                                            <rect key="frame" x="29" y="2" width="12" height="12"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="height" constant="12" id="Cs2-6B-XzK"/>
-                                                                                <constraint firstAttribute="width" constant="12" id="jRb-Kc-aSX"/>
-                                                                            </constraints>
-                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PriorityHighTemplate" id="z1h-pZ-LtL"/>
-                                                                        </imageView>
-                                                                    </subviews>
-                                                                    <visibilityPriorities>
-                                                                        <integer value="1000"/>
-                                                                        <integer value="1000"/>
-                                                                    </visibilityPriorities>
-                                                                    <customSpacing>
-                                                                        <real value="3.4028234663852886e+38"/>
-                                                                        <real value="3.4028234663852886e+38"/>
-                                                                    </customSpacing>
-                                                                </stackView>
-                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7sy-Kk-M9Y">
-                                                                    <rect key="frame" x="63" y="30" width="388" height="13"/>
-                                                                    <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Progress" id="oSz-TE-8jj">
-                                                                        <font key="font" metaFont="system" size="10"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J4v-0p-u4L">
-                                                                    <rect key="frame" x="63" y="1" width="388" height="13"/>
-                                                                    <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Status" id="lmp-Y3-ZQO">
-                                                                        <font key="font" metaFont="system" size="10"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="kNl-5i-USx" customClass="TorrentCellControlButton">
-                                                                    <rect key="frame" x="463" y="15" width="14" height="14"/>
-                                                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ResumeOff" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="oxr-Hn-H15">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <outlet property="torrentCell" destination="7Ic-8y-f3v" id="BrY-70-Qul"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rxb-qW-x6p" customClass="TorrentCellActionButton">
-                                                                    <rect key="frame" x="23" y="23" width="16" height="16"/>
-                                                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ActionHover" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="9Xz-qo-fuz">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="16" id="WLP-JK-i9A"/>
-                                                                        <constraint firstAttribute="height" constant="16" id="bMb-uB-fO6"/>
-                                                                    </constraints>
-                                                                    <connections>
-                                                                        <outlet property="torrentCell" destination="7Ic-8y-f3v" id="sNJ-lh-B90"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="k5I-MN-hYk" customClass="TorrentCellRevealButton">
-                                                                    <rect key="frame" x="480" y="15" width="14" height="14"/>
-                                                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="WF0-QY-3DO">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <outlet property="torrentCell" destination="7Ic-8y-f3v" id="npT-CF-ee4"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ifq-ub-ay4">
-                                                                    <rect key="frame" x="65" y="15" width="384" height="14"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="14" id="D7V-m1-heE"/>
-                                                                    </constraints>
-                                                                </customView>
-                                                            </subviews>
+                                                        </button>
+                                                        <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="k5I-MN-hYk" customClass="TorrentCellRevealButton">
+                                                            <rect key="frame" x="436" y="15" width="14" height="14"/>
+                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="WF0-QY-3DO">
+                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <outlet property="torrentCell" destination="7Ic-8y-f3v" id="npT-CF-ee4"/>
+                                                            </connections>
+                                                        </button>
+                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ifq-ub-ay4">
+                                                            <rect key="frame" x="65" y="15" width="340" height="14"/>
                                                             <constraints>
-                                                                <constraint firstItem="FLl-ue-i20" firstAttribute="centerY" secondItem="7Ic-8y-f3v" secondAttribute="centerY" id="7iF-OP-ifv"/>
-                                                                <constraint firstItem="WTV-L6-lc2" firstAttribute="leading" secondItem="FLl-ue-i20" secondAttribute="trailing" constant="3" id="8e4-oE-Kzh"/>
-                                                                <constraint firstItem="J4v-0p-u4L" firstAttribute="top" secondItem="Ifq-ub-ay4" secondAttribute="bottom" constant="1" id="AyP-y5-tmL"/>
-                                                                <constraint firstItem="Ifq-ub-ay4" firstAttribute="leading" secondItem="vYS-eL-CGb" secondAttribute="leading" id="Dyg-7e-eOb"/>
-                                                                <constraint firstItem="kNl-5i-USx" firstAttribute="centerY" secondItem="Ifq-ub-ay4" secondAttribute="centerY" id="F2k-wy-sR2"/>
-                                                                <constraint firstItem="WTV-L6-lc2" firstAttribute="centerY" secondItem="FLl-ue-i20" secondAttribute="centerY" id="FXq-kY-5ny"/>
-                                                                <constraint firstItem="FLl-ue-i20" firstAttribute="leading" secondItem="7Ic-8y-f3v" secondAttribute="leading" id="Fu9-kh-dtb"/>
-                                                                <constraint firstItem="Ifq-ub-ay4" firstAttribute="trailing" secondItem="7sy-Kk-M9Y" secondAttribute="trailing" id="KFR-7d-Sjr"/>
-                                                                <constraint firstAttribute="trailing" secondItem="k5I-MN-hYk" secondAttribute="trailing" constant="8" id="NRQ-sA-ng6"/>
-                                                                <constraint firstItem="vYS-eL-CGb" firstAttribute="top" secondItem="7Ic-8y-f3v" secondAttribute="top" constant="3" id="QtZ-VZ-lRO"/>
-                                                                <constraint firstItem="Rxb-qW-x6p" firstAttribute="centerX" secondItem="WTV-L6-lc2" secondAttribute="centerX" id="Uyo-j3-TSH"/>
-                                                                <constraint firstItem="Ifq-ub-ay4" firstAttribute="top" secondItem="7sy-Kk-M9Y" secondAttribute="bottom" constant="1" id="XRq-cM-zeI"/>
-                                                                <constraint firstItem="Ifq-ub-ay4" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="vYS-eL-CGb" secondAttribute="trailing" id="b7f-KU-XuC"/>
-                                                                <constraint firstItem="kNl-5i-USx" firstAttribute="leading" secondItem="Ifq-ub-ay4" secondAttribute="trailing" constant="14" id="b80-qd-DxN"/>
-                                                                <constraint firstItem="vYS-eL-CGb" firstAttribute="leading" secondItem="WTV-L6-lc2" secondAttribute="trailing" constant="16" id="bhS-IK-CO7"/>
-                                                                <constraint firstItem="7sy-Kk-M9Y" firstAttribute="top" secondItem="vYS-eL-CGb" secondAttribute="bottom" constant="1" id="fDS-sV-lfi"/>
-                                                                <constraint firstItem="k5I-MN-hYk" firstAttribute="leading" secondItem="kNl-5i-USx" secondAttribute="trailing" constant="3" id="fsy-23-flK"/>
-                                                                <constraint firstItem="J4v-0p-u4L" firstAttribute="trailing" secondItem="Ifq-ub-ay4" secondAttribute="trailing" id="j5C-sr-mIK"/>
-                                                                <constraint firstItem="7sy-Kk-M9Y" firstAttribute="leading" secondItem="Ifq-ub-ay4" secondAttribute="leading" id="utw-yR-w0F"/>
-                                                                <constraint firstItem="J4v-0p-u4L" firstAttribute="leading" secondItem="Ifq-ub-ay4" secondAttribute="leading" id="vQR-NJ-Twe"/>
-                                                                <constraint firstItem="k5I-MN-hYk" firstAttribute="centerY" secondItem="kNl-5i-USx" secondAttribute="centerY" id="xjv-n4-F1m"/>
-                                                                <constraint firstItem="Rxb-qW-x6p" firstAttribute="centerY" secondItem="WTV-L6-lc2" secondAttribute="centerY" id="y0a-c5-pYS"/>
+                                                                <constraint firstAttribute="height" constant="14" id="D7V-m1-heE"/>
+                                                            </constraints>
+                                                        </customView>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="FLl-ue-i20" firstAttribute="centerY" secondItem="7Ic-8y-f3v" secondAttribute="centerY" id="7iF-OP-ifv"/>
+                                                        <constraint firstItem="WTV-L6-lc2" firstAttribute="leading" secondItem="FLl-ue-i20" secondAttribute="trailing" constant="3" id="8e4-oE-Kzh"/>
+                                                        <constraint firstItem="J4v-0p-u4L" firstAttribute="top" secondItem="Ifq-ub-ay4" secondAttribute="bottom" constant="1" id="AyP-y5-tmL"/>
+                                                        <constraint firstItem="Ifq-ub-ay4" firstAttribute="leading" secondItem="vYS-eL-CGb" secondAttribute="leading" id="Dyg-7e-eOb"/>
+                                                        <constraint firstItem="kNl-5i-USx" firstAttribute="centerY" secondItem="Ifq-ub-ay4" secondAttribute="centerY" id="F2k-wy-sR2"/>
+                                                        <constraint firstItem="WTV-L6-lc2" firstAttribute="centerY" secondItem="FLl-ue-i20" secondAttribute="centerY" id="FXq-kY-5ny"/>
+                                                        <constraint firstItem="FLl-ue-i20" firstAttribute="leading" secondItem="7Ic-8y-f3v" secondAttribute="leading" id="Fu9-kh-dtb"/>
+                                                        <constraint firstItem="Ifq-ub-ay4" firstAttribute="trailing" secondItem="7sy-Kk-M9Y" secondAttribute="trailing" id="KFR-7d-Sjr"/>
+                                                        <constraint firstAttribute="trailing" secondItem="k5I-MN-hYk" secondAttribute="trailing" constant="8" id="NRQ-sA-ng6"/>
+                                                        <constraint firstItem="vYS-eL-CGb" firstAttribute="top" secondItem="7Ic-8y-f3v" secondAttribute="top" constant="3" id="QtZ-VZ-lRO"/>
+                                                        <constraint firstItem="Rxb-qW-x6p" firstAttribute="centerX" secondItem="WTV-L6-lc2" secondAttribute="centerX" id="Uyo-j3-TSH"/>
+                                                        <constraint firstItem="Ifq-ub-ay4" firstAttribute="top" secondItem="7sy-Kk-M9Y" secondAttribute="bottom" constant="1" id="XRq-cM-zeI"/>
+                                                        <constraint firstItem="Ifq-ub-ay4" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="vYS-eL-CGb" secondAttribute="trailing" id="b7f-KU-XuC"/>
+                                                        <constraint firstItem="kNl-5i-USx" firstAttribute="leading" secondItem="Ifq-ub-ay4" secondAttribute="trailing" constant="14" id="b80-qd-DxN"/>
+                                                        <constraint firstItem="vYS-eL-CGb" firstAttribute="leading" secondItem="WTV-L6-lc2" secondAttribute="trailing" constant="16" id="bhS-IK-CO7"/>
+                                                        <constraint firstItem="7sy-Kk-M9Y" firstAttribute="top" secondItem="vYS-eL-CGb" secondAttribute="bottom" constant="1" id="fDS-sV-lfi"/>
+                                                        <constraint firstItem="k5I-MN-hYk" firstAttribute="leading" secondItem="kNl-5i-USx" secondAttribute="trailing" constant="3" id="fsy-23-flK"/>
+                                                        <constraint firstItem="J4v-0p-u4L" firstAttribute="trailing" secondItem="Ifq-ub-ay4" secondAttribute="trailing" id="j5C-sr-mIK"/>
+                                                        <constraint firstItem="7sy-Kk-M9Y" firstAttribute="leading" secondItem="Ifq-ub-ay4" secondAttribute="leading" id="utw-yR-w0F"/>
+                                                        <constraint firstItem="J4v-0p-u4L" firstAttribute="leading" secondItem="Ifq-ub-ay4" secondAttribute="leading" id="vQR-NJ-Twe"/>
+                                                        <constraint firstItem="k5I-MN-hYk" firstAttribute="centerY" secondItem="kNl-5i-USx" secondAttribute="centerY" id="xjv-n4-F1m"/>
+                                                        <constraint firstItem="Rxb-qW-x6p" firstAttribute="centerY" secondItem="WTV-L6-lc2" secondAttribute="centerY" id="y0a-c5-pYS"/>
+                                                    </constraints>
+                                                    <connections>
+                                                        <outlet property="fActionButton" destination="Rxb-qW-x6p" id="ICn-NC-ahy"/>
+                                                        <outlet property="fControlButton" destination="kNl-5i-USx" id="iN7-sX-ciA"/>
+                                                        <outlet property="fGroupIndicatorView" destination="FLl-ue-i20" id="0QU-wF-59e"/>
+                                                        <outlet property="fIconView" destination="WTV-L6-lc2" id="gmV-h3-Muk"/>
+                                                        <outlet property="fRevealButton" destination="k5I-MN-hYk" id="Qkq-Yq-UAY"/>
+                                                        <outlet property="fStackView" destination="vYS-eL-CGb" id="MDM-8N-HVT"/>
+                                                        <outlet property="fTorrentPriorityView" destination="FUW-Pk-EJ8" id="0MT-4C-9H7"/>
+                                                        <outlet property="fTorrentPriorityViewWidthConstraint" destination="jRb-Kc-aSX" id="tEJ-L9-33e"/>
+                                                        <outlet property="fTorrentProgressBarView" destination="Ifq-ub-ay4" id="rEw-BU-47h"/>
+                                                        <outlet property="fTorrentProgressField" destination="7sy-Kk-M9Y" id="nk4-R3-1Wv"/>
+                                                        <outlet property="fTorrentStatusField" destination="J4v-0p-u4L" id="nqa-rT-XUI"/>
+                                                        <outlet property="fTorrentTitleField" destination="gIX-h2-fIl" id="h3s-C4-XNT"/>
+                                                    </connections>
+                                                </tableCellView>
+                                                <tableCellView identifier="SmallTorrentCell" id="ouH-H8-Otv" customClass="SmallTorrentCell">
+                                                    <rect key="frame" x="11" y="87" width="458" height="22"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
+                                                            <rect key="frame" x="45" y="2" width="408" height="18"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
+                                                            </constraints>
+                                                        </customView>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4yg-IA-aOF">
+                                                            <rect key="frame" x="0.0" y="8" width="6" height="6"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="6" id="Gfx-gR-O2I"/>
+                                                                <constraint firstAttribute="width" constant="6" id="SCs-lp-qum"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSStatusAvailable" id="brn-HI-eEh"/>
+                                                        </imageView>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WWu-yD-Amw">
+                                                            <rect key="frame" x="14" y="3" width="16" height="16"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="16" id="42D-Ja-dYD"/>
+                                                                <constraint firstAttribute="width" constant="16" id="y2G-x9-YIV"/>
+                                                            </constraints>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSFolder" id="Kea-PS-H27"/>
+                                                        </imageView>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="9Cg-Nh-Hcr" customClass="TorrentCellActionButton">
+                                                            <rect key="frame" x="14" y="3" width="16" height="16"/>
+                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ActionHover" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="ejE-Yu-JNS">
+                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="16" id="B01-Zu-gNh"/>
+                                                                <constraint firstAttribute="height" constant="16" id="dNQ-J3-27z"/>
                                                             </constraints>
                                                             <connections>
-                                                                <outlet property="fActionButton" destination="Rxb-qW-x6p" id="ICn-NC-ahy"/>
-                                                                <outlet property="fControlButton" destination="kNl-5i-USx" id="iN7-sX-ciA"/>
-                                                                <outlet property="fGroupIndicatorView" destination="FLl-ue-i20" id="0QU-wF-59e"/>
-                                                                <outlet property="fIconView" destination="WTV-L6-lc2" id="gmV-h3-Muk"/>
-                                                                <outlet property="fRevealButton" destination="k5I-MN-hYk" id="Qkq-Yq-UAY"/>
-                                                                <outlet property="fStackView" destination="vYS-eL-CGb" id="MDM-8N-HVT"/>
-                                                                <outlet property="fTorrentPriorityView" destination="FUW-Pk-EJ8" id="0MT-4C-9H7"/>
-                                                                <outlet property="fTorrentPriorityViewWidthConstraint" destination="jRb-Kc-aSX" id="tEJ-L9-33e"/>
-                                                                <outlet property="fTorrentProgressBarView" destination="Ifq-ub-ay4" id="rEw-BU-47h"/>
-                                                                <outlet property="fTorrentProgressField" destination="7sy-Kk-M9Y" id="nk4-R3-1Wv"/>
-                                                                <outlet property="fTorrentStatusField" destination="J4v-0p-u4L" id="nqa-rT-XUI"/>
-                                                                <outlet property="fTorrentTitleField" destination="gIX-h2-fIl" id="h3s-C4-XNT"/>
+                                                                <outlet property="torrentCell" destination="ouH-H8-Otv" id="r2c-b8-jcH"/>
                                                             </connections>
-                                                        </tableCellView>
-                                                        <tableCellView identifier="SmallTorrentCell" id="ouH-H8-Otv" customClass="SmallTorrentCell">
-                                                            <rect key="frame" x="11" y="87" width="502" height="22"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        </button>
+                                                        <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dPU-vz-fnz">
+                                                            <rect key="frame" x="45" y="4" width="45" height="15"/>
                                                             <subviews>
-                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="x9c-7U-Odp">
-                                                                    <rect key="frame" x="45" y="2" width="452" height="18"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
-                                                                    </constraints>
-                                                                </customView>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4yg-IA-aOF">
-                                                                    <rect key="frame" x="0.0" y="8" width="6" height="6"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="6" id="Gfx-gR-O2I"/>
-                                                                        <constraint firstAttribute="width" constant="6" id="SCs-lp-qum"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSStatusAvailable" id="brn-HI-eEh"/>
-                                                                </imageView>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WWu-yD-Amw">
-                                                                    <rect key="frame" x="14" y="3" width="16" height="16"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="16" id="42D-Ja-dYD"/>
-                                                                        <constraint firstAttribute="width" constant="16" id="y2G-x9-YIV"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSFolder" id="Kea-PS-H27"/>
-                                                                </imageView>
-                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="9Cg-Nh-Hcr" customClass="TorrentCellActionButton">
-                                                                    <rect key="frame" x="14" y="3" width="16" height="16"/>
-                                                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ActionHover" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="ejE-Yu-JNS">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="16" id="B01-Zu-gNh"/>
-                                                                        <constraint firstAttribute="height" constant="16" id="dNQ-J3-27z"/>
-                                                                    </constraints>
-                                                                    <connections>
-                                                                        <outlet property="torrentCell" destination="ouH-H8-Otv" id="r2c-b8-jcH"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dPU-vz-fnz">
-                                                                    <rect key="frame" x="45" y="4" width="41" height="15"/>
-                                                                    <subviews>
-                                                                        <textField focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nyW-bO-2kN">
-                                                                            <rect key="frame" x="-2" y="0.0" width="29" height="15"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Title" id="kbX-Av-eP4">
-                                                                                <font key="font" metaFont="cellTitle"/>
-                                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                        <imageView horizontalHuggingPriority="1000" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ocL-c0-B8y">
-                                                                            <rect key="frame" x="29" y="1" width="12" height="12"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="width" constant="12" id="grl-70-hEy"/>
-                                                                                <constraint firstAttribute="height" constant="12" id="hps-Ab-lio"/>
-                                                                            </constraints>
-                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PriorityHighTemplate" id="LI6-cz-gYa"/>
-                                                                        </imageView>
-                                                                    </subviews>
-                                                                    <edgeInsets key="edgeInsets" left="0.0" right="4" top="0.0" bottom="0.0"/>
-                                                                    <visibilityPriorities>
-                                                                        <integer value="1000"/>
-                                                                        <integer value="1000"/>
-                                                                    </visibilityPriorities>
-                                                                    <customSpacing>
-                                                                        <real value="3.4028234663852886e+38"/>
-                                                                        <real value="3.4028234663852886e+38"/>
-                                                                    </customSpacing>
-                                                                </stackView>
-                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ExW-pe-aKm">
-                                                                    <rect key="frame" x="84" y="4" width="412" height="14"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" alignment="right" title="Status String" id="Zmj-A9-NPf">
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <textField focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nyW-bO-2kN">
+                                                                    <rect key="frame" x="-2" y="0.0" width="29" height="15"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Title" id="kbX-Av-eP4">
+                                                                        <font key="font" metaFont="cellTitle"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="bGq-Kc-jWE" customClass="TorrentCellControlButton">
-                                                                    <rect key="frame" x="463" y="4" width="14" height="14"/>
-                                                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ResumeOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="DmO-My-6OF">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
+                                                                <imageView horizontalHuggingPriority="1000" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ocL-c0-B8y">
+                                                                    <rect key="frame" x="29" y="1" width="12" height="12"/>
                                                                     <constraints>
-                                                                        <constraint firstAttribute="width" constant="14" id="hQW-cC-Lp7"/>
-                                                                        <constraint firstAttribute="height" constant="14" id="jWF-m2-n6g"/>
+                                                                        <constraint firstAttribute="width" constant="12" id="grl-70-hEy"/>
+                                                                        <constraint firstAttribute="height" constant="12" id="hps-Ab-lio"/>
                                                                     </constraints>
-                                                                    <connections>
-                                                                        <outlet property="torrentCell" destination="ouH-H8-Otv" id="1mw-p3-MDP"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="Hyt-Uv-vDm" customClass="TorrentCellRevealButton">
-                                                                    <rect key="frame" x="480" y="4" width="14" height="14"/>
-                                                                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="dWx-5q-ABk">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="14" id="CYn-n4-Daq"/>
-                                                                        <constraint firstAttribute="width" constant="14" id="P9R-Cw-RJF"/>
-                                                                    </constraints>
-                                                                    <connections>
-                                                                        <outlet property="torrentCell" destination="ouH-H8-Otv" id="zlt-Qk-E34"/>
-                                                                    </connections>
-                                                                </button>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PriorityHighTemplate" id="LI6-cz-gYa"/>
+                                                                </imageView>
                                                             </subviews>
+                                                            <edgeInsets key="edgeInsets" left="0.0" right="4" top="0.0" bottom="0.0"/>
+                                                            <visibilityPriorities>
+                                                                <integer value="1000"/>
+                                                                <integer value="1000"/>
+                                                            </visibilityPriorities>
+                                                            <customSpacing>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                            </customSpacing>
+                                                        </stackView>
+                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ExW-pe-aKm">
+                                                            <rect key="frame" x="88" y="4" width="364" height="14"/>
+                                                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" alignment="right" title="Status String" id="Zmj-A9-NPf">
+                                                                <font key="font" metaFont="smallSystem"/>
+                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="bGq-Kc-jWE" customClass="TorrentCellControlButton">
+                                                            <rect key="frame" x="419" y="4" width="14" height="14"/>
+                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ResumeOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="DmO-My-6OF">
+                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
                                                             <constraints>
-                                                                <constraint firstItem="Hyt-Uv-vDm" firstAttribute="centerY" secondItem="x9c-7U-Odp" secondAttribute="centerY" id="1WR-Ta-vbl"/>
-                                                                <constraint firstAttribute="trailing" secondItem="ExW-pe-aKm" secondAttribute="trailing" constant="8" id="5OS-LM-hyI"/>
-                                                                <constraint firstItem="ExW-pe-aKm" firstAttribute="leading" secondItem="dPU-vz-fnz" secondAttribute="trailing" id="7R9-zA-Nh7"/>
-                                                                <constraint firstItem="ExW-pe-aKm" firstAttribute="centerY" secondItem="4yg-IA-aOF" secondAttribute="centerY" id="Lmc-wT-yP4"/>
-                                                                <constraint firstItem="x9c-7U-Odp" firstAttribute="leading" secondItem="9Cg-Nh-Hcr" secondAttribute="trailing" constant="15" id="On5-WE-C7H"/>
-                                                                <constraint firstItem="bGq-Kc-jWE" firstAttribute="centerY" secondItem="x9c-7U-Odp" secondAttribute="centerY" id="PrG-V3-ry0"/>
-                                                                <constraint firstItem="4yg-IA-aOF" firstAttribute="leading" secondItem="ouH-H8-Otv" secondAttribute="leading" id="Ps8-HO-fGd"/>
-                                                                <constraint firstItem="9Cg-Nh-Hcr" firstAttribute="centerY" secondItem="4yg-IA-aOF" secondAttribute="centerY" id="Rvd-RT-10P"/>
-                                                                <constraint firstItem="dPU-vz-fnz" firstAttribute="centerY" secondItem="ouH-H8-Otv" secondAttribute="centerY" id="VXm-be-NaO"/>
-                                                                <constraint firstItem="x9c-7U-Odp" firstAttribute="centerY" secondItem="9Cg-Nh-Hcr" secondAttribute="centerY" id="VaS-hJ-vAV"/>
-                                                                <constraint firstAttribute="trailing" secondItem="x9c-7U-Odp" secondAttribute="trailing" constant="5" id="daS-0F-yKf"/>
-                                                                <constraint firstAttribute="trailing" secondItem="Hyt-Uv-vDm" secondAttribute="trailing" constant="8" id="fKb-o5-n1k"/>
-                                                                <constraint firstItem="dPU-vz-fnz" firstAttribute="leading" secondItem="WWu-yD-Amw" secondAttribute="trailing" constant="15" id="gxk-cy-Mq2"/>
-                                                                <constraint firstItem="WWu-yD-Amw" firstAttribute="centerY" secondItem="9Cg-Nh-Hcr" secondAttribute="centerY" id="hYn-MV-EFh"/>
-                                                                <constraint firstItem="4yg-IA-aOF" firstAttribute="centerY" secondItem="ouH-H8-Otv" secondAttribute="centerY" id="izm-2a-TOI"/>
-                                                                <constraint firstItem="Hyt-Uv-vDm" firstAttribute="leading" secondItem="bGq-Kc-jWE" secondAttribute="trailing" constant="3" id="kX1-gB-jyF"/>
-                                                                <constraint firstItem="9Cg-Nh-Hcr" firstAttribute="leading" secondItem="4yg-IA-aOF" secondAttribute="trailing" constant="8" id="lf2-Bm-TFR"/>
-                                                                <constraint firstItem="WWu-yD-Amw" firstAttribute="centerX" secondItem="9Cg-Nh-Hcr" secondAttribute="centerX" id="tNz-Ea-fpP"/>
+                                                                <constraint firstAttribute="width" constant="14" id="hQW-cC-Lp7"/>
+                                                                <constraint firstAttribute="height" constant="14" id="jWF-m2-n6g"/>
                                                             </constraints>
                                                             <connections>
-                                                                <outlet property="fActionButton" destination="9Cg-Nh-Hcr" id="88t-qS-msz"/>
-                                                                <outlet property="fControlButton" destination="bGq-Kc-jWE" id="Oyb-Iu-Na0"/>
-                                                                <outlet property="fGroupIndicatorView" destination="4yg-IA-aOF" id="ROF-Ua-PGS"/>
-                                                                <outlet property="fIconView" destination="WWu-yD-Amw" id="vWy-ch-grE"/>
-                                                                <outlet property="fRevealButton" destination="Hyt-Uv-vDm" id="PHz-zj-UsH"/>
-                                                                <outlet property="fStackView" destination="dPU-vz-fnz" id="hPz-Up-wEK"/>
-                                                                <outlet property="fTorrentPriorityView" destination="ocL-c0-B8y" id="OoF-f4-uU5"/>
-                                                                <outlet property="fTorrentPriorityViewWidthConstraint" destination="grl-70-hEy" id="sps-C4-rsi"/>
-                                                                <outlet property="fTorrentProgressBarView" destination="x9c-7U-Odp" id="WGd-KA-6xD"/>
-                                                                <outlet property="fTorrentStatusField" destination="ExW-pe-aKm" id="rQQ-ip-8MV"/>
-                                                                <outlet property="fTorrentTitleField" destination="nyW-bO-2kN" id="Xsd-Ro-ren"/>
+                                                                <outlet property="torrentCell" destination="ouH-H8-Otv" id="1mw-p3-MDP"/>
                                                             </connections>
-                                                        </tableCellView>
-                                                    </prototypeCellViews>
-                                                </tableColumn>
-                                            </tableColumns>
-                                            <connections>
-                                                <outlet property="dataSource" destination="206" id="3097"/>
-                                                <outlet property="fContextNoRow" destination="589" id="3101"/>
-                                                <outlet property="fContextRow" destination="456" id="3100"/>
-                                                <outlet property="fController" destination="206" id="3102"/>
-                                            </connections>
-                                        </outlineView>
-                                    </subviews>
-                                </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
-                                    <rect key="frame" x="-100" y="-100" width="451" height="15"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
-                                    <rect key="frame" x="499" y="0.0" width="16" height="0.0"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
-                            <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JCm-xb-Dpw">
-                                <rect key="frame" x="0.0" y="0.0" width="524" height="24"/>
-                                <subviews>
-                                    <textField focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
-                                        <rect key="frame" x="258" y="5" width="8" height="14"/>
-                                        <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" usesSingleLineMode="YES" id="3049">
-                                            <font key="font" metaFont="smallSystem"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="3420">
-                                        <rect key="frame" x="60" y="3" width="18" height="18"/>
-                                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
-                                            <behavior key="behavior" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="clearCompleted:" target="206" id="3424"/>
-                                        </connections>
-                                    </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="2690">
-                                        <rect key="frame" x="34" y="3" width="18" height="18"/>
-                                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TortoiseTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
-                                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="speedLimitChanged:" target="206" id="3180"/>
-                                            <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
-                                        </connections>
-                                    </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="3435">
-                                        <rect key="frame" x="8" y="3" width="18" height="18"/>
-                                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="EllipsisTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
-                                            <behavior key="behavior" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="showGlobalPopover:" target="206" id="3439"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="3420" firstAttribute="leading" secondItem="2690" secondAttribute="trailing" constant="8" symbolic="YES" id="FEn-NM-flo"/>
-                                    <constraint firstItem="2690" firstAttribute="leading" secondItem="3435" secondAttribute="trailing" constant="8" symbolic="YES" id="Ofp-KJ-XZv"/>
-                                    <constraint firstItem="2690" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="PS4-Bx-QIF"/>
-                                    <constraint firstItem="2700" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="RtK-gx-Jsv"/>
-                                    <constraint firstItem="3435" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="Wid-lz-U1e"/>
-                                    <constraint firstAttribute="height" constant="24" id="dyn-PY-CuN"/>
-                                    <constraint firstItem="2700" firstAttribute="centerX" secondItem="JCm-xb-Dpw" secondAttribute="centerX" id="hcK-0p-UnE"/>
-                                    <constraint firstItem="3420" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="usg-NR-gmG"/>
-                                    <constraint firstItem="3435" firstAttribute="leading" secondItem="JCm-xb-Dpw" secondAttribute="leading" constant="8" id="xFe-Hi-hSp"/>
-                                </constraints>
-                            </customView>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="Hyt-Uv-vDm" customClass="TorrentCellRevealButton">
+                                                            <rect key="frame" x="436" y="4" width="14" height="14"/>
+                                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="dWx-5q-ABk">
+                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="14" id="CYn-n4-Daq"/>
+                                                                <constraint firstAttribute="width" constant="14" id="P9R-Cw-RJF"/>
+                                                            </constraints>
+                                                            <connections>
+                                                                <outlet property="torrentCell" destination="ouH-H8-Otv" id="zlt-Qk-E34"/>
+                                                            </connections>
+                                                        </button>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="Hyt-Uv-vDm" firstAttribute="centerY" secondItem="x9c-7U-Odp" secondAttribute="centerY" id="1WR-Ta-vbl"/>
+                                                        <constraint firstAttribute="trailing" secondItem="ExW-pe-aKm" secondAttribute="trailing" constant="8" id="5OS-LM-hyI"/>
+                                                        <constraint firstItem="ExW-pe-aKm" firstAttribute="leading" secondItem="dPU-vz-fnz" secondAttribute="trailing" id="7R9-zA-Nh7"/>
+                                                        <constraint firstItem="ExW-pe-aKm" firstAttribute="centerY" secondItem="4yg-IA-aOF" secondAttribute="centerY" id="Lmc-wT-yP4"/>
+                                                        <constraint firstItem="x9c-7U-Odp" firstAttribute="leading" secondItem="9Cg-Nh-Hcr" secondAttribute="trailing" constant="15" id="On5-WE-C7H"/>
+                                                        <constraint firstItem="bGq-Kc-jWE" firstAttribute="centerY" secondItem="x9c-7U-Odp" secondAttribute="centerY" id="PrG-V3-ry0"/>
+                                                        <constraint firstItem="4yg-IA-aOF" firstAttribute="leading" secondItem="ouH-H8-Otv" secondAttribute="leading" id="Ps8-HO-fGd"/>
+                                                        <constraint firstItem="9Cg-Nh-Hcr" firstAttribute="centerY" secondItem="4yg-IA-aOF" secondAttribute="centerY" id="Rvd-RT-10P"/>
+                                                        <constraint firstItem="dPU-vz-fnz" firstAttribute="centerY" secondItem="ouH-H8-Otv" secondAttribute="centerY" id="VXm-be-NaO"/>
+                                                        <constraint firstItem="x9c-7U-Odp" firstAttribute="centerY" secondItem="9Cg-Nh-Hcr" secondAttribute="centerY" id="VaS-hJ-vAV"/>
+                                                        <constraint firstAttribute="trailing" secondItem="x9c-7U-Odp" secondAttribute="trailing" constant="5" id="daS-0F-yKf"/>
+                                                        <constraint firstAttribute="trailing" secondItem="Hyt-Uv-vDm" secondAttribute="trailing" constant="8" id="fKb-o5-n1k"/>
+                                                        <constraint firstItem="dPU-vz-fnz" firstAttribute="leading" secondItem="WWu-yD-Amw" secondAttribute="trailing" constant="15" id="gxk-cy-Mq2"/>
+                                                        <constraint firstItem="WWu-yD-Amw" firstAttribute="centerY" secondItem="9Cg-Nh-Hcr" secondAttribute="centerY" id="hYn-MV-EFh"/>
+                                                        <constraint firstItem="4yg-IA-aOF" firstAttribute="centerY" secondItem="ouH-H8-Otv" secondAttribute="centerY" id="izm-2a-TOI"/>
+                                                        <constraint firstItem="Hyt-Uv-vDm" firstAttribute="leading" secondItem="bGq-Kc-jWE" secondAttribute="trailing" constant="3" id="kX1-gB-jyF"/>
+                                                        <constraint firstItem="9Cg-Nh-Hcr" firstAttribute="leading" secondItem="4yg-IA-aOF" secondAttribute="trailing" constant="8" id="lf2-Bm-TFR"/>
+                                                        <constraint firstItem="WWu-yD-Amw" firstAttribute="centerX" secondItem="9Cg-Nh-Hcr" secondAttribute="centerX" id="tNz-Ea-fpP"/>
+                                                    </constraints>
+                                                    <connections>
+                                                        <outlet property="fActionButton" destination="9Cg-Nh-Hcr" id="88t-qS-msz"/>
+                                                        <outlet property="fControlButton" destination="bGq-Kc-jWE" id="Oyb-Iu-Na0"/>
+                                                        <outlet property="fGroupIndicatorView" destination="4yg-IA-aOF" id="ROF-Ua-PGS"/>
+                                                        <outlet property="fIconView" destination="WWu-yD-Amw" id="vWy-ch-grE"/>
+                                                        <outlet property="fRevealButton" destination="Hyt-Uv-vDm" id="PHz-zj-UsH"/>
+                                                        <outlet property="fStackView" destination="dPU-vz-fnz" id="hPz-Up-wEK"/>
+                                                        <outlet property="fTorrentPriorityView" destination="ocL-c0-B8y" id="OoF-f4-uU5"/>
+                                                        <outlet property="fTorrentPriorityViewWidthConstraint" destination="grl-70-hEy" id="sps-C4-rsi"/>
+                                                        <outlet property="fTorrentProgressBarView" destination="x9c-7U-Odp" id="WGd-KA-6xD"/>
+                                                        <outlet property="fTorrentStatusField" destination="ExW-pe-aKm" id="rQQ-ip-8MV"/>
+                                                        <outlet property="fTorrentTitleField" destination="nyW-bO-2kN" id="Xsd-Ro-ren"/>
+                                                    </connections>
+                                                </tableCellView>
+                                            </prototypeCellViews>
+                                        </tableColumn>
+                                    </tableColumns>
+                                    <connections>
+                                        <outlet property="dataSource" destination="206" id="3097"/>
+                                        <outlet property="fContextNoRow" destination="589" id="3101"/>
+                                        <outlet property="fContextRow" destination="456" id="3100"/>
+                                        <outlet property="fController" destination="206" id="3102"/>
+                                    </connections>
+                                </outlineView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
+                            <rect key="frame" x="-100" y="-100" width="451" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
+                            <rect key="frame" x="499" y="0.0" width="16" height="0.0"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JCm-xb-Dpw" userLabel="Bottom bar">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="24"/>
+                        <subviews>
+                            <textField focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
+                                <rect key="frame" x="211" y="5" width="58" height="14"/>
+                                <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Transfers" usesSingleLineMode="YES" id="3049">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3435" userLabel="Global Actions">
+                                <rect key="frame" x="8" y="3" width="18" height="18"/>
+                                <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="EllipsisTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
+                                    <behavior key="behavior" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="showGlobalPopover:" target="206" id="3439"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="2690" userLabel="Speed Limit">
+                                <rect key="frame" x="34" y="3" width="18" height="18"/>
+                                <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TortoiseTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
+                                    <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="speedLimitChanged:" target="206" id="3180"/>
+                                    <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
+                                </connections>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="3420" userLabel="Clear Completed">
+                                <rect key="frame" x="60" y="3" width="18" height="18"/>
+                                <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
+                                    <behavior key="behavior" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="clearCompleted:" target="206" id="3424"/>
+                                </connections>
+                            </button>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="RjE-Lj-Ija">
+                                <rect key="frame" x="0.0" y="21" width="480" height="5"/>
+                            </box>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="JCm-xb-Dpw" firstAttribute="leading" secondItem="Msk-Iv-kCJ" secondAttribute="leading" id="7N2-SG-w8d"/>
-                            <constraint firstAttribute="trailing" secondItem="JCm-xb-Dpw" secondAttribute="trailing" id="RMo-FM-GgE"/>
+                            <constraint firstItem="RjE-Lj-Ija" firstAttribute="leading" secondItem="JCm-xb-Dpw" secondAttribute="leading" id="18t-vw-Qo1"/>
+                            <constraint firstItem="3420" firstAttribute="leading" secondItem="2690" secondAttribute="trailing" constant="8" symbolic="YES" id="FEn-NM-flo"/>
+                            <constraint firstItem="RjE-Lj-Ija" firstAttribute="top" secondItem="JCm-xb-Dpw" secondAttribute="top" id="JvT-ug-aaa"/>
+                            <constraint firstItem="2690" firstAttribute="leading" secondItem="3435" secondAttribute="trailing" constant="8" symbolic="YES" id="Ofp-KJ-XZv"/>
+                            <constraint firstItem="2690" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="PS4-Bx-QIF"/>
+                            <constraint firstItem="2700" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="RtK-gx-Jsv"/>
+                            <constraint firstItem="3435" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="Wid-lz-U1e"/>
+                            <constraint firstAttribute="height" constant="24" id="dyn-PY-CuN"/>
+                            <constraint firstItem="2700" firstAttribute="centerX" secondItem="JCm-xb-Dpw" secondAttribute="centerX" id="hcK-0p-UnE"/>
+                            <constraint firstItem="3420" firstAttribute="centerY" secondItem="JCm-xb-Dpw" secondAttribute="centerY" id="usg-NR-gmG"/>
+                            <constraint firstItem="3435" firstAttribute="leading" secondItem="JCm-xb-Dpw" secondAttribute="leading" priority="750" constant="8" id="xFe-Hi-hSp"/>
+                            <constraint firstAttribute="trailing" secondItem="RjE-Lj-Ija" secondAttribute="trailing" id="zej-Ml-IeG"/>
                         </constraints>
-                        <visibilityPriorities>
-                            <integer value="1000"/>
-                            <integer value="1000"/>
-                        </visibilityPriorities>
-                        <customSpacing>
-                            <real value="3.4028234663852886e+38"/>
-                            <real value="3.4028234663852886e+38"/>
-                        </customSpacing>
-                    </stackView>
+                    </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Msk-Iv-kCJ" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="MCc-fn-fwX"/>
-                    <constraint firstAttribute="trailing" secondItem="Msk-Iv-kCJ" secondAttribute="trailing" id="Q4f-XT-uPH"/>
-                    <constraint firstItem="Msk-Iv-kCJ" firstAttribute="top" secondItem="2" secondAttribute="top" id="Uv1-dY-LX7"/>
-                    <constraint firstAttribute="bottom" secondItem="Msk-Iv-kCJ" secondAttribute="bottom" id="xdi-eZ-CRL"/>
+                    <constraint firstItem="3088" firstAttribute="leading" secondItem="d6L-dv-l2F" secondAttribute="leading" id="24n-gr-fRj"/>
+                    <constraint firstItem="3088" firstAttribute="trailing" secondItem="d6L-dv-l2F" secondAttribute="trailing" id="2Lr-O1-ixK"/>
+                    <constraint firstAttribute="bottom" secondItem="JCm-xb-Dpw" secondAttribute="bottom" id="3p4-RO-fqZ"/>
+                    <constraint firstItem="JCm-xb-Dpw" firstAttribute="top" secondItem="3088" secondAttribute="bottom" id="AKz-Hp-l2f"/>
+                    <constraint firstItem="3088" firstAttribute="top" secondItem="d6L-dv-l2F" secondAttribute="top" id="aoY-8i-ff5"/>
+                    <constraint firstAttribute="trailing" secondItem="JCm-xb-Dpw" secondAttribute="trailing" id="ibE-6g-rdA"/>
+                    <constraint firstItem="JCm-xb-Dpw" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="nd4-bq-8Ih"/>
                 </constraints>
+                <viewLayoutGuide key="safeArea" id="d6L-dv-l2F"/>
+                <viewLayoutGuide key="layoutMargins" id="yfA-KK-fCu"/>
             </view>
             <connections>
                 <outlet property="menu" destination="29" id="2687"/>
             </connections>
-            <point key="canvasLocation" x="138.5" y="125"/>
+            <point key="canvasLocation" x="138" y="379.5"/>
         </window>
         <menu systemMenu="main" id="29" userLabel="MainMenu">
             <items>
@@ -538,6 +535,7 @@
                                 </connections>
                             </menuItem>
                             <menuItem title="Donate…" tag="5678" id="3212">
+                                <imageReference key="image" image="heart" catalog="system" symbolScale="default" variableValue="1"/>
                                 <connections>
                                     <action selector="linkDonate:" target="206" id="3213"/>
                                 </connections>
@@ -589,23 +587,23 @@
                 <menuItem title="File" id="83">
                     <menu key="submenu" title="File" id="81">
                         <items>
-                            <menuItem title="Create Torrent File…" keyEquivalent="n" id="1921">
+                            <menuItem title="Create Torrent File…" image="doc.badge.plus" catalog="system" keyEquivalent="n" id="1921">
                                 <connections>
                                     <action selector="createFile:" target="206" id="1922"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Open Torrent File…" keyEquivalent="o" id="72">
+                            <menuItem title="Open Torrent File…" image="folder" catalog="system" keyEquivalent="o" id="72">
                                 <connections>
                                     <action selector="openShowSheet:" target="206" id="300"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Open With Options Window…" tag="501" alternate="YES" keyEquivalent="o" id="1680">
+                            <menuItem title="Open With Options Window…" image="folder.badge.gear" catalog="system" tag="501" alternate="YES" keyEquivalent="o" id="1680">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="openShowSheet:" target="206" id="1681"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Open Torrent Address…" keyEquivalent="u" id="1846">
+                            <menuItem title="Open Torrent Address…" image="globe" catalog="system" keyEquivalent="u" id="1846">
                                 <connections>
                                     <action selector="openURLShowSheet:" target="206" id="1847"/>
                                 </connections>
@@ -621,7 +619,7 @@
                             <menuItem isSeparatorItem="YES" id="79">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Quick Look" keyEquivalent="y" id="3166">
+                            <menuItem title="Quick Look" image="eye" catalog="system" keyEquivalent="y" id="3166">
                                 <connections>
                                     <action selector="toggleQuickLook:" target="206" id="3168"/>
                                 </connections>
@@ -629,12 +627,12 @@
                             <menuItem isSeparatorItem="YES" id="3167">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Move Data File To…" id="1891">
+                            <menuItem title="Move Data File To…" image="arrow.forward.folder" catalog="system" id="1891">
                                 <connections>
                                     <action selector="moveDataFilesSelected:" target="206" id="3153"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Rename File…" id="3448">
+                            <menuItem title="Rename File…" image="pencil" catalog="system" id="3448">
                                 <connections>
                                     <action selector="renameSelected:" target="206" id="3449"/>
                                 </connections>
@@ -642,12 +640,12 @@
                             <menuItem isSeparatorItem="YES" id="3215">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Save Torrent File As…" tag="4" keyEquivalent="s" id="1533">
+                            <menuItem title="Save Torrent File As…" image="arrow.down.doc" catalog="system" tag="4" keyEquivalent="s" id="1533">
                                 <connections>
                                     <action selector="copyTorrentFiles:" target="206" id="1893"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Share Torrent File" id="s5v-VO-G2y">
+                            <menuItem title="Share Torrent File" image="square.and.arrow.up" catalog="system" id="s5v-VO-G2y">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Share Torrent File" id="Cay-iU-bH4">
                                     <connections>
@@ -703,29 +701,24 @@
                                     <action selector="selectAll:" target="-1" id="179"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Select None" keyEquivalent="A" id="1675">
-                                <connections>
-                                    <action selector="deselectAll:" target="-1" id="1677"/>
-                                </connections>
-                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
                 <menuItem title="View" id="301">
                     <menu key="submenu" title="View" id="302">
                         <items>
-                            <menuItem title="Compact View" keyEquivalent="t" id="1578">
+                            <menuItem title="Compact View" image="arrow.down.forward.and.arrow.up.backward" catalog="system" keyEquivalent="t" id="1578">
                                 <connections>
                                     <action selector="toggleSmallView:" target="206" id="1579"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Pieces Bar" keyEquivalent="t" id="2185">
+                            <menuItem title="Pieces Bar" image="puzzlepiece" catalog="system" keyEquivalent="t" id="2185">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="togglePiecesBar:" target="206" id="2186"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Availability" id="2279">
+                            <menuItem title="Availability" image="hand.thumbsdown.hand.thumbsup" catalog="system" id="2279">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleAvailabilityBar:" target="206" id="2280"/>
@@ -734,12 +727,12 @@
                             <menuItem isSeparatorItem="YES" id="1282">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Use Groups" keyEquivalent="g" id="3078">
+                            <menuItem title="Use Groups" image="pin" catalog="system" keyEquivalent="g" id="3078">
                                 <connections>
                                     <action selector="setSortByGroup:" target="206" id="3079"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Sort Transfers By" id="1894">
+                            <menuItem title="Sort Transfers By" image="arrow.up.arrow.down" catalog="system" id="1894">
                                 <menu key="submenu" title="Sort Transfers By" id="1895">
                                     <items>
                                         <menuItem title="Queue Order" id="1901">
@@ -790,12 +783,12 @@
                                         <menuItem isSeparatorItem="YES" id="2881">
                                             <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </menuItem>
-                                        <menuItem title="Ascending" id="1899">
+                                        <menuItem title="Ascending" image="arrow.up" catalog="system" id="1899">
                                             <connections>
                                                 <action selector="setSortReverse:" target="206" id="1908"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Descending" tag="1" id="3405">
+                                        <menuItem title="Descending" image="arrow.down" catalog="system" tag="1" id="3405">
                                             <connections>
                                                 <action selector="setSortReverse:" target="206" id="3406"/>
                                             </connections>
@@ -806,7 +799,7 @@
                             <menuItem isSeparatorItem="YES" id="1591">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Show Inspector" keyEquivalent="i" id="1536">
+                            <menuItem title="Show Inspector" image="info.circle" catalog="system" keyEquivalent="i" id="1536">
                                 <connections>
                                     <action selector="showInfo:" target="206" id="1538"/>
                                 </connections>
@@ -843,7 +836,7 @@
                 <menuItem title="Transfers" id="1399">
                     <menu key="submenu" title="Transfers" id="1400">
                         <items>
-                            <menuItem title="Speed Limit" keyEquivalent="l" id="1566">
+                            <menuItem title="Speed Limit" image="tortoise" catalog="system" keyEquivalent="l" id="1566">
                                 <connections>
                                     <action selector="toggleSpeedLimit:" target="206" id="2144"/>
                                 </connections>
@@ -851,12 +844,12 @@
                             <menuItem isSeparatorItem="YES" id="1567">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Pause Selected" keyEquivalent="." id="1403">
+                            <menuItem title="Pause Selected" image="pause" catalog="system" keyEquivalent="." id="1403">
                                 <connections>
                                     <action selector="stopSelectedTorrents:" target="206" id="1581"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Resume Selected" keyEquivalent="/" id="1404">
+                            <menuItem title="Resume Selected" image="arrow.clockwise" catalog="system" keyEquivalent="/" id="1404">
                                 <connections>
                                     <action selector="resumeSelectedTorrents:" target="206" id="1582"/>
                                 </connections>
@@ -864,7 +857,7 @@
                             <menuItem isSeparatorItem="YES" id="1412">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Remove From List" tag="2" id="1516">
+                            <menuItem title="Remove From List" image="trash" catalog="system" tag="2" id="1516">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
@@ -872,7 +865,7 @@ CA
                                     <action selector="removeNoDelete:" target="206" id="1546"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove and Trash Data File" tag="4" id="1514">
+                            <menuItem title="Remove and Trash Data File" image="document.on.trash" catalog="system" tag="4" id="1514">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
@@ -881,7 +874,7 @@ CA
                                     <action selector="removeDeleteData:" target="206" id="1547"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove All Completed From List" id="3407">
+                            <menuItem title="Remove All Completed From List" image="trash.circle.fill" catalog="system" id="3407">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="clearCompleted:" target="206" id="3409"/>
@@ -890,7 +883,7 @@ CA
                             <menuItem isSeparatorItem="YES" id="1526">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Show in Finder" keyEquivalent="r" id="1539">
+                            <menuItem title="Show in Finder" image="finder" catalog="system" keyEquivalent="r" id="1539">
                                 <connections>
                                     <action selector="revealFile:" target="-1" id="1543"/>
                                 </connections>
@@ -898,13 +891,13 @@ CA
                             <menuItem isSeparatorItem="YES" id="1541">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Pause All" keyEquivalent="." id="1413">
+                            <menuItem title="Pause All" image="pause.circle.fill" catalog="system" keyEquivalent="." id="1413">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="stopAllTorrents:" target="206" id="1417"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Resume All" keyEquivalent="/" id="1414">
+                            <menuItem title="Resume All" image="arrow.clockwise.circle.fill" catalog="system" keyEquivalent="/" id="1414">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="resumeAllTorrents:" target="206" id="1418"/>
@@ -913,12 +906,12 @@ CA
                             <menuItem isSeparatorItem="YES" id="1805">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Resume Selected Right Away" id="1678">
+                            <menuItem title="Resume Selected Right Away" image="arrow.clockwise.circle" catalog="system" id="1678">
                                 <connections>
                                     <action selector="resumeSelectedTorrentsNoWait:" target="206" id="1806"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Resume All Waiting" id="1804">
+                            <menuItem title="Resume All Waiting" image="stopwatch" catalog="system" id="1804">
                                 <connections>
                                     <action selector="resumeWaitingTorrents:" target="206" id="1807"/>
                                 </connections>
@@ -926,7 +919,7 @@ CA
                             <menuItem isSeparatorItem="YES" id="1861">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Group" id="2839">
+                            <menuItem title="Group" image="pin" catalog="system" id="2839">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Group" id="2840">
                                     <connections>
@@ -937,12 +930,12 @@ CA
                             <menuItem isSeparatorItem="YES" id="3408">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Update Tracker" id="1860">
+                            <menuItem title="Update Tracker" image="megaphone" catalog="system" id="1860">
                                 <connections>
                                     <action selector="announceSelectedTorrents:" target="206" id="1862"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Verify Local Data" id="1877">
+                            <menuItem title="Verify Local Data" image="bandage" catalog="system" id="1877">
                                 <connections>
                                     <action selector="verifySelectedTorrents:" target="206" id="3147"/>
                                 </connections>
@@ -994,17 +987,17 @@ CA
                             <menuItem isSeparatorItem="YES" id="1799">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Transmission" keyEquivalent="1" id="1696">
+                            <menuItem title="Transmission" image="house" catalog="system" keyEquivalent="1" id="1696">
                                 <connections>
                                     <action selector="showMainWindow:" target="206" id="1702"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Statistics" keyEquivalent="2" id="2301">
+                            <menuItem title="Statistics" image="chart.bar" catalog="system" keyEquivalent="2" id="2301">
                                 <connections>
                                     <action selector="showStatsWindow:" target="206" id="2302"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Message Log" keyEquivalent="3" id="1795">
+                            <menuItem title="Message Log" image="text.bubble" catalog="system" keyEquivalent="3" id="1795">
                                 <connections>
                                     <action selector="showMessageWindow:" target="206" id="1796"/>
                                 </connections>
@@ -1031,17 +1024,17 @@ CA
                             <menuItem isSeparatorItem="YES" id="1559">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Transmission Homepage" id="1558">
+                            <menuItem title="Transmission Homepage" image="globe" catalog="system" id="1558">
                                 <connections>
                                     <action selector="linkHomepage:" target="206" id="1560"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Forums" id="418">
+                            <menuItem title="Forums" image="bubble.left.and.bubble.right" catalog="system" id="418">
                                 <connections>
                                     <action selector="linkForums:" target="206" id="421"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Support &amp; Development" id="3170">
+                            <menuItem title="Support &amp; Development" image="keyboard" catalog="system" id="3170">
                                 <connections>
                                     <action selector="linkGitHub:" target="206" id="3171"/>
                                 </connections>
@@ -1066,7 +1059,6 @@ CA
                 <outlet property="fShareMenu" destination="Cay-iU-bH4" id="nHs-6t-KFn"/>
                 <outlet property="fSortMenu" destination="1895" id="3440"/>
                 <outlet property="fSpeedLimitButton" destination="2690" id="2703"/>
-                <outlet property="fStackView" destination="Msk-Iv-kCJ" id="UBA-Uw-iSC"/>
                 <outlet property="fTableView" destination="3091" id="3118"/>
                 <outlet property="fTotalTorrentsField" destination="2700" id="2702"/>
                 <outlet property="fWindow" destination="21" id="246"/>
@@ -1074,17 +1066,17 @@ CA
         </customObject>
         <menu title="Menu" id="456" userLabel="ContextRowMenu">
             <items>
-                <menuItem title="Pause Selected" tag="1" id="457">
+                <menuItem title="Pause Selected" image="pause" catalog="system" tag="1" id="457">
                     <connections>
                         <action selector="stopSelectedTorrents:" target="206" id="1583"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Resume Selected" tag="1" id="1028">
+                <menuItem title="Resume Selected" image="arrow.clockwise" catalog="system" tag="1" id="1028">
                     <connections>
                         <action selector="resumeSelectedTorrents:" target="206" id="1584"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Resume Selected Right Away" tag="1" id="1808">
+                <menuItem title="Resume Selected Right Away" image="arrow.clockwise.circle" catalog="system" tag="1" id="1808">
                     <connections>
                         <action selector="resumeSelectedTorrentsNoWait:" target="206" id="1809"/>
                     </connections>
@@ -1092,12 +1084,12 @@ CA
                 <menuItem isSeparatorItem="YES" id="613">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Remove From List" tag="2" id="1550">
+                <menuItem title="Remove From List" image="trash" catalog="system" tag="2" id="1550">
                     <connections>
                         <action selector="removeNoDelete:" target="206" id="1554"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Remove and Trash Data File" tag="4" id="1551">
+                <menuItem title="Remove and Trash Data File" image="document.on.trash" catalog="system" tag="4" id="1551">
                     <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                     <connections>
                         <action selector="removeDeleteData:" target="206" id="1555"/>
@@ -1106,7 +1098,7 @@ CA
                 <menuItem isSeparatorItem="YES" id="3172">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Show in Finder" id="516">
+                <menuItem title="Show in Finder" image="finder" catalog="system" id="516">
                     <connections>
                         <action selector="revealFile:" target="206" id="1467"/>
                     </connections>
@@ -1114,7 +1106,7 @@ CA
                 <menuItem isSeparatorItem="YES" id="1522">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Group" id="2849">
+                <menuItem title="Group" image="pin" catalog="system" id="2849">
                     <menu key="submenu" title="Group" id="2850">
                         <connections>
                             <outlet property="delegate" destination="206" id="2854"/>
@@ -1124,12 +1116,12 @@ CA
                 <menuItem isSeparatorItem="YES" id="3206">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Move Data File To…" id="3209">
+                <menuItem title="Move Data File To…" image="arrow.up.doc" catalog="system" id="3209">
                     <connections>
                         <action selector="moveDataFilesSelected:" target="206" id="3210"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Rename File…" tag="4" id="3445">
+                <menuItem title="Rename File…" image="pencil" catalog="system" tag="4" id="3445">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="renameSelected:" target="206" id="3447"/>
@@ -1138,13 +1130,13 @@ CA
                 <menuItem isSeparatorItem="YES" id="3220">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Save Torrent File As…" tag="4" id="3207">
+                <menuItem title="Save Torrent File As…" image="arrow.down.doc" catalog="system" tag="4" id="3207">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="copyTorrentFiles:" target="206" id="3208"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Share Torrent File" id="8t6-wh-5UW">
+                <menuItem title="Share Torrent File" image="square.and.arrow.up" catalog="system" id="8t6-wh-5UW">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Share Torrent File" id="lvU-Va-GzM">
                         <connections>
@@ -1161,12 +1153,12 @@ CA
                 <menuItem isSeparatorItem="YES" id="2848">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Update Tracker" id="2122">
+                <menuItem title="Update Tracker" image="megaphone" catalog="system" id="2122">
                     <connections>
                         <action selector="announceSelectedTorrents:" target="206" id="2124"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Verify Local Data" id="3221">
+                <menuItem title="Verify Local Data" image="bandage" catalog="system" id="3221">
                     <connections>
                         <action selector="verifySelectedTorrents:" target="206" id="3222"/>
                     </connections>
@@ -1174,7 +1166,7 @@ CA
                 <menuItem isSeparatorItem="YES" id="3450">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Show Inspector" tag="6" id="459">
+                <menuItem title="Show Inspector" image="info.circle" catalog="system" tag="6" id="459">
                     <connections>
                         <action selector="showInfo:" target="206" id="477"/>
                     </connections>
@@ -1184,17 +1176,17 @@ CA
         </menu>
         <menu title="Menu" id="589" userLabel="ContextNoRowMenu">
             <items>
-                <menuItem title="Create Torrent File…" id="1923">
+                <menuItem title="Create Torrent File…" image="doc.badge.plus" catalog="system" id="1923">
                     <connections>
                         <action selector="createFile:" target="206" id="1924"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Open Torrent File…" id="611">
+                <menuItem title="Open Torrent File…" image="folder" catalog="system" id="611">
                     <connections>
                         <action selector="openShowSheet:" target="206" id="612"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Open Torrent Address…" id="1858">
+                <menuItem title="Open Torrent Address…" image="globe" catalog="system" id="1858">
                     <connections>
                         <action selector="openURLShowSheet:" target="206" id="1859"/>
                     </connections>
@@ -1202,7 +1194,7 @@ CA
                 <menuItem isSeparatorItem="YES" id="3077">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
-                <menuItem title="Show Inspector" tag="6" id="598">
+                <menuItem title="Show Inspector" image="info.circle" catalog="system" tag="6" id="598">
                     <connections>
                         <action selector="showInfo:" target="206" id="605"/>
                     </connections>
@@ -1224,14 +1216,37 @@ CA
         <image name="RevealOff" width="14" height="14"/>
         <image name="TortoiseTemplate" width="18" height="18"/>
         <image name="UpArrowTemplate" width="8" height="12"/>
+        <image name="arrow.clockwise" catalog="system" width="14" height="16"/>
+        <image name="arrow.clockwise.circle" catalog="system" width="15" height="15"/>
+        <image name="arrow.clockwise.circle.fill" catalog="system" width="15" height="15"/>
+        <image name="arrow.down" catalog="system" width="13" height="14"/>
+        <image name="arrow.down.doc" catalog="system" width="14" height="16"/>
+        <image name="arrow.down.forward.and.arrow.up.backward" catalog="system" width="16" height="15"/>
+        <image name="arrow.forward.folder" catalog="system" width="18" height="14"/>
+        <image name="arrow.up" catalog="system" width="13" height="14"/>
+        <image name="arrow.up.arrow.down" catalog="system" width="18" height="15"/>
+        <image name="arrow.up.doc" catalog="system" width="14" height="16"/>
+        <image name="bandage" catalog="system" width="16" height="16"/>
+        <image name="bubble.left.and.bubble.right" catalog="system" width="22" height="17"/>
+        <image name="chart.bar" catalog="system" width="20" height="14"/>
+        <image name="doc.badge.plus" catalog="system" width="16" height="18"/>
+        <image name="document.on.trash" catalog="system" width="17" height="20"/>
+        <image name="eye" catalog="system" width="21" height="13"/>
+        <image name="finder" catalog="system" width="16" height="15"/>
+        <image name="folder" catalog="system" width="18" height="14"/>
+        <image name="folder.badge.gear" catalog="system" width="20" height="15"/>
+        <image name="globe" catalog="system" width="15" height="15"/>
+        <image name="hand.thumbsdown.hand.thumbsup" catalog="system" width="22" height="19"/>
+        <image name="heart" catalog="system" width="16" height="14"/>
+        <image name="house" catalog="system" width="19" height="16"/>
         <image name="imageCell:Uue-OE-Cnc:image" width="62" height="62">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
-S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCkqMTQ3PUBVJG51bGzWDQ4PEBESExQVFhcYVk5T
-U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
-EiDAAACAA4ALWHs2MiwgNjJ90hsPHB5aTlMub2JqZWN0c6EdgASACtIbDyAjoiEigAWABoAJ0w8lJico
-FF8QFE5TVElGRlJlcHJlc2VudGF0aW9uXxAZTlNJbnRlcm5hbExheW91dERpcmVjdGlvboAIgAdPEgAB
-AHpNTQAqAADwSPLy8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwbHCEaJissMzY5P0JVJG51bGzXDQ4PEBESExQVFhcYGRpW
+TlNTaXplViRjbGFzc1xOU0ltYWdlRmxhZ3NWTlNSZXBzW05TVGludENvbG9yV05TQ29sb3JeTlNSZXNp
+emluZ01vZGWAAoANEiDAAACAA4AAgAsQAFh7NjIsIDYyfdIdDh4gWk5TLm9iamVjdHOhH4AEgArSHQ4i
+JaIjJIAFgAaACdMOJygpKhpfEBROU1RJRkZSZXByZXNlbnRhdGlvbl8QGU5TSW50ZXJuYWxMYXlvdXRE
+aXJlY3Rpb26ACIAHTxIAAQB6TU0AKgAA8Ejy8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
 8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
 8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
 8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
@@ -2256,85 +2271,99 @@ AHpNTQAqAADwSPLy8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
 8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
 8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
 8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly
-8v/y8vL/8vLy//Ly8v8AEgEAAAMAAAABAHwAAAEBAAMAAAABAHwAAAECAAMAAAAEAADxNgEDAAMAAAAB
-AAEAAAEGAAMAAAABAAIAAAEKAAMAAAABAAEAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAAB
-AAQAAAEWAAMAAAABAHwAAAEXAAQAAAABAADwQAEaAAUAAAABAADxJgEbAAUAAAABAADxLgEcAAMAAAAB
-AAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAAEAADxPodzAAcAAA80AADxRgAAAAAAAACQ
-AAAAAQAAAJAAAAABAAgACAAIAAgAAQABAAEAAQAADzRhcHBsAhAAAG1udHJSR0IgWFlaIAffAAwABQAN
-ABIACGFjc3BBUFBMAAAAAEFQUEwAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWRlc2MAAAFQAAAAYmRzY20AAAG0
-AAAEGmNwcnQAAAXQAAAAI3d0cHQAAAX0AAAAFHJYWVoAAAYIAAAAFGdYWVoAAAYcAAAAFGJYWVoAAAYw
-AAAAFHJUUkMAAAZEAAAIDGFhcmcAAA5QAAAAIHZjZ3QAAA5wAAAAMG5kaW4AAA6gAAAAPmNoYWQAAA7g
-AAAALG1tb2QAAA8MAAAAKGJUUkMAAAZEAAAIDGdUUkMAAAZEAAAIDGFhYmcAAA5QAAAAIGFhZ2cAAA5Q
-AAAAIGRlc2MAAAAAAAAACERpc3BsYXkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtbHVjAAAAAAAAACIAAAAM
-aHJIUgAAABQAAAGoa29LUgAAAAwAAAG8bmJOTwAAABIAAAHIaWQAAAAAABIAAAHaaHVIVQAAABQAAAHs
-Y3NDWgAAABYAAAIAZGFESwAAABwAAAIWdWtVQQAAABwAAAIyYXIAAAAAABQAAAJOaXRJVAAAABQAAAJi
-cm9STwAAABIAAAJ2bmxOTAAAABYAAAKIaGVJTAAAABYAAAKeZXNFUwAAABIAAAJ2ZmlGSQAAABAAAAK0
-emhUVwAAAAwAAALEdmlWTgAAAA4AAALQc2tTSwAAABYAAALeemhDTgAAAAwAAALEcnVSVQAAACQAAAL0
-ZnJGUgAAABYAAAMYbXMAAAAAABIAAAMuY2FFUwAAABgAAANAdGhUSAAAAAwAAANYZXNYTAAAABIAAAJ2
-ZGVERQAAABAAAANkZW5VUwAAABIAAAN0cHRCUgAAABgAAAOGcGxQTAAAABIAAAOeZWxHUgAAACIAAAOw
-c3ZTRQAAABAAAAPSdHJUUgAAABQAAAPiamFKUAAAAA4AAAP2cHRQVAAAABYAAAQEAEwAQwBEACAAdQAg
-AGIAbwBqAGnO7LfsACAATABDAEQARgBhAHIAZwBlAC0ATABDAEQATABDAEQAIABXAGEAcgBuAGEAUwB6
-AO0AbgBlAHMAIABMAEMARABCAGEAcgBlAHYAbgD9ACAATABDAEQATABDAEQALQBmAGEAcgB2AGUAcwBr
-AOYAcgBtBBoEPgQ7BEwEPgRABD4EMgQ4BDkAIABMAEMARCAPAEwAQwBEACAGRQZEBkgGRgYpAEwAQwBE
-ACAAYwBvAGwAbwByAGkATABDAEQAIABjAG8AbABvAHIASwBsAGUAdQByAGUAbgAtAEwAQwBEIA8ATABD
-AEQAIAXmBdEF4gXVBeAF2QBWAOQAcgBpAC0ATABDAERfaYJyACAATABDAEQATABDAEQAIABNAOAAdQBG
-AGEAcgBlAGIAbgDpACAATABDAEQEJgQyBDUEQgQ9BD4EOQAgBBYEGgAtBDQEOARBBD8EOwQ1BDkATABD
-AEQAIABjAG8AdQBsAGUAdQByAFcAYQByAG4AYQAgAEwAQwBEAEwAQwBEACAAZQBuACAAYwBvAGwAbwBy
-AEwAQwBEACAOKg41AEYAYQByAGIALQBMAEMARABDAG8AbABvAHIAIABMAEMARABMAEMARAAgAEMAbwBs
-AG8AcgBpAGQAbwBLAG8AbABvAHIAIABMAEMARAOIA7MDxwPBA8kDvAO3ACADvwO4A8wDvQO3ACAATABD
-AEQARgDkAHIAZwAtAEwAQwBEAFIAZQBuAGsAbABpACAATABDAEQwqzDpMPwAIABMAEMARABMAEMARAAg
-AGEAIABDAG8AcgBlAHMAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIEluYy4sIDIwMTUAAFhZWiAAAAAA
-AADzFgABAAAAARbKWFlaIAAAAAAAAHHAAAA5igAAAWdYWVogAAAAAAAAYSMAALnmAAAT9lhZWiAAAAAA
-AAAj8gAADJAAAL3QY3VydgAAAAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA2ADsAQABFAEoATwBU
-AFkAXgBjAGgAbQByAHcAfACBAIYAiwCQAJUAmgCfAKMAqACtALIAtwC8AMEAxgDLANAA1QDbAOAA5QDr
-APAA9gD7AQEBBwENARMBGQEfASUBKwEyATgBPgFFAUwBUgFZAWABZwFuAXUBfAGDAYsBkgGaAaEBqQGx
-AbkBwQHJAdEB2QHhAekB8gH6AgMCDAIUAh0CJgIvAjgCQQJLAlQCXQJnAnECegKEAo4CmAKiAqwCtgLB
-AssC1QLgAusC9QMAAwsDFgMhAy0DOANDA08DWgNmA3IDfgOKA5YDogOuA7oDxwPTA+AD7AP5BAYEEwQg
-BC0EOwRIBFUEYwRxBH4EjASaBKgEtgTEBNME4QTwBP4FDQUcBSsFOgVJBVgFZwV3BYYFlgWmBbUFxQXV
-BeUF9gYGBhYGJwY3BkgGWQZqBnsGjAadBq8GwAbRBuMG9QcHBxkHKwc9B08HYQd0B4YHmQesB78H0gfl
-B/gICwgfCDIIRghaCG4IggiWCKoIvgjSCOcI+wkQCSUJOglPCWQJeQmPCaQJugnPCeUJ+woRCicKPQpU
-CmoKgQqYCq4KxQrcCvMLCwsiCzkLUQtpC4ALmAuwC8gL4Qv5DBIMKgxDDFwMdQyODKcMwAzZDPMNDQ0m
-DUANWg10DY4NqQ3DDd4N+A4TDi4OSQ5kDn8Omw62DtIO7g8JDyUPQQ9eD3oPlg+zD88P7BAJECYQQxBh
-EH4QmxC5ENcQ9RETETERTxFtEYwRqhHJEegSBxImEkUSZBKEEqMSwxLjEwMTIxNDE2MTgxOkE8UT5RQG
-FCcUSRRqFIsUrRTOFPAVEhU0FVYVeBWbFb0V4BYDFiYWSRZsFo8WshbWFvoXHRdBF2UXiReuF9IX9xgb
-GEAYZRiKGK8Y1Rj6GSAZRRlrGZEZtxndGgQaKhpRGncanhrFGuwbFBs7G2MbihuyG9ocAhwqHFIcexyj
-HMwc9R0eHUcdcB2ZHcMd7B4WHkAeah6UHr4e6R8THz4faR+UH78f6iAVIEEgbCCYIMQg8CEcIUghdSGh
-Ic4h+yInIlUigiKvIt0jCiM4I2YjlCPCI/AkHyRNJHwkqyTaJQklOCVoJZclxyX3JicmVyaHJrcm6CcY
-J0kneierJ9woDSg/KHEooijUKQYpOClrKZ0p0CoCKjUqaCqbKs8rAis2K2krnSvRLAUsOSxuLKIs1y0M
-LUEtdi2rLeEuFi5MLoIuty7uLyQvWi+RL8cv/jA1MGwwpDDbMRIxSjGCMbox8jIqMmMymzLUMw0zRjN/
-M7gz8TQrNGU0njTYNRM1TTWHNcI1/TY3NnI2rjbpNyQ3YDecN9c4FDhQOIw4yDkFOUI5fzm8Ofk6Njp0
-OrI67zstO2s7qjvoPCc8ZTykPOM9Ij1hPaE94D4gPmA+oD7gPyE/YT+iP+JAI0BkQKZA50EpQWpBrEHu
-QjBCckK1QvdDOkN9Q8BEA0RHRIpEzkUSRVVFmkXeRiJGZ0arRvBHNUd7R8BIBUhLSJFI10kdSWNJqUnw
-SjdKfUrESwxLU0uaS+JMKkxyTLpNAk1KTZNN3E4lTm5Ot08AT0lPk0/dUCdQcVC7UQZRUFGbUeZSMVJ8
-UsdTE1NfU6pT9lRCVI9U21UoVXVVwlYPVlxWqVb3V0RXklfgWC9YfVjLWRpZaVm4WgdaVlqmWvVbRVuV
-W+VcNVyGXNZdJ114XcleGl5sXr1fD19hX7NgBWBXYKpg/GFPYaJh9WJJYpxi8GNDY5dj62RAZJRk6WU9
-ZZJl52Y9ZpJm6Gc9Z5Nn6Wg/aJZo7GlDaZpp8WpIap9q92tPa6dr/2xXbK9tCG1gbbluEm5rbsRvHm94
-b9FwK3CGcOBxOnGVcfByS3KmcwFzXXO4dBR0cHTMdSh1hXXhdj52m3b4d1Z3s3gReG54zHkqeYl553pG
-eqV7BHtje8J8IXyBfOF9QX2hfgF+Yn7CfyN/hH/lgEeAqIEKgWuBzYIwgpKC9INXg7qEHYSAhOOFR4Wr
-hg6GcobXhzuHn4gEiGmIzokziZmJ/opkisqLMIuWi/yMY4zKjTGNmI3/jmaOzo82j56QBpBukNaRP5Go
-khGSepLjk02TtpQglIqU9JVflcmWNJaflwqXdZfgmEyYuJkkmZCZ/JpomtWbQpuvnByciZz3nWSd0p5A
-nq6fHZ+Ln/qgaaDYoUehtqImopajBqN2o+akVqTHpTilqaYapoum/adup+CoUqjEqTepqaocqo+rAqt1
-q+msXKzQrUStuK4trqGvFq+LsACwdbDqsWCx1rJLssKzOLOutCW0nLUTtYq2AbZ5tvC3aLfguFm40blK
-ucK6O7q1uy67p7whvJu9Fb2Pvgq+hL7/v3q/9cBwwOzBZ8Hjwl/C28NYw9TEUcTOxUvFyMZGxsPHQce/
-yD3IvMk6ybnKOMq3yzbLtsw1zLXNNc21zjbOts83z7jQOdC60TzRvtI/0sHTRNPG1EnUy9VO1dHWVdbY
-11zX4Nhk2OjZbNnx2nba+9uA3AXcit0Q3ZbeHN6i3ynfr+A24L3hROHM4lPi2+Nj4+vkc+T85YTmDeaW
-5x/nqegy6LzpRunQ6lvq5etw6/vshu0R7ZzuKO6070DvzPBY8OXxcvH/8ozzGfOn9DT0wvVQ9d72bfb7
-94r4Gfio+Tj5x/pX+uf7d/wH/Jj9Kf26/kv+3P9t//9wYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQ
-AAAKDnZjZ3QAAAAAAAAAAQABAAAAAAAAAAEAAAABAAAAAAAAAAEAAAABAAAAAAAAAAEAAG5kaW4AAAAA
-AAAANgAAp0AAAFWAAABMwAAAnsAAACWAAAAMwAAAUAAAAFRAAAIzMwACMzMAAjMzAAAAAAAAAABzZjMy
-AAAAAAABDHIAAAX4///zHQAAB7oAAP1y///7nf///aQAAAPZAADAcW1tb2QAAAAAAAAGEAAAoA4AAAAA
-yc58GAAAAAAAAAAAAAAAAAAAAADSKywtLlokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFn
-ZVJlcKMtLzBaTlNJbWFnZVJlcFhOU09iamVjdNIrLDIzV05TQXJyYXmiMjDSKyw1Nl5OU011dGFibGVB
-cnJheaM1MjDTODkPOjs8V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0issPj9XTlNDb2xvcqI+
-MNIrLEFCV05TSW1hZ2WiQTAAAAAIAAAAEQAAABoAAAAkAAAAKQAAADIAAAA3AAAASQAAAEwAAABRAAAA
-UwAAAGIAAABoAAAAdQAAAHwAAACLAAAAkgAAAJ8AAACmAAAArgAAALAAAACyAAAAtAAAALkAAAC7AAAA
-vQAAAMYAAADLAAAA1gAAANgAAADaAAAA3AAAAOEAAADkAAAA5gAAAOgAAADqAAAA8QAAAQgAAAEkAAAB
-JgAAASgAAQGoAAEBrQABAbgAAQHBAAEB1AABAdgAAQHjAAEB7AABAfEAAQH5AAEB/AABAgEAAQIQAAEC
-FAABAhsAAQIjAAECMAABAjUAAQI3AAECOQABAj4AAQJGAAECSQABAk4AAQJWAAAAAAAABAEAAAAAAAAA
-QwAAAAAAAAAAAAAAAAABAlk
+8v/y8vL/8vLy//Ly8v/y8vL/8vLy//Ly8v/y8vL/ABIBAAADAAAAAQB8AAABAQADAAAAAQB8AAABAgAD
+AAAABAAA8TYBAwADAAAAAQABAAABBgADAAAAAQACAAABCgADAAAAAQABAAABEQAEAAAAAQAAAAgBEgAD
+AAAAAQABAAABFQADAAAAAQAEAAABFgADAAAAAQB8AAABFwAEAAAAAQAA8EABGgAFAAAAAQAA8SYBGwAF
+AAAAAQAA8S4BHAADAAAAAQABAAABKAADAAAAAQACAAABUgADAAAAAQABAAABUwADAAAABAAA8T6HcwAH
+AAAPNAAA8UYAAAAAAAAAkAAAAAEAAACQAAAAAQAIAAgACAAIAAEAAQABAAEAAA80YXBwbAIQAABtbnRy
+UkdCIFhZWiAH3wAMAAUADQASAAhhY3NwQVBQTAAAAABBUFBMAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAA
+AADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFkZXNj
+AAABUAAAAGJkc2NtAAABtAAABBpjcHJ0AAAF0AAAACN3dHB0AAAF9AAAABRyWFlaAAAGCAAAABRnWFla
+AAAGHAAAABRiWFlaAAAGMAAAABRyVFJDAAAGRAAACAxhYXJnAAAOUAAAACB2Y2d0AAAOcAAAADBuZGlu
+AAAOoAAAAD5jaGFkAAAO4AAAACxtbW9kAAAPDAAAAChiVFJDAAAGRAAACAxnVFJDAAAGRAAACAxhYWJn
+AAAOUAAAACBhYWdnAAAOUAAAACBkZXNjAAAAAAAAAAhEaXNwbGF5AAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+bWx1YwAAAAAAAAAiAAAADGhySFIAAAAUAAABqGtvS1IAAAAMAAABvG5iTk8AAAASAAAByGlkAAAAAAAS
+AAAB2mh1SFUAAAAUAAAB7GNzQ1oAAAAWAAACAGRhREsAAAAcAAACFnVrVUEAAAAcAAACMmFyAAAAAAAU
+AAACTml0SVQAAAAUAAACYnJvUk8AAAASAAACdm5sTkwAAAAWAAACiGhlSUwAAAAWAAACnmVzRVMAAAAS
+AAACdmZpRkkAAAAQAAACtHpoVFcAAAAMAAACxHZpVk4AAAAOAAAC0HNrU0sAAAAWAAAC3npoQ04AAAAM
+AAACxHJ1UlUAAAAkAAAC9GZyRlIAAAAWAAADGG1zAAAAAAASAAADLmNhRVMAAAAYAAADQHRoVEgAAAAM
+AAADWGVzWEwAAAASAAACdmRlREUAAAAQAAADZGVuVVMAAAASAAADdHB0QlIAAAAYAAADhnBsUEwAAAAS
+AAADnmVsR1IAAAAiAAADsHN2U0UAAAAQAAAD0nRyVFIAAAAUAAAD4mphSlAAAAAOAAAD9nB0UFQAAAAW
+AAAEBABMAEMARAAgAHUAIABiAG8AagBpzuy37AAgAEwAQwBEAEYAYQByAGcAZQAtAEwAQwBEAEwAQwBE
+ACAAVwBhAHIAbgBhAFMAegDtAG4AZQBzACAATABDAEQAQgBhAHIAZQB2AG4A/QAgAEwAQwBEAEwAQwBE
+AC0AZgBhAHIAdgBlAHMAawDmAHIAbQQaBD4EOwRMBD4EQAQ+BDIEOAQ5ACAATABDAEQgDwBMAEMARAAg
+BkUGRAZIBkYGKQBMAEMARAAgAGMAbwBsAG8AcgBpAEwAQwBEACAAYwBvAGwAbwByAEsAbABlAHUAcgBl
+AG4ALQBMAEMARCAPAEwAQwBEACAF5gXRBeIF1QXgBdkAVgDkAHIAaQAtAEwAQwBEX2mCcgAgAEwAQwBE
+AEwAQwBEACAATQDgAHUARgBhAHIAZQBiAG4A6QAgAEwAQwBEBCYEMgQ1BEIEPQQ+BDkAIAQWBBoALQQ0
+BDgEQQQ/BDsENQQ5AEwAQwBEACAAYwBvAHUAbABlAHUAcgBXAGEAcgBuAGEAIABMAEMARABMAEMARAAg
+AGUAbgAgAGMAbwBsAG8AcgBMAEMARAAgDioONQBGAGEAcgBiAC0ATABDAEQAQwBvAGwAbwByACAATABD
+AEQATABDAEQAIABDAG8AbABvAHIAaQBkAG8ASwBvAGwAbwByACAATABDAEQDiAOzA8cDwQPJA7wDtwAg
+A78DuAPMA70DtwAgAEwAQwBEAEYA5AByAGcALQBMAEMARABSAGUAbgBrAGwAaQAgAEwAQwBEMKsw6TD8
+ACAATABDAEQATABDAEQAIABhACAAQwBvAHIAZQBzAAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBJbmMu
+LCAyMDE1AABYWVogAAAAAAAA8xYAAQAAAAEWylhZWiAAAAAAAABxwAAAOYoAAAFnWFlaIAAAAAAAAGEj
+AAC55gAAE/ZYWVogAAAAAAAAI/IAAAyQAAC90GN1cnYAAAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAt
+ADIANgA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3AHwAgQCGAIsAkACVAJoAnwCjAKgArQCyALcAvADB
+AMYAywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQETARkBHwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1
+AXwBgwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHpAfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJx
+AnoChAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAMLAxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6
+A8cD0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVY
+BWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZIBlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdP
+B2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghuCIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmk
+CboJzwnlCfsKEQonCj0KVApqCoEKmAquCsUK3ArzCwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxc
+DHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3eDfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96
+D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExExEU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMD
+EyMTQxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTwFRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6
+Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkgGUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtj
+G4obshvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3DHeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBB
+IGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLdIwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWX
+Jccl9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhxKKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitp
+K50r0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6CLrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6
+MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUTNU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiM
+OMg5BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76DwnPGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/i
+QCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPARANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fA
+SAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkviTCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAn
+UHFQu1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSPVNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1ka
+WWlZuFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3JXhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKc
+YvBjQ2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeTZ+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yv
+bQhtYG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHwcktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdW
+d7N4EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzhfUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKS
+gvSDV4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhpiM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45m
+js6PNo+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSKlPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrV
+m0Kbr5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFHobaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfg
+qFKoxKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6hrxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WK
+tgG2ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8IbybvRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPU
+xFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB
+00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT
+4tvjY+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM
+8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn+3f8B/yY/Sn9uv5L/tz/bf//cGFyYQAAAAAAAwAA
+AAJmZgAA8qcAAA1ZAAAT0AAACg52Y2d0AAAAAAAAAAEAAQAAAAAAAAABAAAAAQAAAAAAAAABAAAAAQAA
+AAAAAAABAABuZGluAAAAAAAAADYAAKdAAABVgAAATMAAAJ7AAAAlgAAADMAAAFAAAABUQAACMzMAAjMz
+AAIzMwAAAAAAAAAAc2YzMgAAAAAAAQxyAAAF+P//8x0AAAe6AAD9cv//+53///2kAAAD2QAAwHFtbW9k
+AAAAAAAABhAAAKAOAAAAAMnOfBgAAAAAAAAAAAAAAAAAAAAA0i0uLzBaJGNsYXNzbmFtZVgkY2xhc3Nl
+c18QEE5TQml0bWFwSW1hZ2VSZXCjLzEyWk5TSW1hZ2VSZXBYTlNPYmplY3TSLS40NVdOU0FycmF5ojQy
+0i0uNzheTlNNdXRhYmxlQXJyYXmjNzQy0zo7Djw9PldOU1doaXRlXE5TQ29sb3JTcGFjZUQwIDAAEAOA
+DNItLkBBV05TQ29sb3KiQDLSLS5DRFdOU0ltYWdlokMyAAAACAAAABEAAAAaAAAAJAAAACkAAAAyAAAA
+NwAAAEkAAABMAAAAUQAAAFMAAABiAAAAaAAAAHcAAAB+AAAAhQAAAJIAAACZAAAApQAAAK0AAAC8AAAA
+vgAAAMAAAADFAAAAxwAAAMkAAADLAAAAzQAAANYAAADbAAAA5gAAAOgAAADqAAAA7AAAAPEAAAD0AAAA
+9gAAAPgAAAD6AAABAQAAARgAAAE0AAABNgAAATgAAQG4AAEBvQABAcgAAQHRAAEB5AABAegAAQHzAAEB
+/AABAgEAAQIJAAECDAABAhEAAQIgAAECJAABAisAAQIzAAECQAABAkUAAQJHAAECSQABAk4AAQJWAAEC
+WQABAl4AAQJmAAAAAAAABAEAAAAAAAAARQAAAAAAAAAAAAAAAAABAmk
 </mutableData>
         </image>
+        <image name="info.circle" catalog="system" width="15" height="15"/>
+        <image name="keyboard" catalog="system" width="19" height="13"/>
+        <image name="megaphone" catalog="system" width="18" height="16"/>
+        <image name="pause" catalog="system" width="9" height="13"/>
+        <image name="pause.circle.fill" catalog="system" width="15" height="15"/>
+        <image name="pencil" catalog="system" width="14" height="13"/>
+        <image name="pin" catalog="system" width="15" height="17"/>
+        <image name="puzzlepiece" catalog="system" width="22" height="15"/>
+        <image name="square.and.arrow.up" catalog="system" width="15" height="18"/>
+        <image name="stopwatch" catalog="system" width="15" height="17"/>
+        <image name="text.bubble" catalog="system" width="17" height="16"/>
+        <image name="tortoise" catalog="system" width="25" height="13"/>
+        <image name="trash" catalog="system" width="15" height="17"/>
+        <image name="trash.circle.fill" catalog="system" width="15" height="15"/>
     </resources>
 </document>

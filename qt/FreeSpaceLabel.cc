@@ -76,13 +76,13 @@ void FreeSpaceLabel::onTimer()
 
     auto* q = new RpcQueue{ this };
 
-    q->add([this, &args]() { return session_->exec("free-space", &args); });
+    q->add([this, &args]() { return session_->exec(TR_KEY_free_space_kebab, &args); });
 
     q->add(
         [this](RpcResponse const& r)
         {
             // update the label
-            if (auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes); bytes && *bytes > 1)
+            if (auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes_kebab); bytes && *bytes > 1)
             {
                 setText(tr("%1 free").arg(Formatter::storage_to_string(*bytes)));
             }

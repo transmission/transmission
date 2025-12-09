@@ -101,29 +101,30 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto const val = group_map->value_if<bool>(TR_KEY_uploadLimited))
+        if (auto const val = group_map->value_if<bool>({ TR_KEY_upload_limited, TR_KEY_upload_limited_camel }); val)
         {
             limits.up_limited = *val;
         }
 
-        if (auto const val = group_map->value_if<bool>(TR_KEY_downloadLimited))
+        if (auto const val = group_map->value_if<bool>({ TR_KEY_download_limited, TR_KEY_download_limited_camel }); val)
         {
             limits.down_limited = *val;
         }
 
-        if (auto const val = group_map->value_if<int64_t>(TR_KEY_uploadLimit))
+        if (auto const val = group_map->value_if<int64_t>({ TR_KEY_upload_limit, TR_KEY_upload_limit_camel }); val)
         {
             limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
-        if (auto const val = group_map->value_if<int64_t>(TR_KEY_downloadLimit))
+        if (auto const val = group_map->value_if<int64_t>({ TR_KEY_download_limit, TR_KEY_download_limit_camel }); val)
         {
             limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
 
-        if (auto const val = group_map->value_if<bool>(TR_KEY_honorsSessionLimits))
+        if (auto const val = group_map->value_if<bool>({ TR_KEY_honors_session_limits, TR_KEY_honors_session_limits_camel });
+            val)
         {
             group.honor_parent_limits(TR_UP, *val);
             group.honor_parent_limits(TR_DOWN, *val);
@@ -139,12 +140,12 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     {
         auto const limits = group->get_limits();
         auto group_map = tr_variant::Map{ 6U };
-        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit.count(Speed::Units::KByps));
-        group_map.try_emplace(TR_KEY_downloadLimited, limits.down_limited);
-        group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        group_map.try_emplace(TR_KEY_download_limit, limits.down_limit.count(Speed::Units::KByps));
+        group_map.try_emplace(TR_KEY_download_limited, limits.down_limited);
+        group_map.try_emplace(TR_KEY_honors_session_limits, group->are_parent_limits_honored(TR_UP));
         group_map.try_emplace(TR_KEY_name, name.sv());
-        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit.count(Speed::Units::KByps));
-        group_map.try_emplace(TR_KEY_uploadLimited, limits.up_limited);
+        group_map.try_emplace(TR_KEY_upload_limit, limits.up_limit.count(Speed::Units::KByps));
+        group_map.try_emplace(TR_KEY_upload_limited, limits.up_limited);
         groups_map.try_emplace(name.quark(), std::move(group_map));
     }
 
@@ -416,9 +417,10 @@ tr_session::BoundSocket::BoundSocket(
         return;
     }
 
-    tr_logAddInfo(fmt::format(
-        fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
-        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
+    tr_logAddInfo(
+        fmt::format(
+            fmt::runtime(_("Listening to incoming peer connections on {hostport}")),
+            fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
 
@@ -447,9 +449,8 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
-        auto const source_addr = global_source_address(type);
-        auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
-                                                                                            tr_address::any(TR_AF_INET6);
+        auto const source_addr = source_address(type);
+        auto const default_addr = source_addr && source_addr->is_global_unicast() ? *source_addr : tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
@@ -1505,9 +1506,10 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
 
     if (n_torrents != 0U)
     {
-        tr_logAddInfo(fmt::format(
-            fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
-            fmt::arg("count", n_torrents)));
+        tr_logAddInfo(
+            fmt::format(
+                fmt::runtime(tr_ngettext("Loaded {count} torrent", "Loaded {count} torrents", n_torrents)),
+                fmt::arg("count", n_torrents)));
     }
 
     loaded_promise->set_value(n_torrents);
@@ -1655,6 +1657,15 @@ size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->settings_.cache_size_mbytes;
+}
+
+// ---
+
+void tr_sessionSetCompleteVerifyEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->settings_.torrent_complete_verify_enabled = enabled;
 }
 
 // ---
@@ -2061,6 +2072,10 @@ void tr_session::verify_add(tr_torrent* const tor)
 }
 
 // ---
+void tr_session::flush_torrent_files(tr_torrent_id_t const tor_id) const noexcept
+{
+    this->cache->flush_torrent(tor_id);
+}
 
 void tr_session::close_torrent_files(tr_torrent_id_t const tor_id) noexcept
 {

@@ -112,7 +112,7 @@ template<typename T>
  * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
-[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern);
 
 template<typename T>
 [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
@@ -161,15 +161,15 @@ template<typename T>
     return 0;
 }
 
-constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
+constexpr std::string_view tr_strv_sep(std::string_view* sv, std::string_view delim)
 {
-    auto pos = sv->find(delim);
+    auto pos = sv->find_first_of(delim);
     auto const ret = sv->substr(0, pos);
     sv->remove_prefix(pos != std::string_view::npos ? pos + 1 : std::size(*sv));
     return ret;
 }
 
-constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, std::string_view delim)
 {
     if (std::empty(*sv))
     {
@@ -178,6 +178,16 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char d
 
     *token = tr_strv_sep(sv, delim);
     return true;
+}
+
+constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
+{
+    return tr_strv_sep(sv, { &delim, 1U });
+}
+
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
+{
+    return tr_strv_sep(sv, token, { &delim, 1U });
 }
 
 [[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
@@ -237,7 +247,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 
 /** @param ratio    the ratio to convert to a string
     @param infinity the string representation of "infinity" */
-[[nodiscard]] std::string tr_strratio(double ratio, std::string_view infinity);
+[[nodiscard]] std::string tr_strratio(double ratio, std::string_view none, std::string_view infinity);
 
 // ---
 
