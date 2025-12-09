@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <iostream>
+
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -60,7 +62,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 213U>{ {
     { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab },
     { TR_KEY_done_date, TR_KEY_done_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_download_count, TR_KEY_download_count_camel },
-    { TR_KEY_download_dir, TR_KEY_download_dir_camel }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // Crazy case 1: camel in torrent-get/set, kebab everywhere else
     { TR_KEY_download_dir_free_space, TR_KEY_download_dir_free_space_kebab },
     { TR_KEY_download_limit, TR_KEY_download_limit_camel },
     { TR_KEY_download_limited, TR_KEY_download_limited_camel },
@@ -545,6 +547,7 @@ struct CloneState
     api_compat::Style style = {};
     bool is_rpc = false;
     bool convert_strings = false;
+    bool is_torrent = false;
 };
 
 [[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state)
@@ -580,9 +583,17 @@ struct CloneState
         {
             if (state_.convert_strings)
             {
-                if (auto key = tr_quark_lookup(holder.sv_))
+                if (auto lookup = tr_quark_lookup(holder.sv_))
                 {
-                    return tr_variant{ tr_quark_get_string_view(api_compat::convert(*key, state_.style)) };
+                    auto key = api_compat::convert(*lookup, state_.style);
+
+                    // Crazy case 1: downloadDir in torrent-get, download-dir in session-get
+                    if (state_.is_torrent && key == TR_KEY_download_dir_kebab)
+                    {
+                        key = TR_KEY_download_dir_camel;
+                    }
+
+                    return tr_variant{ tr_quark_get_string_view(key) };
                 }
             }
 
@@ -671,6 +682,7 @@ tr_quark convert(tr_quark const src, Style const style)
 
 tr_variant convert(tr_variant const& src, Style const tgt_style)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " src [" << tr_variant_serde::json().to_string(src) << "]\n";
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
 
@@ -691,6 +703,12 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     auto state = detail::CloneState{};
     state.style = tgt_style;
     state.is_rpc = is_request || is_response;
+
+    if (auto const method = src_top->value_if<std::string_view>(TR_KEY_method))
+    {
+        auto const key = tr_quark_get_string_view(tr_quark_convert(tr_quark_new(*method)));
+        state.is_torrent = key == "torrent_get" || key == "torrent_set";
+    }
 
     auto ret = convert_impl(src, state);
 

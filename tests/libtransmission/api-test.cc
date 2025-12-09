@@ -535,7 +535,7 @@ TEST(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
-    static auto constexpr TestCases = std::array<TestCase, 17U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 20U>{ {
         { "torrent_get current -> current", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
         { "torrent_get current -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
         { "torrent_get legacy -> current", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
@@ -546,34 +546,20 @@ TEST(ApiCompatTest, canConvertRpc)
         { "session_get legacy -> legacy", LegacySessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
         { "session_get current -> current", CurrentSessionGetJson, Style::Current, CurrentSessionGetJson },
 
-        {
-            "free_space current -> current",
-            BadFreeSpaceRequest,
-            Style::Current,
-            BadFreeSpaceRequest,
-        },
+        { "free_space current -> current", BadFreeSpaceRequest, Style::Current, BadFreeSpaceRequest, },
         { "free_space current -> legacy", BadFreeSpaceRequest, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
         { "free_space legacy -> current", BadFreeSpaceRequestLegacy, Style::Current, BadFreeSpaceRequest },
         { "free_space legacy -> legacy", BadFreeSpaceRequestLegacy, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
 
-        {
-            "free_space response current -> current",
-            BadFreeSpaceResponse,
-            Style::Current,
-            BadFreeSpaceResponse,
-        },
-        { "free_space response current -> legacy", BadFreeSpaceResponse, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
-        { "free_space response legacy -> current", BadFreeSpaceResponseLegacy, Style::Current, BadFreeSpaceResponse },
-        { "free_space response legacy -> legacy", BadFreeSpaceResponseLegacy, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+        { "free_space error response current -> current", BadFreeSpaceResponse, Style::Current, BadFreeSpaceResponse, },
+        { "free_space error response current -> legacy", BadFreeSpaceResponse, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+        { "free_space error response legacy -> current", BadFreeSpaceResponseLegacy, Style::Current, BadFreeSpaceResponse },
+        { "free_space error response legacy -> legacy", BadFreeSpaceResponseLegacy, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
 
-        { "session_get response legacy -> current",
-          LegacySessionGetResponseJson,
-          Style::Current,
-          CurrentSessionGetResponseJson },
-        // TODO: current -> legacy
-        // TODO: legacy -> legacy
-        // TODO: current -> current
-        // TODO: error responses
+        { "session_get response current -> current", CurrentSessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
+        { "session_get response current -> legacy", CurrentSessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
+        { "session_get response legacy -> current", LegacySessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
+        { "session_get response legacy -> legacy", LegacySessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
     } };
 
     for (auto [name, src, tgt_style, expected] : TestCases)

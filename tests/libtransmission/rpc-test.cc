@@ -31,7 +31,7 @@ using RpcTest = SessionTest;
 
 namespace
 {
-[[nodiscard]] std::string make_request(tr_session* session, std::string_view const jsonreq)
+[[nodiscard]] std::string makeRequest(tr_session* session, std::string_view const jsonreq)
 {
     auto serde = tr_variant_serde::json().inplace();
 
@@ -899,7 +899,7 @@ TEST_F(RpcTest, relativeFreeSpaceError)
 {
     auto constexpr Input = BadRequest;
     auto constexpr Expected = BadResponse;
-    auto const actual = make_request(session_, Input);
+    auto const actual = makeRequest(session_, Input);
     EXPECT_EQ(Expected, actual);
 }
 
@@ -907,7 +907,7 @@ TEST_F(RpcTest, relativeFreeSpaceErrorLegacy)
 {
     auto constexpr Input = BadRequestLegacy;
     auto constexpr Expected = BadResponseLegacy;
-    auto const actual = make_request(session_, Input);
+    auto const actual = makeRequest(session_, Input);
     EXPECT_EQ(Expected, actual);
 }
 } // namespace free_space_test
