@@ -3010,7 +3010,6 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& re
 void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback)
 {
     auto const lock = session->unique_lock();
-    std::cerr << __FILE__ << ':' << __LINE__ << " request [" << tr_variant_serde::json().to_string(request) << "]\n";
 
     if (auto const* const vec = request.get_if<tr_variant::Vector>(); vec != nullptr)
     {
