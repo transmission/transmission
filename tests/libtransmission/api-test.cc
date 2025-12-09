@@ -493,6 +493,15 @@ constexpr std::string_view BadFreeSpaceRequest = R"json({
         "path": "this/path/is/not/absolute"
     }
 })json";
+
+constexpr std::string_view BadFreeSpaceRequestLegacy = R"json({
+    "arguments": {
+        "path": "this/path/is/not/absolute"
+    },
+    "method": "free-space",
+    "tag": 39693
+})json";
+
 constexpr std::string_view BadFreeSpaceResponse = R"json({
     "error": {
         "code": 3,
@@ -503,14 +512,6 @@ constexpr std::string_view BadFreeSpaceResponse = R"json({
     },
     "id": 39693,
     "jsonrpc": "2.0"
-})json";
-
-constexpr std::string_view BadFreeSpaceRequestLegacy = R"json({
-    "arguments": {
-        "path": "this/path/is/not/absolute"
-    },
-    "method": "free-space",
-    "tag": 39693
 })json";
 
 constexpr std::string_view BadFreeSpaceResponseLegacy = R"json({

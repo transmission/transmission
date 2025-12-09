@@ -201,11 +201,10 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 // ---
 
 namespace api_compat = libtransmission::api_compat;
-using Style = api_compat::Style;
 
 struct tr_variant::CloneState
 {
-    Style style;
+    api_compat::Style style;
     bool is_rpc = false;
     bool convert_strings = false;
 };
@@ -281,7 +280,57 @@ struct tr_variant::CloneState
     return std::visit(Visitor{ state }, val_);
 }
 
-tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
+namespace
+{
+
+/**
+ * Guess the error code from a legacy RPC response message.
+ *
+ * Use case: a modern Transmission client that parses jsonrpc needs to
+ * connect to a legacy Transmission RPC server.
+ *
+ * We're not going to always get this right: There are some edge cases
+ * where legacy Transmission's error messages are unhelpful.
+ */
+[[nodiscard]] JsonRpc::Error::Code guess_error_code(std::string_view const result_in)
+{
+    using namespace JsonRpc;
+
+    auto const result = tr_strlower(result_in);
+
+    if (result == "success")
+        return Error::SUCCESS;
+
+    static auto constexpr Phrases = std::array<std::pair<std::string_view, Error::Code>, 13U>{ {
+        { "absolute", Error::PATH_NOT_ABSOLUTE },
+        { "couldn't fetch blocklist", Error::HTTP_ERROR },
+        { "couldn't save", Error::SYSTEM_ERROR },
+        { "couldn't test port", Error::HTTP_ERROR },
+        { "file index out of range", Error::FILE_IDX_OOR },
+        { "invalid ip protocol", Error::INVALID_PARAMS },
+        { "invalid or corrupt torrent", Error::CORRUPT_TORRENT },
+        { "invalid tracker list", Error::INVALID_TRACKER_LIST },
+        { "labels cannot", Error::INVALID_PARAMS },
+        { "no filename or metainfo specified", Error::INVALID_PARAMS },
+        { "no location", Error::INVALID_PARAMS },
+        { "torrent-rename-path requires 1 torrent", Error::INVALID_PARAMS },
+        { "unrecognized info", Error::UNRECOGNIZED_INFO },
+    } };
+
+    for (auto const& [substr, code] : Phrases)
+    {
+        if (tr_strv_contains(result, substr))
+        {
+            return code;
+        }
+    }
+
+    return {};
+}
+
+} // namespace
+
+tr_variant tr_variant::cloneToStyle(api_compat::Style const tgt_style) const
 {
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
@@ -309,17 +358,68 @@ tr_variant tr_variant::cloneToStyle(Style const tgt_style) const
     // jsonrpc <-> legacy rpc conversion
     if (is_rpc)
     {
-        if (tgt_style == Style::Current)
+        auto const is_jsonrpc = tgt_style == Style::Current;
+
+        // this test works for both jsonrpc and legacy:
+        // - in jsonrpc, 'result' only exists on success
+        // - in legacy, 'result' is always 'success' on success
+        auto const is_success = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success";
+
+        // - use the `jsonrpc` tag in jsonrpc, but not in legacy
+        if (is_jsonrpc)
         {
             tgt_top->try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
-            tgt_top->replace_key(TR_KEY_tag, TR_KEY_id);
         }
         else
         {
             tgt_top->erase(TR_KEY_jsonrpc);
+        }
+
+        // - use `id` in jsonrpc, use `tag` in legacy
+        if (is_jsonrpc)
+        {
+            tgt_top->replace_key(TR_KEY_tag, TR_KEY_id);
+        }
+        else
+        {
             tgt_top->replace_key(TR_KEY_id, TR_KEY_tag);
         }
 
+        if (!is_success && is_response)
+        {
+            if (!is_jsonrpc)
+            {
+                // in legacy error responses:
+                // - copy `error.data.error_string` to `result`
+                // - remove `error` object
+                // - add an empty `arguments` object
+                if (auto const* error = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
+                    if (auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data))
+                        if (auto const* errmsg = data->find_if<std::string_view>(TR_KEY_error_string_camel))
+                            tgt_top->try_emplace(TR_KEY_result, *errmsg);
+
+                tgt_top->erase(TR_KEY_error);
+                tgt_top->try_emplace(TR_KEY_arguments, tr_variant::make_map());
+            }
+            else
+            {
+                // in jsonrpc error message:
+                // - copy `result` to `error.data.error_string`
+                // - ensure `error` object exists and is well-formatted
+                // - remove `result`
+                auto const* errmsg = tgt_top->find_if<std::string_view>(TR_KEY_result);
+                std::string_view errmsg_sv = errmsg ? *errmsg : "unknown error";
+                auto* error = tgt_top->try_emplace(TR_KEY_error, tr_variant::make_map()).first.get_if<tr_variant::Map>();
+                auto* data = error->try_emplace(TR_KEY_data, tr_variant::make_map()).first.get_if<tr_variant::Map>();
+                data->try_emplace(TR_KEY_error_string, errmsg_sv);
+                auto const code = guess_error_code(errmsg_sv);
+                error->try_emplace(TR_KEY_code, code);
+                error->try_emplace(TR_KEY_message, JsonRpc::Error::to_string(code));
+                tgt_top->erase(TR_KEY_result);
+            }
+        }
+
+        //
         if (was_legacy_response && tgt_style == Style::Current)
         {
             auto const success = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success";
