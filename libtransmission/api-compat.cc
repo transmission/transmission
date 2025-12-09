@@ -29,7 +29,7 @@ struct ApiKey
     tr_quark legacy;
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 213U>{ {
+auto constexpr RpcKeys = std::array<ApiKey, 214U>{ {
     { TR_KEY_active_torrent_count, TR_KEY_active_torrent_count_camel },
     { TR_KEY_activity_date, TR_KEY_activity_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_added_date, TR_KEY_added_date_camel }, // TODO(ckerr) legacy duplicate
@@ -42,6 +42,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 213U>{ {
     { TR_KEY_alt_speed_up, TR_KEY_alt_speed_up_kebab },
     { TR_KEY_announce_state, TR_KEY_announce_state_camel },
     { TR_KEY_anti_brute_force_enabled, TR_KEY_anti_brute_force_enabled_kebab },
+    { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab },
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_blocklist_enabled, TR_KEY_blocklist_enabled_kebab },
     { TR_KEY_blocklist_size, TR_KEY_blocklist_size_kebab },
@@ -682,7 +683,7 @@ tr_quark convert(tr_quark const src, Style const style)
 
 tr_variant convert(tr_variant const& src, Style const tgt_style)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " src [" << tr_variant_serde::json().to_string(src) << "]\n";
+    // std::cerr << __FILE__ << ':' << __LINE__ << " src [" << tr_variant_serde::json().to_string(src) << "]\n";
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
 
@@ -694,15 +695,19 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     auto const* const src_top = src.get_if<tr_variant::Map>();
     auto const is_request = src_top->contains(TR_KEY_method);
 
-    auto const was_current_response = src_top->contains(TR_KEY_jsonrpc) &&
-        (src_top->contains(TR_KEY_result) || src_top->contains(TR_KEY_error));
-    auto const was_legacy_response = !src_top->contains(TR_KEY_jsonrpc) && src_top->contains(TR_KEY_result);
-    auto const is_response = was_current_response || was_legacy_response;
+    auto const was_jsonrpc = src_top->contains(TR_KEY_jsonrpc);
+    auto const was_jsonrpc_response = was_jsonrpc && (src_top->contains(TR_KEY_result) || src_top->contains(TR_KEY_error));
+    auto const was_legacy_response = !was_jsonrpc && src_top->contains(TR_KEY_result);
+    auto const is_response = was_jsonrpc_response || was_legacy_response;
     auto const is_rpc = is_request || is_response;
 
     auto state = detail::CloneState{};
     state.style = tgt_style;
     state.is_rpc = is_request || is_response;
+
+    auto const is_success = is_response && (was_jsonrpc_response
+        ? src_top->contains(TR_KEY_result)
+        : src_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success");
 
     if (auto const method = src_top->value_if<std::string_view>(TR_KEY_method))
     {
@@ -719,10 +724,6 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     {
         auto const is_jsonrpc = tgt_style == Style::Current;
 
-        // this test works for both jsonrpc and legacy:
-        // - in jsonrpc, 'result' only exists on success
-        // - in legacy, 'result' is always 'success' on success
-        auto const is_success = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success";
 
         // - use the `jsonrpc` tag in jsonrpc, but not in legacy
         if (is_jsonrpc)
@@ -742,6 +743,15 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
         else
         {
             tgt_top->replace_key(TR_KEY_id, TR_KEY_tag);
+        }
+
+        if (is_success && is_response && was_jsonrpc && !is_jsonrpc)
+        {
+            // in legacy messages:
+            // - move `result` to `arguments`
+            // - add `result: "success"`
+            tgt_top->replace_key(TR_KEY_result, TR_KEY_arguments);
+            tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string("success"));
         }
 
         if (!is_success && is_response)
