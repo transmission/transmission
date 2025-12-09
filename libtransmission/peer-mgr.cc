@@ -1149,6 +1149,13 @@ std::vector<uint8_t> tr_swarm::WishlistMediator::active_request_count(tr_piece_i
             ret[block - begin] += static_cast<uint8_t>(peer->active_requests.test(block));
         }
     }
+    for (auto const& webseed : swarm_.webseeds)
+    {
+        for (auto block = begin; block < end; ++block)
+        {
+            ret[block - begin] += static_cast<uint8_t>(webseed->active_requests.test(block));
+        }
+    }
     return ret;
 }
 
