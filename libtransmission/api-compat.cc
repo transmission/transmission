@@ -713,9 +713,9 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     state.style = tgt_style;
     state.is_rpc = is_request || is_response;
 
-    auto const is_success = is_response && (was_jsonrpc_response
-        ? src_top->contains(TR_KEY_result)
-        : src_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success");
+    auto const is_success = is_response &&
+        (was_jsonrpc_response ? src_top->contains(TR_KEY_result) :
+                                src_top->value_if<std::string_view>(TR_KEY_result).value_or("") == "success");
 
     if (auto const method = src_top->value_if<std::string_view>(TR_KEY_method))
     {
@@ -727,7 +727,8 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     {
         if (auto const* const args = src_top->find_if<tr_variant::Map>(was_jsonrpc ? TR_KEY_result : TR_KEY_arguments))
         {
-            state.is_free_space_response = args->contains(TR_KEY_path) && args->contains(was_jsonrpc ? TR_KEY_size_bytes :TR_KEY_size_bytes_kebab);
+            state.is_free_space_response = args->contains(TR_KEY_path) &&
+                args->contains(was_jsonrpc ? TR_KEY_size_bytes : TR_KEY_size_bytes_kebab);
         }
     }
 
@@ -739,7 +740,6 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     if (is_rpc)
     {
         auto const is_jsonrpc = tgt_style == Style::Current;
-
 
         // - use the `jsonrpc` tag in jsonrpc, but not in legacy
         if (is_jsonrpc)

@@ -557,7 +557,6 @@ constexpr std::string_view WellFormedFreeSpaceLegacyResponse = R"json({
     "tag": 41414
 })json";
 
-
 } // namespace
 
 TEST(ApiCompatTest, convert)
@@ -573,42 +572,39 @@ TEST(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
+
+    // clang-format off
     static auto constexpr TestCases = std::array<TestCase, 28U>{ {
-        { "torrent_get current -> current", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
-        { "torrent_get current -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
-        { "torrent_get legacy -> current", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
-        { "torrent_get legacy -> legacy", LegacyTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
-
-        { "session_get legacy -> current", LegacySessionGetJson, Style::Current, CurrentSessionGetJson },
-        { "session_get current -> legacy", CurrentSessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
-        { "session_get legacy -> legacy", LegacySessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
-        { "session_get current -> current", CurrentSessionGetJson, Style::Current, CurrentSessionGetJson },
-
-        { "free_space current -> current", BadFreeSpaceRequest, Style::Current, BadFreeSpaceRequest, },
-        { "free_space current -> legacy", BadFreeSpaceRequest, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
-        { "free_space legacy -> current", BadFreeSpaceRequestLegacy, Style::Current, BadFreeSpaceRequest },
-        { "free_space legacy -> legacy", BadFreeSpaceRequestLegacy, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
-
-        { "free_space error response current -> current", BadFreeSpaceResponse, Style::Current, BadFreeSpaceResponse, },
-        { "free_space error response current -> legacy", BadFreeSpaceResponse, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
-        { "free_space error response legacy -> current", BadFreeSpaceResponseLegacy, Style::Current, BadFreeSpaceResponse },
+        { "free_space jsonrpc -> jsonrpc", BadFreeSpaceRequest, Style::Current, BadFreeSpaceRequest },
+        { "free_space jsonrpc -> legacy", BadFreeSpaceRequest, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
+        { "free_space error response jsonrpc -> jsonrpc", BadFreeSpaceResponse, Style::Current, BadFreeSpaceResponse },
+        { "free_space error response jsonrpc -> legacy", BadFreeSpaceResponse, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+        { "free_space error response legacy -> jsonrpc", BadFreeSpaceResponseLegacy, Style::Current, BadFreeSpaceResponse },
         { "free_space error response legacy -> legacy", BadFreeSpaceResponseLegacy, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
-
-        { "session_get response current -> current", CurrentSessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
-        { "session_get response current -> legacy", CurrentSessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
-        { "session_get response legacy -> current", LegacySessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
+        { "free_space legacy -> jsonrpc", BadFreeSpaceRequestLegacy, Style::Current, BadFreeSpaceRequest },
+        { "free_space legacy -> legacy", BadFreeSpaceRequestLegacy, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
+        { "free_space req jsonrpc -> jsonrpc", WellFormedFreeSpaceRequest, Style::Current, WellFormedFreeSpaceRequest },
+        { "free_space req jsonrpc -> legacy", WellFormedFreeSpaceRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest },
+        { "free_space req legacy -> jsonrpc", WellFormedFreeSpaceLegacyRequest, Style::Current, WellFormedFreeSpaceRequest },
+        { "free_space req legacy -> legacy", WellFormedFreeSpaceLegacyRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest },
+        { "free_space response jsonrpc -> jsonrpc", WellFormedFreeSpaceResponse, Style::Current, WellFormedFreeSpaceResponse },
+        { "free_space response jsonrpc -> legacy", WellFormedFreeSpaceResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse },
+        { "free_space response legacy -> jsonrpc", WellFormedFreeSpaceLegacyResponse, Style::Current, WellFormedFreeSpaceResponse },
+        { "free_space response legacy -> legacy", WellFormedFreeSpaceLegacyResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse },
+        { "session_get jsonrpc -> jsonrpc", CurrentSessionGetJson, Style::Current, CurrentSessionGetJson },
+        { "session_get jsonrpc -> legacy", CurrentSessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
+        { "session_get legacy -> jsonrpc", LegacySessionGetJson, Style::Current, CurrentSessionGetJson },
+        { "session_get legacy -> legacy", LegacySessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
+        { "session_get response jsonrpc -> jsonrpc", CurrentSessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
+        { "session_get response jsonrpc -> legacy", CurrentSessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
+        { "session_get response legacy -> jsonrpc", LegacySessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
         { "session_get response legacy -> legacy", LegacySessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
-
-        { "free_space req current -> current", WellFormedFreeSpaceRequest, Style::Current, WellFormedFreeSpaceRequest }, 
-        { "free_space req current -> legacy", WellFormedFreeSpaceRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest }, 
-        { "free_space req legacy -> current", WellFormedFreeSpaceLegacyRequest, Style::Current, WellFormedFreeSpaceRequest }, 
-        { "free_space req legacy -> legacy", WellFormedFreeSpaceLegacyRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest }, 
-
-        { "free_space response current -> current", WellFormedFreeSpaceResponse, Style::Current, WellFormedFreeSpaceResponse }, 
-        { "free_space response current -> legacy", WellFormedFreeSpaceResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse }, 
-        { "free_space response legacy -> current", WellFormedFreeSpaceLegacyResponse, Style::Current, WellFormedFreeSpaceResponse }, 
-        { "free_space response legacy -> legacy", WellFormedFreeSpaceLegacyResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse, }, 
+        { "torrent_get jsonrpc -> jsonrpc", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
+        { "torrent_get jsonrpc -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
+        { "torrent_get legacy -> jsonrpc", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
+        { "torrent_get legacy -> legacy", LegacyTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
     } };
+    // clang-format on
 
     for (auto [name, src, tgt_style, expected] : TestCases)
     {
@@ -624,6 +620,8 @@ TEST(ApiCompatTest, canConvertDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
+
+    // clang-format off
     static auto constexpr TestCases = std::array<TestCase, 8U>{ {
         { "settings current -> current", CurrentSettingsJson, Style::Current, CurrentSettingsJson },
         { "settings current -> legacy", CurrentSettingsJson, Style::LegacySettings, LegacySettingsJson },
@@ -635,6 +633,7 @@ TEST(ApiCompatTest, canConvertDataFiles)
         { "stats legacy -> current", LegacyStatsJson, Style::Current, CurrentStatsJson },
         { "stats legacy -> legacy", LegacyStatsJson, Style::LegacySettings, LegacyStatsJson },
     } };
+    // clang-format on
 
     for (auto [name, src, tgt_style, expected] : TestCases)
     {
