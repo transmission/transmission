@@ -17,6 +17,7 @@
 #include <variant>
 #include <vector>
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20

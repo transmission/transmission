@@ -11,6 +11,7 @@
 #include <string_view>
 #include <vector>
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 
 using namespace std::literals;
@@ -797,8 +798,8 @@ std::string_view tr_quark_get_string_view(tr_quark q)
     return q < TR_N_KEYS ? MyStatic[q] : my_runtime[q - TR_N_KEYS];
 }
 
-tr_quark tr_quark_convert(tr_quark const key)
+tr_quark tr_quark_convert(tr_quark const quark)
 {
     using namespace libtransmission::api_compat;
-    return convert(key, Style::Current);
+    return convert(quark, Style::Current);
 }

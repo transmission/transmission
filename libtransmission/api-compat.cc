@@ -505,7 +505,9 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     auto const result = tr_strlower(result_in);
 
     if (result == "success")
+    {
         return Error::SUCCESS;
+    }
 
     static auto constexpr Phrases = std::array<std::pair<std::string_view, Error::Code>, 13U>{ {
         { "absolute", Error::PATH_NOT_ABSOLUTE },
@@ -540,7 +542,7 @@ namespace detail
 {
 struct CloneState
 {
-    api_compat::Style style;
+    api_compat::Style style = {};
     bool is_rpc = false;
     bool convert_strings = false;
 };
@@ -577,8 +579,12 @@ struct CloneState
         tr_variant operator()(tr_variant::StringHolder const& holder) const
         {
             if (state_.convert_strings)
+            {
                 if (auto key = tr_quark_lookup(holder.sv_))
+                {
                     return tr_variant{ tr_quark_get_string_view(api_compat::convert(*key, state_.style)) };
+                }
+            }
 
             return tr_variant{ holder.sv_ };
         }
@@ -589,7 +595,9 @@ struct CloneState
             auto& tgt = ret.val_.emplace<tr_variant::Vector>();
             tgt.reserve(std::size(src));
             for (auto const& val : src)
+            {
                 tgt.emplace_back(convert_impl(val, state_));
+            }
             return ret;
         }
 
@@ -623,23 +631,39 @@ tr_quark convert(tr_quark const src, Style const style)
     {
     case Style::LegacyRpc:
         for (auto const [current, legacy] : RpcKeys)
+        {
             if (src == current || src == legacy)
+            {
                 return legacy;
+            }
+        }
         break;
 
     case Style::LegacySettings:
         for (auto const [current, legacy] : SessionKeys)
+        {
             if (src == current || src == legacy)
+            {
                 return legacy;
+            }
+        }
         break;
 
     case Style::Current:
         for (auto const [current, legacy] : RpcKeys)
+        {
             if (src == current || src == legacy)
+            {
                 return current;
+            }
+        }
         for (auto const [current, legacy] : SessionKeys)
+        {
             if (src == current || src == legacy)
+            {
                 return current;
+            }
+        }
     }
 
     return src;
@@ -651,7 +675,9 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     // I've just been trying to get the tests passing.
 
     if (src.val_.index() != tr_variant::MapIndex)
+    {
         abort(); // FIXME
+    }
 
     auto const* const src_top = src.get_if<tr_variant::Map>();
     auto const is_request = src_top->contains(TR_KEY_method);
@@ -709,9 +735,15 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
                 // - remove `error` object
                 // - add an empty `arguments` object
                 if (auto const* error = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
+                {
                     if (auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data))
+                    {
                         if (auto const* errmsg = data->find_if<std::string_view>(TR_KEY_error_string_camel))
+                        {
                             tgt_top->try_emplace(TR_KEY_result, *errmsg);
+                        }
+                    }
+                }
 
                 tgt_top->erase(TR_KEY_error);
                 tgt_top->try_emplace(TR_KEY_arguments, tr_variant::make_map());
@@ -723,7 +755,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
                 // - ensure `error` object exists and is well-formatted
                 // - remove `result`
                 auto const* errmsg = tgt_top->find_if<std::string_view>(TR_KEY_result);
-                std::string_view errmsg_sv = errmsg ? *errmsg : "unknown error";
+                std::string_view const errmsg_sv = errmsg != nullptr ? *errmsg : "unknown error";
                 auto* error = tgt_top->try_emplace(TR_KEY_error, tr_variant::make_map()).first.get_if<tr_variant::Map>();
                 auto* data = error->try_emplace(TR_KEY_data, tr_variant::make_map()).first.get_if<tr_variant::Map>();
                 data->try_emplace(TR_KEY_error_string, errmsg_sv);

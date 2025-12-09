@@ -27,8 +27,29 @@ using namespace std::literals;
 
 namespace libtransmission::test
 {
-
 using RpcTest = SessionTest;
+
+namespace
+{
+[[nodiscard]] std::string make_request(tr_session* session, std::string_view const jsonreq)
+{
+    auto serde = tr_variant_serde::json().inplace();
+
+    auto const request = serde.parse(jsonreq);
+    if (!request)
+    {
+        return {};
+    }
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session,
+        std::move(*request),
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    return serde.to_string(response);
+}
+} // namespace
 
 TEST_F(RpcTest, EmptyRequest)
 {
@@ -838,7 +859,7 @@ TEST_F(RpcTest, torrentGetLegacy)
     tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
 
-namespace FreeSpaceTest
+namespace free_space_test
 {
 constexpr std::string_view BadRequest = R"json({
     "id": 39693,
@@ -874,23 +895,6 @@ constexpr std::string_view BadResponseLegacy = R"json({
     "tag": 39693
 })json";
 
-[[nodiscard]] std::string make_request(tr_session* session, std::string_view const jsonreq)
-{
-    auto serde = tr_variant_serde::json().inplace();
-
-    auto const request = serde.parse(jsonreq);
-    if (!request)
-        return {};
-
-    auto response = tr_variant{};
-    tr_rpc_request_exec(
-        session,
-        std::move(*request),
-        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
-
-    return serde.to_string(response);
-}
-
 TEST_F(RpcTest, relativeFreeSpaceError)
 {
     auto constexpr Input = BadRequest;
@@ -906,6 +910,6 @@ TEST_F(RpcTest, relativeFreeSpaceErrorLegacy)
     auto const actual = make_request(session_, Input);
     EXPECT_EQ(Expected, actual);
 }
-} // namespace FreeSpaceTest
+} // namespace free_space_test
 
 } // namespace libtransmission::test
