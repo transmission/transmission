@@ -384,6 +384,7 @@ public:
         [[nodiscard]] tr_piece_index_t sequential_download_from_piece() const override;
         [[nodiscard]] size_t count_piece_replication(tr_piece_index_t piece) const override;
         [[nodiscard]] tr_block_span_t block_span(tr_piece_index_t piece) const override;
+        [[nodiscard]] tr_block_span_t raw_block_span(tr_piece_index_t piece) const override;
         [[nodiscard]] tr_piece_index_t piece_count() const override;
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override;
 
@@ -1127,6 +1128,12 @@ tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) c
 {
     return tor_.block_span_for_piece(piece);
 }
+
+tr_block_span_t tr_swarm::WishlistMediator::raw_block_span(tr_piece_index_t piece) const
+{
+    return tor_.block_span_for_piece(piece);
+}
+
 
 tr_piece_index_t tr_swarm::WishlistMediator::piece_count() const
 {
