@@ -549,6 +549,7 @@ struct CloneState
     bool is_rpc = false;
     bool convert_strings = false;
     bool is_torrent = false;
+    bool is_free_space_response = false;
 };
 
 [[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state)
@@ -588,7 +589,7 @@ struct CloneState
                 {
                     auto key = api_compat::convert(*lookup, state_.style);
 
-                    // Crazy case 1: downloadDir in torrent-get, download-dir in session-get
+                    // Crazy case: downloadDir in torrent-get, download-dir in session-get
                     if (state_.is_torrent && key == TR_KEY_download_dir_kebab)
                     {
                         key = TR_KEY_download_dir_camel;
@@ -621,9 +622,17 @@ struct CloneState
             for (auto const& [key, val] : src)
             {
                 auto const pop = state_.convert_strings;
-                auto const new_key = api_compat::convert(key, state_.style);
+                auto new_key = api_compat::convert(key, state_.style);
+                // TODO: shouldn't we be converting when new_key == TR_KEY_arguments?
                 auto const special = (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
                 state_.convert_strings |= special;
+
+                // Crazy case: total_size in free-space, totalSize in torrent-get
+                if (state_.is_free_space_response && new_key == TR_KEY_total_size_camel)
+                {
+                    new_key = TR_KEY_total_size;
+                }
+
                 tgt.insert_or_assign(new_key, convert_impl(val, state_));
                 state_.convert_strings = pop;
             }
@@ -683,7 +692,6 @@ tr_quark convert(tr_quark const src, Style const style)
 
 tr_variant convert(tr_variant const& src, Style const tgt_style)
 {
-    // std::cerr << __FILE__ << ':' << __LINE__ << " src [" << tr_variant_serde::json().to_string(src) << "]\n";
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
 
@@ -713,6 +721,14 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     {
         auto const key = tr_quark_get_string_view(tr_quark_convert(tr_quark_new(*method)));
         state.is_torrent = key == "torrent_get" || key == "torrent_set";
+    }
+
+    if (is_response)
+    {
+        if (auto const* const args = src_top->find_if<tr_variant::Map>(was_jsonrpc ? TR_KEY_result : TR_KEY_arguments))
+        {
+            state.is_free_space_response = args->contains(TR_KEY_path) && args->contains(was_jsonrpc ? TR_KEY_size_bytes :TR_KEY_size_bytes_kebab);
+        }
     }
 
     auto ret = convert_impl(src, state);

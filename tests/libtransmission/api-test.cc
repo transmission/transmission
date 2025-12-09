@@ -520,6 +520,44 @@ constexpr std::string_view BadFreeSpaceResponseLegacy = R"json({
     "tag": 39693
 })json";
 
+constexpr std::string_view WellFormedFreeSpaceRequest = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": "/this/path/does/not/exist"
+    }
+})json";
+
+constexpr std::string_view WellFormedFreeSpaceResponse = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "result": {
+        "path": "/this/path/does/not/exist",
+        "size_bytes": -1,
+        "total_size": -1
+    }
+})json";
+
+constexpr std::string_view WellFormedFreeSpaceLegacyRequest = R"json({
+    "arguments": {
+        "path": "/this/path/does/not/exist"
+    },
+    "method": "free-space",
+    "tag": 41414
+})json";
+
+constexpr std::string_view WellFormedFreeSpaceLegacyResponse = R"json({
+    "arguments": {
+        "path": "/this/path/does/not/exist",
+        "size-bytes": -1,
+        "total_size": -1
+    },
+    "result": "success",
+    "tag": 41414
+})json";
+
+
 } // namespace
 
 TEST(ApiCompatTest, convert)
@@ -535,7 +573,7 @@ TEST(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
-    static auto constexpr TestCases = std::array<TestCase, 20U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 28U>{ {
         { "torrent_get current -> current", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
         { "torrent_get current -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
         { "torrent_get legacy -> current", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
@@ -560,6 +598,16 @@ TEST(ApiCompatTest, canConvertRpc)
         { "session_get response current -> legacy", CurrentSessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
         { "session_get response legacy -> current", LegacySessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
         { "session_get response legacy -> legacy", LegacySessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
+
+        { "free_space req current -> current", WellFormedFreeSpaceRequest, Style::Current, WellFormedFreeSpaceRequest }, 
+        { "free_space req current -> legacy", WellFormedFreeSpaceRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest }, 
+        { "free_space req legacy -> current", WellFormedFreeSpaceLegacyRequest, Style::Current, WellFormedFreeSpaceRequest }, 
+        { "free_space req legacy -> legacy", WellFormedFreeSpaceLegacyRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest }, 
+
+        { "free_space response current -> current", WellFormedFreeSpaceResponse, Style::Current, WellFormedFreeSpaceResponse }, 
+        { "free_space response current -> legacy", WellFormedFreeSpaceResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse }, 
+        { "free_space response legacy -> current", WellFormedFreeSpaceLegacyResponse, Style::Current, WellFormedFreeSpaceResponse }, 
+        { "free_space response legacy -> legacy", WellFormedFreeSpaceLegacyResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse, }, 
     } };
 
     for (auto [name, src, tgt_style, expected] : TestCases)
