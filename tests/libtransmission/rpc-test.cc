@@ -881,6 +881,14 @@ constexpr std::string_view BadResponse = R"json({
     "jsonrpc": "2.0"
 })json";
 
+TEST_F(RpcTest, relativeFreeSpaceError)
+{
+    auto constexpr Input = BadRequest;
+    auto constexpr Expected = BadResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
 constexpr std::string_view BadRequestLegacy = R"json({
     "arguments": {
         "path": "this/path/is/not/absolute"
@@ -895,18 +903,64 @@ constexpr std::string_view BadResponseLegacy = R"json({
     "tag": 39693
 })json";
 
-TEST_F(RpcTest, relativeFreeSpaceError)
-{
-    auto constexpr Input = BadRequest;
-    auto constexpr Expected = BadResponse;
-    auto const actual = makeRequest(session_, Input);
-    EXPECT_EQ(Expected, actual);
-}
-
 TEST_F(RpcTest, relativeFreeSpaceErrorLegacy)
 {
     auto constexpr Input = BadRequestLegacy;
     auto constexpr Expected = BadResponseLegacy;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+constexpr std::string_view WellFormedRequest = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": "/this/path/does/not/exist"
+    }
+})json";
+
+constexpr std::string_view WellFormedResponse = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "result": {
+        "path": "/this/path/does/not/exist",
+        "size-bytes": -1,
+        "size_bytes": -1,
+        "total_size": -1
+    }
+})json";
+
+TEST_F(RpcTest, wellFormedFreeSpace)
+{
+    auto constexpr Input = WellFormedRequest;
+    auto constexpr Expected = WellFormedResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+constexpr std::string_view WellFormedLegacyRequest = R"json({
+    "arguments": {
+        "path": "/this/path/does/not/exist"
+    }
+    "method": "free_space",
+    "tag": 41414,
+})json";
+
+constexpr std::string_view WellFormedLegacyResponse = R"json({
+    "arguments": {
+        "path": "/this/path/does/not/exist",
+        "size-bytes": -1,
+        "size_bytes": -1,
+        "total_size": -1
+    }
+    "tag": 41414,
+})json";
+
+TEST_F(RpcTest, wellFormedLegacyFreeSpace)
+{
+    auto constexpr Input = WellFormedLegacyRequest;
+    auto constexpr Expected = WellFormedLegacyResponse;
     auto const actual = makeRequest(session_, Input);
     EXPECT_EQ(Expected, actual);
 }
