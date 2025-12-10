@@ -41,3 +41,10 @@ enum class Style
 [[nodiscard]] tr_quark convert(tr_quark src, Style tgt_style);
 
 } // namespace libtransmission::api_compat
+
+/**
+ * Get the replacement quark from old deprecated quarks.
+ *
+ * Note: Temporary shim just for the transition period to snake_case.
+ */
+[[nodiscard]] tr_quark tr_quark_convert(tr_quark quark);

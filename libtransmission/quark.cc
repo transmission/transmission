@@ -798,9 +798,3 @@ std::string_view tr_quark_get_string_view(tr_quark q)
 {
     return q < TR_N_KEYS ? MyStatic[q] : my_runtime[q - TR_N_KEYS];
 }
-
-tr_quark tr_quark_convert(tr_quark const quark)
-{
-    using namespace libtransmission::api_compat;
-    return convert(quark, Style::Current);
-}
