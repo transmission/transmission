@@ -9,7 +9,6 @@
 #include <string_view>
 
 #include <libtransmission/quark.h>
-#include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
 

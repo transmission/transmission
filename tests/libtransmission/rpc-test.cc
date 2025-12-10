@@ -27,6 +27,7 @@ using namespace std::literals;
 
 namespace libtransmission::test
 {
+
 using RpcTest = SessionTest;
 
 namespace

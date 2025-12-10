@@ -27,7 +27,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/rpcimpl.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
