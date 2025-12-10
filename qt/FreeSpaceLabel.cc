@@ -82,7 +82,7 @@ void FreeSpaceLabel::onTimer()
         [this](RpcResponse const& r)
         {
             // update the label
-            if (auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes_kebab); bytes && *bytes > 1)
+            if (auto const bytes = dictFind<int64_t>(r.result.get(), TR_KEY_size_bytes_kebab); bytes && *bytes > 1)
             {
                 setText(tr("%1 free").arg(Formatter::storage_to_string(*bytes)));
             }
@@ -92,7 +92,7 @@ void FreeSpaceLabel::onTimer()
             }
 
             // update the tooltip
-            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
+            auto const path = dictFind<QString>(r.result.get(), TR_KEY_path);
             setToolTip(QDir::toNativeSeparators(path.value_or(QString{})));
 
             timer_.start();

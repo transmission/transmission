@@ -289,8 +289,8 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 
     if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
     {
-        ret.args = createVariant();
-        std::swap(*ret.args, *args);
+        ret.result = createVariant();
+        std::swap(*ret.result, *args);
         variantInit(args, false);
     }
 

@@ -37,7 +37,7 @@ extern "C"
 struct RpcResponse
 {
     QString errmsg;
-    TrVariantPtr args;
+    TrVariantPtr result;
     bool success = false;
     QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
 };

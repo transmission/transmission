@@ -103,7 +103,7 @@ void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
         // If for whatever reason the status optional is empty here,
         // then something must have gone wrong with the port test,
         // so the UI should show the "error" state
-        emit portTested(dictFind<bool>(r.args.get(), TR_KEY_port_is_open_kebab), ip_protocol);
+        emit portTested(dictFind<bool>(r.result.get(), TR_KEY_port_is_open_kebab), ip_protocol);
     };
 
     auto* q = new RpcQueue{};
@@ -137,7 +137,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
         [](RpcResponse const& r)
         {
             tr_variant* torrents = nullptr;
-            if (!tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
+            if (!tr_variantDictFindList(r.result.get(), TR_KEY_torrents, &torrents))
             {
                 return;
             }
@@ -490,8 +490,8 @@ void Session::torrentRenamePath(torrent_ids_t const& torrent_ids, QString const&
         [this, &args]() { return exec(TR_KEY_torrent_rename_path_kebab, &args); },
         [](RpcResponse const& r)
         {
-            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path).value_or(QStringLiteral("(unknown)"));
-            auto const name = dictFind<QString>(r.args.get(), TR_KEY_name).value_or(QStringLiteral("(unknown)"));
+            auto const path = dictFind<QString>(r.result.get(), TR_KEY_path).value_or(QStringLiteral("(unknown)"));
+            auto const name = dictFind<QString>(r.result.get(), TR_KEY_name).value_or(QStringLiteral("(unknown)"));
 
             auto* d = new QMessageBox{
                 QMessageBox::Information,
@@ -664,12 +664,12 @@ void Session::refreshTorrents(torrent_ids_t const& torrent_ids, TorrentPropertie
         {
             tr_variant* torrents = nullptr;
 
-            if (tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
+            if (tr_variantDictFindList(r.result.get(), TR_KEY_torrents, &torrents))
             {
                 emit torrentsUpdated(torrents, all_torrents);
             }
 
-            if (tr_variantDictFindList(r.args.get(), TR_KEY_removed, &torrents))
+            if (tr_variantDictFindList(r.result.get(), TR_KEY_removed, &torrents))
             {
                 emit torrentsRemoved(torrents);
             }
@@ -762,7 +762,7 @@ void Session::refreshSessionStats()
 
     q->add([this]() { return exec(TR_KEY_session_stats_kebab, nullptr); });
 
-    q->add([this](RpcResponse const& r) { updateStats(r.args.get()); });
+    q->add([this](RpcResponse const& r) { updateStats(r.result.get()); });
 
     q->run();
 }
@@ -773,7 +773,7 @@ void Session::refreshSessionInfo()
 
     q->add([this]() { return exec(TR_KEY_session_get_kebab, nullptr); });
 
-    q->add([this](RpcResponse const& r) { updateInfo(r.args.get()); });
+    q->add([this](RpcResponse const& r) { updateInfo(r.result.get()); });
 
     q->run();
 }
@@ -787,7 +787,7 @@ void Session::updateBlocklist()
     q->add(
         [this](RpcResponse const& r)
         {
-            if (auto const size = dictFind<int>(r.args.get(), TR_KEY_blocklist_size_kebab); size)
+            if (auto const size = dictFind<int>(r.result.get(), TR_KEY_blocklist_size_kebab); size)
             {
                 setBlocklistSize(*size);
             }
@@ -1028,11 +1028,11 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict)
     q->add(
         [this, add_me](RpcResponse const& r)
         {
-            if (tr_variant* dup = nullptr; tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added_kebab, &dup))
+            if (tr_variant* dup = nullptr; tr_variantDictFindDict(r.result.get(), TR_KEY_torrent_added_kebab, &dup))
             {
                 add_me.disposeSourceFile();
             }
-            else if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate_kebab, &dup))
+            else if (tr_variantDictFindDict(r.result.get(), TR_KEY_torrent_duplicate_kebab, &dup))
             {
                 add_me.disposeSourceFile();
 
