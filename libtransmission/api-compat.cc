@@ -492,6 +492,49 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     { TR_KEY_peer_limit_per_torrent, TR_KEY_peer_limit_per_torrent_kebab },
 } };
 
+[[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
+{
+    if (style == Style::Tr5)
+    {
+        for (auto const [current, legacy] : RpcKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return current;
+            }
+        }
+        for (auto const [current, legacy] : SessionKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return current;
+            }
+        }
+    }
+    else if (is_rpc) // legacy RPC
+    {
+        for (auto const [current, legacy] : RpcKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
+        }
+    }
+    else // legacy datafiles
+    {
+        for (auto const [current, legacy] : SessionKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
+        }
+    }
+
+    return src;
+}
+
 /**
  * Guess the error code from a legacy RPC response message.
  *
@@ -537,49 +580,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     }
 
     return {};
-}
-
-[[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
-{
-    if (style == Style::Tr5)
-    {
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-    }
-    else if (is_rpc) // legacy RPC
-    {
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-    }
-    else // legacy datafiles
-    {
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-    }
-
-    return src;
 }
 } // namespace
 
