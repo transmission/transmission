@@ -713,8 +713,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "use-speed-limit"sv, // .resume
     "use_global_speed_limit"sv, // .resume
     "use_speed_limit"sv, // .resume
-    "user-has-given-informed-consent"sv, // gtk app, qt app
-    "user_has_given_informed_consent"sv, // gtk app, qt app
     "ut_holepunch"sv, // BT protocol
     "ut_metadata"sv, // BEP0011; BT protocol
     "ut_pex"sv, // BEP0010, BEP0011; BT protocol
@@ -1109,7 +1107,6 @@ tr_quark tr_quark_convert(tr_quark const q)
     case TR_KEY_uploaded_ever_camel: return TR_KEY_uploaded_ever;
     case TR_KEY_use_global_speed_limit_kebab: return TR_KEY_use_global_speed_limit;
     case TR_KEY_use_speed_limit_kebab: return TR_KEY_use_speed_limit;
-    case TR_KEY_user_has_given_informed_consent_kebab: return TR_KEY_user_has_given_informed_consent;
     case TR_KEY_utp_enabled_kebab: return TR_KEY_utp_enabled;
     case TR_KEY_watch_dir_kebab: return TR_KEY_watch_dir;
     case TR_KEY_watch_dir_enabled_kebab: return TR_KEY_watch_dir_enabled;
