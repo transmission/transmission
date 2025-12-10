@@ -559,15 +559,6 @@ constexpr std::string_view WellFormedFreeSpaceLegacyResponse = R"json({
 
 } // namespace
 
-TEST(ApiCompatTest, convert)
-{
-    using namespace libtransmission::api_compat;
-
-    EXPECT_EQ(TR_KEY_activity_date, convert(TR_KEY_activity_date, Style::Current));
-    EXPECT_EQ(TR_KEY_activity_date_camel, convert(TR_KEY_activity_date, Style::LegacyRpc));
-    EXPECT_EQ(TR_KEY_activity_date_kebab, convert(TR_KEY_activity_date, Style::LegacySettings));
-}
-
 TEST(ApiCompatTest, canConvertRpc)
 {
     using Style = libtransmission::api_compat::Style;

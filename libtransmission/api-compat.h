@@ -38,8 +38,6 @@ enum class Style
 
 [[nodiscard]] tr_variant convert(tr_variant const& src, Style tgt_style);
 
-[[nodiscard]] tr_quark convert(tr_quark src, Style tgt_style);
-
 } // namespace libtransmission::api_compat
 
 /**

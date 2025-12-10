@@ -539,6 +539,49 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     return {};
 }
 
+tr_quark convert_key(tr_quark const src, Style const style)
+{
+    switch (style)
+    {
+    case Style::LegacyRpc:
+        for (auto const [current, legacy] : RpcKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
+        }
+        break;
+
+    case Style::LegacySettings:
+        for (auto const [current, legacy] : SessionKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
+        }
+        break;
+
+    case Style::Current:
+        for (auto const [current, legacy] : RpcKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return current;
+            }
+        }
+        for (auto const [current, legacy] : SessionKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return current;
+            }
+        }
+    }
+
+    return src;
+}
 } // namespace
 
 namespace detail
@@ -587,7 +630,7 @@ struct CloneState
             {
                 if (auto lookup = tr_quark_lookup(holder.sv_))
                 {
-                    auto key = api_compat::convert(*lookup, state_.style);
+                    auto key = convert_key(*lookup, state_.style);
 
                     // Crazy case: downloadDir in torrent-get, download-dir in session-get
                     if (state_.is_torrent && key == TR_KEY_download_dir_kebab)
@@ -622,7 +665,7 @@ struct CloneState
             for (auto const& [key, val] : src)
             {
                 auto const pop = state_.convert_strings;
-                auto new_key = api_compat::convert(key, state_.style);
+                auto new_key = convert_key(key, state_.style);
                 // TODO: shouldn't we be converting when new_key == TR_KEY_arguments?
                 auto const special = (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
                 state_.convert_strings |= special;
@@ -645,50 +688,6 @@ struct CloneState
     return std::visit(Visitor{ state }, self.val_);
 }
 } // namespace detail
-
-tr_quark convert(tr_quark const src, Style const style)
-{
-    switch (style)
-    {
-    case Style::LegacyRpc:
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-        break;
-
-    case Style::LegacySettings:
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-        break;
-
-    case Style::Current:
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return current;
-            }
-        }
-    }
-
-    return src;
-}
 
 tr_variant convert(tr_variant const& src, Style const tgt_style)
 {
@@ -832,5 +831,5 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 tr_quark tr_quark_convert(tr_quark const quark)
 {
     using namespace libtransmission::api_compat;
-    return convert(quark, Style::Current);
+    return convert_key(quark, Style::Current);
 }
