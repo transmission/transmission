@@ -85,7 +85,7 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
-    RpcResponseFuture sendRequest(TrVariantPtr json);
+    RpcResponseFuture sendRequest(TrVariantPtr json, int64_t id);
     QNetworkAccessManager* networkAccessManager();
     int64_t getNextId();
 

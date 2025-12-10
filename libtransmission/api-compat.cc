@@ -625,10 +625,13 @@ struct CloneState
 
         tr_variant operator()(tr_variant::StringHolder const& holder) const
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " string in [" << holder.sv_ << "]\n";
             if (state_.convert_strings)
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << " trying to convert\n";
                 if (auto lookup = tr_quark_lookup(holder.sv_))
                 {
+                    std::cerr << __FILE__ << ':' << __LINE__ << " lookup succeeded\n";
                     auto key = convert_key(*lookup, state_.style, state_.is_rpc);
 
                     // Crazy case: downloadDir in torrent-get, download-dir in session-get
@@ -637,7 +640,8 @@ struct CloneState
                         key = TR_KEY_download_dir_camel;
                     }
 
-                    return tr_variant{ tr_quark_get_string_view(key) };
+                    std::cerr << __FILE__ << ':' << __LINE__ << " lookup succeeded [" << tr_quark_get_string_view(key) << "]\n";
+                    return tr_variant::unmanaged_string(key);
                 }
             }
 
@@ -665,9 +669,14 @@ struct CloneState
             {
                 auto const pop = state_.convert_strings;
                 auto new_key = convert_key(key, state_.style, state_.is_rpc);
-                // TODO: shouldn't we be converting when new_key == TR_KEY_arguments?
-                auto const special = (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
+                auto const special =
+                    (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids || new_key == TR_KEY_torrents));
+                // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` on previous line with logic to turn on convert
+                // if it's an array inside an array val whose key was `torrents`.
+                // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
                 state_.convert_strings |= special;
+                std::cerr << __FILE__ << ':' << __LINE__ << " is_rpc " << state_.is_rpc << " special " << special
+                          << " convert_strings " << state_.convert_strings << '\n';
 
                 // Crazy case: total_size in free-space, totalSize in torrent-get
                 if (state_.is_free_space_response && new_key == TR_KEY_total_size_camel)
