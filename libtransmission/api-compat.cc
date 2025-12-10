@@ -541,7 +541,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
 
 [[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
 {
-    if (style == Style::Current)
+    if (style == Style::Tr5)
     {
         for (auto const [current, legacy] : RpcKeys)
         {
@@ -738,8 +738,8 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     // jsonrpc <-> legacy rpc conversion
     if (is_rpc)
     {
-        auto const is_jsonrpc = tgt_style == Style::Current;
-        auto const is_legacy = tgt_style != Style::Current;
+        auto const is_jsonrpc = tgt_style == Style::Tr5;
+        auto const is_legacy = tgt_style != Style::Tr5;
 
         // - use `jsonrpc` in jsonrpc, but not in legacy
         // - use `id` in jsonrpc; use `tag` in legacy
@@ -830,5 +830,5 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 tr_quark tr_quark_convert(tr_quark const quark)
 {
     using namespace libtransmission::api_compat;
-    return convert_key(quark, Style::Current, false /*ignored for Style::Current*/);
+    return convert_key(quark, Style::Tr5, false /*ignored for Style::Tr5*/);
 }
