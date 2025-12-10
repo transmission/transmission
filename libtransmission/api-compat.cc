@@ -833,6 +833,15 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     return style;
 }
 
+[[nodiscard]] tr_variant convert_outgoing_data(tr_variant const& src)
+{
+    return convert(src, get_export_settings_style());
+}
+
+[[nodiscard]] tr_variant convert_incoming_data(tr_variant const& src)
+{
+    return convert(src, Style::Tr5);
+}
 } // namespace libtransmission::api_compat
 
 tr_quark tr_quark_convert(tr_quark const quark)
