@@ -101,7 +101,7 @@ public:
 
         [[nodiscard]] auto contains(tr_quark const key) const noexcept
         {
-            return find(key) != end();
+            return find(key) != end(); // NOLINT(readability-container-contains)
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
