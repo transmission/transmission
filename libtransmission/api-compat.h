@@ -11,24 +11,23 @@ struct tr_variant;
 
 namespace libtransmission::api_compat
 {
+// Nothing to see here.
+// Exposed as public only so tr_variant can see it & declare it a friend.
 namespace detail
 {
-
 struct CloneState;
-
 [[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state);
-
 } // namespace detail
 
 enum class Style
 {
-    // RPC naming scheme before we migrated to snake case.
+    // Tr4: mixed-case keys, bespoke RPC
     LegacyRpc,
 
-    // settings.json naming scheme before we migrated to snake case.
+    // Tr4: mixed-case keys
     LegacySettings,
 
-    // The current style: everything in snake case..
+    // Tr5: snake_case keys everywhere + jsonrpc for RPC
     Current,
 
     // Use case for exporting to legacy: users can use the
