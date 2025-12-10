@@ -99,7 +99,6 @@ bool change(TorrentFile& setme, tr_variant const* value)
         changed = change(setme.key, child) || changed; \
         break;
 
-            HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY

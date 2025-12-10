@@ -30,6 +30,28 @@ namespace libtransmission::test
 
 using RpcTest = SessionTest;
 
+namespace
+{
+[[nodiscard]] std::string makeRequest(tr_session* session, std::string_view const jsonreq)
+{
+    auto serde = tr_variant_serde::json().inplace();
+
+    auto const request = serde.parse(jsonreq);
+    if (!request)
+    {
+        return {};
+    }
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session,
+        std::move(*request),
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    return serde.to_string(response);
+}
+} // namespace
+
 TEST_F(RpcTest, EmptyRequest)
 {
     static auto constexpr Request = ""sv;
@@ -99,7 +121,7 @@ TEST_F(RpcTest, JsonRpcWrongVersion)
 {
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, "1.0");
-    request_map.try_emplace(TR_KEY_method, "session_stats");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
     request_map.try_emplace(TR_KEY_id, 12345);
 
     auto response = tr_variant{};
@@ -141,7 +163,7 @@ TEST_F(RpcTest, idSync)
     {
         auto request_map = tr_variant::Map{ 3U };
         request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-        request_map.try_emplace(TR_KEY_method, "session-stats");
+        request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats_kebab));
         request_map[TR_KEY_id].merge(request_id); // copy
 
         auto response = tr_variant{};
@@ -187,7 +209,7 @@ TEST_F(RpcTest, idWrongType)
     {
         auto request_map = tr_variant::Map{ 3U };
         request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-        request_map.try_emplace(TR_KEY_method, "session_stats");
+        request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
         request_map[TR_KEY_id].merge(request_id); // copy
 
         auto response = tr_variant{};
@@ -221,7 +243,7 @@ TEST_F(RpcTest, idWrongType)
 TEST_F(RpcTest, tagSyncLegacy)
 {
     auto request_map = tr_variant::Map{ 2U };
-    request_map.try_emplace(TR_KEY_method, "session_stats");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
     request_map.try_emplace(TR_KEY_tag, 12345);
 
     auto response = tr_variant{};
@@ -255,7 +277,7 @@ TEST_F(RpcTest, idAsync)
 
         auto request_map = tr_variant::Map{ 3U };
         request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-        request_map.try_emplace(TR_KEY_method, "torrent-rename-path");
+        request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_rename_path_kebab));
         request_map[TR_KEY_id].merge(request_id); // copy
 
         auto params_map = tr_variant::Map{ 2U };
@@ -306,7 +328,7 @@ TEST_F(RpcTest, tagAsyncLegacy)
     EXPECT_NE(nullptr, tor);
 
     auto request_map = tr_variant::Map{ 3U };
-    request_map.try_emplace(TR_KEY_method, "torrent_rename_path");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_rename_path));
     request_map.try_emplace(TR_KEY_tag, 12345);
 
     auto arguments_map = tr_variant::Map{ 2U };
@@ -339,7 +361,7 @@ TEST_F(RpcTest, NotificationSync)
 {
     auto request_map = tr_variant::Map{ 2U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "session_stats");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats));
 
     auto response = tr_variant{};
     tr_rpc_request_exec(
@@ -357,7 +379,7 @@ TEST_F(RpcTest, NotificationAsync)
 
     auto request_map = tr_variant::Map{ 2U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "torrent_rename_path");
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_rename_path));
 
     auto params_map = tr_variant::Map{ 2U };
     params_map.try_emplace(TR_KEY_path, "files-filled-with-zeroes/512");
@@ -440,18 +462,18 @@ TEST_F(RpcTest, batch)
 
     auto request = tr_variant::Map{ 3U };
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "session-stats");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats_kebab));
     request.try_emplace(TR_KEY_id, 12345);
     request_vec.emplace_back(std::move(request));
 
     request = tr_variant::Map{ 2U };
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "session-set");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_set_kebab));
     request_vec.emplace_back(std::move(request));
 
     request = tr_variant::Map{ 3U };
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "session-stats");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats_kebab));
     request.try_emplace(TR_KEY_id, "12345"sv);
     request_vec.emplace_back(std::move(request));
 
@@ -473,7 +495,7 @@ TEST_F(RpcTest, batch)
     request_vec.emplace_back(std::move(request));
 
     request = tr_variant::Map{ 2U };
-    request.try_emplace(TR_KEY_method, "session-stats");
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_stats_kebab));
     request.try_emplace(TR_KEY_tag, 12345);
     request_vec.emplace_back(std::move(request));
 
@@ -592,7 +614,7 @@ TEST_F(RpcTest, sessionGet)
 
     auto request_map = tr_variant::Map{ 3U };
     request_map.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request_map.try_emplace(TR_KEY_method, "session_get"sv);
+    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_session_get));
     request_map.try_emplace(TR_KEY_id, 12345);
     auto response = tr_variant{};
     tr_rpc_request_exec(
@@ -764,7 +786,7 @@ TEST_F(RpcTest, torrentGet)
     auto request = tr_variant::Map{ 3U };
 
     request.try_emplace(TR_KEY_jsonrpc, JsonRpc::Version);
-    request.try_emplace(TR_KEY_method, "torrent_get"sv);
+    request.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(TR_KEY_torrent_get));
     request.try_emplace(TR_KEY_id, 12345);
 
     auto params = tr_variant::Map{ 1U };
@@ -797,5 +819,162 @@ TEST_F(RpcTest, torrentGet)
     // cleanup
     tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
 }
+
+TEST_F(RpcTest, torrentGetLegacy)
+{
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
+    EXPECT_NE(nullptr, tor);
+
+    auto request = tr_variant::Map{ 1U };
+
+    request.try_emplace(TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_get_kebab));
+
+    auto args_in = tr_variant::Map{ 1U };
+    auto fields = tr_variant::Vector{};
+    fields.emplace_back(tr_quark_get_string_view(TR_KEY_id));
+    args_in.try_emplace(TR_KEY_fields, std::move(fields));
+    request.try_emplace(TR_KEY_arguments, std::move(args_in));
+
+    auto response = tr_variant{};
+    tr_rpc_request_exec(
+        session_,
+        std::move(request),
+        [&response](tr_session* /*session*/, tr_variant&& resp) { response = std::move(resp); });
+
+    auto* response_map = response.get_if<tr_variant::Map>();
+    ASSERT_NE(response_map, nullptr);
+    auto* args_out = response_map->find_if<tr_variant::Map>(TR_KEY_arguments);
+    ASSERT_NE(args_out, nullptr);
+
+    auto* torrents = args_out->find_if<tr_variant::Vector>(TR_KEY_torrents);
+    ASSERT_NE(torrents, nullptr);
+    EXPECT_EQ(1UL, std::size(*torrents));
+
+    auto* first_torrent = (*torrents)[0].get_if<tr_variant::Map>();
+    ASSERT_NE(first_torrent, nullptr);
+    auto first_torrent_id = first_torrent->value_if<int64_t>(TR_KEY_id);
+    ASSERT_TRUE(first_torrent_id);
+    EXPECT_EQ(1, *first_torrent_id);
+
+    // cleanup
+    tr_torrentRemove(tor, false, nullptr, nullptr, nullptr, nullptr);
+}
+
+namespace free_space_test
+{
+constexpr std::string_view BadRequest = R"json({
+    "id": 39693,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": "this/path/is/not/absolute"
+    }
+})json";
+constexpr std::string_view BadResponse = R"json({
+    "error": {
+        "code": 3,
+        "data": {
+            "error_string": "directory path is not absolute"
+        },
+        "message": "path is not absolute"
+    },
+    "id": 39693,
+    "jsonrpc": "2.0"
+})json";
+
+TEST_F(RpcTest, relativeFreeSpaceError)
+{
+    auto constexpr Input = BadRequest;
+    auto constexpr Expected = BadResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+constexpr std::string_view BadRequestLegacy = R"json({
+    "arguments": {
+        "path": "this/path/is/not/absolute"
+    },
+    "method": "free-space",
+    "tag": 39693
+})json";
+
+constexpr std::string_view BadResponseLegacy = R"json({
+    "arguments": {},
+    "result": "directory path is not absolute",
+    "tag": 39693
+})json";
+
+TEST_F(RpcTest, relativeFreeSpaceErrorLegacy)
+{
+    auto constexpr Input = BadRequestLegacy;
+    auto constexpr Expected = BadResponseLegacy;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+#ifdef _WIN32
+// JSON expects backslashes escaped, hence the double escaping here.
+#define RPC_NON_EXISTENT_PATH "C:\\\\this\\\\path\\\\does\\\\not\\\\exist"
+#else
+#define RPC_NON_EXISTENT_PATH "/this/path/does/not/exist"
+#endif
+
+constexpr std::string_view WellFormedRequest = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "method": "free_space",
+    "params": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json("
+    }
+})json";
+
+constexpr std::string_view WellFormedResponse = R"json({
+    "id": 41414,
+    "jsonrpc": "2.0",
+    "result": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json(",
+        "size-bytes": -1,
+        "size_bytes": -1,
+        "total_size": -1
+    }
+})json";
+
+TEST_F(RpcTest, wellFormedFreeSpace)
+{
+    auto constexpr Input = WellFormedRequest;
+    auto constexpr Expected = WellFormedResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+
+constexpr std::string_view WellFormedLegacyRequest = R"json({
+    "arguments": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json("
+    },
+    "method": "free-space",
+    "tag": 41414
+})json";
+
+constexpr std::string_view WellFormedLegacyResponse = R"json({
+    "arguments": {
+        "path": ")json" RPC_NON_EXISTENT_PATH R"json(",
+        "size-bytes": -1,
+        "size_bytes": -1,
+        "total_size": -1
+    },
+    "result": "success",
+    "tag": 41414
+})json";
+
+#undef RPC_NON_EXISTENT_PATH
+
+TEST_F(RpcTest, wellFormedLegacyFreeSpace)
+{
+    auto constexpr Input = WellFormedLegacyRequest;
+    auto constexpr Expected = WellFormedLegacyResponse;
+    auto const actual = makeRequest(session_, Input);
+    EXPECT_EQ(Expected, actual);
+}
+} // namespace free_space_test
 
 } // namespace libtransmission::test

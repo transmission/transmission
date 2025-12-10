@@ -24,7 +24,11 @@
 
 using namespace std::literals;
 
-using VariantTest = ::testing::Test;
+class VariantTest : public ::testing::Test
+{
+protected:
+    static void expectVariantMatchesQuark(tr_quark key);
+};
 
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
@@ -80,6 +84,35 @@ TEST_F(VariantTest, getType)
     sv = v.value_if<std::string_view>();
     ASSERT_TRUE(sv);
     EXPECT_EQ(strkey, *sv);
+}
+
+// static
+void VariantTest::expectVariantMatchesQuark(tr_quark const key)
+{
+    auto const key_sv = tr_quark_get_string_view(key);
+
+    auto const var = tr_variant::unmanaged_string(key);
+    auto const var_sv = var.value_if<std::string_view>();
+    ASSERT_TRUE(var_sv);
+
+    // The strings should not just be equal,
+    // but should point to literally the same memory
+    EXPECT_EQ(key_sv, *var_sv);
+    EXPECT_EQ(std::data(key_sv), std::data(*var_sv));
+}
+
+TEST_F(VariantTest, unmanagedStringFromPredefinedQuark)
+{
+    expectVariantMatchesQuark(TR_KEY_name);
+}
+
+TEST_F(VariantTest, unmanagedStringFromNewQuark)
+{
+    static auto constexpr NewString = std::string_view{ "this-string-is-not-already-interned" };
+    ASSERT_FALSE(tr_quark_lookup(NewString));
+
+    auto const key = tr_quark_new(NewString);
+    expectVariantMatchesQuark(key);
 }
 
 TEST_F(VariantTest, parseInt)

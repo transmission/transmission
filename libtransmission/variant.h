@@ -101,7 +101,7 @@ public:
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
         {
-            static auto constexpr Predicate = [](auto const& item, tr_quark key)
+            auto constexpr Predicate = [](auto const& item, tr_quark key)
             {
                 return item.first == key;
             };
@@ -270,6 +270,11 @@ public:
         auto ret = tr_variant{};
         ret.val_.emplace<StringHolder>().set_unmanaged(val);
         return ret;
+    }
+
+    [[nodiscard]] static tr_variant unmanaged_string(tr_quark const key)
+    {
+        return unmanaged_string(tr_quark_get_string_view(key));
     }
 
     template<typename Val>

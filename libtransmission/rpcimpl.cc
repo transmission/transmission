@@ -19,6 +19,8 @@
 
 #include <fmt/format.h>
 
+#include <small/map.hpp>
+
 #include <libdeflate.h>
 
 #include "libtransmission/transmission.h"
@@ -127,11 +129,29 @@ namespace
 
 namespace
 {
+[[nodiscard]] constexpr bool is_valid_id(tr_variant const& val)
+{
+    switch (val.index())
+    {
+    // https://www.jsonrpc.org/specification#request_object
+    // An identifier established by the Client that MUST contain a String,
+    // Number, or NULL value if included. .. The value SHOULD normally not
+    // be Null and Numbers SHOULD NOT contain fractional parts
+    case tr_variant::StringIndex:
+    case tr_variant::IntIndex:
+    case tr_variant::DoubleIndex:
+    case tr_variant::NullIndex:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
 // https://www.jsonrpc.org/specification#response_object
 [[nodiscard]] tr_variant::Map build_response(Error::Code code, tr_variant id, tr_variant::Map&& body)
 {
-    if (id.index() != tr_variant::StringIndex && id.index() != tr_variant::IntIndex && id.index() != tr_variant::DoubleIndex &&
-        id.index() != tr_variant::NullIndex)
+    if (!is_valid_id(id))
     {
         TR_ASSERT(false);
         id = nullptr;
@@ -2809,36 +2829,36 @@ namespace session_get_helpers
 
 using SyncHandler = std::pair<JsonRpc::Error::Code, std::string> (*)(tr_session*, tr_variant::Map const&, tr_variant::Map&);
 
-auto constexpr SyncHandlers = std::array<std::tuple<std::string_view, SyncHandler, bool /*has_side_effects*/>, 20U>{ {
-    { "free_space"sv, freeSpace, false },
-    { "group_get"sv, groupGet, false },
-    { "group_set"sv, groupSet, true },
-    { "queue_move_bottom"sv, queueMoveBottom, true },
-    { "queue_move_down"sv, queueMoveDown, true },
-    { "queue_move_top"sv, queueMoveTop, true },
-    { "queue_move_up"sv, queueMoveUp, true },
-    { "session_close"sv, sessionClose, true },
-    { "session_get"sv, sessionGet, false },
-    { "session_set"sv, sessionSet, true },
-    { "session_stats"sv, sessionStats, false },
-    { "torrent_get"sv, torrentGet, false },
-    { "torrent_reannounce"sv, torrentReannounce, true },
-    { "torrent_remove"sv, torrentRemove, true },
-    { "torrent_set"sv, torrentSet, true },
-    { "torrent_set_location"sv, torrentSetLocation, true },
-    { "torrent_start"sv, torrentStart, true },
-    { "torrent_start_now"sv, torrentStartNow, true },
-    { "torrent_stop"sv, torrentStop, true },
-    { "torrent_verify"sv, torrentVerify, true },
+auto const sync_handlers = small::max_size_map<tr_quark, std::pair<SyncHandler, bool /*has_side_effects*/>, 20U>{ {
+    { TR_KEY_free_space, { freeSpace, false } },
+    { TR_KEY_group_get, { groupGet, false } },
+    { TR_KEY_group_set, { groupSet, true } },
+    { TR_KEY_queue_move_bottom, { queueMoveBottom, true } },
+    { TR_KEY_queue_move_down, { queueMoveDown, true } },
+    { TR_KEY_queue_move_top, { queueMoveTop, true } },
+    { TR_KEY_queue_move_up, { queueMoveUp, true } },
+    { TR_KEY_session_close, { sessionClose, true } },
+    { TR_KEY_session_get, { sessionGet, false } },
+    { TR_KEY_session_set, { sessionSet, true } },
+    { TR_KEY_session_stats, { sessionStats, false } },
+    { TR_KEY_torrent_get, { torrentGet, false } },
+    { TR_KEY_torrent_reannounce, { torrentReannounce, true } },
+    { TR_KEY_torrent_remove, { torrentRemove, true } },
+    { TR_KEY_torrent_set, { torrentSet, true } },
+    { TR_KEY_torrent_set_location, { torrentSetLocation, true } },
+    { TR_KEY_torrent_start, { torrentStart, true } },
+    { TR_KEY_torrent_start_now, { torrentStartNow, true } },
+    { TR_KEY_torrent_stop, { torrentStop, true } },
+    { TR_KEY_torrent_verify, { torrentVerify, true } },
 } };
 
 using AsyncHandler = void (*)(tr_session*, tr_variant::Map const&, DoneCb&&, tr_rpc_idle_data*);
 
-auto constexpr AsyncHandlers = std::array<std::tuple<std::string_view, AsyncHandler, bool /*has_side_effects*/>, 4U>{ {
-    { "blocklist_update"sv, blocklistUpdate, true },
-    { "port_test"sv, portTest, false },
-    { "torrent_add"sv, torrentAdd, true },
-    { "torrent_rename_path"sv, torrentRenamePath, true },
+auto const async_handlers = small::max_size_map<tr_quark, std::pair<AsyncHandler, bool /*has_side_effects*/>, 4U>{ {
+    { TR_KEY_blocklist_update, { blocklistUpdate, true } },
+    { TR_KEY_port_test, { portTest, false } },
+    { TR_KEY_torrent_add, { torrentAdd, true } },
+    { TR_KEY_torrent_rename_path, { torrentRenamePath, true } },
 } };
 
 void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
@@ -2887,59 +2907,36 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
     }
 
     auto const method_name = map->value_if<std::string_view>(TR_KEY_method).value_or(""sv);
+    auto const method_key = tr_quark_convert(tr_quark_new(method_name));
 
     auto data = tr_rpc_idle_data{};
     data.session = session;
-    if (is_jsonrpc)
+
+    if (auto iter = map->find(is_jsonrpc ? TR_KEY_id : TR_KEY_tag); iter != std::end(*map))
     {
-        if (auto it_id = map->find(TR_KEY_id); it_id != std::end(*map))
+        tr_variant const& id = iter->second;
+        if (is_jsonrpc && !is_valid_id(id))
         {
-            auto const& id = it_id->second;
-            switch (id.index())
-            {
-            case tr_variant::StringIndex:
-            case tr_variant::IntIndex:
-            case tr_variant::DoubleIndex:
-            case tr_variant::NullIndex:
-                data.id.merge(id); // copy
-                break;
-            default:
-                callback(
-                    session,
-                    build_response(
-                        Error::INVALID_REQUEST,
-                        nullptr,
-                        Error::build_data("id type must be String, Number, or Null"sv, {})));
-                return;
-            }
+            callback(
+                session,
+                build_response(
+                    Error::INVALID_REQUEST,
+                    nullptr,
+                    Error::build_data("id type must be String, Number, or Null"sv, {})));
+            return;
         }
+        data.id.merge(id);
     }
-    else if (auto tag = map->value_if<int64_t>(TR_KEY_tag); tag)
-    {
-        data.id = *tag;
-    }
+
     data.callback = std::move(callback);
 
     auto const is_notification = is_jsonrpc && !data.id.has_value();
 
     auto done_cb = is_jsonrpc ? tr_rpc_idle_done : tr_rpc_idle_done_legacy;
 
-    auto const test = [method_name](auto const& handler)
+    if (auto const handler = async_handlers.find(method_key); handler != std::end(async_handlers))
     {
-        auto const& name = std::get<0>(handler);
-        if (name == method_name)
-        {
-            return true;
-        }
-
-        auto kebab_case = std::string{ name };
-        std::replace(std::begin(kebab_case), std::end(kebab_case), '_', '-');
-        return kebab_case == method_name;
-    };
-
-    if (auto const end = std::end(AsyncHandlers), handler = std::find_if(std::begin(AsyncHandlers), end, test); handler != end)
-    {
-        auto const& [name, func, has_side_effects] = *handler;
+        auto const& [func, has_side_effects] = handler->second;
         if (is_notification && !has_side_effects)
         {
             done_cb(&data, Error::SUCCESS, {});
@@ -2958,9 +2955,9 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
         return;
     }
 
-    if (auto const end = std::end(SyncHandlers), handler = std::find_if(std::begin(SyncHandlers), end, test); handler != end)
+    if (auto const handler = sync_handlers.find(method_key); handler != std::end(sync_handlers))
     {
-        auto const& [name, func, has_side_effects] = *handler;
+        auto const& [func, has_side_effects] = handler->second;
         if (is_notification && !has_side_effects)
         {
             done_cb(&data, Error::SUCCESS, {});

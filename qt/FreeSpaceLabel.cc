@@ -76,7 +76,7 @@ void FreeSpaceLabel::onTimer()
 
     auto* q = new RpcQueue{ this };
 
-    q->add([this, &args]() { return session_->exec("free-space", &args); });
+    q->add([this, &args]() { return session_->exec(TR_KEY_free_space_kebab, &args); });
 
     q->add(
         [this](RpcResponse const& r)

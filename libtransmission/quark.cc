@@ -73,11 +73,13 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "blocklist-date"sv,
     "blocklist-enabled"sv,
     "blocklist-size"sv,
+    "blocklist-update"sv,
     "blocklist-updates-enabled"sv,
     "blocklist-url"sv,
     "blocklist_date"sv,
     "blocklist_enabled"sv,
     "blocklist_size"sv,
+    "blocklist_update"sv,
     "blocklist_updates_enabled"sv,
     "blocklist_url"sv,
     "blocks"sv,
@@ -112,7 +114,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "current-stats"sv,
     "current_stats"sv,
     "data"sv,
-    "date"sv,
     "dateCreated"sv,
     "date_created"sv,
     "default-trackers"sv,
@@ -196,6 +197,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "flag_str"sv,
     "flags"sv,
     "format"sv,
+    "free-space"sv,
+    "free_space"sv,
     "fromCache"sv,
     "fromDht"sv,
     "fromIncoming"sv,
@@ -211,13 +214,16 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "from_pex"sv,
     "from_tracker"sv,
     "group"sv,
+    "group-get"sv,
+    "group-set"sv,
+    "group_get"sv,
+    "group_set"sv,
     "hasAnnounced"sv,
     "hasScraped"sv,
     "has_announced"sv,
     "has_scraped"sv,
     "hashString"sv,
     "hash_string"sv,
-    "have"sv,
     "haveUnchecked"sv,
     "haveValid"sv,
     "have_unchecked"sv,
@@ -400,8 +406,10 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "port"sv,
     "port-forwarding-enabled"sv,
     "port-is-open"sv,
+    "port-test"sv,
     "port_forwarding_enabled"sv,
     "port_is_open"sv,
+    "port_test"sv,
     "preallocation"sv,
     "preferred_transports"sv,
     "primary-mime-type"sv,
@@ -419,9 +427,17 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "prompt-before-exit"sv,
     "prompt_before_exit"sv,
     "proxy_url"sv,
+    "queue-move-bottom"sv,
+    "queue-move-down"sv,
+    "queue-move-top"sv,
+    "queue-move-up"sv,
     "queue-stalled-enabled"sv,
     "queue-stalled-minutes"sv,
     "queuePosition"sv,
+    "queue_move_bottom"sv,
+    "queue_move_down"sv,
+    "queue_move_top"sv,
+    "queue_move_up"sv,
     "queue_position"sv,
     "queue_stalled_enabled"sv,
     "queue_stalled_minutes"sv,
@@ -537,11 +553,19 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "seeding_time_seconds"sv,
     "sequential_download"sv,
     "sequential_download_from_piece"sv,
+    "session-close"sv,
     "session-count"sv,
+    "session-get"sv,
     "session-id"sv,
+    "session-set"sv,
+    "session-stats"sv,
     "sessionCount"sv,
+    "session_close"sv,
     "session_count"sv,
+    "session_get"sv,
     "session_id"sv,
+    "session_set"sv,
+    "session_stats"sv,
     "show-backup-trackers"sv,
     "show-extra-peer-details"sv,
     "show-filterbar"sv,
@@ -565,6 +589,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "size_bytes"sv,
     "size_units"sv,
     "size_when_done"sv,
+    "sleep-per-seconds-during-verify"sv,
     "sleep_per_seconds_during_verify"sv,
     "socket_address"sv,
     "sort-mode"sv,
@@ -602,20 +627,27 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "tcp_enabled"sv,
     "tier"sv,
     "time-checked"sv,
+    "torrent-add"sv,
     "torrent-added"sv,
-    "torrent-added-notification-command"sv,
     "torrent-added-notification-enabled"sv,
     "torrent-added-verify-mode"sv,
-    "torrent-complete-notification-command"sv,
     "torrent-complete-notification-enabled"sv,
     "torrent-complete-sound-command"sv,
     "torrent-complete-sound-enabled"sv,
     "torrent-duplicate"sv,
     "torrent-get"sv,
+    "torrent-reannounce"sv,
+    "torrent-remove"sv,
+    "torrent-rename-path"sv,
     "torrent-set"sv,
     "torrent-set-location"sv,
+    "torrent-start"sv,
+    "torrent-start-now"sv,
+    "torrent-stop"sv,
+    "torrent-verify"sv,
     "torrentCount"sv,
     "torrentFile"sv,
+    "torrent_add"sv,
     "torrent_added"sv,
     "torrent_added_notification_enabled"sv,
     "torrent_added_verify_mode"sv,
@@ -627,8 +659,15 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "torrent_duplicate"sv,
     "torrent_file"sv,
     "torrent_get"sv,
+    "torrent_reannounce"sv,
+    "torrent_remove"sv,
+    "torrent_rename_path"sv,
     "torrent_set"sv,
     "torrent_set_location"sv,
+    "torrent_start"sv,
+    "torrent_start_now"sv,
+    "torrent_stop"sv,
+    "torrent_verify"sv,
     "torrents"sv,
     "totalSize"sv,
     "total_size"sv,
@@ -788,6 +827,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_blocklist_date_kebab: return TR_KEY_blocklist_date;
     case TR_KEY_blocklist_enabled_kebab: return TR_KEY_blocklist_enabled;
     case TR_KEY_blocklist_size_kebab: return TR_KEY_blocklist_size;
+    case TR_KEY_blocklist_update_kebab: return TR_KEY_blocklist_update;
     case TR_KEY_blocklist_updates_enabled_kebab: return TR_KEY_blocklist_updates_enabled;
     case TR_KEY_blocklist_url_kebab: return TR_KEY_blocklist_url;
     case TR_KEY_bytes_completed_camel: return TR_KEY_bytes_completed;
@@ -839,6 +879,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_filter_text_kebab: return TR_KEY_filter_text;
     case TR_KEY_filter_trackers_kebab: return TR_KEY_filter_trackers;
     case TR_KEY_flag_str_camel: return TR_KEY_flag_str;
+    case TR_KEY_free_space_kebab: return TR_KEY_free_space;
     case TR_KEY_from_cache_camel: return TR_KEY_from_cache;
     case TR_KEY_from_dht_camel: return TR_KEY_from_dht;
     case TR_KEY_from_incoming_camel: return TR_KEY_from_incoming;
@@ -846,6 +887,8 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_from_ltep_camel: return TR_KEY_from_ltep;
     case TR_KEY_from_pex_camel: return TR_KEY_from_pex;
     case TR_KEY_from_tracker_camel: return TR_KEY_from_tracker;
+    case TR_KEY_group_get_kebab: return TR_KEY_group_get;
+    case TR_KEY_group_set_kebab: return TR_KEY_group_set;
     case TR_KEY_hash_string_camel: return TR_KEY_hash_string;
     case TR_KEY_has_announced_camel: return TR_KEY_has_announced;
     case TR_KEY_has_scraped_camel: return TR_KEY_has_scraped;
@@ -923,12 +966,17 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_piece_size_camel: return TR_KEY_piece_size;
     case TR_KEY_port_forwarding_enabled_kebab: return TR_KEY_port_forwarding_enabled;
     case TR_KEY_port_is_open_kebab: return TR_KEY_port_is_open;
+    case TR_KEY_port_test_kebab: return TR_KEY_port_test;
     case TR_KEY_primary_mime_type_kebab: return TR_KEY_primary_mime_type;
     case TR_KEY_priority_high_kebab: return TR_KEY_priority_high;
     case TR_KEY_priority_low_kebab: return TR_KEY_priority_low;
     case TR_KEY_priority_normal_kebab: return TR_KEY_priority_normal;
     case TR_KEY_prompt_before_exit_kebab: return TR_KEY_prompt_before_exit;
     case TR_KEY_queue_position_camel: return TR_KEY_queue_position;
+    case TR_KEY_queue_move_bottom_kebab: return TR_KEY_queue_move_bottom;
+    case TR_KEY_queue_move_down_kebab: return TR_KEY_queue_move_down;
+    case TR_KEY_queue_move_top_kebab: return TR_KEY_queue_move_top;
+    case TR_KEY_queue_move_up_kebab: return TR_KEY_queue_move_up;
     case TR_KEY_queue_stalled_enabled_kebab: return TR_KEY_queue_stalled_enabled;
     case TR_KEY_queue_stalled_minutes_kebab: return TR_KEY_queue_stalled_minutes;
     case TR_KEY_rate_download_camel: return TR_KEY_rate_download;
@@ -985,10 +1033,14 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_seed_ratio_mode_camel: return TR_KEY_seed_ratio_mode;
     case TR_KEY_seeding_time_seconds_kebab: return TR_KEY_seeding_time_seconds;
     case TR_KEY_seeder_count_camel: return TR_KEY_seeder_count;
+    case TR_KEY_session_close_kebab: return TR_KEY_session_close;
     case TR_KEY_session_count_camel:
     case TR_KEY_session_count_kebab:
         return TR_KEY_session_count;
+    case TR_KEY_session_get_kebab: return TR_KEY_session_get;
     case TR_KEY_session_id_kebab: return TR_KEY_session_id;
+    case TR_KEY_session_set_kebab: return TR_KEY_session_set;
+    case TR_KEY_session_stats_kebab: return TR_KEY_session_stats;
     case TR_KEY_show_backup_trackers_kebab: return TR_KEY_show_backup_trackers;
     case TR_KEY_show_extra_peer_details_kebab: return TR_KEY_show_extra_peer_details;
     case TR_KEY_show_filterbar_kebab: return TR_KEY_show_filterbar;
@@ -1000,6 +1052,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_size_bytes_kebab: return TR_KEY_size_bytes;
     case TR_KEY_size_units_kebab: return TR_KEY_size_units;
     case TR_KEY_size_when_done_camel: return TR_KEY_size_when_done;
+    case TR_KEY_sleep_per_seconds_during_verify_kebab: return TR_KEY_sleep_per_seconds_during_verify;
     case TR_KEY_sort_mode_kebab: return TR_KEY_sort_mode;
     case TR_KEY_sort_reversed_kebab: return TR_KEY_sort_reversed;
     case TR_KEY_speed_Bps_kebab: return TR_KEY_speed_Bps;
@@ -1014,6 +1067,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_start_minimized_kebab: return TR_KEY_start_minimized;
     case TR_KEY_statusbar_stats_kebab: return TR_KEY_statusbar_stats;
     case TR_KEY_tcp_enabled_kebab: return TR_KEY_tcp_enabled;
+    case TR_KEY_torrent_add_kebab: return TR_KEY_torrent_add;
     case TR_KEY_torrent_added_kebab: return TR_KEY_torrent_added;
     case TR_KEY_torrent_added_notification_enabled_kebab: return TR_KEY_torrent_added_notification_enabled;
     case TR_KEY_torrent_added_verify_mode_kebab: return TR_KEY_torrent_added_verify_mode;
@@ -1024,8 +1078,15 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_torrent_duplicate_kebab: return TR_KEY_torrent_duplicate;
     case TR_KEY_torrent_file_camel: return TR_KEY_torrent_file;
     case TR_KEY_torrent_get_kebab: return TR_KEY_torrent_get;
+    case TR_KEY_torrent_reannounce_kebab: return TR_KEY_torrent_reannounce;
+    case TR_KEY_torrent_remove_kebab: return TR_KEY_torrent_remove;
+    case TR_KEY_torrent_rename_path_kebab: return TR_KEY_torrent_rename_path;
     case TR_KEY_torrent_set_kebab: return TR_KEY_torrent_set;
     case TR_KEY_torrent_set_location_kebab: return TR_KEY_torrent_set_location;
+    case TR_KEY_torrent_start_kebab: return TR_KEY_torrent_start;
+    case TR_KEY_torrent_start_now_kebab: return TR_KEY_torrent_start_now;
+    case TR_KEY_torrent_stop_kebab: return TR_KEY_torrent_stop;
+    case TR_KEY_torrent_verify_kebab: return TR_KEY_torrent_verify;
     case TR_KEY_total_size_camel: return TR_KEY_total_size;
     case TR_KEY_tracker_add_camel: return TR_KEY_tracker_add;
     case TR_KEY_tracker_list_camel: return TR_KEY_tracker_list;
