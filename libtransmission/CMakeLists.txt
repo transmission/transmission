@@ -112,6 +112,8 @@ target_sources(${TR_NAME}
         rpc-server.h
         rpcimpl.cc
         rpcimpl.h
+        serializable.cc
+        serializable.h
         session-alt-speeds.cc
         session-alt-speeds.h
         session-id.cc
@@ -120,8 +122,6 @@ target_sources(${TR_NAME}
         session-thread.h
         session.cc
         session.h
-        settings.cc
-        settings.h
         stats.cc
         stats.h
         subprocess-posix.cc
