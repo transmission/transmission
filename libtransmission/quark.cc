@@ -592,6 +592,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "size_bytes"sv, // rpc
     "size_units"sv, // rpc
     "size_when_done"sv, // rpc
+    "sleep-per-seconds-during-verify"sv, // tr_session::Settings
     "sleep_per_seconds_during_verify"sv, // tr_session::Settings
     "socket_address"sv, // .resume
     "sort-mode"sv, // gtk app, qt app
