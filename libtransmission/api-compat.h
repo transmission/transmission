@@ -22,10 +22,7 @@ struct CloneState;
 enum class Style
 {
     // Tr4: mixed-case keys, bespoke RPC
-    LegacyRpc,
-
-    // Tr4: mixed-case keys
-    LegacySettings,
+    Legacy,
 
     // Tr5: snake_case keys everywhere + jsonrpc for RPC
     Current,
@@ -33,7 +30,7 @@ enum class Style
     // Use case for exporting to legacy: users can use the
     // same settings.json in 4.0.x and 4.1.x.
     // TODO: when we bump to 5.0.0, change this to `Current`
-    DefaultSettingsExportStyle = LegacySettings,
+    DefaultSettingsExportStyle = Legacy,
 };
 
 [[nodiscard]] tr_variant convert(tr_variant const& src, Style tgt_style);

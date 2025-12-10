@@ -539,31 +539,10 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     return {};
 }
 
-tr_quark convert_key(tr_quark const src, Style const style)
+[[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
 {
-    switch (style)
+    if (style == Style::Current)
     {
-    case Style::LegacyRpc:
-        for (auto const [current, legacy] : RpcKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-        break;
-
-    case Style::LegacySettings:
-        for (auto const [current, legacy] : SessionKeys)
-        {
-            if (src == current || src == legacy)
-            {
-                return legacy;
-            }
-        }
-        break;
-
-    case Style::Current:
         for (auto const [current, legacy] : RpcKeys)
         {
             if (src == current || src == legacy)
@@ -576,6 +555,26 @@ tr_quark convert_key(tr_quark const src, Style const style)
             if (src == current || src == legacy)
             {
                 return current;
+            }
+        }
+    }
+    else if (is_rpc) // legacy RPC
+    {
+        for (auto const [current, legacy] : RpcKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return legacy;
+            }
+        }
+    }
+    else // legacy datafiles
+    {
+        for (auto const [current, legacy] : SessionKeys)
+        {
+            if (src == current || src == legacy)
+            {
+                return legacy;
             }
         }
     }
@@ -630,7 +629,7 @@ struct CloneState
             {
                 if (auto lookup = tr_quark_lookup(holder.sv_))
                 {
-                    auto key = convert_key(*lookup, state_.style);
+                    auto key = convert_key(*lookup, state_.style, state_.is_rpc);
 
                     // Crazy case: downloadDir in torrent-get, download-dir in session-get
                     if (state_.is_torrent && key == TR_KEY_download_dir_kebab)
@@ -665,7 +664,7 @@ struct CloneState
             for (auto const& [key, val] : src)
             {
                 auto const pop = state_.convert_strings;
-                auto new_key = convert_key(key, state_.style);
+                auto new_key = convert_key(key, state_.style, state_.is_rpc);
                 // TODO: shouldn't we be converting when new_key == TR_KEY_arguments?
                 auto const special = (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields));
                 state_.convert_strings |= special;
@@ -831,5 +830,5 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 tr_quark tr_quark_convert(tr_quark const quark)
 {
     using namespace libtransmission::api_compat;
-    return convert_key(quark, Style::Current);
+    return convert_key(quark, Style::Current, false /*ignored for Style::Current*/);
 }

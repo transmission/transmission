@@ -567,33 +567,33 @@ TEST(ApiCompatTest, canConvertRpc)
     // clang-format off
     static auto constexpr TestCases = std::array<TestCase, 28U>{ {
         { "free_space jsonrpc -> jsonrpc", BadFreeSpaceRequest, Style::Current, BadFreeSpaceRequest },
-        { "free_space jsonrpc -> legacy", BadFreeSpaceRequest, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
+        { "free_space jsonrpc -> legacy", BadFreeSpaceRequest, Style::Legacy, BadFreeSpaceRequestLegacy },
         { "free_space legacy -> jsonrpc", BadFreeSpaceRequestLegacy, Style::Current, BadFreeSpaceRequest },
-        { "free_space legacy -> legacy", BadFreeSpaceRequestLegacy, Style::LegacyRpc, BadFreeSpaceRequestLegacy },
+        { "free_space legacy -> legacy", BadFreeSpaceRequestLegacy, Style::Legacy, BadFreeSpaceRequestLegacy },
         { "free_space error response jsonrpc -> jsonrpc", BadFreeSpaceResponse, Style::Current, BadFreeSpaceResponse },
-        { "free_space error response jsonrpc -> legacy", BadFreeSpaceResponse, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+        { "free_space error response jsonrpc -> legacy", BadFreeSpaceResponse, Style::Legacy, BadFreeSpaceResponseLegacy },
         { "free_space error response legacy -> jsonrpc", BadFreeSpaceResponseLegacy, Style::Current, BadFreeSpaceResponse },
-        { "free_space error response legacy -> legacy", BadFreeSpaceResponseLegacy, Style::LegacyRpc, BadFreeSpaceResponseLegacy },
+        { "free_space error response legacy -> legacy", BadFreeSpaceResponseLegacy, Style::Legacy, BadFreeSpaceResponseLegacy },
         { "free_space req jsonrpc -> jsonrpc", WellFormedFreeSpaceRequest, Style::Current, WellFormedFreeSpaceRequest },
-        { "free_space req jsonrpc -> legacy", WellFormedFreeSpaceRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest },
+        { "free_space req jsonrpc -> legacy", WellFormedFreeSpaceRequest, Style::Legacy, WellFormedFreeSpaceLegacyRequest },
         { "free_space req legacy -> jsonrpc", WellFormedFreeSpaceLegacyRequest, Style::Current, WellFormedFreeSpaceRequest },
-        { "free_space req legacy -> legacy", WellFormedFreeSpaceLegacyRequest, Style::LegacyRpc, WellFormedFreeSpaceLegacyRequest },
+        { "free_space req legacy -> legacy", WellFormedFreeSpaceLegacyRequest, Style::Legacy, WellFormedFreeSpaceLegacyRequest },
         { "free_space response jsonrpc -> jsonrpc", WellFormedFreeSpaceResponse, Style::Current, WellFormedFreeSpaceResponse },
-        { "free_space response jsonrpc -> legacy", WellFormedFreeSpaceResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse },
+        { "free_space response jsonrpc -> legacy", WellFormedFreeSpaceResponse, Style::Legacy, WellFormedFreeSpaceLegacyResponse },
         { "free_space response legacy -> jsonrpc", WellFormedFreeSpaceLegacyResponse, Style::Current, WellFormedFreeSpaceResponse },
-        { "free_space response legacy -> legacy", WellFormedFreeSpaceLegacyResponse, Style::LegacyRpc, WellFormedFreeSpaceLegacyResponse },
+        { "free_space response legacy -> legacy", WellFormedFreeSpaceLegacyResponse, Style::Legacy, WellFormedFreeSpaceLegacyResponse },
         { "session_get jsonrpc -> jsonrpc", CurrentSessionGetJson, Style::Current, CurrentSessionGetJson },
-        { "session_get jsonrpc -> legacy", CurrentSessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
+        { "session_get jsonrpc -> legacy", CurrentSessionGetJson, Style::Legacy, LegacySessionGetJson },
         { "session_get legacy -> jsonrpc", LegacySessionGetJson, Style::Current, CurrentSessionGetJson },
-        { "session_get legacy -> legacy", LegacySessionGetJson, Style::LegacyRpc, LegacySessionGetJson },
+        { "session_get legacy -> legacy", LegacySessionGetJson, Style::Legacy, LegacySessionGetJson },
         { "session_get response jsonrpc -> jsonrpc", CurrentSessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
-        { "session_get response jsonrpc -> legacy", CurrentSessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
+        { "session_get response jsonrpc -> legacy", CurrentSessionGetResponseJson, Style::Legacy, LegacySessionGetResponseJson },
         { "session_get response legacy -> jsonrpc", LegacySessionGetResponseJson, Style::Current, CurrentSessionGetResponseJson },
-        { "session_get response legacy -> legacy", LegacySessionGetResponseJson, Style::LegacyRpc, LegacySessionGetResponseJson },
+        { "session_get response legacy -> legacy", LegacySessionGetResponseJson, Style::Legacy, LegacySessionGetResponseJson },
         { "torrent_get jsonrpc -> jsonrpc", CurrentTorrentGetJson, Style::Current, CurrentTorrentGetJson },
-        { "torrent_get jsonrpc -> legacy", CurrentTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
+        { "torrent_get jsonrpc -> legacy", CurrentTorrentGetJson, Style::Legacy, LegacyTorrentGetJson },
         { "torrent_get legacy -> jsonrpc", LegacyTorrentGetJson, Style::Current, CurrentTorrentGetJson },
-        { "torrent_get legacy -> legacy", LegacyTorrentGetJson, Style::LegacyRpc, LegacyTorrentGetJson },
+        { "torrent_get legacy -> legacy", LegacyTorrentGetJson, Style::Legacy, LegacyTorrentGetJson },
     } };
     // clang-format on
 
@@ -615,14 +615,14 @@ TEST(ApiCompatTest, canConvertDataFiles)
     // clang-format off
     static auto constexpr TestCases = std::array<TestCase, 8U>{ {
         { "settings current -> current", CurrentSettingsJson, Style::Current, CurrentSettingsJson },
-        { "settings current -> legacy", CurrentSettingsJson, Style::LegacySettings, LegacySettingsJson },
+        { "settings current -> legacy", CurrentSettingsJson, Style::Legacy, LegacySettingsJson },
         { "settings legacy -> current", LegacySettingsJson, Style::Current, CurrentSettingsJson },
-        { "settings legacy -> legacy", LegacySettingsJson, Style::LegacySettings, LegacySettingsJson },
+        { "settings legacy -> legacy", LegacySettingsJson, Style::Legacy, LegacySettingsJson },
 
         { "stats current -> current", CurrentStatsJson, Style::Current, CurrentStatsJson },
-        { "stats current -> legacy", CurrentStatsJson, Style::LegacySettings, LegacyStatsJson },
+        { "stats current -> legacy", CurrentStatsJson, Style::Legacy, LegacyStatsJson },
         { "stats legacy -> current", LegacyStatsJson, Style::Current, CurrentStatsJson },
-        { "stats legacy -> legacy", LegacyStatsJson, Style::LegacySettings, LegacyStatsJson },
+        { "stats legacy -> legacy", LegacyStatsJson, Style::Legacy, LegacyStatsJson },
     } };
     // clang-format on
 
