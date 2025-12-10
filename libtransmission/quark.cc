@@ -589,6 +589,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "size_bytes"sv,
     "size_units"sv,
     "size_when_done"sv,
+    "sleep-per-seconds-during-verify"sv,
     "sleep_per_seconds_during_verify"sv,
     "socket_address"sv,
     "sort-mode"sv,
@@ -1051,6 +1052,7 @@ tr_quark tr_quark_convert(tr_quark q)
     case TR_KEY_size_bytes_kebab: return TR_KEY_size_bytes;
     case TR_KEY_size_units_kebab: return TR_KEY_size_units;
     case TR_KEY_size_when_done_camel: return TR_KEY_size_when_done;
+    case TR_KEY_sleep_per_seconds_during_verify_kebab: return TR_KEY_sleep_per_seconds_during_verify;
     case TR_KEY_sort_mode_kebab: return TR_KEY_sort_mode;
     case TR_KEY_sort_reversed_kebab: return TR_KEY_sort_reversed;
     case TR_KEY_speed_Bps_kebab: return TR_KEY_speed_Bps;
