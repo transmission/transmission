@@ -80,7 +80,7 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
         assert(false);
     }
 
-    exec("session-set", &args);
+    exec(TR_KEY_session_set_kebab, &args);
 }
 
 void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
@@ -108,7 +108,7 @@ void Session::portTest(Session::PortTestIpProtocol const ip_protocol)
 
     auto* q = new RpcQueue{};
 
-    q->add([this, &args]() { return exec("port-test", &args); }, response_func);
+    q->add([this, &args]() { return exec(TR_KEY_port_test_kebab, &args); }, response_func);
 
     q->add(response_func);
 
@@ -487,7 +487,7 @@ void Session::torrentRenamePath(torrent_ids_t const& torrent_ids, QString const&
     auto* q = new RpcQueue{};
 
     q->add(
-        [this, &args]() { return exec("torrent-rename-path", &args); },
+        [this, &args]() { return exec(TR_KEY_torrent_rename_path_kebab, &args); },
         [](RpcResponse const& r)
         {
             auto const path = dictFind<QString>(r.args.get(), TR_KEY_path).value_or(QStringLiteral("(unknown)"));
@@ -688,7 +688,7 @@ void Session::refreshExtraStats(torrent_ids_t const& ids)
     refreshTorrents(ids, TorrentProperties::DetailStat);
 }
 
-void Session::sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids)
+void Session::sendTorrentRequest(tr_quark const method, torrent_ids_t const& torrent_ids)
 {
     tr_variant args;
     tr_variantInitDict(&args, 1);
@@ -696,7 +696,7 @@ void Session::sendTorrentRequest(std::string_view request, torrent_ids_t const& 
 
     auto* q = new RpcQueue{};
 
-    q->add([this, request, &args]() { return exec(request, &args); });
+    q->add([this, method, &args]() { return exec(method, &args); });
 
     q->add([this, torrent_ids]() { refreshTorrents(torrent_ids, TorrentProperties::MainStats); });
 
@@ -705,37 +705,37 @@ void Session::sendTorrentRequest(std::string_view request, torrent_ids_t const& 
 
 void Session::pauseTorrents(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("torrent-stop", ids);
+    sendTorrentRequest(TR_KEY_torrent_stop_kebab, ids);
 }
 
 void Session::startTorrents(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("torrent-start", ids);
+    sendTorrentRequest(TR_KEY_torrent_start_kebab, ids);
 }
 
 void Session::startTorrentsNow(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("torrent-start-now", ids);
+    sendTorrentRequest(TR_KEY_torrent_start_now_kebab, ids);
 }
 
 void Session::queueMoveTop(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("queue-move-top", ids);
+    sendTorrentRequest(TR_KEY_queue_move_top_kebab, ids);
 }
 
 void Session::queueMoveUp(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("queue-move-up", ids);
+    sendTorrentRequest(TR_KEY_queue_move_up_kebab, ids);
 }
 
 void Session::queueMoveDown(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("queue-move-down", ids);
+    sendTorrentRequest(TR_KEY_queue_move_down_kebab, ids);
 }
 
 void Session::queueMoveBottom(torrent_ids_t const& ids)
 {
-    sendTorrentRequest("queue-move-bottom", ids);
+    sendTorrentRequest(TR_KEY_queue_move_bottom_kebab, ids);
 }
 
 void Session::refreshActiveTorrents()
@@ -760,7 +760,7 @@ void Session::refreshSessionStats()
 {
     auto* q = new RpcQueue{};
 
-    q->add([this]() { return exec("session-stats", nullptr); });
+    q->add([this]() { return exec(TR_KEY_session_stats_kebab, nullptr); });
 
     q->add([this](RpcResponse const& r) { updateStats(r.args.get()); });
 
@@ -771,7 +771,7 @@ void Session::refreshSessionInfo()
 {
     auto* q = new RpcQueue{};
 
-    q->add([this]() { return exec("session-get", nullptr); });
+    q->add([this]() { return exec(TR_KEY_session_get_kebab, nullptr); });
 
     q->add([this](RpcResponse const& r) { updateInfo(r.args.get()); });
 
@@ -782,7 +782,7 @@ void Session::updateBlocklist()
 {
     auto* q = new RpcQueue{};
 
-    q->add([this]() { return exec("blocklist-update", nullptr); });
+    q->add([this]() { return exec(TR_KEY_blocklist_update_kebab, nullptr); });
 
     q->add(
         [this](RpcResponse const& r)
@@ -801,11 +801,6 @@ void Session::updateBlocklist()
 ***/
 
 RpcResponseFuture Session::exec(tr_quark method, tr_variant* args)
-{
-    return rpc_.exec(method, args);
-}
-
-RpcResponseFuture Session::exec(std::string_view method, tr_variant* args)
 {
     return rpc_.exec(method, args);
 }
@@ -1018,7 +1013,7 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict)
     auto* q = new RpcQueue{};
 
     q->add(
-        [this, args_dict]() { return exec("torrent-add", args_dict); },
+        [this, args_dict]() { return exec(TR_KEY_torrent_add_kebab, args_dict); },
         [add_me](RpcResponse const& r)
         {
             auto* d = new QMessageBox{ QMessageBox::Warning,
@@ -1100,7 +1095,7 @@ void Session::addNewlyCreatedTorrent(QString const& filename, QString const& loc
     dictAdd(&args, TR_KEY_paused, !prefs_.getBool(Prefs::START));
     dictAdd(&args, TR_KEY_metainfo, b64);
 
-    exec("torrent-add", &args);
+    exec(TR_KEY_torrent_add_kebab, &args);
 }
 
 void Session::removeTorrents(torrent_ids_t const& ids, bool delete_files)
@@ -1112,7 +1107,7 @@ void Session::removeTorrents(torrent_ids_t const& ids, bool delete_files)
         addOptionalIds(&args, ids);
         dictAdd(&args, TR_KEY_delete_local_data_kebab, delete_files);
 
-        exec("torrent-remove", &args);
+        exec(TR_KEY_torrent_remove_kebab, &args);
     }
 }
 
@@ -1124,7 +1119,7 @@ void Session::verifyTorrents(torrent_ids_t const& ids)
         tr_variantInitDict(&args, 1);
         addOptionalIds(&args, ids);
 
-        exec("torrent-verify", &args);
+        exec(TR_KEY_torrent_verify_kebab, &args);
     }
 }
 
@@ -1136,7 +1131,7 @@ void Session::reannounceTorrents(torrent_ids_t const& ids)
         tr_variantInitDict(&args, 1);
         addOptionalIds(&args, ids);
 
-        exec("torrent-reannounce", &args);
+        exec(TR_KEY_torrent_reannounce_kebab, &args);
     }
 }
 

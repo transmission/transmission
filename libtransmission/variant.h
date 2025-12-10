@@ -102,7 +102,7 @@ public:
 
         [[nodiscard]] auto contains(tr_quark const key) const noexcept
         {
-            return find(key) != end();
+            return find(key) != end(); // NOLINT(readability-container-contains)
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
@@ -148,11 +148,15 @@ public:
         bool replace_key(tr_quark const old_key, tr_quark const new_key)
         {
             if (contains(new_key))
+            {
                 return false;
+            }
 
             auto iter = find(old_key);
             if (iter == end())
+            {
                 return false;
+            }
 
             iter->first = new_key;
             return true;

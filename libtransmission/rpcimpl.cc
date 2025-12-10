@@ -136,11 +136,29 @@ auto constexpr Messages = std::array<std::pair<Code, std::string_view>, 15U>{ {
 
 namespace
 {
+[[nodiscard]] constexpr bool is_valid_id(tr_variant const& val)
+{
+    switch (val.index())
+    {
+    // https://www.jsonrpc.org/specification#request_object
+    // An identifier established by the Client that MUST contain a String,
+    // Number, or NULL value if included. .. The value SHOULD normally not
+    // be Null and Numbers SHOULD NOT contain fractional parts
+    case tr_variant::StringIndex:
+    case tr_variant::IntIndex:
+    case tr_variant::DoubleIndex:
+    case tr_variant::NullIndex:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
 // https://www.jsonrpc.org/specification#response_object
 [[nodiscard]] tr_variant::Map build_response(Error::Code code, tr_variant id, tr_variant::Map&& body)
 {
-    if (id.index() != tr_variant::StringIndex && id.index() != tr_variant::IntIndex && id.index() != tr_variant::DoubleIndex &&
-        id.index() != tr_variant::NullIndex)
+    if (!is_valid_id(id))
     {
         TR_ASSERT(false);
         id = nullptr;
@@ -245,7 +263,8 @@ using DoneCb = std::function<void(struct tr_rpc_idle_data* data, JsonRpc::Error:
 
         if (auto const val = var.value_if<std::string_view>())
         {
-            if (*val == "recently_active"sv || *val == "recently-active")
+            if (*val == tr_quark_get_string_view(TR_KEY_recently_active) ||
+                *val == tr_quark_get_string_view(TR_KEY_recently_active_kebab))
             {
                 auto const cutoff = tr_time() - RecentlyActiveSeconds;
                 auto const recent = torrents.get_matching([cutoff](auto* walk) { return walk->has_changed_since(cutoff); });
@@ -1133,7 +1152,8 @@ namespace make_torrent_field_helpers
                                                                                                               TrFormat::Object;
 
     if (auto val = args_in.value_if<std::string_view>(TR_KEY_ids).value_or(""sv);
-        val == "recently_active"sv || val == "recently-active"sv)
+        val == tr_quark_get_string_view(TR_KEY_recently_active) ||
+        val == tr_quark_get_string_view(TR_KEY_recently_active_kebab))
     {
         auto const cutoff = tr_time() - RecentlyActiveSeconds;
         auto const ids = session->torrents().removedSince(cutoff);
@@ -2900,34 +2920,23 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
 
     auto data = tr_rpc_idle_data{};
     data.session = session;
-    if (is_jsonrpc)
+
+    if (auto iter = map->find(is_jsonrpc ? TR_KEY_id : TR_KEY_tag); iter != std::end(*map))
     {
-        if (auto it_id = map->find(TR_KEY_id); it_id != std::end(*map))
+        tr_variant const& id = iter->second;
+        if (is_jsonrpc && !is_valid_id(id))
         {
-            auto const& id = it_id->second;
-            switch (id.index())
-            {
-            case tr_variant::StringIndex:
-            case tr_variant::IntIndex:
-            case tr_variant::DoubleIndex:
-            case tr_variant::NullIndex:
-                data.id.merge(id); // copy
-                break;
-            default:
-                callback(
-                    session,
-                    build_response(
-                        Error::INVALID_REQUEST,
-                        nullptr,
-                        Error::build_data("id type must be String, Number, or Null"sv, {})));
-                return;
-            }
+            callback(
+                session,
+                build_response(
+                    Error::INVALID_REQUEST,
+                    nullptr,
+                    Error::build_data("id type must be String, Number, or Null"sv, {})));
+            return;
         }
+        data.id.merge(id);
     }
-    else if (auto tag = map->value_if<int64_t>(TR_KEY_tag); tag)
-    {
-        data.id = *tag;
-    }
+
     data.callback = std::move(callback);
 
     auto const is_notification = is_jsonrpc && !data.id.has_value();

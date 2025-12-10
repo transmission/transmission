@@ -1047,8 +1047,11 @@ tr_block_span_t tr_swarm::WishlistMediator::block_span(tr_piece_index_t piece) c
     // Overlapping block spans caused by blocks unaligned to piece boundaries
     // might cause redundant block requests to be sent out, so detect it and
     // ensure that block spans within the wishlist do not overlap.
-    if (auto const is_unaligned_piece = tor_.block_loc(span.begin).piece != piece; is_unaligned_piece)
+    auto const block_begin_piece = tor_.block_loc(span.begin).piece;
+    if (auto const is_unaligned_piece = block_begin_piece != piece;
+        is_unaligned_piece && tor_.piece_is_wanted(block_begin_piece))
     {
+        TR_ASSERT(block_begin_piece < piece);
         ++span.begin;
     }
 
