@@ -25,10 +25,11 @@ enum class Style : uint8_t
 {
     Tr4, // bespoke RPC, mixed-case keys,
     Tr5, // jsonrpc, all snake_case keys
-    DefaultSettingsExportStyle = Tr4, // TODO: make this to `Tr5` in 5.0.0-beta.1
 };
 
 [[nodiscard]] tr_variant convert(tr_variant const& src, Style tgt_style);
+
+[[nodiscard]] Style get_export_settings_style();
 
 } // namespace libtransmission::api_compat
 

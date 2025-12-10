@@ -825,6 +825,14 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
     return ret;
 }
+
+[[nodiscard]] Style get_export_settings_style()
+{
+    // TODO: change default to Tr5 in transmission 5.0.0-beta.1
+    static auto const style = tr_env_get_string("TR_SAVE_VERSION_FORMAT", "4") == "5" ? Style::Tr5 : Style::Tr4;
+    return style;
+}
+
 } // namespace libtransmission::api_compat
 
 tr_quark tr_quark_convert(tr_quark const quark)
