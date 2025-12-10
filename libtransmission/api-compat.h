@@ -7,7 +7,7 @@
 
 #include <cstdint> // uint8_t
 
-#include <libtransmission/quark.h>
+#include "libtransmission/quark.h"
 
 struct tr_variant;
 
