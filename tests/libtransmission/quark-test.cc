@@ -12,26 +12,29 @@
 
 #include "gtest/gtest.h"
 
-class QuarkTest : public ::testing::Test
-{
-protected:
-    template<typename T>
-    std::string quarkGetString(T i)
-    {
-        return std::string{ tr_quark_get_string_view(tr_quark{ i }) };
-    }
-};
+using namespace std::literals;
+
+using QuarkTest = ::testing::Test;
 
 TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
 {
-    for (size_t i = 0; i < TR_N_KEYS; ++i)
+    for (size_t i = 0; i < TR_N_STATIC_KEYS; ++i)
     {
-        auto const str = quarkGetString(i);
-        auto const q = tr_quark_lookup(str);
-        ASSERT_TRUE(q.has_value());
-        assert(q.has_value());
-        EXPECT_EQ(i, *q);
+        auto const str = tr_quark_get_string_view(i);
+        auto const key = tr_quark_lookup(str);
+        EXPECT_EQ(i, key.value_or(~i));
     }
+}
+
+TEST_F(QuarkTest, stringsMatchExpectedValues)
+{
+    // can lookup public keys
+    EXPECT_EQ(""sv, tr_quark_get_string_view(TR_KEY_NONE));
+    EXPECT_EQ("wanted"sv, tr_quark_get_string_view(TR_KEY_wanted));
+
+    // can lookup private keys
+    using namespace libtransmission::api_compat::detail;
+    EXPECT_EQ("files-added", tr_quark_get_string_view(TR_KEY_files_added_kebab));
 }
 
 TEST_F(QuarkTest, newQuarkByStringView)

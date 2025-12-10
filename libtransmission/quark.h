@@ -17,7 +17,8 @@ using tr_quark = size_t;
  */
 enum // NOLINT(performance-enum-size)
 {
-    TR_KEY_NONE, /* represented as an empty string */
+    TR_BEGIN_PUBLIC_KEYS = 0,
+    TR_KEY_NONE = TR_BEGIN_PUBLIC_KEYS, /* represented as an empty string */
     TR_KEY_active_torrent_count_camel, /* rpc (deprecated) */
     TR_KEY_active_torrent_count, /* rpc */
     TR_KEY_activity_date_kebab, /* resume file (legacy) */
@@ -149,7 +150,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_download_queue_size,
     TR_KEY_download_speed,
     TR_KEY_downloaded,
-    TR_KEY_downloaded_bytes_kebab,
     TR_KEY_downloaded_bytes_camel,
     TR_KEY_downloaded_ever_camel,
     TR_KEY_downloaded_bytes,
@@ -178,7 +178,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_file_stats,
     TR_KEY_filename,
     TR_KEY_files,
-    TR_KEY_files_added_kebab,
     TR_KEY_files_unwanted_kebab,
     TR_KEY_files_wanted_kebab,
     TR_KEY_files_added_camel,
@@ -526,7 +525,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_script_torrent_done_filename,
     TR_KEY_script_torrent_done_seeding_enabled,
     TR_KEY_script_torrent_done_seeding_filename,
-    TR_KEY_seconds_active_kebab,
     TR_KEY_seconds_active_camel,
     TR_KEY_seconds_downloading_camel,
     TR_KEY_seconds_seeding_camel,
@@ -554,7 +552,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_sequential_download,
     TR_KEY_sequential_download_from_piece,
     TR_KEY_session_close_kebab,
-    TR_KEY_session_count_kebab,
     TR_KEY_session_get_kebab,
     TR_KEY_session_id_kebab,
     TR_KEY_session_set_kebab,
@@ -701,7 +698,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_upload_slots_per_torrent,
     TR_KEY_upload_speed,
     TR_KEY_uploaded,
-    TR_KEY_uploaded_bytes_kebab,
     TR_KEY_uploaded_bytes_camel,
     TR_KEY_uploaded_ever_camel,
     TR_KEY_uploaded_bytes,
@@ -731,7 +727,27 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_webseeds_sending_to_us_camel,
     TR_KEY_webseeds_sending_to_us,
     TR_KEY_yourip,
-    TR_N_KEYS
+    TR_END_PUBLIC_KEYS,
+    TR_N_PUBLIC_KEYS = TR_END_PUBLIC_KEYS - TR_BEGIN_PUBLIC_KEYS,
+    TR_BEGIN_PRIVATE_KEYS = TR_END_PUBLIC_KEYS
+};
+namespace libtransmission::api_compat::detail
+{
+enum
+{
+    TR_KEY_downloaded_bytes_kebab = TR_BEGIN_PRIVATE_KEYS,
+    TR_KEY_files_added_kebab,
+    TR_KEY_seconds_active_kebab,
+    TR_KEY_session_count_kebab,
+    TR_KEY_uploaded_bytes_kebab,
+    END_PRIVATE,
+};
+} // namespace libtransmission::api_compat::detail
+enum
+{
+    TR_END_PRIVATE_KEYS = libtransmission::api_compat::detail::END_PRIVATE,
+    TR_N_PRIVATE_KEYS = TR_END_PRIVATE_KEYS - TR_BEGIN_PRIVATE_KEYS,
+    TR_N_STATIC_KEYS = TR_N_PUBLIC_KEYS + TR_N_PRIVATE_KEYS
 };
 
 /**

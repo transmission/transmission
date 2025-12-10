@@ -2758,7 +2758,7 @@ namespace session_get_helpers
 
     if (std::empty(fields)) // no fields specified; get them all
     {
-        for (tr_quark field_id = TR_KEY_NONE + 1; field_id < TR_N_KEYS; ++field_id)
+        for (tr_quark field_id = TR_BEGIN_PUBLIC_KEYS + 1U; field_id < TR_END_PUBLIC_KEYS; ++field_id)
         {
             fields.insert(field_id);
         }
