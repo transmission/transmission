@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // int16_t
 #include <functional>
 #include <optional>
 

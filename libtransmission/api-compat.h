@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdint> // uint8_t
+
 #include <libtransmission/quark.h>
 
 struct tr_variant;
@@ -19,7 +21,7 @@ struct CloneState;
 [[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state);
 } // namespace detail
 
-enum class Style
+enum class Style : uint8_t
 {
     Tr4, // bespoke RPC, mixed-case keys,
     Tr5, // jsonrpc, all snake_case keys
