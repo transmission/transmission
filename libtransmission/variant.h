@@ -441,7 +441,7 @@ private:
     friend tr_variant libtransmission::api_compat::detail::convert_impl(
         tr_variant const& self,
         libtransmission::api_compat::detail::CloneState& state);
-    friend tr_variant libtransmission::api_compat::convert(tr_variant const&, libtransmission::api_compat::Style);
+    friend tr_variant libtransmission::api_compat::convert(tr_variant const& src, libtransmission::api_compat::Style tgt_style);
 
     // Holds a string_view to either an unmanaged/external string or to
     // one owned by the class. If the string is unmanaged, only sv_ is used.
