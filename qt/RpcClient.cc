@@ -283,11 +283,9 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 {
     RpcResponse ret;
 
-    if (auto const result = dictFind<QString>(&response, TR_KEY_result); result)
-    {
-        ret.result = *result;
-        ret.success = *result == QStringLiteral("success");
-    }
+    auto const errmsg = dictFind<QString>(&response, TR_KEY_result).value_or(QString{});
+    ret.success = errmsg == QStringLiteral("success");
+    ret.errmsg = ret.success ? QString{} : errmsg;
 
     if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
     {
