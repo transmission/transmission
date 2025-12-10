@@ -11,7 +11,6 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 
 using namespace std::literals;
