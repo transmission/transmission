@@ -755,14 +755,14 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
+[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view keystr);
 
 /**
  * Get the string view that corresponds to the specified quark.
  *
  * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
  */
-[[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark quark);
+[[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark key);
 
 /**
  * Create a new quark for the specified string. If a quark already

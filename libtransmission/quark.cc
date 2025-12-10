@@ -770,7 +770,7 @@ auto& my_runtime{ *new std::vector<std::string_view>{} };
 
 } // namespace
 
-std::optional<tr_quark> tr_quark_lookup(std::string_view str)
+std::optional<tr_quark> tr_quark_lookup(std::string_view keystr)
 {
     // is it one of our sorted static keys?
     auto search_lower = [](auto const begin, auto const end, auto const str)
@@ -782,11 +782,11 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view str)
         }
         return ret;
     };
-    if (auto const key = search_lower(std::begin(MyPublic), std::end(MyPublic), str))
+    if (auto const key = search_lower(std::begin(MyPublic), std::end(MyPublic), keystr))
     {
         return TR_BEGIN_PUBLIC_KEYS + *key;
     }
-    if (auto const key = search_lower(std::begin(MyPrivate), std::end(MyPrivate), str))
+    if (auto const key = search_lower(std::begin(MyPrivate), std::end(MyPrivate), keystr))
     {
         return TR_BEGIN_PRIVATE_KEYS + *key;
     }
@@ -794,7 +794,7 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view str)
     // is it a key added at runtime?
     auto const rbegin = std::begin(my_runtime);
     auto const rend = std::end(my_runtime);
-    if (auto const rit = std::find(rbegin, rend, str); rit != rend)
+    if (auto const rit = std::find(rbegin, rend, keystr); rit != rend)
     {
         return TR_N_STATIC_KEYS + std::distance(rbegin, rit);
     }
