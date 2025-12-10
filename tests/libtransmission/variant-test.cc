@@ -556,6 +556,57 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_EQ(ExpectedInt, *i);
 }
 
+TEST_F(VariantTest, mapContains)
+{
+    auto const key_bool = tr_quark_new("contains-bool"sv);
+    auto const key_int = tr_quark_new("contains-int"sv);
+    auto const key_double = tr_quark_new("contains-double"sv);
+    auto const key_string = tr_quark_new("contains-string"sv);
+    auto const key_vector = tr_quark_new("contains-vector"sv);
+    auto const key_map = tr_quark_new("contains-map"sv);
+    auto const key_missing = tr_quark_new("contains-missing"sv);
+    auto const nested_key = tr_quark_new("contains-nested"sv);
+
+    // populate a test map
+
+    auto top = tr_variant::make_map(6U);
+    auto* const map = top.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+
+    map->try_emplace(key_bool, true);
+    map->try_emplace(key_int, int64_t{ 42 });
+    map->try_emplace(key_double, 4.2);
+    map->try_emplace(key_string, "needle"sv);
+
+    auto vec = tr_variant::Vector{};
+    vec.emplace_back(true);
+    vec.emplace_back(int64_t{ 7 });
+    map->try_emplace(key_vector, std::move(vec));
+
+    auto nested = tr_variant::make_map(1U);
+    auto* nested_map = nested.get_if<tr_variant::Map>();
+    ASSERT_NE(nested_map, nullptr);
+    nested_map->try_emplace(nested_key, "nested"sv);
+    map->try_emplace(key_map, std::move(nested));
+
+    // ---
+
+    // test: returns true for entries that exist
+    EXPECT_TRUE(map->contains(key_bool));
+    EXPECT_TRUE(map->contains(key_double));
+    EXPECT_TRUE(map->contains(key_int));
+    EXPECT_TRUE(map->contains(key_map));
+    EXPECT_TRUE(map->contains(key_string));
+    EXPECT_TRUE(map->contains(key_vector));
+
+    // test: returns false for entries that never existed
+    EXPECT_FALSE(map->contains(key_missing));
+
+    // test: returns false for entries that were removed
+    EXPECT_EQ(1U, map->erase(key_vector));
+    EXPECT_FALSE(map->contains(key_vector));
+}
+
 TEST_F(VariantTest, variantFromBufFuzz)
 {
     auto benc_serde = tr_variant_serde::json();
