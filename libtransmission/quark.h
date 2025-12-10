@@ -711,8 +711,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_use_speed_limit_kebab,
     TR_KEY_use_global_speed_limit,
     TR_KEY_use_speed_limit,
-    TR_KEY_user_has_given_informed_consent_kebab,
-    TR_KEY_user_has_given_informed_consent,
     TR_KEY_ut_holepunch,
     TR_KEY_ut_metadata,
     TR_KEY_ut_pex,
