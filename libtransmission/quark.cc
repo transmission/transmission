@@ -457,6 +457,8 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "ratio_mode"sv,
     "read-clipboard"sv,
     "read_clipboard"sv,
+    "recently-active"sv,
+    "recently_active"sv,
     "recheckProgress"sv,
     "recheck_progress"sv,
     "remote-session-enabled"sv,
