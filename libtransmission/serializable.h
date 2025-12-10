@@ -28,6 +28,12 @@ class Serializers
 {
 public:
     template<typename T>
+    using Deserialize = bool (*)(tr_variant const& src, T* ptgt);
+
+    template<typename T>
+    using Serialize = tr_variant (*)(T const& src);
+
+    template<typename T>
     static tr_variant serialize(T const& src)
     {
         return converter_storage<T>.serialize(src);
@@ -46,12 +52,6 @@ public:
     {
         return converters.at(idx).first(src, vptgt);
     }
-
-    template<typename T>
-    using Deserialize = bool (*)(tr_variant const& src, T* ptgt);
-
-    template<typename T>
-    using Serialize = tr_variant (*)(T const& src);
 
     template<typename T>
     static void add_converter(Deserialize<T> deserialize, Serialize<T> serialize)
