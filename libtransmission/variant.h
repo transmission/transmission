@@ -99,9 +99,9 @@ public:
             return Vector::const_iterator{ const_cast<Map*>(this)->find(key) };
         }
 
-        [[nodiscard]] auto contains(tr_quark const key) const noexcept
+        [[nodiscard]] TR_CONSTEXPR20 auto contains(tr_quark const key) const noexcept
         {
-            return find(key) != end(); // NOLINT(readability-container-contains)
+            return find(key) != end();
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(std::initializer_list<tr_quark> keys) noexcept
@@ -144,7 +144,7 @@ public:
             return 0U;
         }
 
-        bool replace_key(tr_quark const old_key, tr_quark const new_key)
+        TR_CONSTEXPR20 bool replace_key(tr_quark const old_key, tr_quark const new_key)
         {
             if (contains(new_key))
             {
