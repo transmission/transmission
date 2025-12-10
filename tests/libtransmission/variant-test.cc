@@ -607,6 +607,87 @@ TEST_F(VariantTest, mapContains)
     EXPECT_FALSE(map->contains(key_vector));
 }
 
+TEST_F(VariantTest, mapReplaceKey)
+{
+    auto constexpr IntVal = int64_t{ 73 };
+    auto const key_bool = tr_quark_new("replace-bool"sv);
+    auto const key_int = tr_quark_new("replace-int"sv);
+    auto const key_double = tr_quark_new("replace-double"sv);
+    auto const key_string = tr_quark_new("replace-string"sv);
+    auto const key_vector = tr_quark_new("replace-vector"sv);
+    auto const key_map = tr_quark_new("replace-map"sv);
+    auto const key_duplicate = tr_quark_new("replace-duplicate"sv);
+    auto const key_missing_src = tr_quark_new("replace-missing-src"sv);
+    auto const key_missing_tgt = tr_quark_new("replace-missing-tgt"sv);
+    auto const key_replacement = tr_quark_new("replace-string-new"sv);
+    auto const key_nested = tr_quark_new("replace-nested"sv);
+
+    // populate a sample map
+
+    auto top = tr_variant::make_map(7U);
+    auto* const map = top.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+
+    map->try_emplace(key_bool, true);
+    map->try_emplace(key_int, IntVal);
+    map->try_emplace(key_double, 7.3);
+    map->try_emplace(key_string, "string"sv);
+
+    auto vec = tr_variant::Vector{};
+    vec.emplace_back(false);
+    vec.emplace_back(int64_t{ 99 });
+    map->try_emplace(key_vector, std::move(vec));
+
+    auto nested = tr_variant::make_map(1U);
+    auto* nested_map = nested.get_if<tr_variant::Map>();
+    ASSERT_NE(nested_map, nullptr);
+    nested_map->try_emplace(key_nested, "nested"sv);
+    map->try_emplace(key_map, std::move(nested));
+
+    map->try_emplace(key_duplicate, "occupied"sv);
+
+    // ---
+
+    // test: neither src nor tgt exist
+    auto const serde = tr_variant_serde::json();
+    auto expected = serde.to_string(top);
+    EXPECT_FALSE(map->contains(key_missing_src));
+    EXPECT_FALSE(map->contains(key_missing_tgt));
+    EXPECT_FALSE(map->replace_key(key_missing_src, key_missing_tgt));
+    EXPECT_FALSE(map->contains(key_missing_src));
+    EXPECT_FALSE(map->contains(key_missing_tgt));
+    auto actual = serde.to_string(top);
+    EXPECT_EQ(expected, actual); // confirm variant is unchanged
+
+    // test: src doesn't exist
+    expected = serde.to_string(top);
+    EXPECT_FALSE(map->contains(key_missing_src));
+    EXPECT_EQ(IntVal, map->value_if<int64_t>(key_int).value_or(!IntVal));
+    EXPECT_FALSE(map->replace_key(key_missing_src, key_int));
+    EXPECT_FALSE(map->contains(key_missing_src));
+    EXPECT_EQ(IntVal, map->value_if<int64_t>(key_int).value_or(!IntVal));
+    actual = serde.to_string(top);
+    EXPECT_EQ(expected, actual); // confirm variant is unchanged
+
+    // test: tgt already exists
+    expected = serde.to_string(top);
+    EXPECT_TRUE(map->contains(key_int));
+    EXPECT_TRUE(map->contains(key_string));
+    EXPECT_FALSE(map->replace_key(key_int, key_string));
+    EXPECT_TRUE(map->contains(key_int));
+    EXPECT_TRUE(map->contains(key_string));
+    actual = serde.to_string(top);
+    EXPECT_EQ(expected, actual); // confirm variant is unchanged
+
+    // test: successful replacement
+    EXPECT_TRUE(map->contains(key_int));
+    EXPECT_FALSE(map->contains(key_replacement));
+    EXPECT_TRUE(map->replace_key(key_int, key_replacement));
+    EXPECT_FALSE(map->contains(key_int));
+    EXPECT_TRUE(map->contains(key_replacement));
+    EXPECT_EQ(IntVal, map->value_if<int64_t>(key_replacement).value_or(!IntVal));
+}
+
 TEST_F(VariantTest, variantFromBufFuzz)
 {
     auto benc_serde = tr_variant_serde::json();
