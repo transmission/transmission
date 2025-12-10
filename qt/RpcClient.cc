@@ -94,9 +94,9 @@ RpcResponseFuture RpcClient::exec(tr_quark const method_key, tr_variant* args)
     return sendRequest(json);
 }
 
-int64_t RpcClient::getNextTag()
+int64_t RpcClient::getNextId()
 {
-    return next_tag_++;
+    return next_id_++;
 }
 
 void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise)
@@ -139,14 +139,14 @@ void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcRespons
     }
 }
 
-void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
 {
     if (verbose_)
     {
         fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*req));
     }
 
-    local_requests_.try_emplace(tag, promise);
+    local_requests_.try_emplace(id, promise);
     tr_rpc_request_exec(
         session_,
         *req,
@@ -168,8 +168,8 @@ void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse>
 
 RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 {
-    int64_t const tag = getNextTag();
-    dictAdd(json.get(), TR_KEY_tag, tag);
+    auto const id = getNextId();
+    dictAdd(json.get(), TR_KEY_tag, id);
 
     QFutureInterface<RpcResponse> promise;
     promise.setExpectedResultCount(1);
@@ -179,7 +179,7 @@ RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 
     if (session_ != nullptr)
     {
-        sendLocalRequest(json, promise, tag);
+        sendLocalRequest(json, promise, id);
     }
     else if (!url_.isEmpty())
     {
@@ -263,7 +263,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
-    if (auto node = local_requests_.extract(parseResponseTag(*response)); node)
+    if (auto node = local_requests_.extract(parseResponseId(*response)); node)
     {
         auto const result = parseResponseData(*response);
 
@@ -274,7 +274,7 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     }
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& response) const
+int64_t RpcClient::parseResponseId(tr_variant& response) const
 {
     return dictFind<int>(&response, TR_KEY_tag).value_or(-1);
 }
