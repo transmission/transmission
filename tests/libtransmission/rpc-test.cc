@@ -977,4 +977,17 @@ TEST_F(RpcTest, wellFormedLegacyFreeSpace)
 }
 } // namespace free_space_test
 
+TEST_F(RpcTest, jsonRpcError)
+{
+    using namespace JsonRpc::Error;
+    for (auto const code : { PARSE_ERROR, INVALID_REQUEST, METHOD_NOT_FOUND, INVALID_PARAMS, INTERNAL_ERROR })
+    {
+        auto const str = to_string(code);
+        EXPECT_NE(""sv, str);
+        auto const actual = to_code(str);
+        ASSERT_TRUE(actual);
+        EXPECT_EQ(code, *actual);
+    }
+}
+
 } // namespace libtransmission::test
