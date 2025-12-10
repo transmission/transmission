@@ -38,8 +38,6 @@ enum Code : int16_t
 };
 
 [[nodiscard]] std::string_view to_string(Code code);
-
-[[nodiscard]] std::optional<Code> to_code(std::string_view errmsg);
 } // namespace Error
 } // namespace JsonRpc
 

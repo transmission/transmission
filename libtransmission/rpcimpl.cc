@@ -118,20 +118,6 @@ auto constexpr Messages = std::array<std::pair<Code, std::string_view>, 15U>{ {
 
     return {};
 }
-
-[[nodiscard]] std::optional<Code> to_code(std::string_view const errmsg)
-{
-    for (auto const& [code, str] : Messages)
-    {
-        if (errmsg == str)
-        {
-            return code;
-        }
-    }
-
-    return {};
-}
-
 } // namespace Error
 
 namespace
