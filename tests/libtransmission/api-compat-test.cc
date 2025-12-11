@@ -597,7 +597,7 @@ TEST(ApiCompatTest, canConvertRpc)
     } };
     // clang-format on
 
-    for (auto [name, src, tgt_style, expected] : TestCases)
+    for (auto const& [name, src, tgt_style, expected] : TestCases)
     {
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
@@ -626,7 +626,7 @@ TEST(ApiCompatTest, canConvertDataFiles)
     } };
     // clang-format on
 
-    for (auto [name, src, tgt_style, expected] : TestCases)
+    for (auto const& [name, src, tgt_style, expected] : TestCases)
     {
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
