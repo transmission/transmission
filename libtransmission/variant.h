@@ -682,18 +682,6 @@ private:
         Json
     };
 
-    struct WalkFuncs
-    {
-        void (*null_func)(tr_variant const& var, std::nullptr_t val, void* user_data);
-        void (*int_func)(tr_variant const& var, int64_t val, void* user_data);
-        void (*bool_func)(tr_variant const& var, bool val, void* user_data);
-        void (*double_func)(tr_variant const& var, double val, void* user_data);
-        void (*string_func)(tr_variant const& var, std::string_view val, void* user_data);
-        void (*dict_begin_func)(tr_variant const& var, void* user_data);
-        void (*list_begin_func)(tr_variant const& var, void* user_data);
-        void (*container_end_func)(tr_variant const& var, void* user_data);
-    };
-
     explicit tr_variant_serde(Type type)
         : type_{ type }
     {
@@ -704,8 +692,6 @@ private:
 
     [[nodiscard]] std::string to_json_string(tr_variant const& var) const;
     [[nodiscard]] static std::string to_benc_string(tr_variant const& var);
-
-    static void walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts);
 
     Type type_;
 
