@@ -87,6 +87,9 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* params)
         std::swap(tgt, *params); // TODO(ckerr): tr_variant::Map::extract() and insert()?
     }
 
+    // TODO: use https://github.com/transmission/transmission/issues/7888
+    // to figure out whether we're talking to a jsonrpc server or legacy server,
+    // and call api_compat::convert() accordingly instead of convert_outgoign_data()
     auto req = tr_variant{ std::move(map) };
     req = libtransmission::api_compat::convert_outgoing_data(req);
     return sendRequest(std::make_shared<tr_variant>(std::move(req)), id);
