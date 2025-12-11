@@ -713,8 +713,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "use-speed-limit"sv, // .resume
     "use_global_speed_limit"sv, // .resume
     "use_speed_limit"sv, // .resume
-    "user-has-given-informed-consent"sv, // gtk app, qt app
-    "user_has_given_informed_consent"sv, // gtk app, qt app
     "ut_holepunch"sv, // BT protocol
     "ut_metadata"sv, // BEP0011; BT protocol
     "ut_pex"sv, // BEP0010, BEP0011; BT protocol
