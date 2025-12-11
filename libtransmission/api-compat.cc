@@ -409,7 +409,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     { TR_KEY_remote_session_username, TR_KEY_remote_session_username_kebab },
     { TR_KEY_torrent_complete_sound_command, TR_KEY_torrent_complete_sound_command_kebab },
     { TR_KEY_torrent_complete_sound_enabled, TR_KEY_torrent_complete_sound_enabled_kebab },
-    { TR_KEY_user_has_given_informed_consent, TR_KEY_user_has_given_informed_consent_kebab },
     { TR_KEY_read_clipboard, TR_KEY_read_clipboard_kebab },
 
     // daemon
@@ -470,7 +469,6 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     { TR_KEY_torrent_complete_notification_enabled, TR_KEY_torrent_complete_notification_enabled_kebab },
     { TR_KEY_torrent_complete_sound_enabled, TR_KEY_torrent_complete_sound_enabled_kebab },
     { TR_KEY_trash_can_enabled, TR_KEY_trash_can_enabled_kebab },
-    { TR_KEY_user_has_given_informed_consent, TR_KEY_user_has_given_informed_consent_kebab },
     { TR_KEY_watch_dir, TR_KEY_watch_dir_kebab },
     { TR_KEY_watch_dir_enabled, TR_KEY_watch_dir_enabled_kebab },
     { TR_KEY_torrent_complete_sound_command, TR_KEY_torrent_complete_sound_command_kebab },
