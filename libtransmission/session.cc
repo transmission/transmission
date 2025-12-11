@@ -30,6 +30,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
@@ -495,9 +496,9 @@ tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* co
             config_dir != nullptr ? config_dir : tr_getDefaultConfigDir(app_name));
         tr_sys_path_exists(filename))
     {
-        if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+        if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
         {
-            settings.merge(*file_settings);
+            settings.merge(libtransmission::api_compat::convert_incoming_data(*file_settings));
         }
     }
 
@@ -518,14 +519,15 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     // - previous session's settings stored in settings.json
     // - built-in defaults
     auto settings = tr_sessionGetDefaultSettings();
-    if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+    if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
     {
-        settings.merge(*file_settings);
+        settings.merge(libtransmission::api_compat::convert_incoming_data(*file_settings));
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
+    settings = libtransmission::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file

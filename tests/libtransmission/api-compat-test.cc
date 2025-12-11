@@ -594,6 +594,8 @@ TEST(ApiCompatTest, canConvertRpc)
         { "torrent_get tr5 -> tr4", CurrentTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
         { "torrent_get tr4 -> tr5", LegacyTorrentGetJson, Style::Tr5, CurrentTorrentGetJson },
         { "torrent_get tr4 -> tr4", LegacyTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
+
+        // TODO(ckerr): torrent-get with 'table'
     } };
     // clang-format on
 

@@ -36,8 +36,8 @@ extern "C"
 
 struct RpcResponse
 {
-    QString result;
-    TrVariantPtr args;
+    QString errmsg;
+    TrVariantPtr result;
     bool success = false;
     QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
 };
@@ -85,13 +85,13 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
-    RpcResponseFuture sendRequest(TrVariantPtr json);
+    RpcResponseFuture sendRequest(TrVariantPtr json, int64_t id);
     QNetworkAccessManager* networkAccessManager();
-    int64_t getNextTag();
+    int64_t getNextId();
 
     void sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
-    [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
+    void sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t id);
+    [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
     std::optional<QNetworkRequest> request_;
@@ -101,7 +101,7 @@ private:
     QUrl url_;
     QNetworkAccessManager* nam_ = {};
     std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
-    int64_t next_tag_ = {};
+    int64_t next_id_ = {};
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
     bool url_is_loopback_ = false;
 };

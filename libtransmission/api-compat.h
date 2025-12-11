@@ -31,6 +31,9 @@ enum class Style : uint8_t
 
 [[nodiscard]] Style get_export_settings_style();
 
+[[nodiscard]] tr_variant convert_incoming_data(tr_variant const& src);
+[[nodiscard]] tr_variant convert_outgoing_data(tr_variant const& src);
+
 } // namespace libtransmission::api_compat
 
 /**

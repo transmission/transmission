@@ -16,8 +16,10 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-#include <libtransmission/rpcimpl.h>
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/api-compat.h>
+#include <libtransmission/rpcimpl.h>
 #include <libtransmission/version.h> // LONG_VERSION_STRING
 
 #include "VariantHelpers.h"
@@ -71,32 +73,28 @@ void RpcClient::start(QUrl const& url)
     request_.reset();
 }
 
-RpcResponseFuture RpcClient::exec(tr_quark const method_key, tr_variant* args)
+RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* params)
 {
-    auto const method = tr_quark_get_string_view(method_key);
+    auto const id = getNextId();
 
-    TrVariantPtr const json = createVariant();
-    tr_variantInitDict(json.get(), 3);
-    dictAdd(json.get(), TR_KEY_method, method);
-
-    if (args != nullptr) // if args were passed in, use them
+    auto map = tr_variant::Map{ 4U };
+    map.try_emplace(TR_KEY_id, id);
+    map.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+    map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(method));
+    if (params != nullptr) // if args were passed in, use them
     {
-        auto* child = tr_variantDictFind(json.get(), TR_KEY_arguments);
-
-        if (child == nullptr)
-        {
-            child = tr_variantDictAddDict(json.get(), TR_KEY_arguments, 0);
-        }
-
-        std::swap(*child, *args);
+        auto& tgt = map.try_emplace(TR_KEY_params, tr_variant::Map{}).first;
+        std::swap(tgt, *params); // TODO(ckerr): tr_variant::Map::extract() and insert()?
     }
 
-    return sendRequest(json);
+    auto req = tr_variant{ std::move(map) };
+    req = libtransmission::api_compat::convert_outgoing_data(req);
+    return sendRequest(std::make_shared<tr_variant>(std::move(req)), id);
 }
 
-int64_t RpcClient::getNextTag()
+int64_t RpcClient::getNextId()
 {
-    return next_tag_++;
+    return next_id_++;
 }
 
 void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise)
@@ -139,14 +137,14 @@ void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcRespons
     }
 }
 
-void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
 {
     if (verbose_)
     {
         fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*req));
     }
 
-    local_requests_.try_emplace(tag, promise);
+    local_requests_.try_emplace(id, promise);
     tr_rpc_request_exec(
         session_,
         *req,
@@ -166,12 +164,9 @@ void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse>
         });
 }
 
-RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
+RpcResponseFuture RpcClient::sendRequest(std::shared_ptr<tr_variant> req, int64_t const id)
 {
-    int64_t const tag = getNextTag();
-    dictAdd(json.get(), TR_KEY_tag, tag);
-
-    QFutureInterface<RpcResponse> promise;
+    auto promise = QFutureInterface<RpcResponse>{};
     promise.setExpectedResultCount(1);
     promise.setProgressRange(0, 1);
     promise.setProgressValue(0);
@@ -179,11 +174,11 @@ RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 
     if (session_ != nullptr)
     {
-        sendLocalRequest(json, promise, tag);
+        sendLocalRequest(req, promise, id);
     }
     else if (!url_.isEmpty())
     {
-        sendNetworkRequest(json, promise);
+        sendNetworkRequest(req, promise);
     }
 
     return promise.future();
@@ -250,7 +245,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         auto const json = createVariant();
         auto result = RpcResponse{};
 
-        if (auto top = tr_variant_serde::json().parse(json_data); top)
+        if (auto top = tr_variant_serde::json().parse(json_data))
         {
             std::swap(*json, *top);
             result = parseResponseData(*json);
@@ -263,7 +258,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
-    if (auto node = local_requests_.extract(parseResponseTag(*response)); node)
+    if (auto node = local_requests_.extract(parseResponseId(*response)); node)
     {
         auto const result = parseResponseData(*response);
 
@@ -274,26 +269,47 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     }
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& response) const
+int64_t RpcClient::parseResponseId(tr_variant& response) const
 {
     return dictFind<int>(&response, TR_KEY_tag).value_or(-1);
 }
 
 RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 {
-    RpcResponse ret;
+    auto ret = RpcResponse{};
 
-    if (auto const result = dictFind<QString>(&response, TR_KEY_result); result)
+    if (verbose_)
     {
-        ret.result = *result;
-        ret.success = *result == QStringLiteral("success");
+        fmt::print("{:s}:{:d} raw response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(response));
     }
 
-    if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
+    response = libtransmission::api_compat::convert_incoming_data(response);
+
+    if (verbose_)
     {
-        ret.args = createVariant();
-        std::swap(*ret.args, *args);
-        variantInit(args, false);
+        fmt::print("{:s}:{:d} converted response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(response));
+    }
+
+    if (auto* top = response.get_if<tr_variant::Map>())
+    {
+        ret.success = true;
+
+        if (auto* error = top->find_if<tr_variant::Map>(TR_KEY_error))
+        {
+            ret.success = false;
+
+            if (auto const* errmsg = error->find_if<std::string_view>(TR_KEY_message))
+            {
+                ret.errmsg = QString::fromUtf8(std::data(*errmsg), std::size(*errmsg));
+            }
+        }
+
+        if (tr_variant* result = tr_variantDictFind(&response, TR_KEY_result))
+        {
+            ret.result = createVariant();
+            std::swap(*ret.result, *result); // TODO(ckerr): tr_variant::Map::extract() & insert()?
+            variantInit(result, false);
+        }
     }
 
     return ret;
