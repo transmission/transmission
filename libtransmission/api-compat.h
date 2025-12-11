@@ -13,10 +13,9 @@ struct tr_variant;
 
 namespace libtransmission::api_compat
 {
-// Nothing to see here.
-// Exposed as public only so tr_variant can see it & declare it a friend.
 namespace detail
 {
+// This is only public so that tr_variant can see it & declare it as a friend.
 struct CloneState;
 [[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state);
 } // namespace detail
