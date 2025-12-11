@@ -31,7 +31,7 @@ namespace
 {
 namespace wi
 {
-// clang-format off
+// clang-format off: compatibility with #ifdef
 using key_t = math::wide_integer::uintwide_t<
     tr_message_stream_encryption::DH::KeySize * std::numeric_limits<unsigned char>::digits
 #ifdef WIDE_INTEGER_HAS_LIMB_TYPE_UINT64
