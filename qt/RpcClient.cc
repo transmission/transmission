@@ -84,7 +84,7 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* params)
     if (params != nullptr) // if args were passed in, use them
     {
         auto& tgt = map.try_emplace(TR_KEY_params, tr_variant::Map{}).first;
-        std::swap(tgt, *params);
+        std::swap(tgt, *params); // TODO(ckerr): tr_variant::Map::extract() and insert()?
     }
 
     auto req = tr_variant{ std::move(map) };
@@ -307,7 +307,7 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
         if (tr_variant* result = tr_variantDictFind(&response, TR_KEY_result))
         {
             ret.result = createVariant();
-            std::swap(*ret.result, *result);
+            std::swap(*ret.result, *result); // TODO(ckerr): tr_variant::Map::extract() & insert()?
             variantInit(result, false);
         }
     }

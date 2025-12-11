@@ -670,7 +670,9 @@ struct CloneState
                 auto const pop = state_.convert_strings;
                 auto new_key = convert_key(key, state_.style, state_.is_rpc);
                 auto const special =
-                    (state_.is_rpc && (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids || new_key == TR_KEY_torrents));
+                    (state_.is_rpc &&
+                     (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids ||
+                      new_key == TR_KEY_torrents));
                 // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` on previous line with logic to turn on convert
                 // if it's an array inside an array val whose key was `torrents`.
                 // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
