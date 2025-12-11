@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -29,6 +30,79 @@ class VariantTest : public ::testing::Test
 protected:
     static void expectVariantMatchesQuark(tr_quark key);
 };
+
+namespace
+{
+
+struct RecordingVisitor final : tr_variant::Visitor
+{
+    void on_array_begin() override
+    {
+        events.emplace_back("array_begin");
+    }
+
+    void on_array_end() override
+    {
+        events.emplace_back("array_end");
+    }
+
+    void on_object_begin() override
+    {
+        events.emplace_back("object_begin");
+    }
+
+    void on_object_key(tr_quark key) override
+    {
+        events.emplace_back(std::string{ "object_key:" } + std::string{ tr_quark_get_string_view(key) });
+    }
+
+    void on_object_end() override
+    {
+        events.emplace_back("object_end");
+    }
+
+    void on_bool(bool val) override
+    {
+        events.emplace_back(val ? "bool:true" : "bool:false");
+    }
+
+    void on_double(double val) override
+    {
+        events.emplace_back(std::string{ "double:" } + formatDouble(val));
+    }
+
+    void on_empty() override
+    {
+        events.emplace_back("empty");
+    }
+
+    void on_int(int64_t val) override
+    {
+        events.emplace_back(std::string{ "int:" } + std::to_string(val));
+    }
+
+    void on_null() override
+    {
+        events.emplace_back("null");
+    }
+
+    void on_string(std::string_view str) override
+    {
+        events.emplace_back(std::string{ "string:" } + std::string{ str });
+    }
+
+    std::vector<std::string> events;
+
+private:
+    static std::string formatDouble(double val)
+    {
+        auto oss = std::ostringstream{};
+        oss << val;
+        return oss.str();
+    }
+};
+
+} // namespace
 
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
@@ -84,6 +158,83 @@ TEST_F(VariantTest, getType)
     sv = v.value_if<std::string_view>();
     ASSERT_TRUE(sv);
     EXPECT_EQ(strkey, *sv);
+}
+
+TEST_F(VariantTest, walkVisitsHierarchy)
+{
+    static auto constexpr Json = R"({
+        "walk-bool": true,
+        "walk-list": [7, 3.5, "walk-string"],
+        "walk-child": {
+            "walk-inner-null": null,
+            "walk-inner-array": [false]
+        },
+        "walk-empty": null
+    })"sv;
+
+    auto serde = tr_variant_serde::json();
+    auto parsed = serde.parse(Json);
+    ASSERT_TRUE(parsed);
+    auto top = std::move(*parsed);
+
+    auto* const map = top.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+
+    // Force top['walk-empty'] to be an unset variant.
+    auto const key_empty = tr_quark_new("walk-empty"sv);
+    auto iter = map->find(key_empty);
+    ASSERT_NE(iter, map->end());
+    iter->second.clear();
+
+    auto visitor = RecordingVisitor{};
+    top.walk(visitor);
+
+    auto const expected = std::vector<std::string>{
+        "object_begin",
+        "object_key:walk-bool",
+        "bool:true",
+        "object_key:walk-list",
+        "array_begin",
+        "int:7",
+        "double:3.5",
+        "string:walk-string",
+        "array_end",
+        "object_key:walk-child",
+        "object_begin",
+        "object_key:walk-inner-null",
+        "null",
+        "object_key:walk-inner-array",
+        "array_begin",
+        "bool:false",
+        "array_end",
+        "object_end",
+        "object_key:walk-empty",
+        "empty",
+        "object_end",
+    };
+
+    EXPECT_EQ(expected, visitor.events);
+}
+
+TEST_F(VariantTest, walkHandlesEmptyContainers)
+{
+    auto visitor = RecordingVisitor{};
+
+    auto vec = tr_variant::make_vector(0U);
+    vec.walk(visitor);
+    EXPECT_EQ((std::vector<std::string>{ "array_begin", "array_end" }), visitor.events);
+
+    visitor.events.clear();
+
+    auto map = tr_variant::make_map(0U);
+    map.walk(visitor);
+    EXPECT_EQ((std::vector<std::string>{ "object_begin", "object_end" }), visitor.events);
+
+    visitor.events.clear();
+
+    auto empty = tr_variant{};
+    empty.walk(visitor);
+    EXPECT_EQ((std::vector<std::string>{ "empty" }), visitor.events);
 }
 
 // static

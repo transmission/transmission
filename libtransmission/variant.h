@@ -436,6 +436,25 @@ public:
         return *this;
     }
 
+    struct Visitor
+    {
+        virtual void on_array_begin() = 0;
+        virtual void on_array_end() = 0;
+
+        virtual void on_object_begin() = 0;
+        virtual void on_object_key(tr_quark key) = 0;
+        virtual void on_object_end() = 0;
+
+        virtual void on_bool(bool val) = 0;
+        virtual void on_double(double val) = 0;
+        virtual void on_empty() = 0;
+        virtual void on_int(int64_t val) = 0;
+        virtual void on_null() = 0;
+        virtual void on_string(std::string_view str) = 0;
+    };
+
+    void walk(Visitor& visitor, bool sort_dicts = false) const;
+
 private:
     // Holds a string_view to either an unmanaged/external string or to
     // one owned by the class. If the string is unmanaged, only sv_ is used.

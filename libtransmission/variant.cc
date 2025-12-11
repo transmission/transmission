@@ -717,103 +717,91 @@ private:
     small::vector<WalkNode::ByKey, InitialCapacity> sortbuf_;
 };
 
-/**
- * This function's previous recursive implementation was
- * easier to read, but was vulnerable to a smash-stacking
- * attack via maliciously-crafted data. (#667)
- */
-void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts)
+void tr_variant::walk(Visitor& visitor, bool const sort_dicts) const
 {
     auto stack = VariantWalker{};
-    stack.emplace(&top, sort_dicts);
+    stack.emplace(this, sort_dicts);
 
     while (!stack.empty())
     {
         auto& node = stack.top();
-        tr_variant const* v = nullptr;
+        auto const* const current = node.current();
 
         if (!node.is_visited())
         {
-            v = node.current();
             node.set_visited();
+
+            if (current == nullptr || !current->has_value())
+            {
+                visitor.on_empty();
+                stack.pop();
+            }
+            else if (current->holds_alternative<tr_variant::Vector>())
+            {
+                visitor.on_array_begin();
+            }
+            else if (current->holds_alternative<tr_variant::Map>())
+            {
+                visitor.on_object_begin();
+            }
+            else
+            {
+                if (current->holds_alternative<std::nullptr_t>())
+                {
+                    visitor.on_null();
+                }
+                else if (auto const* bool_val = current->get_if<tr_variant::BoolIndex>(); bool_val != nullptr)
+                {
+                    visitor.on_bool(*bool_val);
+                }
+                else if (auto const* int_val = current->get_if<tr_variant::IntIndex>(); int_val != nullptr)
+                {
+                    visitor.on_int(*int_val);
+                }
+                else if (auto const* double_val = current->get_if<tr_variant::DoubleIndex>(); double_val != nullptr)
+                {
+                    visitor.on_double(*double_val);
+                }
+                else if (auto const* string_val = current->get_if<tr_variant::StringIndex>(); string_val != nullptr)
+                {
+                    visitor.on_string(*string_val);
+                }
+                else
+                {
+                    visitor.on_empty();
+                }
+
+                stack.pop();
+            }
         }
         else
         {
-            auto [key, child] = node.next_child();
+            auto const [key, child] = node.next_child();
 
-            v = child;
-
-            if (v != nullptr)
+            if (child == nullptr)
             {
-                if (node.current()->holds_alternative<tr_variant::Map>())
+                if (current->holds_alternative<tr_variant::Vector>())
                 {
-                    auto const keystr = tr_quark_get_string_view(key);
-                    walk_funcs.string_func(tr_variant::unmanaged_string(keystr), keystr, user_data);
+                    visitor.on_array_end();
                 }
-            }
-            else // finished with this node
-            {
-                if (variant_is_container(node.current()))
+                else if (current->holds_alternative<tr_variant::Map>())
                 {
-                    walk_funcs.container_end_func(*node.current(), user_data);
+                    visitor.on_object_end();
                 }
 
                 stack.pop();
                 continue;
             }
-        }
 
-        switch (variant_index(v))
-        {
-        case tr_variant::NullIndex:
-            walk_funcs.null_func(*v, *v->get_if<tr_variant::NullIndex>(), user_data);
-            break;
-
-        case tr_variant::BoolIndex:
-            walk_funcs.bool_func(*v, *v->get_if<tr_variant::BoolIndex>(), user_data);
-            break;
-
-        case tr_variant::IntIndex:
-            walk_funcs.int_func(*v, *v->get_if<tr_variant::IntIndex>(), user_data);
-            break;
-
-        case tr_variant::DoubleIndex:
-            walk_funcs.double_func(*v, *v->get_if<tr_variant::DoubleIndex>(), user_data);
-            break;
-
-        case tr_variant::StringIndex:
-            walk_funcs.string_func(*v, *v->get_if<tr_variant::StringIndex>(), user_data);
-            break;
-
-        case tr_variant::VectorIndex:
-            if (v == node.current())
+            if (current->holds_alternative<tr_variant::Map>())
             {
-                walk_funcs.list_begin_func(*v, user_data);
+                visitor.on_object_key(key);
             }
-            else
-            {
-                stack.emplace(v, sort_dicts);
-            }
-            break;
 
-        case tr_variant::MapIndex:
-            if (v == node.current())
-            {
-                walk_funcs.dict_begin_func(*v, user_data);
-            }
-            else
-            {
-                stack.emplace(v, sort_dicts);
-            }
-            break;
-
-        default: // NoneIndex:
-            break;
+            stack.emplace(child, sort_dicts);
         }
     }
 }
-
-// ---
 
 bool tr_variantDictChild(tr_variant* const var, size_t pos, tr_quark* key, tr_variant** setme_value)
 {
