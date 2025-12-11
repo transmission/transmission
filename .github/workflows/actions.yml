@@ -1392,6 +1392,21 @@ jobs:
           run: |
             set -ex
             mkdir src && gtar xf transmission*.tar.* -C src --strip-components 1
+            
+            mkdir web_test
+            cp -r \
+              src/web/esbuild.mjs \
+              src/web/package-lock.json \
+              src/web/package.json \
+              src/web/assets/ \
+              src/web/public_html/ \
+              src/web/src/ \
+              web_test
+            cd web_test
+            /usr/local/bin/npm ci --no-audit --no-fund --no-progress && /usr/local/bin/npm run build ||
+              cat /root/.npm/_logs/*.log
+            cd -
+            
             cmake \
               -S src \
               -B obj \
