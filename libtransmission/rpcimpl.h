@@ -7,7 +7,6 @@
 
 #include <cstdint> // int16_t
 #include <functional>
-#include <optional>
 
 struct tr_session;
 struct tr_variant;

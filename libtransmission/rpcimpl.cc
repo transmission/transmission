@@ -11,7 +11,6 @@
 #include <iterator>
 #include <memory>
 #include <numeric>
-#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -55,26 +54,47 @@ namespace JsonRpc
 // https://www.jsonrpc.org/specification#error_object
 namespace Error
 {
+[[nodiscard]] std::string_view to_string(Code const code)
+{
+    switch (code)
+    {
+    case PARSE_ERROR:
+        return "Parse error"sv;
+    case INVALID_REQUEST:
+        return "Invalid Request"sv;
+    case METHOD_NOT_FOUND:
+        return "Method not found"sv;
+    case INVALID_PARAMS:
+        return "Invalid params"sv;
+    case INTERNAL_ERROR:
+        return "Internal error"sv;
+    case SUCCESS:
+        return "success"sv;
+    case SET_ANNOUNCE_LIST:
+        return "error setting announce list"sv;
+    case INVALID_TRACKER_LIST:
+        return "Invalid tracker list"sv;
+    case PATH_NOT_ABSOLUTE:
+        return "path is not absolute"sv;
+    case UNRECOGNIZED_INFO:
+        return "unrecognized info"sv;
+    case SYSTEM_ERROR:
+        return "system error"sv;
+    case FILE_IDX_OOR:
+        return "file index out of range"sv;
+    case PIECE_IDX_OOR:
+        return "piece index out of range"sv;
+    case HTTP_ERROR:
+        return "HTTP error from backend service"sv;
+    case CORRUPT_TORRENT:
+        return "invalid or corrupt torrent file"sv;
+    default:
+        return {};
+    }
+}
+
 namespace
 {
-auto constexpr Messages = std::array<std::pair<Code, std::string_view>, 15U>{ {
-    { PARSE_ERROR, "Parse error"sv },
-    { INVALID_REQUEST, "Invalid Request"sv },
-    { METHOD_NOT_FOUND, "Method not found"sv },
-    { INVALID_PARAMS, "Invalid params"sv },
-    { INTERNAL_ERROR, "Internal error"sv },
-    { SUCCESS, "success"sv },
-    { SET_ANNOUNCE_LIST, "error setting announce list"sv },
-    { INVALID_TRACKER_LIST, "Invalid tracker list"sv },
-    { PATH_NOT_ABSOLUTE, "path is not absolute"sv },
-    { UNRECOGNIZED_INFO, "unrecognized info"sv },
-    { SYSTEM_ERROR, "system error"sv },
-    { FILE_IDX_OOR, "file index out of range"sv },
-    { PIECE_IDX_OOR, "piece index out of range"sv },
-    { HTTP_ERROR, "HTTP error from backend service"sv },
-    { CORRUPT_TORRENT, "invalid or corrupt torrent file"sv },
-} };
-
 [[nodiscard]] tr_variant::Map build_data(std::string_view error_string, tr_variant::Map&& result)
 {
     auto ret = tr_variant::Map{ 2U };
@@ -105,19 +125,6 @@ auto constexpr Messages = std::array<std::pair<Code, std::string_view>, 15U>{ {
     return ret;
 }
 } // namespace
-
-[[nodiscard]] std::string_view to_string(Code const code_in)
-{
-    for (auto const& [code, str] : Messages)
-    {
-        if (code_in == code)
-        {
-            return str;
-        }
-    }
-
-    return {};
-}
 } // namespace Error
 
 namespace
