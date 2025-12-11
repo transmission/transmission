@@ -38,8 +38,18 @@ class VariantTest : public ::testing::Test
 {
 protected:
     static void expectVariantMatchesQuark(tr_quark key);
-};
 
+    [[nodiscard]] static tr_variant parseJson(std::string_view json)
+    {
+        if (auto var = tr_variant_serde::json().inplace().parse(json))
+        {
+            return *std::move(var);
+        }
+
+        ADD_FAILURE() << "Failed to parse JSON: " << json;
+        return {};
+    }
+};
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
 #else
@@ -447,6 +457,108 @@ TEST_F(VariantTest, merge)
     sv = map->value_if<std::string_view>(s8);
     ASSERT_TRUE(sv);
     EXPECT_EQ("ghi"sv, *sv);
+}
+
+TEST_F(VariantTest, mergePromotesScalarToMapViaJson)
+{
+    auto const key = tr_quark_new("nested"sv);
+
+    auto const src = parseJson(R"({"nested":42})"sv);
+    auto tgt = tr_variant{};
+    tgt.merge(src);
+
+    auto const* const map = tgt.get_if<tr_variant::Map>();
+    ASSERT_NE(map, nullptr);
+    auto const value = map->value_if<int64_t>(key);
+    ASSERT_TRUE(value);
+    EXPECT_EQ(42, *value);
+}
+
+TEST_F(VariantTest, mergeVectorsResizesAndRecursesViaJson)
+{
+    auto const key = tr_quark_new("name"sv);
+
+    auto const src = parseJson(R"([7,{"name":"new"},true])"sv);
+    auto tgt = parseJson(R"([1,{"name":"old"}])"sv);
+    tgt.merge(src);
+
+    auto const* const vec = tgt.get_if<tr_variant::Vector>();
+    ASSERT_NE(vec, nullptr);
+    ASSERT_EQ(3U, vec->size());
+    auto const first = vec->at(0).value_if<int64_t>();
+    ASSERT_TRUE(first);
+    EXPECT_EQ(7, *first);
+    auto const name = vec->at(1).get_if<tr_variant::Map>()->value_if<std::string_view>(key);
+    ASSERT_TRUE(name);
+    EXPECT_EQ("new"sv, *name);
+    auto const flag = vec->at(2).value_if<bool>();
+    ASSERT_TRUE(flag);
+    EXPECT_TRUE(*flag);
+}
+
+TEST_F(VariantTest, mergeScalarsOverwritesRegardlessOfTypeViaJson)
+{
+    auto tgt = parseJson(R"(true)"sv);
+
+    tgt.merge(parseJson(R"(123)"sv));
+    EXPECT_EQ(123, *tgt.value_if<int64_t>());
+
+    tgt.merge(parseJson(R"(4.5)"sv));
+    EXPECT_DOUBLE_EQ(4.5, *tgt.value_if<double>());
+
+    tgt.merge(parseJson(R"("foo")"sv));
+    auto const sv = tgt.value_if<std::string_view>();
+    ASSERT_TRUE(sv);
+    EXPECT_EQ("foo"sv, *sv);
+
+    tgt.merge(parseJson(R"(null)"sv));
+    EXPECT_TRUE(tgt.holds_alternative<std::nullptr_t>());
+
+    tgt.merge(parseJson(R"({})"sv));
+    EXPECT_TRUE(tgt.holds_alternative<tr_variant::Map>());
+}
+
+TEST_F(VariantTest, mergeNestedMapsPreservesExistingEntriesViaJson)
+{
+    auto const config = tr_quark_new("config"sv);
+
+    auto const src = parseJson(R"({"config":{"enabled":false,"address":"localhost"}})"sv);
+    auto tgt = parseJson(R"({"config":{"port":51413,"enabled":true}})"sv);
+    tgt.merge(src);
+
+    auto const* const cfg = tgt.get_if<tr_variant::Map>()->find_if<tr_variant::Map>(config);
+    ASSERT_NE(cfg, nullptr);
+    auto const port = cfg->value_if<int64_t>(tr_quark_new("port"sv));
+    ASSERT_TRUE(port);
+    EXPECT_EQ(51413, *port);
+    auto const enabled = cfg->value_if<bool>(tr_quark_new("enabled"sv));
+    ASSERT_TRUE(enabled);
+    EXPECT_FALSE(*enabled);
+    auto const address = cfg->value_if<std::string_view>(tr_quark_new("address"sv));
+    ASSERT_TRUE(address);
+    EXPECT_EQ("localhost"sv, *address);
+}
+
+TEST_F(VariantTest, mergeStringsUpdatesOwnershipViaJson)
+{
+    // src holds one unmanaged string
+    auto constexpr SrcSv = "src"sv;
+    auto const src = tr_variant::unmanaged_string(SrcSv);
+    ASSERT_EQ(std::data(SrcSv), std::data(src.value_if<std::string_view>().value_or(""sv)));
+
+    // tgt holds a different unmanaged string
+    auto constexpr TgtSv = "tgt"sv;
+    auto tgt = tr_variant::unmanaged_string(TgtSv);
+    ASSERT_EQ(std::data(TgtSv), std::data(tgt.value_if<std::string_view>().value_or(""sv)));
+
+    tgt.merge(src);
+
+    // tgt should now be holding an allocated copy of `SrcSv`.
+    // tgt needs its own copy in case it outlives `src`.
+    auto const actual = tgt.value_if<std::string_view>().value_or(""sv);
+    ASSERT_EQ(SrcSv, actual);
+    ASSERT_NE(std::data(SrcSv), std::data(actual));
+    ASSERT_NE(std::data(TgtSv), std::data(actual));
 }
 
 TEST_F(VariantTest, stackSmash)

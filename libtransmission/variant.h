@@ -430,11 +430,7 @@ public:
         val_.emplace<std::monostate>();
     }
 
-    tr_variant& merge(tr_variant const& that)
-    {
-        std::visit(Merge{ *this }, that.val_);
-        return *this;
-    }
+    tr_variant& merge(tr_variant const& that);
 
     template<typename Visitor>
     [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor)
@@ -468,23 +464,6 @@ private:
 
     private:
         std::string str_;
-    };
-
-    class Merge
-    {
-    public:
-        explicit Merge(tr_variant& tgt);
-        void operator()(std::monostate const& src);
-        void operator()(std::nullptr_t const& src);
-        void operator()(bool const& src);
-        void operator()(int64_t const& src);
-        void operator()(double const& src);
-        void operator()(tr_variant::StringHolder const& src);
-        void operator()(tr_variant::Vector const& src);
-        void operator()(tr_variant::Map const& src);
-
-    private:
-        tr_variant& tgt_;
     };
 
     template<typename Visitor>

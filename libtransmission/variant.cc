@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <variant>
@@ -181,63 +182,48 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 
 // ---
 
-tr_variant::Merge::Merge(tr_variant& tgt)
-    : tgt_{ tgt }
+tr_variant& tr_variant::merge(tr_variant const& that)
 {
-}
-
-void tr_variant::Merge::operator()(std::monostate const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(std::nullptr_t const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(bool const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(int64_t const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(double const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(tr_variant::StringHolder const& src)
-{
-    tgt_ = src.sv_;
-}
-
-void tr_variant::Merge::operator()(tr_variant::Vector const& src)
-{
-    auto const n_items = std::size(src);
-    auto& tgt = tgt_.val_.emplace<Vector>();
-    tgt.resize(n_items);
-    for (size_t i = 0; i < n_items; ++i)
-    {
-        std::visit(Merge{ tgt[i] }, src[i].val_);
-    }
-}
-
-void tr_variant::Merge::operator()(tr_variant::Map const& src)
-{
-    // if tgt_ isn't already a map, make it one
-    if (tgt_.index() != tr_variant::MapIndex)
-    {
-        tgt_.val_.emplace<tr_variant::Map>();
-    }
-
-    if (auto* tgt = tgt_.get_if<tr_variant::MapIndex>(); tgt != nullptr)
-    {
-        tgt->reserve(std::size(*tgt) + std::size(src));
-        for (auto const& [key, val] : src)
+    that.visit(
+        [this](auto const& value)
         {
-            std::visit(Merge{ (*tgt)[tr_quark_convert(key)] }, val.val_);
-        }
-    }
+            using ValueType = std::decay_t<decltype(value)>;
+
+            if constexpr (
+                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
+                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
+                std::is_same_v<ValueType, std::string_view>)
+            {
+                *this = value;
+            }
+            else if constexpr (std::is_same_v<ValueType, Vector>)
+            {
+                auto& dest = val_.emplace<Vector>();
+                dest.resize(std::size(value));
+                for (size_t i = 0; i < std::size(value); ++i)
+                {
+                    dest[i].merge(value[i]);
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, Map>)
+            {
+                if (index() != MapIndex)
+                {
+                    val_.emplace<Map>();
+                }
+
+                if (auto* dest = this->template get_if<MapIndex>(); dest != nullptr)
+                {
+                    dest->reserve(std::size(*dest) + std::size(value));
+                    for (auto const& [key, child] : value)
+                    {
+                        (*dest)[tr_quark_convert(key)].merge(child);
+                    }
+                }
+            }
+        });
+
+    return *this;
 }
 
 // ---
