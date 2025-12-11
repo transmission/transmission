@@ -277,63 +277,90 @@ namespace to_string_helpers
 {
 using OutBuf = libtransmission::StackBuffer<1024U * 8U, std::byte>;
 
-void saveNullFunc(tr_variant const& /*var*/, std::nullptr_t /*val*/, void* vout)
+class BencSaveVisitor final : public tr_variant::Visitor
 {
-    static_cast<OutBuf*>(vout)->add("0:"sv);
-}
+public:
+    explicit BencSaveVisitor(OutBuf& out)
+        : out_{ out }
+    {
+    }
 
-void saveIntFunc(tr_variant const& /*var*/, int64_t const val, void* vout)
-{
-    auto out = static_cast<OutBuf*>(vout);
+    void on_array_begin() override
+    {
+        out_.push_back('l');
+    }
 
-    auto const [buf, buflen] = out->reserve_space(64U);
-    auto* walk = reinterpret_cast<char*>(buf);
-    auto const* const begin = walk;
-    walk = fmt::format_to(walk, FMT_COMPILE("i{:d}e"), val);
-    out->commit_space(walk - begin);
-}
+    void on_array_end() override
+    {
+        out_.push_back('e');
+    }
 
-void saveBoolFunc(tr_variant const& /*var*/, bool const val, void* vout)
-{
-    static_cast<OutBuf*>(vout)->add(val ? "i1e"sv : "i0e"sv);
-}
+    void on_object_begin() override
+    {
+        out_.push_back('d');
+    }
 
-void saveStringImpl(OutBuf* out, std::string_view sv)
-{
-    // `${sv.size()}:${sv}`
-    auto const [buf, buflen] = out->reserve_space(std::size(sv) + 32U);
-    auto* begin = reinterpret_cast<char*>(buf);
-    auto* const end = fmt::format_to(begin, FMT_COMPILE("{:d}:{:s}"), std::size(sv), sv);
-    out->commit_space(end - begin);
-}
+    void on_object_key(tr_quark const val) override
+    {
+        save_string(tr_quark_get_string_view(val));
+    }
 
-void saveStringFunc(tr_variant const& /*var*/, std::string_view const val, void* vout)
-{
-    saveStringImpl(static_cast<OutBuf*>(vout), val);
-}
+    void on_object_end() override
+    {
+        out_.push_back('e');
+    }
 
-void saveRealFunc(tr_variant const& /*val*/, double const val, void* vout)
-{
-    // the benc spec doesn't handle floats; save it as a string.
-    auto buf = std::array<char, 64>{};
-    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val);
-    saveStringImpl(static_cast<OutBuf*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
-}
+    void on_bool(bool const val) override
+    {
+        out_.add(val ? "i1e"sv : "i0e"sv);
+    }
 
-void saveDictBeginFunc(tr_variant const& /*val*/, void* vbuf)
-{
-    static_cast<OutBuf*>(vbuf)->push_back('d');
-}
+    void on_double(double const val) override
+    {
+        save_real(val);
+    }
 
-void saveListBeginFunc(tr_variant const& /*val*/, void* vbuf)
-{
-    static_cast<OutBuf*>(vbuf)->push_back('l');
-}
+    void on_empty() override
+    {
+    }
 
-void saveContainerEndFunc(tr_variant const& /*val*/, void* vbuf)
-{
-    static_cast<OutBuf*>(vbuf)->push_back('e');
-}
+    void on_int(int64_t const val) override
+    {
+        auto const [buf, buflen] = out_.reserve_space(64U);
+        auto* walk = reinterpret_cast<char*>(buf);
+        auto const* const begin = walk;
+        walk = fmt::format_to(walk, FMT_COMPILE("i{:d}e"), val);
+        out_.commit_space(walk - begin);
+    }
+
+    void on_null() override
+    {
+        out_.add("0:"sv);
+    }
+
+    void on_string(std::string_view str) override
+    {
+        save_string(str);
+    }
+
+private:
+    void save_string(std::string_view const val)
+    {
+        auto const [buf, buflen] = out_.reserve_space(std::size(val) + 32U);
+        auto* begin = reinterpret_cast<char*>(buf);
+        auto* const end = fmt::format_to(begin, FMT_COMPILE("{:d}:{:s}"), std::size(val), val);
+        out_.commit_space(end - begin);
+    }
+
+    void save_real(double const val)
+    {
+        auto buf = std::array<char, 64>{};
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val);
+        save_string({ std::data(buf), static_cast<size_t>(out - std::data(buf)) });
+    }
+
+    OutBuf& out_;
+};
 
 } // namespace to_string_helpers
 } // namespace
@@ -342,18 +369,8 @@ std::string tr_variant_serde::to_benc_string(tr_variant const& var)
 {
     using namespace to_string_helpers;
 
-    static auto constexpr Funcs = WalkFuncs{
-        saveNullFunc, //
-        saveIntFunc, //
-        saveBoolFunc, //
-        saveRealFunc, //
-        saveStringFunc, //
-        saveDictBeginFunc, //
-        saveListBeginFunc, //
-        saveContainerEndFunc, //
-    };
-
     auto buf = OutBuf{};
-    walk(var, Funcs, &buf, true);
+    auto visitor = BencSaveVisitor{ buf };
+    var.walk(visitor, true);
     return buf.to_string();
 }

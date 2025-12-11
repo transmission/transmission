@@ -311,54 +311,77 @@ private:
 
 using writer_var_t = std::variant<rapidjson::Writer<string_output_stream>, rapidjson::PrettyWriter<string_output_stream>>;
 
-void jsonNullFunc(tr_variant const& /*var*/, std::nullptr_t /*val*/, void* vdata)
+class JsonSaveVisitor final : public tr_variant::Visitor
 {
-    std::visit([](auto&& writer) { writer.Null(); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
-{
-    std::visit([val](auto&& writer) { writer.Int64(val); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonBoolFunc(tr_variant const& /*var*/, bool const val, void* vdata)
-{
-    std::visit([val](auto&& writer) { writer.Bool(val); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonRealFunc(tr_variant const& /*var*/, double const val, void* vdata)
-{
-    std::visit([val](auto&& writer) { writer.Double(val); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
-{
-    std::visit([sv](auto&& writer) { writer.String(std::data(sv), std::size(sv)); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonDictBeginFunc(tr_variant const& /*var*/, void* vdata)
-{
-    std::visit([](auto&& writer) { writer.StartObject(); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonListBeginFunc(tr_variant const& /*var*/, void* vdata)
-{
-    std::visit([](auto&& writer) { writer.StartArray(); }, *static_cast<writer_var_t*>(vdata));
-}
-
-void jsonContainerEndFunc(tr_variant const& var, void* vdata)
-{
-    auto& writer_var = *static_cast<writer_var_t*>(vdata);
-
-    if (var.holds_alternative<tr_variant::Map>())
+public:
+    explicit JsonSaveVisitor(writer_var_t& writer)
+        : writer_{ writer }
     {
-        std::visit([](auto&& writer) { writer.EndObject(); }, writer_var);
     }
-    else /* list */
+
+    void on_array_begin() override
     {
-        std::visit([](auto&& writer) { writer.EndArray(); }, writer_var);
+        with_writer([](auto& writer) { writer.StartArray(); });
     }
-}
+
+    void on_array_end() override
+    {
+        with_writer([](auto& writer) { writer.EndArray(); });
+    }
+
+    void on_object_begin() override
+    {
+        with_writer([](auto& writer) { writer.StartObject(); });
+    }
+
+    void on_object_key(tr_quark const val) override
+    {
+        on_string(tr_quark_get_string_view(val));
+    }
+
+    void on_object_end() override
+    {
+        with_writer([](auto& writer) { writer.EndObject(); });
+    }
+
+    void on_bool(bool const val) override
+    {
+        with_writer([val](auto& writer) { writer.Bool(val); });
+    }
+
+    void on_double(double const val) override
+    {
+        with_writer([val](auto& writer) { writer.Double(val); });
+    }
+
+    void on_empty() override
+    {
+    }
+
+    void on_int(int64_t const val) override
+    {
+        with_writer([val](auto& writer) { writer.Int64(val); });
+    }
+
+    void on_null() override
+    {
+        with_writer([](auto& writer) { writer.Null(); });
+    }
+
+    void on_string(std::string_view const val) override
+    {
+        with_writer([val](auto& writer) { writer.String(std::data(val), std::size(val)); });
+    }
+
+private:
+    template<typename Func>
+    void with_writer(Func&& func)
+    {
+        std::visit([&](auto& writer) { std::forward<Func>(func)(writer); }, writer_);
+    }
+
+    writer_var_t& writer_;
+};
 
 } // namespace to_string_helpers
 } // namespace
@@ -366,17 +389,6 @@ void jsonContainerEndFunc(tr_variant const& var, void* vdata)
 std::string tr_variant_serde::to_json_string(tr_variant const& var) const
 {
     using namespace to_string_helpers;
-
-    static auto constexpr Funcs = WalkFuncs{
-        jsonNullFunc, //
-        jsonIntFunc, //
-        jsonBoolFunc, //
-        jsonRealFunc, //
-        jsonStringFunc, //
-        jsonDictBeginFunc, //
-        jsonListBeginFunc, //
-        jsonContainerEndFunc, //
-    };
 
     auto out = std::string{};
     out.reserve(rapidjson::StringBuffer::kDefaultCapacity);
@@ -390,7 +402,8 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     {
         writer.emplace<1>(stream);
     }
-    walk(var, Funcs, &writer, true);
+    auto visitor = JsonSaveVisitor{ writer };
+    var.walk(visitor, true);
 
     return out;
 }

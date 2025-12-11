@@ -35,21 +35,6 @@ using namespace std::literals;
 
 namespace
 {
-[[nodiscard]] constexpr bool variant_is_container(tr_variant const* const var)
-{
-    return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
-}
-
-[[nodiscard]] constexpr size_t variant_index(tr_variant const* const var)
-{
-    if (var != nullptr)
-    {
-        return var->index();
-    }
-
-    return tr_variant::NoneIndex;
-}
-
 template<typename T>
 [[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
 {
