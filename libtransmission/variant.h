@@ -436,6 +436,18 @@ public:
         return *this;
     }
 
+    template<typename Visitor>
+    [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor)
+    {
+        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+    }
+
+    template<typename Visitor>
+    [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor) const
+    {
+        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+    }
+
 private:
     // Holds a string_view to either an unmanaged/external string or to
     // one owned by the class. If the string is unmanaged, only sv_ is used.
@@ -474,6 +486,39 @@ private:
     private:
         tr_variant& tgt_;
     };
+
+    template<typename Visitor>
+    class VisitAdapter
+    {
+    public:
+        explicit constexpr VisitAdapter(Visitor visitor)
+            : visitor_{ std::move(visitor) }
+        {
+        }
+
+        template<typename T>
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) const
+        {
+            if constexpr (std::is_same_v<std::decay_t<T>, StringHolder>)
+            {
+                return visitor_(value.sv_);
+            }
+            else
+            {
+                return visitor_(std::forward<T>(value));
+            }
+        }
+
+    private:
+        mutable Visitor visitor_;
+    };
+
+    template<typename Visitor>
+    [[nodiscard]] static constexpr auto make_visit_adapter(Visitor&& visitor)
+    {
+        using AdaptedVisitor = VisitAdapter<std::decay_t<Visitor>>;
+        return AdaptedVisitor{ std::forward<Visitor>(visitor) };
+    }
 
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };

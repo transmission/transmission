@@ -9,6 +9,7 @@
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -23,6 +24,15 @@
 #include "test-fixtures.h"
 
 using namespace std::literals;
+
+template<class... Ts>
+struct Overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+
+template<class... Ts>
+Overloaded(Ts...) -> Overloaded<Ts...>;
 
 class VariantTest : public ::testing::Test
 {
@@ -108,7 +118,7 @@ TEST_F(VariantTest, unmanagedStringFromPredefinedQuark)
 
 TEST_F(VariantTest, unmanagedStringFromNewQuark)
 {
-    static auto constexpr NewString = std::string_view{ "this-string-is-not-already-interned" };
+    static auto constexpr NewString = "this-string-is-not-already-interned"sv;
     ASSERT_FALSE(tr_quark_lookup(NewString));
 
     auto const key = tr_quark_new(NewString);
@@ -686,6 +696,202 @@ TEST_F(VariantTest, mapReplaceKey)
     EXPECT_FALSE(map->contains(key_int));
     EXPECT_TRUE(map->contains(key_replacement));
     EXPECT_EQ(IntVal, map->value_if<int64_t>(key_replacement).value_or(!IntVal));
+}
+
+TEST_F(VariantTest, visitStringExposesStringView)
+{
+    auto const text = "visit-string"sv;
+    auto var = tr_variant{ std::string{ text } };
+    auto called = false;
+
+    var.visit(
+        Overloaded{ [&](std::string_view sv)
+                    {
+                        called = true;
+                        EXPECT_EQ(text, sv);
+                    },
+                    [](auto&&)
+                    {
+                        FAIL();
+                    } });
+
+    EXPECT_TRUE(called);
+}
+
+TEST_F(VariantTest, visitConstVariant)
+{
+    auto var = tr_variant::make_vector(1U);
+    auto* vec = var.get_if<tr_variant::Vector>();
+    ASSERT_NE(vec, nullptr);
+    vec->emplace_back(int64_t{ 99 });
+
+    auto const result = std::as_const(var).visit(
+        Overloaded{ [](tr_variant::Vector const& values) -> int64_t
+                    {
+                        EXPECT_EQ(1U, std::size(values));
+                        return values[0].value_if<int64_t>().value_or(-1);
+                    },
+                    [](auto&&) -> int64_t
+                    {
+                        ADD_FAILURE() << "unexpected alternative";
+                        return -1;
+                    } });
+
+    EXPECT_EQ(99, result);
+}
+
+TEST_F(VariantTest, visitNestedJsonSummarizesStructure)
+{
+    auto constexpr Json = R"({
+        "root": {
+            "name": "transmission",
+            "flags": [true, false, {"nested": ["alpha", "beta"]}],
+            "ports": [9090, 9091],
+            "paths": {
+                "config": "/etc/transmission",
+                "data": "/var/lib/transmission",
+                "history": [1, 2, 3]
+            }
+        }
+    })"sv;
+
+    auto serde = tr_variant_serde::json();
+    auto parsed = serde.parse(Json);
+    ASSERT_TRUE(parsed);
+    auto const& top = *parsed;
+
+    auto const summarize = [&](auto const& self, tr_variant const& node) -> std::string
+    {
+        return node.visit(
+            Overloaded{ [&](tr_variant::Map const& map)
+                        {
+                            auto out = std::string{ "{" };
+                            auto first = true;
+                            for (auto const& [key, child] : map)
+                            {
+                                if (!first)
+                                {
+                                    out += ',';
+                                }
+                                first = false;
+                                out += tr_quark_get_string_view(key);
+                                out += ':';
+                                out += self(self, child);
+                            }
+                            out += '}';
+                            return out;
+                        },
+                        [&](tr_variant::Vector const& vec)
+                        {
+                            auto out = std::string{ "[" };
+                            for (size_t i = 0; i < vec.size(); ++i)
+                            {
+                                if (i != 0U)
+                                {
+                                    out += ',';
+                                }
+                                out += self(self, vec[i]);
+                            }
+                            out += ']';
+                            return out;
+                        },
+                        [&](std::string_view const val) { return std::string{ val }; },
+                        [&](bool const val) { return std::string{ val ? "true" : "false" }; },
+                        [&](int64_t const val) { return std::to_string(val); },
+                        [&](double const val) { return std::to_string(val); },
+                        [&](std::nullptr_t) { return std::string{ "null" }; },
+                        [&](std::monostate) { return std::string{ "<unset>" }; },
+                        [&](auto&&)
+                        {
+                            return std::string{ "?" };
+                        } });
+    };
+
+    auto const summary = summarize(summarize, top);
+    auto constexpr Expected =
+        "{root:{name:transmission,flags:[true,false,{nested:[alpha,beta]}],ports:[9090,9091],paths:{config:/etc/transmission,data:/var/lib/transmission,history:[1,2,3]}}}"sv;
+    EXPECT_EQ(Expected, summary);
+}
+
+TEST_F(VariantTest, visitNestedJsonAggregatesLeaves)
+{
+    auto constexpr Json = R"({
+        "files": [
+            { "name": "file1", "size": 5, "pieces": [1, 2] },
+            { "name": "file2", "size": 7, "pieces": [] }
+        ],
+        "meta": { "active": true }
+    })"sv;
+
+    auto serde = tr_variant_serde::json();
+    auto parsed = serde.parse(Json);
+    ASSERT_TRUE(parsed);
+    auto const& top = *parsed;
+
+    auto total_size = int64_t{};
+    auto piece_count = size_t{};
+    auto names = std::vector<std::string>{};
+    auto true_flags = int{};
+
+    auto const walk = [&](auto const& self, tr_variant const& node) -> void
+    {
+        node.visit(Overloaded{
+            [&](tr_variant::Map const& map) {
+                for (auto const& [key, child] : map)
+                {
+                    auto const key_sv = tr_quark_get_string_view(key);
+
+                    if (key_sv == "size")
+                    {
+                        // GCC 10 on Debian 11 misparses `child.get_if<int64_t>()`,
+                        // so visit instead to keep this portable.
+                        child.visit(Overloaded{
+                            [&](int64_t const val) { total_size += val; },
+                            [&](auto&&) {}
+                        });
+                        continue;
+                    }
+
+                    if (key_sv == "name")
+                    {
+                        child.visit(Overloaded{
+                            [&](std::string_view sv) { names.emplace_back(sv); },
+                            [&](auto&&) { FAIL(); } });
+                        continue;
+                    }
+
+                    if (key_sv == "pieces")
+                    {
+                        child.visit(Overloaded{
+                            [&](tr_variant::Vector const& vec) { piece_count += std::size(vec); },
+                            [&](auto&&) { FAIL(); } });
+                        continue;
+                    }
+
+                    self(self, child);
+                }
+            },
+            [&](tr_variant::Vector const& vec) {
+                for (auto const& child : vec)
+                {
+                    self(self, child);
+                }
+            },
+            [&](bool const val) {
+                if (val)
+                {
+                    ++true_flags;
+                }
+            },
+            [&](auto&&) {} });
+    };
+
+    walk(walk, top);
+
+    EXPECT_EQ(12, total_size);
+    EXPECT_EQ(2U, piece_count);
+    EXPECT_EQ((std::vector<std::string>{ "file1", "file2" }), names);
+    EXPECT_EQ(1, true_flags);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)
