@@ -377,7 +377,6 @@ constexpr std::string_view LegacySettingsJson = R"json({
     "torrent-complete-sound-enabled": true,
     "trash-original-torrent-files": false,
     "upload-slots-per-torrent": 8,
-    "user-has-given-informed-consent": true,
     "utp-enabled": true,
     "watch-dir": "/home/user/Downloads",
     "watch-dir-enabled": false
@@ -479,7 +478,6 @@ constexpr std::string_view CurrentSettingsJson = R"json({
     "torrent_complete_sound_enabled": true,
     "trash_original_torrent_files": false,
     "upload_slots_per_torrent": 8,
-    "user_has_given_informed_consent": true,
     "utp_enabled": true,
     "watch_dir": "/home/user/Downloads",
     "watch_dir_enabled": false
