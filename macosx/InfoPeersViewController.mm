@@ -258,7 +258,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     }
 }
 
-// clang-format off
+// clang-format off: compatibility with unnamed arguemnts
 - (NSString*)connectedTextFrom:(NSUInteger)tracker
                               :(NSUInteger)incoming
                               :(NSUInteger)cache
