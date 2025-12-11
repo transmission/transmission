@@ -255,62 +255,29 @@ namespace
 {
 namespace to_string_helpers
 {
-// implements RapidJSON's Stream concept, so that the library can output
-// directly to a std::string, and we can avoid some copying by copy elision
-// http://rapidjson.org/md_doc_stream.html
-struct string_output_stream
+// implements RapidJSON's write-only stream concept using fmt::memory_buffer.
+// See <rapidjson/stream.h> for details.
+struct FmtOutputStream
 {
     using Ch = char;
 
-    explicit string_output_stream(std::string& str)
-        : str_ref_{ str }
+    void Put(Ch const ch)
+    {
+        buf_.push_back(ch);
+    }
+
+    void Flush()
     {
     }
 
-    [[nodiscard]] static Ch Peek()
+    [[nodiscard]] std::string to_string() const
     {
-        TR_ASSERT(false);
-        return 0;
-    }
-
-    [[nodiscard]] static Ch Take()
-    {
-        TR_ASSERT(false);
-        return 0;
-    }
-
-    static size_t Tell()
-    {
-        TR_ASSERT(false);
-        return 0U;
-    }
-
-    static Ch* PutBegin()
-    {
-        TR_ASSERT(false);
-        return nullptr;
-    }
-
-    void Put(Ch const c)
-    {
-        str_ref_ += c;
-    }
-
-    static void Flush()
-    {
-    }
-
-    static size_t PutEnd(Ch* /*begin*/)
-    {
-        TR_ASSERT(false);
-        return 0U;
+        return fmt::to_string(buf_);
     }
 
 private:
-    std::string& str_ref_;
+    fmt::memory_buffer buf_;
 };
-
-using writer_var_t = std::variant<rapidjson::Writer<string_output_stream>, rapidjson::PrettyWriter<string_output_stream>>;
 
 [[nodiscard]] auto sorted_entries(tr_variant::Map const& map)
 {
@@ -320,14 +287,14 @@ using writer_var_t = std::variant<rapidjson::Writer<string_output_stream>, rapid
     {
         entries.emplace_back(tr_quark_get_string_view(key), &child);
     }
-
-    std::sort(std::begin(entries), std::end(entries), [](auto const& a, auto const& b) { return a.first < b.first; });
+    std::sort(std::begin(entries), std::end(entries));
     return entries;
 }
 
+template<typename WriterT>
 struct JsonWriter
 {
-    writer_var_t& writer;
+    WriterT& writer;
 
     void operator()(std::monostate /*unused*/) const
     {
@@ -335,52 +302,53 @@ struct JsonWriter
 
     void operator()(std::nullptr_t) const
     {
-        std::visit([](auto& w) { w.Null(); }, writer);
+        writer.Null();
     }
 
-    void operator()(bool val) const
+    void operator()(bool const val) const
     {
-        std::visit([val](auto& w) { w.Bool(val); }, writer);
+        writer.Bool(val);
     }
 
-    void operator()(int64_t val) const
+    void operator()(int64_t const val) const
     {
-        std::visit([val](auto& w) { w.Int64(val); }, writer);
+        writer.Int64(val);
     }
 
-    void operator()(double val) const
+    void operator()(double const val) const
     {
-        std::visit([val](auto& w) { w.Double(val); }, writer);
+        writer.Double(val);
     }
 
-    void operator()(std::string_view sv) const
+    void operator()(std::string_view const val) const
     {
-        std::visit([sv](auto& w) { w.String(std::data(sv), std::size(sv)); }, writer);
+        writer.String(std::data(val), std::size(val));
     }
 
-    void operator()(tr_variant::Vector const& vec) const
+    void operator()(tr_variant::Vector const& val) const
     {
-        std::visit([](auto& w) { w.StartArray(); }, writer);
-        for (auto const& child : vec)
+        writer.StartArray();
+        for (auto const& child : val)
         {
             child.visit(*this);
         }
-        std::visit([](auto& w) { w.EndArray(); }, writer);
+        writer.EndArray();
     }
 
-    void operator()(tr_variant::Map const& map) const
+    void operator()(tr_variant::Map const& val) const
     {
-        std::visit([](auto& w) { w.StartObject(); }, writer);
-        auto entries = sorted_entries(map);
-        for (auto const& [key, child] : entries)
+        writer.StartObject();
+        for (auto const& [key, child] : sorted_entries(val))
         {
-            auto const key_sv = key;
-            std::visit([key_sv](auto& w) { w.String(std::data(key_sv), std::size(key_sv)); }, writer);
+            writer.String(std::data(key), std::size(key));
             child->visit(*this);
         }
-        std::visit([](auto& w) { w.EndObject(); }, writer);
+        writer.EndObject();
     }
 };
+
+template<typename WriterT>
+JsonWriter(WriterT&) -> JsonWriter<WriterT>;
 
 } // namespace to_string_helpers
 } // namespace
@@ -389,19 +357,16 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
 {
     using namespace to_string_helpers;
 
-    auto out = std::string{};
-    out.reserve(rapidjson::StringBuffer::kDefaultCapacity);
-    auto stream = string_output_stream{ out };
-    auto writer = writer_var_t{};
+    auto buf = FmtOutputStream{};
     if (compact_)
     {
-        writer.emplace<0>(stream);
+        auto writer = rapidjson::Writer{ buf };
+        var.visit(JsonWriter{ writer });
     }
     else
     {
-        writer.emplace<1>(stream);
+        auto writer = rapidjson::PrettyWriter{ buf };
+        var.visit(JsonWriter{ writer });
     }
-    var.visit(JsonWriter{ writer });
-
-    return out;
+    return buf.to_string();
 }
