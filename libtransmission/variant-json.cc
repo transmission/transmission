@@ -96,8 +96,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool StartObject()
     {
-        tr_variantInitDict(push_stack(), prealloc_guess());
-        return true;
+        if (auto* node = push_stack())
+        {
+            tr_variantInitDict(node, prealloc_guess());
+            return true;
+        }
+
+        return false;
     }
 
     bool Key(Ch const* const str, rapidjson::SizeType const len, bool const copy)
@@ -122,8 +127,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool StartArray()
     {
-        tr_variantInitList(push_stack(), prealloc_guess());
-        return true;
+        if (auto* node = push_stack())
+        {
+            tr_variantInitList(node, prealloc_guess());
+            return true;
+        }
+
+        return false;
     }
 
     bool EndArray(rapidjson::SizeType const len)
@@ -141,7 +151,7 @@ private:
 
     tr_variant* push_stack() noexcept
     {
-        return stack_.emplace(get_leaf());
+        return std::size(stack_) < MaxDepth ? stack_.emplace(get_leaf()) : nullptr;
     }
 
     void pop_stack(rapidjson::SizeType const len) noexcept
@@ -229,10 +239,13 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
     {
         return std::optional<tr_variant>{ std::move(top) };
     }
-
     if (auto err_code = reader.GetParseErrorCode(); err_code == rapidjson::kParseErrorDocumentEmpty)
     {
         error_.set(EINVAL, "No content");
+    }
+    else if (err_code == rapidjson::kParseErrorTermination)
+    {
+        error_.set(E2BIG, "Max stack depth reached; unable to continue parsing");
     }
     else
     {

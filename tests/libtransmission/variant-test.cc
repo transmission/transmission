@@ -459,7 +459,7 @@ TEST_F(VariantTest, mergeOverwritesDifferingTypes)
     }
 }
 
-TEST_F(VariantTest, stackSmash)
+TEST_F(VariantTest, stackSmashBenc)
 {
     // set up a nested list of list of lists.
     static int constexpr Depth = STACK_SMASH_DEPTH;
@@ -467,6 +467,22 @@ TEST_F(VariantTest, stackSmash)
 
     // test that parsing fails without crashing
     auto serde = tr_variant_serde::benc();
+    auto var = serde.inplace().parse(in);
+    EXPECT_FALSE(var.has_value());
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
+}
+
+TEST_F(VariantTest, stackSmashJson)
+{
+    auto serde = tr_variant_serde::json();
+    serde.inplace();
+
+    // set up a nested array of arrays of arrays.
+    static auto constexpr Depth = STACK_SMASH_DEPTH;
+    auto const in = std::string(Depth, '[') + std::string(Depth, ']');
+
+    // test that parsing fails without crashing
     auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
     EXPECT_TRUE(serde.error_);
