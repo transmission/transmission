@@ -862,29 +862,14 @@ TEST_F(VariantTest, visitConstVariant)
     EXPECT_EQ(99, result);
 }
 
-TEST_F(VariantTest, visitNestedJsonSummarizesStructure)
+namespace
 {
-    auto constexpr Json = R"({
-        "root": {
-            "name": "transmission",
-            "flags": [true, false, {"nested": ["alpha", "beta"]}],
-            "ports": [9090, 9091],
-            "paths": {
-                "config": "/etc/transmission",
-                "data": "/var/lib/transmission",
-                "history": [1, 2, 3]
-            }
-        }
-    })"sv;
 
-    auto serde = tr_variant_serde::json();
-    auto parsed = serde.parse(Json);
-    ASSERT_TRUE(parsed);
-    auto const& top = *parsed;
-
-    auto const summarize = [&](auto const& self, tr_variant const& node) -> std::string
+[[nodiscard]] std::string summarizeVariant(tr_variant const& var)
+{
+    auto const summarize = [&](auto const& self, tr_variant const& cur) -> std::string
     {
-        return node.visit(
+        return cur.visit(
             Overloaded{ [&](tr_variant::Map const& map)
                         {
                             auto out = std::string{ "{" };
@@ -929,9 +914,49 @@ TEST_F(VariantTest, visitNestedJsonSummarizesStructure)
                         } });
     };
 
-    auto const summary = summarize(summarize, top);
-    auto constexpr Expected =
-        "{root:{name:transmission,flags:[true,false,{nested:[alpha,beta]}],ports:[9090,9091],paths:{config:/etc/transmission,data:/var/lib/transmission,history:[1,2,3]}}}"sv;
+    return summarize(summarize, var);
+}
+
+} // namespace
+
+TEST_F(VariantTest, visitsNestedObjects)
+{
+    auto const var = parseJson(R"({"outer":{"inner":{"flag":true,"name":"transmission"}}})"sv);
+    auto const summary = summarizeVariant(var);
+    auto constexpr Expected = "{outer:{inner:{flag:true,name:transmission}}}"sv;
+    EXPECT_EQ(Expected, summary);
+}
+
+TEST_F(VariantTest, visitsNestedArrays)
+{
+    auto const var = parseJson(R"([[1],[2,3]])"sv);
+    auto const summary = summarizeVariant(var);
+    auto constexpr Expected = "[[1],[2,3]]"sv;
+    EXPECT_EQ(Expected, summary);
+}
+
+TEST_F(VariantTest, visitsScalarValues)
+{
+    using TestCase = std::pair<tr_variant, std::string_view>;
+    auto const TestCases = std::array<TestCase, 5U>{ {
+        { tr_variant{ "string" }, "string" },
+        { tr_variant::unmanaged_string("unmanaged"), "unmanaged" },
+        { tr_variant{ 999 }, "999" },
+        { tr_variant{ false }, "false" },
+        { tr_variant{ nullptr }, "null" },
+    } };
+
+    for (auto const& [var, expected] : TestCases)
+    {
+        EXPECT_EQ(expected, summarizeVariant(var));
+    }
+}
+
+TEST_F(VariantTest, visitsMixedTypes)
+{
+    auto const var = parseJson(R"({"outer":{"flag":false,"list":[null,"x"]}})"sv);
+    auto const summary = summarizeVariant(var);
+    auto constexpr Expected = "{outer:{flag:false,list:[null,x]}}"sv;
     EXPECT_EQ(Expected, summary);
 }
 
