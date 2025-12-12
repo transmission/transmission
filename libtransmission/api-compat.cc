@@ -710,8 +710,8 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
     if (auto const method = src_top->value_if<std::string_view>(TR_KEY_method))
     {
-        auto const key = tr_quark_get_string_view(tr_quark_convert(tr_quark_new(*method)));
-        state.is_torrent = key == "torrent_get" || key == "torrent_set";
+        auto const key = tr_quark_convert(tr_quark_new(*method));
+        state.is_torrent = key == TR_KEY_torrent_get || key == TR_KEY_torrent_set;
     }
 
     if (is_response)
