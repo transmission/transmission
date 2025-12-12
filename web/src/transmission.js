@@ -389,7 +389,7 @@ export class Transmission extends EventTarget {
   _initializeClusterize() {
     // Initialize clusterize.js for virtual scrolling
     this.clusterize = new Clusterize({
-      blocks_in_cluster: 6, // Increase from default 4 for better scrolling
+      blocks_in_cluster: 4,
       callbacks: {
         clusterChanged: () => {
           // Update selections on newly rendered rows
@@ -400,7 +400,7 @@ export class Transmission extends EventTarget {
       no_data_class: 'clusterize-no-data',
       no_data_text: '',
       rows: ['<li class="clusterize-no-data"></li>'],
-      rows_in_block: 50, // Keep default but make explicit
+      rows_in_block: 25,
       scrollId: 'torrent-container',
       show_no_data_row: true,
       tag: 'li',
