@@ -1349,7 +1349,6 @@ jobs:
         arch:
           - x86_64
           - aarch64
-          - riscv64
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     steps:
       - name: Show Configuration
