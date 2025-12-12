@@ -598,6 +598,7 @@ public:
                 s->block_history.try_emplace(loc.block).first->second.emplace_back(
                     now,
                     fmt::format("cancelled to {} [{}]", msgs->display_name(), msgs->user_agent()));
+                s->log_block_history(loc.block);
             }
             break;
 
@@ -645,6 +646,7 @@ public:
                     s->block_history.try_emplace(block).first->second.emplace_back(
                         now,
                         fmt::format("choked by {} [{}]", msgs->display_name(), msgs->user_agent()));
+                    s->log_block_history(block);
                 }
             }
             break;
@@ -882,6 +884,18 @@ private:
                         piece,
                         peer->strikes + 1));
                 add_strike(peer);
+                auto const* const msgs = dynamic_cast<tr_peerMsgs*>(peer);
+                auto const now = std::chrono::system_clock::now();
+                for (auto [block, end] = wishlist_mediator.block_span(piece); block < end; ++block)
+                {
+                    block_history.try_emplace(block).first->second.emplace_back(
+                        now,
+                        fmt::format(
+                            "got bad piece {} [{}]",
+                            peer->display_name(),
+                            msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                    log_block_history(block);
+                }
             }
         };
 
@@ -977,6 +991,7 @@ private:
                         "rejected by {} [{}]",
                         peer->display_name(),
                         msgs != nullptr ? msgs->user_agent() : "webseed"sv));
+                s->log_block_history(loc.block);
             }
             break;
 
