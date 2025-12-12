@@ -25,6 +25,9 @@
 
 using namespace std::literals;
 
+namespace
+{
+
 template<class... Ts>
 struct Overloaded : Ts...
 {
@@ -33,6 +36,8 @@ struct Overloaded : Ts...
 
 template<class... Ts>
 Overloaded(Ts...) -> Overloaded<Ts...>;
+
+} // namespace
 
 class VariantTest : public ::testing::Test
 {
