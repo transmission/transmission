@@ -430,7 +430,7 @@ TEST_F(VariantTest, mergeOverwritesDifferingTypes)
         { tr_variant{ true }, "true" },
         { tr_variant{ int64_t{ 123 } }, "123" },
         { tr_variant{ 4.5 }, "4.5" },
-        { tr_variant{ "foo"sv }, "\"foo\""sv },
+        { tr_variant{ "foo"sv }, R"("foo")"sv },
         { tr_variant{ nullptr }, "null"sv },
         { tr_variant::make_map(0U), "{}"sv },
         { tr_variant::make_vector(), "[]"sv },
