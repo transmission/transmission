@@ -29,7 +29,7 @@ struct ApiKey
     tr_quark legacy;
 };
 
-auto constexpr RpcKeys = std::array<ApiKey, 214U>{ {
+auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_active_torrent_count, TR_KEY_active_torrent_count_camel },
     { TR_KEY_activity_date, TR_KEY_activity_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_added_date, TR_KEY_added_date_camel }, // TODO(ckerr) legacy duplicate
@@ -244,9 +244,8 @@ auto constexpr RpcKeys = std::array<ApiKey, 214U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 219U>{ {
     // .resume
-    { TR_KEY_peers2_6, TR_KEY_peers2_6_kebab },
     { TR_KEY_peers2_6, TR_KEY_peers2_6_kebab },
     { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab },
     { TR_KEY_use_global_speed_limit, TR_KEY_use_global_speed_limit_kebab },
@@ -268,20 +267,12 @@ auto constexpr SessionKeys = std::array<ApiKey, 230U>{ {
     { TR_KEY_idle_mode, TR_KEY_idle_mode_kebab },
     { TR_KEY_time_checked, TR_KEY_time_checked_kebab },
     { TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab },
-    { TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab },
-    { TR_KEY_max_peers, TR_KEY_max_peers_kebab },
     { TR_KEY_max_peers, TR_KEY_max_peers_kebab },
     { TR_KEY_added_date, TR_KEY_added_date_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_added_date, TR_KEY_added_date_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_done_date, TR_KEY_done_date_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_done_date, TR_KEY_done_date_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_activity_date, TR_KEY_activity_date_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab },
     { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab },
     { TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab },
-    { TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab },
-    { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab }, // TODO(ckerr) legacy duplicate
 
     // stats.json
