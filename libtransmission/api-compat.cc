@@ -276,11 +276,11 @@ auto constexpr SessionKeys = std::array<ApiKey, 219U>{ {
     { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab }, // TODO(ckerr) legacy duplicate
 
     // stats.json
-    { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_files_added, TR_KEY_files_added_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_seconds_active, TR_KEY_seconds_active_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_session_count, TR_KEY_session_count_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_downloaded_bytes, detail::TR_KEY_downloaded_bytes_kebab },
+    { TR_KEY_files_added, detail::TR_KEY_files_added_kebab },
+    { TR_KEY_seconds_active, detail::TR_KEY_seconds_active_kebab },
+    { TR_KEY_session_count, detail::TR_KEY_session_count_kebab },
+    { TR_KEY_uploaded_bytes, detail::TR_KEY_uploaded_bytes_kebab },
 
     // tr_session::Settings
     { TR_KEY_announce_ip, TR_KEY_announce_ip_kebab },

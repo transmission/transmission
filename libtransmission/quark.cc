@@ -18,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
+auto constexpr MyPublic = std::array<std::string_view, TR_N_PUBLIC_KEYS>{
     ""sv,
     "activeTorrentCount"sv, // rpc
     "active_torrent_count"sv, // rpc
@@ -151,7 +151,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "download_queue_size"sv, // rpc, tr_session::Settings
     "download_speed"sv, // rpc
     "downloaded"sv, // BEP0048; .resume, BT protocol
-    "downloaded-bytes"sv, // stats.json
     "downloadedBytes"sv, // rpc
     "downloadedEver"sv, // rpc
     "downloaded_bytes"sv, // rpc, stats.json
@@ -180,7 +179,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "file_stats"sv, // rpc
     "filename"sv, // rpc
     "files"sv, // .resume, .torrent, rpc
-    "files-added"sv, // stats.json
     "files-unwanted"sv, // rpc
     "files-wanted"sv, // rpc
     "filesAdded"sv, // rpc
@@ -528,7 +526,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "script_torrent_done_filename"sv, // rpc, tr_session::Settings
     "script_torrent_done_seeding_enabled"sv, // rpc, tr_session::Settings
     "script_torrent_done_seeding_filename"sv, // rpc, tr_session::Settings
-    "seconds-active"sv, // stats.json
     "secondsActive"sv, // rpc
     "secondsDownloading"sv, // rpc
     "secondsSeeding"sv, // rpc
@@ -556,7 +553,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "sequential_download"sv, // .resume, daemon, rpc, tr_session::Settings
     "sequential_download_from_piece"sv, // .resume, rpc
     "session-close"sv, // rpc
-    "session-count"sv, // stats.json
     "session-get"sv, // rpc
     "session-id"sv, // rpc
     "session-set"sv, // rpc
@@ -703,7 +699,6 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "upload_slots_per_torrent"sv, // tr_session::Settings
     "upload_speed"sv, // rpc
     "uploaded"sv, // .resume
-    "uploaded-bytes"sv, // stats.json
     "uploadedBytes"sv, // rpc
     "uploadedEver"sv, // rpc
     "uploaded_bytes"sv, // rpc, stats.json
@@ -733,11 +728,27 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "yourip"sv, // BEP0010; BT protocol
 };
 
+auto constexpr MyPrivate = std::array<std::string_view, TR_N_PRIVATE_KEYS>{
+    "downloaded-bytes"sv, // stats.json
+    "files-added"sv, // stats.json
+    "seconds-active"sv, // stats.json
+    "session-count"sv, // stats.json
+    "uploaded-bytes"sv // stats.json
+};
+
 bool constexpr quarks_are_sorted()
 {
-    for (size_t i = 1; i < std::size(MyStatic); ++i)
+    for (size_t i = 1; i < std::size(MyPublic); ++i)
     {
-        if (MyStatic[i - 1] >= MyStatic[i])
+        if (MyPublic[i - 1] >= MyPublic[i])
+        {
+            return false;
+        }
+    }
+
+    for (size_t i = 1; i < std::size(MyPrivate); ++i)
+    {
+        if (MyPrivate[i - 1] >= MyPrivate[i])
         {
             return false;
         }
@@ -747,42 +758,56 @@ bool constexpr quarks_are_sorted()
 }
 
 static_assert(quarks_are_sorted(), "Predefined quarks must be sorted by their string value");
-static_assert(std::size(MyStatic) == TR_N_KEYS);
+static_assert(std::size(MyPublic) == TR_N_PUBLIC_KEYS);
+static_assert(std::size(MyPublic) == TR_END_PUBLIC_KEYS - TR_BEGIN_PUBLIC_KEYS);
+static_assert(std::size(MyPrivate) == TR_N_PRIVATE_KEYS);
+static_assert(std::size(MyPrivate) == TR_END_PRIVATE_KEYS - TR_BEGIN_PRIVATE_KEYS);
+static_assert(TR_N_STATIC_KEYS == TR_N_PUBLIC_KEYS + TR_N_PRIVATE_KEYS);
 
 auto& my_runtime{ *new std::vector<std::string_view>{} };
 
 } // namespace
 
-std::optional<tr_quark> tr_quark_lookup(std::string_view key)
+std::optional<tr_quark> tr_quark_lookup(std::string_view keystr)
 {
-    // is it in our static array?
-    auto constexpr Sbegin = std::begin(MyStatic);
-    auto constexpr Send = std::end(MyStatic);
-
-    if (auto const sit = std::lower_bound(Sbegin, Send, key); sit != Send && *sit == key)
+    // is it one of our sorted static keys?
+    auto search_lower = [](auto const begin, auto const end, auto const str)
     {
-        return std::distance(Sbegin, sit);
+        auto ret = std::optional<tr_quark>{};
+        if (auto const iter = std::lower_bound(begin, end, str); iter != end && *iter == str)
+        {
+            ret = std::distance(begin, iter);
+        }
+        return ret;
+    };
+    if (auto const key = search_lower(std::begin(MyPublic), std::end(MyPublic), keystr))
+    {
+        return TR_BEGIN_PUBLIC_KEYS + *key;
+    }
+    if (auto const key = search_lower(std::begin(MyPrivate), std::end(MyPrivate), keystr))
+    {
+        return TR_BEGIN_PRIVATE_KEYS + *key;
     }
 
-    /* was it added during runtime? */
+    // is it a key added at runtime?
     auto const rbegin = std::begin(my_runtime);
     auto const rend = std::end(my_runtime);
-    if (auto const rit = std::find(rbegin, rend, key); rit != rend)
+    if (auto const rit = std::find(rbegin, rend, keystr); rit != rend)
     {
-        return TR_N_KEYS + std::distance(rbegin, rit);
+        return TR_N_STATIC_KEYS + std::distance(rbegin, rit);
     }
 
     return {};
 }
 
-tr_quark tr_quark_new(std::string_view str)
+tr_quark tr_quark_new(std::string_view const str)
 {
     if (auto const prior = tr_quark_lookup(str); prior)
     {
         return *prior;
     }
 
-    auto const ret = TR_N_KEYS + std::size(my_runtime);
+    auto const ret = TR_N_STATIC_KEYS + std::size(my_runtime);
     auto const len = std::size(str);
     auto* perma = new char[len + 1];
     std::copy_n(std::begin(str), len, perma);
@@ -791,7 +816,17 @@ tr_quark tr_quark_new(std::string_view str)
     return ret;
 }
 
-std::string_view tr_quark_get_string_view(tr_quark q)
+std::string_view tr_quark_get_string_view(tr_quark const key)
 {
-    return q < TR_N_KEYS ? MyStatic[q] : my_runtime[q - TR_N_KEYS];
+    if (TR_BEGIN_PUBLIC_KEYS <= key && key < TR_END_PUBLIC_KEYS)
+    {
+        return MyPublic[key - TR_BEGIN_PUBLIC_KEYS];
+    }
+
+    if (TR_BEGIN_PRIVATE_KEYS <= key && key < TR_END_PRIVATE_KEYS)
+    {
+        return MyPrivate[key - TR_BEGIN_PRIVATE_KEYS];
+    }
+
+    return my_runtime[key - TR_N_STATIC_KEYS];
 }
