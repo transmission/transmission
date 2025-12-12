@@ -250,10 +250,14 @@ public:
 
     constexpr tr_variant() noexcept = default;
     ~tr_variant() = default;
-    tr_variant(tr_variant const&) = delete;
     tr_variant(tr_variant&& that) noexcept = default;
-    tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
+
+    // Copying a variant is potentially expensive, so copy assignment
+    // and copy construct are deleted here to prevent accidental copies.
+    // Use clone() instead.
+    tr_variant(tr_variant const&) = delete;
+    tr_variant& operator=(tr_variant const&) = delete;
 
     template<typename Val>
     tr_variant(Val&& value) // NOLINT(bugprone-forwarding-reference-overload, google-explicit-constructor)
@@ -443,6 +447,8 @@ public:
     {
         return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
     }
+
+    [[nodiscard]] tr_variant clone() const;
 
 private:
     // Holds a string_view to either an unmanaged/external string or to

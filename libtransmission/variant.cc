@@ -182,6 +182,13 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 
 // ---
 
+tr_variant tr_variant::clone() const
+{
+    auto ret = tr_variant{};
+    ret.merge(*this);
+    return ret;
+}
+
 tr_variant& tr_variant::merge(tr_variant const& that)
 {
     that.visit(
