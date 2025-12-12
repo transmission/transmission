@@ -644,20 +644,18 @@ struct CloneState
 
         tr_variant operator()(tr_variant::Vector const& src)
         {
-            auto ret = tr_variant{};
-            auto& tgt = ret.val_.emplace<tr_variant::Vector>();
+            auto tgt = tr_variant::Vector();
             tgt.reserve(std::size(src));
             for (auto const& val : src)
             {
                 tgt.emplace_back(convert_impl(val, state_));
             }
-            return ret;
+            return tgt;
         }
 
         tr_variant operator()(tr_variant::Map const& src)
         {
-            auto ret = tr_variant{};
-            auto& tgt = ret.val_.emplace<tr_variant::Map>();
+            auto tgt = tr_variant::Map{ std::size(src) };
             tgt.reserve(std::size(src));
             for (auto const& [key, val] : src)
             {
@@ -681,7 +679,7 @@ struct CloneState
                 tgt.insert_or_assign(new_key, convert_impl(val, state_));
                 state_.convert_strings = pop;
             }
-            return ret;
+            return tgt;
         }
 
         CloneState& state_;
