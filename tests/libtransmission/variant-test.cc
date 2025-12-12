@@ -7,8 +7,10 @@
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <map>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -46,15 +48,18 @@ protected:
 
     [[nodiscard]] static tr_variant parseJson(std::string_view json)
     {
-        if (auto var = tr_variant_serde::json().inplace().parse(json))
+        auto serde = tr_variant_serde::json();
+        serde.inplace();
+        if (auto var = serde.parse(json))
         {
-            return *std::move(var);
+            return std::move(*var);
         }
 
         ADD_FAILURE() << "Failed to parse JSON: " << json;
         return {};
     }
 };
+
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
 #else
@@ -930,85 +935,77 @@ TEST_F(VariantTest, visitNestedJsonSummarizesStructure)
     EXPECT_EQ(Expected, summary);
 }
 
-TEST_F(VariantTest, visitNestedJsonAggregatesLeaves)
+TEST_F(VariantTest, visitsNodesDepthFirst)
 {
-    auto constexpr Json = R"({
+    auto const var = parseJson(R"({
         "files": [
             { "name": "file1", "size": 5, "pieces": [1, 2] },
             { "name": "file2", "size": 7, "pieces": [] }
         ],
         "meta": { "active": true }
-    })"sv;
+    })"sv);
 
-    auto serde = tr_variant_serde::json();
-    auto parsed = serde.parse(Json);
-    ASSERT_TRUE(parsed);
-    auto const& top = *parsed;
+    auto visited_counts = std::map<size_t, size_t>{};
 
-    auto total_size = int64_t{};
-    auto piece_count = size_t{};
-    auto names = std::vector<std::string>{};
-    auto true_flags = int{};
+    auto flattened = tr_variant::Vector{};
+    flattened.reserve(64U);
 
-    auto const walk = [&](auto const& self, tr_variant const& node) -> void
+    auto flatten = [&](tr_variant const& node, auto const& self) -> void
     {
-        node.visit(Overloaded{
-            [&](tr_variant::Map const& map) {
-                for (auto const& [key, child] : map)
+        ++visited_counts[node.index()];
+
+        node.visit(
+            [&](auto const& val)
+            {
+                using ValueType = std::decay_t<decltype(val)>;
+
+                if constexpr (
+                    std::is_same_v<ValueType, bool> || //
+                    std::is_same_v<ValueType, double> || //
+                    std::is_same_v<ValueType, int64_t> || //
+                    std::is_same_v<ValueType, std::monostate> || //
+                    std::is_same_v<ValueType, std::nullptr_t> || //
+                    std::is_same_v<ValueType, std::string_view>)
                 {
-                    auto const key_sv = tr_quark_get_string_view(key);
-
-                    if (key_sv == "size")
-                    {
-                        // GCC 10 on Debian 11 misparses `child.get_if<int64_t>()`,
-                        // so visit instead to keep this portable.
-                        child.visit(Overloaded{
-                            [&](int64_t const val) { total_size += val; },
-                            [&](auto&&) {}
-                        });
-                        continue;
-                    }
-
-                    if (key_sv == "name")
-                    {
-                        child.visit(Overloaded{
-                            [&](std::string_view sv) { names.emplace_back(sv); },
-                            [&](auto&&) { FAIL(); } });
-                        continue;
-                    }
-
-                    if (key_sv == "pieces")
-                    {
-                        child.visit(Overloaded{
-                            [&](tr_variant::Vector const& vec) { piece_count += std::size(vec); },
-                            [&](auto&&) { FAIL(); } });
-                        continue;
-                    }
-
-                    self(self, child);
+                    flattened.emplace_back(val);
                 }
-            },
-            [&](tr_variant::Vector const& vec) {
-                for (auto const& child : vec)
+                else if constexpr (std::is_same_v<ValueType, tr_variant::Vector>)
                 {
-                    self(self, child);
+                    for (auto const& child : val)
+                    {
+                        self(child, self);
+                    }
                 }
-            },
-            [&](bool const val) {
-                if (val)
+                else if constexpr (std::is_same_v<ValueType, tr_variant::Map>)
                 {
-                    ++true_flags;
+                    for (auto const& [key, child] : val)
+                    {
+                        flattened.emplace_back(tr_variant::unmanaged_string(key));
+                        self(child, self);
+                    }
                 }
-            },
-            [&](auto&&) {} });
+            });
     };
 
-    walk(walk, top);
+    flatten(var, flatten);
 
-    EXPECT_EQ(12, total_size);
-    EXPECT_EQ(2U, piece_count);
-    EXPECT_EQ((std::vector<std::string>{ "file1", "file2" }), names);
-    EXPECT_EQ(1, true_flags);
+    // confirm the nodes were visited depth-first
+    auto serde = tr_variant_serde::json();
+    serde.compact();
+    auto const actual = serde.to_string({ std::move(flattened) });
+    auto constexpr Expected =
+        R"(["files","name","file1","size",5,"pieces",1,2,"name","file2","size",7,"pieces","meta","active",true])"sv;
+    EXPECT_EQ(Expected, actual);
+
+    // confirm the expected number of nodes were visited
+    auto const expected_visited_count = std::map<size_t, size_t>{
+        { tr_variant::BoolIndex, 1U }, //
+        { tr_variant::IntIndex, 4U }, //
+        { tr_variant::MapIndex, 4U }, //
+        { tr_variant::StringIndex, 2U }, //
+        { tr_variant::VectorIndex, 3U }, //
+    };
+    EXPECT_EQ(expected_visited_count, visited_counts);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)
