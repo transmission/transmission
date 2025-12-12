@@ -388,11 +388,9 @@ void Session::start()
 
 void Session::addOptionalIds(tr_variant* args_dict, torrent_ids_t const& torrent_ids) const
 {
-    auto constexpr RecentlyActiveKey = std::string_view{ "recently-active" };
-
     if (&torrent_ids == &RecentlyActiveIDs)
     {
-        dictAdd(args_dict, TR_KEY_ids, RecentlyActiveKey);
+        dictAdd(args_dict, TR_KEY_ids, tr_quark_get_string_view(TR_KEY_recently_active_kebab));
     }
     else if (!std::empty(torrent_ids))
     {
