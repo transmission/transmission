@@ -5,6 +5,7 @@
 
 #include <string_view>
 
+#include <libtransmission/api-compat.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 

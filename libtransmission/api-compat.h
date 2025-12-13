@@ -13,13 +13,6 @@ struct tr_variant;
 
 namespace libtransmission::api_compat
 {
-namespace detail
-{
-// This is only public so that tr_variant can see it & declare it as a friend.
-struct CloneState;
-[[nodiscard]] tr_variant convert_impl(tr_variant const& self, CloneState& state);
-} // namespace detail
-
 enum class Style : uint8_t
 {
     Tr4, // bespoke RPC, mixed-case keys,

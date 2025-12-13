@@ -18,7 +18,6 @@
 #include <variant>
 #include <vector>
 
-#include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
@@ -459,11 +458,6 @@ public:
     [[nodiscard]] tr_variant clone() const;
 
 private:
-    friend tr_variant libtransmission::api_compat::detail::convert_impl(
-        tr_variant const& self,
-        libtransmission::api_compat::detail::CloneState& state);
-    friend tr_variant libtransmission::api_compat::convert(tr_variant const& src, libtransmission::api_compat::Style tgt_style);
-
     // Holds a string_view to either an unmanaged/external string or to
     // one owned by the class. If the string is unmanaged, only sv_ is used.
     // If we own the string, then sv_ points to the managed str_.

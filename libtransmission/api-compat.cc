@@ -11,6 +11,7 @@
 #include <string_view>
 #include <vector>
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/utils.h"
@@ -570,10 +571,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 219U>{ {
 
     return {};
 }
-} // namespace
 
-namespace detail
-{
 struct CloneState
 {
     api_compat::Style style = {};
@@ -612,11 +610,11 @@ struct CloneState
             return tr_variant{ val };
         }
 
-        tr_variant operator()(tr_variant::StringHolder const& holder) const
+        tr_variant operator()(std::string_view const& sv) const
         {
             if (state_.convert_strings)
             {
-                if (auto lookup = tr_quark_lookup(holder.sv_))
+                if (auto lookup = tr_quark_lookup(sv))
                 {
                     auto key = convert_key(*lookup, state_.style, state_.is_rpc);
 
@@ -630,7 +628,7 @@ struct CloneState
                 }
             }
 
-            return tr_variant{ holder.sv_ };
+            return tr_variant{ sv };
         }
 
         tr_variant operator()(tr_variant::Vector const& src)
@@ -676,16 +674,16 @@ struct CloneState
         CloneState& state_;
     };
 
-    return std::visit(Visitor{ state }, self.val_);
+    return self.visit(Visitor{ state });
 }
-} // namespace detail
+} // namespace
 
 tr_variant convert(tr_variant const& src, Style const tgt_style)
 {
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
 
-    if (src.val_.index() != tr_variant::MapIndex)
+    if (src.index() != tr_variant::MapIndex)
     {
         abort(); // FIXME
     }
@@ -700,7 +698,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     auto const is_response = was_jsonrpc_response || was_legacy_response;
     auto const is_rpc = is_request || is_response;
 
-    auto state = detail::CloneState{};
+    auto state = CloneState{};
     state.style = tgt_style;
     state.is_rpc = is_request || is_response;
 
