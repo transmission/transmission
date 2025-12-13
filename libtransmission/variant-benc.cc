@@ -326,7 +326,7 @@ struct BencWriter
         out_.push_back('l');
         for (auto const& child : vec)
         {
-            child.visit(std::cref(*this));
+            child.visit(*this);
         }
         out_.push_back('e');
     }
@@ -338,7 +338,7 @@ struct BencWriter
         for (auto const& [key, child] : entries)
         {
             write_string(key);
-            child->visit(std::cref(*this));
+            child->visit(*this);
         }
         out_.push_back('e');
     }

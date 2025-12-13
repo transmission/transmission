@@ -8,6 +8,7 @@
 #include <algorithm> // std::move()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <functional> // std::invoke
 #include <initializer_list>
 #include <optional>
 #include <string>
@@ -487,27 +488,47 @@ private:
         {
         }
 
+        // These ref-qualified overloads preserve the visitor's cv/ref category
+        // (lvalue/rvalue, const/non-const) to match std::visit() semantics.
         template<typename T>
-        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) const
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &
         {
-            if constexpr (std::is_same_v<std::decay_t<T>, StringHolder>)
-            {
-                return visitor_(value.sv_);
-            }
-            else
-            {
-                return visitor_(std::forward<T>(value));
-            }
+            return call(*this, std::forward<T>(value));
+        }
+        template<typename T>
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) const&
+        {
+            return call(*this, std::forward<T>(value));
+        }
+        template<typename T>
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &&
+        {
+            return call(std::move(*this), std::forward<T>(value));
         }
 
     private:
-        mutable Visitor visitor_;
+        template<typename Self, typename T>
+        [[nodiscard]] static constexpr decltype(auto) call(Self&& self, T&& value)
+        {
+            auto&& visitor = std::forward<Self>(self).visitor_;
+
+            if constexpr (std::is_same_v<std::decay_t<T>, StringHolder>)
+            {
+                return std::invoke(std::forward<decltype(visitor)>(visitor), value.sv_);
+            }
+            else
+            {
+                return std::invoke(std::forward<decltype(visitor)>(visitor), std::forward<T>(value));
+            }
+        }
+
+        Visitor visitor_;
     };
 
     template<typename Visitor>
     [[nodiscard]] static constexpr auto make_visit_adapter(Visitor&& visitor)
     {
-        using AdaptedVisitor = VisitAdapter<std::decay_t<Visitor>>;
+        using AdaptedVisitor = VisitAdapter<Visitor>;
         return AdaptedVisitor{ std::forward<Visitor>(visitor) };
     }
 
