@@ -245,7 +245,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 138U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_added_date, TR_KEY_added_date_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab },
@@ -357,6 +357,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 138U>{ {
     { TR_KEY_show_statusbar, TR_KEY_show_statusbar_kebab },
     { TR_KEY_show_toolbar, TR_KEY_show_toolbar_kebab },
     { TR_KEY_show_tracker_scrapes, TR_KEY_show_tracker_scrapes_kebab },
+    { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab },
     { TR_KEY_sort_mode, TR_KEY_sort_mode_kebab },
     { TR_KEY_sort_reversed, TR_KEY_sort_reversed_kebab },
     { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab },
