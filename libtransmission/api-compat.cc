@@ -702,7 +702,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
     auto state = CloneState{};
     state.style = tgt_style;
-    state.is_rpc = is_request || is_response;
+    state.is_rpc = is_rpc;
 
     auto const is_success = is_response &&
         (was_jsonrpc_response ? src_top->contains(TR_KEY_result) :
