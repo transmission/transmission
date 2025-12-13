@@ -8,6 +8,7 @@
 #include <algorithm> // std::move()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <functional> // std::invoke
 #include <initializer_list>
 #include <optional>
 #include <string>
@@ -250,10 +251,14 @@ public:
 
     constexpr tr_variant() noexcept = default;
     ~tr_variant() = default;
-    tr_variant(tr_variant const&) = delete;
     tr_variant(tr_variant&& that) noexcept = default;
-    tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
+
+    // Copying a variant is potentially expensive, so copy assignment
+    // and copy construct are deleted here to prevent accidental copies.
+    // Use clone() instead.
+    tr_variant(tr_variant const&) = delete;
+    tr_variant& operator=(tr_variant const&) = delete;
 
     template<typename Val>
     tr_variant(Val&& value) // NOLINT(bugprone-forwarding-reference-overload, google-explicit-constructor)
@@ -430,11 +435,27 @@ public:
         val_.emplace<std::monostate>();
     }
 
-    tr_variant& merge(tr_variant const& that)
+    template<typename Visitor>
+    [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor)
     {
-        std::visit(Merge{ *this }, that.val_);
-        return *this;
+        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
     }
+
+    template<typename Visitor>
+    [[nodiscard]] constexpr decltype(auto) visit(Visitor&& visitor) const
+    {
+        return std::visit(make_visit_adapter(std::forward<Visitor>(visitor)), val_);
+    }
+
+    // Usually updates `this` to hold a clone of `that`, with two exceptions:
+    // 1. If both sides hold maps, recursively merge each entry and overwrite
+    //    duplicate keys from `this`.
+    // 2. Any unmanaged string taken from `that` is copied so `this` owns its copy.
+    tr_variant& merge(tr_variant const& that);
+
+    // Returns a new copy of `this`.
+    // Any unmanaged strings in `this` are copied so the new variant owns its copy.
+    [[nodiscard]] tr_variant clone() const;
 
 private:
     // Holds a string_view to either an unmanaged/external string or to
@@ -458,22 +479,58 @@ private:
         std::string str_;
     };
 
-    class Merge
+    template<typename Visitor>
+    class VisitAdapter
     {
     public:
-        explicit Merge(tr_variant& tgt);
-        void operator()(std::monostate const& src);
-        void operator()(std::nullptr_t const& src);
-        void operator()(bool const& src);
-        void operator()(int64_t const& src);
-        void operator()(double const& src);
-        void operator()(tr_variant::StringHolder const& src);
-        void operator()(tr_variant::Vector const& src);
-        void operator()(tr_variant::Map const& src);
+        explicit constexpr VisitAdapter(Visitor visitor)
+            : visitor_{ std::move(visitor) }
+        {
+        }
+
+        // These ref-qualified overloads preserve the visitor's cv/ref category
+        // (lvalue/rvalue, const/non-const) to match std::visit() semantics.
+        template<typename T>
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &
+        {
+            return call(*this, std::forward<T>(value));
+        }
+        template<typename T>
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) const&
+        {
+            return call(*this, std::forward<T>(value));
+        }
+        template<typename T>
+        [[nodiscard]] constexpr decltype(auto) operator()(T&& value) &&
+        {
+            return call(std::move(*this), std::forward<T>(value));
+        }
 
     private:
-        tr_variant& tgt_;
+        template<typename Self, typename T>
+        [[nodiscard]] static constexpr decltype(auto) call(Self&& self, T&& value)
+        {
+            auto&& visitor = std::forward<Self>(self).visitor_;
+
+            if constexpr (std::is_same_v<std::decay_t<T>, StringHolder>)
+            {
+                return std::invoke(std::forward<decltype(visitor)>(visitor), value.sv_);
+            }
+            else
+            {
+                return std::invoke(std::forward<decltype(visitor)>(visitor), std::forward<T>(value));
+            }
+        }
+
+        Visitor visitor_;
     };
+
+    template<typename Visitor>
+    [[nodiscard]] static constexpr auto make_visit_adapter(Visitor&& visitor)
+    {
+        using AdaptedVisitor = VisitAdapter<Visitor>;
+        return AdaptedVisitor{ std::forward<Visitor>(visitor) };
+    }
 
     std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };
@@ -637,18 +694,6 @@ private:
         Json
     };
 
-    struct WalkFuncs
-    {
-        void (*null_func)(tr_variant const& var, std::nullptr_t val, void* user_data);
-        void (*int_func)(tr_variant const& var, int64_t val, void* user_data);
-        void (*bool_func)(tr_variant const& var, bool val, void* user_data);
-        void (*double_func)(tr_variant const& var, double val, void* user_data);
-        void (*string_func)(tr_variant const& var, std::string_view val, void* user_data);
-        void (*dict_begin_func)(tr_variant const& var, void* user_data);
-        void (*list_begin_func)(tr_variant const& var, void* user_data);
-        void (*container_end_func)(tr_variant const& var, void* user_data);
-    };
-
     explicit tr_variant_serde(Type type)
         : type_{ type }
     {
@@ -659,8 +704,6 @@ private:
 
     [[nodiscard]] std::string to_json_string(tr_variant const& var) const;
     [[nodiscard]] static std::string to_benc_string(tr_variant const& var);
-
-    static void walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts);
 
     Type type_;
 
