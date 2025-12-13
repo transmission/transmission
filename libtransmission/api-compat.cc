@@ -720,7 +720,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
                 if (auto* data = error.find_if<tr_variant::Map>(TR_KEY_data))
                 {
-                    if (auto const* errmsg = data->find_if<std::string_view>(TR_KEY_error_string_camel))
+                    if (auto const errmsg = data->value_if<std::string_view>(TR_KEY_error_string_camel))
                     {
                         tgt_top->try_emplace(TR_KEY_result, *errmsg);
                     }
@@ -731,7 +731,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
                     }
                 }
 
-                if (auto const* errmsg = error.find_if<std::string_view>(TR_KEY_message))
+                if (auto const errmsg = error.value_if<std::string_view>(TR_KEY_message))
                 {
                     tgt_top->try_emplace(TR_KEY_result, *errmsg);
                 }
