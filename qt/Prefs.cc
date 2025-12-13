@@ -19,6 +19,8 @@
 #endif
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/api-compat.h>
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"

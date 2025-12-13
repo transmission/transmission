@@ -480,6 +480,8 @@
 		EDBAAC8C29E486BC00D9495F /* ip-cache.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBAAC8B29E486BC00D9495F /* ip-cache.h */; };
 		EDBAAC8E29E486C200D9495F /* ip-cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDBAAC8D29E486C200D9495F /* ip-cache.cc */; };
 		EDBDFA9E25AFCCA60093D9C1 /* evutil_time.c in Sources */ = {isa = PBXBuildFile; fileRef = EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */; };
+		EDC37BCD2EE9C2AD001E2612 /* api-compat.cc in Sources */ = {isa = PBXBuildFile; fileRef = EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */; };
+		EDC37BCE2EE9C2AD001E2612 /* api-compat.h in Headers */ = {isa = PBXBuildFile; fileRef = EDC37BCB2EE9C2AD001E2612 /* api-compat.h */; };
 		EDC749F92D98AE3000A12D0F /* PowerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = EDC749F82D98AE2900A12D0F /* PowerManager.mm */; };
 		F11545ACA7C4D7A464F703AB /* block-info.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A044CBD8C049AFCBD4DB411 /* block-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
@@ -1472,6 +1474,8 @@
 		EDBAAC8B29E486BC00D9495F /* ip-cache.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "ip-cache.h"; sourceTree = "<group>"; };
 		EDBAAC8D29E486C200D9495F /* ip-cache.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "ip-cache.cc"; sourceTree = "<group>"; };
 		EDBDFA9D25AFCCA60093D9C1 /* evutil_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = evutil_time.c; sourceTree = "<group>"; };
+		EDC37BCB2EE9C2AD001E2612 /* api-compat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "api-compat.h"; sourceTree = "<group>"; };
+		EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "api-compat.cc"; sourceTree = "<group>"; };
 		EDC749F72D98ADE200A12D0F /* PowerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PowerManager.h; sourceTree = "<group>"; };
 		EDC749F82D98AE2900A12D0F /* PowerManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PowerManager.mm; sourceTree = "<group>"; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
@@ -1919,6 +1923,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				EDC37BCB2EE9C2AD001E2612 /* api-compat.h */,
+				EDC37BCC2EE9C2AD001E2612 /* api-compat.cc */,
 				66F977825E65AD498C028BB1 /* announce-list.cc */,
 				66F977825E65AD498C028BB3 /* announce-list.h */,
 				A23F299F132A447400E9A83B /* announcer-common.h */,
@@ -2561,6 +2567,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1077A51183EB29600634C22 /* file.h in Headers */,
+				EDC37BCE2EE9C2AD001E2612 /* api-compat.h in Headers */,
 				BEFC1E290C07861A00B0BB3C /* version.h in Headers */,
 				BEFC1E2A0C07861A00B0BB3C /* utils.h in Headers */,
 				BE7AA337F6752914B0C416B0 /* utils-ev.h in Headers */,
@@ -3489,6 +3496,7 @@
 				C1FEE57A1C3223CC00D62832 /* watchdir.cc in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.cc in Sources */,
 				C843FC8429C51B9400491854 /* utils.mm in Sources */,
+				EDC37BCD2EE9C2AD001E2612 /* api-compat.cc in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.cc in Sources */,
 				C17740D5273A002C00E455D2 /* web-utils.cc in Sources */,
 				A2679294130E00A000CB7464 /* tr-utp.cc in Sources */,

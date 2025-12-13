@@ -6,6 +6,7 @@ Users can set environmental variables to override Transmission's default behavio
  * If `TR_CURL_SSL_NO_VERIFY` is set, Transmission will not validate SSL certificate for HTTPS connections when talking to trackers. See CURL's documentation ([CURLOPT_SSL_VERIFYHOST](https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html) and [CURLOPT_SSL_VERIFYPEER](https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html)) for more details.
  * If `TR_CURL_VERBOSE` is set, debugging information for libcurl will be enabled.  More information about libcurl's debugging mode [is available here](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTVERBOSE).
  * If `TR_DHT_VERBOSE` is set, Transmission will log all of the DHT's activities in excruciating detail to standard error.
+ * If `TR_SAVE_VERSION_FORMAT` is set to `4` or `5`, it will save settings.json, stats.json, etc. files to either Transmission 4 or Transmission 5 format.
 
 ## Standard Variables Used by Transmission
  * If `TRANSMISSION_WEB_HOME` is _not_ set, non-Mac platforms will look for the [Web Interface](Web-Interface.md) files in `XDG_DATA_HOME` and in `XDG_DATA_DIRS` as described in [the XDG Base Directory Specification](https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html#variables). `XDG_DATA_HOME` has a default value of `$HOME/.local/share/`.

@@ -22,6 +22,7 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
