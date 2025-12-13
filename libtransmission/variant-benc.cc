@@ -348,18 +348,18 @@ struct BencWriter
 private:
     void write_string(std::string_view sv) const
     {
-        fmt::format_to(fmt::appender(out_), FMT_COMPILE("{:d}:{:s}"), std::size(sv), sv);
+        fmt::format_to(fmt::appender(out_), "{:d}:{:s}", std::size(sv), sv);
     }
 
     void write_int(int64_t val) const
     {
-        fmt::format_to(fmt::appender(out_), FMT_COMPILE("i{:d}e"), val);
+        fmt::format_to(fmt::appender(out_), "i{:d}e", val);
     }
 
     void write_real(double val) const
     {
         auto buf = std::array<char, 64>{};
-        auto const* const out_ptr = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val);
+        auto const* const out_ptr = fmt::format_to(std::data(buf), "{:f}", val);
         write_string({ std::data(buf), static_cast<size_t>(out_ptr - std::data(buf)) });
     }
 
