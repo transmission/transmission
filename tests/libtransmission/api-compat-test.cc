@@ -223,21 +223,36 @@ constexpr std::string_view LegacyTorrentGetJson = R"json({
     "arguments": {
         "fields": [
             "downloadDir",
+            "downloadedEver",
+            "editDate",
             "error",
             "errorString",
             "eta",
+            "haveUnchecked",
+            "haveValid",
             "id",
             "isFinished",
             "leftUntilDone",
+            "manualAnnounceTime",
+            "metadataPercentComplete",
             "name",
+            "peersConnected",
             "peersGettingFromUs",
             "peersSendingToUs",
+            "percentDone",
+            "queuePosition",
             "rateDownload",
             "rateUpload",
+            "recheckProgress",
+            "seedRatioLimit",
+            "seedRatioMode",
             "sizeWhenDone",
             "status",
-            "uploadRatio"
-        ]
+            "uploadRatio",
+            "uploadedEver",
+            "webseedsSendingToUs"
+        ],
+        "ids": "recently-active"
     },
     "method": "torrent-get",
     "tag": 6
@@ -250,21 +265,36 @@ constexpr std::string_view CurrentTorrentGetJson = R"json({
     "params": {
         "fields": [
             "download_dir",
+            "downloaded_ever",
+            "edit_date",
             "error",
             "error_string",
             "eta",
+            "have_unchecked",
+            "have_valid",
             "id",
             "is_finished",
             "left_until_done",
+            "manual_announce_time",
+            "metadata_percent_complete",
             "name",
+            "peers_connected",
             "peers_getting_from_us",
             "peers_sending_to_us",
+            "percent_done",
+            "queue_position",
             "rate_download",
             "rate_upload",
+            "recheck_progress",
+            "seed_ratio_limit",
+            "seed_ratio_mode",
             "size_when_done",
             "status",
-            "upload_ratio"
-        ]
+            "upload_ratio",
+            "uploaded_ever",
+            "webseeds_sending_to_us"
+        ],
+        "ids": "recently_active"
     }
 })json";
 
