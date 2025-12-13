@@ -683,12 +683,14 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
     // TODO: yes I know this method is ugly rn.
     // I've just been trying to get the tests passing.
 
-    if (src.index() != tr_variant::MapIndex)
+    auto const* const src_top = src.get_if<tr_variant::Map>();
+
+    // if it's not a Map, just clone it
+    if (src_top == nullptr)
     {
-        abort(); // FIXME
+        return src.clone();
     }
 
-    auto const* const src_top = src.get_if<tr_variant::Map>();
     auto const is_request = src_top->contains(TR_KEY_method);
 
     auto const was_jsonrpc = src_top->contains(TR_KEY_jsonrpc);
