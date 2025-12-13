@@ -18,6 +18,8 @@
 #include <fmt/compile.h>
 #include <fmt/format.h>
 
+#include <small/vector.hpp>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "libtransmission/benc.h"
@@ -279,7 +281,8 @@ using OutBuf = fmt::memory_buffer;
 
 [[nodiscard]] auto sorted_entries(tr_variant::Map const& map)
 {
-    auto entries = std::vector<std::pair<std::string_view, tr_variant const*>>{};
+    static auto constexpr N = 32U;
+    auto entries = small::vector<std::pair<std::string_view, tr_variant const*>, N>{};
     entries.reserve(map.size());
     for (auto const& [key, child] : map)
     {
