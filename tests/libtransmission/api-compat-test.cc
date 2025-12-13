@@ -222,6 +222,7 @@ constexpr std::string_view CurrentSessionGetResponseJson = R"json({
 constexpr std::string_view LegacyTorrentGetJson = R"json({
     "arguments": {
         "fields": [
+            "downloadDir",
             "error",
             "errorString",
             "eta",
@@ -248,6 +249,7 @@ constexpr std::string_view CurrentTorrentGetJson = R"json({
     "method": "torrent_get",
     "params": {
         "fields": [
+            "download_dir",
             "error",
             "error_string",
             "eta",

@@ -64,7 +64,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_dht_enabled, TR_KEY_dht_enabled_kebab },
     { TR_KEY_done_date, TR_KEY_done_date_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_download_count, TR_KEY_download_count_camel },
-    { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // Crazy case 1: camel in torrent-get/set, kebab everywhere else
+    { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // crazy case 1: camel in torrent-get/set, kebab everywhere else
     { TR_KEY_download_dir_free_space, TR_KEY_download_dir_free_space_kebab },
     { TR_KEY_download_limit, TR_KEY_download_limit_camel },
     { TR_KEY_download_limited, TR_KEY_download_limited_camel },
@@ -516,23 +516,38 @@ struct CloneState
 
         tr_variant operator()(std::string_view const& sv) const
         {
-            if (state_.convert_strings)
+            if (!state_.convert_strings)
             {
-                if (auto lookup = tr_quark_lookup(sv))
-                {
-                    auto key = convert_key(*lookup, state_.style, state_.is_rpc);
-
-                    // Crazy case: downloadDir in torrent-get, download-dir in session-get
-                    if (state_.is_torrent && key == TR_KEY_download_dir_kebab)
-                    {
-                        key = TR_KEY_download_dir_camel;
-                    }
-
-                    return tr_variant::unmanaged_string(key);
-                }
+                return sv;
             }
 
-            return tr_variant{ sv };
+            auto const lookup = tr_quark_lookup(sv);
+            if (!lookup)
+            {
+                return sv;
+            }
+
+            auto key = *lookup;
+
+            // crazy case 1: downloadDir in torrent-get, download-dir in session-get
+            if (state_.is_rpc &&
+                (key == TR_KEY_download_dir_camel || key == TR_KEY_download_dir_kebab || key == TR_KEY_download_dir))
+            {
+                if (state_.style == Style::Tr5)
+                {
+                    key = TR_KEY_download_dir;
+                }
+                else
+                {
+                    key = state_.is_torrent ? TR_KEY_download_dir_camel : TR_KEY_download_dir_kebab;
+                }
+            }
+            else
+            {
+                key = convert_key(key, state_.style, state_.is_rpc);
+            }
+
+            return tr_variant::unmanaged_string(key);
         }
 
         tr_variant operator()(tr_variant::Vector const& src)
