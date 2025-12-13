@@ -3,13 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::sort
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <variant>
@@ -19,8 +19,6 @@
 #endif
 
 #include <fmt/format.h>
-
-#include <small/vector.hpp>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -35,21 +33,6 @@ using namespace std::literals;
 
 namespace
 {
-[[nodiscard]] constexpr bool variant_is_container(tr_variant const* const var)
-{
-    return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
-}
-
-[[nodiscard]] constexpr size_t variant_index(tr_variant const* const var)
-{
-    if (var != nullptr)
-    {
-        return var->index();
-    }
-
-    return tr_variant::NoneIndex;
-}
-
 template<typename T>
 [[nodiscard]] bool value_if(tr_variant const* const var, T* const setme)
 {
@@ -199,63 +182,55 @@ tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& tha
 
 // ---
 
-tr_variant::Merge::Merge(tr_variant& tgt)
-    : tgt_{ tgt }
+tr_variant tr_variant::clone() const
 {
+    auto ret = tr_variant{};
+    ret.merge(*this);
+    return ret;
 }
 
-void tr_variant::Merge::operator()(std::monostate const& src)
+tr_variant& tr_variant::merge(tr_variant const& that)
 {
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(std::nullptr_t const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(bool const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(int64_t const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(double const& src)
-{
-    tgt_ = src;
-}
-void tr_variant::Merge::operator()(tr_variant::StringHolder const& src)
-{
-    tgt_ = src.sv_;
-}
-
-void tr_variant::Merge::operator()(tr_variant::Vector const& src)
-{
-    auto const n_items = std::size(src);
-    auto& tgt = tgt_.val_.emplace<Vector>();
-    tgt.resize(n_items);
-    for (size_t i = 0; i < n_items; ++i)
-    {
-        std::visit(Merge{ tgt[i] }, src[i].val_);
-    }
-}
-
-void tr_variant::Merge::operator()(tr_variant::Map const& src)
-{
-    // if tgt_ isn't already a map, make it one
-    if (tgt_.index() != tr_variant::MapIndex)
-    {
-        tgt_.val_.emplace<tr_variant::Map>();
-    }
-
-    if (auto* tgt = tgt_.get_if<tr_variant::MapIndex>(); tgt != nullptr)
-    {
-        tgt->reserve(std::size(*tgt) + std::size(src));
-        for (auto const& [key, val] : src)
+    that.visit(
+        [this](auto const& value)
         {
-            std::visit(Merge{ (*tgt)[tr_quark_convert(key)] }, val.val_);
-        }
-    }
+            using ValueType = std::decay_t<decltype(value)>;
+
+            if constexpr (
+                std::is_same_v<ValueType, std::monostate> || std::is_same_v<ValueType, std::nullptr_t> ||
+                std::is_same_v<ValueType, bool> || std::is_same_v<ValueType, int64_t> || std::is_same_v<ValueType, double> ||
+                std::is_same_v<ValueType, std::string_view>)
+            {
+                *this = value;
+            }
+            else if constexpr (std::is_same_v<ValueType, Vector>)
+            {
+                auto& dest = val_.emplace<Vector>();
+                dest.resize(std::size(value));
+                for (size_t i = 0; i < std::size(value); ++i)
+                {
+                    dest[i].merge(value[i]);
+                }
+            }
+            else if constexpr (std::is_same_v<ValueType, Map>)
+            {
+                if (index() != MapIndex)
+                {
+                    val_.emplace<Map>();
+                }
+
+                if (auto* dest = this->template get_if<MapIndex>(); dest != nullptr)
+                {
+                    dest->reserve(std::size(*dest) + std::size(value));
+                    for (auto const& [key, child] : value)
+                    {
+                        (*dest)[tr_quark_convert(key)].merge(child);
+                    }
+                }
+            }
+        });
+
+    return *this;
 }
 
 // ---
@@ -550,267 +525,6 @@ bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
     }
 
     return false;
-}
-
-// --- BENC WALKING
-
-class WalkNode
-{
-public:
-    WalkNode() = default;
-
-    explicit WalkNode(tr_variant const* const var)
-        : var_{ var }
-    {
-    }
-
-    std::pair<tr_quark, tr_variant const*> next_child()
-    {
-        if (var_ == nullptr)
-        {
-            return {};
-        }
-
-        if (auto const* const map = var_->get_if<tr_variant::MapIndex>(); map != nullptr)
-        {
-            if (auto idx = next_index(); idx < std::size(*map))
-            {
-                auto iter = std::cbegin(*map);
-                std::advance(iter, idx);
-                return { iter->first, &iter->second };
-            }
-        }
-        else if (auto const* const vec = var_->get_if<tr_variant::VectorIndex>(); vec != nullptr)
-        {
-            if (auto idx = next_index(); idx < std::size(*vec))
-            {
-                return { {}, &vec->at(idx) };
-            }
-        }
-
-        return {};
-    }
-
-    [[nodiscard]] constexpr auto is_visited() const noexcept
-    {
-        return is_visited_;
-    }
-
-    constexpr void set_visited() noexcept
-    {
-        is_visited_ = true;
-    }
-
-    [[nodiscard]] tr_variant const* current() const noexcept
-    {
-        return var_;
-    }
-
-protected:
-    friend class VariantWalker;
-
-    tr_variant const* var_ = nullptr;
-
-    bool is_visited_ = false;
-
-    void assign(tr_variant const* v_in)
-    {
-        var_ = v_in;
-        is_visited_ = false;
-        child_index_ = 0;
-        sorted_.clear();
-    }
-
-    struct ByKey
-    {
-        std::string_view key;
-        size_t idx = {};
-    };
-
-    template<typename Container>
-    void sort(Container& sortbuf)
-    {
-        auto const* const map = var_ != nullptr ? var_->get_if<tr_variant::MapIndex>() : nullptr;
-        if (map == nullptr)
-        {
-            return;
-        }
-
-        auto idx = size_t{};
-        auto const n = std::size(*map);
-        sortbuf.resize(n);
-        for (auto const& [key, val] : *map)
-        {
-            sortbuf[idx] = { tr_quark_get_string_view(key), idx };
-            ++idx;
-        }
-
-        std::sort(std::begin(sortbuf), std::end(sortbuf), [](ByKey const& a, ByKey const& b) { return a.key < b.key; });
-
-        //  keep the sorted indices
-
-        sorted_.resize(n);
-        for (size_t i = 0; i < n; ++i)
-        {
-            sorted_[i] = sortbuf[i].idx;
-        }
-    }
-
-private:
-    // When walking `v`'s children, this is the index of the next child
-    size_t child_index_ = 0;
-
-    // When `v` is a dict, this is its children's indices sorted by key.
-    // Bencoded dicts must be sorted, so this is useful when writing benc.
-    small::vector<size_t, 128U> sorted_;
-
-    [[nodiscard]] size_t next_index()
-    {
-        auto idx = child_index_++;
-
-        if (idx < std::size(sorted_))
-        {
-            idx = sorted_[idx];
-        }
-
-        return idx;
-    }
-};
-
-class VariantWalker
-{
-public:
-    void emplace(tr_variant const* v_in, bool sort_dicts)
-    {
-        stack_.emplace_back(v_in);
-
-        if (sort_dicts)
-        {
-            top().sort(sortbuf_);
-        }
-    }
-
-    void pop()
-    {
-        TR_ASSERT(!std::empty(stack_));
-
-        if (auto const size = std::size(stack_); size != 0U)
-        {
-            stack_.resize(size - 1U);
-        }
-    }
-
-    [[nodiscard]] bool empty() const noexcept
-    {
-        return std::empty(stack_);
-    }
-
-    WalkNode& top()
-    {
-        TR_ASSERT(!std::empty(stack_));
-        return stack_.back();
-    }
-
-private:
-    static auto constexpr InitialCapacity = size_t{ 24U };
-    small::vector<WalkNode, InitialCapacity> stack_;
-    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf_;
-};
-
-/**
- * This function's previous recursive implementation was
- * easier to read, but was vulnerable to a smash-stacking
- * attack via maliciously-crafted data. (#667)
- */
-void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts)
-{
-    auto stack = VariantWalker{};
-    stack.emplace(&top, sort_dicts);
-
-    while (!stack.empty())
-    {
-        auto& node = stack.top();
-        tr_variant const* v = nullptr;
-
-        if (!node.is_visited())
-        {
-            v = node.current();
-            node.set_visited();
-        }
-        else
-        {
-            auto [key, child] = node.next_child();
-
-            v = child;
-
-            if (v != nullptr)
-            {
-                if (node.current()->holds_alternative<tr_variant::Map>())
-                {
-                    auto const keystr = tr_quark_get_string_view(key);
-                    walk_funcs.string_func(tr_variant::unmanaged_string(keystr), keystr, user_data);
-                }
-            }
-            else // finished with this node
-            {
-                if (variant_is_container(node.current()))
-                {
-                    walk_funcs.container_end_func(*node.current(), user_data);
-                }
-
-                stack.pop();
-                continue;
-            }
-        }
-
-        switch (variant_index(v))
-        {
-        case tr_variant::NullIndex:
-            walk_funcs.null_func(*v, *v->get_if<tr_variant::NullIndex>(), user_data);
-            break;
-
-        case tr_variant::BoolIndex:
-            walk_funcs.bool_func(*v, *v->get_if<tr_variant::BoolIndex>(), user_data);
-            break;
-
-        case tr_variant::IntIndex:
-            walk_funcs.int_func(*v, *v->get_if<tr_variant::IntIndex>(), user_data);
-            break;
-
-        case tr_variant::DoubleIndex:
-            walk_funcs.double_func(*v, *v->get_if<tr_variant::DoubleIndex>(), user_data);
-            break;
-
-        case tr_variant::StringIndex:
-            walk_funcs.string_func(*v, *v->get_if<tr_variant::StringIndex>(), user_data);
-            break;
-
-        case tr_variant::VectorIndex:
-            if (v == node.current())
-            {
-                walk_funcs.list_begin_func(*v, user_data);
-            }
-            else
-            {
-                stack.emplace(v, sort_dicts);
-            }
-            break;
-
-        case tr_variant::MapIndex:
-            if (v == node.current())
-            {
-                walk_funcs.dict_begin_func(*v, user_data);
-            }
-            else
-            {
-                stack.emplace(v, sort_dicts);
-            }
-            break;
-
-        default: // NoneIndex:
-            break;
-        }
-    }
 }
 
 // ---
