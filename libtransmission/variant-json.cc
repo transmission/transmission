@@ -353,7 +353,7 @@ struct JsonWriter
         writer.StartObject();
         for (auto const& [key, child] : sorted_entries(val))
         {
-            writer.String(std::data(key), std::size(key));
+            writer.Key(std::data(key), std::size(key));
             child->visit(*this);
         }
         writer.EndObject();
