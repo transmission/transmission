@@ -40,6 +40,7 @@ public:
         IntIndex,
         DoubleIndex,
         StringIndex,
+        StringViewIndex,
         VectorIndex,
         MapIndex
     };
@@ -295,7 +296,7 @@ public:
     [[nodiscard]] static tr_variant unmanaged_string(std::string_view val)
     {
         auto ret = tr_variant{};
-        ret.val_.emplace<StringHolder>().set_unmanaged(val);
+        ret.val_.emplace<std::string_view>(val);
         return ret;
     }
 
@@ -307,13 +308,15 @@ public:
     template<typename Val>
     tr_variant& operator=(Val value)
     {
-        if constexpr (std::is_same_v<Val, std::nullptr_t>)
+        if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            val_.emplace<std::nullptr_t>(value);
+            // Note: std::string_view assignment takes ownership by copying.
+            // Use unmanaged_string() if you want the variant to hold a shallow copy.
+            val_.emplace<std::string>(value);
         }
-        else if constexpr (std::is_same_v<Val, std::string_view>)
+        else if constexpr (std::is_same_v<Val, char const*> || std::is_same_v<Val, char*>)
         {
-            val_.emplace<StringHolder>(std::string{ value });
+            val_.emplace<std::string>(value != nullptr ? value : "");
         }
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints
@@ -332,24 +335,6 @@ public:
         return *this;
     }
 
-    tr_variant& operator=(std::string&& value)
-    {
-        val_.emplace<StringHolder>(std::move(value));
-        return *this;
-    }
-
-    tr_variant& operator=(std::string const& value)
-    {
-        *this = std::string{ value };
-        return *this;
-    }
-
-    tr_variant& operator=(char const* const value)
-    {
-        *this = std::string{ value != nullptr ? value : "" };
-        return *this;
-    }
-
     [[nodiscard]] constexpr auto index() const noexcept
     {
         return val_.index();
@@ -363,15 +348,7 @@ public:
     template<typename Val>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        if constexpr (std::is_same_v<Val, std::string_view>)
-        {
-            auto const* const val = std::get_if<StringHolder>(&val_);
-            return val != nullptr ? &val->sv_ : nullptr;
-        }
-        else
-        {
-            return std::get_if<Val>(&val_);
-        }
+        return std::get_if<Val>(&val_);
     }
 
     template<typename Val>
@@ -383,15 +360,7 @@ public:
     template<size_t Index>
     [[nodiscard]] constexpr auto* get_if() noexcept
     {
-        if constexpr (Index == StringIndex)
-        {
-            auto const* const val = std::get_if<StringIndex>(&val_);
-            return val != nullptr ? &val->sv_ : nullptr;
-        }
-        else
-        {
-            return std::get_if<Index>(&val_);
-        }
+        return std::get_if<Index>(&val_);
     }
 
     template<size_t Index>
@@ -422,7 +391,7 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return std::holds_alternative<StringHolder>(val_);
+            return std::holds_alternative<std::string>(val_) || std::holds_alternative<std::string_view>(val_);
         }
         else
         {
@@ -458,27 +427,6 @@ public:
     [[nodiscard]] tr_variant clone() const;
 
 private:
-    // Holds a string_view to either an unmanaged/external string or to
-    // one owned by the class. If the string is unmanaged, only sv_ is used.
-    // If we own the string, then sv_ points to the managed str_.
-    class StringHolder
-    {
-    public:
-        StringHolder() = default;
-        ~StringHolder() = default;
-        explicit StringHolder(std::string&& str) noexcept;
-        StringHolder(StringHolder&& that) noexcept;
-        StringHolder(StringHolder const&) = delete;
-        void set_unmanaged(std::string_view sv);
-        StringHolder& operator=(StringHolder&& that) noexcept;
-        StringHolder& operator=(StringHolder const&) = delete;
-
-        std::string_view sv_;
-
-    private:
-        std::string str_;
-    };
-
     template<typename Visitor>
     class VisitAdapter
     {
@@ -512,9 +460,10 @@ private:
         {
             auto&& visitor = std::forward<Self>(self).visitor_;
 
-            if constexpr (std::is_same_v<std::decay_t<T>, StringHolder>)
+            // Convert std::string to std::string_view for visitors
+            if constexpr (std::is_same_v<std::decay_t<T>, std::string>)
             {
-                return std::invoke(std::forward<decltype(visitor)>(visitor), value.sv_);
+                return std::invoke(std::forward<decltype(visitor)>(visitor), std::string_view{ value });
             }
             else
             {
@@ -532,7 +481,7 @@ private:
         return AdaptedVisitor{ std::forward<Visitor>(visitor) };
     }
 
-    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, StringHolder, Vector, Map> val_;
+    std::variant<std::monostate, std::nullptr_t, bool, int64_t, double, std::string, std::string_view, Vector, Map> val_;
 };
 
 template<>
@@ -541,6 +490,8 @@ template<>
 [[nodiscard]] std::optional<bool> tr_variant::value_if() noexcept;
 template<>
 [[nodiscard]] std::optional<double> tr_variant::value_if() noexcept;
+template<>
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept;
 
 // --- Strings
 

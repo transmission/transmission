@@ -118,7 +118,8 @@ template<>
         break;
 
     case StringIndex:
-        if (auto const val = *get_if<StringIndex>(); val == "true"sv)
+    case StringViewIndex:
+        if (auto const val = value_if<std::string_view>(); val == "true"sv)
         {
             return true;
         }
@@ -147,38 +148,34 @@ template<>
         return static_cast<double>(*get_if<IntIndex>());
 
     case StringIndex:
-        return tr_num_parse<double>(*get_if<StringIndex>());
+    case StringViewIndex:
+        if (auto const sv = value_if<std::string_view>())
+        {
+            return tr_num_parse<double>(*sv);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return {};
+}
+
+template<>
+[[nodiscard]] std::optional<std::string_view> tr_variant::value_if() noexcept
+{
+    switch (index())
+    {
+    case StringIndex:
+        return *std::get_if<std::string>(&val_);
+
+    case StringViewIndex:
+        return *std::get_if<std::string_view>(&val_);
 
     default:
         return {};
     }
-}
-
-// ---
-
-tr_variant::StringHolder::StringHolder(std::string&& str) noexcept
-    : str_{ std::move(str) }
-{
-    sv_ = str_;
-}
-
-tr_variant::StringHolder::StringHolder(StringHolder&& that) noexcept
-{
-    *this = std::move(that);
-}
-
-void tr_variant::StringHolder::set_unmanaged(std::string_view sv)
-{
-    str_.clear();
-    sv_ = sv;
-}
-
-tr_variant::StringHolder& tr_variant::StringHolder::operator=(StringHolder&& that) noexcept
-{
-    auto const managed = std::data(that.sv_) == std::data(that.str_);
-    std::swap(str_, that.str_);
-    sv_ = managed ? str_ : that.sv_;
-    return *this;
 }
 
 // ---

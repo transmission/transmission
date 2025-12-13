@@ -738,7 +738,11 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
         R"(["files","name","file1","size",5,"pieces",1,2,"name","file2","size",7,"pieces","meta","active",true])"sv;
     EXPECT_EQ(Expected, actual);
 
-    // test that we visited the expected number of nodes
+    // test that we visited the expected number of nodes.
+    //
+    // FIXME(ckerr): `serde.inplace()` doesn't work on JSON right now.
+    // RapidJSON always copies strings unless given mutable JSON input.
+    // That's why StringViewIndex is missing two counts here.
     auto const expected_visited_count = std::map<size_t, size_t>{
         { tr_variant::BoolIndex, 1U }, //
         { tr_variant::IntIndex, 4U }, //
