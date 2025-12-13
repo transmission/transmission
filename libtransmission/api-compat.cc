@@ -645,7 +645,6 @@ struct CloneState
         tr_variant operator()(tr_variant::Map const& src)
         {
             auto tgt = tr_variant::Map{ std::size(src) };
-            tgt.reserve(std::size(src));
             for (auto const& [key, val] : src)
             {
                 auto const pop = state_.convert_strings;
