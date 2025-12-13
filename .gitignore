@@ -22,7 +22,7 @@ node_modules/
 /tests/**/*.out
 /third-party/miniupnp/miniupnpcstrings.h
 /third-party/suffixes_dafsa.h
-/web/public_html/transmission-app.js.map
+/web/public_html/transmission-app.*
 /android/.cxx
 /android/.gradle
 /android/build
