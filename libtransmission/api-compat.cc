@@ -682,6 +682,12 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             // - add an empty `arguments` object
             if (auto const* error = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
             {
+                // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
+                if (auto const code = error->value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
+                {
+                    tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string("no method name"));
+                }
+
                 if (auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data))
                 {
                     if (auto const* errmsg = data->find_if<std::string_view>(TR_KEY_error_string_camel))
@@ -706,7 +712,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             tgt_top->replace_key(TR_KEY_arguments, TR_KEY_result);
         }
 
-        if (is_response && is_jsonrpc && !is_success)
+        if (is_response && is_jsonrpc && !is_success && was_legacy)
         {
             // in jsonrpc error message:
             // - copy `result` to `error.data.error_string`
@@ -714,17 +720,14 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             // - remove `result`
             auto const* errmsg = tgt_top->find_if<std::string_view>(TR_KEY_result);
             std::string_view const errmsg_sv = errmsg != nullptr ? *errmsg : "unknown error";
-            auto* error = tgt_top->try_emplace(TR_KEY_error, tr_variant::make_map()).first.get_if<tr_variant::Map>();
-            auto* data = error->try_emplace(TR_KEY_data, tr_variant::make_map()).first.get_if<tr_variant::Map>();
-            data->try_emplace(TR_KEY_error_string, errmsg_sv);
+            auto error = tr_variant::Map{ 3U };
+            auto data = tr_variant::Map{ 2U };
+            data.try_emplace(TR_KEY_error_string, errmsg_sv);
             auto const code = guess_error_code(errmsg_sv);
-            error->try_emplace(TR_KEY_code, code);
-            error->try_emplace(TR_KEY_message, JsonRpc::Error::to_string(code));
+            error.try_emplace(TR_KEY_code, code);
+            error.try_emplace(TR_KEY_message, JsonRpc::Error::to_string(code));
             tgt_top->erase(TR_KEY_result);
-        }
 
-        if (is_response && is_jsonrpc && !is_success && was_legacy)
-        {
             if (auto const args_it = tgt_top->find(TR_KEY_arguments); args_it != std::end(*tgt_top))
             {
                 auto args = std::move(args_it->second);
@@ -732,11 +735,15 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
                 if (auto const* args_map = args.get_if<tr_variant::Map>(); args_map != nullptr && !std::empty(*args_map))
                 {
-                    auto* error = tgt_top->try_emplace(TR_KEY_error, tr_variant::make_map()).first.get_if<tr_variant::Map>();
-                    auto* data = error->try_emplace(TR_KEY_data, tr_variant::make_map()).first.get_if<tr_variant::Map>();
-                    data->try_emplace(TR_KEY_result, std::move(args));
+                    data.try_emplace(TR_KEY_result, std::move(args));
                 }
             }
+
+            if (!std::empty(data))
+            {
+                error.try_emplace(TR_KEY_data, std::move(data));
+            }
+            tgt_top->try_emplace(TR_KEY_error, std::move(error));
         }
 
         if (is_request && is_jsonrpc)
