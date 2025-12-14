@@ -387,6 +387,8 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_watch_dir_force_generic, TR_KEY_watch_dir_force_generic_kebab },
 } };
 
+auto constexpr MethodNotFoundLegacyErrmsg = std::string_view{ "no method name" };
+
 [[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
 {
     if (style == Style::Tr5)
@@ -450,7 +452,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
         return Error::SUCCESS;
     }
 
-    static auto constexpr Phrases = std::array<std::pair<std::string_view, Error::Code>, 13U>{ {
+    static auto constexpr Phrases = std::array<std::pair<std::string_view, Error::Code>, 14U>{ {
         { "absolute", Error::PATH_NOT_ABSOLUTE },
         { "couldn't fetch blocklist", Error::HTTP_ERROR },
         { "couldn't save", Error::SYSTEM_ERROR },
@@ -464,6 +466,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
         { "no location", Error::INVALID_PARAMS },
         { "torrent-rename-path requires 1 torrent", Error::INVALID_PARAMS },
         { "unrecognized info", Error::UNRECOGNIZED_INFO },
+        { MethodNotFoundLegacyErrmsg, Error::METHOD_NOT_FOUND },
     } };
 
     for (auto const& [substr, code] : Phrases)
@@ -685,7 +688,7 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
                 // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
                 if (auto const code = error->value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
                 {
-                    tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string("no method name"));
+                    tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string(MethodNotFoundLegacyErrmsg));
                 }
 
                 if (auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data))
@@ -722,7 +725,11 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             std::string_view const errmsg_sv = errmsg != nullptr ? *errmsg : "unknown error";
             auto error = tr_variant::Map{ 3U };
             auto data = tr_variant::Map{ 2U };
-            data.try_emplace(TR_KEY_error_string, errmsg_sv);
+            // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
+            if (errmsg_sv != MethodNotFoundLegacyErrmsg)
+            {
+                data.try_emplace(TR_KEY_error_string, errmsg_sv);
+            }
             auto const code = guess_error_code(errmsg_sv);
             error.try_emplace(TR_KEY_code, code);
             error.try_emplace(TR_KEY_message, JsonRpc::Error::to_string(code));
