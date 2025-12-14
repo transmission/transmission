@@ -298,6 +298,29 @@ constexpr std::string_view CurrentTorrentGetJson = R"json({
     }
 })json";
 
+constexpr std::string_view CurrentPortTestErrorResponse = R"json({
+    "error": {
+        "code": 8,
+        "data": {
+            "error_string": "Couldn't test port: No Response (0)",
+            "result": {
+                "ip_protocol": "ipv6"
+            }
+        },
+        "message": "HTTP error from backend service"
+    },
+    "id": 9,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view LegacyPortTestErrorResponse = R"json({
+    "arguments": {
+        "ip_protocol": "ipv6"
+    },
+    "result": "Couldn't test port: No Response (0)",
+    "tag": 9
+})json";
+
 constexpr std::string_view LegacyStatsJson = R"json({
     "downloaded-bytes": 12,
     "files-added": 34,
@@ -598,7 +621,7 @@ TEST(ApiCompatTest, canConvertRpc)
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 28U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 30U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -627,6 +650,8 @@ TEST(ApiCompatTest, canConvertRpc)
         { "torrent_get tr5 -> tr4", CurrentTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
         { "torrent_get tr4 -> tr5", LegacyTorrentGetJson, Style::Tr5, CurrentTorrentGetJson },
         { "torrent_get tr4 -> tr4", LegacyTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
+        { "port_test error response tr5 -> tr5", CurrentPortTestErrorResponse, Style::Tr5, CurrentPortTestErrorResponse },
+        { "port_test error response tr5 -> tr4", CurrentPortTestErrorResponse, Style::Tr4, LegacyPortTestErrorResponse },
 
         // TODO(ckerr): torrent-get with 'table'
     } };

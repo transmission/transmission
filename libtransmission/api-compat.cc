@@ -688,6 +688,11 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
                     {
                         tgt_top->try_emplace(TR_KEY_result, *errmsg);
                     }
+
+                    if (auto const result = data->find(TR_KEY_result); result != std::end(*data))
+                    {
+                        tgt_top->try_emplace(TR_KEY_arguments, result->second.clone());
+                    }
                 }
             }
 
