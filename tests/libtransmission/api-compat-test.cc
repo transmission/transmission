@@ -621,7 +621,7 @@ TEST(ApiCompatTest, canConvertRpc)
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 30U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 32U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -652,6 +652,8 @@ TEST(ApiCompatTest, canConvertRpc)
         { "torrent_get tr4 -> tr4", LegacyTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
         { "port_test error response tr5 -> tr5", CurrentPortTestErrorResponse, Style::Tr5, CurrentPortTestErrorResponse },
         { "port_test error response tr5 -> tr4", CurrentPortTestErrorResponse, Style::Tr4, LegacyPortTestErrorResponse },
+        { "port_test error response tr4 -> tr5", LegacyPortTestErrorResponse, Style::Tr5, CurrentPortTestErrorResponse },
+        { "port_test error response tr4 -> tr4", LegacyPortTestErrorResponse, Style::Tr4, LegacyPortTestErrorResponse },
 
         // TODO(ckerr): torrent-get with 'table'
     } };

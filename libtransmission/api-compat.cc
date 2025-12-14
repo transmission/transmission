@@ -725,7 +725,18 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
         if (is_response && is_jsonrpc && !is_success && was_legacy)
         {
-            tgt_top->erase(TR_KEY_arguments);
+            if (auto const args_it = tgt_top->find(TR_KEY_arguments); args_it != std::end(*tgt_top))
+            {
+                auto args = std::move(args_it->second);
+                tgt_top->erase(TR_KEY_arguments);
+
+                if (auto const* args_map = args.get_if<tr_variant::Map>(); args_map != nullptr && !std::empty(*args_map))
+                {
+                    auto* error = tgt_top->try_emplace(TR_KEY_error, tr_variant::make_map()).first.get_if<tr_variant::Map>();
+                    auto* data = error->try_emplace(TR_KEY_data, tr_variant::make_map()).first.get_if<tr_variant::Map>();
+                    data->try_emplace(TR_KEY_result, std::move(args));
+                }
+            }
         }
 
         if (is_request && is_jsonrpc)
