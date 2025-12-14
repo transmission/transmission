@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // int16_t
 #include <functional>
 
 struct tr_session;
@@ -34,7 +35,9 @@ enum Code : int16_t
     HTTP_ERROR,
     CORRUPT_TORRENT
 };
-}
+
+[[nodiscard]] std::string_view to_string(Code code);
+} // namespace Error
 } // namespace JsonRpc
 
 using tr_rpc_response_func = std::function<void(tr_session* session, tr_variant&& response)>;

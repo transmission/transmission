@@ -32,6 +32,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h"
+#include "libtransmission/api-compat.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
 #include "libtransmission/session.h"
@@ -54,9 +55,7 @@ namespace JsonRpc
 // https://www.jsonrpc.org/specification#error_object
 namespace Error
 {
-namespace
-{
-[[nodiscard]] constexpr std::string_view get_message(Code code)
+[[nodiscard]] std::string_view to_string(Code const code)
 {
     switch (code)
     {
@@ -95,6 +94,8 @@ namespace
     }
 }
 
+namespace
+{
 [[nodiscard]] tr_variant::Map build_data(std::string_view error_string, tr_variant::Map&& result)
 {
     auto ret = tr_variant::Map{ 2U };
@@ -116,7 +117,7 @@ namespace
 {
     auto ret = tr_variant::Map{ 3U };
     ret.try_emplace(TR_KEY_code, code);
-    ret.try_emplace(TR_KEY_message, tr_variant::unmanaged_string(get_message(code)));
+    ret.try_emplace(TR_KEY_message, tr_variant::unmanaged_string(to_string(code)));
     if (!std::empty(data))
     {
         ret.try_emplace(TR_KEY_data, std::move(data));
@@ -205,7 +206,7 @@ void tr_rpc_idle_done_legacy(struct tr_rpc_idle_data* data, JsonRpc::Error::Code
     // build the response
     auto response_map = tr_variant::Map{ 3U };
     response_map.try_emplace(TR_KEY_arguments, std::move(data->args_out));
-    response_map.try_emplace(TR_KEY_result, std::empty(result) ? JsonRpc::Error::get_message(code) : result);
+    response_map.try_emplace(TR_KEY_result, std::empty(result) ? JsonRpc::Error::to_string(code) : result);
     if (auto& tag = data->id; tag.has_value())
     {
         response_map.try_emplace(TR_KEY_tag, std::move(tag));
