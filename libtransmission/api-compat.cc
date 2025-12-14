@@ -683,15 +683,19 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             // - copy `error.data.error_string` to `result`
             // - remove `error` object
             // - add an empty `arguments` object
-            if (auto const* error = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
+            if (auto* error_ptr = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
             {
+                // move the `error` object before memory reallocations invalidate the pointer
+                auto error = std::move(*error_ptr);
+                tgt_top->erase(TR_KEY_error);
+
                 // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
-                if (auto const code = error->value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
+                if (auto const code = error.value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
                 {
                     tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string(MethodNotFoundLegacyErrmsg));
                 }
 
-                if (auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data))
+                if (auto* data = error.find_if<tr_variant::Map>(TR_KEY_data))
                 {
                     if (auto const* errmsg = data->find_if<std::string_view>(TR_KEY_error_string_camel))
                     {
@@ -700,12 +704,16 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
 
                     if (auto const result = data->find(TR_KEY_result); result != std::end(*data))
                     {
-                        tgt_top->try_emplace(TR_KEY_arguments, result->second.clone());
+                        tgt_top->try_emplace(TR_KEY_arguments, std::move(result->second));
                     }
+                }
+
+                if (auto const* errmsg = error.find_if<std::string_view>(TR_KEY_message))
+                {
+                    tgt_top->try_emplace(TR_KEY_result, *errmsg);
                 }
             }
 
-            tgt_top->erase(TR_KEY_error);
             tgt_top->try_emplace(TR_KEY_arguments, tr_variant::make_map());
         }
 

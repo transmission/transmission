@@ -629,6 +629,21 @@ constexpr std::string_view BadMethodNameLegacyResponse = R"json({
     "tag": 39693
 })json";
 
+constexpr std::string_view UnrecognisedInfoResponse = R"json({
+    "error": {
+        "code": 4,
+        "message": "unrecognized info"
+    },
+    "id": 10,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view UnrecognisedInfoLegacyResponse = R"json({
+    "arguments": {},
+    "result": "unrecognized info",
+    "tag": 10
+})json";
+
 } // namespace
 
 TEST(ApiCompatTest, canConvertRpc)
@@ -637,7 +652,7 @@ TEST(ApiCompatTest, canConvertRpc)
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 36U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 38U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -674,6 +689,8 @@ TEST(ApiCompatTest, canConvertRpc)
         { "bad method name tr5 -> tr4", BadMethodNameResponse, Style::Tr4, BadMethodNameLegacyResponse },
         { "bad method name tr4 -> tr5", BadMethodNameLegacyResponse, Style::Tr5, BadMethodNameResponse },
         { "bad method name tr4 -> tr4", BadMethodNameLegacyResponse, Style::Tr4, BadMethodNameLegacyResponse },
+        { "unrecognised info tr5 -> tr5", UnrecognisedInfoResponse, Style::Tr5, UnrecognisedInfoResponse},
+        { "unrecognised info tr5 -> tr4", UnrecognisedInfoResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
 
         // TODO(ckerr): torrent-get with 'table'
     } };
