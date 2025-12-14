@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:Qt6Version = '6.10.0'
+$global:Qt6Version = '6.10.1'
 
 $global:Qt6Deps = @(
     'DBus'
@@ -47,8 +47,6 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-qt-libpng'
         '-qt-libjpeg'
         '-no-opengl'
-        '-no-freetype'
-        '-no-harfbuzz'
         '-no-feature-androiddeployqt'
         '-no-feature-assistant'
         '-no-feature-brotli'
@@ -66,9 +64,7 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
         '-no-feature-emojisegmenter'
         '-no-feature-fontcombobox'
         '-no-feature-fontdialog'
-        '-no-feature-freetype'
         '-no-feature-gestures'
-        '-no-feature-harfbuzz'
         '-no-feature-keysequenceedit'
         '-no-feature-lcdnumber'
         '-no-feature-listwidget'
@@ -130,6 +126,11 @@ function global:Build-Qt6([string] $PrefixDir, [string] $Arch, [string] $DepsPre
     Edit-TextFile (Join-Path $SourceDir qtactiveqt CMakeLists.txt) 'OR NOT TARGET Qt::PrintSupport' ''
     Edit-TextFile (Join-Path $SourceDir qtactiveqt CMakeLists.txt) 'PrintSupport' ''
     Edit-TextFile (Join-Path $SourceDir qtactiveqt tools CMakeLists.txt) 'add_subdirectory[(]testcon[)]' ''
+
+    # Fix unity build (due to https://github.com/qt/qtbase/commit/a6ac84731776381ee5ac6b6306acdc4418e900d9)
+    Edit-TextFile (Join-Path $SourceDir qtbase src corelib text qbytearray.h) 'Q_PRESUME.+;' ''
+    Edit-TextFile (Join-Path $SourceDir qtbase src corelib text qstring.h) 'Q_PRESUME.+;' ''
+    Edit-TextFile (Join-Path $SourceDir qtbase src corelib tools qlist.h) 'Q_PRESUME.+;' ''
 
     # Fix build (including because of disabled features)
     Edit-TextFile (Join-Path $SourceDir qtbase src gui text windows qwindowsfontdatabasebase_p.h) 'unique_ptr<QCustomFontFileLoader>' 'unique_ptr<int>'

@@ -68,14 +68,16 @@ void ensureFontsLoaded()
 #endif
 }
 
-QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const point_size)
+QPixmap makeIconFromCodepoint(QString const family, QChar const codepoint, int const pixel_size)
 {
-    auto const font = QFont{ family, point_size - 8 };
+    auto font = QFont{ family };
     if (!QFontMetrics{ font }.inFont(codepoint))
         return {};
 
+    font.setPixelSize(pixel_size);
+
     // FIXME: HDPI, pixel size vs point size?
-    auto const rect = QRect{ 0, 0, point_size, point_size };
+    auto const rect = QRect{ 0, 0, pixel_size, pixel_size };
     auto pixmap = QPixmap{ rect.size() };
     pixmap.fill(Qt::transparent);
     auto painter = QPainter{ &pixmap };
@@ -422,7 +424,7 @@ QIcon icon(Type const type, QStyle const* const style)
 {
     ensureFontsLoaded();
 
-    auto const point_sizes = small::max_size_set<int, 7U>{
+    auto const pixel_sizes = small::max_size_set<int, 7U>{
         style->pixelMetric(QStyle::PM_ButtonIconSize),   style->pixelMetric(QStyle::PM_LargeIconSize),
         style->pixelMetric(QStyle::PM_ListViewIconSize), style->pixelMetric(QStyle::PM_MessageBoxIconSize),
         style->pixelMetric(QStyle::PM_SmallIconSize),    style->pixelMetric(QStyle::PM_TabBarIconSize),
@@ -436,8 +438,8 @@ QIcon icon(Type const type, QStyle const* const style)
     {
         auto icon = QIcon{};
         auto const name = QString::fromUtf8(std::data(key), std::size(key));
-        for (int const point_size : point_sizes)
-            if (auto const pixmap = loadSFSymbol(name, point_size); !pixmap.isNull())
+        for (int const pixel_size : pixel_sizes)
+            if (auto const pixmap = loadSFSymbol(name, pixel_size); !pixmap.isNull())
                 icon.addPixmap(pixmap);
         if (!icon.isNull())
             return icon;
@@ -450,8 +452,8 @@ QIcon icon(Type const type, QStyle const* const style)
         {
             auto icon = QIcon{};
             auto const ch = QChar{ key };
-            for (int const point_size : point_sizes)
-                if (auto pixmap = makeIconFromCodepoint(family, ch, point_size); !pixmap.isNull())
+            for (int const pixel_size : pixel_sizes)
+                if (auto pixmap = makeIconFromCodepoint(family, ch, pixel_size); !pixmap.isNull())
                     icon.addPixmap(pixmap);
             if (!icon.isNull())
                 return icon;
