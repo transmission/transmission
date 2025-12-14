@@ -387,6 +387,8 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_watch_dir_force_generic, TR_KEY_watch_dir_force_generic_kebab },
 } };
 
+auto constexpr MethodNotFoundLegacyErrmsg = std::string_view{ "no method name" };
+
 [[nodiscard]] constexpr tr_quark convert_key(tr_quark const src, Style const style, bool const is_rpc)
 {
     if (style == Style::Tr5)
@@ -450,7 +452,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
         return Error::SUCCESS;
     }
 
-    static auto constexpr Phrases = std::array<std::pair<std::string_view, Error::Code>, 13U>{ {
+    static auto constexpr Phrases = std::array<std::pair<std::string_view, Error::Code>, 14U>{ {
         { "absolute", Error::PATH_NOT_ABSOLUTE },
         { "couldn't fetch blocklist", Error::HTTP_ERROR },
         { "couldn't save", Error::SYSTEM_ERROR },
@@ -464,6 +466,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
         { "no location", Error::INVALID_PARAMS },
         { "torrent-rename-path requires 1 torrent", Error::INVALID_PARAMS },
         { "unrecognized info", Error::UNRECOGNIZED_INFO },
+        { MethodNotFoundLegacyErrmsg, Error::METHOD_NOT_FOUND },
     } };
 
     for (auto const& [substr, code] : Phrases)
@@ -680,18 +683,37 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             // - copy `error.data.error_string` to `result`
             // - remove `error` object
             // - add an empty `arguments` object
-            if (auto const* error = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
+            if (auto* error_ptr = tgt_top->find_if<tr_variant::Map>(TR_KEY_error))
             {
-                if (auto const* data = error->find_if<tr_variant::Map>(TR_KEY_data))
+                // move the `error` object before memory reallocations invalidate the pointer
+                auto error = std::move(*error_ptr);
+                tgt_top->erase(TR_KEY_error);
+
+                // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
+                if (auto const code = error.value_if<int64_t>(TR_KEY_code); code && *code == JsonRpc::Error::METHOD_NOT_FOUND)
+                {
+                    tgt_top->try_emplace(TR_KEY_result, tr_variant::unmanaged_string(MethodNotFoundLegacyErrmsg));
+                }
+
+                if (auto* data = error.find_if<tr_variant::Map>(TR_KEY_data))
                 {
                     if (auto const* errmsg = data->find_if<std::string_view>(TR_KEY_error_string_camel))
                     {
                         tgt_top->try_emplace(TR_KEY_result, *errmsg);
                     }
+
+                    if (auto const result = data->find(TR_KEY_result); result != std::end(*data))
+                    {
+                        tgt_top->try_emplace(TR_KEY_arguments, std::move(result->second));
+                    }
+                }
+
+                if (auto const* errmsg = error.find_if<std::string_view>(TR_KEY_message))
+                {
+                    tgt_top->try_emplace(TR_KEY_result, *errmsg);
                 }
             }
 
-            tgt_top->erase(TR_KEY_error);
             tgt_top->try_emplace(TR_KEY_arguments, tr_variant::make_map());
         }
 
@@ -701,26 +723,42 @@ tr_variant convert(tr_variant const& src, Style const tgt_style)
             tgt_top->replace_key(TR_KEY_arguments, TR_KEY_result);
         }
 
-        if (is_response && is_jsonrpc && !is_success)
+        if (is_response && is_jsonrpc && !is_success && was_legacy)
         {
             // in jsonrpc error message:
             // - copy `result` to `error.data.error_string`
             // - ensure `error` object exists and is well-formatted
             // - remove `result`
-            auto const* errmsg = tgt_top->find_if<std::string_view>(TR_KEY_result);
-            std::string_view const errmsg_sv = errmsg != nullptr ? *errmsg : "unknown error";
-            auto* error = tgt_top->try_emplace(TR_KEY_error, tr_variant::make_map()).first.get_if<tr_variant::Map>();
-            auto* data = error->try_emplace(TR_KEY_data, tr_variant::make_map()).first.get_if<tr_variant::Map>();
-            data->try_emplace(TR_KEY_error_string, errmsg_sv);
-            auto const code = guess_error_code(errmsg_sv);
-            error->try_emplace(TR_KEY_code, code);
-            error->try_emplace(TR_KEY_message, JsonRpc::Error::to_string(code));
+            auto const errstr = tgt_top->value_if<std::string_view>(TR_KEY_result).value_or("unknown error");
+            auto error = tr_variant::Map{ 3U };
+            auto data = tr_variant::Map{ 2U };
+            auto const code = guess_error_code(errstr);
+            auto const errmsg = JsonRpc::Error::to_string(code);
+            error.try_emplace(TR_KEY_code, code);
+            error.try_emplace(TR_KEY_message, errmsg);
+            // crazy case: current and legacy METHOD_NOT_FOUND has different error messages
+            if (errstr != errmsg && errstr != MethodNotFoundLegacyErrmsg)
+            {
+                data.try_emplace(TR_KEY_error_string, errstr);
+            }
             tgt_top->erase(TR_KEY_result);
-        }
 
-        if (is_response && is_jsonrpc && !is_success && was_legacy)
-        {
-            tgt_top->erase(TR_KEY_arguments);
+            if (auto const args_it = tgt_top->find(TR_KEY_arguments); args_it != std::end(*tgt_top))
+            {
+                auto args = std::move(args_it->second);
+                tgt_top->erase(TR_KEY_arguments);
+
+                if (auto const* args_map = args.get_if<tr_variant::Map>(); args_map != nullptr && !std::empty(*args_map))
+                {
+                    data.try_emplace(TR_KEY_result, std::move(args));
+                }
+            }
+
+            if (!std::empty(data))
+            {
+                error.try_emplace(TR_KEY_data, std::move(data));
+            }
+            tgt_top->try_emplace(TR_KEY_error, std::move(error));
         }
 
         if (is_request && is_jsonrpc)

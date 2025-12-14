@@ -10,6 +10,7 @@
 #include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 namespace
 {
@@ -296,6 +297,29 @@ constexpr std::string_view CurrentTorrentGetJson = R"json({
         ],
         "ids": "recently_active"
     }
+})json";
+
+constexpr std::string_view CurrentPortTestErrorResponse = R"json({
+    "error": {
+        "code": 8,
+        "data": {
+            "error_string": "Couldn't test port: No Response (0)",
+            "result": {
+                "ip_protocol": "ipv6"
+            }
+        },
+        "message": "HTTP error from backend service"
+    },
+    "id": 9,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view LegacyPortTestErrorResponse = R"json({
+    "arguments": {
+        "ip_protocol": "ipv6"
+    },
+    "result": "Couldn't test port: No Response (0)",
+    "tag": 9
 })json";
 
 constexpr std::string_view LegacyStatsJson = R"json({
@@ -590,6 +614,36 @@ constexpr std::string_view WellFormedFreeSpaceLegacyResponse = R"json({
     "tag": 41414
 })json";
 
+constexpr std::string_view BadMethodNameResponse = R"json({
+    "error": {
+        "code": -32601,
+        "message": "Method not found"
+    },
+    "id": 39693,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view BadMethodNameLegacyResponse = R"json({
+    "arguments": {},
+    "result": "no method name",
+    "tag": 39693
+})json";
+
+constexpr std::string_view UnrecognisedInfoResponse = R"json({
+    "error": {
+        "code": 4,
+        "message": "unrecognized info"
+    },
+    "id": 10,
+    "jsonrpc": "2.0"
+})json";
+
+constexpr std::string_view UnrecognisedInfoLegacyResponse = R"json({
+    "arguments": {},
+    "result": "unrecognized info",
+    "tag": 10
+})json";
+
 } // namespace
 
 TEST(ApiCompatTest, canConvertRpc)
@@ -598,7 +652,7 @@ TEST(ApiCompatTest, canConvertRpc)
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 28U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 40U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -627,6 +681,18 @@ TEST(ApiCompatTest, canConvertRpc)
         { "torrent_get tr5 -> tr4", CurrentTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
         { "torrent_get tr4 -> tr5", LegacyTorrentGetJson, Style::Tr5, CurrentTorrentGetJson },
         { "torrent_get tr4 -> tr4", LegacyTorrentGetJson, Style::Tr4, LegacyTorrentGetJson },
+        { "port_test error response tr5 -> tr5", CurrentPortTestErrorResponse, Style::Tr5, CurrentPortTestErrorResponse },
+        { "port_test error response tr5 -> tr4", CurrentPortTestErrorResponse, Style::Tr4, LegacyPortTestErrorResponse },
+        { "port_test error response tr4 -> tr5", LegacyPortTestErrorResponse, Style::Tr5, CurrentPortTestErrorResponse },
+        { "port_test error response tr4 -> tr4", LegacyPortTestErrorResponse, Style::Tr4, LegacyPortTestErrorResponse },
+        { "bad method name tr5 -> tr5", BadMethodNameResponse, Style::Tr5, BadMethodNameResponse },
+        { "bad method name tr5 -> tr4", BadMethodNameResponse, Style::Tr4, BadMethodNameLegacyResponse },
+        { "bad method name tr4 -> tr5", BadMethodNameLegacyResponse, Style::Tr5, BadMethodNameResponse },
+        { "bad method name tr4 -> tr4", BadMethodNameLegacyResponse, Style::Tr4, BadMethodNameLegacyResponse },
+        { "unrecognised info tr5 -> tr5", UnrecognisedInfoResponse, Style::Tr5, UnrecognisedInfoResponse},
+        { "unrecognised info tr5 -> tr4", UnrecognisedInfoResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
+        { "unrecognised info tr4 -> tr5", UnrecognisedInfoLegacyResponse, Style::Tr5, UnrecognisedInfoResponse},
+        { "unrecognised info tr4 -> tr4", UnrecognisedInfoLegacyResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
 
         // TODO(ckerr): torrent-get with 'table'
     } };
@@ -636,7 +702,7 @@ TEST(ApiCompatTest, canConvertRpc)
     {
         auto serde = tr_variant_serde::json();
         auto parsed = serde.parse(src);
-        ASSERT_TRUE(parsed.has_value());
+        ASSERT_TRUE(parsed.has_value()) << name << ": " << serde.error_;
         auto converted = libtransmission::api_compat::convert(*parsed, tgt_style);
         EXPECT_EQ(expected, serde.to_string(converted)) << name;
     }
