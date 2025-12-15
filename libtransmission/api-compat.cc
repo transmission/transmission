@@ -283,7 +283,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_filter_text, TR_KEY_filter_text_kebab },
     { TR_KEY_filter_trackers, TR_KEY_filter_trackers_kebab },
     { TR_KEY_idle_limit, TR_KEY_idle_limit_kebab_APICOMPAT },
-    { TR_KEY_idle_mode, TR_KEY_idle_mode_kebab },
+    { TR_KEY_idle_mode, TR_KEY_idle_mode_kebab_APICOMPAT },
     { TR_KEY_idle_seeding_limit, TR_KEY_idle_seeding_limit_kebab },
     { TR_KEY_idle_seeding_limit_enabled, TR_KEY_idle_seeding_limit_enabled_kebab },
     { TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab },
