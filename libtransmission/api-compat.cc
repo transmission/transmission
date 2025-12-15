@@ -259,7 +259,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_announce_ip_enabled, TR_KEY_announce_ip_enabled_kebab },
     { TR_KEY_anti_brute_force_enabled, TR_KEY_anti_brute_force_enabled_kebab },
     { TR_KEY_anti_brute_force_threshold, TR_KEY_anti_brute_force_threshold_kebab },
-    { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_bandwidth_priority, TR_KEY_bandwidth_priority_kebab_APICOMPAT },
     { TR_KEY_bind_address_ipv4, TR_KEY_bind_address_ipv4_kebab },
     { TR_KEY_bind_address_ipv6, TR_KEY_bind_address_ipv6_kebab },
     { TR_KEY_blocklist_date, TR_KEY_blocklist_date_kebab },
