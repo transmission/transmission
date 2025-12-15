@@ -35,11 +35,11 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_NONE, /* represented as an empty string */
     TR_KEY_active_torrent_count_camel, /* rpc (deprecated) */
     TR_KEY_active_torrent_count, /* rpc */
-    TR_KEY_activity_date_kebab, /* resume file (legacy) */
+    TR_KEY_activity_date_kebab_APICOMPAT,
     TR_KEY_activity_date_camel, /* rpc (deprecated) */
     TR_KEY_activity_date, /* rpc, resume file */
     TR_KEY_added, /* pex */
-    TR_KEY_added_date_kebab, /* resume file (legacy) */
+    TR_KEY_added_date_kebab_APICOMPAT, /* resume file (legacy) */
     TR_KEY_added_f, /* pex */
     TR_KEY_added6, /* pex */
     TR_KEY_added6_f, /* pex */
@@ -74,7 +74,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_anti_brute_force_threshold, /* rpc, settings */
     TR_KEY_arguments, /* rpc */
     TR_KEY_availability, // rpc
-    TR_KEY_bandwidth_priority_kebab,
+    TR_KEY_bandwidth_priority_kebab_APICOMPAT,
     TR_KEY_bandwidth_priority_camel,
     TR_KEY_bandwidth_priority,
     TR_KEY_begin_piece,
@@ -143,7 +143,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_dht_enabled_kebab,
     TR_KEY_dht_enabled,
     TR_KEY_dnd,
-    TR_KEY_done_date_kebab,
+    TR_KEY_done_date_kebab_APICOMPAT,
     TR_KEY_done_date_camel,
     TR_KEY_done_date,
     TR_KEY_download_dir_kebab,
@@ -170,7 +170,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_downloaded_bytes,
     TR_KEY_downloaded_ever,
     TR_KEY_downloader_count,
-    TR_KEY_downloading_time_seconds_kebab,
+    TR_KEY_downloading_time_seconds_kebab_APICOMPAT,
     TR_KEY_downloading_time_seconds,
     TR_KEY_dropped,
     TR_KEY_dropped6,
@@ -246,8 +246,8 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_host,
     TR_KEY_id,
     TR_KEY_id_timestamp,
-    TR_KEY_idle_limit_kebab,
-    TR_KEY_idle_mode_kebab,
+    TR_KEY_idle_limit_kebab_APICOMPAT,
+    TR_KEY_idle_mode_kebab_APICOMPAT,
     TR_KEY_idle_seeding_limit_kebab,
     TR_KEY_idle_seeding_limit_enabled_kebab,
     TR_KEY_idle_limit,
@@ -333,7 +333,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_main_window_y,
     TR_KEY_manual_announce_time_camel,
     TR_KEY_manual_announce_time,
-    TR_KEY_max_peers_kebab,
+    TR_KEY_max_peers_kebab_APICOMPAT,
     TR_KEY_max_connected_peers_camel,
     TR_KEY_max_connected_peers,
     TR_KEY_max_peers,
@@ -392,7 +392,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peer_socket_tos,
     TR_KEY_peers,
     TR_KEY_peers2,
-    TR_KEY_peers2_6_kebab,
+    TR_KEY_peers2_6_kebab_APICOMPAT,
     TR_KEY_peers2_6,
     TR_KEY_peers_connected_camel,
     TR_KEY_peers_from_camel,
@@ -464,7 +464,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_rate_upload,
     TR_KEY_ratio_limit_kebab,
     TR_KEY_ratio_limit_enabled_kebab,
-    TR_KEY_ratio_mode_kebab,
+    TR_KEY_ratio_mode_kebab_APICOMPAT,
     TR_KEY_ratio_limit,
     TR_KEY_ratio_limit_enabled,
     TR_KEY_ratio_mode,
@@ -564,7 +564,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_seed_ratio_mode,
     TR_KEY_seeder_count_camel,
     TR_KEY_seeder_count,
-    TR_KEY_seeding_time_seconds_kebab,
+    TR_KEY_seeding_time_seconds_kebab_APICOMPAT,
     TR_KEY_seeding_time_seconds,
     TR_KEY_sequential_download,
     TR_KEY_sequential_download_from_piece,
@@ -613,7 +613,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_sort_reversed,
     TR_KEY_source,
     TR_KEY_speed,
-    TR_KEY_speed_Bps_kebab,
+    TR_KEY_speed_Bps_kebab_APICOMPAT,
     TR_KEY_speed_bytes_kebab,
     TR_KEY_speed_limit_down_kebab,
     TR_KEY_speed_limit_down_enabled_kebab,
@@ -722,8 +722,8 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_uploaded_bytes,
     TR_KEY_uploaded_ever,
     TR_KEY_url_list,
-    TR_KEY_use_global_speed_limit_kebab,
-    TR_KEY_use_speed_limit_kebab,
+    TR_KEY_use_global_speed_limit_kebab_APICOMPAT,
+    TR_KEY_use_speed_limit_kebab_APICOMPAT,
     TR_KEY_use_global_speed_limit,
     TR_KEY_use_speed_limit,
     TR_KEY_ut_holepunch,
