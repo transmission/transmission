@@ -331,13 +331,13 @@ tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* to
 
 tr_resume::fields_t load_idle_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>({ TR_KEY_idle_limit, TR_KEY_idle_limit_kebab });
+    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_idle_limit);
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const imin = d->value_if<int64_t>({ TR_KEY_idle_limit, TR_KEY_idle_limit_kebab }); imin)
+    if (auto const imin = d->value_if<int64_t>(TR_KEY_idle_limit))
     {
         tor->set_idle_limit_minutes(*imin);
     }
