@@ -247,7 +247,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
 
 auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab }, // TODO(ckerr) legacy duplicate
-    { TR_KEY_added_date, TR_KEY_added_date_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab },
     { TR_KEY_alt_speed_enabled, TR_KEY_alt_speed_enabled_kebab },
     { TR_KEY_alt_speed_time_begin, TR_KEY_alt_speed_time_begin_kebab },
