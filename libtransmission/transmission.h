@@ -181,13 +181,12 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  *
  * @param app_defaults tr_variant containing the app defaults
  * @param config_dir the configuration directory to find settings.json
- * @param app_name if config_dir is empty, app_name is used to find the default dir.
  * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name);
+tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, std::string_view config_dir);
 
 /**
  * Add the session's configuration settings to the benc dictionary
