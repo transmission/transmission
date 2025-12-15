@@ -35,7 +35,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_NONE, /* represented as an empty string */
     TR_KEY_active_torrent_count_camel, /* rpc (deprecated) */
     TR_KEY_active_torrent_count, /* rpc */
-    TR_KEY_activity_date_kebab, /* resume file (legacy) */
+    TR_KEY_activity_date_kebab,
     TR_KEY_activity_date_camel, /* rpc (deprecated) */
     TR_KEY_activity_date, /* rpc, resume file */
     TR_KEY_added, /* pex */
@@ -392,7 +392,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_peer_socket_tos,
     TR_KEY_peers,
     TR_KEY_peers2,
-    TR_KEY_peers2_6_kebab,
+    TR_KEY_peers2_6_kebab_APICOMPAT,
     TR_KEY_peers2_6,
     TR_KEY_peers_connected_camel,
     TR_KEY_peers_from_camel,
