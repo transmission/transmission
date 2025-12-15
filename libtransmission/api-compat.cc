@@ -315,7 +315,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_queue_stalled_minutes, TR_KEY_queue_stalled_minutes_kebab },
     { TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab },
     { TR_KEY_ratio_limit_enabled, TR_KEY_ratio_limit_enabled_kebab },
-    { TR_KEY_ratio_mode, TR_KEY_ratio_mode_kebab },
+    { TR_KEY_ratio_mode, TR_KEY_ratio_mode_kebab_APICOMPAT },
     { TR_KEY_read_clipboard, TR_KEY_read_clipboard_kebab },
     { TR_KEY_remote_session_enabled, TR_KEY_remote_session_enabled_kebab },
     { TR_KEY_remote_session_host, TR_KEY_remote_session_host_kebab },

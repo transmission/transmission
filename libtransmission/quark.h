@@ -464,7 +464,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_rate_upload,
     TR_KEY_ratio_limit_kebab,
     TR_KEY_ratio_limit_enabled_kebab,
-    TR_KEY_ratio_mode_kebab,
+    TR_KEY_ratio_mode_kebab_APICOMPAT,
     TR_KEY_ratio_limit,
     TR_KEY_ratio_limit_enabled,
     TR_KEY_ratio_mode,
