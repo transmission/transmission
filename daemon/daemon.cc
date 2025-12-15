@@ -402,7 +402,7 @@ tr_variant load_settings(char const* config_dir)
     app_defaults_map.try_emplace(TR_KEY_start_paused, false);
     app_defaults_map.try_emplace(TR_KEY_pidfile, tr_variant::unmanaged_string(""sv));
     auto const app_defaults = tr_variant{ std::move(app_defaults_map) };
-    return tr_sessionLoadSettings(&app_defaults, config_dir);
+    return tr_sessionLoadSettings(config_dir, &app_defaults);
 }
 
 } // namespace

@@ -238,7 +238,7 @@ Prefs::Prefs(QString config_dir)
 #endif
 
     auto const app_defaults = get_default_app_settings();
-    auto settings = tr_sessionLoadSettings(&app_defaults, config_dir_.toStdString());
+    auto settings = tr_sessionLoadSettings(config_dir_.toStdString(), &app_defaults);
     ensureSoundCommandIsAList(&settings);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
