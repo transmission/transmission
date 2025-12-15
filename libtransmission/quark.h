@@ -723,7 +723,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_uploaded_ever,
     TR_KEY_url_list,
     TR_KEY_use_global_speed_limit_kebab,
-    TR_KEY_use_speed_limit_kebab,
+    TR_KEY_use_speed_limit_kebab_APICOMPAT,
     TR_KEY_use_global_speed_limit,
     TR_KEY_use_speed_limit,
     TR_KEY_ut_holepunch,

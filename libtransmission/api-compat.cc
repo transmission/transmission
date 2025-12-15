@@ -380,7 +380,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_upload_slots_per_torrent, TR_KEY_upload_slots_per_torrent_kebab },
     { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_kebab_APICOMPAT },
     { TR_KEY_use_global_speed_limit, TR_KEY_use_global_speed_limit_kebab },
-    { TR_KEY_use_speed_limit, TR_KEY_use_speed_limit_kebab },
+    { TR_KEY_use_speed_limit, TR_KEY_use_speed_limit_kebab_APICOMPAT },
     { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab },
     { TR_KEY_watch_dir, TR_KEY_watch_dir_kebab },
     { TR_KEY_watch_dir_enabled, TR_KEY_watch_dir_enabled_kebab },
