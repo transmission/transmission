@@ -381,7 +381,9 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     }
     else
     {
-        auto writer = rapidjson::PrettyWriter{ buf };
+        // Explicitly specify template parameter to workaround
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85790
+        auto writer = rapidjson::PrettyWriter<FmtOutputStream>{ buf };
         var.visit(JsonWriter{ writer });
     }
     return buf.to_string();
