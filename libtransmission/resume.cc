@@ -16,6 +16,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bitfield.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -636,6 +637,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         return {};
     }
 
+    otop = libtransmission::api_compat::convert_incoming_data(*otop);
     auto const* const p_map = otop->get_if<tr_variant::Map>();
     if (p_map == nullptr)
     {
@@ -985,8 +987,9 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     save_labels(map, tor);
     save_group(map, tor);
 
+    auto const out = libtransmission::api_compat::convert_outgoing_data(std::move(map));
     auto serde = tr_variant_serde::benc();
-    if (!serde.to_file(std::move(map), tor->resume_file()))
+    if (!serde.to_file(out, tor->resume_file()))
     {
         tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_.message()));
     }
