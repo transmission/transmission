@@ -296,7 +296,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_main_window_width, TR_KEY_main_window_width_kebab },
     { TR_KEY_main_window_x, TR_KEY_main_window_x_kebab },
     { TR_KEY_main_window_y, TR_KEY_main_window_y_kebab },
-    { TR_KEY_max_peers, TR_KEY_max_peers_kebab },
+    { TR_KEY_max_peers, TR_KEY_max_peers_kebab_APICOMPAT },
     { TR_KEY_message_level, TR_KEY_message_level_kebab },
     { TR_KEY_open_dialog_dir, TR_KEY_open_dialog_dir_kebab },
     { TR_KEY_peer_congestion_algorithm, TR_KEY_peer_congestion_algorithm_kebab },

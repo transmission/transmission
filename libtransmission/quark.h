@@ -333,7 +333,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_main_window_y,
     TR_KEY_manual_announce_time_camel,
     TR_KEY_manual_announce_time,
-    TR_KEY_max_peers_kebab,
+    TR_KEY_max_peers_kebab_APICOMPAT,
     TR_KEY_max_connected_peers_camel,
     TR_KEY_max_connected_peers,
     TR_KEY_max_peers,
