@@ -277,7 +277,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab },
     { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab },
     { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab_APICOMPAT },
-    { TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab },
+    { TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab_APICOMPAT },
     { TR_KEY_files_added, TR_KEY_files_added_kebab_APICOMPAT },
     { TR_KEY_filter_mode, TR_KEY_filter_mode_kebab },
     { TR_KEY_filter_text, TR_KEY_filter_text_kebab },

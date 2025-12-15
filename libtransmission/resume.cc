@@ -751,7 +751,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0)
     {
-        if (auto i = map.value_if<int64_t>({ TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab }); i)
+        if (auto const i = map.value_if<int64_t>(TR_KEY_downloading_time_seconds))
         {
             helper.load_seconds_downloading_before_current_start(*i);
             fields_loaded |= tr_resume::TimeDownloading;
