@@ -479,23 +479,21 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     return settings;
 }
 
-tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name)
+tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant const* const app_defaults)
 {
+    // start with session defaults...
     auto settings = tr_sessionGetDefaultSettings();
 
-    // if app defaults are provided, override libtransmission defaults
+    // ...app defaults (if provided) override session defaults...
     if (app_defaults != nullptr && app_defaults->holds_alternative<tr_variant::Map>())
     {
         settings.merge(*app_defaults);
     }
 
-    // if a settings file exists, use it to override the defaults
-    if (auto const filename = fmt::format(
-            "{:s}/settings.json",
-            config_dir != nullptr ? config_dir : tr_getDefaultConfigDir(app_name));
-        tr_sys_path_exists(filename))
+    // ...and settings.json (if available) override the defaults
+    if (auto const filename = fmt::format("{:s}/settings.json", config_dir); tr_sys_path_exists(filename))
     {
-        if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+        if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
         {
             settings.merge(*file_settings);
         }
@@ -563,7 +561,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     // - client settings
     // - previous session's values in settings.json
     // - hardcoded defaults
-    auto settings = tr_sessionLoadSettings(nullptr, config_dir, nullptr);
+    auto settings = tr_sessionLoadSettings(config_dir);
     settings.merge(client_settings);
 
     // if logging is desired, start it now before doing more work

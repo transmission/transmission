@@ -179,15 +179,14 @@ tr_variant tr_sessionGetSettings(tr_session const* session);
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param app_defaults tr_variant containing the app defaults
  * @param config_dir the configuration directory to find settings.json
- * @param app_name if config_dir is empty, app_name is used to find the default dir.
+ * @param app_defaults optional tr_variant containing the app-specific defaults
  * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-tr_variant tr_sessionLoadSettings(tr_variant const* app_defaults, char const* config_dir, char const* app_name);
+[[nodiscard]] tr_variant tr_sessionLoadSettings(std::string_view config_dir, tr_variant const* app_defaults = nullptr);
 
 /**
  * Add the session's configuration settings to the benc dictionary
