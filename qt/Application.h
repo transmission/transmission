@@ -87,7 +87,6 @@ public slots:
     void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
-    void consentGiven(int result) const;
     void onSessionSourceChanged() const;
     void onTorrentsAdded(torrent_ids_t const& torrent_ids) const;
     void onTorrentsCompleted(torrent_ids_t const& torrent_ids) const;

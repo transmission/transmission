@@ -9,11 +9,26 @@
 #include <optional>
 #include <string_view>
 
-/* Quarks — a 2-way association between a string and a unique integer identifier */
+/**
+ * Quarks — a 2-way association between a compile-time interned string
+ * and a unique integer identifier. Used to make well-known strings
+ * (e.g. strings in settings files, the JSON-RPC API, and BitTorrent protocol)
+ * cheap to store, cheap to compare, and usable in switch-case statements.
+ */
 using tr_quark = size_t;
 
-/*
+/**
  * Predefined Quarks.
+ *
+ * IMPORTANT:
+ *
+ * * Use snake case for new entries.
+ *
+ * * Entries whose names contain `_camel`, `_kebab`, or `_APICOMPAT` are
+ *   all deprecated. Do not use them in new code except in api_compat.
+ *   - `_camel` means the entry's string is in camelCase.
+ *   - `_kebab` means the entry's string is in kebab-case.
+ *   - `_APICOMPAT` means the entry is only used in api_compat.
  */
 enum // NOLINT(performance-enum-size)
 {
@@ -149,7 +164,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_download_queue_size,
     TR_KEY_download_speed,
     TR_KEY_downloaded,
-    TR_KEY_downloaded_bytes_kebab,
+    TR_KEY_downloaded_bytes_kebab_APICOMPAT,
     TR_KEY_downloaded_bytes_camel,
     TR_KEY_downloaded_ever_camel,
     TR_KEY_downloaded_bytes,
@@ -178,7 +193,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_file_stats,
     TR_KEY_filename,
     TR_KEY_files,
-    TR_KEY_files_added_kebab,
+    TR_KEY_files_added_kebab_APICOMPAT,
     TR_KEY_files_unwanted_kebab,
     TR_KEY_files_wanted_kebab,
     TR_KEY_files_added_camel,
@@ -455,6 +470,8 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_ratio_mode,
     TR_KEY_read_clipboard_kebab,
     TR_KEY_read_clipboard,
+    TR_KEY_recently_active_kebab,
+    TR_KEY_recently_active,
     TR_KEY_recheck_progress_camel,
     TR_KEY_recheck_progress,
     TR_KEY_remote_session_enabled_kebab,
@@ -524,7 +541,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_script_torrent_done_filename,
     TR_KEY_script_torrent_done_seeding_enabled,
     TR_KEY_script_torrent_done_seeding_filename,
-    TR_KEY_seconds_active_kebab,
+    TR_KEY_seconds_active_kebab_APICOMPAT,
     TR_KEY_seconds_active_camel,
     TR_KEY_seconds_downloading_camel,
     TR_KEY_seconds_seeding_camel,
@@ -552,7 +569,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_sequential_download,
     TR_KEY_sequential_download_from_piece,
     TR_KEY_session_close_kebab,
-    TR_KEY_session_count_kebab,
+    TR_KEY_session_count_kebab_APICOMPAT,
     TR_KEY_session_get_kebab,
     TR_KEY_session_id_kebab,
     TR_KEY_session_set_kebab,
@@ -624,6 +641,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_tcp_enabled_kebab,
     TR_KEY_tcp_enabled,
     TR_KEY_tier,
+    TR_KEY_time_checked_kebab,
     TR_KEY_time_checked,
     TR_KEY_torrent_add_kebab,
     TR_KEY_torrent_added_kebab,
@@ -698,7 +716,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_upload_slots_per_torrent,
     TR_KEY_upload_speed,
     TR_KEY_uploaded,
-    TR_KEY_uploaded_bytes_kebab,
+    TR_KEY_uploaded_bytes_kebab_APICOMPAT,
     TR_KEY_uploaded_bytes_camel,
     TR_KEY_uploaded_ever_camel,
     TR_KEY_uploaded_bytes,
@@ -708,8 +726,6 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_use_speed_limit_kebab,
     TR_KEY_use_global_speed_limit,
     TR_KEY_use_speed_limit,
-    TR_KEY_user_has_given_informed_consent_kebab,
-    TR_KEY_user_has_given_informed_consent,
     TR_KEY_ut_holepunch,
     TR_KEY_ut_metadata,
     TR_KEY_ut_pex,
@@ -751,10 +767,3 @@ enum // NOLINT(performance-enum-size)
  * created.
  */
 [[nodiscard]] tr_quark tr_quark_new(std::string_view str);
-
-/**
- * Get the replacement quark from old deprecated quarks.
- *
- * Note: Temporary shim just for the transition period to snake_case.
- */
-[[nodiscard]] tr_quark tr_quark_convert(tr_quark quark);

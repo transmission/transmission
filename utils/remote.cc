@@ -607,7 +607,7 @@ void add_id_arg(tr_variant::Map& args, std::string_view id_str, std::string_view
 
     if (IdActive == id_str)
     {
-        args.insert_or_assign(TR_KEY_ids, "recently-active"sv);
+        args.insert_or_assign(TR_KEY_ids, tr_variant::unmanaged_string(TR_KEY_recently_active_kebab));
     }
     else if (IdAll != id_str)
     {
