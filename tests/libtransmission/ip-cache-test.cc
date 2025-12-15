@@ -13,12 +13,12 @@
 #include <string_view>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/ip-cache.h>
 #include <libtransmission/net.h>
 #include <libtransmission/timer.h>
 #include <libtransmission/web.h>
-
-#include "gtest/gtest.h"
 
 using namespace std::literals;
 

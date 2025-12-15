@@ -8,10 +8,10 @@
 #include <memory>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-buffer.h>
-
-#include "gtest/gtest.h"
 
 using BufferTest = ::testing::Test;
 using namespace std::literals;

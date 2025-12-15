@@ -17,10 +17,10 @@
 #include <sys/socket.h>
 #endif
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
-
-#include "gtest/gtest.h"
 
 using NetTest = ::testing::Test;
 using namespace std::literals;

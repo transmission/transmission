@@ -8,6 +8,8 @@
 #include <memory>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <small/vector.hpp>
 
 #include <libtransmission/transmission.h>
@@ -19,8 +21,6 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/session.h>
 #include <libtransmission/variant.h>
-
-#include "gtest/gtest.h"
 
 using namespace std::literals;
 

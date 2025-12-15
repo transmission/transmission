@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
@@ -21,7 +23,6 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

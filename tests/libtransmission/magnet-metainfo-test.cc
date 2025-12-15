@@ -7,7 +7,7 @@
 #include <cstddef> // size_t, std::byte
 #include <string_view>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer()
 #include <libtransmission/magnet-metainfo.h>

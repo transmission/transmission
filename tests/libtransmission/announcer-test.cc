@@ -10,12 +10,12 @@
 #include <optional>
 #include <string_view>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include <libtransmission/announcer-common.h>
 #include <libtransmission/net.h>
-
-#include "gtest/gtest.h"
 
 using AnnouncerTest = ::testing::Test;
 

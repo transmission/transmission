@@ -7,9 +7,9 @@
 #include <iterator>
 #include <string_view>
 
-#include <libtransmission/tr-strbuf.h>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include <libtransmission/tr-strbuf.h>
 
 using StrbufTest = ::testing::Test;
 using namespace std::literals;

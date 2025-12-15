@@ -8,9 +8,9 @@
 #include <string>
 #include <string_view>
 
-#include <libtransmission/quark.h>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include <libtransmission/quark.h>
 
 class QuarkTest : public ::testing::Test
 {

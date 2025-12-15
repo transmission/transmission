@@ -8,10 +8,10 @@
 
 #include <fmt/format.h>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/benc.h>
 #include <libtransmission/error.h>
-
-#include "gtest/gtest.h"
 
 using BencTest = ::testing::Test;
 using namespace std::literals;

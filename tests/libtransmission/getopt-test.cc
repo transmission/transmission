@@ -5,9 +5,9 @@
 
 #include <array>
 
-#include <libtransmission/tr-getopt.h>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+#include <libtransmission/tr-getopt.h>
 
 namespace
 {

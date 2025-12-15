@@ -20,6 +20,8 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include <libtransmission/file.h>
@@ -30,7 +32,6 @@
 #include <libtransmission/watchdir.h>
 #include <libtransmission/watchdir-base.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

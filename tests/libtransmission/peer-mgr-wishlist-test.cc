@@ -8,6 +8,8 @@
 #include <memory>
 #include <set>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include <libtransmission/transmission.h>
@@ -15,8 +17,6 @@
 #include <libtransmission/bitfield.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/peer-mgr-wishlist.h>
-
-#include "gtest/gtest.h"
 
 class PeerMgrWishlistTest : public ::testing::Test
 {

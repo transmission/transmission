@@ -5,11 +5,11 @@
 
 #include <cstdint>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/block-info.h>
-
-#include "gtest/gtest.h"
 
 using BlockInfoTest = ::testing::Test;
 

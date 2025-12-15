@@ -10,12 +10,12 @@
 #include <tuple>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
-
-#include "gtest/gtest.h"
 
 using namespace std::literals;
 

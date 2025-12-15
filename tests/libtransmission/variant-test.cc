@@ -14,6 +14,8 @@
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include <libtransmission/benc.h>
@@ -22,7 +24,6 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

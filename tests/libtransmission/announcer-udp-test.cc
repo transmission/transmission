@@ -26,6 +26,8 @@
 
 #include <event2/event.h>
 
+#include <gtest/gtest.h>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include <libtransmission/announcer.h>
@@ -40,7 +42,6 @@
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_p...
 #include "libtransmission/utils.h"
 
-#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

@@ -7,10 +7,10 @@
 #include <ctime>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/session-alt-speeds.h>
-
-#include "gtest/gtest.h"
 
 using namespace std::literals;
 
