@@ -291,15 +291,13 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
-    if (auto const* child = map.find_if<tr_variant::Map>({ TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab });
-        child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_up))
     {
         load_single_speed_limit(*child, TR_UP, tor);
         ret = tr_resume::Speedlimit;
     }
 
-    if (auto const* child = map.find_if<tr_variant::Map>({ TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab });
-        child != nullptr)
+    if (auto const* child = map.find_if<tr_variant::Map>(TR_KEY_speed_limit_down))
     {
         load_single_speed_limit(*child, TR_DOWN, tor);
         ret = tr_resume::Speedlimit;
@@ -310,13 +308,13 @@ auto load_speed_limits(tr_variant::Map const& map, tr_torrent* tor)
 
 tr_resume::fields_t load_ratio_limits(tr_variant::Map const& map, tr_torrent* tor)
 {
-    auto const* const d = map.find_if<tr_variant::Map>({ TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab });
+    auto const* const d = map.find_if<tr_variant::Map>(TR_KEY_ratio_limit);
     if (d == nullptr)
     {
         return {};
     }
 
-    if (auto const dratio = d->value_if<double>({ TR_KEY_ratio_limit, TR_KEY_ratio_limit_kebab }); dratio)
+    if (auto const dratio = d->value_if<double>(TR_KEY_ratio_limit))
     {
         tor->set_seed_ratio(*dratio);
     }
@@ -669,8 +667,7 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0)
     {
-        if (auto sv = map.value_if<std::string_view>({ TR_KEY_incomplete_dir, TR_KEY_incomplete_dir_kebab });
-            sv && !std::empty(*sv))
+        if (auto sv = map.value_if<std::string_view>(TR_KEY_incomplete_dir); sv && !std::empty(*sv))
         {
             helper.load_incomplete_dir(*sv);
             fields_loaded |= tr_resume::IncompleteDir;
