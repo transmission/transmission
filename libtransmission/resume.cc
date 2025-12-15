@@ -267,7 +267,7 @@ void save_idle_limits(tr_variant::Map& map, tr_torrent const* tor)
 
 void load_single_speed_limit(tr_variant::Map const& map, tr_direction dir, tr_torrent* tor)
 {
-    if (auto const i = map.value_if<int64_t>({ TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab }); i)
+    if (auto const i = map.value_if<int64_t>(TR_KEY_speed_Bps))
     {
         tor->set_speed_limit(dir, Speed{ *i, Speed::Units::Byps });
     }

@@ -360,7 +360,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab },
     { TR_KEY_sort_mode, TR_KEY_sort_mode_kebab },
     { TR_KEY_sort_reversed, TR_KEY_sort_reversed_kebab },
-    { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab },
+    { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab_APICOMPAT },
     { TR_KEY_speed_limit_down, TR_KEY_speed_limit_down_kebab },
     { TR_KEY_speed_limit_down_enabled, TR_KEY_speed_limit_down_enabled_kebab },
     { TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab },
