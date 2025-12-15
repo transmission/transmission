@@ -347,7 +347,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_seconds_active, TR_KEY_seconds_active_kebab_APICOMPAT },
     { TR_KEY_seed_queue_enabled, TR_KEY_seed_queue_enabled_kebab },
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab },
-    { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab },
+    { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab_APICOMPAT },
     { TR_KEY_session_count, TR_KEY_session_count_kebab_APICOMPAT },
     { TR_KEY_show_backup_trackers, TR_KEY_show_backup_trackers_kebab },
     { TR_KEY_show_extra_peer_details, TR_KEY_show_extra_peer_details_kebab },
