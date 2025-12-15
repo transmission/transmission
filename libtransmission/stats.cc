@@ -9,6 +9,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/stats.h"
@@ -17,24 +18,29 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+namespace api_compat = libtransmission::api_compat;
 
 namespace
 {
-std::optional<tr_variant> load_stats(std::string_view config_dir)
+[[nodiscard]] auto load_stats(std::string_view config_dir)
 {
-    if (auto filename = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(filename))
+    auto var = std::optional<tr_variant>{};
+
+    if (auto file = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(file))
     {
-        return tr_variant_serde::json().parse_file(filename);
+        var = tr_variant_serde::json().parse_file(file);
+    }
+    else if (auto oldfile = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(oldfile))
+    {
+        var = tr_variant_serde::benc().parse_file(oldfile);
     }
 
-    // maybe the user just upgraded from an old version of Transmission
-    // that was still using stats.benc
-    if (auto filename = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(filename))
+    if (var)
     {
-        return tr_variant_serde::benc().parse_file(filename);
+        var = api_compat::convert_incoming_data(*var);
     }
 
-    return {};
+    return var;
 }
 } // namespace
 
@@ -52,21 +58,21 @@ tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
         return {};
     }
 
-    auto const load = [map](std::initializer_list<tr_quark> keys, uint64_t& dst)
+    auto const load = [map](auto const key, uint64_t& tgt)
     {
-        if (auto const val = map->value_if<int64_t>(keys); val)
+        if (auto const val = map->value_if<int64_t>(key))
         {
-            dst = *val;
+            tgt = *val;
         }
     };
 
     auto ret = tr_session_stats{};
 
-    load({ TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab }, ret.downloadedBytes);
-    load({ TR_KEY_files_added, TR_KEY_files_added_kebab }, ret.filesAdded);
-    load({ TR_KEY_seconds_active, TR_KEY_seconds_active_kebab }, ret.secondsActive);
-    load({ TR_KEY_session_count, TR_KEY_session_count_kebab }, ret.sessionCount);
-    load({ TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_kebab }, ret.uploadedBytes);
+    load(TR_KEY_downloaded_bytes, ret.downloadedBytes);
+    load(TR_KEY_files_added, ret.filesAdded);
+    load(TR_KEY_seconds_active, ret.secondsActive);
+    load(TR_KEY_session_count, ret.sessionCount);
+    load(TR_KEY_uploaded_bytes, ret.uploadedBytes);
 
     return ret;
 }
@@ -80,7 +86,10 @@ void tr_stats::save() const
     map.try_emplace(TR_KEY_seconds_active, saveme.secondsActive);
     map.try_emplace(TR_KEY_session_count, saveme.sessionCount);
     map.try_emplace(TR_KEY_uploaded_bytes, saveme.uploadedBytes);
-    tr_variant_serde::json().to_file(tr_variant{ std::move(map) }, tr_pathbuf{ config_dir_, "/stats.json"sv });
+
+    auto var = tr_variant{ std::move(map) };
+    var = api_compat::convert_outgoing_data(var);
+    tr_variant_serde::json().to_file(var, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
 void tr_stats::clear()

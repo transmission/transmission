@@ -276,9 +276,9 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_download_dir, TR_KEY_download_dir_kebab }, // TODO(ckerr) legacy duplicate
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab },
     { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab },
-    { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab_APICOMPAT },
     { TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab },
-    { TR_KEY_files_added, TR_KEY_files_added_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_files_added, TR_KEY_files_added_kebab_APICOMPAT },
     { TR_KEY_filter_mode, TR_KEY_filter_mode_kebab },
     { TR_KEY_filter_text, TR_KEY_filter_text_kebab },
     { TR_KEY_filter_trackers, TR_KEY_filter_trackers_kebab },
@@ -344,11 +344,11 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_script_torrent_done_filename, TR_KEY_script_torrent_done_filename_kebab },
     { TR_KEY_script_torrent_done_seeding_enabled, TR_KEY_script_torrent_done_seeding_enabled_kebab },
     { TR_KEY_script_torrent_done_seeding_filename, TR_KEY_script_torrent_done_seeding_filename_kebab },
-    { TR_KEY_seconds_active, TR_KEY_seconds_active_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_seconds_active, TR_KEY_seconds_active_kebab_APICOMPAT },
     { TR_KEY_seed_queue_enabled, TR_KEY_seed_queue_enabled_kebab },
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab },
     { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab },
-    { TR_KEY_session_count, TR_KEY_session_count_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_session_count, TR_KEY_session_count_kebab_APICOMPAT },
     { TR_KEY_show_backup_trackers, TR_KEY_show_backup_trackers_kebab },
     { TR_KEY_show_extra_peer_details, TR_KEY_show_extra_peer_details_kebab },
     { TR_KEY_show_filterbar, TR_KEY_show_filterbar_kebab },
@@ -378,7 +378,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_trash_can_enabled, TR_KEY_trash_can_enabled_kebab },
     { TR_KEY_trash_original_torrent_files, TR_KEY_trash_original_torrent_files_kebab },
     { TR_KEY_upload_slots_per_torrent, TR_KEY_upload_slots_per_torrent_kebab },
-    { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_kebab }, // TODO(ckerr) legacy duplicate
+    { TR_KEY_uploaded_bytes, TR_KEY_uploaded_bytes_kebab_APICOMPAT },
     { TR_KEY_use_global_speed_limit, TR_KEY_use_global_speed_limit_kebab },
     { TR_KEY_use_speed_limit, TR_KEY_use_speed_limit_kebab },
     { TR_KEY_utp_enabled, TR_KEY_utp_enabled_kebab },
