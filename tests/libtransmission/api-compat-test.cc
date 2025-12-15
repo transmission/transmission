@@ -1013,7 +1013,6 @@ TEST(ApiCompatTest, canConvertJsonDataFiles)
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
-    // clang-format off
     static auto constexpr TestCases = std::array<TestCase, 8U>{ {
         { "settings tr5 -> tr5", CurrentSettingsJson, Style::Tr5, CurrentSettingsJson },
         { "settings tr5 -> tr4", CurrentSettingsJson, Style::Tr4, LegacySettingsJson },
@@ -1023,9 +1022,8 @@ TEST(ApiCompatTest, canConvertJsonDataFiles)
         { "stats tr5 -> tr5", CurrentStatsJson, Style::Tr5, CurrentStatsJson },
         { "stats tr5 -> tr4", CurrentStatsJson, Style::Tr4, LegacyStatsJson },
         { "stats tr4 -> tr5", LegacyStatsJson, Style::Tr5, CurrentStatsJson },
-        { "stats tr4 -> tr4", LegacyStatsJson, Style::Tr4, LegacyStatsJson }
+        { "stats tr4 -> tr4", LegacyStatsJson, Style::Tr4, LegacyStatsJson },
     } };
-    // clang-format on
 
     for (auto const& [name, src, tgt_style, expected] : TestCases)
     {
@@ -1038,19 +1036,18 @@ TEST(ApiCompatTest, canConvertJsonDataFiles)
         EXPECT_EQ(expected, serde.to_string(converted)) << name;
     }
 }
+
 TEST(ApiCompatTest, canConvertBencDataFiles)
 {
     using Style = libtransmission::api_compat::Style;
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
-    // clang-format off
     static auto constexpr TestCases = std::array<TestCase, 4U>{ {
         { "resume tr5 -> tr5", ResumeBenc, Style::Tr5, ResumeBenc },
         { "resume tr5 -> tr4", ResumeBenc, Style::Tr4, LegacyResumeBenc },
         { "resume tr4 -> tr5", LegacyResumeBenc, Style::Tr5, ResumeBenc },
         { "resume tr4 -> tr4", LegacyResumeBenc, Style::Tr4, LegacyResumeBenc },
     } };
-    // clang-format on
 
     for (auto const& [name, src, tgt_style, expected] : TestCases)
     {
