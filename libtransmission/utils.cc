@@ -691,7 +691,7 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 
 // --- ENVIRONMENT
 
-bool tr_env_key_exists(char const* key)
+bool tr_env_key_exists(char const* key) noexcept
 {
     TR_ASSERT(key != nullptr);
 
