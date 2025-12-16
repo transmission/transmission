@@ -230,7 +230,7 @@ public:
                 return it->second.value_if<Type>();
             }
 
-            return {};
+            return std::nullopt;
         }
 
         template<typename Type>
@@ -241,7 +241,7 @@ public:
                 return it->second.value_if<Type>();
             }
 
-            return {};
+            return std::nullopt;
         }
 
     private:
