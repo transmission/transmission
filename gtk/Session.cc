@@ -91,7 +91,6 @@ public:
 
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
-    void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
     void send_rpc_request(tr_quark method, tr_variant const& params, std::function<void(tr_variant&)> on_response);
 
     void commit_prefs_change(tr_quark key);
@@ -1204,8 +1203,6 @@ void Session::set_pref(tr_quark const key, double newval)
 ****
 ***/
 
-/* #define DEBUG_RPC */
-
 namespace
 {
 
@@ -1278,29 +1275,6 @@ void Session::Impl::send_rpc_request(
     auto req = tr_variant{ std::move(reqmap) };
     // gtr_message(tr_variant_serde::json().to_string(req));
     tr_rpc_request_exec(session_, req, std::move(callback));
-}
-
-void Session::Impl::send_rpc_request(
-    tr_variant const& request,
-    int64_t tag,
-    std::function<void(tr_variant&)> const& response_func)
-{
-    if (session_ == nullptr)
-    {
-        gtr_error("GTK+ client doesn't support connections to remote servers yet.");
-    }
-    else
-    {
-        /* remember this request */
-        pendingRequests.try_emplace(tag, response_func);
-
-        /* make the request */
-#ifdef DEBUG_RPC
-        gtr_message(fmt::format("request: [{}]", tr_variantToStr(request, TR_VARIANT_FMT_JSON_LEAN)));
-#endif
-
-        tr_rpc_request_exec(session_, request, core_read_rpc_response);
-    }
 }
 
 /***
@@ -1393,14 +1367,6 @@ void Session::blocklist_update()
 }
 
 // ---
-
-void Session::exec(tr_variant const& request)
-{
-    auto const tag = nextTag;
-    ++nextTag;
-
-    impl_->send_rpc_request(request, tag, {});
-}
 
 void Session::exec(tr_quark method, tr_variant const& params)
 {
