@@ -2381,16 +2381,12 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
     {
         auto const torrent_id = iter->get_value(tracker_cols.torrent_id);
         auto const tracker_id = iter->get_value(tracker_cols.tracker_id);
-        tr_variant top;
 
-        tr_variantInitDict(&top, 2);
-        tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-        auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-        tr_variantDictAddInt(args, TR_KEY_id, torrent_id);
-        auto* const trackers = tr_variantDictAddList(args, TR_KEY_tracker_remove_camel, 1);
-        tr_variantListAddInt(trackers, tracker_id);
-
-        core_->exec(top);
+        // TODO(ckerr): migrate to `TR_KEY_tracker_list`
+        auto params = tr_variant::Map{ 2U };
+        params.try_emplace(TR_KEY_ids, Session::to_variant({ torrent_id }));
+        params.try_emplace(TR_KEY_tracker_remove, Session::to_variant({ tracker_id }));
+        core_->exec(TR_KEY_torrent_set, std::move(params));
         refresh();
     }
 }
