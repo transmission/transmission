@@ -6,7 +6,7 @@
 
 @class BlocklistDownloaderViewController;
 
-typedef NS_ENUM(NSUInteger, BlocklistDownloadState) { //
+typedef NS_ENUM(NSUInteger, BlocklistDownloadState) {
     BlocklistDownloadStateStart,
     BlocklistDownloadStateDownloading,
     BlocklistDownloadStateProcessing

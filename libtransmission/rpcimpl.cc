@@ -892,7 +892,6 @@ namespace make_torrent_field_helpers
 
     TR_ASSERT(isSupportedTorrentGetField(key));
 
-    // clang-format off
     switch (key)
     {
     case TR_KEY_activity_date:
@@ -901,17 +900,22 @@ namespace make_torrent_field_helpers
     case TR_KEY_added_date:
     case TR_KEY_added_date_camel:
         return st.addedDate;
-    case TR_KEY_availability: return make_piece_availability_vec(tor);
+    case TR_KEY_availability:
+        return make_piece_availability_vec(tor);
     case TR_KEY_bandwidth_priority:
     case TR_KEY_bandwidth_priority_camel:
         return tor.get_priority();
-    case TR_KEY_bytes_completed: return make_bytes_completed_vec(tor);
-    case TR_KEY_bytes_completed_camel: return make_bytes_completed_vec(tor);
-    case TR_KEY_comment: return tor.comment();
+    case TR_KEY_bytes_completed:
+        return make_bytes_completed_vec(tor);
+    case TR_KEY_bytes_completed_camel:
+        return make_bytes_completed_vec(tor);
+    case TR_KEY_comment:
+        return tor.comment();
     case TR_KEY_corrupt_ever:
     case TR_KEY_corrupt_ever_camel:
         return st.corruptEver;
-    case TR_KEY_creator: return tor.creator();
+    case TR_KEY_creator:
+        return tor.creator();
     case TR_KEY_date_created:
     case TR_KEY_date_created_camel:
         return tor.date_created();
@@ -936,11 +940,13 @@ namespace make_torrent_field_helpers
     case TR_KEY_edit_date:
     case TR_KEY_edit_date_camel:
         return st.editDate;
-    case TR_KEY_error: return st.error;
+    case TR_KEY_error:
+        return st.error;
     case TR_KEY_error_string:
     case TR_KEY_error_string_camel:
         return st.errorString;
-    case TR_KEY_eta: return st.eta;
+    case TR_KEY_eta:
+        return st.eta;
     case TR_KEY_eta_idle:
     case TR_KEY_eta_idle_camel:
         return st.etaIdle;
@@ -950,8 +956,10 @@ namespace make_torrent_field_helpers
     case TR_KEY_file_count:
     case TR_KEY_file_count_kebab:
         return tor.file_count();
-    case TR_KEY_files: return make_file_vec(tor);
-    case TR_KEY_group: return tr_variant::unmanaged_string(tor.bandwidth_group().sv());
+    case TR_KEY_files:
+        return make_file_vec(tor);
+    case TR_KEY_group:
+        return tr_variant::unmanaged_string(tor.bandwidth_group().sv());
     case TR_KEY_hash_string:
     case TR_KEY_hash_string_camel:
         return tr_variant::unmanaged_string(tor.info_hash_string().sv());
@@ -964,7 +972,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_honors_session_limits:
     case TR_KEY_honors_session_limits_camel:
         return tor.uses_session_limits();
-    case TR_KEY_id: return st.id;
+    case TR_KEY_id:
+        return st.id;
     case TR_KEY_is_finished:
     case TR_KEY_is_finished_camel:
         return st.finished;
@@ -974,7 +983,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_is_stalled:
     case TR_KEY_is_stalled_camel:
         return st.isStalled;
-    case TR_KEY_labels: return make_labels_vec(tor);
+    case TR_KEY_labels:
+        return make_labels_vec(tor);
     case TR_KEY_left_until_done:
     case TR_KEY_left_until_done_camel:
         return st.leftUntilDone;
@@ -990,11 +1000,13 @@ namespace make_torrent_field_helpers
     case TR_KEY_metadata_percent_complete:
     case TR_KEY_metadata_percent_complete_camel:
         return st.metadataPercentComplete;
-    case TR_KEY_name: return tor.name();
+    case TR_KEY_name:
+        return tor.name();
     case TR_KEY_peer_limit:
     case TR_KEY_peer_limit_kebab:
         return tor.peer_limit();
-    case TR_KEY_peers: return make_peer_vec(tor);
+    case TR_KEY_peers:
+        return make_peer_vec(tor);
     case TR_KEY_peers_connected:
     case TR_KEY_peers_connected_camel:
         return st.peersConnected;
@@ -1019,11 +1031,13 @@ namespace make_torrent_field_helpers
     case TR_KEY_piece_size:
     case TR_KEY_piece_size_camel:
         return tor.piece_size();
-    case TR_KEY_pieces: return make_piece_bitfield(tor);
+    case TR_KEY_pieces:
+        return make_piece_bitfield(tor);
     case TR_KEY_primary_mime_type:
     case TR_KEY_primary_mime_type_kebab:
         return tr_variant::unmanaged_string(tor.primary_mime_type());
-    case TR_KEY_priorities: return make_file_priorities_vec(tor);
+    case TR_KEY_priorities:
+        return make_file_priorities_vec(tor);
     case TR_KEY_queue_position:
     case TR_KEY_queue_position_camel:
         return st.queuePosition;
@@ -1054,16 +1068,20 @@ namespace make_torrent_field_helpers
     case TR_KEY_seed_ratio_mode:
     case TR_KEY_seed_ratio_mode_camel:
         return tor.seed_ratio_mode();
-    case TR_KEY_sequential_download: return tor.is_sequential_download();
-    case TR_KEY_sequential_download_from_piece: return tor.sequential_download_from_piece();
+    case TR_KEY_sequential_download:
+        return tor.is_sequential_download();
+    case TR_KEY_sequential_download_from_piece:
+        return tor.sequential_download_from_piece();
     case TR_KEY_size_when_done:
     case TR_KEY_size_when_done_camel:
         return st.sizeWhenDone;
-    case TR_KEY_source: return tor.source();
+    case TR_KEY_source:
+        return tor.source();
     case TR_KEY_start_date:
     case TR_KEY_start_date_camel:
         return st.startDate;
-    case TR_KEY_status: return st.activity;
+    case TR_KEY_status:
+        return st.activity;
     case TR_KEY_torrent_file:
     case TR_KEY_torrent_file_camel:
         return tor.torrent_file();
@@ -1076,7 +1094,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_tracker_stats:
     case TR_KEY_tracker_stats_camel:
         return make_tracker_stats_vec(tor);
-    case TR_KEY_trackers: return make_tracker_vec(tor);
+    case TR_KEY_trackers:
+        return make_tracker_vec(tor);
     case TR_KEY_upload_limit:
     case TR_KEY_upload_limit_camel:
         return tr_torrentGetSpeedLimit_KBps(&tor, TR_UP);
@@ -1089,14 +1108,16 @@ namespace make_torrent_field_helpers
     case TR_KEY_uploaded_ever:
     case TR_KEY_uploaded_ever_camel:
         return st.uploadedEver;
-    case TR_KEY_wanted: return make_file_wanted_vec(tor);
-    case TR_KEY_webseeds: return make_webseed_vec(tor);
+    case TR_KEY_wanted:
+        return make_file_wanted_vec(tor);
+    case TR_KEY_webseeds:
+        return make_webseed_vec(tor);
     case TR_KEY_webseeds_sending_to_us:
     case TR_KEY_webseeds_sending_to_us_camel:
         return st.webseedsSendingToUs;
-    default: return tr_variant{};
+    default:
+        return tr_variant{};
     }
-    // clang-format on
 }
 
 [[nodiscard]] auto make_torrent_info_map(tr_torrent* const tor, tr_quark const* const fields, size_t const field_count)
@@ -2548,7 +2569,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
 
 [[nodiscard]] tr_variant make_session_field(tr_session const& session, tr_quark const key)
 {
-    // clang-format off
     switch (key)
     {
     case TR_KEY_alt_speed_down:
@@ -2611,7 +2631,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_download_queue_size:
     case TR_KEY_download_queue_size_kebab:
         return session.queueSize(TR_DOWN);
-    case TR_KEY_encryption: return getEncryptionModeString(tr_sessionGetEncryption(&session));
+    case TR_KEY_encryption:
+        return getEncryptionModeString(tr_sessionGetEncryption(&session));
     case TR_KEY_idle_seeding_limit:
     case TR_KEY_idle_seeding_limit_kebab:
         return session.idleLimitMinutes();
@@ -2645,7 +2666,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_port_forwarding_enabled:
     case TR_KEY_port_forwarding_enabled_kebab:
         return tr_sessionIsPortForwardingEnabled(&session);
-    case TR_KEY_preferred_transports: return session.save_preferred_transports();
+    case TR_KEY_preferred_transports:
+        return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled:
     case TR_KEY_queue_stalled_enabled_kebab:
         return session.queueStalledEnabled();
@@ -2655,7 +2677,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_rename_partial_files:
     case TR_KEY_rename_partial_files_kebab:
         return session.isIncompleteFileNamingEnabled();
-    case TR_KEY_reqq: return session.reqq();
+    case TR_KEY_reqq:
+        return session.reqq();
     case TR_KEY_rpc_version:
     case TR_KEY_rpc_version_kebab:
         return RpcVersion;
@@ -2695,7 +2718,8 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_seed_queue_size:
     case TR_KEY_seed_queue_size_kebab:
         return session.queueSize(TR_UP);
-    case TR_KEY_sequential_download: return session.sequential_download();
+    case TR_KEY_sequential_download:
+        return session.sequential_download();
     case TR_KEY_session_id:
     case TR_KEY_session_id_kebab:
         return session.sessionId();
@@ -2720,14 +2744,16 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_trash_original_torrent_files:
     case TR_KEY_trash_original_torrent_files_kebab:
         return session.shouldDeleteSource();
-    case TR_KEY_units: return values_get_units();
+    case TR_KEY_units:
+        return values_get_units();
     case TR_KEY_utp_enabled:
     case TR_KEY_utp_enabled_kebab:
         return session.allowsUTP();
-    case TR_KEY_version: return LONG_VERSION_STRING;
-    default: return tr_variant{};
+    case TR_KEY_version:
+        return LONG_VERSION_STRING;
+    default:
+        return tr_variant{};
     }
-    // clang-format on
 }
 
 namespace session_get_helpers
