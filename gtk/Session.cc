@@ -1208,10 +1208,17 @@ namespace
 
 int64_t nextId = 1;
 
+bool const verbose_ = tr_env_key_exists("TR_RPC_VERBOSE");
+
 std::map<int64_t, std::function<void(tr_variant&)>> pendingRequests;
 
 bool core_read_rpc_response_idle(tr_variant& response)
 {
+    if (verbose_)
+    {
+        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(response));
+    }
+
     if (auto const* resmap = response.get_if<tr_variant::Map>())
     {
         if (auto const id = resmap->value_if<int64_t>(TR_KEY_id))
@@ -1271,7 +1278,12 @@ void Session::Impl::send_rpc_request(
     }
 
     auto req = tr_variant{ std::move(reqmap) };
-    // gtr_message(tr_variant_serde::json().to_string(req));
+
+    if (verbose_)
+    {
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(req));
+    }
+
     tr_rpc_request_exec(session_, req, std::move(callback));
 }
 
