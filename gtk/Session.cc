@@ -1322,36 +1322,30 @@ void Session::port_test(PortTestIpProtocol const ip_protocol)
     }
     impl_->set_port_test_pending(true, ip_protocol);
 
-    auto const tag = nextTag++;
-
-    auto arguments_map = tr_variant::Map{ 1U };
-    arguments_map.try_emplace(TR_KEY_ip_protocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
-
-    auto request_map = tr_variant::Map{ 3U };
-    request_map.try_emplace(TR_KEY_method, tr_variant::unmanaged_string("port-test"sv));
-    request_map.try_emplace(TR_KEY_tag, tag);
-    request_map.try_emplace(TR_KEY_arguments, std::move(arguments_map));
+    auto params = tr_variant::Map{ 1U };
+    params.try_emplace(TR_KEY_ip_protocol, tr_variant::unmanaged_string(IpStr[ip_protocol]));
 
     impl_->send_rpc_request(
-        tr_variant{ std::move(request_map) },
-        tag,
+        TR_KEY_port_test,
+        std::move(params),
         [this, ip_protocol](tr_variant& response)
         {
             impl_->set_port_test_pending(false, ip_protocol);
 
-            auto status = std::optional<bool>{};
-            if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
+            auto is_open = std::optional<bool>();
+
+            if (auto const* resmap = response.get_if<tr_variant::Map>())
             {
-                if (auto result = bool{}; tr_variantDictFindBool(args, TR_KEY_port_is_open_kebab, &result))
+                if (auto const* result = resmap->find_if<tr_variant::Map>(TR_KEY_result))
                 {
-                    status = result;
+                    is_open = result->value_if<bool>(TR_KEY_port_is_open);
                 }
             }
 
             // If for whatever reason the status optional is empty here,
             // then something must have gone wrong with the port test,
             // so the UI should show the "error" state
-            impl_->signal_port_tested().emit(status, ip_protocol);
+            impl_->signal_port_tested().emit(is_open, ip_protocol);
         });
 }
 
