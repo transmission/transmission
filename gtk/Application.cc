@@ -199,7 +199,7 @@ private:
     void start_all_torrents();
     void pause_all_torrents();
     void copy_magnet_link_to_clipboard(Glib::RefPtr<Torrent> const& torrent) const;
-    bool call_rpc_for_selected_torrents(tr_quark const method);
+    bool call_rpc_for_selected_torrents(tr_quark method);
     void remove_selected(bool delete_files);
 
     static tr_rpc_callback_status on_rpc_changed(
