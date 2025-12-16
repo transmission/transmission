@@ -1206,26 +1206,24 @@ void Session::set_pref(tr_quark const key, double newval)
 namespace
 {
 
-int64_t nextTag = 1;
+int64_t nextId = 1;
 
 std::map<int64_t, std::function<void(tr_variant&)>> pendingRequests;
 
 bool core_read_rpc_response_idle(tr_variant& response)
 {
-    if (int64_t tag = 0; tr_variantDictFindInt(&response, TR_KEY_tag, &tag))
+    if (auto const* resmap = response.get_if<tr_variant::Map>())
     {
-        if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
+        if (auto const id = resmap->value_if<int64_t>(TR_KEY_id))
         {
-            if (auto const& response_func = data_it->second; response_func)
+            if (auto const nh = pendingRequests.extract(*id))
             {
-                response_func(response);
+                nh.mapped()(response);
             }
-
-            pendingRequests.erase(data_it);
-        }
-        else
-        {
-            gtr_warning(fmt::format(fmt::runtime(_("Couldn't find pending RPC request for tag {tag}")), fmt::arg("tag", tag)));
+            else
+            {
+                gtr_warning(fmt::format(fmt::runtime(_("Couldn't find pending RPC request for id {id}")), fmt::arg("id", *id)));
+            }
         }
     }
 
@@ -1266,7 +1264,7 @@ void Session::Impl::send_rpc_request(
     auto callback = std::function<void(tr_session*, tr_variant&&)>{};
     if (on_response)
     {
-        auto const id = nextTag++;
+        auto const id = nextId++;
         pendingRequests.try_emplace(id, std::move(on_response));
         reqmap.try_emplace(TR_KEY_id, id);
         callback = core_read_rpc_response;
