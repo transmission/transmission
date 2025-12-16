@@ -2339,16 +2339,11 @@ void AddTrackerDialog::on_response(int response)
         {
             if (tr_urlIsValidTracker(url.c_str()))
             {
-                tr_variant top;
-
-                tr_variantInitDict(&top, 2);
-                tr_variantDictAddStrView(&top, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_set_kebab));
-                auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-                tr_variantDictAddInt(args, TR_KEY_id, torrent_id_);
-                auto* const trackers = tr_variantDictAddList(args, TR_KEY_tracker_add_camel, 1);
-                tr_variantListAddStr(trackers, url.raw());
-
-                core_->exec(top);
+                // TODO(ckerr) migrate to `TR_KEY_tracker_list`
+                auto params = tr_variant::Map{ 2U };
+                params.try_emplace(TR_KEY_ids, Session::to_variant({ torrent_id_ }));
+                params.try_emplace(TR_KEY_tracker_add, Session::to_variant({ url.raw() }));
+                core_->exec(TR_KEY_torrent_set, std::move(params));
                 parent_.refresh();
             }
             else
