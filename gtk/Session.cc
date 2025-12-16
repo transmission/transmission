@@ -92,6 +92,7 @@ public:
     void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
     void send_rpc_request(tr_variant const& request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
+    void send_rpc_request(tr_quark method, tr_variant const& params, std::function<void(tr_variant&)> on_response);
 
     void commit_prefs_change(tr_quark key);
 
@@ -1248,6 +1249,43 @@ void core_read_rpc_response(tr_session* /*session*/, tr_variant&& response)
 } // namespace
 
 void Session::Impl::send_rpc_request(
+    tr_quark const method,
+    tr_variant const& params,
+    std::function<void(tr_variant&)> on_response)
+{
+    if (session_ == nullptr)
+    {
+        gtr_error("GTK+ client doesn't support connections to remote servers yet.");
+        return;
+    }
+
+    // build the jsonrpc request
+    auto reqmap = tr_variant::Map{ 4U };
+    reqmap.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+    reqmap.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(method));
+
+    // add params if there are any
+    if (params.has_value())
+    {
+        reqmap.try_emplace(TR_KEY_params, params.clone());
+    }
+
+    // add id if we want a response
+    auto callback = std::function<void(tr_session*, tr_variant&&)>{};
+    if (on_response)
+    {
+        auto const id = nextTag++;
+        pendingRequests.try_emplace(id, std::move(on_response));
+        reqmap.try_emplace(TR_KEY_id, id);
+        callback = core_read_rpc_response;
+    }
+
+    auto req = tr_variant{ std::move(reqmap) };
+    // gtr_message(tr_variant_serde::json().to_string(req));
+    tr_rpc_request_exec(session_, req, std::move(callback));
+}
+
+void Session::Impl::send_rpc_request(
     tr_variant const& request,
     int64_t tag,
     std::function<void(tr_variant&)> const& response_func)
@@ -1381,6 +1419,11 @@ void Session::exec(tr_variant const& request)
     ++nextTag;
 
     impl_->send_rpc_request(request, tag, {});
+}
+
+void Session::exec(tr_quark method, tr_variant const& params)
+{
+    impl_->send_rpc_request(method, params, {});
 }
 
 /***
