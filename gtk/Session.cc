@@ -1373,39 +1373,31 @@ void Session::Impl::set_port_test_pending(bool pending, Session::PortTestIpProto
 
 void Session::blocklist_update()
 {
-    auto const tag = nextTag;
-    ++nextTag;
-
-    tr_variant request;
-    tr_variantInitDict(&request, 2);
-    tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
-    tr_variantDictAddInt(&request, TR_KEY_tag, tag);
     impl_->send_rpc_request(
-        request,
-        tag,
-        [this](auto& response)
+        TR_KEY_blocklist_update,
+        tr_variant{}, // no params
+        [this](tr_variant& response)
         {
-            tr_variant* args = nullptr;
-            int64_t ruleCount = 0;
+            std::optional<int64_t> n_rules;
 
-            if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
-                !tr_variantDictFindInt(args, TR_KEY_blocklist_size_kebab, &ruleCount))
+            if (auto const* resmap = response.get_if<tr_variant::Map>())
             {
-                ruleCount = -1;
+                if (auto const* result = resmap->find_if<tr_variant::Map>(TR_KEY_result))
+                {
+                    n_rules = result->value_if<int64_t>(TR_KEY_blocklist_size);
+                }
             }
 
-            if (ruleCount > 0)
+            if (n_rules.has_value())
             {
                 gtr_pref_int_set(TR_KEY_blocklist_date, tr_time());
             }
 
-            impl_->signal_blocklist_updated().emit(ruleCount >= 0);
+            impl_->signal_blocklist_updated().emit(*n_rules >= 0);
         });
 }
 
-/***
-****
-***/
+// ---
 
 void Session::exec(tr_variant const& request)
 {
