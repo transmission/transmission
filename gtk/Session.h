@@ -134,9 +134,28 @@ public:
     void set_pref(tr_quark key, int val);
     void set_pref(tr_quark key, double val);
 
-    /**
-    ***
-    **/
+    // ---
+
+    // Helper for building RPC payloads.
+    // TODO(C++20): fold these two into a single std::span method
+    template<typename T>
+    [[nodiscard]] static auto to_variant(std::vector<T> const& items)
+    {
+        auto vec = tr_variant::Vector{};
+        vec.reserve(std::size(items));
+        for (auto const& item : items)
+        {
+            vec.emplace_back(item);
+        }
+        return vec;
+    }
+    template<typename T>
+    [[nodiscard]] static auto to_variant(std::initializer_list<T> items)
+    {
+        return to_variant(std::vector<T>{ std::move(items) });
+    }
+
+    // ---
 
     void port_test(PortTestIpProtocol ip_protocol);
     bool port_test_pending(PortTestIpProtocol ip_protocol) const noexcept;
