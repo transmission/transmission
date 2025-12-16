@@ -414,12 +414,8 @@ void DetailsDialog::onButtonBoxClicked(QAbstractButton* button)
 
         QString const re = QStringLiteral("((,|;)\\s*)");
 
-//see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-        QStringList const labels_list = labels_text.split(QRegularExpression(re), QString::SkipEmptyParts);
-#else
+        // see https://doc.qt.io/qt-5/qt.html#SplitBehaviorFlags-enum
         QStringList const labels_list = labels_text.split(QRegularExpression(re), Qt::SkipEmptyParts);
-#endif
 
         torrentSet(TR_KEY_labels, labels_list);
 
