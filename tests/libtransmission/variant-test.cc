@@ -641,10 +641,10 @@ TEST_F(VariantTest, visitStringExposesStringView)
                         called = true;
                         EXPECT_EQ(Text, sv);
                     },
-                    [](auto&&)
-                    {
-                        FAIL();
-                    } });
+                    // clang-format off: TODO: remove when we bump to clang-format >= 21
+                    [](auto&&) { FAIL(); } }
+    );
+    // clang-format on
 
     EXPECT_TRUE(called);
 }
