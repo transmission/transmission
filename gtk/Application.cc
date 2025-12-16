@@ -1447,12 +1447,7 @@ void Application::Impl::remove_selected(bool delete_files)
 
 void Application::Impl::start_all_torrents()
 {
-    auto* session = core_->get_session();
-    tr_variant request;
-
-    tr_variantInitDict(&request, 1);
-    tr_variantDictAddStrView(&request, TR_KEY_method, tr_quark_get_string_view(TR_KEY_torrent_start_kebab));
-    tr_rpc_request_exec(session, request, {});
+    core_->exec(TR_KEY_torrent_start, {});
 }
 
 void Application::Impl::pause_all_torrents()
