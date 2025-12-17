@@ -365,6 +365,51 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
     }
 }
 
+TEST_F(PeerMgrWishlistTest, sequentialDownloadSlowPeer)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: three pieces, all missing
+        mediator.piece_count_ = 3;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 250 };
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+
+        // and we want all three pieces
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+        mediator.client_wants_piece_.insert(2);
+
+        // we enabled sequential download
+        mediator.is_sequential_download_ = true;
+
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, true);  // slow peer
+    };
+
+    // Slow peer should get blocks from the end (reversed order)
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 250 };
+        auto const spans = get_spans(150);  // Request 150 blocks to avoid getting piece 0
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(150U, requested.count());
+        EXPECT_EQ(0U, requested.count(0, 100)); // Should be requested by fast peers
+        EXPECT_EQ(100U, requested.count(100, 200));
+        EXPECT_EQ(50U, requested.count(200, 250));
+    }
+}
+
 TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
 {
     auto const get_spans = [this](size_t n_wanted)
