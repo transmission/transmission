@@ -289,7 +289,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestSameBlockTwice)
 
     // even if we ask wishlist for all the blocks,
     // it should omit blocks [0..10) from the return set
-    auto const spans = wishlist.next(250, PeerHasAllPieces);
+    auto const spans = wishlist.next(250, PeerHasAllPieces, false);
     auto requested = tr_bitfield{ 250 };
     for (auto const& [begin, end] : spans)
     {
@@ -325,12 +325,12 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
         // we enabled sequential download
         mediator.is_sequential_download_ = true;
 
-        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, false);
     };
 
-    // when we ask for blocks, apart from the last piece,
-    // which will be returned first because it is smaller,
-    // we should get pieces in order
+    // In sequential mode, pieces are ordered by salt.
+    // Since we skip "prefer pieces closer to completion" in sequential mode,
+    // we get pieces strictly in salt order.
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
@@ -338,13 +338,13 @@ TEST_F(PeerMgrWishlistTest, sequentialDownload)
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 250 };
-        auto const spans = get_spans(100);
+        auto const spans = get_spans(150);
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);
         }
-        EXPECT_EQ(100U, requested.count());
-        EXPECT_EQ(50U, requested.count(0, 100));
+        EXPECT_EQ(150U, requested.count());
+        EXPECT_EQ(100U, requested.count(0, 100));
         EXPECT_EQ(0U, requested.count(100, 200));
         EXPECT_EQ(50U, requested.count(200, 250));
     }
@@ -394,7 +394,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPiece)
         mediator.is_sequential_download_ = true;
         mediator.sequential_download_from_piece_ = 2;
 
-        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces);
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // First and last piece come first in sequential download mode regardless
@@ -679,7 +679,7 @@ TEST_F(PeerMgrWishlistTest, peerDisconnectDecrementsReplication)
         // this is what a real mediator should return at this point:
         // mediator.piece_replication_[0] = 1;
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist prefers to request rarer pieces, so it
@@ -756,7 +756,7 @@ TEST_F(PeerMgrWishlistTest, gotBadPieceResetsPiece)
         // the random piece turns out to be corrupted, so all blocks should be missing again
         got_bad_piece_.emit(nullptr, random_piece);
 
-        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces), random_piece };
+        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, false), random_piece };
     };
 
     // The wishlist should request the bad piece last, since it now became
@@ -814,7 +814,7 @@ TEST_F(PeerMgrWishlistTest, gotBitfieldIncrementsReplication)
         // mediator.piece_replication_[0] = 3;
         // mediator.piece_replication_[1] = 3;
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist prefers to request rarer pieces, so it
@@ -883,7 +883,7 @@ TEST_F(PeerMgrWishlistTest, sentRequestsResortsPiece)
         // candidate list cache
         sent_request_.emit(nullptr, nullptr, { 0, 1 });
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist prefers to get pieces completed ASAP, so it
@@ -955,7 +955,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveIncrementsReplication)
         // this is what a real mediator should return at this point:
         // mediator.piece_replication_[0] = 3;
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist prefers to request rarer pieces, so it
@@ -1028,7 +1028,7 @@ TEST_F(PeerMgrWishlistTest, gotChokeResetsRequestedBlocks)
         requested.set_span(0, 10);
         got_choke_.emit(nullptr, requested);
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist only picks blocks with no active requests, which are
@@ -1086,7 +1086,7 @@ TEST_F(PeerMgrWishlistTest, gotHaveAllDoesNotAffectOrder)
         // mediator.piece_replication_[1] = 3;
         // mediator.piece_replication_[2] = 4;
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist prefers to request rarer pieces, so it
@@ -1162,7 +1162,7 @@ TEST_F(PeerMgrWishlistTest, gotRejectResetsBlock)
             got_reject_.emit(nullptr, nullptr, block);
         }
 
-        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces), std::move(rejected_bitfield) };
+        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, false), std::move(rejected_bitfield) };
     };
 
     // wishlist only picks blocks with no active requests, which are
@@ -1218,7 +1218,7 @@ TEST_F(PeerMgrWishlistTest, gotRejectResortsPiece)
         auto const random_piece = tr_rand_int(2U);
         got_reject_.emit(nullptr, nullptr, mediator.block_span_[random_piece].begin);
 
-        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces), 1U - random_piece };
+        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, false), 1U - random_piece };
     };
 
     // wishlist prioritises pieces that have fewer unrequested blocks.
@@ -1277,7 +1277,7 @@ TEST_F(PeerMgrWishlistTest, sentCancelResetsBlocks)
             sent_cancel_.emit(nullptr, nullptr, block);
         }
 
-        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces), std::move(cancelled_bitfield) };
+        return std::pair{ wishlist.next(n_wanted, PeerHasAllPieces, false), std::move(cancelled_bitfield) };
     };
 
     // wishlist only picks blocks with no active requests, which are
@@ -1332,7 +1332,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlockAfterBlockCompleted)
         // we sent "Request" messages
         sent_request_.emit(nullptr, nullptr, { 0, 120 });
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist only picks blocks with no active requests, which are
@@ -1386,7 +1386,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPieceAfterPieceCompleted)
 
     // receiving a "piece_completed" signal removes the piece from the
     // wishlist's cache, its blocks should not be in the return set.
-    auto const spans = wishlist.next(10, PeerHasAllPieces);
+    auto const spans = wishlist.next(10, PeerHasAllPieces, false);
     auto requested = tr_bitfield{ 300 };
     for (auto const& [begin, end] : spans)
     {
@@ -1428,7 +1428,7 @@ TEST_F(PeerMgrWishlistTest, settingPriorityResortsCandidates)
         mediator.piece_priority_[1] = TR_PRI_HIGH;
         priority_changed_.emit(nullptr, nullptr, 0U, TR_PRI_HIGH);
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // wishlist should pick the high priority piece's blocks first.
@@ -1483,11 +1483,12 @@ TEST_F(PeerMgrWishlistTest, settingSequentialDownloadResortsCandidates)
         mediator.is_sequential_download_ = true;
         sequential_download_changed_.emit(nullptr, true);
 
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
-    // we should get pieces in sequential order when we ask for blocks,
-    // except the last piece should follow immediately after the first piece
+    // In sequential mode, pieces are ordered by salt.
+    // Since we skip "prefer pieces closer to completion" in sequential mode,
+    // we get pieces strictly in salt order.
     // NB: when all other things are equal in the wishlist, pieces are
     // picked at random so this test -could- pass even if there's a bug.
     // So test several times to shake out any randomness
@@ -1558,7 +1559,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadFromPieceResortsCandidates)
 
         // the sequential download setting was changed,
         // the candidate list should be resorted
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // First and last piece come first in sequential download mode regardless
@@ -1618,7 +1619,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAdd)
 
         // a candidate should be inserted into the wishlist for
         // piece 2 and piece 3
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // We should request all 4 pieces here.
@@ -1676,7 +1677,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
         files_wanted_changed_.emit(nullptr, nullptr, 0, true);
 
         // the candidate objects for piece 2 and piece 3 should be removed
-        return wishlist.next(n_wanted, PeerHasAllPieces);
+        return wishlist.next(n_wanted, PeerHasAllPieces, false);
     };
 
     // We should request only the first 2 pieces here.
