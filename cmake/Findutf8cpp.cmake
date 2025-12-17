@@ -2,33 +2,30 @@ find_package(${CMAKE_FIND_PACKAGE_NAME} QUIET NO_MODULE)
 
 include(FindPackageHandleStandardArgs)
 if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+    if(${CMAKE_FIND_PACKAGE_NAME}_VERSION VERSION_LESS 4.0.0)
+        # Before 4.0.0, some compiler options from their tests leaked into the
+        # main target. We workaround by clearing them here.
+        set_property(TARGET utf8cpp PROPERTY INTERFACE_COMPILE_OPTIONS)
+    endif()
+
     find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME} CONFIG_MODE)
     return()
 endif()
 
-if(UNIX)
-    find_package(PkgConfig QUIET)
-    pkg_check_modules(_RAPIDJSON QUIET RapidJSON)
-endif()
-
 find_path(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
-    NAMES rapidjson/rapidjson.h
-    HINTS ${_RAPIDJSON_INCLUDEDIR})
-
-if(_RAPIDJSON_VERSION)
-    set(${CMAKE_FIND_PACKAGE_NAME}_VERSION ${_RAPIDJSON_VERSION})
-endif()
+    NAMES utf8.h
+    PATH_SUFFIXES utf8cpp)
 
 find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME}
-    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR
-    VERSION_VAR ${CMAKE_FIND_PACKAGE_NAME}_VERSION)
+    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR)
 
 if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
     set(${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
 
-    if(NOT TARGET RapidJSON)
-        add_library(RapidJSON INTERFACE IMPORTED)
-        target_include_directories(RapidJSON
+    if(NOT TARGET utf8::cpp)
+        add_library(utf8::cpp INTERFACE IMPORTED)
+
+        target_include_directories(utf8::cpp
             INTERFACE
                 ${${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIR})
     endif()
