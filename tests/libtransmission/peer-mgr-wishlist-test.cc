@@ -390,7 +390,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadSlowPeer)
         // we enabled sequential download
         mediator.is_sequential_download_ = true;
 
-        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, true);  // slow peer
+        return Wishlist{ mediator }.next(n_wanted, PeerHasAllPieces, true); // slow peer
     };
 
     // Slow peer should get blocks from the end (reversed order)
@@ -398,7 +398,7 @@ TEST_F(PeerMgrWishlistTest, sequentialDownloadSlowPeer)
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 250 };
-        auto const spans = get_spans(150);  // Request 150 blocks to avoid getting piece 0
+        auto const spans = get_spans(150); // Request 150 blocks to avoid getting piece 0
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);
