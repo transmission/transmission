@@ -2158,8 +2158,8 @@ size_t tr_peerMsgsImpl::max_available_reqs() const
     // In sequential mode, peers should target a 1s
     // window of blocks requests to avoid low timeout value
     size_t const floor = is_sequential ? size_t{ 1 } : size_t{ 32 };
-    size_t const Seconds = is_sequential ? RequestBufSecsSequential : RequestBufSecs;
-    size_t const estimated_blocks_in_period = (rate.base_quantity() * Seconds) / tr_block_info::BlockSize;
+    size_t const seconds = is_sequential ? RequestBufSecsSequential : RequestBufSecs;
+    size_t const estimated_blocks_in_period = (rate.base_quantity() * seconds) / tr_block_info::BlockSize;
     auto const ceil = peer_reqq_.value_or(PeerReqQDefault);
 
     return std::clamp(estimated_blocks_in_period, floor, ceil);
