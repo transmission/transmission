@@ -71,16 +71,27 @@ Wishlist::Candidate::Candidate(tr_piece_index_t piece_in, tr_piece_index_t salt_
 
 std::vector<tr_block_span_t> Wishlist::next(
     size_t const n_wanted_blocks,
-    std::function<bool(tr_piece_index_t)> const& peer_has_piece)
+    std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+    bool is_slow_peer)
 {
     if (n_wanted_blocks == 0U)
     {
         return {};
     }
 
+    // for slow peers in sequential mode, reverse the candidates to
+    // assign least priority pieces from the end
+    auto candidates_reversed = CandidateVec{};
+    if (mediator_.is_sequential_download() && is_slow_peer)
+    {
+        candidates_reversed = candidates_;
+        std::reverse(std::begin(candidates_reversed), std::end(candidates_reversed));
+    }
+    auto const& candidates = mediator_.is_sequential_download() && is_slow_peer ? candidates_reversed : candidates_;
+
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
-    for (auto const& candidate : candidates_)
+    for (auto const& candidate : candidates)
     {
         auto const n_added = std::size(blocks);
         TR_ASSERT(n_added <= n_wanted_blocks);
