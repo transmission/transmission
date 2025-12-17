@@ -1328,7 +1328,18 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     {
         return {};
     }
-    return swarm.wishlist->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); });
+
+    // check if peer is slow (< 1 block/s) in sequential mode.
+    // slow peer will request blocks from the end (not urgent for streaming)
+    bool is_slow_peer = false;
+    if (torrent->is_sequential_download())
+    {
+        using Speed = libtransmission::Values::Speed;
+        auto const peer_speed = peer->get_piece_speed(tr_time_msec(), TR_PEER_TO_CLIENT);
+        is_slow_peer = peer_speed < Speed{ tr_block_info::BlockSize, Speed::Units::Byps };
+    }
+
+    return swarm.wishlist->next(numwant, [peer](tr_piece_index_t p) { return peer->has_piece(p); }, is_slow_peer);
 }
 
 namespace

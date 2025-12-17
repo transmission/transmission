@@ -59,6 +59,7 @@ class Wishlist::Impl
             , replication{ mediator->count_piece_replication(piece_in) }
             , priority{ mediator->priority(piece_in) }
             , salt{ salt_in }
+            , is_sequential{ mediator->is_sequential_download() }
         {
             unrequested.reserve(block_span.end - block_span.begin);
             for (auto [begin, i] = block_span; i > begin; --i)
@@ -99,6 +100,7 @@ class Wishlist::Impl
         tr_priority_t priority;
 
         tr_piece_index_t salt;
+        bool is_sequential;
     };
 
     using CandidateVec = std::vector<Candidate>;
@@ -108,7 +110,8 @@ public:
 
     [[nodiscard]] std::vector<tr_block_span_t> next(
         size_t n_wanted_blocks,
-        std::function<bool(tr_piece_index_t)> const& peer_has_piece);
+        std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+        bool is_slow_peer = false);
 
 private:
     TR_CONSTEXPR20 void dec_replication() noexcept
@@ -478,16 +481,27 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
 
 std::vector<tr_block_span_t> Wishlist::Impl::next(
     size_t const n_wanted_blocks,
-    std::function<bool(tr_piece_index_t)> const& peer_has_piece)
+    std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+    bool is_slow_peer)
 {
     if (n_wanted_blocks == 0U)
     {
         return {};
     }
 
+    // for slow peers in sequential mode, reverse the candidates to
+    // assign least priority pieces from the end
+    auto candidates_reversed = CandidateVec{};
+    if (mediator_.is_sequential_download() && is_slow_peer)
+    {
+        candidates_reversed = candidates_;
+        std::reverse(std::begin(candidates_reversed), std::end(candidates_reversed));
+    }
+    auto const& candidates = mediator_.is_sequential_download() && is_slow_peer ? candidates_reversed : candidates_;
+
     auto blocks = small::vector<tr_block_index_t>{};
     blocks.reserve(n_wanted_blocks);
-    for (auto const& candidate : candidates_)
+    for (auto const& candidate : candidates)
     {
         auto const n_added = std::size(blocks);
         TR_ASSERT(n_added <= n_wanted_blocks);
@@ -517,10 +531,14 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
 
 int Wishlist::Impl::Candidate::compare(Candidate const& that) const noexcept
 {
-    // prefer pieces closer to completion
-    if (auto const val = tr_compare_3way(std::size(unrequested), std::size(that.unrequested)); val != 0)
+    // prefer pieces closer to completion. Skipped in sequential mode to allow slow peers
+    // request lower priority pieces while fast peers request blocks in order.
+    if (!is_sequential)
     {
-        return val;
+        if (auto const val = tr_compare_3way(std::size(unrequested), std::size(that.unrequested)); val != 0)
+        {
+            return val;
+        }
     }
 
     // prefer higher priority
@@ -549,7 +567,8 @@ Wishlist::~Wishlist() = default;
 
 std::vector<tr_block_span_t> Wishlist::next(
     size_t const n_wanted_blocks,
-    std::function<bool(tr_piece_index_t)> const& peer_has_piece)
+    std::function<bool(tr_piece_index_t)> const& peer_has_piece,
+    bool is_slow_peer)
 {
-    return impl_->next(n_wanted_blocks, peer_has_piece);
+    return impl_->next(n_wanted_blocks, peer_has_piece, is_slow_peer);
 }
