@@ -71,13 +71,10 @@ void RpcClient::start(QUrl const& url)
     request_.reset();
 }
 
-RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
+RpcResponseFuture RpcClient::exec(tr_quark const method_key, tr_variant* args)
 {
-    return exec(tr_quark_get_string_view(method), args);
-}
+    auto const method = tr_quark_get_string_view(method_key);
 
-RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
-{
     TrVariantPtr const json = createVariant();
     tr_variantInitDict(json.get(), 3);
     dictAdd(json.get(), TR_KEY_method, method);

@@ -48,36 +48,41 @@ sig_atomic_t manualUpdate = false;
 
 char const* torrentPath = nullptr;
 
-auto constexpr Options = std::array<tr_option, 20>{
-    { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
-      { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-      { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
-      { 'D', "no-downlimit", "Don't limit the download speed", "D", false, nullptr },
-      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-      { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
-      { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
-      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-      { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-      { 't',
-        "tos",
-        "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
-        ")",
-        "t",
-        true,
-        "<dscp-or-tos>" },
-      { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
-      { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
-      { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
-      { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
-      { 500, "sequential-download", "Download pieces sequentially", "seq", false, nullptr },
+using Arg = tr_option::Arg;
+auto constexpr Options = std::array<tr_option, 20>{ {
+    { 'b', "blocklist", "Enable peer blocklists", "b", Arg::None, nullptr },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", Arg::None, nullptr },
+    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", Arg::Required, "<speed>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", Arg::None, nullptr },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", Arg::None, nullptr },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", Arg::None, nullptr },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", Arg::None, nullptr },
+    { 'f', "finish", "Run a script when the torrent finishes", "f", Arg::Required, "<script>" },
+    { 'g', "config-dir", "Where to find configuration files", "g", Arg::Required, "<path>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", Arg::None, nullptr },
+    { 'M', "no-portmap", "Disable portmapping", "M", Arg::None, nullptr },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", Arg::Required, "<port>" },
+    { 't',
+      "tos",
+      "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
+      ")",
+      "t",
+      Arg::Required,
+      "<dscp-or-tos>" },
+    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", Arg::Required, "<speed>" },
+    { 'U', "no-uplimit", "Don't limit the upload speed", "U", Arg::None, nullptr },
+    { 'v', "verify", "Verify the specified torrent", "v", Arg::None, nullptr },
+    { 'V', "version", "Show version number and exit", "V", Arg::None, nullptr },
+    { 'w', "download-dir", "Where to save downloaded data", "w", Arg::Required, "<path>" },
+    { 500, "sequential-download", "Download pieces sequentially", "seq", Arg::None, nullptr },
 
-      { 0, nullptr, nullptr, nullptr, false, nullptr } }
-};
+    { 0, nullptr, nullptr, nullptr, Arg::None, nullptr },
+} };
+static_assert(Options[std::size(Options) - 2].val != 0);
+} // namespace
 
+namespace
+{
 int parseCommandLine(tr_variant*, int argc, char const** argv);
 
 void sigHandler(int signal);
@@ -321,7 +326,7 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     auto const config_dir = getConfigDir(argc, (char const**)argv);
-    auto settings = tr_sessionLoadSettings(nullptr, config_dir.c_str(), MyConfigName);
+    auto settings = tr_sessionLoadSettings(config_dir);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -339,25 +344,6 @@ int tr_main(int argc, char* argv[])
     {
         fprintf(stderr, "No torrent specified!\n");
         return EXIT_FAILURE;
-    }
-
-    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
-    {
-        auto const sz_download_dir = std::string{ sv };
-
-        if (!tr_sys_path_exists(sz_download_dir))
-        {
-            if (auto error = tr_error{}; !tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error) && error)
-            {
-                auto const errmsg = fmt::format(
-                    "Couldn't create '{path}': {error} ({error_code})",
-                    fmt::arg("path", sz_download_dir),
-                    fmt::arg("error", error.message()),
-                    fmt::arg("error_code", error.code()));
-                fmt::print(stderr, "{:s}\n", errmsg);
-                return EXIT_FAILURE;
-            }
-        }
     }
 
     auto* const h = tr_sessionInit(config_dir.c_str(), false, settings);

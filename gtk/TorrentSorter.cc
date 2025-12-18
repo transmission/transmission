@@ -10,6 +10,7 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
 #include <algorithm>
@@ -226,7 +227,7 @@ int TorrentSorter::compare(Torrent const& lhs, Torrent const& rhs) const
 void TorrentSorter::update(Torrent::ChangeFlags changes)
 {
     using Flag = Torrent::ChangeFlag;
-    static auto constexpr CompareFlags = std::array<std::pair<CompareFunc, Torrent::ChangeFlags>, 9U>{ {
+    static auto TR_CONSTEXPR23 CompareFlags = std::array<std::pair<CompareFunc, Torrent::ChangeFlags>, 9U>{ {
         { &compare_by_activity, Flag::ACTIVE_PEER_COUNT | Flag::QUEUE_POSITION | Flag::SPEED_DOWN | Flag::SPEED_UP },
         { &compare_by_age, Flag::ADDED_DATE | Flag::NAME },
         { &compare_by_eta, Flag::ETA | Flag::NAME },

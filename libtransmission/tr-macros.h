@@ -17,9 +17,11 @@
 #define TR_CONSTEXPR20
 #endif
 
-// Placeholder for future use.
-// Can't implement right now because __cplusplus version for C++23 is currently TBD
+#if __cplusplus >= 202302L // _MSVC_LANG value for C++23 not available yet
+#define TR_CONSTEXPR23 constexpr
+#else
 #define TR_CONSTEXPR23
+#endif
 
 // ---
 

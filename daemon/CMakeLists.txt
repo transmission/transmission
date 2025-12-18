@@ -15,7 +15,7 @@ tr_allow_compile_if(
 
 target_compile_definitions(${TR_NAME}-daemon
     PRIVATE
-        $<$<BOOL:${WITH_SYSTEMD}>:USE_SYSTEMD>)
+        $<$<BOOL:${WITH_SYSTEMD}>:WITH_SYSTEMD>)
 
 tr_target_compile_definitions_for_headers(${TR_NAME}-daemon
     PRIVATE

@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <event2/buffer.h>
 #include <event2/event.h>
 #include <event2/http.h>
 
@@ -11,14 +10,6 @@
 
 namespace libtransmission::evhelpers
 {
-
-void BufferDeleter::operator()(struct evbuffer* buf) const noexcept
-{
-    if (buf != nullptr)
-    {
-        evbuffer_free(buf);
-    }
-}
 
 void EventBaseDeleter::operator()(struct event_base* evbase) const noexcept
 {

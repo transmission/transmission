@@ -346,4 +346,33 @@ TEST_F(SessionTest, savesSettings)
     }
 }
 
+TEST_F(SessionTest, loadTorrentsThenMagnets)
+{
+    static auto constexpr TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/archlinux-2025.05.01-x86_64.iso.torrent";
+    static auto constexpr MagnetFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/archlinux-2025.05.01-x86_64.iso.magnet";
+
+    if (auto error = tr_error{};
+        !tr_sys_path_copy(
+            TorrentFile,
+            tr_pathbuf{ session_->torrentDir(), "/2e34989b1c60df821b2d046c884d8f4d1858b97a.torrent"sv },
+            &error) ||
+        !tr_sys_path_copy(
+            MagnetFile,
+            tr_pathbuf{ session_->torrentDir(), "/2e34989b1c60df821b2d046c884d8f4d1858b97a.magnet"sv },
+            &error))
+    {
+        GTEST_SKIP() << fmt::format("Failed to setup torrents dir: {} ({})", error.message(), error.code());
+    }
+
+    auto* const ctor = tr_ctorNew(session_);
+    ctor->set_paused(TR_FORCE, false);
+    EXPECT_EQ(tr_sessionLoadTorrents(session_, ctor), 1U);
+    tr_ctorFree(ctor);
+
+    auto* const tor = session_->torrents().get(1U);
+    ASSERT_NE(tor, nullptr);
+
+    EXPECT_TRUE(tor->has_metainfo());
+}
+
 } // namespace libtransmission::test

@@ -3,14 +3,15 @@
   "main": "index.js",
   "repository": "https://github.com/transmission/transmission",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "node esbuild.mjs"
   },
   "devDependencies": {
-    "esbuild": "^0.19.7",
-    "esbuild-sass-plugin": "^2.16.0"
+    "esbuild": "^0.25.11",
+    "esbuild-sass-plugin": "^3.3.1"
   },
   "dependencies": {
-    "lodash.isequal": "^4.5.0"
+    "fast-deep-equal": "^3.1.3"
   }
 }

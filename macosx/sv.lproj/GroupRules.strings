@@ -24,7 +24,7 @@
 "100.title" = "Namn";
 
 /* Class = "NSMenuItem"; title = "Comment"; ObjectID = "102"; */
-"102.title" = "Kommentar:";
+"102.title" = "Kommentar";
 
 /* Class = "NSMenuItem"; title = "matches"; ObjectID = "118"; */
 "118.title" = "matchar";

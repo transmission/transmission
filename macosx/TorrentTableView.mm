@@ -366,6 +366,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
         groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
 
+        NSString* tooltipDownload = NSLocalizedString(@"Download speed", "Torrent table -> group row -> tooltip");
+        groupCell.fGroupDownloadField.toolTip = tooltipDownload;
+        groupCell.fGroupDownloadView.toolTip = tooltipDownload;
+
         BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
         groupCell.fGroupDownloadField.hidden = displayGroupRowRatio;
         groupCell.fGroupDownloadView.hidden = displayGroupRowRatio;
@@ -376,6 +380,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
 
             groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForRatio:group.ratio];
+
+            NSString* tooltipRatio = NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip");
+            groupCell.fGroupUploadAndRatioField.toolTip = tooltipRatio;
+            groupCell.fGroupUploadAndRatioView.toolTip = tooltipRatio;
         }
         else
         {
@@ -383,7 +391,24 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
 
             groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForSpeed:group.uploadRate];
+
+            NSString* tooltipUpload = NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
+            groupCell.fGroupUploadAndRatioField.toolTip = tooltipUpload;
+            groupCell.fGroupUploadAndRatioView.toolTip = tooltipUpload;
         }
+
+        NSString* tooltipGroup;
+        NSUInteger count = group.torrents.count;
+        if (count == 1)
+        {
+            tooltipGroup = NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
+        }
+        else
+        {
+            tooltipGroup = NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip");
+            tooltipGroup = [NSString localizedStringWithFormat:tooltipGroup, count];
+        }
+        groupCell.toolTip = tooltipGroup;
 
         return groupCell;
     }
@@ -400,42 +425,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     {
         return [self.dataSource outlineView:outlineView objectValueForTableColumn:[self tableColumnWithIdentifier:@"Group"]
                                      byItem:item];
-    }
-}
-
-- (NSString*)outlineView:(NSOutlineView*)outlineView
-          toolTipForCell:(NSCell*)cell
-                    rect:(NSRectPointer)rect
-             tableColumn:(NSTableColumn*)column
-                    item:(id)item
-           mouseLocation:(NSPoint)mouseLocation
-{
-    NSString* ident = column.identifier;
-    if ([ident isEqualToString:@"DL"] || [ident isEqualToString:@"DL Image"])
-    {
-        return NSLocalizedString(@"Download speed", "Torrent table -> group row -> tooltip");
-    }
-    else if ([ident isEqualToString:@"UL"] || [ident isEqualToString:@"UL Image"])
-    {
-        return [self.fDefaults boolForKey:@"DisplayGroupRowRatio"] ?
-            NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip") :
-            NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
-    }
-    else if (ident)
-    {
-        NSUInteger count = ((TorrentGroup*)item).torrents.count;
-        if (count == 1)
-        {
-            return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
-        }
-        else
-        {
-            return [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
-        }
-    }
-    else
-    {
-        return nil;
     }
 }
 

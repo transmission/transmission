@@ -9,9 +9,6 @@
 
 #include <small/set.hpp>
 
-#include <QApplication>
-#include <QStyle>
-
 #include <libtransmission/transmission.h> // priorities
 
 #include "FileTreeItem.h"
@@ -175,15 +172,9 @@ QVariant FileTreeItem::data(int column, int role) const
     case Qt::DecorationRole:
         if (column == FileTreeModel::COL_NAME)
         {
-            if (file_index_ < 0)
-            {
-                value = QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon);
-            }
-            else
-            {
-                auto const& icon_cache = IconCache::get();
-                value = childCount() > 0 ? icon_cache.folderIcon() : icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
-            }
+            auto const& icon_cache = IconCache::get();
+            value = (file_index_ < 0 || childCount() > 0) ? icon_cache.folderIcon() :
+                                                            icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
         }
 
         break;

@@ -68,6 +68,7 @@ public:
         STALLED,
         TOTAL_SIZE,
         TRACKERS,
+        N_FLAGS,
     };
 
     using ChangeFlags = Flags<ChangeFlag>;

@@ -12,7 +12,7 @@
 "219.title" = "Andra…";
 
 /* Class = "NSTabViewItem"; label = "Adding"; ObjectID = "253"; */
-"253.label" = "Lägga till";
+"253.label" = "Tilläggning";
 
 /* Class = "NSTabViewItem"; label = "Management"; ObjectID = "254"; */
 "254.label" = "Hantering";
@@ -60,7 +60,7 @@
 "1213.title" = "Kontrollera automatiskt dagligen";
 
 /* Class = "NSTextFieldCell"; title = "Check for update:"; ObjectID = "1214"; */
-"1214.title" = "Sök efter uppdatering";
+"1214.title" = "Sök efter uppdatering:";
 
 /* Class = "NSTextFieldCell"; title = "Default location:"; ObjectID = "1216"; */
 "1216.title" = "Standardplats:";
@@ -129,7 +129,7 @@
 "1255.title" = "System viloläge:";
 
 /* Class = "NSButtonCell"; title = "Upload rate:"; ObjectID = "1265"; */
-"1265.title" = "Sändningshastighet";
+"1265.title" = "Sändningshastighet:";
 
 /* Class = "NSButtonCell"; title = "Download rate:"; ObjectID = "1267"; */
 "1267.title" = "Hämtningshastighet:";
@@ -153,7 +153,7 @@
 "1275.title" = "Hastighetsgränsläge:";
 
 /* Class = "NSTextFieldCell"; title = "Upload rate:"; ObjectID = "1276"; */
-"1276.title" = "Sändningshastighet";
+"1276.title" = "Sändningshastighet:";
 
 /* Class = "NSTextFieldCell"; title = "Download rate:"; ObjectID = "1277"; */
 "1277.title" = "Hämtningshastighet:";
@@ -192,13 +192,13 @@
 "1437.title" = "Uppdatera";
 
 /* Class = "NSTextFieldCell"; title = "blocklist loaded/not loaded"; ObjectID = "1438"; */
-"1438.title" = "blocklistan inläst/inte inläst";
+"1438.title" = "blockeringslistan inläst/inte inläst";
 
 /* Class = "NSTextFieldCell"; title = "Blocklist:"; ObjectID = "1439"; */
-"1439.title" = "Blocklista";
+"1439.title" = "Blockeringslista:";
 
 /* Class = "NSButtonCell"; title = "Prevent peers in blocklist from connecting"; ObjectID = "1440"; */
-"1440.title" = "Förhindra att jämlikar i blocklistan ansluter";
+"1440.title" = "Förhindra att jämlikar i blockeringslistan ansluter";
 
 /* Class = "NSTextFieldCell"; title = "High connection limits might significantly impact system performance"; ObjectID = "1441"; */
 "1441.title" = "Höga anslutningsgränser kan avsevärt påverka systemets prestanda";

@@ -101,7 +101,6 @@ public:
     }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
     using Tag = RpcQueue::Tag;
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, bool val);
@@ -194,7 +193,7 @@ private:
     Tag torrentSetImpl(tr_variant* args);
     void sessionSet(tr_quark const key, QVariant const& value);
     void pumpRequests();
-    void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
+    void sendTorrentRequest(tr_quark method, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
     std::set<std::string_view> const& getKeyNames(TorrentProperties props);
 

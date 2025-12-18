@@ -547,13 +547,13 @@
     <message>
         <location line="+6"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Maksimum modparter:</translation>
+        <translation>&amp;Højeste antal modparter:</translation>
     </message>
 </context>
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+288"/>
+        <location filename="../FileTreeItem.cc" line="+279"/>
         <location filename="../FileTreeView.cc" line="+110"/>
         <location line="+258"/>
         <source>Low</source>
@@ -1110,7 +1110,7 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>&amp;Kopiér magnet-link til udklipsholder</translation>
+        <translation>&amp;Kopiér magnetlink til udklipsholder</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1167,7 +1167,7 @@
         <location line="+762"/>
         <location line="+9"/>
         <source>Limited at %1</source>
-        <translation>Begrænset ved %1</translation>
+        <translation>Begrænset til %1</translation>
     </message>
     <message>
         <location line="-716"/>
@@ -1182,7 +1182,7 @@
     <message>
         <location line="-40"/>
         <source>Seed Forever</source>
-        <translation>Seed for altid</translation>
+        <translation>Seed uendeligt</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -1211,7 +1211,7 @@
         <location line="-14"/>
         <location line="+7"/>
         <source>Down: %1, Up: %2</source>
-        <translation>Ned: %1, op: %2</translation>
+        <translation>Ned: %1, Op: %2</translation>
     </message>
     <message>
         <location line="+433"/>
@@ -1289,12 +1289,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen.</translation>
+        <translation>Når den er blevet fjernet kræver det torrent-filen eller magnetlinket for at fortsætte overførslen.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne.</translation>
+        <translation>Når de er blevet fjernet kræver det torrent-filerne eller magnetlinkene for at fortsætte overførslerne.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1486,7 +1486,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
     <message>
         <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Åbn torrent fra URL eller magnet-link</translation>
+        <translation>Åbn torrent fra URL eller magnetlink</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1603,7 +1603,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
     <message>
         <location line="+44"/>
         <source>&amp;On days:</source>
-        <translation>&amp;På dagene:</translation>
+        <translation>&amp;På følgende dage:</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+378"/>
@@ -1691,7 +1691,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
     <message>
         <location line="+44"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
-        <translation>Brug port-&amp;videresendelse med UPnP eller NAT-PMP fra min router</translation>
+        <translation>Brug port&amp;viderestilling med UPnP eller NAT-PMP fra min router</translation>
     </message>
     <message>
         <location line="+65"/>
@@ -1711,7 +1711,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>Vis torrent-indstillinger-&amp;dialogen</translation>
+        <translation>Vis torrent-indstillings&amp;dialogen</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1731,7 +1731,7 @@ For at tilføje en anden primær-URL, skal du tilføje den efter en tom linje.</
     <message>
         <location line="+6"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>Mak&amp;simale aktive downloads:</translation>
+        <translation>&amp;Højeste antal aktive downloads:</translation>
     </message>
     <message>
         <location line="+49"/>
@@ -1961,7 +1961,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
     <message>
         <location line="-195"/>
         <source>Peer Limits</source>
-        <translation>Modpartsbegrænsning</translation>
+        <translation>Modpartsbegrænsninger</translation>
     </message>
     <message>
         <location line="+74"/>
@@ -2064,7 +2064,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
     <message>
         <location filename="../PrefsDialog.ui" line="-323"/>
         <source>Adding</source>
-        <translation>Tilføjer</translation>
+        <translation>Tilføjelse</translation>
     </message>
     <message>
         <location line="+117"/>
@@ -2085,7 +2085,7 @@ For at tilføje en ny primær-URL, skal du tilføje den efter en tom linje.</tra
     <message>
         <location line="+7"/>
         <source>Keep &amp;incomplete files in:</source>
-        <translation>Behold &amp;ufuldstændige filer i:</translation>
+        <translation>Opbevar &amp;ufuldstændige filer i:</translation>
     </message>
     <message>
         <location line="-100"/>

@@ -78,7 +78,6 @@ namespace
     map.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
     map.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
     map.try_emplace(TR_KEY_trash_can_enabled, true);
-    map.try_emplace(TR_KEY_user_has_given_informed_consent, false);
     map.try_emplace(TR_KEY_watch_dir, dir);
     map.try_emplace(TR_KEY_watch_dir_enabled, false);
     return tr_variant{ std::move(map) };
@@ -109,7 +108,7 @@ tr_variant& getPrefs()
     if (!settings.has_value())
     {
         auto const app_defaults = get_default_app_settings();
-        settings.merge(tr_sessionLoadSettings(&app_defaults, gl_confdir.c_str(), nullptr));
+        settings.merge(tr_sessionLoadSettings(gl_confdir, &app_defaults));
         ensure_sound_cmd_is_a_list(&settings);
     }
 

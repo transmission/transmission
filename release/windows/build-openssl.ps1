@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:OpenSslVersion = '3.1.5'
+$global:OpenSslVersion = '3.5.4'
 
 $global:OpenSslDeps = @()
 

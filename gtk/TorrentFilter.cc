@@ -9,6 +9,7 @@
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 
 #include <array>
 #include <utility>
@@ -130,7 +131,7 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
 
     if (activity_type_ != Activity::ALL)
     {
-        static constexpr auto ActivityFlags = std::array<std::pair<Activity, Torrent::ChangeFlags>, 7U>{ {
+        static auto TR_CONSTEXPR23 ActivityFlags = std::array<std::pair<Activity, Torrent::ChangeFlags>, 7U>{ {
             { Activity::DOWNLOADING, Flag::ACTIVITY },
             { Activity::SEEDING, Flag::ACTIVITY },
             { Activity::ACTIVE, Flag::ACTIVE_PEER_COUNT | Flag::ACTIVITY },

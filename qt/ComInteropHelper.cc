@@ -19,7 +19,6 @@ QAXCLASS(InteropObject)
 QAXFACTORY_END() // NOLINT
 
 // These are ActiveQt internals; declaring here as I don't like their WinMain much...
-extern HANDLE qAxInstance; // NOLINT
 extern bool qAxOutProcServer; // NOLINT
 extern wchar_t qAxModuleFilename[MAX_PATH]; // NOLINT
 extern QString qAxInit(); // NOLINT
@@ -43,7 +42,6 @@ void ComInteropHelper::initialize()
 {
     qAxOutProcServer = true;
     ::GetModuleFileNameW(nullptr, qAxModuleFilename, MAX_PATH);
-    qAxInstance = ::GetModuleHandleW(nullptr);
 
     ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     qAxInit();

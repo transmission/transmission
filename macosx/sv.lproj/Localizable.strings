@@ -42,8 +42,12 @@
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
-   Inspector -> selected torrents */
+   Inspector -> selected torrents
+   quicklook file count */
 "%lu files" = "%lu filer";
+
+/* quicklook file header */
+/* "%lu Files" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu inkommande";
@@ -78,6 +82,9 @@
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu spårare";
 
+/* quicklook tracker header */
+/* "%lu Trackers" = ""; */
+
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
@@ -85,6 +92,9 @@
 
 /* Torrent -> status string */
 "%lu web seeds" = "%lu webbdistributioner";
+
+/* quicklook web seed header */
+/* "%lu Web Seeds" = ""; */
 
 /* Create torrent -> info */
 "%u pieces, %@ each" = "%1$u delar, %2$@ vardera";
@@ -110,16 +120,22 @@
 /* stats window -> times opened */
 "1 time" = "1 gång";
 
+/* quicklook tracker header */
+/* "1 Tracker" = ""; */
+
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 överföring";
 
+/* quicklook web seed header */
+/* "1 Web Seed" = ""; */
+
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" är inte en giltig torrentfil.";
 
 /* Prefs -> blocklist -> message */
-"A blocklist must first be downloaded" = "En blocklista måste först hämtas";
+"A blocklist must first be downloaded" = "En blockeringslista måste först hämtas";
 
 /* Create torrent -> file already exists warning -> warning */
 "A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "En fil med namnet \"%1$@\" finns redan i mappen \"%2$@\". Välj ett nytt namn eller mapp för att skapa torrentfilen.";
@@ -278,6 +294,15 @@
    Create torrent -> select file */
 "Create Torrent File" = "Skapa torrentfil";
 
+/* quicklook creation info */
+/* "Created on %@" = ""; */
+
+/* quicklook creation info */
+/* "Created on %@ with %@" = ""; */
+
+/* quicklook creation info */
+/* "Created with %@" = ""; */
+
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Det gick inte att skapa \"%@\".";
 
@@ -332,7 +357,7 @@
 "Download Complete" = "Hämtningen slutförd";
 
 /* Blocklist -> message */
-"Download of the blocklist failed." = "Det gick inte att hämta blocklistan.";
+"Download of the blocklist failed." = "Det gick inte att hämta blockeringslistan.";
 
 /* files tab -> tooltip */
 "Download Some" = "Hämta en del";
@@ -349,7 +374,7 @@
 "Downloading" = "Hämtar";
 
 /* Blocklist -> message */
-"Downloading blocklist" = "Hämtar blocklistan";
+"Downloading blocklist" = "Hämtar blockeringslistan";
 
 /* Torrent -> status string */
 "Downloading from %lu of %lu peers" = "Hämtar från %1$lu av %2$lu jämlikar";
@@ -709,7 +734,7 @@
 "Process" = "Process";
 
 /* Blocklist -> message */
-"Processing blocklist" = "Processar blocklistan";
+"Processing blocklist" = "Processar blockeringslistan";
 
 /* Stats window -> label */
 "Program Started" = "Program startat";
@@ -994,7 +1019,7 @@
 "This folder contains no files." = "Denna mapp innehåller inga filer.";
 
 /* Preferences -> Transfers -> Adding -> Magnet tooltip */
-"This option is not available if Default location is set to Same as torrent file." = "Det här alternativet är inte tillgängligt om Standardplats är inställd på Samma som torrentfil.";
+"This option is not available if Default location is set to Same as torrent file." = "Detta alternativ är inte tillgängligt om Standardplatsen är inställd på Samma som torrentfilen.";
 
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Denna överföring är aktiv. När den har tagits bort kommer torrentfilen eller magnetlänken att krävas för att fortsätta överföringen.";
@@ -1068,7 +1093,7 @@
 "Transfers Not Active" = "Överföringar inte aktiva";
 
 /* Legal alert -> message */
-"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission är ett fildelningsprogram. När du kör en torrent, kommer dess data att göras tillgängliga för andra genom att den skickas. Du och endast du är fullt ansvarig för att utöva korrekt omdöme och följa dina lokala lagar.";
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission är ett fildelningsprogram. När du kör en torrent kommer dess data att göras tillgängliga för andra genom sändning. Du och endast du är fullt ansvarig för att utöva korrekt omdöme och följa dina lokala lagar.";
 
 /* Donation beg -> message */
 "Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission är en fullfjädrad torrentapplikation. Mycket tid och ansträngning har lagts ner på utveckling, kodning och förfining. Om du gillar att använda den, överväg att visa din kärlek med en donation.";

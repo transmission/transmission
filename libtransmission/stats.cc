@@ -3,12 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <array>
+#include <initializer_list>
 #include <optional>
 #include <utility>
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/file.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/stats.h"
@@ -17,49 +18,61 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+namespace api_compat = libtransmission::api_compat;
 
 namespace
 {
-std::optional<tr_variant> load_stats(std::string_view config_dir)
+[[nodiscard]] auto load_stats(std::string_view config_dir)
 {
-    if (auto filename = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(filename))
+    auto var = std::optional<tr_variant>{};
+
+    if (auto file = tr_pathbuf{ config_dir, "/stats.json"sv }; tr_sys_path_exists(file))
     {
-        return tr_variant_serde::json().parse_file(filename);
+        var = tr_variant_serde::json().parse_file(file);
+    }
+    else if (auto oldfile = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(oldfile))
+    {
+        var = tr_variant_serde::benc().parse_file(oldfile);
     }
 
-    // maybe the user just upgraded from an old version of Transmission
-    // that was still using stats.benc
-    if (auto filename = tr_pathbuf{ config_dir, "/stats.benc"sv }; tr_sys_path_exists(filename))
+    if (var)
     {
-        return tr_variant_serde::benc().parse_file(filename);
+        var = api_compat::convert_incoming_data(*var);
     }
 
-    return {};
+    return var;
 }
 } // namespace
 
 tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 {
+    auto const stats = load_stats(config_dir);
+    if (!stats)
+    {
+        return {};
+    }
+
+    auto const* const map = stats->get_if<tr_variant::Map>();
+    if (map == nullptr)
+    {
+        return {};
+    }
+
+    auto const load = [map](auto const key, uint64_t& tgt)
+    {
+        if (auto const val = map->value_if<int64_t>(key))
+        {
+            tgt = *val;
+        }
+    };
+
     auto ret = tr_session_stats{};
 
-    if (auto stats = load_stats(config_dir); stats)
-    {
-        auto const key_tgts = std::array<std::pair<tr_quark, uint64_t*>, 5>{
-            { { TR_KEY_downloaded_bytes, &ret.downloadedBytes },
-              { TR_KEY_files_added, &ret.filesAdded },
-              { TR_KEY_seconds_active, &ret.secondsActive },
-              { TR_KEY_session_count, &ret.sessionCount },
-              { TR_KEY_uploaded_bytes, &ret.uploadedBytes } }
-        };
-
-        for (auto& [key, tgt] : key_tgts)
-        {
-            if (auto val = int64_t{}; tr_variantDictFindInt(&*stats, key, &val))
-            {
-                *tgt = val;
-            }
-        }
-    }
+    load(TR_KEY_downloaded_bytes, ret.downloadedBytes);
+    load(TR_KEY_files_added, ret.filesAdded);
+    load(TR_KEY_seconds_active, ret.secondsActive);
+    load(TR_KEY_session_count, ret.sessionCount);
+    load(TR_KEY_uploaded_bytes, ret.uploadedBytes);
 
     return ret;
 }
@@ -67,14 +80,16 @@ tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 void tr_stats::save() const
 {
     auto const saveme = cumulative();
-    auto top = tr_variant{};
-    tr_variantInitDict(&top, 5);
-    tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, saveme.downloadedBytes);
-    tr_variantDictAddInt(&top, TR_KEY_files_added, saveme.filesAdded);
-    tr_variantDictAddInt(&top, TR_KEY_seconds_active, saveme.secondsActive);
-    tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
-    tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
-    tr_variant_serde::json().to_file(top, tr_pathbuf{ config_dir_, "/stats.json"sv });
+    auto map = tr_variant::Map{ 5 };
+    map.try_emplace(TR_KEY_downloaded_bytes, saveme.downloadedBytes);
+    map.try_emplace(TR_KEY_files_added, saveme.filesAdded);
+    map.try_emplace(TR_KEY_seconds_active, saveme.secondsActive);
+    map.try_emplace(TR_KEY_session_count, saveme.sessionCount);
+    map.try_emplace(TR_KEY_uploaded_bytes, saveme.uploadedBytes);
+
+    auto var = tr_variant{ std::move(map) };
+    var = api_compat::convert_outgoing_data(var);
+    tr_variant_serde::json().to_file(var, tr_pathbuf{ config_dir_, "/stats.json"sv });
 }
 
 void tr_stats::clear()

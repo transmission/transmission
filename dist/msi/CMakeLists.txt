@@ -15,7 +15,9 @@ if(MSVC_TOOLSET_VERSION MATCHES "^([0-9]+)([0-9])$")
     set(MSVC_TOOLSET_VERSION_MINOR ${CMAKE_MATCH_2})
 endif()
 
-if(MSVC_TOOLSET_VERSION EQUAL 143)
+if(MSVC_TOOLSET_VERSION EQUAL 145)
+    set(MSVS_VERSION 18)
+elseif(MSVC_TOOLSET_VERSION EQUAL 143)
     set(MSVS_VERSION 17)
 elseif(MSVC_TOOLSET_VERSION EQUAL 142)
     set(MSVS_VERSION 16)
@@ -91,6 +93,7 @@ wix_candle(WIX_OBJS
         "ThirdPartyDir=${TR_THIRD_PARTY_DIR}"
         "QtDir=${TR_QT_DIR}"
         "QtMajorVer=${Qt_VERSION_MAJOR}"
+        "QtMinorVer=${Qt_VERSION_MINOR}"
         "LicenseFile=${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
         "WebSrcDir=${WEBSRCDIR}"
         "TrQmSrcDir=${TRQMSRCDIR}"

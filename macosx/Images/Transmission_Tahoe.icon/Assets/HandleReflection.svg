@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 872 192" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-76.51369,-265.667758)">
+        <g transform="matrix(1.224393,0,0,1.224393,-114.493424,25.518782)">
+            <g id="HandleGlow" transform="matrix(1.114225,0,0,0.67603,-58.459333,133.320639)">
+                <path d="M212.627,126.554C206.101,128.04 201.064,133.234 199.779,139.804C189.995,189.983 190.069,227.689 199.83,279.919C201.086,286.629 206.256,291.925 212.935,293.341C412.28,335.295 611.626,334.189 810.972,293.302C817.724,291.908 822.951,286.548 824.176,279.763C833.378,229.284 833.465,191.654 824.104,140.048C822.909,133.366 817.825,128.052 811.203,126.563C613.834,82.469 414.299,80.951 212.627,126.554Z" style="fill:url(#_Radial1);"/>
+            </g>
+        </g>
+    </g>
+    <defs>
+        <radialGradient id="_Radial1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-0.212004,114.388398,-319.100803,-0.591411,511.787996,208.654003)"><stop offset="0" style="stop-color:rgb(185,0,0);stop-opacity:0.58"/><stop offset="0.5" style="stop-color:rgb(255,83,83);stop-opacity:0.5"/><stop offset="0.73" style="stop-color:rgb(255,131,131);stop-opacity:0.36"/><stop offset="1" style="stop-color:white;stop-opacity:0"/></radialGradient>
+    </defs>
+</svg>

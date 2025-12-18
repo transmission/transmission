@@ -30,7 +30,7 @@
 "91.title" = "Prioritet:";
 
 /* Class = "NSTextFieldCell"; title = "Magnet Link"; ObjectID = "101"; */
-"101.title" = "Magnet-link";
+"101.title" = "Magnetlink";
 
 /* Class = "NSMenuItem"; title = "None"; ObjectID = "2zq-5y-smI"; */
 "2zq-5y-smI.title" = "Ingen";

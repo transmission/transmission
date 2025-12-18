@@ -101,7 +101,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>En pause</translation>
+        <translation>Suspendu</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -173,7 +173,7 @@
     <message>
         <location line="+4"/>
         <source>Downloading from this peer</source>
-        <translation>Téléchargement à partir de ce pair</translation>
+        <translation>Téléchargement en provenance de ce pair</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -553,7 +553,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+288"/>
+        <location filename="../FileTreeItem.cc" line="+279"/>
         <location filename="../FileTreeView.cc" line="+110"/>
         <location line="+258"/>
         <source>Low</source>
@@ -667,7 +667,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>En pause</translation>
+        <translation>Suspendu</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -878,12 +878,12 @@
     <message>
         <location line="+5"/>
         <source>&amp;Pause</source>
-        <translation>Mettre en &amp;pause</translation>
+        <translation>Sus&amp;pendre</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>Mettre le torrent en pause</translation>
+        <translation>Suspendre le torrent</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -923,7 +923,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Pause All</source>
-        <translation>Tout mettre en &amp;pause</translation>
+        <translation>Tout sus&amp;pendre</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2406,7 +2406,7 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
     <message>
         <location line="+0"/>
         <source>Paused</source>
-        <translation>En pause</translation>
+        <translation>Suspendu</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2511,8 +2511,8 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Téléchargement à partir d’%Ln pair</numerusform>
-            <numerusform>Téléchargement à partir de %Ln pairs</numerusform>
+            <numerusform>Téléchargement en provenance de %Ln&#xa0;pair</numerusform>
+            <numerusform>Téléchargement en provenance de %Ln&#xa0;pairs</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2532,8 +2532,8 @@ Pour ajouter une nouvelle URL primaire, placez-la après une ligne vide.</transl
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Téléchargement de métadonnées à partir d’%Ln pair (%1&#xa0;% effectués)</numerusform>
-            <numerusform>Téléchargement de métadonnées à partir de %Ln pairs (%1&#xa0;% effectués)</numerusform>
+            <numerusform>Téléchargement de métadonnées en provenance de %Ln&#xa0;pair (%1&#xa0;% terminés)</numerusform>
+            <numerusform>Téléchargement de métadonnées en provenance de %Ln&#xa0;pairs (%1&#xa0;% terminés)</numerusform>
         </translation>
     </message>
     <message numerus="yes">

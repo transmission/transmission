@@ -8,6 +8,8 @@
 #include <memory>
 #include <string_view>
 
+#include <small/vector.hpp>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/log.h>
@@ -28,8 +30,8 @@ TEST_F(SettingsTest, canInstantiate)
 {
     auto settings = tr_session::Settings{};
 
-    auto var = settings.save();
-    EXPECT_TRUE(var.has_value());
+    auto map = settings.save();
+    EXPECT_FALSE(std::empty(map));
 }
 
 TEST_F(SettingsTest, canLoadBools)
@@ -54,10 +56,8 @@ TEST_F(SettingsTest, canSaveBools)
     auto const expected_value = !settings.seed_queue_enabled;
     settings.seed_queue_enabled = expected_value;
 
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<bool>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<bool>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(expected_value, *val);
 }
@@ -84,10 +84,8 @@ TEST_F(SettingsTest, canSaveDoubles)
     auto const expected_value = !default_value;
     settings.seed_queue_enabled = expected_value;
 
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<bool>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<bool>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(expected_value, *val);
 }
@@ -121,10 +119,8 @@ TEST_F(SettingsTest, canSaveEncryptionMode)
     EXPECT_NE(ExpectedValue, settings.seed_queue_enabled);
     settings.encryption_mode = ExpectedValue;
 
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<int64_t>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(ExpectedValue, *val);
 }
@@ -160,10 +156,8 @@ TEST_F(SettingsTest, canSaveLogLevel)
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.log_level = ExpectedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<int64_t>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(ExpectedValue, *val);
 }
@@ -199,10 +193,8 @@ TEST_F(SettingsTest, canSaveMode)
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.umask = ExpectedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<std::string_view>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<std::string_view>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ("0777"sv, *val);
 }
@@ -232,10 +224,8 @@ TEST_F(SettingsTest, canSavePort)
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.peer_port = ExpectedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<int64_t>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(ExpectedValue.host(), *val);
 }
@@ -271,10 +261,8 @@ TEST_F(SettingsTest, canSavePreallocation)
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.preallocation_mode = ExpectedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<int64_t>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(static_cast<int64_t>(ExpectedValue), *val);
 }
@@ -300,10 +288,8 @@ TEST_F(SettingsTest, canSaveSizeT)
     auto const expected_value = settings.queue_stalled_minutes + 5U;
 
     settings.queue_stalled_minutes = expected_value;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<int64_t>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(expected_value, static_cast<size_t>(*val));
 }
@@ -331,10 +317,8 @@ TEST_F(SettingsTest, canSaveString)
     EXPECT_NE(ChangedValue, tr_session::Settings{}.bind_address_ipv4);
 
     settings.bind_address_ipv4 = ChangedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<std::string_view>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<std::string_view>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(ChangedValue, *val);
 }
@@ -367,17 +351,13 @@ TEST_F(SettingsTest, canSaveNullableString)
     EXPECT_EQ(std::nullopt, settings.proxy_url);
 
     settings.proxy_url = ChangedValue;
-    auto var = settings.save();
-    auto* map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const sv = map->value_if<std::string_view>(Key);
+    auto map = settings.save();
+    auto const sv = map.value_if<std::string_view>(Key);
     EXPECT_EQ(ChangedValue, sv);
 
     settings.proxy_url = std::nullopt;
-    var = settings.save();
-    map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const null_p = map->value_if<std::nullptr_t>(Key);
+    map = settings.save();
+    auto const null_p = map.value_if<std::nullptr_t>(Key);
     EXPECT_TRUE(null_p);
 }
 
@@ -411,10 +391,8 @@ TEST_F(SettingsTest, canSaveTos)
     ASSERT_NE(ChangedValue, settings.peer_socket_tos);
 
     settings.peer_socket_tos = tr_tos_t(0x20);
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<std::string_view>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<std::string_view>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ(ChangedValue.toString(), *val);
 }
@@ -449,51 +427,83 @@ TEST_F(SettingsTest, canSaveVerify)
     ASSERT_NE(ChangedValue, settings.torrent_added_verify_mode);
 
     settings.torrent_added_verify_mode = ChangedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<std::string_view>(Key);
+    auto const map = settings.save();
+    auto const val = map.value_if<std::string_view>(Key);
     ASSERT_TRUE(val);
     EXPECT_EQ("full"sv, *val);
 }
 
 TEST_F(SettingsTest, canLoadPreferredTransport)
 {
-    static auto constexpr Key = TR_KEY_preferred_transport;
-    static auto constexpr ExpectedValue = std::array{ TR_PREFER_TCP, TR_PREFER_UTP };
+    static auto constexpr Key = TR_KEY_preferred_transports;
+    auto const expected_value = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{
+        TR_PREFER_TCP,
+        TR_PREFER_UTP,
+    };
+    auto expected_value_vec = tr_variant::Vector{};
+    expected_value_vec.reserve(std::size(expected_value));
+    for (auto const ele : expected_value)
+    {
+        expected_value_vec.emplace_back(ele);
+    }
 
     auto settings = std::make_unique<tr_session::Settings>();
-    auto const& default_value = settings->preferred_transport;
-    ASSERT_NE(ExpectedValue, default_value);
+    auto const& default_value = settings->preferred_transports;
+    ASSERT_NE(expected_value, default_value);
 
     auto map = tr_variant::Map{ 1U };
-    map.try_emplace(Key, ExpectedValue.front());
+    map.try_emplace(Key, std::move(expected_value_vec));
     settings->load(tr_variant{ std::move(map) });
-    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    EXPECT_EQ(expected_value, settings->preferred_transports);
+
+    auto const expected_value_single = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{
+        TR_PREFER_TCP
+    };
+
+    expected_value_vec = tr_variant::Vector{};
+    expected_value_vec.reserve(std::size(expected_value_single));
+    for (auto const ele : expected_value_single)
+    {
+        expected_value_vec.emplace_back(ele);
+    }
+    settings = std::make_unique<tr_session::Settings>();
+    map = tr_variant::Map{ 1U };
+    map.try_emplace(Key, std::move(expected_value_vec));
+    settings->load(tr_variant{ std::move(map) });
+    EXPECT_EQ(expected_value_single, settings->preferred_transports);
 
     settings = std::make_unique<tr_session::Settings>();
     map = tr_variant::Map{ 1U };
     map.try_emplace(Key, "tcp"sv);
     settings->load(tr_variant{ std::move(map) });
-    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    EXPECT_EQ(expected_value_single, settings->preferred_transports);
 }
 
 TEST_F(SettingsTest, canSavePreferredTransport)
 {
-    static auto constexpr Key = TR_KEY_preferred_transport;
-    static auto constexpr ExpectedValue = std::array{ TR_PREFER_TCP, TR_PREFER_UTP };
+    static auto constexpr Key = TR_KEY_preferred_transports;
+    static auto constexpr ExpectedValue = std::array<std::string_view, TR_NUM_PREFERRED_TRANSPORT>{ "tcp"sv, "utp"sv };
+    auto const setting_value = small::max_size_vector<tr_preferred_transport, TR_NUM_PREFERRED_TRANSPORT>{
+        TR_PREFER_TCP,
+        TR_PREFER_UTP,
+    };
 
     auto settings = tr_session::Settings{};
-    auto const& default_value = settings.preferred_transport;
-    ASSERT_NE(ExpectedValue, default_value);
+    auto const& default_value = settings.preferred_transports;
+    ASSERT_NE(setting_value, default_value);
 
-    settings.preferred_transport = ExpectedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val = map->value_if<std::string_view>(Key);
-    ASSERT_TRUE(val);
-    EXPECT_EQ("tcp"sv, *val);
+    settings.preferred_transports = setting_value;
+    auto const map = settings.save();
+    auto* const l = map.find_if<tr_variant::Vector>(Key);
+    ASSERT_NE(l, nullptr);
+    ASSERT_EQ(std::size(ExpectedValue), std::size(*l));
+    for (size_t i = 0, n = std::size(*l); i < n; ++i)
+    {
+        auto const& expected = ExpectedValue[i];
+        auto const& actual = (*l)[i];
+        ASSERT_EQ(actual.index(), tr_variant::StringIndex);
+        EXPECT_EQ(expected, actual.value_if<std::string_view>());
+    }
 }
 
 TEST_F(SettingsTest, canLoadSleepPerSecondsDuringVerify)
@@ -527,10 +537,8 @@ TEST_F(SettingsTest, canSaveSleepPerSecondsDuringVerify)
     ASSERT_NE(ExpectedValue, default_value);
 
     settings.sleep_per_seconds_during_verify = ExpectedValue;
-    auto var = settings.save();
-    auto* const map = var.get_if<tr_variant::Map>();
-    ASSERT_NE(map, nullptr);
-    auto const val_raw = map->value_if<int64_t>(Key);
+    auto const map = settings.save();
+    auto const val_raw = map.value_if<int64_t>(Key);
     ASSERT_TRUE(val_raw);
     EXPECT_EQ(ExpectedValue, std::chrono::milliseconds{ *val_raw });
 }
