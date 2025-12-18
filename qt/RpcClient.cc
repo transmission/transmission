@@ -243,18 +243,16 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        auto const json_data = reply->readAll().trimmed().toStdString();
-        auto const json = createVariant();
-        auto result = RpcResponse{};
+        auto const json = reply->readAll().trimmed().toStdString();
+        auto response = RpcResponse{};
 
-        if (auto top = tr_variant_serde::json().parse(json_data); top)
+        if (auto var = tr_variant_serde::json().parse(json))
         {
-            std::swap(*json, *top);
-            result = parseResponseData(*json);
+            response = parseResponseData(*var);
         }
 
         promise.setProgressValue(1);
-        promise.reportFinished(&result);
+        promise.reportFinished(&response);
     }
 }
 
