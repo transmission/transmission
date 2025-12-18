@@ -395,6 +395,7 @@ void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 
         auto json = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(input_buffer, -1)), body_length };
         handle_rpc_from_json(req, server, json);
+        return;
     }
 
     send_simple_response(req, HTTP_BADMETHOD);
@@ -582,6 +583,7 @@ void handle_request(struct evhttp_request* req, void* arg)
         auto const new_location = fmt::format("{:s}web/", server->url());
         evhttp_add_header(output_headers, "Location", new_location.c_str());
         send_simple_response(req, HTTP_MOVEPERM, nullptr);
+        return;
     }
 
     /* We've moved the web UI to an HTML-based login form, away from the old a
