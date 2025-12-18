@@ -7,7 +7,7 @@ const ctx = await esbuild.context({
   entryNames: '[dir]/[name]',
   entryPoints: {
     'login/login': './src/login/login.js',
-    'transmission-app': './src/main.js'
+    'transmission-app': './src/main.js',
   },
   legalComments: 'external',
   loader: {
@@ -27,4 +27,3 @@ if (process.env.DEV) {
   await ctx.rebuild();
   ctx.dispose();
 }
-

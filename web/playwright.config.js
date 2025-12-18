@@ -26,9 +26,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  
-    // Playwright writes test results to disk and you can't stop it. So at least
-    // put them out of the way.
-    preserveOutput: "never",
-    outputDir: "/tmp/playwright-garbage-I-cant-suppress"
+
+  // Playwright writes test results to disk and you can't stop it. So at least
+  // put them out of the way.
+  preserveOutput: 'never',
+  // eslint-disable-next-line sonarjs/publicly-writable-directories
+  outputDir: '/tmp/playwright-garbage-I-cant-suppress',
 });

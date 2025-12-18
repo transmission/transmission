@@ -44,7 +44,7 @@ export const AuthManager = {
   },
 
   redirectToLogin() {
-    window.location.href = `${getAppRoot()}/login/index.html`;
+    globalThis.location.href = `${getAppRoot()}/login/index.html`;
   },
 
   /**

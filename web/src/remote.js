@@ -15,7 +15,7 @@ export const RPC = {
   _QueueMoveDown: 'queue_move_down',
   _QueueMoveTop: 'queue_move_top',
   _QueueMoveUp: 'queue_move_up',
-  _Root: new URL(`${getAppRoot()}/../rpc`, window.location.href).pathname,
+  _Root: new URL(`${getAppRoot()}/../rpc`, globalThis.location.href).pathname,
   _TurtleDownSpeedLimit: 'alt_speed_down',
   _TurtleState: 'alt_speed_enabled',
   _TurtleUpSpeedLimit: 'alt_speed_up',

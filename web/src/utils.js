@@ -374,12 +374,15 @@ export function setTextContent(e, text) {
  * @return {string} Absolute path of the web root
  */
 export const getAppRoot = () => {
-  const path = window.location.pathname;
+  const path = globalThis.location.pathname;
   const pathSegments = path
     .split('/')
     .filter((pathOrFile) => pathOrFile !== '' && !pathOrFile.endsWith('.html'))
-    .reverse();
+    .toReversed();
   const webIndex = pathSegments.indexOf('web');
   const traversal = '../'.repeat(webIndex);
-  return new URL(traversal, window.location.href).pathname.replace(/\/$/, '');
+  return new URL(traversal, globalThis.location.href).pathname.replace(
+    /\/$/,
+    '',
+  );
 };

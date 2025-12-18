@@ -1,10 +1,11 @@
+/* eslint-disable sonarjs/no-hardcoded-passwords */
 // @ts-check
 /// <reference types="node" />
 /// <reference lib="es2024" />
 
 import { test, expect } from '@playwright/test';
 
-import {launchTransmissionDaemon} from './utils.js';
+import { launchTransmissionDaemon } from './utils.js';
 
 test.describe('Authentication', () => {
   const credentials = { password: 'pass', username: 'user' };
