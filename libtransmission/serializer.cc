@@ -7,7 +7,9 @@
 #include <array>
 #include <chrono>
 #include <cstddef> // size_t
-#include <cstdint> // int64_t, uint32_t
+#include <cstdint> // int64_t, uint32_t, uint64_t
+#include <limits>
+#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -24,14 +26,14 @@
 #include "libtransmission/net.h" // for tr_port
 #include "libtransmission/open-files.h" // for tr_open_files::Preallocation
 #include "libtransmission/peer-io.h" // tr_preferred_transport
-#include "libtransmission/serializable.h"
+#include "libtransmission/serializer.h"
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
 #include "libtransmission/variant.h"
 #include "libtransmission/tr-assert.h"
 
 using namespace std::literals;
 
-namespace libtransmission
+namespace libtransmission::serializer
 {
 namespace
 {
@@ -70,6 +72,47 @@ bool to_double(tr_variant const& src, double* tgt)
 }
 
 tr_variant from_double(double const& val)
+{
+    return val;
+}
+
+// ---
+
+bool to_int(tr_variant const& src, int* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        if (*val < std::numeric_limits<int>::min() || *val > std::numeric_limits<int>::max())
+        {
+            return false;
+        }
+
+        *tgt = static_cast<int>(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant from_int(int const& val)
+{
+    return static_cast<int64_t>(val);
+}
+
+// ---
+
+bool to_int64(tr_variant const& src, int64_t* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        *tgt = *val;
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant from_int64(int64_t const& val)
 {
     return val;
 }
@@ -395,6 +438,24 @@ tr_variant from_size_t(size_t const& val)
 
 // ---
 
+bool to_uint64(tr_variant const& src, uint64_t* tgt)
+{
+    if (auto const val = src.value_if<int64_t>())
+    {
+        *tgt = static_cast<uint64_t>(*val);
+        return true;
+    }
+
+    return false;
+}
+
+tr_variant from_uint64(uint64_t const& val)
+{
+    return val;
+}
+
+// ---
+
 bool to_string(tr_variant const& src, std::string* tgt)
 {
     if (auto const val = src.value_if<std::string_view>())
@@ -518,21 +579,31 @@ tr_variant from_verify_added_mode(tr_verify_added_mode const& val)
 }
 } // unnamed namespace
 
-Serializers::ConvertersMap Serializers::converters = { {
-    Serializers::build_converter_entry(to_bool, from_bool),
-    Serializers::build_converter_entry(to_double, from_double),
-    Serializers::build_converter_entry(to_encryption_mode, from_encryption_mode),
-    Serializers::build_converter_entry(to_log_level, from_log_level),
-    Serializers::build_converter_entry(to_mode_t, from_mode_t),
-    Serializers::build_converter_entry(to_msec, from_msec),
-    Serializers::build_converter_entry(to_optional_string, from_optional_string),
-    Serializers::build_converter_entry(to_port, from_port),
-    Serializers::build_converter_entry(to_preallocation_mode, from_preallocation_mode),
-    Serializers::build_converter_entry(to_preferred_transport, from_preferred_transport),
-    Serializers::build_converter_entry(to_size_t, from_size_t),
-    Serializers::build_converter_entry(to_string, from_string),
-    Serializers::build_converter_entry(to_tos_t, from_tos_t),
-    Serializers::build_converter_entry(to_verify_added_mode, from_verify_added_mode),
-} };
+void Converters::ensure_default_converters()
+{
+    static auto once = std::once_flag{};
+    std::call_once(
+        once,
+        []
+        {
+            Converters::add(to_bool, from_bool);
+            Converters::add(to_double, from_double);
+            Converters::add(to_encryption_mode, from_encryption_mode);
+            Converters::add(to_int, from_int);
+            Converters::add(to_int64, from_int64);
+            Converters::add(to_log_level, from_log_level);
+            Converters::add(to_mode_t, from_mode_t);
+            Converters::add(to_msec, from_msec);
+            Converters::add(to_optional_string, from_optional_string);
+            Converters::add(to_port, from_port);
+            Converters::add(to_preallocation_mode, from_preallocation_mode);
+            Converters::add(to_preferred_transport, from_preferred_transport);
+            Converters::add(to_size_t, from_size_t);
+            Converters::add(to_string, from_string);
+            Converters::add(to_tos_t, from_tos_t);
+            Converters::add(to_uint64, from_uint64);
+            Converters::add(to_verify_added_mode, from_verify_added_mode);
+        });
+}
 
-} // namespace libtransmission
+} // namespace libtransmission::serializer
