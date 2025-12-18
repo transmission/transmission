@@ -594,10 +594,10 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
     for (auto const& candidate : candidates_)
     {
         auto const [begin, end] = candidate.block_span;
-        auto const [raw_begin, raw_end] = mediator_.raw_block_span(candidate.piece);
+        auto const [raw_begin, raw_end] = candidate.raw_block_span;
         tr_logAddInfo(
             fmt::format(
-                "  piece {}: unrequested size = {}, block_span = [{}, {}), raw_block_span = [{}, {}), unaligned = {}",
+                "  piece {}: unrequested size = {}, block_span = [{}, {}), raw_block_span = [{}, {}), shrunken = {}",
                 candidate.piece,
                 std::size(candidate.unrequested),
                 begin,
@@ -606,9 +606,9 @@ std::vector<tr_block_span_t> Wishlist::Impl::next(
                 raw_end,
                 begin != raw_begin || end != raw_end));
         auto const active_req = mediator_.active_request_count(candidate.piece);
-        for (auto block = begin; block < end; ++block)
+        for (auto block = raw_begin; block < raw_end; ++block)
         {
-            auto const n_req = active_req[block - begin];
+            auto const n_req = active_req[block - raw_begin];
             auto const requested = n_req != 0U;
             auto const contains = candidate.unrequested.contains(block);
             auto const has = mediator_.client_has_block(block);
