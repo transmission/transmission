@@ -30,6 +30,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/api-compat.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
@@ -495,7 +496,8 @@ tr_variant tr_sessionLoadSettings(std::string_view const config_dir, tr_variant 
     {
         if (auto const file_settings = tr_variant_serde::json().parse_file(filename))
         {
-            settings.merge(*file_settings);
+            auto const incoming_style = libtransmission::api_compat::convert_incoming_data(*file_settings);
+            settings.merge(incoming_style);
         }
     }
 
@@ -518,12 +520,14 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     auto settings = tr_sessionGetDefaultSettings();
     if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        settings.merge(*file_settings);
+        auto const incoming_style = libtransmission::api_compat::convert_incoming_data(*file_settings);
+        settings.merge(incoming_style);
     }
     settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em
+    settings = libtransmission::api_compat::convert_outgoing_data(settings);
     tr_variant_serde::json().to_file(settings, filename);
 
     // write bandwidth groups limits to file
