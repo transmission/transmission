@@ -87,7 +87,6 @@ private slots:
 private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
-    int64_t getNextTag();
 
     void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
@@ -101,7 +100,6 @@ private:
     QUrl url_;
     QNetworkAccessManager* nam_ = {};
     std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
-    int64_t next_tag_ = {};
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
     bool url_is_loopback_ = false;
 };

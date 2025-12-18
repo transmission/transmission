@@ -32,6 +32,12 @@ namespace
 char constexpr const* const RequestBodyKey{ "requestBody" };
 char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
+int64_t nextTag()
+{
+    static int64_t tag = {};
+    return tag++;
+}
+
 TrVariantPtr createVariant()
 {
     return std::make_shared<tr_variant>();
@@ -92,11 +98,6 @@ RpcResponseFuture RpcClient::exec(tr_quark const method_key, tr_variant* args)
     }
 
     return sendRequest(json);
-}
-
-int64_t RpcClient::getNextTag()
-{
-    return next_tag_++;
 }
 
 void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
@@ -167,7 +168,7 @@ void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResp
 
 RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 {
-    int64_t const tag = getNextTag();
+    int64_t const tag = nextTag();
     dictAdd(json.get(), TR_KEY_tag, tag);
 
     QFutureInterface<RpcResponse> promise;
