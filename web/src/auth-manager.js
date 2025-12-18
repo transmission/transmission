@@ -83,8 +83,7 @@ export const AuthManager = {
       // actually authenticated.
     } else if (response.status !== 204 && response.status !== 409) {
       throw new Error(
-        'Unexpected response from RPC auth check',
-        response.status,
+        `Unexpected response from RPC auth check: ${response.status}`,
       );
     }
 
