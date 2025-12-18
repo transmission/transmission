@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 
@@ -32,10 +33,28 @@ namespace
 char constexpr const* const RequestBodyKey{ "requestBody" };
 char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-int64_t nextTag()
+[[nodiscard]] int64_t nextTag()
 {
     static int64_t tag = {};
     return tag++;
+}
+
+[[nodiscard]] std::pair<tr_variant, int64_t> buildRequest(tr_quark const method, tr_variant* args)
+{
+    auto const tag = nextTag();
+
+    // TODO(ckerr): JSON-RPCize
+    auto req = tr_variant::Map{ 3U };
+    req.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(method));
+    req.try_emplace(TR_KEY_tag, tag);
+    if (args != nullptr)
+    {
+        auto tmp = tr_variant{};
+        std::swap(tmp, *args);
+        req.try_emplace(TR_KEY_arguments, std::move(tmp));
+    }
+
+    return { std::move(req), tag };
 }
 
 TrVariantPtr createVariant()
@@ -77,27 +96,28 @@ void RpcClient::start(QUrl const& url)
     request_.reset();
 }
 
-RpcResponseFuture RpcClient::exec(tr_quark const method_key, tr_variant* args)
+RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 {
-    auto const method = tr_quark_get_string_view(method_key);
+    auto const [req, tag] = buildRequest(method, args);
 
-    TrVariantPtr const json = createVariant();
-    tr_variantInitDict(json.get(), 3);
-    dictAdd(json.get(), TR_KEY_method, method);
+    auto promise = QFutureInterface<RpcResponse>{};
+    promise.setExpectedResultCount(1);
+    promise.setProgressRange(0, 1);
+    promise.setProgressValue(0);
+    promise.reportStarted();
 
-    if (args != nullptr) // if args were passed in, use them
+    if (session_ != nullptr)
     {
-        auto* child = tr_variantDictFind(json.get(), TR_KEY_arguments);
-
-        if (child == nullptr)
-        {
-            child = tr_variantDictAddDict(json.get(), TR_KEY_arguments, 0);
-        }
-
-        std::swap(*child, *args);
+        sendLocalRequest(req, promise, tag);
+    }
+    else if (!url_.isEmpty())
+    {
+        auto const json = tr_variant_serde::json().compact().to_string(req);
+        auto const body = QByteArray::fromStdString(json);
+        sendNetworkRequest(body, promise);
     }
 
-    return sendRequest(json);
+    return promise.future();
 }
 
 void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
@@ -164,30 +184,6 @@ void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResp
             // to process the response here... let's push it over to the Qt thread.
             QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, resp));
         });
-}
-
-RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
-{
-    int64_t const tag = nextTag();
-    dictAdd(json.get(), TR_KEY_tag, tag);
-
-    QFutureInterface<RpcResponse> promise;
-    promise.setExpectedResultCount(1);
-    promise.setProgressRange(0, 1);
-    promise.setProgressValue(0);
-    promise.reportStarted();
-
-    if (session_ != nullptr)
-    {
-        sendLocalRequest(*json, promise, tag);
-    }
-    else if (!url_.isEmpty())
-    {
-        auto const body = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*json));
-        sendNetworkRequest(body, promise);
-    }
-
-    return promise.future();
 }
 
 QNetworkAccessManager* RpcClient::networkAccessManager()
