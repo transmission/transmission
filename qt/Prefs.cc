@@ -313,11 +313,7 @@ Prefs::Prefs(QString config_dir)
         case QMetaType::QDateTime:
             if (auto const value = getValue<time_t>(b); value)
             {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
                 values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
-#else
-                values_[i].setValue(QDateTime::fromTime_t(*value));
-#endif
             }
             break;
 
@@ -395,11 +391,7 @@ Prefs::~Prefs()
             break;
 
         case QMetaType::QDateTime:
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
             dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
-#else
-            dictAdd(&current_settings, key, val.toDateTime().toTime_t());
-#endif
             break;
 
         default:
