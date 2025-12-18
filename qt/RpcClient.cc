@@ -29,7 +29,7 @@ using ::trqt::variant_helpers::variantInit;
 namespace
 {
 
-char constexpr const* const RequestDataPropertyKey{ "requestData" };
+char constexpr const* const RequestBodyKey{ "requestBody" };
 char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
 TrVariantPtr createVariant()
@@ -99,7 +99,7 @@ int64_t RpcClient::getNextTag()
     return next_tag_++;
 }
 
-void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise)
+void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise)
 {
     if (!request_)
     {
@@ -117,9 +117,8 @@ void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcRespons
         request_ = request;
     }
 
-    auto const json_data = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*req));
-    QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
-    reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(req));
+    QNetworkReply* reply = networkAccessManager()->post(*request_, body);
+    reply->setProperty(RequestBodyKey, body);
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
 
     connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
@@ -135,7 +134,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr req, QFutureInterface<RpcRespons
         }
 
         qInfo() << "Body:";
-        qInfo() << json_data.constData();
+        qInfo() << body.constData();
     }
 }
 
@@ -183,7 +182,8 @@ RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
     }
     else if (!url_.isEmpty())
     {
-        sendNetworkRequest(json, promise);
+        auto const body = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*json));
+        sendNetworkRequest(body, promise);
     }
 
     return promise.future();
@@ -230,7 +230,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         session_id_ = QString::fromUtf8(reply->rawHeader(TR_RPC_SESSION_ID_HEADER));
         request_.reset();
 
-        sendNetworkRequest(reply->property(RequestDataPropertyKey).value<TrVariantPtr>(), promise);
+        sendNetworkRequest(reply->property(RequestBodyKey).toByteArray(), promise);
         return;
     }
 
