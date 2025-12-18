@@ -645,6 +645,16 @@ constexpr std::string_view UnrecognisedInfoLegacyResponse = R"json({
     "tag": 10
 })json";
 
+constexpr std::string_view LegacyNonIntTagRequest = R"json({
+    "method": "session-get",
+    "tag": "0"
+})json";
+
+constexpr std::string_view LegacyNonIntTagRequestResult = R"json({
+    "jsonrpc": "2.0",
+    "method": "session_get"
+})json";
+
 // clang-format off
 constexpr std::string_view LegacyResumeBenc =
     "d"
@@ -953,7 +963,7 @@ TEST_F(ApiCompatTest, canConvertRpc)
     using TestCase = std::tuple<std::string_view, std::string_view, Style, std::string_view>;
 
     // clang-format off
-    static auto constexpr TestCases = std::array<TestCase, 40U>{ {
+    static auto constexpr TestCases = std::array<TestCase, 42U>{ {
         { "free_space tr5 -> tr5", BadFreeSpaceRequest, Style::Tr5, BadFreeSpaceRequest },
         { "free_space tr5 -> tr4", BadFreeSpaceRequest, Style::Tr4, BadFreeSpaceRequestLegacy },
         { "free_space tr4 -> tr5", BadFreeSpaceRequestLegacy, Style::Tr5, BadFreeSpaceRequest },
@@ -994,6 +1004,8 @@ TEST_F(ApiCompatTest, canConvertRpc)
         { "unrecognised info tr5 -> tr4", UnrecognisedInfoResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
         { "unrecognised info tr4 -> tr5", UnrecognisedInfoLegacyResponse, Style::Tr5, UnrecognisedInfoResponse},
         { "unrecognised info tr4 -> tr4", UnrecognisedInfoLegacyResponse, Style::Tr4, UnrecognisedInfoLegacyResponse},
+        { "non-int tag tr4 -> tr5", LegacyNonIntTagRequest, Style::Tr5, LegacyNonIntTagRequestResult },
+        { "non-int tag tr4 -> tr4", LegacyNonIntTagRequest, Style::Tr4, LegacyNonIntTagRequest },
 
         // TODO(ckerr): torrent-get with 'table'
     } };

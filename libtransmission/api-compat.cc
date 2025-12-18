@@ -682,6 +682,10 @@ void convert_jsonrpc(tr_variant::Map& top, State const& state)
     if (is_jsonrpc)
     {
         top.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
+        if (auto const tag = top.value_if<int64_t>(TR_KEY_tag); state.was_legacy && !tag)
+        {
+            top.erase(TR_KEY_tag);
+        }
         top.replace_key(TR_KEY_tag, TR_KEY_id);
     }
     else
