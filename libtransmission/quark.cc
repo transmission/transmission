@@ -568,22 +568,38 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "session_id"sv, // rpc
     "session_set"sv, // rpc
     "session_stats"sv, // rpc
+    "show-active",
+    "show-all",
     "show-backup-trackers"sv, // gtk app, qt app
+    "show-downloading",
+    "show-error",
     "show-extra-peer-details"sv, // gtk app
     "show-filterbar"sv, // gtk app, qt app
+    "show-finished",
     "show-notification-area-icon"sv, // gtk app, qt app
     "show-options-window"sv, // gtk app, qt app
+    "show-paused",
+    "show-seeding",
     "show-statusbar"sv, // gtk app, qt app
     "show-toolbar"sv, // gtk app, qt app
     "show-tracker-scrapes"sv, // gtk app, qt app
+    "show-verifying",
+    "show_active",
+    "show_all",
     "show_backup_trackers"sv, // gtk app, qt app
+    "show_downloading",
+    "show_error",
     "show_extra_peer_details"sv, // gtk app
     "show_filterbar"sv, // gtk app, qt app
+    "show_finished",
     "show_notification_area_icon"sv, // gtk app, qt app
     "show_options_window"sv, // gtk app, qt app
+    "show_paused",
+    "show_seeding",
     "show_statusbar"sv, // gtk app, qt app
     "show_toolbar"sv, // gtk app, qt app
     "show_tracker_scrapes"sv, // gtk app, qt app
+    "show_verifying",
     "sitename"sv, // rpc
     "size-bytes"sv, // rpc
     "size-units"sv, // rpc

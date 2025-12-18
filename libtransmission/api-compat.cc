@@ -245,7 +245,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 149U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab },
@@ -349,14 +349,22 @@ auto constexpr SessionKeys = std::array<ApiKey, 149U>{ {
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab },
     { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab_APICOMPAT },
     { TR_KEY_session_count, TR_KEY_session_count_kebab_APICOMPAT },
+    { TR_KEY_show_active, TR_KEY_show_active_kebab_APICOMPAT },
+    { TR_KEY_show_all, TR_KEY_show_all_kebab_APICOMPAT },
     { TR_KEY_show_backup_trackers, TR_KEY_show_backup_trackers_kebab },
+    { TR_KEY_show_downloading, TR_KEY_show_downloading_kebab_APICOMPAT },
+    { TR_KEY_show_error, TR_KEY_show_error_kebab_APICOMPAT },
     { TR_KEY_show_extra_peer_details, TR_KEY_show_extra_peer_details_kebab },
     { TR_KEY_show_filterbar, TR_KEY_show_filterbar_kebab },
+    { TR_KEY_show_finished, TR_KEY_show_finished_kebab_APICOMPAT },
     { TR_KEY_show_notification_area_icon, TR_KEY_show_notification_area_icon_kebab },
     { TR_KEY_show_options_window, TR_KEY_show_options_window_kebab },
+    { TR_KEY_show_paused, TR_KEY_show_paused_kebab_APICOMPAT },
+    { TR_KEY_show_seeding, TR_KEY_show_seeding_kebab_APICOMPAT },
     { TR_KEY_show_statusbar, TR_KEY_show_statusbar_kebab },
     { TR_KEY_show_toolbar, TR_KEY_show_toolbar_kebab },
     { TR_KEY_show_tracker_scrapes, TR_KEY_show_tracker_scrapes_kebab },
+    { TR_KEY_show_verifying, TR_KEY_show_verifying_kebab_APICOMPAT },
     { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab },
     { TR_KEY_sort_by_activity, TR_KEY_sort_by_activity_kebab_APICOMPAT },
     { TR_KEY_sort_by_age, TR_KEY_sort_by_age_kebab_APICOMPAT },
