@@ -594,8 +594,28 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "sleep-per-seconds-during-verify"sv, // tr_session::Settings
     "sleep_per_seconds_during_verify"sv, // tr_session::Settings
     "socket_address"sv, // .resume
+    "sort-by-activity", // gtk app, qt app
+    "sort-by-age", // gtk app, qt app
+    "sort-by-eta", // gtk app, qt app
+    "sort-by-id", // gtk app, qt app
+    "sort-by-name", // gtk app, qt app
+    "sort-by-progress", // gtk app, qt app
+    "sort-by-queue", // gtk app, qt app
+    "sort-by-ratio", // gtk app, qt app
+    "sort-by-size", // gtk app, qt app
+    "sort-by-state", // gtk app, qt app
     "sort-mode"sv, // gtk app, qt app
     "sort-reversed"sv, // gtk app, qt app
+    "sort_by_activity", // gtk app, qt app
+    "sort_by_age", // gtk app, qt app
+    "sort_by_eta", // gtk app, qt app
+    "sort_by_id", // gtk app, qt app
+    "sort_by_name", // gtk app, qt app
+    "sort_by_progress", // gtk app, qt app
+    "sort_by_queue", // gtk app, qt app
+    "sort_by_ratio", // gtk app, qt app
+    "sort_by_size", // gtk app, qt app
+    "sort_by_state", // gtk app, qt app
     "sort_mode"sv, // gtk app, qt app
     "sort_reversed"sv, // gtk app, qt app
     "source"sv, // .torrent
