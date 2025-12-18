@@ -590,16 +590,19 @@ struct CloneState
             {
                 auto const pop = state_.convert_strings;
                 auto new_key = convert_key(key, state_.style, state_.is_rpc);
+
                 auto const special_rpc = state_.is_rpc &&
                     (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids ||
                      new_key == TR_KEY_torrents);
-                auto const special_settings = !state_.is_rpc &&
-                    (new_key == TR_KEY_sort_mode || key == TR_KEY_sort_mode || new_key == TR_KEY_filter_mode ||
-                     key == TR_KEY_filter_mode);
                 // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` on previous line with logic to turn on convert
                 // if it's an array inside an array val whose key was `torrents`.
                 // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
-                state_.convert_strings |= special_rpc | special_settings;
+                state_.convert_strings |= special_rpc;
+
+                auto const special_settings = !state_.is_rpc &&
+                    (new_key == TR_KEY_sort_mode || key == TR_KEY_sort_mode || new_key == TR_KEY_filter_mode ||
+                     key == TR_KEY_filter_mode);
+                state_.convert_strings |= special_settings;
 
                 // Crazy case: total_size in free-space, totalSize in torrent-get
                 if (state_.is_free_space_response && new_key == TR_KEY_total_size_camel)
