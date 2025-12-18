@@ -21,6 +21,9 @@
 namespace libtransmission::serializer
 {
 
+// These type traits are used for serialize() and deserialize() to sniff
+// out containers that support `push_back()`, `insert()`, `reserve()`, etc.
+// Example uses: (de)serializing std::vector<T>, QStringList, small::set<T>
 namespace detail
 {
 
@@ -62,22 +65,22 @@ template<typename T, std::size_t N>
 inline constexpr bool is_std_array_v<std::array<T, N>> = true;
 
 template<typename C>
-tr_variant to_push_back_range(C const& src);
+tr_variant from_push_back_range(C const& src);
 
 template<typename C>
-bool from_push_back_range(tr_variant const& src, C* ptgt);
+bool to_push_back_range(tr_variant const& src, C* ptgt);
 
 template<typename C>
-tr_variant to_insert_range(C const& src);
+tr_variant from_insert_range(C const& src);
 
 template<typename C>
-bool from_insert_range(tr_variant const& src, C* ptgt);
+bool to_insert_range(tr_variant const& src, C* ptgt);
 
 template<typename C>
-tr_variant to_array(C const& src);
+tr_variant from_array(C const& src);
 
 template<typename C>
-bool from_array(tr_variant const& src, C* ptgt);
+bool to_array(tr_variant const& src, C* ptgt);
 
 // Call reserve() if available, otherwise no-op
 template<typename C>
@@ -117,17 +120,17 @@ public:
 
         if constexpr (detail::is_push_back_range_v<T>)
         {
-            return detail::to_push_back_range(src);
+            return detail::from_push_back_range(src);
         }
 
         if constexpr (detail::is_insert_range_v<T>)
         {
-            return detail::to_insert_range(src);
+            return detail::from_insert_range(src);
         }
 
         if constexpr (detail::is_std_array_v<T>)
         {
-            return detail::to_array(src);
+            return detail::from_array(src);
         }
 
         fmt::print(stderr, "ERROR: No serializer registered for type '{}'\\n", typeid(T).name());
@@ -146,22 +149,23 @@ public:
 
         if constexpr (detail::is_push_back_range_v<T>)
         {
-            return detail::from_push_back_range(src, ptgt);
+            return detail::to_push_back_range(src, ptgt);
         }
 
         if constexpr (detail::is_insert_range_v<T>)
         {
-            return detail::from_insert_range(src, ptgt);
+            return detail::to_insert_range(src, ptgt);
         }
 
         if constexpr (detail::is_std_array_v<T>)
         {
-            return detail::from_array(src, ptgt);
+            return detail::to_array(src, ptgt);
         }
 
         return false;
     }
 
+    // register a new tr_variant<->T converter.
     template<typename T>
     static void add(Deserialize<T> deserialize, Serialize<T> serialize)
     {
@@ -274,7 +278,7 @@ namespace detail
 {
 
 template<typename C>
-tr_variant to_push_back_range(C const& src)
+tr_variant from_push_back_range(C const& src)
 {
     auto ret = tr_variant::Vector{};
     ret.reserve(std::size(src));
@@ -286,7 +290,7 @@ tr_variant to_push_back_range(C const& src)
 }
 
 template<typename C>
-bool from_push_back_range(tr_variant const& src, C* const ptgt)
+bool to_push_back_range(tr_variant const& src, C* const ptgt)
 {
     auto const* const vec = src.get_if<tr_variant::Vector>();
     if (vec == nullptr)
@@ -312,7 +316,7 @@ bool from_push_back_range(tr_variant const& src, C* const ptgt)
 }
 
 template<typename C>
-tr_variant to_insert_range(C const& src)
+tr_variant from_insert_range(C const& src)
 {
     auto ret = tr_variant::Vector{};
     ret.reserve(std::size(src));
@@ -324,7 +328,7 @@ tr_variant to_insert_range(C const& src)
 }
 
 template<typename C>
-bool from_insert_range(tr_variant const& src, C* const ptgt)
+bool to_insert_range(tr_variant const& src, C* const ptgt)
 {
     auto const* const vec = src.get_if<tr_variant::Vector>();
     if (vec == nullptr)
@@ -349,7 +353,7 @@ bool from_insert_range(tr_variant const& src, C* const ptgt)
 }
 
 template<typename C>
-tr_variant to_array(C const& src)
+tr_variant from_array(C const& src)
 {
     auto ret = tr_variant::Vector{};
     ret.reserve(std::size(src));
@@ -361,7 +365,7 @@ tr_variant to_array(C const& src)
 }
 
 template<typename C>
-bool from_array(tr_variant const& src, C* const ptgt)
+bool to_array(tr_variant const& src, C* const ptgt)
 {
     auto const* const vec = src.get_if<tr_variant::Vector>();
     if (vec == nullptr)
