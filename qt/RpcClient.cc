@@ -138,17 +138,17 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
     }
 }
 
-void RpcClient::sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
 {
     if (verbose_)
     {
-        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*req));
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(req));
     }
 
     local_requests_.try_emplace(tag, promise);
     tr_rpc_request_exec(
         session_,
-        *req,
+        req,
         [this](tr_session* /*sesson*/, tr_variant&& response)
         {
             if (verbose_)
@@ -178,7 +178,7 @@ RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 
     if (session_ != nullptr)
     {
-        sendLocalRequest(json, promise, tag);
+        sendLocalRequest(*json, promise, tag);
     }
     else if (!url_.isEmpty())
     {

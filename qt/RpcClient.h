@@ -90,7 +90,7 @@ private:
     int64_t getNextTag();
 
     void sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(TrVariantPtr req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
+    void sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t tag);
     [[nodiscard]] int64_t parseResponseTag(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
