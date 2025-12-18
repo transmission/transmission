@@ -245,7 +245,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_torrent_verify, TR_KEY_torrent_verify_kebab },
 } };
 
-auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
+auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_activity_date, TR_KEY_activity_date_kebab_APICOMPAT },
     { TR_KEY_added_date, TR_KEY_added_date_kebab_APICOMPAT },
     { TR_KEY_alt_speed_down, TR_KEY_alt_speed_down_kebab },
@@ -349,15 +349,33 @@ auto constexpr SessionKeys = std::array<ApiKey, 139U>{ {
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab },
     { TR_KEY_seeding_time_seconds, TR_KEY_seeding_time_seconds_kebab_APICOMPAT },
     { TR_KEY_session_count, TR_KEY_session_count_kebab_APICOMPAT },
+    { TR_KEY_show_active, TR_KEY_show_active_kebab_APICOMPAT },
+    { TR_KEY_show_all, TR_KEY_show_all_kebab_APICOMPAT },
     { TR_KEY_show_backup_trackers, TR_KEY_show_backup_trackers_kebab },
+    { TR_KEY_show_downloading, TR_KEY_show_downloading_kebab_APICOMPAT },
+    { TR_KEY_show_error, TR_KEY_show_error_kebab_APICOMPAT },
     { TR_KEY_show_extra_peer_details, TR_KEY_show_extra_peer_details_kebab },
     { TR_KEY_show_filterbar, TR_KEY_show_filterbar_kebab },
+    { TR_KEY_show_finished, TR_KEY_show_finished_kebab_APICOMPAT },
     { TR_KEY_show_notification_area_icon, TR_KEY_show_notification_area_icon_kebab },
     { TR_KEY_show_options_window, TR_KEY_show_options_window_kebab },
+    { TR_KEY_show_paused, TR_KEY_show_paused_kebab_APICOMPAT },
+    { TR_KEY_show_seeding, TR_KEY_show_seeding_kebab_APICOMPAT },
     { TR_KEY_show_statusbar, TR_KEY_show_statusbar_kebab },
     { TR_KEY_show_toolbar, TR_KEY_show_toolbar_kebab },
     { TR_KEY_show_tracker_scrapes, TR_KEY_show_tracker_scrapes_kebab },
+    { TR_KEY_show_verifying, TR_KEY_show_verifying_kebab_APICOMPAT },
     { TR_KEY_sleep_per_seconds_during_verify, TR_KEY_sleep_per_seconds_during_verify_kebab },
+    { TR_KEY_sort_by_activity, TR_KEY_sort_by_activity_kebab_APICOMPAT },
+    { TR_KEY_sort_by_age, TR_KEY_sort_by_age_kebab_APICOMPAT },
+    { TR_KEY_sort_by_eta, TR_KEY_sort_by_eta_kebab_APICOMPAT },
+    { TR_KEY_sort_by_id, TR_KEY_sort_by_id_kebab_APICOMPAT },
+    { TR_KEY_sort_by_name, TR_KEY_sort_by_name_kebab_APICOMPAT },
+    { TR_KEY_sort_by_progress, TR_KEY_sort_by_progress_kebab_APICOMPAT },
+    { TR_KEY_sort_by_queue, TR_KEY_sort_by_queue_kebab_APICOMPAT },
+    { TR_KEY_sort_by_ratio, TR_KEY_sort_by_ratio_kebab_APICOMPAT },
+    { TR_KEY_sort_by_size, TR_KEY_sort_by_size_kebab_APICOMPAT },
+    { TR_KEY_sort_by_state, TR_KEY_sort_by_state_kebab_APICOMPAT },
     { TR_KEY_sort_mode, TR_KEY_sort_mode_kebab },
     { TR_KEY_sort_reversed, TR_KEY_sort_reversed_kebab },
     { TR_KEY_speed_Bps, TR_KEY_speed_Bps_kebab_APICOMPAT },
@@ -572,14 +590,19 @@ struct CloneState
             {
                 auto const pop = state_.convert_strings;
                 auto new_key = convert_key(key, state_.style, state_.is_rpc);
-                auto const special =
-                    (state_.is_rpc &&
-                     (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids ||
-                      new_key == TR_KEY_torrents));
+
+                auto const special_rpc = state_.is_rpc &&
+                    (new_key == TR_KEY_method || new_key == TR_KEY_fields || new_key == TR_KEY_ids ||
+                     new_key == TR_KEY_torrents);
                 // TODO(ckerr): replace `new_key == TR_KEY_TORRENTS` on previous line with logic to turn on convert
                 // if it's an array inside an array val whose key was `torrents`.
                 // This is for the edge case of table mode: `torrents : [ [ 'key1', 'key2' ], [ ... ] ]`
-                state_.convert_strings |= special;
+                state_.convert_strings |= special_rpc;
+
+                auto const special_settings = !state_.is_rpc &&
+                    (new_key == TR_KEY_sort_mode || key == TR_KEY_sort_mode || new_key == TR_KEY_filter_mode ||
+                     key == TR_KEY_filter_mode);
+                state_.convert_strings |= special_settings;
 
                 // Crazy case: total_size in free-space, totalSize in torrent-get
                 if (state_.is_free_space_response && new_key == TR_KEY_total_size_camel)
