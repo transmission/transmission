@@ -48,12 +48,12 @@ public:
 
         void load(tr_variant const& src)
         {
-            libtransmission::serializer::load(*this, fields, src);
+            libtransmission::serializer::load(*this, Fields, src);
         }
 
         [[nodiscard]] tr_variant::Map save() const
         {
-            return libtransmission::serializer::save(*this, fields);
+            return libtransmission::serializer::save(*this, Fields);
         }
 
         // NB: When adding a field here, you must also add it to
@@ -77,7 +77,7 @@ public:
         template<auto MemberPtr>
         using Field = libtransmission::serializer::Field<MemberPtr>;
 
-        static constexpr auto fields = std::tuple{
+        static constexpr auto Fields = std::tuple{
             Field<&Settings::is_anti_brute_force_enabled>{ TR_KEY_anti_brute_force_enabled },
             Field<&Settings::anti_brute_force_limit>{ TR_KEY_anti_brute_force_threshold },
             Field<&Settings::authentication_required>{ TR_KEY_rpc_authentication_required },

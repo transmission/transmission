@@ -394,16 +394,16 @@ public:
 
         void load(tr_variant const& src)
         {
-            libtransmission::serializer::load(*this, fields, src);
+            libtransmission::serializer::load(*this, Fields, src);
         }
 
         [[nodiscard]] tr_variant::Map save() const
         {
-            return libtransmission::serializer::save(*this, fields);
+            return libtransmission::serializer::save(*this, Fields);
         }
 
         // NB: When adding a field here, you must also add it to
-        // `fields` if you want it to be in session-settings.json
+        // `Fields` if you want it to be in session-settings.json
         bool announce_ip_enabled = false;
         bool blocklist_enabled = false;
         bool dht_enabled = true;
@@ -473,7 +473,7 @@ public:
         template<auto MemberPtr>
         using Field = libtransmission::serializer::Field<MemberPtr>;
 
-        static constexpr auto fields = std::tuple{
+        static constexpr auto Fields = std::tuple{
             Field<&Settings::announce_ip>{ TR_KEY_announce_ip },
             Field<&Settings::announce_ip_enabled>{ TR_KEY_announce_ip_enabled },
             Field<&Settings::bind_address_ipv4>{ TR_KEY_bind_address_ipv4 },

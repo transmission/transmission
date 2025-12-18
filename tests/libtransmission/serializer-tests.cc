@@ -41,9 +41,9 @@ struct Rect
     }
 };
 
-void register_rect_converter()
+void registerRectConverter()
 {
-    static auto const to_rect = [](tr_variant const& src, Rect* tgt)
+    static auto const ToRect = [](tr_variant const& src, Rect* tgt)
     {
         auto const* const v = src.get_if<tr_variant::Vector>();
         if (v == nullptr || std::size(*v) != 4U)
@@ -65,7 +65,7 @@ void register_rect_converter()
         return true;
     };
 
-    static auto const from_rect = [](Rect const& r) -> tr_variant
+    static auto const FromRect = [](Rect const& r) -> tr_variant
     {
         auto v = tr_variant::Vector{};
         v.reserve(4U);
@@ -77,7 +77,7 @@ void register_rect_converter()
     };
 
     static std::once_flag once;
-    std::call_once(once, [] { Converters::add<Rect>(to_rect, from_rect); });
+    std::call_once(once, [] { Converters::add<Rect>(ToRect, FromRect); });
 }
 
 TEST_F(SerializerTest, usesBuiltins)
@@ -172,7 +172,7 @@ TEST_F(SerializerTest, usesIntWithOverflowCheck)
 
 TEST_F(SerializerTest, usesCustomTypes)
 {
-    register_rect_converter();
+    registerRectConverter();
 
     static constexpr Rect Expected{ 10, 20, 640, 480 };
     auto const var = Converters::serialize(Expected);
@@ -218,7 +218,7 @@ TEST_F(SerializerTest, usesVectors)
 
 TEST_F(SerializerTest, usesVectorsOfCustom)
 {
-    register_rect_converter();
+    registerRectConverter();
 
     auto const expected = std::vector<Rect>{ { 1, 2, 3, 4 }, { 10, 20, 640, 480 } };
     auto const var = Converters::serialize(expected);
@@ -286,7 +286,7 @@ struct Endpoint
     std::string address;
     tr_port port;
 
-    static constexpr auto fields = std::tuple{
+    static constexpr auto Fields = std::tuple{
         Field<&Endpoint::address>{ TR_KEY_address },
         Field<&Endpoint::port>{ TR_KEY_port },
     };
@@ -309,13 +309,13 @@ TEST_F(SerializerTest, fieldSaveLoad)
 
     // Save to variant
     auto constexpr Expected = R"({"address":"localhost","port":51413})"sv;
-    auto const var = tr_variant{ save(expected, Endpoint::fields) };
+    auto const var = tr_variant{ save(expected, Endpoint::Fields) };
     EXPECT_EQ(Expected, tr_variant_serde::json().compact().to_string(var));
 
     // Load back into a new instance
     auto actual = Endpoint{};
     EXPECT_NE(actual, expected);
-    load(actual, Endpoint::fields, var);
+    load(actual, Endpoint::Fields, var);
     EXPECT_EQ(actual, expected);
 }
 
@@ -324,7 +324,7 @@ TEST_F(SerializerTest, fieldLoadIgnoresMissingKeys)
     auto endpoint = Endpoint{ "default", tr_port::from_host(9999) };
     auto const original = endpoint;
 
-    load(endpoint, Endpoint::fields, tr_variant::make_map());
+    load(endpoint, Endpoint::Fields, tr_variant::make_map());
 
     // Should remain unchanged
     EXPECT_EQ(original, endpoint);
@@ -335,7 +335,7 @@ TEST_F(SerializerTest, fieldLoadIgnoresNonMap)
     auto endpoint = Endpoint{ "default", tr_port::from_host(9999) };
     auto const original = endpoint;
 
-    load(endpoint, Endpoint::fields, tr_variant{ 42 });
+    load(endpoint, Endpoint::Fields, tr_variant{ 42 });
 
     // Should remain unchanged
     EXPECT_EQ(original, endpoint);

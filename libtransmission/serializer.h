@@ -27,6 +27,9 @@ namespace libtransmission::serializer
 namespace detail
 {
 
+// NOLINTBEGIN(readability-identifier-naming)
+// use std-style naming for these traits
+
 template<typename T>
 using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
@@ -89,10 +92,11 @@ auto reserve_if_possible(C& c, std::size_t n) -> decltype(c.reserve(n), void())
     c.reserve(n);
 }
 template<typename C>
-void reserve_if_possible(C& /*c*/, ...)
+void reserve_if_possible(C& /*c*/, ...) // NOLINT(cert-dcl50-cpp)
 {
 }
 
+// NOLINTEND(readability-identifier-naming)
 } // namespace detail
 
 /**
