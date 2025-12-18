@@ -1,4 +1,5 @@
 import { AuthManager } from '../auth-manager.js';
+import { RPC } from '../remote.js';
 import { getAppRoot } from '../utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // for them to do here, and Transmission might not be set up for logins
   // anyway.
   const alreadyLoggedIn = await AuthManager.testCredentials(
+    RPC,
     AuthManager.loadCredentials(),
   );
   if (alreadyLoggedIn) {
@@ -26,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
 
-    const credsAreValid = await AuthManager.testCredentials({
+    const credsAreValid = await AuthManager.testCredentials(RPC, {
       password,
       username,
     });

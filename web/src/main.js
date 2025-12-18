@@ -7,6 +7,7 @@ import { AuthManager } from './auth-manager.js';
 import { ActionManager } from './action-manager.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
+import { RPC } from './remote.js';
 import { Transmission } from './transmission.js';
 import { debounce } from './utils.js';
 
@@ -16,7 +17,7 @@ async function main() {
   // The user might load up the web app without being logged in. All RPC calls
   // will fail.
   const credentials = AuthManager.loadCredentials();
-  if (!(await AuthManager.testCredentials(credentials))) {
+  if (!(await AuthManager.testCredentials(RPC, credentials))) {
     AuthManager.redirectToLogin();
     // Even though we've just initiated a page navigation, JS on this page will
     // continue executing until until the end of the current synchronous code

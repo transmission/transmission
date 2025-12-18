@@ -1,4 +1,3 @@
-import { RPC } from './remote.js';
 import { getAppRoot } from './utils.js';
 
 const localStorageKey = 'credentials';
@@ -68,7 +67,7 @@ export const AuthManager = {
    * @param {{username: string, password: string} | null} credentials
    * @return {Promise<boolean>}
    */
-  async testCredentials(credentials) {
+  async testCredentials(RPC, credentials) {
     const headers = new Headers();
     this.addAuthHeaders(headers, credentials);
     // Issue an empty bodied no-op request to the RPC endpoint to see if our
