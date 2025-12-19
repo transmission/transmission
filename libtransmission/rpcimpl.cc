@@ -2269,7 +2269,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->setDefaultTrackers(*val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_download_queue_size); val)
     {
         tr_sessionSetQueueSize(session, TR_DOWN, *val);
     }
@@ -2598,7 +2598,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_download_queue_enabled:
         return session.queueEnabled(TR_DOWN);
     case TR_KEY_download_queue_size:
-    case TR_KEY_download_queue_size_kebab:
         return session.queueSize(TR_DOWN);
     case TR_KEY_encryption:
         return tr_variant::unmanaged_string(getEncryptionModeString(tr_sessionGetEncryption(&session)));

@@ -68,7 +68,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_download_limit, TR_KEY_download_limit_camel },
     { TR_KEY_download_limited, TR_KEY_download_limited_camel },
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab_APICOMPAT },
-    { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab },
+    { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab_APICOMPAT },
     { TR_KEY_download_speed, TR_KEY_download_speed_camel },
     { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_downloaded_ever, TR_KEY_downloaded_ever_camel },
@@ -274,7 +274,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_done_date, TR_KEY_done_date_kebab_APICOMPAT },
     { TR_KEY_download_dir, TR_KEY_download_dir_kebab_APICOMPAT },
     { TR_KEY_download_queue_enabled, TR_KEY_download_queue_enabled_kebab_APICOMPAT },
-    { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab },
+    { TR_KEY_download_queue_size, TR_KEY_download_queue_size_kebab_APICOMPAT },
     { TR_KEY_downloaded_bytes, TR_KEY_downloaded_bytes_kebab_APICOMPAT },
     { TR_KEY_downloading_time_seconds, TR_KEY_downloading_time_seconds_kebab_APICOMPAT },
     { TR_KEY_files_added, TR_KEY_files_added_kebab_APICOMPAT },

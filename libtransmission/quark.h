@@ -149,7 +149,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_download_dir_kebab_APICOMPAT,
     TR_KEY_download_dir_free_space_kebab_APICOMPAT,
     TR_KEY_download_queue_enabled_kebab_APICOMPAT,
-    TR_KEY_download_queue_size_kebab,
+    TR_KEY_download_queue_size_kebab_APICOMPAT,
     TR_KEY_download_count_camel,
     TR_KEY_download_dir_camel,
     TR_KEY_download_limit_camel,
