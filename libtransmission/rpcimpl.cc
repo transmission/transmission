@@ -151,9 +151,9 @@ namespace
 }
 
 // https://www.jsonrpc.org/specification#response_object
-[[nodiscard]] tr_variant::Map build_response(Error::Code code, tr_variant id, tr_variant::Map&& body)
+[[nodiscard]] tr_variant::Map build_response(Error::Code code, tr_variant id, tr_variant::Map&& body, bool is_jsonrpc = true)
 {
-    if (!is_valid_id(id))
+    if (is_jsonrpc && !is_valid_id(id))
     {
         TR_ASSERT(false);
         id = nullptr;
@@ -199,36 +199,28 @@ struct tr_rpc_idle_data
     tr_session* session = nullptr;
     tr_variant::Map args_out;
     tr_rpc_response_func callback;
+
+    // TODO: api-compat
+    bool is_jsonrpc;
 };
-
-void tr_rpc_idle_done_legacy(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, std::string_view result)
-{
-    // build the response
-    auto response_map = tr_variant::Map{ 3U };
-    response_map.try_emplace(TR_KEY_arguments, std::move(data->args_out));
-    response_map.try_emplace(TR_KEY_result, std::empty(result) ? JsonRpc::Error::to_string(code) : result);
-    if (auto& tag = data->id; tag.has_value())
-    {
-        response_map.try_emplace(TR_KEY_tag, std::move(tag));
-    }
-
-    // send the response back to the listener
-    data->callback(data->session, tr_variant{ std::move(response_map) });
-}
 
 void tr_rpc_idle_done(struct tr_rpc_idle_data* data, JsonRpc::Error::Code code, std::string_view errmsg)
 {
     using namespace JsonRpc;
 
-    if (data->id.has_value())
+    if (!data->is_jsonrpc || data->id.has_value())
     {
         auto const is_success = code == Error::SUCCESS;
-        data->callback(
-            data->session,
-            build_response(
-                code,
-                std::move(data->id),
-                is_success ? std::move(data->args_out) : Error::build_data(errmsg, std::move(data->args_out))));
+        auto response = tr_variant{ build_response(
+            code,
+            std::move(data->id),
+            is_success ? std::move(data->args_out) : Error::build_data(errmsg, std::move(data->args_out)),
+            data->is_jsonrpc) };
+        if (!data->is_jsonrpc)
+        {
+            libtransmission::api_compat::convert(response, libtransmission::api_compat::Style::Tr4);
+        }
+        data->callback(data->session, std::move(response));
     }
     else // notification
     {
@@ -2894,7 +2886,7 @@ void noop_response_callback(tr_session* /*session*/, tr_variant&& /*response*/)
 {
 }
 
-void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback, bool is_batch)
+void tr_rpc_request_exec_impl(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback, bool is_batch)
 {
     using namespace JsonRpc;
 
@@ -2903,7 +2895,7 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
         callback = noop_response_callback;
     }
 
-    auto const* const map = request.get_if<tr_variant::Map>();
+    auto const* map = request.get_if<tr_variant::Map>();
     if (map == nullptr)
     {
         callback(
@@ -2927,24 +2919,42 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
             build_response(Error::INVALID_REQUEST, nullptr, Error::build_data("JSON-RPC version is not 2.0"sv, {})));
         return;
     }
+    else
+    {
+        libtransmission::api_compat::convert_incoming_data(request);
+        map = request.get_if<tr_variant::Map>();
+        TR_ASSERT(map != nullptr);
+        if (map == nullptr)
+        {
+            auto response = tr_variant::Map{ 2U };
+            response.try_emplace(TR_KEY_arguments, tr_variant::Map{});
+            response.try_emplace(
+                TR_KEY_result,
+                tr_variant::unmanaged_string(
+                    "bug in api-compat, please report a bug at https://github.com/transmission/transmission/issues"sv));
+            callback(session, std::move(response));
+            return;
+        }
+    }
 
     auto const empty_params = tr_variant::Map{};
-    auto const* params = map->find_if<tr_variant::Map>(is_jsonrpc ? TR_KEY_params : TR_KEY_arguments);
+    auto const* params = map->find_if<tr_variant::Map>(TR_KEY_params);
     if (params == nullptr)
     {
         params = &empty_params;
     }
 
     auto const method_name = map->value_if<std::string_view>(TR_KEY_method).value_or(""sv);
-    auto const method_key = tr_quark_convert(tr_quark_new(method_name));
+    auto const method_key = tr_quark_new(method_name);
 
     auto data = tr_rpc_idle_data{};
     data.session = session;
+    data.is_jsonrpc = is_jsonrpc;
 
-    if (auto iter = map->find(is_jsonrpc ? TR_KEY_id : TR_KEY_tag); iter != std::end(*map))
+    if (auto iter = map->find(TR_KEY_id); iter != std::end(*map))
     {
         tr_variant const& id = iter->second;
-        if (is_jsonrpc && !is_valid_id(id))
+        if (!is_valid_id(id))
         {
             callback(
                 session,
@@ -2961,23 +2971,21 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
 
     auto const is_notification = is_jsonrpc && !data.id.has_value();
 
-    auto done_cb = is_jsonrpc ? tr_rpc_idle_done : tr_rpc_idle_done_legacy;
-
     if (auto const handler = async_handlers.find(method_key); handler != std::end(async_handlers))
     {
         auto const& [func, has_side_effects] = handler->second;
         if (is_notification && !has_side_effects)
         {
-            done_cb(&data, Error::SUCCESS, {});
+            tr_rpc_idle_done(&data, Error::SUCCESS, {});
             return;
         }
 
         func(
             session,
             *params,
-            [cb = std::move(done_cb)](tr_rpc_idle_data* d, Error::Code code, std::string_view errmsg)
+            [](tr_rpc_idle_data* d, Error::Code code, std::string_view errmsg)
             {
-                cb(d, code, errmsg);
+                tr_rpc_idle_done(d, code, errmsg);
                 delete d;
             },
             new tr_rpc_idle_data{ std::move(data) });
@@ -2989,20 +2997,20 @@ void tr_rpc_request_exec_impl(tr_session* session, tr_variant const& request, tr
         auto const& [func, has_side_effects] = handler->second;
         if (is_notification && !has_side_effects)
         {
-            done_cb(&data, Error::SUCCESS, {});
+            tr_rpc_idle_done(&data, Error::SUCCESS, {});
             return;
         }
 
         auto const [err, errmsg] = func(session, *params, data.args_out);
-        done_cb(&data, err, errmsg);
+        tr_rpc_idle_done(&data, err, errmsg);
         return;
     }
 
     // couldn't find a handler
-    done_cb(&data, Error::METHOD_NOT_FOUND, is_jsonrpc ? ""sv : "no method name"sv);
+    tr_rpc_idle_done(&data, Error::METHOD_NOT_FOUND, ""sv);
 }
 
-void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& requests, tr_rpc_response_func&& callback)
+void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector& requests, tr_rpc_response_func&& callback)
 {
     auto const n_requests = std::size(requests);
     auto responses = std::make_shared<tr_variant::Vector>(n_requests);
@@ -3036,11 +3044,12 @@ void tr_rpc_request_exec_batch(tr_session* session, tr_variant::Vector const& re
 
 } // namespace
 
-void tr_rpc_request_exec(tr_session* session, tr_variant const& request, tr_rpc_response_func&& callback)
+// TODO(tearfur): take `tr_variant const& request` after removing api_compat
+void tr_rpc_request_exec(tr_session* session, tr_variant& request, tr_rpc_response_func&& callback)
 {
     auto const lock = session->unique_lock();
 
-    if (auto const* const vec = request.get_if<tr_variant::Vector>(); vec != nullptr)
+    if (auto* const vec = request.get_if<tr_variant::Vector>(); vec != nullptr)
     {
         tr_rpc_request_exec_batch(session, *vec, std::move(callback));
         return;
