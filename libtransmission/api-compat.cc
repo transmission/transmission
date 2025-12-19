@@ -173,7 +173,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_enabled_kebab_APICOMPAT },
     { TR_KEY_script_torrent_done_filename, TR_KEY_script_torrent_done_filename_kebab_APICOMPAT },
     { TR_KEY_script_torrent_done_seeding_enabled, TR_KEY_script_torrent_done_seeding_enabled_kebab_APICOMPAT },
-    { TR_KEY_script_torrent_done_seeding_filename, TR_KEY_script_torrent_done_seeding_filename_kebab },
+    { TR_KEY_script_torrent_done_seeding_filename, TR_KEY_script_torrent_done_seeding_filename_kebab_APICOMPAT },
     { TR_KEY_seconds_active, TR_KEY_seconds_active_camel }, // TODO(ckerr) legacy duplicate
     { TR_KEY_seconds_downloading, TR_KEY_seconds_downloading_camel },
     { TR_KEY_seconds_seeding, TR_KEY_seconds_seeding_camel },
@@ -342,7 +342,7 @@ auto constexpr SessionKeys = std::array<ApiKey, 157U>{ {
     { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_enabled_kebab_APICOMPAT },
     { TR_KEY_script_torrent_done_filename, TR_KEY_script_torrent_done_filename_kebab_APICOMPAT },
     { TR_KEY_script_torrent_done_seeding_enabled, TR_KEY_script_torrent_done_seeding_enabled_kebab_APICOMPAT },
-    { TR_KEY_script_torrent_done_seeding_filename, TR_KEY_script_torrent_done_seeding_filename_kebab },
+    { TR_KEY_script_torrent_done_seeding_filename, TR_KEY_script_torrent_done_seeding_filename_kebab_APICOMPAT },
     { TR_KEY_seconds_active, TR_KEY_seconds_active_kebab_APICOMPAT },
     { TR_KEY_seed_queue_enabled, TR_KEY_seed_queue_enabled_kebab },
     { TR_KEY_seed_queue_size, TR_KEY_seed_queue_size_kebab },
