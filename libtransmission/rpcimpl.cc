@@ -839,7 +839,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_seed_idle_mode:
     case TR_KEY_seed_idle_mode_camel:
     case TR_KEY_seed_ratio_limit:
-    case TR_KEY_seed_ratio_limit_camel:
     case TR_KEY_seed_ratio_mode:
     case TR_KEY_seed_ratio_mode_camel:
     case TR_KEY_sequential_download:
@@ -1055,7 +1054,6 @@ namespace make_torrent_field_helpers
     case TR_KEY_seed_idle_mode_camel:
         return tor.idle_limit_mode();
     case TR_KEY_seed_ratio_limit:
-    case TR_KEY_seed_ratio_limit_camel:
         return tor.seed_ratio();
     case TR_KEY_seed_ratio_mode:
     case TR_KEY_seed_ratio_mode_camel:
@@ -1525,7 +1523,7 @@ namespace make_torrent_field_helpers
             tor->set_idle_limit_mode(static_cast<tr_idlelimit>(*val));
         }
 
-        if (auto const val = args_in.value_if<double>({ TR_KEY_seed_ratio_limit, TR_KEY_seed_ratio_limit_camel }); val)
+        if (auto const val = args_in.value_if<double>(TR_KEY_seed_ratio_limit); val)
         {
             tor->set_seed_ratio(*val);
         }
@@ -2344,7 +2342,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetIncompleteFileNamingEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<double>({ TR_KEY_seed_ratio_limit, TR_KEY_seed_ratio_limit_camel }); val)
+    if (auto const val = args_in.value_if<double>(TR_KEY_seed_ratio_limit); val)
     {
         tr_sessionSetRatioLimit(session, *val);
     }
@@ -2650,7 +2648,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_script_torrent_done_seeding_filename:
         return session.script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
     case TR_KEY_seed_ratio_limit:
-    case TR_KEY_seed_ratio_limit_camel:
         return session.desiredRatio();
     case TR_KEY_seed_ratio_limited:
     case TR_KEY_seed_ratio_limited_camel:
