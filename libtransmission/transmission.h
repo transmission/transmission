@@ -55,6 +55,7 @@ struct tr_torrent_metainfo;
 struct tr_variant;
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
+#define TR_RPC_RPC_VERSION_HEADER "X-Transmission-Rpc-Version"
 
 enum tr_verify_added_mode : uint8_t
 {
