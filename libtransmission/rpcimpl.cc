@@ -2586,7 +2586,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_cache_size_mb:
         return tr_sessionGetCacheLimit_MB(&session);
     case TR_KEY_config_dir:
-    case TR_KEY_config_dir_kebab:
         return session.configDir();
     case TR_KEY_default_trackers:
     case TR_KEY_default_trackers_kebab:
