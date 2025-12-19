@@ -290,8 +290,15 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 
     if (auto const result = dictFind<QString>(&response, TR_KEY_result); result)
     {
-        ret.result = *result;
-        ret.success = *result == QStringLiteral("success");
+        if (*result == QStringLiteral("success"))
+        {
+            ret.success = true;
+        }
+        else
+        {
+            ret.success = false;
+            ret.errmsg = *result;
+        }
     }
 
     if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
