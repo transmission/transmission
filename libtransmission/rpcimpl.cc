@@ -2355,7 +2355,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetRatioLimited(session, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_idle_seeding_limit, TR_KEY_idle_seeding_limit_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_idle_seeding_limit); val)
     {
         tr_sessionSetIdleLimit(session, *val);
     }
@@ -2602,7 +2602,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_encryption:
         return tr_variant::unmanaged_string(getEncryptionModeString(tr_sessionGetEncryption(&session)));
     case TR_KEY_idle_seeding_limit:
-    case TR_KEY_idle_seeding_limit_kebab:
         return session.idleLimitMinutes();
     case TR_KEY_idle_seeding_limit_enabled:
     case TR_KEY_idle_seeding_limit_enabled_kebab:

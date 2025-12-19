@@ -248,7 +248,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_id_timestamp,
     TR_KEY_idle_limit_kebab_APICOMPAT,
     TR_KEY_idle_mode_kebab_APICOMPAT,
-    TR_KEY_idle_seeding_limit_kebab,
+    TR_KEY_idle_seeding_limit_kebab_APICOMPAT,
     TR_KEY_idle_seeding_limit_enabled_kebab,
     TR_KEY_idle_limit,
     TR_KEY_idle_mode,
