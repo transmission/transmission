@@ -2107,7 +2107,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
             group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
-            group_map.try_emplace(TR_KEY_speed_limit_up_kebab, limits.up_limit.count(Speed::Units::KByps));
             group_map.try_emplace(TR_KEY_speed_limit_up_enabled, limits.up_limited);
             group_map.try_emplace(TR_KEY_speed_limit_up_enabled_kebab, limits.up_limited);
             groups_vec.emplace_back(std::move(group_map));
@@ -2149,7 +2148,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         limits.down_limit = Speed{ *val, Speed::Units::KByps };
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_up); val)
     {
         limits.up_limit = Speed{ *val, Speed::Units::KByps };
     }
@@ -2404,7 +2403,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionLimitSpeed(session, TR_DOWN, *val);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_speed_limit_up, TR_KEY_speed_limit_up_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_speed_limit_up); val)
     {
         session->set_speed_limit(TR_UP, Speed{ *val, Speed::Units::KByps });
     }
@@ -2660,7 +2659,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_speed_limit_down_enabled:
         return session.is_speed_limited(TR_DOWN);
     case TR_KEY_speed_limit_up:
-    case TR_KEY_speed_limit_up_kebab:
         return session.speed_limit(TR_UP).count(Speed::Units::KByps);
     case TR_KEY_speed_limit_up_enabled:
     case TR_KEY_speed_limit_up_enabled_kebab:
