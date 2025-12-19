@@ -505,7 +505,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_rpc_url_kebab,
     TR_KEY_rpc_username_kebab,
     TR_KEY_rpc_version_kebab_APICOMPAT,
-    TR_KEY_rpc_version_minimum_kebab,
+    TR_KEY_rpc_version_minimum_kebab_APICOMPAT,
     TR_KEY_rpc_version_semver_kebab,
     TR_KEY_rpc_whitelist_kebab,
     TR_KEY_rpc_whitelist_enabled_kebab,
