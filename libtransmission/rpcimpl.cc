@@ -2324,8 +2324,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetLPDEnabled(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_peer_port_random_on_start, TR_KEY_peer_port_random_on_start_kebab });
-        val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_peer_port_random_on_start); val)
     {
         tr_sessionSetPeerPortRandomOnStart(session, *val);
     }
@@ -2617,7 +2616,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_peer_port:
         return session.advertisedPeerPort().host();
     case TR_KEY_peer_port_random_on_start:
-    case TR_KEY_peer_port_random_on_start_kebab:
         return session.isPortRandom();
     case TR_KEY_pex_enabled:
     case TR_KEY_pex_enabled_kebab:
