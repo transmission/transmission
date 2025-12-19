@@ -424,6 +424,31 @@ TEST_F(VariantTest, mergeMapsOverwritesSrcMapEntries)
     EXPECT_EQ(R"({"dup_key":789,"src_key":123,"tgt_key":456})"sv, serde.to_string(tgt));
 }
 
+TEST_F(VariantTest, variantConstructor)
+{
+    auto const var_none = tr_variant{};
+    auto const var_null = tr_variant{ nullptr };
+    auto const var_true = tr_variant{ true };
+    auto const var_false = tr_variant{ false };
+    auto const var_int = tr_variant{ 123 };
+    auto const var_real = tr_variant{ 4.5 };
+    auto const var_sv = tr_variant{ "foo"sv };
+    auto const var_s = tr_variant{ "foo"s };
+    auto const var_char_ptr = tr_variant{ "foo" };
+    auto const var_char_nullptr = tr_variant{ static_cast<char const*>(nullptr) };
+
+    EXPECT_EQ(var_none.index(), tr_variant::NoneIndex);
+    EXPECT_EQ(var_null.index(), tr_variant::NullIndex);
+    EXPECT_EQ(var_true.index(), tr_variant::BoolIndex);
+    EXPECT_EQ(var_false.index(), tr_variant::BoolIndex);
+    EXPECT_EQ(var_int.index(), tr_variant::IntIndex);
+    EXPECT_EQ(var_real.index(), tr_variant::DoubleIndex);
+    EXPECT_EQ(var_sv.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_s.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_char_ptr.index(), tr_variant::StringIndex);
+    EXPECT_EQ(var_char_nullptr.index(), tr_variant::StringIndex);
+}
+
 TEST_F(VariantTest, mergeOverwritesDifferingTypes)
 {
     auto const variants = std::array<std::pair<tr_variant, std::string_view>, 7U>{ {
@@ -738,7 +763,7 @@ TEST_F(VariantTest, visitsNodesDepthFirst)
         R"(["files","name","file1","size",5,"pieces",1,2,"name","file2","size",7,"pieces","meta","active",true])"sv;
     EXPECT_EQ(Expected, actual);
 
-    // test that we visited the expected number of nodes
+    // test that we visited the expected number of nodes.
     auto const expected_visited_count = std::map<size_t, size_t>{
         { tr_variant::BoolIndex, 1U }, //
         { tr_variant::IntIndex, 4U }, //
