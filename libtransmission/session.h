@@ -1213,7 +1213,10 @@ private:
     friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
-    friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings);
+    friend tr_session* tr_sessionInit(
+        std::string_view config_dir,
+        bool message_queueing_enabled,
+        tr_variant const& client_settings);
     friend uint16_t tr_sessionGetPeerPort(tr_session const* session);
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);

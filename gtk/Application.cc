@@ -614,7 +614,7 @@ void Application::Impl::on_startup()
     }
 
     /* initialize the libtransmission session */
-    session = tr_sessionInit(config_dir_.c_str(), true, gtr_pref_get_all());
+    session = tr_sessionInit(config_dir_, true, gtr_pref_get_all());
 
     gtr_pref_flag_set(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(session));
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));

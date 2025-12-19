@@ -318,13 +318,14 @@ private:
 
     // ---
 
-    void recalculate_wanted_pieces()
+    void candidate_list_upkeep()
     {
         auto n_old_c = std::size(candidates_);
         auto salter = tr_salt_shaker<tr_piece_index_t>{};
         auto const is_sequential = mediator_.is_sequential_download();
         auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
         auto const n_pieces = mediator_.piece_count();
+        candidates_.reserve(n_pieces);
 
         std::sort(
             std::begin(candidates_),
@@ -334,7 +335,9 @@ private:
         for (tr_piece_index_t piece = 0U, idx_c = 0U; piece < n_pieces; ++piece)
         {
             auto const existing_candidate = idx_c < n_old_c && piece == candidates_[idx_c].piece;
-            if (mediator_.client_wants_piece(piece))
+            auto const client_wants_piece = mediator_.client_wants_piece(piece);
+            auto const client_has_piece = mediator_.client_has_piece(piece);
+            if (client_wants_piece && !client_has_piece)
             {
                 if (existing_candidate)
                 {
@@ -425,7 +428,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
     : tags_{ {
           // candidates
           mediator_in.observe_files_wanted_changed([this](tr_torrent*, tr_file_index_t const*, tr_file_index_t, bool)
-                                                   { recalculate_wanted_pieces(); }),
+                                                   { candidate_list_upkeep(); }),
           // replication, unrequested
           mediator_in.observe_peer_disconnect([this](tr_torrent*, tr_bitfield const& b, tr_bitfield const& ar)
                                               { peer_disconnect(b, ar); }),
@@ -458,22 +461,7 @@ Wishlist::Impl::Impl(Mediator& mediator_in)
       } }
     , mediator_{ mediator_in }
 {
-    auto salter = tr_salt_shaker<tr_piece_index_t>{};
-    auto const is_sequential = mediator_.is_sequential_download();
-    auto const sequential_download_from_piece = mediator_.sequential_download_from_piece();
-    auto const n_pieces = mediator_.piece_count();
-    candidates_.reserve(n_pieces);
-    for (tr_piece_index_t piece = 0U; piece < n_pieces; ++piece)
-    {
-        if (mediator_.client_has_piece(piece) || !mediator_.client_wants_piece(piece))
-        {
-            continue;
-        }
-
-        auto const salt = get_salt(piece, n_pieces, salter(), is_sequential, sequential_download_from_piece);
-        candidates_.emplace_back(piece, salt, &mediator_);
-    }
-    std::sort(std::begin(candidates_), std::end(candidates_));
+    candidate_list_upkeep();
 }
 
 std::vector<tr_block_span_t> Wishlist::Impl::next(

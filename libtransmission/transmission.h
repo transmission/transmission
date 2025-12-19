@@ -55,6 +55,7 @@ struct tr_torrent_metainfo;
 struct tr_variant;
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
+#define TR_RPC_RPC_VERSION_HEADER "X-Transmission-Rpc-Version"
 
 enum tr_verify_added_mode : uint8_t
 {
@@ -218,7 +219,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
+tr_session* tr_sessionInit(std::string_view config_dir, bool message_queueing_enabled, tr_variant const& settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */

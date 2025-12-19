@@ -219,6 +219,37 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatAreNotWanted)
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
 }
 
+TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatClientHas)
+{
+    auto mediator = MockMediator{ *this };
+
+    // setup: three pieces
+    mediator.piece_count_ = 3;
+    mediator.block_span_[0] = { 0, 100 };
+    mediator.block_span_[1] = { 100, 200 };
+    mediator.block_span_[2] = { 200, 250 };
+
+    // we have pieces 0, 1
+    mediator.client_has_piece_.insert(0);
+    mediator.client_has_piece_.insert(1);
+
+    // peer has all pieces
+    mediator.piece_replication_[0] = 1;
+    mediator.piece_replication_[1] = 1;
+    mediator.piece_replication_[2] = 1;
+
+    // we want all three pieces
+    mediator.client_wants_piece_.insert(0);
+    mediator.client_wants_piece_.insert(1);
+    mediator.client_wants_piece_.insert(2);
+
+    // we should only get piece 2
+    auto const spans = Wishlist{ mediator }.next(1000, PeerHasAllPieces);
+    ASSERT_EQ(1U, std::size(spans));
+    EXPECT_EQ(mediator.block_span_[2].begin, spans[0].begin);
+    EXPECT_EQ(mediator.block_span_[2].end, spans[0].end);
+}
+
 TEST_F(PeerMgrWishlistTest, onlyRequestBlocksThePeerHas)
 {
     auto mediator = MockMediator{ *this };
@@ -1629,16 +1660,76 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAdd)
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 400 };
+        auto const spans = get_spans(400);
+        for (auto const& [begin, end] : spans)
+        {
+            requested.set_span(begin, end);
+        }
+        EXPECT_EQ(400U, requested.count());
+        EXPECT_NE(0U, requested.count(0, 100));
+        EXPECT_NE(0U, requested.count(100, 200));
+        EXPECT_NE(0U, requested.count(200, 300));
+        EXPECT_NE(0U, requested.count(300, 400));
+    }
+}
+
+TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListAddHad)
+{
+    auto const get_spans = [this](size_t n_wanted)
+    {
+        auto mediator = MockMediator{ *this };
+
+        // setup: four pieces
+        mediator.piece_count_ = 4;
+        mediator.block_span_[0] = { 0, 100 };
+        mediator.block_span_[1] = { 100, 200 };
+        mediator.block_span_[2] = { 200, 300 };
+        mediator.block_span_[3] = { 300, 400 };
+
+        // we have pieces 2, 3
+        mediator.client_has_piece_.insert(2);
+        mediator.client_has_piece_.insert(3);
+
+        // peer has all pieces
+        mediator.piece_replication_[0] = 1;
+        mediator.piece_replication_[1] = 1;
+        mediator.piece_replication_[2] = 1;
+        mediator.piece_replication_[3] = 1;
+
+        // we initially wanted the first 2 pieces only
+        mediator.client_wants_piece_.insert(0);
+        mediator.client_wants_piece_.insert(1);
+
+        // allow the wishlist to build its cache
+        auto wishlist = Wishlist{ mediator };
+
+        // now we want piece 2 and piece 3
+        mediator.client_wants_piece_.insert(2);
+        mediator.client_wants_piece_.insert(3);
+        files_wanted_changed_.emit(nullptr, nullptr, 0, true);
+
+        // the candidate list should remain unchanged
+        return wishlist.next(n_wanted, PeerHasAllPieces);
+    };
+
+    // We should only request pieces 0, 1 here.
+    // NB: when all other things are equal in the wishlist, pieces are
+    // picked at random so this test -could- pass even if there's a bug.
+    // So test several times to shake out any randomness
+    static auto constexpr NumRuns = 1000;
+    for (int run = 0; run < NumRuns; ++run)
+    {
+        auto requested = tr_bitfield{ 400 };
         auto const spans = get_spans(350);
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);
         }
-        EXPECT_EQ(350U, requested.count());
+        EXPECT_EQ(200U, requested.count());
         EXPECT_NE(0U, requested.count(0, 100));
         EXPECT_NE(0U, requested.count(100, 200));
-        EXPECT_NE(0U, requested.count(200, 300));
-        EXPECT_NE(0U, requested.count(300, 400));
+        EXPECT_EQ(0U, requested.count(200, 300));
+        EXPECT_EQ(0U, requested.count(300, 400));
     }
 }
 
@@ -1687,7 +1778,7 @@ TEST_F(PeerMgrWishlistTest, setFileWantedUpdatesCandidateListRemove)
     for (int run = 0; run < NumRuns; ++run)
     {
         auto requested = tr_bitfield{ 400 };
-        auto const spans = get_spans(350);
+        auto const spans = get_spans(400);
         for (auto const& [begin, end] : spans)
         {
             requested.set_span(begin, end);

@@ -17,6 +17,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+#include <libtransmission/api-compat.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h> // LONG_VERSION_STRING
@@ -26,6 +27,7 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 using ::trqt::variant_helpers::variantInit;
+namespace api_compat = libtransmission::api_compat;
 
 namespace
 {
@@ -33,35 +35,27 @@ namespace
 char constexpr const* const RequestBodyKey{ "requestBody" };
 char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-[[nodiscard]] int64_t nextTag()
+[[nodiscard]] int64_t nextId()
 {
-    static int64_t tag = {};
-    return tag++;
+    static int64_t id = {};
+    return id++;
 }
 
-[[nodiscard]] std::pair<tr_variant, int64_t> buildRequest(tr_quark const method, tr_variant* args)
+[[nodiscard]] std::pair<tr_variant, int64_t> buildRequest(tr_quark const method, tr_variant* params)
 {
-    auto const tag = nextTag();
+    auto const id = nextId();
 
-    // TODO(ckerr): JSON-RPCize
-    auto req = tr_variant::Map{ 3U };
+    auto req = tr_variant::Map{ 4U };
+    req.try_emplace(TR_KEY_jsonrpc, tr_variant::unmanaged_string(JsonRpc::Version));
     req.try_emplace(TR_KEY_method, tr_variant::unmanaged_string(method));
-    req.try_emplace(TR_KEY_tag, tag);
-    if (args != nullptr)
+    req.try_emplace(TR_KEY_id, id);
+    if (params != nullptr)
     {
-        auto tmp = tr_variant{};
-        std::swap(tmp, *args);
-        req.try_emplace(TR_KEY_arguments, std::move(tmp));
+        req.try_emplace(TR_KEY_params, params->clone());
     }
 
-    return { std::move(req), tag };
+    return { std::move(req), id };
 }
-
-TrVariantPtr createVariant()
-{
-    return std::make_shared<tr_variant>();
-}
-
 } // namespace
 
 RpcClient::RpcClient(QObject* parent)
@@ -98,7 +92,8 @@ void RpcClient::start(QUrl const& url)
 
 RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 {
-    auto const [req, tag] = buildRequest(method, args);
+    auto [req, id] = buildRequest(method, args);
+    req = api_compat::convert_outgoing_data(req);
 
     auto promise = QFutureInterface<RpcResponse>{};
     promise.setExpectedResultCount(1);
@@ -108,7 +103,7 @@ RpcResponseFuture RpcClient::exec(tr_quark const method, tr_variant* args)
 
     if (session_ != nullptr)
     {
-        sendLocalRequest(req, promise, tag);
+        sendLocalRequest(req, promise, id);
     }
     else if (!url_.isEmpty())
     {
@@ -159,30 +154,31 @@ void RpcClient::sendNetworkRequest(QByteArray const& body, QFutureInterface<RpcR
     }
 }
 
-void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(tr_variant const& req, QFutureInterface<RpcResponse> const& promise, int64_t const id)
 {
     if (verbose_)
     {
         fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(req));
     }
 
-    local_requests_.try_emplace(tag, promise);
+    local_requests_.try_emplace(id, promise);
     tr_rpc_request_exec(
         session_,
         req,
         [this](tr_session* /*sesson*/, tr_variant&& response)
         {
+            auto converted = std::make_shared<tr_variant>(api_compat::convert_incoming_data(response));
             if (verbose_)
             {
-                fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(response));
+                auto serde = tr_variant_serde::json();
+                serde.compact();
+                fmt::print("{:s}:{:d} got raw response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(response));
+                fmt::print("{:s}:{:d} converted response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(*converted));
             }
-
-            TrVariantPtr const resp = createVariant();
-            *resp = std::move(response);
 
             // this callback is invoked in the libtransmission thread, so we don't want
             // to process the response here... let's push it over to the Qt thread.
-            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, resp));
+            QMetaObject::invokeMethod(this, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, converted));
         });
 }
 
@@ -214,9 +210,6 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         {
             qInfo() << b.constData() << ": " << reply->rawHeader(b).constData();
         }
-
-        qInfo() << "json:";
-        qInfo() << reply->peek(reply->bytesAvailable()).constData();
     }
 
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 &&
@@ -244,10 +237,25 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     else
     {
         auto const json = reply->readAll().trimmed().toStdString();
+
+        if (verbose_)
+        {
+            fmt::print("{:s}:{:d} got raw response:\n{:s}\n", __FILE__, __LINE__, json);
+        }
+
         auto response = RpcResponse{};
 
         if (auto var = tr_variant_serde::json().parse(json))
         {
+            var = api_compat::convert_incoming_data(*var);
+
+            if (verbose_)
+            {
+                auto serde = tr_variant_serde::json();
+                serde.compact();
+                fmt::print("{:s}:{:d} compat response:\n{:s}\n", __FILE__, __LINE__, serde.to_string(*var));
+            }
+
             response = parseResponseData(*var);
         }
 
@@ -258,7 +266,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
-    if (auto node = local_requests_.extract(parseResponseTag(*response)); node)
+    if (auto node = local_requests_.extract(parseResponseId(*response)))
     {
         auto const result = parseResponseData(*response);
 
@@ -269,26 +277,34 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     }
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& response) const
+int64_t RpcClient::parseResponseId(tr_variant& response) const
 {
-    return dictFind<int>(&response, TR_KEY_tag).value_or(-1);
+    return dictFind<int>(&response, TR_KEY_id).value_or(-1);
 }
 
 RpcResponse RpcClient::parseResponseData(tr_variant& response) const
 {
-    RpcResponse ret;
+    auto ret = RpcResponse{};
 
-    if (auto const result = dictFind<QString>(&response, TR_KEY_result); result)
-    {
-        ret.result = *result;
-        ret.success = *result == QStringLiteral("success");
-    }
+    ret.success = false;
+    ret.errmsg = QStringLiteral("unknown error");
 
-    if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
+    if (auto* response_map = response.get_if<tr_variant::Map>())
     {
-        ret.args = createVariant();
-        std::swap(*ret.args, *args);
-        variantInit(args, false);
+        if (auto* result = response_map->find_if<tr_variant::Map>(TR_KEY_result))
+        {
+            ret.success = true;
+            ret.errmsg.clear();
+            ret.args = std::make_shared<tr_variant>(std::move(*result));
+        }
+
+        if (auto* error_map = response_map->find_if<tr_variant::Map>(TR_KEY_error))
+        {
+            if (auto const errmsg = error_map->value_if<std::string_view>(TR_KEY_message))
+            {
+                ret.errmsg = QString::fromUtf8(std::data(*errmsg), std::size(*errmsg));
+            }
+        }
     }
 
     return ret;

@@ -10,6 +10,7 @@
 #include <QPixmap>
 #include <QStandardPaths>
 
+using namespace transmission::app;
 using Icon = QPixmap;
 
 template<>

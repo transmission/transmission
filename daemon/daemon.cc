@@ -783,9 +783,9 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 
     /* start the session */
     auto const* const cdir = this->config_dir_.c_str();
-    auto* session = tr_sessionInit(cdir, true, settings_);
+    auto* session = tr_sessionInit(config_dir_, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
-    tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", cdir)));
+    tr_logAddInfo(fmt::format(fmt::runtime(_("Loading settings from '{path}'")), fmt::arg("path", config_dir_)));
     tr_sessionSaveSettings(session, cdir, settings_);
 
     auto const* const settings_map = settings_.get_if<tr_variant::Map>();
