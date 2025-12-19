@@ -2230,7 +2230,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetAltSpeedEnd(session, static_cast<size_t>(*val));
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_alt_speed_time_day, TR_KEY_alt_speed_time_day_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_alt_speed_time_day); val)
     {
         tr_sessionSetAltSpeedDay(session, static_cast<tr_sched_day>(*val));
     }
@@ -2570,7 +2570,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_alt_speed_time_begin:
         return tr_sessionGetAltSpeedBegin(&session);
     case TR_KEY_alt_speed_time_day:
-    case TR_KEY_alt_speed_time_day_kebab:
         return tr_sessionGetAltSpeedDay(&session);
     case TR_KEY_alt_speed_time_enabled:
     case TR_KEY_alt_speed_time_enabled_kebab:
