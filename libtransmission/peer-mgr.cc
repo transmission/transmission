@@ -495,6 +495,7 @@ public:
         {
             peers.erase(iter);
             TR_ASSERT(stats.peer_count == peerCount());
+            mark_swarm_piece_completeness_dirty();
         }
     }
 
