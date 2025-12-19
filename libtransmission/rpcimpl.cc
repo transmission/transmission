@@ -2284,7 +2284,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->setIncompleteDir(*incomplete_dir);
     }
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_incomplete_dir_enabled, TR_KEY_incomplete_dir_enabled_kebab }); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_incomplete_dir_enabled); val)
     {
         session->useIncompleteDir(*val);
     }
@@ -2607,7 +2607,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_incomplete_dir:
         return session.incompleteDir();
     case TR_KEY_incomplete_dir_enabled:
-    case TR_KEY_incomplete_dir_enabled_kebab:
         return session.useIncompleteDir();
     case TR_KEY_lpd_enabled:
     case TR_KEY_lpd_enabled_kebab:

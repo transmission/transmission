@@ -667,7 +667,6 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_encryption,
         TR_KEY_idle_seeding_limit,
         TR_KEY_idle_seeding_limit_enabled,
-        TR_KEY_incomplete_dir_enabled_kebab,
         TR_KEY_incomplete_dir,
         TR_KEY_incomplete_dir_enabled,
         TR_KEY_lpd_enabled_kebab,
