@@ -302,7 +302,7 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
         {
             if (auto const errmsg = error_map->value_if<std::string_view>(TR_KEY_message))
             {
-                ret.errmsg = QString::fromUtf8(*errmsg);
+                ret.errmsg = QString::fromUtf8(std::data(*errmsg), std::size(*errmsg));
             }
         }
     }
