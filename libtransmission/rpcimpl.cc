@@ -2254,7 +2254,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         session->setDownloadDir(*download_dir);
     }
 
-    if (auto const val = args_in.value_if<int64_t>({ TR_KEY_queue_stalled_minutes, TR_KEY_queue_stalled_minutes_kebab }); val)
+    if (auto const val = args_in.value_if<int64_t>(TR_KEY_queue_stalled_minutes); val)
     {
         tr_sessionSetQueueStalledMinutes(session, static_cast<int>(*val));
     }
@@ -2626,7 +2626,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_queue_stalled_enabled:
         return session.queueStalledEnabled();
     case TR_KEY_queue_stalled_minutes:
-    case TR_KEY_queue_stalled_minutes_kebab:
         return session.queueStalledMinutes();
     case TR_KEY_rename_partial_files:
     case TR_KEY_rename_partial_files_kebab:
