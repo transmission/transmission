@@ -681,7 +681,6 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_queue_stalled_minutes,
         TR_KEY_rename_partial_files,
         TR_KEY_reqq,
-        TR_KEY_rpc_version_semver_kebab,
         TR_KEY_rpc_version,
         TR_KEY_rpc_version_minimum,
         TR_KEY_rpc_version_semver,

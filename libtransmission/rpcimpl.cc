@@ -2636,7 +2636,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_rpc_version_minimum:
         return RpcVersionMin;
     case TR_KEY_rpc_version_semver:
-    case TR_KEY_rpc_version_semver_kebab:
         return tr_variant::unmanaged_string(TrRpcVersionSemver);
     case TR_KEY_script_torrent_added_enabled:
     case TR_KEY_script_torrent_added_enabled_kebab:

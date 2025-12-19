@@ -166,7 +166,7 @@ auto constexpr RpcKeys = std::array<ApiKey, 212U>{ {
     { TR_KEY_rpc_host_whitelist_enabled, TR_KEY_rpc_host_whitelist_enabled_kebab },
     { TR_KEY_rpc_version, TR_KEY_rpc_version_kebab_APICOMPAT },
     { TR_KEY_rpc_version_minimum, TR_KEY_rpc_version_minimum_kebab_APICOMPAT },
-    { TR_KEY_rpc_version_semver, TR_KEY_rpc_version_semver_kebab },
+    { TR_KEY_rpc_version_semver, TR_KEY_rpc_version_semver_kebab_APICOMPAT },
     { TR_KEY_scrape_state, TR_KEY_scrape_state_camel },
     { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_enabled_kebab },
     { TR_KEY_script_torrent_added_filename, TR_KEY_script_torrent_added_filename_kebab },
