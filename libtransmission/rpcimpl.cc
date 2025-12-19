@@ -2259,7 +2259,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetQueueStalledMinutes(session, static_cast<int>(*val));
     }
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_queue_stalled_enabled, TR_KEY_queue_stalled_enabled_kebab }); val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_queue_stalled_enabled); val)
     {
         tr_sessionSetQueueStalledEnabled(session, *val);
     }
@@ -2624,7 +2624,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_preferred_transports:
         return session.save_preferred_transports();
     case TR_KEY_queue_stalled_enabled:
-    case TR_KEY_queue_stalled_enabled_kebab:
         return session.queueStalledEnabled();
     case TR_KEY_queue_stalled_minutes:
     case TR_KEY_queue_stalled_minutes_kebab:

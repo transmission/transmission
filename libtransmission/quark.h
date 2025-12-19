@@ -444,7 +444,7 @@ enum // NOLINT(performance-enum-size)
     TR_KEY_queue_move_down_kebab,
     TR_KEY_queue_move_top_kebab,
     TR_KEY_queue_move_up_kebab,
-    TR_KEY_queue_stalled_enabled_kebab,
+    TR_KEY_queue_stalled_enabled_kebab_APICOMPAT,
     TR_KEY_queue_stalled_minutes_kebab,
     TR_KEY_queue_position_camel,
     TR_KEY_queue_move_bottom,
