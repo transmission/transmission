@@ -631,6 +631,11 @@ void handle_request(struct evhttp_request* req, void* arg)
             session_id);
         evhttp_add_header(output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
         evhttp_add_header(output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
+        evhttp_add_header(
+            output_headers,
+            TR_RPC_RPC_VERSION_HEADER,
+            fmt::format("{:s};{:d}", TrRpcVersionSemver, TrRpcVersion).c_str());
+        evhttp_add_header(output_headers, "Access-Control-Expose-Headers", TR_RPC_RPC_VERSION_HEADER);
         send_simple_response(req, 409, body.c_str());
     }
 #endif

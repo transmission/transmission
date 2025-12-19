@@ -178,9 +178,7 @@ namespace
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-auto constexpr RpcVersion = int64_t{ 18 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
-auto constexpr RpcVersionSemver = "6.0.0"sv;
 
 enum class TrFormat : uint8_t
 {
@@ -2681,13 +2679,13 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         return session.reqq();
     case TR_KEY_rpc_version:
     case TR_KEY_rpc_version_kebab:
-        return RpcVersion;
+        return TrRpcVersion;
     case TR_KEY_rpc_version_minimum:
     case TR_KEY_rpc_version_minimum_kebab:
         return RpcVersionMin;
     case TR_KEY_rpc_version_semver:
     case TR_KEY_rpc_version_semver_kebab:
-        return RpcVersionSemver;
+        return TrRpcVersionSemver;
     case TR_KEY_script_torrent_added_enabled:
     case TR_KEY_script_torrent_added_enabled_kebab:
         return session.useScript(TR_SCRIPT_ON_TORRENT_ADDED);
