@@ -2360,8 +2360,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         tr_sessionSetIdleLimit(session, *val);
     }
 
-    if (auto const val = args_in.value_if<bool>({ TR_KEY_idle_seeding_limit_enabled, TR_KEY_idle_seeding_limit_enabled_kebab });
-        val)
+    if (auto const val = args_in.value_if<bool>(TR_KEY_idle_seeding_limit_enabled); val)
     {
         tr_sessionSetIdleLimited(session, *val);
     }
@@ -2604,7 +2603,6 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
     case TR_KEY_idle_seeding_limit:
         return session.idleLimitMinutes();
     case TR_KEY_idle_seeding_limit_enabled:
-    case TR_KEY_idle_seeding_limit_enabled_kebab:
         return session.isIdleLimited();
     case TR_KEY_incomplete_dir:
     case TR_KEY_incomplete_dir_kebab:
