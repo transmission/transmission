@@ -21,6 +21,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/api-compat.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
@@ -92,8 +93,12 @@ private:
     [[nodiscard]] int64_t parseResponseId(tr_variant& response) const;
     [[nodiscard]] RpcResponse parseResponseData(tr_variant& response) const;
 
+    // TODO: change this default in 5.0.0-beta.1
+    static auto constexpr DefaultNetworkStyle = libtransmission::api_compat::Style::Tr4;
+
     std::optional<QNetworkRequest> request_;
 
+    libtransmission::api_compat::Style network_style_ = DefaultNetworkStyle;
     tr_session* session_ = {};
     QString session_id_;
     QUrl url_;
